@@ -2,7 +2,6 @@ import { EuiButtonIcon, EuiDescriptionList, EuiHealth } from '@elastic/eui';
 import React, { Component } from 'react';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../common/constants';
 import { TableWzAPI } from '../../../common/tables';
-import { IWzSuggestItem } from '../../../wz-search-bar';
 import { ComplianceText, RuleText } from '../components';
 import { getFilterValues } from './lib';
 
@@ -20,9 +19,42 @@ type State = {
   pageTableChecks: { pageIndex: 0 };
 };
 
+const searchBarWQLFieldSuggestions = [
+  { label: 'condition', description: 'filter by check condition' },
+  { label: 'description', description: 'filter by check description' },
+  { label: 'file', description: 'filter by check file' },
+  { label: 'rationale', description: 'filter by check rationale' },
+  { label: 'reason', description: 'filter by check reason' },
+  { label: 'registry', description: 'filter by check registry' },
+  { label: 'remediation', description: 'filter by check remediation' },
+  { label: 'result', description: 'filter by check result' },
+  { label: 'title', description: 'filter by check title' },
+];
+
+const searchBarWQLOptions = {
+  searchTermFields: [
+    'command',
+    'compliance.key',
+    'compliance.value',
+    'description',
+    'directory',
+    'file',
+    'id',
+    'title',
+    'process',
+    'registry',
+    'rationale',
+    'reason',
+    'references',
+    'remediation',
+    'result',
+    'rules.type',
+    'rules.rule',
+  ],
+};
+
 export class InventoryPolicyChecksTable extends Component<Props, State> {
   _isMount = false;
-  suggestions: IWzSuggestItem[] = [];
   columnsChecks: any;
   constructor(props) {
     super(props);
@@ -31,108 +63,9 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
       agent,
       lookingPolicy,
       itemIdToExpandedRowMap: {},
-      filters: filters || [],
+      filters: filters || '',
       pageTableChecks: { pageIndex: 0 },
     };
-    this.suggestions = [
-      {
-        type: 'params',
-        label: 'condition',
-        description: 'Filter by check condition',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues(
-            'condition',
-            value,
-            this.props.agent.id,
-            this.props.lookingPolicy.policy_id
-          ),
-      },
-      {
-        type: 'params',
-        label: 'description',
-        description: 'Filter by check description',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues(
-            'description',
-            value,
-            this.props.agent.id,
-            this.props.lookingPolicy.policy_id
-          ),
-      },
-      {
-        type: 'params',
-        label: 'file',
-        description: 'Filter by check file',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues('file', value, this.props.agent.id, this.props.lookingPolicy.policy_id),
-      },
-      {
-        type: 'params',
-        label: 'registry',
-        description: 'Filter by check registry',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues(
-            'registry',
-            value,
-            this.props.agent.id,
-            this.props.lookingPolicy.policy_id
-          ),
-      },
-      {
-        type: 'params',
-        label: 'rationale',
-        description: 'Filter by check rationale',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues(
-            'rationale',
-            value,
-            this.props.agent.id,
-            this.props.lookingPolicy.policy_id
-          ),
-      },
-      {
-        type: 'params',
-        label: 'reason',
-        description: 'Filter by check reason',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues('reason', value, this.props.agent.id, this.props.lookingPolicy.policy_id),
-      },
-      {
-        type: 'params',
-        label: 'remediation',
-        description: 'Filter by check remediation',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues(
-            'remediation',
-            value,
-            this.props.agent.id,
-            this.props.lookingPolicy.policy_id
-          ),
-      },
-      {
-        type: 'params',
-        label: 'result',
-        description: 'Filter by check result',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues('result', value, this.props.agent.id, this.props.lookingPolicy.policy_id),
-      },
-      {
-        type: 'params',
-        label: 'title',
-        description: 'Filter by check title',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues('title', value, this.props.agent.id, this.props.lookingPolicy.policy_id),
-      },
-    ];
     this.columnsChecks = [
       {
         field: 'id',
@@ -149,7 +82,7 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
       {
         name: 'Target',
         truncateText: true,
-        render: (item) => (
+        render: item => (
           <div>
             {item.file ? (
               <span>
@@ -189,21 +122,25 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
         align: 'right',
         width: '40px',
         isExpander: true,
-        render: (item) => (
+        render: item => (
           <EuiButtonIcon
             onClick={() => this.toggleDetails(item)}
-            aria-label={this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'}
-            iconType={this.state.itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'}
+            aria-label={
+              this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'
+            }
+            iconType={
+              this.state.itemIdToExpandedRowMap[item.id]
+                ? 'arrowUp'
+                : 'arrowDown'
+            }
           />
         ),
       },
     ];
   }
 
-  async componentDidMount() {}
-
   async componentDidUpdate(prevProps) {
-    const { filters } =  this.props
+    const { filters } = this.props;
     if (filters !== prevProps.filters) {
       this.setState({ filters: filters });
     }
@@ -217,7 +154,7 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
    *
    * @param item
    */
-  toggleDetails = (item) => {
+  toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
 
     if (itemIdToExpandedRowMap[item.id]) {
@@ -228,7 +165,7 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
       checks += item.condition ? ` (Condition: ${item.condition})` : '';
       const complianceText =
         item.compliance && item.compliance.length
-          ? item.compliance.map((el) => `${el.key}: ${el.value}`).join('\n')
+          ? item.compliance.map(el => `${el.key}: ${el.value}`).join('\n')
           : '';
       const listItems = [
         {
@@ -260,10 +197,12 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
           description: <ComplianceText complianceText={complianceText} />,
         },
       ];
-      const itemsToShow = listItems.filter((x) => {
+      const itemsToShow = listItems.filter(x => {
         return x.description;
       });
-      itemIdToExpandedRowMap[item.id] = <EuiDescriptionList listItems={itemsToShow} />;
+      itemIdToExpandedRowMap[item.id] = (
+        <EuiDescriptionList listItems={itemsToShow} />
+      );
     }
     this.setState({ itemIdToExpandedRowMap });
   };
@@ -306,28 +245,51 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
       };
     };
 
+    const { filters } = this.state;
+    const agentID = this.props?.agent?.id;
+    const scaPolicyID = this.props?.lookingPolicy?.policy_id;
+
     return (
-      <>
-        <TableWzAPI
-          title="Checks"
-          tableColumns={this.columnsChecks}
-          tableInitialSortingField="id"
-          searchTable={true}
-          searchBarSuggestions={this.suggestions}
-          endpoint={`/sca/${this.props.agent.id}/checks/${this.state.lookingPolicy.policy_id}`}
-          rowProps={getChecksRowProps}
-          tableProps={{
-            isExpandable: true,
-            itemIdToExpandedRowMap: this.state.itemIdToExpandedRowMap,
-            itemId: 'id',
-          }}
-          downloadCsv
-          showReload
-          filters={this.state.filters}
-          onFiltersChange={(filters) => this.setState({ filters })}
-          tablePageSizeOptions={[10, 25, 50, 100]}
-        />
-      </>
+      <TableWzAPI
+        title='Checks'
+        endpoint={`/sca/${this.props.agent.id}/checks/${scaPolicyID}`}
+        tableColumns={this.columnsChecks}
+        tableInitialSortingField='id'
+        tablePageSizeOptions={[10, 25, 50, 100]}
+        rowProps={getChecksRowProps}
+        tableProps={{
+          isExpandable: true,
+          itemIdToExpandedRowMap: this.state.itemIdToExpandedRowMap,
+          itemId: 'id',
+        }}
+        downloadCsv
+        showReload
+        filters={filters}
+        searchTable
+        searchBarWQL={{
+          options: searchBarWQLOptions,
+          suggestions: {
+            field(currentValue) {
+              return searchBarWQLFieldSuggestions;
+            },
+            value: async (currentValue, { field }) => {
+              try {
+                return await getFilterValues(
+                  field,
+                  agentID,
+                  scaPolicyID,
+                  {
+                    ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+                  },
+                  item => ({ label: item }),
+                );
+              } catch (error) {
+                return [];
+              }
+            },
+          },
+        }}
+      />
     );
   }
 }

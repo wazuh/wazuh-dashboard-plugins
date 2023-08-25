@@ -111,9 +111,8 @@ export function TableDefault({
     hidePerPageOptions
   };
   return (
-    <>
     <EuiBasicTable
-      columns={tableColumns}
+      columns={tableColumns.map(({show, ...rest}) => ({...rest}))}
       items={items}
       loading={loading}
       pagination={tablePagination}
@@ -122,6 +121,5 @@ export function TableDefault({
       rowProps={rowProps}
       {...tableProps}
     />
-    </>
   );
 }

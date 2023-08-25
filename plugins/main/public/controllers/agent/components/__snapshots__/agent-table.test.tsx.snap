@@ -3,45 +3,207 @@
 exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
 <div>
   <div
-    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
   >
     <div
-      class="euiFlexItem"
-      style="margin-right:0"
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        class="euiFlexItem"
       >
         <div
-          class="euiFlexItem"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         >
-          <div>
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
+          >
+            <h1
+              class="euiTitle euiTitle--small"
+            >
+              Agents
+              <span>
+                (0)
+              </span>
+            </h1>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
             <div
-              class="euiSuggestInput"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
             >
               <div
-                class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-                id="popover"
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    />
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Deploy new agent
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    />
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Refresh
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                  disabled=""
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    />
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Export formatted
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <span
+                  class="euiToolTipAnchor"
+                >
+                  <button
+                    class="euiButtonEmpty euiButtonEmpty--primary"
+                    type="button"
+                  >
+                    <span
+                      class="euiButtonContent euiButtonEmpty__content"
+                    >
+                      <span
+                        class="euiButtonEmpty__text"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiIcon--primary euiIcon-isLoading"
+                          focusable="false"
+                          height="16"
+                          role="img"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        />
+                      </span>
+                    </span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <div>
+              <div
+                class="euiSuggestInput"
               >
                 <div
-                  class="euiPopover__anchor"
+                  class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                  id="popover"
                 >
-                  <div>
-                    <div
-                      class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
-                    >
+                  <div
+                    class="euiPopover__anchor"
+                  >
+                    <div>
                       <div
-                        style="display:flex"
-                      />
-                      <div
-                        class="euiFormControlLayout__childrenWrapper"
+                        class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
                       >
-                        <input
-                          class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                          placeholder="Filter or search agent"
-                          type="text"
-                          value=""
-                        />
+                        <div
+                          class="euiFormControlLayout__childrenWrapper"
+                        >
+                          <input
+                            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                            placeholder="Search"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div
+                          class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonEmpty__content"
+                              >
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  WQL
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -49,157 +211,38 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
-    >
-      <button
-        class="euiButton euiButton--primary euiButton--fill"
-        type="button"
-      >
-        <span
-          class="euiButtonContent euiButton__content"
-        >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-          <span
-            class="euiButton__text"
-          >
-            Refresh
-          </span>
-        </span>
-      </button>
-    </div>
-  </div>
-  <div
-    class="euiSpacer euiSpacer--m"
-  />
-  <div
-    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-  >
-    <div>
-      <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-      >
-        <div
-          class="euiFlexItem"
-        >
           <div
-            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-          >
-            <div
-              class="euiFlexItem"
-            />
-          </div>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              />
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Deploy new agent
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              />
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Export formatted
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <span
-            class="euiToolTipAnchor"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <button
-              class="euiButtonEmpty euiButtonEmpty--primary"
+              class="euiButton euiButton--primary euiButton--fill"
               type="button"
             >
               <span
-                class="euiButtonContent euiButtonEmpty__content"
+                class="euiButtonContent euiButton__content"
               >
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                />
                 <span
-                  class="euiButtonEmpty__text"
+                  class="euiButton__text"
                 >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon--primary euiIcon-isLoading"
-                    focusable="false"
-                    height="16"
-                    role="img"
-                    viewBox="0 0 16 16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  />
+                  Refresh
                 </span>
               </span>
             </button>
-          </span>
+          </div>
         </div>
-      </div>
-      <div
-        class="euiSpacer euiSpacer--xs"
-      />
-    </div>
-    <div
-      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
-    >
-      <div
-        class="euiFlexItem"
-      >
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
         <div
           class="euiBasicTable"
         >
@@ -375,7 +418,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os_name_4"
+                    data-test-subj="tableHeaderCell_os.name,os.version_4"
                     role="columnheader"
                     scope="col"
                   >
@@ -500,7 +543,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                       <span
                         class="euiTableCellContent__text"
                       >
-                        No agents found
+                        No items found
                       </span>
                     </div>
                   </td>
@@ -518,45 +561,228 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
 exports[`AgentsTable component Renders correctly to match the snapshot with custom columns 1`] = `
 <div>
   <div
-    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
   >
     <div
-      class="euiFlexItem"
-      style="margin-right:0"
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        class="euiFlexItem"
       >
         <div
-          class="euiFlexItem"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         >
-          <div>
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
+          >
+            <h1
+              class="euiTitle euiTitle--small"
+            >
+              Agents
+              <span>
+                (0)
+              </span>
+            </h1>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
             <div
-              class="euiSuggestInput"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
             >
               <div
-                class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-                id="popover"
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Deploy new agent
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Refresh
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                  disabled=""
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Export formatted
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <span
+                  class="euiToolTipAnchor"
+                >
+                  <button
+                    class="euiButtonEmpty euiButtonEmpty--primary"
+                    type="button"
+                  >
+                    <span
+                      class="euiButtonContent euiButtonEmpty__content"
+                    >
+                      <span
+                        class="euiButtonEmpty__text"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiIcon--primary"
+                          focusable="false"
+                          height="32"
+                          role="img"
+                          viewBox="0 0 32 32"
+                          width="32"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            class="euiIcon__fillSecondary"
+                            d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
+                          />
+                          <path
+                            d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
+                          />
+                        </svg>
+                      </span>
+                    </span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <div>
+              <div
+                class="euiSuggestInput"
               >
                 <div
-                  class="euiPopover__anchor"
+                  class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                  id="popover"
                 >
-                  <div>
-                    <div
-                      class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
-                    >
+                  <div
+                    class="euiPopover__anchor"
+                  >
+                    <div>
                       <div
-                        style="display:flex"
-                      />
-                      <div
-                        class="euiFormControlLayout__childrenWrapper"
+                        class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
                       >
-                        <input
-                          class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                          placeholder="Filter or search agent"
-                          type="text"
-                          value=""
-                        />
+                        <div
+                          class="euiFormControlLayout__childrenWrapper"
+                        >
+                          <input
+                            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                            placeholder="Search"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div
+                          class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonEmpty__content"
+                              >
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  WQL
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -564,178 +790,42 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
-    >
-      <button
-        class="euiButton euiButton--primary euiButton--fill"
-        type="button"
-      >
-        <span
-          class="euiButtonContent euiButton__content"
-        >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
-            />
-          </svg>
-          <span
-            class="euiButton__text"
-          >
-            Refresh
-          </span>
-        </span>
-      </button>
-    </div>
-  </div>
-  <div
-    class="euiSpacer euiSpacer--m"
-  />
-  <div
-    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-  >
-    <div>
-      <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-      >
-        <div
-          class="euiFlexItem"
-        >
           <div
-            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-          >
-            <div
-              class="euiFlexItem"
-            />
-          </div>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
-                  fill-rule="evenodd"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Deploy new agent
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Export formatted
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <span
-            class="euiToolTipAnchor"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <button
-              class="euiButtonEmpty euiButtonEmpty--primary"
+              class="euiButton euiButton--primary euiButton--fill"
               type="button"
             >
               <span
-                class="euiButtonContent euiButtonEmpty__content"
+                class="euiButtonContent euiButton__content"
               >
-                <span
-                  class="euiButtonEmpty__text"
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon--primary"
-                    focusable="false"
-                    height="32"
-                    role="img"
-                    viewBox="0 0 32 32"
-                    width="32"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      class="euiIcon__fillSecondary"
-                      d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
-                    />
-                    <path
-                      d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
-                    />
-                  </svg>
+                  <path
+                    d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                  />
+                </svg>
+                <span
+                  class="euiButton__text"
+                >
+                  Refresh
                 </span>
               </span>
             </button>
-          </span>
+          </div>
         </div>
-      </div>
-      <div
-        class="euiSpacer euiSpacer--xs"
-      />
-    </div>
-    <div
-      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
-    >
-      <div
-        class="euiFlexItem"
-      >
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
         <div
           class="euiBasicTable"
         >
@@ -808,9 +898,71 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                 <tr>
                   <th
                     aria-live="polite"
+                    aria-sort="ascending"
+                    class="euiTableHeaderCell"
+                    data-test-subj="tableHeaderCell_id_0"
+                    role="columnheader"
+                    scope="col"
+                  >
+                    <button
+                      class="euiTableHeaderButton euiTableHeaderButton-isSorted"
+                      data-test-subj="tableHeaderSortButton"
+                      type="button"
+                    >
+                      <span
+                        class="euiTableCellContent"
+                      >
+                        <span
+                          class="euiTableCellContent__text"
+                        >
+                          ID
+                        </span>
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiTableSortIcon"
+                          focusable="false"
+                          height="16"
+                          role="img"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                          />
+                        </svg>
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_ip_0"
+                    data-test-subj="tableHeaderCell_name_1"
+                    role="columnheader"
+                    scope="col"
+                  >
+                    <button
+                      class="euiTableHeaderButton"
+                      data-test-subj="tableHeaderSortButton"
+                      type="button"
+                    >
+                      <span
+                        class="euiTableCellContent"
+                      >
+                        <span
+                          class="euiTableCellContent__text"
+                        >
+                          Name
+                        </span>
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-live="polite"
+                    aria-sort="none"
+                    class="euiTableHeaderCell"
+                    data-test-subj="tableHeaderCell_ip_2"
                     role="columnheader"
                     scope="col"
                   >
@@ -834,7 +986,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_1"
+                    data-test-subj="tableHeaderCell_group_3"
                     role="columnheader"
                     scope="col"
                   >
@@ -858,7 +1010,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os_name_2"
+                    data-test-subj="tableHeaderCell_os.name,os.version_4"
                     role="columnheader"
                     scope="col"
                   >
@@ -882,7 +1034,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_node_name_3"
+                    data-test-subj="tableHeaderCell_node_name_5"
                     role="columnheader"
                     scope="col"
                   >
@@ -906,7 +1058,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_version_4"
+                    data-test-subj="tableHeaderCell_version_6"
                     role="columnheader"
                     scope="col"
                   >
@@ -930,7 +1082,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_status_5"
+                    data-test-subj="tableHeaderCell_status_7"
                     role="columnheader"
                     scope="col"
                   >
@@ -952,7 +1104,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                   </th>
                   <th
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_actions_6"
+                    data-test-subj="tableHeaderCell_actions_8"
                     role="columnheader"
                     scope="col"
                     style="width:5%"
@@ -975,7 +1127,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                 >
                   <td
                     class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="7"
+                    colspan="9"
                   >
                     <div
                       class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -983,7 +1135,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                       <span
                         class="euiTableCellContent__text"
                       >
-                        No agents found
+                        No items found
                       </span>
                     </div>
                   </td>
@@ -1001,45 +1153,228 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
 exports[`AgentsTable component Renders correctly to match the snapshot with less columns 1`] = `
 <div>
   <div
-    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
   >
     <div
-      class="euiFlexItem"
-      style="margin-right:0"
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        class="euiFlexItem"
       >
         <div
-          class="euiFlexItem"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         >
-          <div>
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
+          >
+            <h1
+              class="euiTitle euiTitle--small"
+            >
+              Agents
+              <span>
+                (0)
+              </span>
+            </h1>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
             <div
-              class="euiSuggestInput"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
             >
               <div
-                class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-                id="popover"
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Deploy new agent
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Refresh
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                  disabled=""
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Export formatted
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <span
+                  class="euiToolTipAnchor"
+                >
+                  <button
+                    class="euiButtonEmpty euiButtonEmpty--primary"
+                    type="button"
+                  >
+                    <span
+                      class="euiButtonContent euiButtonEmpty__content"
+                    >
+                      <span
+                        class="euiButtonEmpty__text"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiIcon--primary"
+                          focusable="false"
+                          height="32"
+                          role="img"
+                          viewBox="0 0 32 32"
+                          width="32"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            class="euiIcon__fillSecondary"
+                            d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
+                          />
+                          <path
+                            d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
+                          />
+                        </svg>
+                      </span>
+                    </span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <div>
+              <div
+                class="euiSuggestInput"
               >
                 <div
-                  class="euiPopover__anchor"
+                  class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                  id="popover"
                 >
-                  <div>
-                    <div
-                      class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
-                    >
+                  <div
+                    class="euiPopover__anchor"
+                  >
+                    <div>
                       <div
-                        style="display:flex"
-                      />
-                      <div
-                        class="euiFormControlLayout__childrenWrapper"
+                        class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
                       >
-                        <input
-                          class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                          placeholder="Filter or search agent"
-                          type="text"
-                          value=""
-                        />
+                        <div
+                          class="euiFormControlLayout__childrenWrapper"
+                        >
+                          <input
+                            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                            placeholder="Search"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div
+                          class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonEmpty__content"
+                              >
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  WQL
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1047,178 +1382,42 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
-    >
-      <button
-        class="euiButton euiButton--primary euiButton--fill"
-        type="button"
-      >
-        <span
-          class="euiButtonContent euiButton__content"
-        >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
-            />
-          </svg>
-          <span
-            class="euiButton__text"
-          >
-            Refresh
-          </span>
-        </span>
-      </button>
-    </div>
-  </div>
-  <div
-    class="euiSpacer euiSpacer--m"
-  />
-  <div
-    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-  >
-    <div>
-      <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-      >
-        <div
-          class="euiFlexItem"
-        >
           <div
-            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-          >
-            <div
-              class="euiFlexItem"
-            />
-          </div>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
-                  fill-rule="evenodd"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Deploy new agent
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Export formatted
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <span
-            class="euiToolTipAnchor"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <button
-              class="euiButtonEmpty euiButtonEmpty--primary"
+              class="euiButton euiButton--primary euiButton--fill"
               type="button"
             >
               <span
-                class="euiButtonContent euiButtonEmpty__content"
+                class="euiButtonContent euiButton__content"
               >
-                <span
-                  class="euiButtonEmpty__text"
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon--primary"
-                    focusable="false"
-                    height="32"
-                    role="img"
-                    viewBox="0 0 32 32"
-                    width="32"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      class="euiIcon__fillSecondary"
-                      d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
-                    />
-                    <path
-                      d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
-                    />
-                  </svg>
+                  <path
+                    d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                  />
+                </svg>
+                <span
+                  class="euiButton__text"
+                >
+                  Refresh
                 </span>
               </span>
             </button>
-          </span>
+          </div>
         </div>
-      </div>
-      <div
-        class="euiSpacer euiSpacer--xs"
-      />
-    </div>
-    <div
-      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
-    >
-      <div
-        class="euiFlexItem"
-      >
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
         <div
           class="euiBasicTable"
         >
@@ -1403,7 +1602,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os_name_4"
+                    data-test-subj="tableHeaderCell_os.name,os.version_4"
                     role="columnheader"
                     scope="col"
                   >
@@ -1528,7 +1727,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                       <span
                         class="euiTableCellContent__text"
                       >
-                        No agents found
+                        No items found
                       </span>
                     </div>
                   </td>
@@ -1546,45 +1745,228 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
 exports[`AgentsTable component Renders correctly to match the snapshot with less custom columns 1`] = `
 <div>
   <div
-    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
   >
     <div
-      class="euiFlexItem"
-      style="margin-right:0"
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        class="euiFlexItem"
       >
         <div
-          class="euiFlexItem"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         >
-          <div>
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
+          >
+            <h1
+              class="euiTitle euiTitle--small"
+            >
+              Agents
+              <span>
+                (0)
+              </span>
+            </h1>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
             <div
-              class="euiSuggestInput"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
             >
               <div
-                class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-                id="popover"
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Deploy new agent
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Refresh
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                  disabled=""
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Export formatted
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <span
+                  class="euiToolTipAnchor"
+                >
+                  <button
+                    class="euiButtonEmpty euiButtonEmpty--primary"
+                    type="button"
+                  >
+                    <span
+                      class="euiButtonContent euiButtonEmpty__content"
+                    >
+                      <span
+                        class="euiButtonEmpty__text"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiIcon--primary"
+                          focusable="false"
+                          height="32"
+                          role="img"
+                          viewBox="0 0 32 32"
+                          width="32"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            class="euiIcon__fillSecondary"
+                            d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
+                          />
+                          <path
+                            d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
+                          />
+                        </svg>
+                      </span>
+                    </span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <div>
+              <div
+                class="euiSuggestInput"
               >
                 <div
-                  class="euiPopover__anchor"
+                  class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                  id="popover"
                 >
-                  <div>
-                    <div
-                      class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
-                    >
+                  <div
+                    class="euiPopover__anchor"
+                  >
+                    <div>
                       <div
-                        style="display:flex"
-                      />
-                      <div
-                        class="euiFormControlLayout__childrenWrapper"
+                        class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
                       >
-                        <input
-                          class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                          placeholder="Filter or search agent"
-                          type="text"
-                          value=""
-                        />
+                        <div
+                          class="euiFormControlLayout__childrenWrapper"
+                        >
+                          <input
+                            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                            placeholder="Search"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div
+                          class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonEmpty__content"
+                              >
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  WQL
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1592,178 +1974,42 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
-    >
-      <button
-        class="euiButton euiButton--primary euiButton--fill"
-        type="button"
-      >
-        <span
-          class="euiButtonContent euiButton__content"
-        >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
-            />
-          </svg>
-          <span
-            class="euiButton__text"
-          >
-            Refresh
-          </span>
-        </span>
-      </button>
-    </div>
-  </div>
-  <div
-    class="euiSpacer euiSpacer--m"
-  />
-  <div
-    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-  >
-    <div>
-      <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-      >
-        <div
-          class="euiFlexItem"
-        >
           <div
-            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-          >
-            <div
-              class="euiFlexItem"
-            />
-          </div>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
-                  fill-rule="evenodd"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Deploy new agent
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Export formatted
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <span
-            class="euiToolTipAnchor"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <button
-              class="euiButtonEmpty euiButtonEmpty--primary"
+              class="euiButton euiButton--primary euiButton--fill"
               type="button"
             >
               <span
-                class="euiButtonContent euiButtonEmpty__content"
+                class="euiButtonContent euiButton__content"
               >
-                <span
-                  class="euiButtonEmpty__text"
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon--primary"
-                    focusable="false"
-                    height="32"
-                    role="img"
-                    viewBox="0 0 32 32"
-                    width="32"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      class="euiIcon__fillSecondary"
-                      d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
-                    />
-                    <path
-                      d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
-                    />
-                  </svg>
+                  <path
+                    d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                  />
+                </svg>
+                <span
+                  class="euiButton__text"
+                >
+                  Refresh
                 </span>
               </span>
             </button>
-          </span>
+          </div>
         </div>
-      </div>
-      <div
-        class="euiSpacer euiSpacer--xs"
-      />
-    </div>
-    <div
-      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
-    >
-      <div
-        class="euiFlexItem"
-      >
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
         <div
           class="euiBasicTable"
         >
@@ -1836,9 +2082,71 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                 <tr>
                   <th
                     aria-live="polite"
+                    aria-sort="ascending"
+                    class="euiTableHeaderCell"
+                    data-test-subj="tableHeaderCell_id_0"
+                    role="columnheader"
+                    scope="col"
+                  >
+                    <button
+                      class="euiTableHeaderButton euiTableHeaderButton-isSorted"
+                      data-test-subj="tableHeaderSortButton"
+                      type="button"
+                    >
+                      <span
+                        class="euiTableCellContent"
+                      >
+                        <span
+                          class="euiTableCellContent__text"
+                        >
+                          ID
+                        </span>
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiTableSortIcon"
+                          focusable="false"
+                          height="16"
+                          role="img"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                          />
+                        </svg>
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_ip_0"
+                    data-test-subj="tableHeaderCell_name_1"
+                    role="columnheader"
+                    scope="col"
+                  >
+                    <button
+                      class="euiTableHeaderButton"
+                      data-test-subj="tableHeaderSortButton"
+                      type="button"
+                    >
+                      <span
+                        class="euiTableCellContent"
+                      >
+                        <span
+                          class="euiTableCellContent__text"
+                        >
+                          Name
+                        </span>
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-live="polite"
+                    aria-sort="none"
+                    class="euiTableHeaderCell"
+                    data-test-subj="tableHeaderCell_ip_2"
                     role="columnheader"
                     scope="col"
                   >
@@ -1862,7 +2170,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_1"
+                    data-test-subj="tableHeaderCell_group_3"
                     role="columnheader"
                     scope="col"
                   >
@@ -1886,7 +2194,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os_name_2"
+                    data-test-subj="tableHeaderCell_os.name,os.version_4"
                     role="columnheader"
                     scope="col"
                   >
@@ -1910,7 +2218,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_node_name_3"
+                    data-test-subj="tableHeaderCell_node_name_5"
                     role="columnheader"
                     scope="col"
                   >
@@ -1934,7 +2242,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_version_4"
+                    data-test-subj="tableHeaderCell_version_6"
                     role="columnheader"
                     scope="col"
                   >
@@ -1958,7 +2266,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_status_5"
+                    data-test-subj="tableHeaderCell_status_7"
                     role="columnheader"
                     scope="col"
                   >
@@ -1980,7 +2288,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                   </th>
                   <th
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_actions_6"
+                    data-test-subj="tableHeaderCell_actions_8"
                     role="columnheader"
                     scope="col"
                     style="width:5%"
@@ -2003,7 +2311,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                 >
                   <td
                     class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="7"
+                    colspan="9"
                   >
                     <div
                       class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -2011,7 +2319,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
                       <span
                         class="euiTableCellContent__text"
                       >
-                        No agents found
+                        No items found
                       </span>
                     </div>
                   </td>
@@ -2029,45 +2337,228 @@ exports[`AgentsTable component Renders correctly to match the snapshot with less
 exports[`AgentsTable component Renders correctly to match the snapshot with more columns 1`] = `
 <div>
   <div
-    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
   >
     <div
-      class="euiFlexItem"
-      style="margin-right:0"
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        class="euiFlexItem"
       >
         <div
-          class="euiFlexItem"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         >
-          <div>
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
+          >
+            <h1
+              class="euiTitle euiTitle--small"
+            >
+              Agents
+              <span>
+                (0)
+              </span>
+            </h1>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
             <div
-              class="euiSuggestInput"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
             >
               <div
-                class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-                id="popover"
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Deploy new agent
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Refresh
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                  disabled=""
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Export formatted
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <span
+                  class="euiToolTipAnchor"
+                >
+                  <button
+                    class="euiButtonEmpty euiButtonEmpty--primary"
+                    type="button"
+                  >
+                    <span
+                      class="euiButtonContent euiButtonEmpty__content"
+                    >
+                      <span
+                        class="euiButtonEmpty__text"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiIcon--primary"
+                          focusable="false"
+                          height="32"
+                          role="img"
+                          viewBox="0 0 32 32"
+                          width="32"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            class="euiIcon__fillSecondary"
+                            d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
+                          />
+                          <path
+                            d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
+                          />
+                        </svg>
+                      </span>
+                    </span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <div>
+              <div
+                class="euiSuggestInput"
               >
                 <div
-                  class="euiPopover__anchor"
+                  class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                  id="popover"
                 >
-                  <div>
-                    <div
-                      class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
-                    >
+                  <div
+                    class="euiPopover__anchor"
+                  >
+                    <div>
                       <div
-                        style="display:flex"
-                      />
-                      <div
-                        class="euiFormControlLayout__childrenWrapper"
+                        class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
                       >
-                        <input
-                          class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                          placeholder="Filter or search agent"
-                          type="text"
-                          value=""
-                        />
+                        <div
+                          class="euiFormControlLayout__childrenWrapper"
+                        >
+                          <input
+                            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                            placeholder="Search"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div
+                          class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonEmpty__content"
+                              >
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  WQL
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2075,178 +2566,42 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
-    >
-      <button
-        class="euiButton euiButton--primary euiButton--fill"
-        type="button"
-      >
-        <span
-          class="euiButtonContent euiButton__content"
-        >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
-            />
-          </svg>
-          <span
-            class="euiButton__text"
-          >
-            Refresh
-          </span>
-        </span>
-      </button>
-    </div>
-  </div>
-  <div
-    class="euiSpacer euiSpacer--m"
-  />
-  <div
-    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-  >
-    <div>
-      <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-      >
-        <div
-          class="euiFlexItem"
-        >
           <div
-            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-          >
-            <div
-              class="euiFlexItem"
-            />
-          </div>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
-                  fill-rule="evenodd"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Deploy new agent
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Export formatted
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <span
-            class="euiToolTipAnchor"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <button
-              class="euiButtonEmpty euiButtonEmpty--primary"
+              class="euiButton euiButton--primary euiButton--fill"
               type="button"
             >
               <span
-                class="euiButtonContent euiButtonEmpty__content"
+                class="euiButtonContent euiButton__content"
               >
-                <span
-                  class="euiButtonEmpty__text"
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon--primary"
-                    focusable="false"
-                    height="32"
-                    role="img"
-                    viewBox="0 0 32 32"
-                    width="32"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      class="euiIcon__fillSecondary"
-                      d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
-                    />
-                    <path
-                      d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
-                    />
-                  </svg>
+                  <path
+                    d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                  />
+                </svg>
+                <span
+                  class="euiButton__text"
+                >
+                  Refresh
                 </span>
               </span>
             </button>
-          </span>
+          </div>
         </div>
-      </div>
-      <div
-        class="euiSpacer euiSpacer--xs"
-      />
-    </div>
-    <div
-      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
-    >
-      <div
-        class="euiFlexItem"
-      >
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
         <div
           class="euiBasicTable"
         >
@@ -2431,7 +2786,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os_name_4"
+                    data-test-subj="tableHeaderCell_os.name,os.version_4"
                     role="columnheader"
                     scope="col"
                   >
@@ -2556,7 +2911,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                       <span
                         class="euiTableCellContent__text"
                       >
-                        No agents found
+                        No items found
                       </span>
                     </div>
                   </td>
@@ -2574,45 +2929,228 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
 exports[`AgentsTable component Renders correctly to match the snapshot with more custom columns 1`] = `
 <div>
   <div
-    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
   >
     <div
-      class="euiFlexItem"
-      style="margin-right:0"
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        class="euiFlexItem"
       >
         <div
-          class="euiFlexItem"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         >
-          <div>
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
+          >
+            <h1
+              class="euiTitle euiTitle--small"
+            >
+              Agents
+              <span>
+                (0)
+              </span>
+            </h1>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
             <div
-              class="euiSuggestInput"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
             >
               <div
-                class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-                id="popover"
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Deploy new agent
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary"
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Refresh
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <button
+                  class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                  disabled=""
+                  type="button"
+                >
+                  <span
+                    class="euiButtonContent euiButtonEmpty__content"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                      focusable="false"
+                      height="16"
+                      role="img"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                      />
+                    </svg>
+                    <span
+                      class="euiButtonEmpty__text"
+                    >
+                      Export formatted
+                    </span>
+                  </span>
+                </button>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <span
+                  class="euiToolTipAnchor"
+                >
+                  <button
+                    class="euiButtonEmpty euiButtonEmpty--primary"
+                    type="button"
+                  >
+                    <span
+                      class="euiButtonContent euiButtonEmpty__content"
+                    >
+                      <span
+                        class="euiButtonEmpty__text"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiIcon--primary"
+                          focusable="false"
+                          height="32"
+                          role="img"
+                          viewBox="0 0 32 32"
+                          width="32"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            class="euiIcon__fillSecondary"
+                            d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
+                          />
+                          <path
+                            d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
+                          />
+                        </svg>
+                      </span>
+                    </span>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <div>
+              <div
+                class="euiSuggestInput"
               >
                 <div
-                  class="euiPopover__anchor"
+                  class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                  id="popover"
                 >
-                  <div>
-                    <div
-                      class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
-                    >
+                  <div
+                    class="euiPopover__anchor"
+                  >
+                    <div>
                       <div
-                        style="display:flex"
-                      />
-                      <div
-                        class="euiFormControlLayout__childrenWrapper"
+                        class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
                       >
-                        <input
-                          class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                          placeholder="Filter or search agent"
-                          type="text"
-                          value=""
-                        />
+                        <div
+                          class="euiFormControlLayout__childrenWrapper"
+                        >
+                          <input
+                            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                            placeholder="Search"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div
+                          class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonEmpty__content"
+                              >
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  WQL
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2620,178 +3158,42 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
-    >
-      <button
-        class="euiButton euiButton--primary euiButton--fill"
-        type="button"
-      >
-        <span
-          class="euiButtonContent euiButton__content"
-        >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-            focusable="false"
-            height="16"
-            role="img"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
-            />
-          </svg>
-          <span
-            class="euiButton__text"
-          >
-            Refresh
-          </span>
-        </span>
-      </button>
-    </div>
-  </div>
-  <div
-    class="euiSpacer euiSpacer--m"
-  />
-  <div
-    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-  >
-    <div>
-      <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-      >
-        <div
-          class="euiFlexItem"
-        >
           <div
-            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-          >
-            <div
-              class="euiFlexItem"
-            />
-          </div>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 7h3.5a.5.5 0 110 1H8v3.5a.5.5 0 11-1 0V8H3.5a.5.5 0 010-1H7V3.5a.5.5 0 011 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 100 13.236A6.618 6.618 0 007.5.882z"
-                  fill-rule="evenodd"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Deploy new agent
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <button
-            class="euiButtonEmpty euiButtonEmpty--primary"
-            type="button"
-          >
-            <span
-              class="euiButtonContent euiButtonEmpty__content"
-            >
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
-                />
-              </svg>
-              <span
-                class="euiButtonEmpty__text"
-              >
-                Export formatted
-              </span>
-            </span>
-          </button>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <span
-            class="euiToolTipAnchor"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <button
-              class="euiButtonEmpty euiButtonEmpty--primary"
+              class="euiButton euiButton--primary euiButton--fill"
               type="button"
             >
               <span
-                class="euiButtonContent euiButtonEmpty__content"
+                class="euiButtonContent euiButton__content"
               >
-                <span
-                  class="euiButtonEmpty__text"
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon--primary"
-                    focusable="false"
-                    height="32"
-                    role="img"
-                    viewBox="0 0 32 32"
-                    width="32"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      class="euiIcon__fillSecondary"
-                      d="M16 21a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
-                    />
-                    <path
-                      d="M20 32h-8v-4.06a1 1 0 00-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 00.2-1 .93.93 0 00-.86-.6H0V12h4.06a.92.92 0 00.85-.58.94.94 0 00-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0012 4.06V0h8v4.06a1 1 0 001.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 00-.2 1 .93.93 0 00.86.6H32v8h-4.06a.92.92 0 00-.85.58.94.94 0 00.19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 00-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 015-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 012.08-5H30v-4h-2.06a3 3 0 01-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 01-5-2.08V2h-4v2.06a3 3 0 01-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 01-2.08 5H2v4h2.06a3 3 0 012.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 015 2.08V30z"
-                    />
-                  </svg>
+                  <path
+                    d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                  />
+                </svg>
+                <span
+                  class="euiButton__text"
+                >
+                  Refresh
                 </span>
               </span>
             </button>
-          </span>
+          </div>
         </div>
-      </div>
-      <div
-        class="euiSpacer euiSpacer--xs"
-      />
-    </div>
-    <div
-      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-overflow-auto"
-    >
-      <div
-        class="euiFlexItem"
-      >
+        <div
+          class="euiSpacer euiSpacer--s"
+        />
         <div
           class="euiBasicTable"
         >
@@ -2864,9 +3266,71 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                 <tr>
                   <th
                     aria-live="polite"
+                    aria-sort="ascending"
+                    class="euiTableHeaderCell"
+                    data-test-subj="tableHeaderCell_id_0"
+                    role="columnheader"
+                    scope="col"
+                  >
+                    <button
+                      class="euiTableHeaderButton euiTableHeaderButton-isSorted"
+                      data-test-subj="tableHeaderSortButton"
+                      type="button"
+                    >
+                      <span
+                        class="euiTableCellContent"
+                      >
+                        <span
+                          class="euiTableCellContent__text"
+                        >
+                          ID
+                        </span>
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiTableSortIcon"
+                          focusable="false"
+                          height="16"
+                          role="img"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                          />
+                        </svg>
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_ip_0"
+                    data-test-subj="tableHeaderCell_name_1"
+                    role="columnheader"
+                    scope="col"
+                  >
+                    <button
+                      class="euiTableHeaderButton"
+                      data-test-subj="tableHeaderSortButton"
+                      type="button"
+                    >
+                      <span
+                        class="euiTableCellContent"
+                      >
+                        <span
+                          class="euiTableCellContent__text"
+                        >
+                          Name
+                        </span>
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-live="polite"
+                    aria-sort="none"
+                    class="euiTableHeaderCell"
+                    data-test-subj="tableHeaderCell_ip_2"
                     role="columnheader"
                     scope="col"
                   >
@@ -2890,7 +3354,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_1"
+                    data-test-subj="tableHeaderCell_group_3"
                     role="columnheader"
                     scope="col"
                   >
@@ -2914,7 +3378,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os_name_2"
+                    data-test-subj="tableHeaderCell_os.name,os.version_4"
                     role="columnheader"
                     scope="col"
                   >
@@ -2938,7 +3402,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_node_name_3"
+                    data-test-subj="tableHeaderCell_node_name_5"
                     role="columnheader"
                     scope="col"
                   >
@@ -2962,7 +3426,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_version_4"
+                    data-test-subj="tableHeaderCell_version_6"
                     role="columnheader"
                     scope="col"
                   >
@@ -2986,7 +3450,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                     aria-live="polite"
                     aria-sort="none"
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_status_5"
+                    data-test-subj="tableHeaderCell_status_7"
                     role="columnheader"
                     scope="col"
                   >
@@ -3008,7 +3472,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                   </th>
                   <th
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_actions_6"
+                    data-test-subj="tableHeaderCell_actions_8"
                     role="columnheader"
                     scope="col"
                     style="width:5%"
@@ -3031,7 +3495,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                 >
                   <td
                     class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="7"
+                    colspan="9"
                   >
                     <div
                       class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -3039,7 +3503,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with more
                       <span
                         class="euiTableCellContent__text"
                       >
-                        No agents found
+                        No items found
                       </span>
                     </div>
                   </td>

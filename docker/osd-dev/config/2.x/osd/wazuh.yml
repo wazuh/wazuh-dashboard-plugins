@@ -1,19 +1,20 @@
+pattern: wazuh-alerts-*
 hosts:
-  - manager:
-      url: "https://wazuh.manager"
-      port: 55000
-      username: wazuh-wui
-      password: MyS3cr37P450r.*-
-      run_as: false
-  - imposter:
-      url: "http://imposter"
-      port: 8080
-      username: wazuh-wui
-      password: MyS3cr37P450r.*-
-      run_as: false
-  - imposter-cli:
-      url: "http://<ip-local>"
-      port: 8080
-      username: wazuh-wui
-      password: MyS3cr37P450r.*-
-      run_as: false
+  - default:
+    - url: http://wazuh.manager
+    - port: 55000
+    - username: user
+    - password: password
+    - run_as: false
+  - custom:
+    - url: http://custom.manager
+    - port: 55000
+    - username: custom
+    - password: custompassword
+    - run_as: false
+  - custom2:
+    - url: http://custom2.manager
+    - port: 55000
+    - username: custom2
+    - password: custompassword2
+    - run_as: false

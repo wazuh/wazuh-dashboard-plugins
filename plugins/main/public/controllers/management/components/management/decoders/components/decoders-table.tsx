@@ -13,7 +13,11 @@
 import React, { useState, useCallback } from 'react';
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { getToasts } from '../../../../../../kibana-services';
-import { resourceDictionary, ResourcesConstants, ResourcesHandler } from '../../common/resources-handler';
+import {
+  resourceDictionary,
+  ResourcesConstants,
+  ResourcesHandler,
+} from '../../common/resources-handler';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
@@ -23,48 +27,79 @@ import { FlyoutDetail } from './flyout-detail';
 import { withUserPermissions } from '../../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../../react-services/wz-user-permissions';
 import { compose } from 'redux';
-import { SECTION_DECODERS_SECTION, SECTION_DECODERS_KEY } from '../../common/constants';
+import {
+  SECTION_DECODERS_SECTION,
+  SECTION_DECODERS_KEY,
+} from '../../common/constants';
 import {
   ManageFiles,
   AddNewFileButton,
   UploadFilesButton,
-} from '../../common/actions-buttons'
+} from '../../common/actions-buttons';
 
 import apiSuggestsItems from './decoders-suggestions';
+
+const searchBarWQLOptions = {
+  searchTermFields: [
+    'details.order',
+    'details.program_name',
+    'filename',
+    'name',
+    'relative_dirname',
+  ],
+  filterButtons: [
+    {
+      id: 'relative-dirname',
+      input: 'relative_dirname=etc/decoders',
+      label: 'Custom decoders',
+    },
+  ],
+};
+
+const searchBarWQLOptionsFiles = {
+  searchTermFields: ['filename', 'relative_dirname'],
+  filterButtons: [
+    {
+      id: 'relative-dirname',
+      input: 'relative_dirname=etc/rules',
+      label: 'Custom rules',
+    },
+  ],
+};
 
 /***************************************
  * Render tables
  */
 const FilesTable = ({
   actionButtons,
-  buttonOptions,
   columns,
   searchBarSuggestions,
   filters,
-  updateFilters,
-  reload
-}) => <TableWzAPI
+  reload,
+}) => (
+  <TableWzAPI
     reload={reload}
     actionButtons={actionButtons}
-    title={'Decoders files'}
-    searchBarProps={{ buttonOptions: buttonOptions }}
-    description={`From here you can manage your decoders files.`}
+    title='Decoders files'
+    description='From here you can manage your decoders files.'
     tableColumns={columns}
-    tableInitialSortingField={'filename'}
+    tableInitialSortingField='filename'
     searchTable={true}
-    searchBarSuggestions={searchBarSuggestions}
-    endpoint={'/decoders/files'}
+    searchBarWQL={{
+      options: searchBarWQLOptionsFiles,
+      suggestions: searchBarSuggestions,
+    }}
+    endpoint='/decoders/files'
     isExpandable={true}
     downloadCsv={true}
     showReload={true}
     filters={filters}
-    onFiltersChange={updateFilters}
     tablePageSizeOptions={[10, 25, 50, 100]}
   />
+);
 
 const DecodersFlyoutTable = ({
   actionButtons,
-  buttonOptions,
   columns,
   searchBarSuggestions,
   getRowProps,
@@ -75,23 +110,25 @@ const DecodersFlyoutTable = ({
   closeFlyout,
   cleanFilters,
   ...props
-}) => <>
+}) => (
+  <>
     <TableWzAPI
       actionButtons={actionButtons}
-      title={'Decoders'}
-      searchBarProps={{ buttonOptions: buttonOptions }}
-      description={`From here you can manage your decoders.`}
+      title='Decoders'
+      description='From here you can manage your decoders.'
       tableColumns={columns}
-      tableInitialSortingField={'filename'}
+      tableInitialSortingField='filename'
       searchTable={true}
-      searchBarSuggestions={searchBarSuggestions}
-      endpoint={'/decoders'}
+      searchBarWQL={{
+        options: searchBarWQLOptions,
+        suggestions: searchBarSuggestions,
+      }}
+      endpoint='/decoders'
       isExpandable={true}
       rowProps={getRowProps}
       downloadCsv={true}
       showReload={true}
       filters={filters}
-      onFiltersChange={updateFilters}
       tablePageSizeOptions={[10, 25, 50, 100]}
     />
     {isFlyoutVisible && (
@@ -107,13 +144,16 @@ const DecodersFlyoutTable = ({
       />
     )}
   </>
+);
 
 /***************************************
  * Main component
  */
-export default compose(
-  withUserPermissions
-)(function DecodersTable({ setShowingFiles, showingFiles, ...props }) {
+export default compose(withUserPermissions)(function DecodersTable({
+  setShowingFiles,
+  showingFiles,
+  ...props
+}) {
   const [filters, setFilters] = useState([]);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
@@ -121,26 +161,23 @@ export default compose(
 
   const resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
 
-  // Table custom filter options
-  const buttonOptions = [{ label: "Custom decoders", field: "relative_dirname", value: "etc/decoders" },];
-
-  const updateFilters = (filters) => {
+  const updateFilters = filters => {
     setFilters(filters);
-  }
+  };
 
   const cleanFilters = () => {
     setFilters([]);
-  }
+  };
 
   const toggleShowFiles = () => {
     setFilters([]);
     setShowingFiles(!showingFiles);
-  }
+  };
 
   const closeFlyout = () => {
     setIsFlyoutVisible(false);
     setCurrentItem(null);
-  }
+  };
 
   /**
    * Columns and Rows properties
@@ -149,15 +186,17 @@ export default compose(
     const decodersColumns = new DecodersColumns({
       removeItems: removeItems,
       state: {
-        section: SECTION_DECODERS_KEY
-      }, ...props
+        section: SECTION_DECODERS_KEY,
+      },
+      ...props,
     }).columns;
-    const columns = decodersColumns[showingFiles ? 'files' : SECTION_DECODERS_KEY];
+    const columns =
+      decodersColumns[showingFiles ? 'files' : SECTION_DECODERS_KEY];
     return columns;
-  }
+  };
 
-  const getRowProps = (item) => {
-    const getRequiredPermissions = (item) => {
+  const getRowProps = item => {
+    const getRequiredPermissions = item => {
       const { permissionResource } = resourceDictionary[SECTION_DECODERS_KEY];
       return [
         {
@@ -172,12 +211,12 @@ export default compose(
       className: 'customRowClass',
       onClick: !WzUserPermissions.checkMissingUserPermissions(
         getRequiredPermissions(item),
-        props.userPermissions
+        props.userPermissions,
       )
         ? () => {
-          setCurrentItem(item)
-          setIsFlyoutVisible(true);
-        }
+            setCurrentItem(item);
+            setIsFlyoutVisible(true);
+          }
         : undefined,
     };
   };
@@ -185,13 +224,16 @@ export default compose(
   /**
    * Remove files method
    */
-  const removeItems = async (items) => {
+  const removeItems = async items => {
     try {
       const results = items.map(async (item, i) => {
-        await resourcesHandler.deleteFile(item.filename || item.name);
+        await resourcesHandler.deleteFile(
+          item.filename || item.name,
+          item.relative_dirname,
+        );
       });
 
-      Promise.all(results).then((completed) => {
+      Promise.all(results).then(completed => {
         setTableFootprint(Date.now());
         getToasts().add({
           color: 'success',
@@ -213,7 +255,7 @@ export default compose(
       };
       getErrorOrchestrator().handleError(options);
     }
-  }
+  };
 
   const { updateRestartClusterManager, updateFileContent } = props;
   const columns = getColumns();
@@ -235,44 +277,45 @@ export default compose(
       />,
     ];
     if (showingFiles)
-      buttons.push(<UploadFilesButton
-        section={SECTION_DECODERS_SECTION}
-        showingFiles={showingFiles}
-        onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
-      />);
+      buttons.push(
+        <UploadFilesButton
+          section={SECTION_DECODERS_SECTION}
+          showingFiles={showingFiles}
+          onSuccess={() => {
+            updateRestartClusterManager && updateRestartClusterManager();
+          }}
+        />,
+      );
     return buttons;
   }, [showingFiles]);
 
   const actionButtons = buildActionButtons();
 
   return (
-    <div className="wz-inventory">
+    <div className='wz-inventory'>
       {showingFiles ? (
         <FilesTable
           actionButtons={actionButtons}
-          buttonOptions={buttonOptions}
           columns={columns}
           searchBarSuggestions={apiSuggestsItems.files}
           filters={filters}
-          updateFilters={updateFilters}
           reload={tableFootprint}
         />
       ) : (
-          <DecodersFlyoutTable
-            actionButtons={actionButtons}
-            buttonOptions={buttonOptions}
-            columns={columns}
-            searchBarSuggestions={apiSuggestsItems.items}
-            filters={filters}
-            updateFilters={updateFilters}
-            getRowProps={getRowProps}
-            isFlyoutVisible={isFlyoutVisible}
-            currentItem={currentItem}
-            closeFlyout={closeFlyout}
-            cleanFilters={cleanFilters}
-            updateFileContent={updateFileContent}
-          />
-        )}
+        <DecodersFlyoutTable
+          actionButtons={actionButtons}
+          columns={columns}
+          searchBarSuggestions={apiSuggestsItems.items}
+          filters={filters}
+          updateFilters={updateFilters}
+          getRowProps={getRowProps}
+          isFlyoutVisible={isFlyoutVisible}
+          currentItem={currentItem}
+          closeFlyout={closeFlyout}
+          cleanFilters={cleanFilters}
+          updateFileContent={updateFileContent}
+        />
+      )}
     </div>
   );
 });
