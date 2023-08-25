@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { EuiBreadcrumbs } from '@elastic/eui';
 import { connect } from 'react-redux';
-import './globalBreadcrumb.scss';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { getAngularModule } from '../../../kibana-services';
 
@@ -18,11 +17,11 @@ class WzGlobalBreadcrumb extends Component {
   }
 
   crumbs = () => {
-    const breadcrumbs = this.props.state.breadcrumb.map((breadcrumb) =>
+    const breadcrumbs = this.props.state.breadcrumb.map(breadcrumb =>
       breadcrumb.agent
         ? {
             className: 'euiLink euiLink--subdued osdBreadcrumbs',
-            onClick: (ev) => {
+            onClick: ev => {
               ev.stopPropagation();
               AppNavigate.navigateToModule(ev, 'agents', {
                 tab: 'welcome',
@@ -36,7 +35,7 @@ class WzGlobalBreadcrumb extends Component {
         : {
             ...breadcrumb,
             className: 'osdBreadcrumbs',
-          }
+          },
     );
 
     // remove frist breadcrumb if it's empty
@@ -52,12 +51,11 @@ class WzGlobalBreadcrumb extends Component {
       <div>
         {!!this.props.state.breadcrumb.length && (
           <EuiBreadcrumbs
-            className="wz-global-breadcrumb"
             responsive={false}
             truncate={false}
             max={6}
             breadcrumbs={this.crumbs()}
-            aria-label="Wazuh global breadcrumbs"
+            aria-label='Wazuh global breadcrumbs'
           />
         )}
       </div>
@@ -65,7 +63,7 @@ class WzGlobalBreadcrumb extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.globalBreadcrumbReducers,
   };
