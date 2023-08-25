@@ -123,9 +123,9 @@ services:
       retries: 10
 
   os1:
-    # depends_on:
-    #   idpsetup:
-    #     condition: service_completed_successfully
+    depends_on:
+      idpsetup:
+        condition: service_completed_successfully
     image: opensearchproject/opensearch:${OS_VERSION}
     <<: *logging
     profiles:
