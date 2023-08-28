@@ -7,15 +7,6 @@
     ></react-component>
   </div>
 
-  <div
-    ng-if="!ctrl.load && ctrl.settingsTabsProps && !ctrl.apiIsDown && ctrl.apiTableProps.apiEntries.length"
-    class="wz-margin-top-16 md-margin-h"
-  >
-    <react-component
-      name="Tabs"
-      props="ctrl.settingsTabsProps"
-    ></react-component>
-  </div>
   <!-- end head -->
   <!-- api -->
   <div ng-if="ctrl.tab === 'api' && !ctrl.load">
