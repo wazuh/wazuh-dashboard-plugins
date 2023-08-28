@@ -255,7 +255,7 @@ export class WazuhPlugin
         {
           category: categoryEndpointSecurity,
           id: 'wz-security-configuration-assessment',
-          title: 'Security Configuration Assessment',
+          title: 'Security configuration assessment',
           redirectTo: () =>
             `/overview/?tab=sca&tabView=panels${
               store.getState()?.appStateReducers?.currentAgentData?.id
