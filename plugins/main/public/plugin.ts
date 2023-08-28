@@ -503,8 +503,8 @@ export class WazuhPlugin
         },
         {
           category: categoryCloudSecurity,
-          id: 'wz-docker',
-          title: 'Docker',
+          id: 'wz-docker-listener',
+          title: 'Docker listener',
           redirectTo: () =>
             `/overview/?tab=docker&tabView=panels${
               store.getState()?.appStateReducers?.currentAgentData?.id
