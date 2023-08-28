@@ -108,9 +108,7 @@ export const AgentsWelcome = compose(
       const breadcrumb = [
         { text: '' },
         {
-          text: 'Endpoints summary',
-          href: '#/agents-preview',
-          truncate: false,
+          text: 'IT Hygiene',
         },
         {
           text: `${this.props.agent.name}`,

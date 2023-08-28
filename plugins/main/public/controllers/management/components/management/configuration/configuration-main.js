@@ -29,8 +29,7 @@ export default compose(
       breadcrumb = [
         { text: '' },
         {
-          text: 'Endpoints summary',
-          href: '#/agents-preview',
+          text: 'IT Hygiene',
         },
         { agent: props.agent },
         { text: 'Configuration' },

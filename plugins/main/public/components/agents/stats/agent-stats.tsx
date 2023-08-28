@@ -108,8 +108,7 @@ export const MainAgentStats = compose(
       text: '',
     },
     {
-      text: 'Endpoints summary',
-      href: '#/agents-preview',
+      text: 'IT Hygiene',
     },
     { agent },
     {

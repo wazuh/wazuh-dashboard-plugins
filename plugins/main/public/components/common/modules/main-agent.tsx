@@ -73,8 +73,7 @@ export class MainModuleAgent extends Component {
           text: '',
         },
         {
-          text: 'Endpoints summary',
-          href: '#/agents-preview',
+          text: 'IT Hygiene',
         },
         { agent: this.props.agent },
         {
