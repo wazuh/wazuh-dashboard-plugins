@@ -9,31 +9,24 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Fragment, Component } from 'react';
+import React, { Component } from 'react';
 
 import {
-	EuiButtonIcon,
-	EuiCard,
-	EuiFlexGrid,
 	EuiFlexGroup,
 	EuiFlexItem,
-	EuiIcon,
 	EuiPage,
 	EuiPageBody,
 	EuiSpacer,
-	EuiTabbedContent,
 	EuiText,
 	EuiTitle,
-	EuiToolTip
 } from '@elastic/eui';
 
-import WzModuleGuide from './module-guide';
 import WzSampleData from './sample-data';
 import modeGuides from './guides';
 
-import { WAZUH_MODULES } from '../../../common/wazuh-modules';
-import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import store from '../../redux/store';
+import { compose } from 'redux';
+
+import { withGlobalBreadcrumb } from '../common/hocs';
 
 const guides = Object.keys(modeGuides).map(key => modeGuides[key]).sort((a,b) => {
 	if (a.name < b.name) { return -1 }
@@ -50,7 +43,7 @@ interface IStateWzAddModulesData {
 	selectedGuideCategory: any
 };
 
-export default class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
+class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
 	tabs: any
 	constructor(props){
 		super(props);
@@ -96,16 +89,7 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 		// }
 		// "redirect=sample_data" is injected into the href of the "here" button in the callout notifying of installed sample alerts
 	}
-	setGlobalBreadcrumb() {
-    const breadcrumb = [
-			{ text: '' },
-			{ text: 'Server data' }
-		];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-  componentDidMount() {
-    this.setGlobalBreadcrumb();
-  }
+
 	changeGuide = (guide: string = '') => {
 		this.setState({ guide });
 	}
@@ -177,3 +161,13 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 		)
 	}
 }
+
+
+export default compose(
+  withGlobalBreadcrumb(props => {
+    return [
+      { text: '' },
+      { text: 'Server data' }
+    ];
+  }),
+)(WzAddModulesData);

@@ -24,20 +24,33 @@ import {
   EuiPage,
   EuiButtonEmpty,
 } from '@elastic/eui';
-import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import './welcome.scss';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { withErrorBoundary } from '../hocs';
+import {
+  withErrorBoundary,
+  withGlobalBreadcrumb,
+  withReduxProvider,
+} from '../hocs';
 import {
   LogoDocker,
   LogoGitHub,
   LogoGoogleCloud,
   LogoOffice365,
 } from '../logos';
+import { compose } from 'redux';
 
-export const OverviewWelcome = withErrorBoundary(
+export const OverviewWelcome = compose(
+  withReduxProvider,
+  withErrorBoundary,
+  withGlobalBreadcrumb(props => {
+    return [
+      { text: '' },
+      { text: 'Overview' }
+    ];
+  })
+)(
   class OverviewWelcome extends Component {
     constructor(props) {
       super(props);
@@ -46,14 +59,6 @@ export const OverviewWelcome = withErrorBoundary(
       this.state = {
         extensions: this.props.extensions,
       };
-    }
-    setGlobalBreadcrumb() {
-      const breadcrumb = [{ text: '' }, { text: 'Overview' }];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    }
-
-    componentDidMount() {
-      this.setGlobalBreadcrumb();
     }
 
     buildTabCard(tab, icon) {

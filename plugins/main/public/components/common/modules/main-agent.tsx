@@ -19,7 +19,6 @@ import {
   EuiButtonEmpty,
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
-import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../redux/store';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { AppState } from '../../../react-services/app-state';
@@ -27,6 +26,8 @@ import { ReportingService } from '../../../react-services/reporting';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AgentInfo } from '../../common/welcome/agents-info';
 import { getAngularModule } from '../../../kibana-services';
+import { compose } from 'redux';
+import { withGlobalBreadcrumb } from '../hocs';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -53,42 +54,9 @@ export class MainModuleAgent extends Component {
     };
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.section !== this.props.section) {
-      this.setGlobalBreadcrumb();
-    }
-  }
-
-  setGlobalBreadcrumb() {
-    let breadcrumb;
-    if (this.props.section === 'welcome') {
-      breadcrumb = [
-        { text: '' },
-        { text: 'Endpoints summary', href: '#/agents-preview' },
-        { text: this.props.agent.id },
-      ];
-    } else {
-      breadcrumb = [
-        {
-          text: '',
-        },
-        {
-          text: 'IT Hygiene',
-        },
-        { agent: this.props.agent },
-        {
-          text: WAZUH_MODULES[this.props.section].title,
-        },
-      ];
-    }
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    $('#breadcrumbNoTitle').attr('title', '');
-  }
-
   async componentDidMount() {
     const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
-    this.setGlobalBreadcrumb();
   }
 
   showAgentInfo() {
@@ -265,3 +233,29 @@ export class MainModuleAgent extends Component {
     );
   }
 }
+
+
+export default compose(
+  withGlobalBreadcrumb(({agent, section}) => {
+    if (section === 'welcome') {
+      return [
+        { text: '' },
+        { text: 'IT Hygiene' },
+        { text: agent.id },
+      ];
+    } else {
+      return [
+        {
+          text: '',
+        },
+        {
+          text: 'IT Hygiene',
+        },
+        { agent: agent },
+        {
+          text: WAZUH_MODULES[section].title,
+        },
+      ];
+    }
+  }),
+)(MainModuleAgent);

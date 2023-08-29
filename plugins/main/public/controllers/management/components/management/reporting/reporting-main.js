@@ -14,25 +14,13 @@ import React, { Component } from 'react';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzReportingOverview from './reporting-overview';
-import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
-import store from '../../../../../redux/store';
+import { compose } from 'redux';
+import { withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 
 class WzReporting extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-  }
-
-  setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Reporting' }
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
-
-  componentDidMount() {
-    this.setGlobalBreadcrumb();
   }
 
   render() {
@@ -44,4 +32,9 @@ class WzReporting extends Component {
   }
 }
 
-export default WzReporting;
+export default compose(withGlobalBreadcrumb( props => {
+  return [
+    { text: '' },
+    { text: 'Reporting' }
+  ];
+}))(WzReporting);
