@@ -255,7 +255,7 @@ export class WazuhPlugin
         {
           category: categoryEndpointSecurity,
           id: 'wz-security-configuration-assessment',
-          title: 'Security Configuration Assessment',
+          title: 'Security configuration assessment',
           redirectTo: () =>
             `/overview/?tab=sca&tabView=panels${
               store.getState()?.appStateReducers?.currentAgentData?.id
@@ -503,8 +503,8 @@ export class WazuhPlugin
         },
         {
           category: categoryCloudSecurity,
-          id: 'wz-docker',
-          title: 'Docker',
+          id: 'wz-docker-listener',
+          title: 'Docker listener',
           redirectTo: () =>
             `/overview/?tab=docker&tabView=panels${
               store.getState()?.appStateReducers?.currentAgentData?.id
