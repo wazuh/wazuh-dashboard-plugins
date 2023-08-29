@@ -59,7 +59,10 @@ import {
 } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { navigateAppURL } from '../../../react-services/navigate-app';
+import {
+  getNavigationAppURL,
+  navigateAppURL,
+} from '../../../react-services/navigate-app';
 
 export const AgentsWelcome = compose(
   withReduxProvider,
@@ -400,7 +403,7 @@ export const AgentsWelcome = compose(
                       iconType='popout'
                       color='primary'
                       onClick={() => {
-                        window.location.href = `#/overview?tab=mitre`;
+                        navigateAppURL('/app/wz-mitre-attack');
                         this.router.reload();
                       }}
                       aria-label='Open MITRE'
@@ -509,7 +512,13 @@ export const AgentsWelcome = compose(
               </Fragment>
             }
             actions={
-              <EuiButton href='#/agents-preview?' color='primary' fill>
+              <EuiButton
+                href={getNavigationAppURL(
+                  '/app/wz-endpoints-summary#/agents-preview',
+                )}
+                color='primary'
+                fill
+              >
                 Back
               </EuiButton>
             }
