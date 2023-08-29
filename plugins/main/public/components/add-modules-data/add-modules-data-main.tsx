@@ -99,8 +99,7 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 	setGlobalBreadcrumb() {
     const breadcrumb = [
 			{ text: '' },
-			{ text: 'Management', href: '#/manager' },
-			{ text: 'Sample data' }
+			{ text: 'Server data' }
 		];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
@@ -117,7 +116,7 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 		return category !== '' ? guides.filter(guide => guide.category === category) : guides;
 	}
 	render(){
-		// const { guide, selectedGuideCategory } = this.state; // DON'T DELETE. IT'S FOR MODULE GUIDES. 
+		// const { guide, selectedGuideCategory } = this.state; // DON'T DELETE. IT'S FOR MODULE GUIDES.
 		return (
 			<EuiPage restrictWidth='1200px'>
 				<EuiPageBody>

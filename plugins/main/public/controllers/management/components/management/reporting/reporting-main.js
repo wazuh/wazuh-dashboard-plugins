@@ -26,7 +26,6 @@ class WzReporting extends Component {
   setGlobalBreadcrumb() {
     const breadcrumb = [
       { text: '' },
-      { text: 'Management', href: '#/manager' },
       { text: 'Reporting' }
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));

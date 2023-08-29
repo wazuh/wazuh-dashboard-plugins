@@ -251,7 +251,6 @@ export class WzStatisticsOverview extends Component {
 export default compose(
   withGlobalBreadcrumb([
     { text: '' },
-    { text: 'Management', href: '#/manager' },
     { text: 'Statistics' }
   ]),
   withGuard(props => {
@@ -283,7 +282,7 @@ export default compose(
         }
         setLoading(false);
       };
-  
+
       fetchData();
     }, []);
     if(loading){
