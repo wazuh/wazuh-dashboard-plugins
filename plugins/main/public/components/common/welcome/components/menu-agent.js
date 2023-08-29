@@ -10,13 +10,21 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexGrid, EuiFlexGroup, EuiFlexItem, EuiIcon, EuiSideNav } from '@elastic/eui';
+import {
+  EuiFlexGrid,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiIcon,
+  EuiSideNav,
+} from '@elastic/eui';
 import { connect } from 'react-redux';
 import { AppState } from '../../../../react-services/app-state';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
 import { getAngularModule, getToasts } from '../../../../kibana-services';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import { getAgentSections } from './agent-sections';
+import { WAZUH_MODULES } from '../../../../../common/wazuh-modules';
+import { navigateAppURL } from '../../../../react-services/navigate-app';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -31,14 +39,14 @@ class WzMenuAgent extends Component {
       ? JSON.parse(window.localStorage.getItem('menuAgent'))
       : {};
 
-    this.agentSections = getAgentSections(this.menuAgent)
+    this.agentSections = getAgentSections(this.menuAgent);
 
     this.securityInformationItems = [
       this.agentSections.general,
       this.agentSections.fim,
       this.agentSections.aws,
       this.agentSections.gcp,
-      this.agentSections.github
+      this.agentSections.github,
     ];
     this.auditingItems = [
       this.agentSections.pm,
@@ -70,11 +78,13 @@ class WzMenuAgent extends Component {
     this.router = $injector.get('$route');
   }
 
-  clickMenuItem = (section) => {
+  clickMenuItem = section => {
     this.props.closePopover();
     if (this.props.currentTab !== section) {
       // do not redirect if we already are in that tab
-      window.location.href = `#/overview/?tab=${section}`;
+      navigateAppURL(
+        `/app/${WAZUH_MODULES[section].appId}#/overview/?tab=${section}`,
+      );
       this.props.updateCurrentAgentData(this.props.isAgent);
       this.router.reload();
     }
@@ -84,17 +94,17 @@ class WzMenuAgent extends Component {
     getToasts().add({ title, text, toastLifeTimeMs: time, color });
   }
 
-  createItems = (items) => {
-    const keyExists = (key) => Object.keys(this.state.extensions).includes(key);
-    const keyIsTrue = (key) => (this.state.extensions || [])[key];
+  createItems = items => {
+    const keyExists = key => Object.keys(this.state.extensions).includes(key);
+    const keyIsTrue = key => (this.state.extensions || [])[key];
     return items
       .filter(
-        (item) =>
+        item =>
           hasAgentSupportModule(this.props.currentAgentData, item.id) &&
           Object.keys(this.state.extensions).length &&
-          (!keyExists(item.id) || keyIsTrue(item.id))
+          (!keyExists(item.id) || keyIsTrue(item.id)),
       )
-      .map((item) => this.createItem(item));
+      .map(item => this.createItem(item));
   };
 
   createItem = (item, data = {}) => {
@@ -139,12 +149,15 @@ class WzMenuAgent extends Component {
                         color: 'danger',
                       });
                     }
-                    window.localStorage.setItem('menuAgent', JSON.stringify(this.menuAgent));
+                    window.localStorage.setItem(
+                      'menuAgent',
+                      JSON.stringify(this.menuAgent),
+                    );
                     this.props.updateMenuAgents();
                   }}
-                  color="primary"
+                  color='primary'
                   type={this.menuAgent[item.id] ? 'pinFilled' : 'pin'}
-                  aria-label="Next"
+                  aria-label='Next'
                   style={{ cursor: 'pointer' }}
                 />
               </EuiFlexItem>
@@ -158,48 +171,57 @@ class WzMenuAgent extends Component {
   render() {
     const securityInformation = [
       this.createItem(this.agentSections.securityInformation, {
-        icon: <EuiIcon type="managementApp" color="primary" />,
+        icon: <EuiIcon type='managementApp' color='primary' />,
         items: this.createItems(this.securityInformationItems),
       }),
     ];
 
     const auditing = [
       this.createItem(this.agentSections.auditing, {
-        icon: <EuiIcon type="managementApp" color="primary" />,
+        icon: <EuiIcon type='managementApp' color='primary' />,
         items: this.createItems(this.auditingItems),
       }),
     ];
 
     const threatDetection = [
       this.createItem(this.agentSections.threatDetection, {
-        icon: <EuiIcon type="reportingApp" color="primary" />,
+        icon: <EuiIcon type='reportingApp' color='primary' />,
         items: this.createItems(this.threatDetectionItems),
       }),
     ];
 
     const regulatoryCompliance = [
       this.createItem(this.agentSections.regulatoryCompliance, {
-        icon: <EuiIcon type="reportingApp" color="primary" />,
+        icon: <EuiIcon type='reportingApp' color='primary' />,
         items: this.createItems(this.regulatoryComplianceItems),
       }),
     ];
 
     return (
-      <div className="WzManagementSideMenu">
+      <div className='WzManagementSideMenu'>
         {(Object.keys(this.state.extensions).length && (
           <div>
             <EuiFlexGrid columns={2}>
               <EuiFlexItem>
-                <EuiSideNav items={securityInformation} style={{ padding: '4px 12px' }} />
+                <EuiSideNav
+                  items={securityInformation}
+                  style={{ padding: '4px 12px' }}
+                />
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiSideNav items={threatDetection} style={{ padding: '4px 12px' }} />
+                <EuiSideNav
+                  items={threatDetection}
+                  style={{ padding: '4px 12px' }}
+                />
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiSideNav items={regulatoryCompliance} style={{ padding: '4px 12px' }} />
+                <EuiSideNav
+                  items={regulatoryCompliance}
+                  style={{ padding: '4px 12px' }}
+                />
               </EuiFlexItem>
             </EuiFlexGrid>
           </div>
@@ -209,15 +231,16 @@ class WzMenuAgent extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     currentAgentData: state.appStateReducers.currentAgentData,
     currentTab: state.appStateReducers.currentTab,
   };
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  updateCurrentAgentData: (agentData) => dispatch(updateCurrentAgentData(agentData)),
+const mapDispatchToProps = dispatch => ({
+  updateCurrentAgentData: agentData =>
+    dispatch(updateCurrentAgentData(agentData)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WzMenuAgent);

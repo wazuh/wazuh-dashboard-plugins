@@ -36,6 +36,7 @@ import {
 } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { navigateAppURL } from '../../../../../react-services/navigate-app';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -208,7 +209,9 @@ class WzGroupAgentsTable extends Component {
                 aria-label='Go to the agent'
                 iconType='eye'
                 onClick={async () => {
-                  this.props.groupsProps.showAgent(item);
+                  navigateAppURL(
+                    `/app/wz-endpoints-summary#/agents?agent=${item.id}`,
+                  );
                 }}
                 color='primary'
               />
