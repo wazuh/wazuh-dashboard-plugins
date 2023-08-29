@@ -669,7 +669,7 @@ jest.mock('react', () => ({
 }));
 
 // TODO: Fix this test
-describe.skip('AgentsTable component', () => {
+describe('AgentsTable component', () => {
   WzRequest.apiReq = jest.fn(AgentsTable, 'wzReq').mockResolvedValue({
     data: {
       data: { affected_items: data },
