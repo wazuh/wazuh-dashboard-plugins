@@ -37,7 +37,7 @@ export class GroupsController {
       // Listeners
 
       // Resetting the factory configuration
-      this.scope.$on('$destroy', () => { });
+      this.scope.$on('$destroy', () => {});
 
       this.scope.$watch('lookingGroup', value => {
         this.addingAgents = false;
@@ -51,11 +51,11 @@ export class GroupsController {
       this.exportConfigurationProps = {
         exportConfiguration: enabledComponents =>
           this.exportConfiguration(enabledComponents),
-        type: 'group'
+        type: 'group',
       };
 
       this.filesInGroupTableProps = {
-        exportConfigurationProps: this.exportConfigurationProps
+        exportConfigurationProps: this.exportConfigurationProps,
       };
 
       return;
@@ -72,15 +72,18 @@ export class GroupsController {
       // If come from agents
       // Store a boolean variable to check if come from agents
       this.globalAgent = this.shareAgent.getAgent();
-      if (this.globalAgent) {
-        const globalGroup = this.shareAgent.getSelectedGroup();
+      if (this.globalAgent || this.location.search()?.group) {
+        const globalGroup =
+          this.shareAgent.getSelectedGroup() || this.location.search().group;
         // Get ALL groups
         const data = await WzRequest.apiReq('GET', '/groups', {});
-        const filtered = data.data.data.affected_items.filter(group => group.name === globalGroup);
+        const filtered = data.data.data.affected_items.filter(
+          group => group.name === globalGroup,
+        );
         if (Array.isArray(filtered) && filtered.length) {
           // Load that our group
           this.buildGroupsTableProps(data.data.data.items, {
-            group: filtered[0]
+            group: filtered[0],
           });
         } else {
           throw Error(`Group ${globalGroup} not found`);
@@ -121,7 +124,7 @@ export class GroupsController {
     this.reportingService.startConfigReport(
       group,
       'groupConfig',
-      enabledComponents
+      enabledComponents,
     );
   }
 
@@ -145,7 +148,7 @@ export class GroupsController {
       exportConfigurationProps: {
         exportConfiguration: (enabledComponents, group) =>
           this.exportConfiguration(enabledComponents, group),
-        type: 'group'
+        type: 'group',
       },
       currentGroup: group => {
         this.currentGroup = group;
@@ -156,7 +159,7 @@ export class GroupsController {
       showAgent: agent => {
         this.showAgent(agent);
       },
-      selectedGroup: this.redirectGroup
+      selectedGroup: this.redirectGroup,
     };
     this.mctrl.managementProps.groupsProps = this.groupsTableProps;
   }
