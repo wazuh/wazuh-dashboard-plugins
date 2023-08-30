@@ -45,7 +45,14 @@
           "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
           "version": "2"
         },
-        "group": ["default", "test", "test2", "test3", "test4", "test5"],
+        "group": [
+          "default",
+          "test",
+          "test2",
+          "test3",
+          "test4",
+          "test5"
+        ],
         "ip": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",
         "id": "001",
         "registerIP": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",
@@ -68,7 +75,11 @@
           "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
           "version": "2"
         },
-        "group": ["default", "test", "test2"],
+        "group": [
+          "default",
+          "test",
+          "test2"
+        ],
         "ip": "127.0.0.1",
         "id": "002",
         "registerIP": "127.0.0.1",
@@ -97,7 +108,10 @@
         "status": "disconnected",
         "name": "disconnected-agent",
         "dateAdd": "1970-01-01T00:00:00Z",
-        "group": ["default", "test"],
+        "group": [
+          "default",
+          "test"
+        ],
         "lastKeepAlive": "2023-03-14T04:20:51Z",
         "node_name": "node01",
         "registerIP": "any",
@@ -131,7 +145,9 @@
         },
         "ip": "127.0.0.1",
         "id": "005",
-        "group": ["default"],
+        "group": [
+          "default"
+        ],
         "registerIP": "127.0.0.1",
         "dateAdd": "2022-08-25T16:17:46Z",
         "name": "macOS High Sierra agent",
@@ -155,7 +171,9 @@
         "ip": "172.19.0.27",
         "status": "pending",
         "name": "Pending agent",
-        "group": ["default"],
+        "group": [
+          "default"
+        ],
         "node_name": "master-node",
         "version": "Wazuh v4.4.0",
         "lastKeepAlive": "2023-03-16T15:15:05+00:00",
@@ -210,7 +228,10 @@
         "status": "disconnected",
         "name": "disconnected-agent-2",
         "dateAdd": "1970-01-01T00:00:00Z",
-        "group": ["default", "test"],
+        "group": [
+          "default",
+          "test"
+        ],
         "lastKeepAlive": "2023-03-14T04:20:51Z",
         "node_name": "node01",
         "registerIP": "any",

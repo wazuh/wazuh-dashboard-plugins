@@ -29,7 +29,7 @@ export const ModuleMitreAttackIntelligence = compose(
   const [selectedResource, setSelectedResource] = useState(MitreAttackResources[0].id);
   const [searchTermAllResources, setSearchTermAllResources] = useState('');
   const searchTermAllResourcesLastSearch = useRef('');
-  const [resourceFilters, setResourceFilters] = useState([]);
+  const [resourceFilters, setResourceFilters] = useState({});
   const searchTermAllResourcesUsed = useRef(false);
   const searchTermAllResourcesAction = useAsyncAction(
     async (searchTerm) => {
@@ -37,11 +37,23 @@ export const ModuleMitreAttackIntelligence = compose(
       searchTermAllResourcesUsed.current = true;
       searchTermAllResourcesLastSearch.current = searchTerm;
       const limitResults = 5;
+      const fields = ['name', 'description', 'external_id'];
       return (
         await Promise.all(
           MitreAttackResources.map(async (resource) => {
             const response = await WzRequest.apiReq('GET', resource.apiEndpoint, {
-              params: { search: searchTerm, limit: limitResults },
+              params: {
+                ...(
+                  searchTerm
+                    ? {
+                      q: fields
+                        .map(key => `${key}~${searchTerm}`)
+                        .join(',')
+                    }
+                    : {}
+                ),
+                limit: limitResults
+              }
             });
             return {
               id: resource.id,
@@ -53,9 +65,18 @@ export const ModuleMitreAttackIntelligence = compose(
                 response?.data?.data?.total_affected_items &&
                 response?.data?.data?.total_affected_items > limitResults &&
                 (() => {
-                  setResourceFilters([
-                    { field: 'search', value: searchTermAllResourcesLastSearch.current },
-                  ]);
+                  setResourceFilters({
+                    ...(
+                      searchTermAllResourcesLastSearch.current
+                        ? {
+                          q: fields
+                            .map(key => `${key}~${searchTermAllResourcesLastSearch.current}`)
+                            .join(',')
+                        }
+                        : {}
+                    )
+                  }
+                  );
                   setSelectedResource(resource.id);
                 }),
             };
@@ -76,7 +97,7 @@ export const ModuleMitreAttackIntelligence = compose(
 
   const onSelectResource = useCallback(
     (resourceID) => {
-      setResourceFilters([]);
+      setResourceFilters({});
       setSelectedResource((prevSelectedResource) =>
         prevSelectedResource === resourceID && searchTermAllResourcesUsed.current
           ? null

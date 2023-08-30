@@ -14,41 +14,37 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  EuiBasicTable,
   EuiButton,
-  EuiButtonEmpty,
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
   EuiToolTip,
-  EuiTitle,
-  EuiSpacer,
-  EuiCallOut,
-  EuiCheckboxGroup,
-  EuiIcon,
+  EuiIconTip,
 } from '@elastic/eui';
-import { getToasts } from '../../../kibana-services';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
-import {
-  WzSearchBar,
-  filtersToObject,
-} from '../../../components/wz-search-bar';
-import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import {
   API_NAME_AGENT_STATUS,
-  UI_LOGGER_LEVELS,
   UI_ORDER_AGENT_STATUS,
   AGENT_SYNCED_STATUS,
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
 } from '../../../../common/constants';
-import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent-status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
+import { TableWzAPI } from '../../../components/common/tables';
+import { WzRequest } from '../../../react-services/wz-request';
+import { get as getLodash } from 'lodash';
+
+const searchBarWQLOptions = {
+  implicitQuery: {
+    query: 'id!=000',
+    conjunction: ';',
+  },
+};
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -56,283 +52,41 @@ export const AgentsTable = withErrorBoundary(
     constructor(props) {
       super(props);
       this.state = {
-        agents: [],
-        isLoading: false,
-        pageIndex: 0,
-        pageSize: 15,
-        sortDirection: 'asc',
-        sortField: 'id',
-        totalItems: 0,
-        selectedItems: [],
-        allSelected: false,
-        purgeModal: false,
-        isFilterColumnOpen: false,
-        filters: sessionStorage.getItem('agents_preview_selected_options')
-          ? JSON.parse(
-              sessionStorage.getItem('agents_preview_selected_options'),
-            )
-          : [],
+        filters: {
+          default: { q: 'id!=000' },
+          ...(sessionStorage.getItem('wz-agents-overview-table-filter')
+            ? JSON.parse(
+                sessionStorage.getItem('wz-agents-overview-table-filter'),
+              )
+            : {}),
+        },
+        reloadTable: 0,
       };
-      this.suggestions = [
-        {
-          type: 'q',
-          label: 'status',
-          description: 'Filter by agent connection status',
-          operators: ['=', '!='],
-          values: UI_ORDER_AGENT_STATUS,
-        },
-        {
-          type: 'q',
-          label: 'group_config_status',
-          description: 'Filter by agent synced configuration status',
-          operators: ['=', '!='],
-          values: [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED],
-        },
-        {
-          type: 'q',
-          label: 'os.platform',
-          description: 'Filter by operating system platform',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('os.platform', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'ip',
-          description: 'Filter by agent IP address',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('ip', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'name',
-          description: 'Filter by agent name',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('name', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'id',
-          description: 'Filter by agent id',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('id', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'group',
-          description: 'Filter by agent group',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('group', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'node_name',
-          description: 'Filter by node name',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('node_name', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'manager',
-          description: 'Filter by manager',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('manager', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'version',
-          description: 'Filter by agent version',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('version', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'configSum',
-          description: 'Filter by agent config sum',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('configSum', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'mergedSum',
-          description: 'Filter by agent merged sum',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('mergedSum', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'dateAdd',
-          description: 'Filter by add date',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('dateAdd', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'lastKeepAlive',
-          description: 'Filter by last keep alive',
-          operators: ['=', '!='],
-          values: async value =>
-            getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000' }),
-        },
-      ];
-      this.downloadCsv.bind(this);
     }
-
-    onTableChange = ({ page = {}, sort = {} }) => {
-      const { index: pageIndex, size: pageSize } = page;
-      const { field: sortField, direction: sortDirection } = sort;
-      this._isMount &&
-        this.setState({
-          pageIndex,
-          pageSize,
-          sortField,
-          sortDirection,
-        });
-    };
 
     async componentDidMount() {
       this._isMount = true;
-      await this.getItems();
     }
 
     componentWillUnmount() {
       this._isMount = false;
-      if (sessionStorage.getItem('agents_preview_selected_options')) {
-        sessionStorage.removeItem('agents_preview_selected_options');
+      if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
+        sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
     }
 
     async reloadAgents() {
-      await this.getItems();
+      this.setState({ reloadTable: Date.now() });
       await this.props.reload();
     }
 
-    async componentDidUpdate(prevProps, prevState) {
+    async componentDidUpdate(prevProps) {
       if (
-        !_.isEqual(prevState.filters, this.state.filters) ||
-        prevState.pageIndex !== this.state.pageIndex ||
-        prevState.pageSize !== this.state.pageSize ||
-        prevState.sortField !== this.state.sortField ||
-        prevState.sortDirection !== this.state.sortDirection
+        // TODO: external filters
+        !_.isEqual(prevProps.filters, this.props.filters)
       ) {
-        await this.getItems();
-      } else if (
-        !_.isEqual(prevProps.filters, this.props.filters) &&
-        this.props.filters &&
-        this.props.filters.length
-      ) {
-        this.setState({ filters: this.props.filters, pageIndex: 0 });
-        this.props.removeFilters();
+        this.setState({ filters: this.props.filters });
       }
-    }
-
-    async getItems() {
-      try {
-        this._isMount && this.setState({ isLoading: true });
-        const selectFieldsList = this.defaultColumns
-          .filter(field => field.field != 'actions')
-          .map(field => field.field.replace('os_', 'os.')); // "os_name" subfield should be specified as 'os.name'
-        const selectFields = [
-          ...selectFieldsList,
-          'os.platform',
-          'os.uname',
-          'os.version',
-        ].join(','); // Add version and uname fields to render the OS icon and version in the table
-
-        const rawAgents = await this.props.wzReq('GET', '/agents', {
-          params: { ...this.buildFilter(), select: selectFields },
-        });
-        const formatedAgents = rawAgents?.data?.data?.affected_items?.map(
-          this.formatAgent.bind(this),
-        );
-
-        this._isMount &&
-          this.setState({
-            agents: formatedAgents,
-            totalItems: rawAgents?.data?.data?.total_affected_items,
-            isLoading: false,
-          });
-      } catch (error) {
-        const options = {
-          context: `${AgentsTable.name}.getItems`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Could not get the agents list`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-        this.setState({ isLoading: false });
-      }
-    }
-
-    buildFilter() {
-      const { pageIndex, pageSize, filters } = this.state;
-
-      const filter = {
-        ...filtersToObject(filters),
-        offset: pageIndex * pageSize || 0,
-        limit: pageSize,
-        sort: this.buildSortFilter(),
-      };
-      filter.q = !filter.q ? `id!=000` : `id!=000;${filter.q}`;
-
-      return filter;
-    }
-
-    buildSortFilter() {
-      const { sortField, sortDirection } = this.state;
-
-      const field = sortField === 'os_name' ? 'os.name,os.version' : sortField;
-      const direction = sortDirection === 'asc' ? '+' : '-';
-
-      return direction + field;
-    }
-
-    buildQFilter() {
-      const { q } = this.state;
-      return q === '' ? `id!=000` : `id!=000;${q}`;
-    }
-
-    formatAgent(agent) {
-      const agentVersion =
-        agent.version !== undefined ? agent.version.split(' ')[1] : '-';
-      const node_name =
-        agent.node_name && agent.node_name !== 'unknown'
-          ? agent.node_name
-          : '-';
-
-      return {
-        id: agent.id,
-        name: agent.name,
-        ip: agent.ip,
-        status: agent.status,
-        status_code: agent.status_code,
-        group_config_status: agent.group_config_status,
-        group: agent?.group || '-',
-        os_name: agent,
-        version: agentVersion,
-        node_name: node_name,
-        dateAdd: agent.dateAdd ? formatUIDate(agent.dateAdd) : '-',
-        lastKeepAlive: agent.lastKeepAlive
-          ? formatUIDate(agent.lastKeepAlive)
-          : '-',
-        actions: agent,
-        upgrading: false,
-      };
     }
 
     actionButtonsRender(agent) {
@@ -405,130 +159,6 @@ export const AgentsTable = withErrorBoundary(
       );
     }
 
-    reloadAgent = () => {
-      this._isMount &&
-        this.setState({
-          isLoading: true,
-        });
-      this.props.reload();
-    };
-
-    downloadCsv = () => {
-      const filters = this.buildFilter();
-      const formatedFilters = Object.keys(filters)
-        .filter(field => !['limit', 'offset', 'sort'].includes(field))
-        .map(field => ({ name: field, value: filters[field] }));
-      this.props.downloadCsv(formatedFilters);
-    };
-
-    openColumnsFilter = () => {
-      this.setState({
-        isFilterColumnOpen: !this.state.isFilterColumnOpen,
-      });
-    };
-
-    formattedButton() {
-      return (
-        <>
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType='importAction' onClick={this.downloadCsv}>
-              Export formatted
-            </EuiButtonEmpty>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiToolTip content='Select columns table' position='left'>
-              <EuiButtonEmpty onClick={this.openColumnsFilter}>
-                <EuiIcon type='managementApp' color='primary' />
-              </EuiButtonEmpty>
-            </EuiToolTip>
-          </EuiFlexItem>
-        </>
-      );
-    }
-
-    showToast = (color, title, text, time) => {
-      getToasts().add({
-        color: color,
-        title: title,
-        text: text,
-        toastLifeTimeMs: time,
-      });
-    };
-
-    callOutRender() {
-      const { selectedItems, pageSize, allSelected, totalItems } = this.state;
-
-      if (selectedItems.length === 0) {
-        return;
-      } else if (selectedItems.length === pageSize) {
-        return (
-          <div>
-            <EuiSpacer size='m' />
-            <EuiCallOut
-              size='s'
-              title={
-                !allSelected
-                  ? `The ${selectedItems.length} agents on this page are selected`
-                  : ''
-              }
-            >
-              <EuiFlexGroup>
-                <EuiFlexItem grow={false}>
-                  <EuiButton
-                    onClick={() => {
-                      this._isMount &&
-                        this.setState(prevState => ({
-                          allSelected: !prevState.allSelected,
-                        }));
-                    }}
-                  >
-                    {allSelected
-                      ? `Clear all agents selection (${totalItems})`
-                      : `Select all agents (${totalItems})`}
-                  </EuiButton>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiCallOut>
-            <EuiSpacer size='s' />
-          </div>
-        );
-      }
-    }
-
-    // Check in the localstorage what is the column configuration
-    // and check that the columns are valid.
-    // If it is not a valid column it ignores it and if any column is missing it adds it.
-
-    getTableColumnsSelected() {
-      const columnsSelected = JSON.parse(
-        window.localStorage.getItem('columnsSelectedTableAgent'),
-      );
-      if (!columnsSelected) {
-        return [];
-      }
-      const customColumns = this.defaultColumns.map(field => {
-        const fieldConfig = columnsSelected.filter(
-          column => column?.field === field?.field,
-        );
-        if (fieldConfig.length > 0) {
-          return fieldConfig[0];
-        }
-        return field;
-      });
-      window.localStorage.setItem(
-        'columnsSelectedTableAgent',
-        JSON.stringify(customColumns),
-      );
-      return customColumns;
-    }
-
-    setTableColumnsSelected(data) {
-      window.localStorage.setItem(
-        'columnsSelectedTableAgent',
-        JSON.stringify(data),
-      );
-    }
-
     // Columns with the property truncateText: true won't wrap the text
     // This is added to prevent the wrap because of the table-layout: auto
     defaultColumns = [
@@ -537,18 +167,21 @@ export const AgentsTable = withErrorBoundary(
         name: 'ID',
         sortable: true,
         show: true,
+        searchable: true,
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
         show: true,
+        searchable: true,
       },
       {
         field: 'ip',
         name: 'IP address',
         sortable: true,
         show: true,
+        searchable: true,
       },
       {
         field: 'group',
@@ -556,37 +189,64 @@ export const AgentsTable = withErrorBoundary(
         sortable: true,
         show: true,
         render: groups => (groups !== '-' ? this.renderGroups(groups) : '-'),
+        searchable: true,
       },
       {
-        field: 'os_name',
+        field: 'os.name,os.version',
+        composeField: ['os.name', 'os.version'],
         name: 'Operating system',
         sortable: true,
         show: true,
-        render: this.addIconPlatformRender,
+        render: (field, agentData) => this.addIconPlatformRender(agentData),
+        searchable: true,
       },
       {
         field: 'node_name',
         name: 'Cluster node',
         sortable: true,
         show: true,
+        searchable: true,
       },
       {
         field: 'version',
         name: 'Version',
         sortable: true,
         show: true,
+        searchable: true,
       },
       {
         field: 'dateAdd',
-        name: 'Registration date',
+        name: (
+          <span>
+            Registration date{' '}
+            <EuiIconTip
+              content='This is not searchable through a search term.'
+              size='s'
+              color='subdued'
+              type='alert'
+            />
+          </span>
+        ),
         sortable: true,
         show: false,
+        searchable: false,
       },
       {
         field: 'lastKeepAlive',
-        name: 'Last keep alive',
+        name: (
+          <span>
+            Last keep alive{' '}
+            <EuiIconTip
+              content='This is not searchable through a search term.'
+              size='s'
+              color='subdued'
+              type='alert'
+            />
+          </span>
+        ),
         sortable: true,
         show: false,
+        searchable: false,
       },
       {
         field: 'status',
@@ -604,6 +264,7 @@ export const AgentsTable = withErrorBoundary(
         sortable: true,
         show: false,
         render: synced => <AgentSynced synced={synced} />,
+        searchable: true,
       },
       {
         align: 'right',
@@ -611,132 +272,10 @@ export const AgentsTable = withErrorBoundary(
         field: 'actions',
         name: 'Actions',
         show: true,
-        render: agent => this.actionButtonsRender(agent),
+        render: (field, agentData) => this.actionButtonsRender(agentData),
+        searchable: false,
       },
     ];
-
-    columns() {
-      const selectedColumns = this.getTableColumnsSelected();
-
-      if (selectedColumns.length != 0) {
-        const newSelectedColumns = [];
-        selectedColumns.forEach(item => {
-          if (item.show) {
-            const column = this.defaultColumns.find(
-              column => column.field === item.field,
-            );
-            newSelectedColumns.push(column);
-          }
-        });
-        return newSelectedColumns;
-      } else {
-        const fieldColumns = this.defaultColumns.map(item => {
-          return {
-            field: item.field,
-            name: item.name,
-            show: item.show,
-          };
-        });
-        this.setTableColumnsSelected(fieldColumns);
-        return fieldColumns;
-      }
-    }
-
-    headRender() {
-      const formattedButton = this.formattedButton();
-      return (
-        <div>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  {!!this.state.totalItems && (
-                    <EuiTitle size={'s'} style={{ padding: '6px 0px' }}>
-                      <h2>Agents ({this.state.totalItems})</h2>
-                    </EuiTitle>
-                  )}
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <WzButtonPermissions
-                buttonType='empty'
-                permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
-                iconType='plusInCircle'
-                onClick={() => this.props.addingNewAgent()}
-              >
-                Deploy new agent
-              </WzButtonPermissions>
-            </EuiFlexItem>
-            {formattedButton}
-          </EuiFlexGroup>
-          <EuiSpacer size='xs' />
-        </div>
-      );
-    }
-
-    filterBarRender() {
-      return (
-        <EuiFlexGroup>
-          <EuiFlexItem style={{ marginRight: 0 }}>
-            <WzSearchBar
-              noDeleteFiltersOnUpdateSuggests
-              filters={this.state.filters}
-              suggestions={this.suggestions}
-              onFiltersChange={filters =>
-                this.setState({ filters, pageIndex: 0 })
-              }
-              placeholder='Filter or search agent'
-            />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButton
-              iconType='refresh'
-              fill={true}
-              onClick={() => this.reloadAgents()}
-            >
-              Refresh
-            </EuiButton>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      );
-    }
-
-    selectColumnsRender() {
-      const columnsSelected = this.getTableColumnsSelected();
-
-      const onChange = optionId => {
-        let item = columnsSelected.find(item => item.field === optionId);
-        item.show = !item.show;
-        this.setTableColumnsSelected(columnsSelected);
-        this.forceUpdate();
-      };
-
-      const options = () => {
-        return columnsSelected.map(item => {
-          return {
-            id: item.field,
-            label: item.name,
-            checked: item.show,
-          };
-        });
-      };
-
-      return this.state.isFilterColumnOpen ? (
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiCheckboxGroup
-              options={options()}
-              onChange={onChange}
-              className='columnsSelectedCheckboxs'
-              idToSelectedMap={{}}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      ) : (
-        ''
-      );
-    }
 
     tableRender() {
       const getRowProps = item => {
@@ -763,50 +302,201 @@ export const AgentsTable = withErrorBoundary(
         };
       };
 
-      const {
-        pageIndex,
-        pageSize,
-        totalItems,
-        agents,
-        sortField,
-        sortDirection,
-        isLoading,
-      } = this.state;
-      const columns = this.columns();
-      const pagination =
-        totalItems > 15
-          ? {
-              pageIndex: pageIndex,
-              pageSize: pageSize,
-              totalItemCount: totalItems,
-              pageSizeOptions: [15, 25, 50, 100],
-            }
-          : false;
-      const sorting = {
-        sort: {
-          field: sortField,
-          direction: sortDirection,
-        },
-      };
-
       // The EuiBasicTable tableLayout is set to "auto" to improve the use of empty space in the component.
       // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
       // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
       return (
         <EuiFlexGroup className='wz-overflow-auto'>
           <EuiFlexItem>
-            <EuiBasicTable
-              tableLayout='auto'
-              items={agents}
-              itemId='id'
-              columns={columns}
-              onChange={this.onTableChange}
-              sorting={sorting}
-              loading={isLoading}
+            <TableWzAPI
+              title='Agents'
+              actionButtons={[
+                <WzButtonPermissions
+                  buttonType='empty'
+                  permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
+                  iconType='plusInCircle'
+                  onClick={() => this.props.addingNewAgent()}
+                >
+                  Deploy new agent
+                </WzButtonPermissions>,
+              ]}
+              endpoint='/agents'
+              tableColumns={this.defaultColumns}
+              tableInitialSortingField='id'
+              tablePageSizeOptions={[10, 25, 50, 100]}
+              reload={this.state.reloadTable}
+              mapResponseItem={item => {
+                return {
+                  ...item,
+                  ...(item.ip ? { ip: item.ip } : { ip: '-' }),
+                  ...(typeof item.dateAdd === 'string'
+                    ? { dateAdd: formatUIDate(item.dateAdd) }
+                    : { dateAdd: '-' }),
+                  ...(typeof item.lastKeepAlive === 'string'
+                    ? { lastKeepAlive: formatUIDate(item.lastKeepAlive) }
+                    : { lastKeepAlive: '-' }),
+                  ...(item.node_name !== 'unknown'
+                    ? { node_name: item.node_name }
+                    : { node_name: '-' }),
+                  /*
+                  The agent version contains the Wazuh word, this gets the string starting with
+                  v<NUMBER><ANYTHING>
+                  */
+                  ...(typeof item.version === 'string'
+                    ? { version: item.version.match(/(v\d.+)/)?.[1] }
+                    : { version: '-' }),
+                };
+              }}
               rowProps={getRowProps}
-              cellProps={getCellProps}
-              noItemsMessage='No agents found'
-              {...(pagination && { pagination })}
+              filters={this.state.filters}
+              downloadCsv
+              showReload
+              showFieldSelector
+              searchTable
+              searchBarWQL={{
+                options: searchBarWQLOptions,
+                suggestions: {
+                  field(currentValue) {
+                    return [
+                      {
+                        label: 'dateAdd',
+                        description: 'filter by registration date',
+                      },
+                      { label: 'id', description: 'filter by id' },
+                      { label: 'ip', description: 'filter by IP address' },
+                      { label: 'group', description: 'filter by group' },
+                      {
+                        label: 'group_config_status',
+                        description: 'filter by group configuration status',
+                      },
+                      {
+                        label: 'lastKeepAlive',
+                        description: 'filter by last keep alive',
+                      },
+                      { label: 'manager', description: 'filter by manager' },
+                      { label: 'name', description: 'filter by name' },
+                      {
+                        label: 'node_name',
+                        description: 'filter by cluster name',
+                      },
+                      {
+                        label: 'os.name',
+                        description: 'filter by operating system name',
+                      },
+                      {
+                        label: 'os.platform',
+                        description: 'filter by operating platform',
+                      },
+                      {
+                        label: 'os.version',
+                        description: 'filter by operating system version',
+                      },
+                      { label: 'status', description: 'filter by status' },
+                      { label: 'version', description: 'filter by version' },
+                    ];
+                  },
+                  value: async (currentValue, { field }) => {
+                    try {
+                      switch (field) {
+                        case 'status':
+                          return UI_ORDER_AGENT_STATUS.map(status => ({
+                            label: status,
+                          }));
+                        case 'group_config_status':
+                          return [
+                            AGENT_SYNCED_STATUS.SYNCED,
+                            AGENT_SYNCED_STATUS.NOT_SYNCED,
+                          ].map(label => ({
+                            label,
+                          }));
+                        default: {
+                          const response = await WzRequest.apiReq(
+                            'GET',
+                            '/agents',
+                            {
+                              params: {
+                                distinct: true,
+                                limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                                select: field,
+                                sort: `+${field}`,
+                                ...(currentValue
+                                  ? {
+                                      q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                    }
+                                  : {
+                                      q: `${searchBarWQLOptions.implicitQuery.query}`,
+                                    }),
+                              },
+                            },
+                          );
+                          if (field === 'group') {
+                            /* the group field is returned as an string[],
+                            example: ['group1', 'group2']
+
+                            Due the API request done to get the distinct values for the groups is
+                            not returning the exepected values, as workaround, the values are
+                            extracted in the frontend using the returned results.
+
+                            This API request to get the distint values of groups doesn't
+                            return the unique values for the groups, else the unique combination
+                            of groups.
+                            */
+                            return response?.data?.data.affected_items
+                              .map(item => getLodash(item, field))
+                              .flat()
+                              .filter(
+                                (item, index, array) =>
+                                  array.indexOf(item) === index,
+                              )
+                              .sort()
+                              .map(group => ({ label: group }));
+                          }
+                          return response?.data?.data.affected_items.map(
+                            item => ({
+                              label: getLodash(item, field),
+                            }),
+                          );
+                        }
+                      }
+                    } catch (error) {
+                      return [];
+                    }
+                  },
+                },
+                validate: {
+                  value: ({ formattedValue, value: rawValue }, { field }) => {
+                    const value = formattedValue ?? rawValue;
+                    if (value) {
+                      if (['dateAdd', 'lastKeepAlive'].includes(field)) {
+                        return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}:\d{2}(.\d{1,6})?Z?)?$/.test(
+                          value,
+                        )
+                          ? undefined
+                          : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
+                      }
+                    }
+                  },
+                },
+              }}
+              searchBarProps={{
+                buttonsRender: () => (
+                  <EuiButton
+                    iconType='refresh'
+                    fill={true}
+                    onClick={() => this.reloadAgents()}
+                  >
+                    Refresh
+                  </EuiButton>
+                ),
+              }}
+              saveStateStorage={{
+                system: 'localStorage',
+                key: 'wz-agents-overview-table',
+              }}
+              tableProps={{
+                tableLayout: 'auto',
+                cellProps: getCellProps,
+              }}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -814,25 +504,16 @@ export const AgentsTable = withErrorBoundary(
     }
 
     filterGroupBadge = group => {
-      const { filters } = this.state;
-      let auxFilters = filters.map(
-        filter => filter.value.match(/group=(.*S?)/)[1],
-      );
-      if (filters.length > 0) {
-        !auxFilters.includes(group)
-          ? this.setState({
-              filters: [...filters, { field: 'q', value: `group=${group}` }],
-            })
-          : false;
-      } else {
-        this.setState({
-          filters: [...filters, { field: 'q', value: `group=${group}` }],
-        });
-      }
+      this.setState({
+        filters: {
+          default: { q: 'id!=000' },
+          q: `id!=000;group=${group}`,
+        },
+      });
     };
 
     renderGroups(groups) {
-      return (
+      return Array.isArray(groups) ? (
         <GroupTruncate
           groups={groups}
           length={25}
@@ -841,28 +522,14 @@ export const AgentsTable = withErrorBoundary(
           filterAction={this.filterGroupBadge}
           {...this.props}
         />
-      );
+      ) : undefined;
     }
     render() {
-      const title = this.headRender();
-      const filter = this.filterBarRender();
-      const selectColumnsRender = this.selectColumnsRender();
       const table = this.tableRender();
-      const callOut = this.callOutRender();
-      let renderPurgeModal, loadItems;
 
       return (
         <div>
-          {filter}
-          <EuiSpacer size='m' />
-          <EuiPanel paddingSize='m'>
-            {title}
-            {loadItems}
-            {callOut}
-            {selectColumnsRender}
-            {table}
-            {renderPurgeModal}
-          </EuiPanel>
+          <EuiPanel paddingSize='m'>{table}</EuiPanel>
         </div>
       );
     }

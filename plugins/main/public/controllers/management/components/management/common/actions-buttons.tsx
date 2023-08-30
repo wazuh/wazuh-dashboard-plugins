@@ -34,7 +34,12 @@ async function uploadFiles(files, resource, overwrite) {
     for (let idx in files) {
       const { file, content } = files[idx];
       try {
-        await resourcesHandler.updateFile(file, content, overwrite);
+        await resourcesHandler.updateFile(
+          file,
+          content,
+          overwrite,
+          `etc/${resource}`, // upload files to `etc/{resource}` directory. Currently is not possible to select the target directory so it is set by default.
+        );
         results.push({
           index: idx,
           uploaded: true,
@@ -58,7 +63,7 @@ async function uploadFiles(files, resource, overwrite) {
   }
 }
 
-const getUpdatePermissionsFiles = (section) => {
+const getUpdatePermissionsFiles = section => {
   const { permissionResource } = resourceDictionary[section];
   return [
     {
@@ -74,32 +79,34 @@ const getUpdatePermissionsFiles = (section) => {
 
 // Add new rule button
 export const AddNewFileButton = ({ section, updateAddingFile }) => (
-  <>{
-    section !== SECTION_CDBLIST_SECTION &&
-    <WzButtonPermissions
-      permissions={getUpdatePermissionsFiles(section)}
-      buttonType="empty"
-      iconType="plusInCircle"
-      onClick={() =>
-        updateAddingFile({
-          name: '',
-          content: '<!-- Modify it at your will. -->',
-          path: `etc/${section}`,
-        })
-      }
-    >
-      {`Add new ${section} file`}
-    </WzButtonPermissions>
-  }</>
-)
+  <>
+    {section !== SECTION_CDBLIST_SECTION && (
+      <WzButtonPermissions
+        permissions={getUpdatePermissionsFiles(section)}
+        buttonType='empty'
+        iconType='plusInCircle'
+        onClick={() =>
+          updateAddingFile({
+            name: '',
+            content: '<!-- Modify it at your will. -->',
+            path: `etc/${section}`,
+          })
+        }
+      >
+        {`Add new ${section} file`}
+      </WzButtonPermissions>
+    )}
+  </>
+);
 
 //Add new CDB list button
-export const AddNewCdbListButton = (({ section, updateListContent }) => {
-  return <>
+export const AddNewCdbListButton = ({ section, updateListContent }) => {
+  return (
+    <>
       <WzButtonPermissions
-        buttonType="empty"
+        buttonType='empty'
         permissions={getUpdatePermissionsFiles(section)}
-        iconType="plusInCircle"
+        iconType='plusInCircle'
         onClick={() =>
           updateListContent({
             name: false,
@@ -110,15 +117,15 @@ export const AddNewCdbListButton = (({ section, updateListContent }) => {
       >
         {`Add new ${section} file`}
       </WzButtonPermissions>
-  </>
-});
+    </>
+  );
+};
 
 // Manage files
-export const ManageFiles = (({ section, showingFiles, ...props }) => {
-
+export const ManageFiles = ({ section, showingFiles, ...props }) => {
   /**
- * Toggle between files and rules or decoders
- */
+   * Toggle between files and rules or decoders
+   */
   const toggleFiles = async () => {
     try {
       props.toggleShowFiles(!showingFiles);
@@ -136,21 +143,22 @@ export const ManageFiles = (({ section, showingFiles, ...props }) => {
       };
       getErrorOrchestrator().handleError(options);
     }
-  }
+  };
   return (
     <>
-      {section !== SECTION_CDBLIST_SECTION &&
+      {section !== SECTION_CDBLIST_SECTION && (
         <WzButtonPermissions
-          buttonType="empty"
+          buttonType='empty'
           permissions={getUpdatePermissionsFiles(section)}
           iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
           onClick={async () => await toggleFiles()}
         >
           {showingFiles ? `Manage ${section}` : `Manage ${section} files`}
-        </WzButtonPermissions>}
+        </WzButtonPermissions>
+      )}
     </>
-  )
-});
+  );
+};
 
 const uploadFile = async (files, resource, overwrite) => {
   try {
@@ -161,16 +169,20 @@ const uploadFile = async (files, resource, overwrite) => {
   }
 };
 
-export const UploadFilesButton = (({ section, showingFiles, onSuccess, ...props }) => {
-
+export const UploadFilesButton = ({
+  section,
+  showingFiles,
+  onSuccess,
+  ...props
+}) => {
   return (
-        <UploadFiles
-          resource={section}
-          path={`etc/${section}`}
-          upload={uploadFile}
-          onSuccess={() => {
-            onSuccess && onSuccess(true)
-          }}
-        />
-  )
-});
+    <UploadFiles
+      resource={section}
+      path={`etc/${section}`}
+      upload={uploadFile}
+      onSuccess={() => {
+        onSuccess && onSuccess(true);
+      }}
+    />
+  );
+};

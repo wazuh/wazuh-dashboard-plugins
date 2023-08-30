@@ -16,7 +16,7 @@
     </a>
 </p>
 
-- [Welcome!](#welcome)
+- [Welcome](#welcome)
 - [Project resources](#project-resources)
 - [Wazuh UI](#wazuh-ui)
 - [Contribute](#contribute)

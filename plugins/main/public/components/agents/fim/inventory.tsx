@@ -12,7 +12,6 @@
 
 import React, { Component } from 'react';
 import {
-  EuiButtonEmpty,
   EuiEmptyPrompt,
   EuiFlexGroup,
   EuiFlexItem,
@@ -26,9 +25,8 @@ import {
   EuiTabs,
   EuiTitle,
 } from '@elastic/eui';
-import { FilterBar, InventoryTable, RegistryTable } from './inventory/';
+import { InventoryTable, RegistryTable } from './inventory/';
 import { WzRequest } from '../../../react-services/wz-request';
-import exportCsv from '../../../react-services/wz-csv';
 import { getToasts } from '../../../kibana-services';
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { filtersToObject } from '../../wz-search-bar';
@@ -194,45 +192,20 @@ export class Inventory extends Component {
     const { isLoading } = this.state;
     if (tabs.length > 1) {
       return (
-        <div>
-          <EuiTabs>
-            {tabs.map((tab, index) => (
-              <EuiTab
-                onClick={() => this.onSelectedTabChanged(tab.id)}
-                isSelected={tab.id === this.state.selectedTabId}
-                disabled={tab.disabled}
-                key={index}>
-                {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}
-              </EuiTab>
-            ))}
-          </EuiTabs>
-          <EuiSpacer size="s" />
-          <EuiFlexGroup>
-            <EuiFlexItem />
-            <EuiFlexItem grow={false}>
-              <EuiButtonEmpty iconType="importAction" onClick={() => this.downloadCsv()}>
-                Export formatted
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </div>
-      )
-    } else {
-      return (
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiTitle size="s">
-              <h1> {tabs[0].name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}</h1>
-            </EuiTitle>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="importAction" onClick={() => this.downloadCsv()}>
-              Export formatted
-            </EuiButtonEmpty>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      )
-    }
+        <EuiTabs>
+          {tabs.map((tab, index) => (
+            <EuiTab
+              onClick={() => this.onSelectedTabChanged(tab.id)}
+              isSelected={tab.id === this.state.selectedTabId}
+              disabled={tab.disabled}
+              key={index}>
+              {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}
+            </EuiTab>
+          ))}
+        </EuiTabs>
+      );
+    };
+    return null;
   }
 
   showToast = (color, title, time) => {
@@ -243,44 +216,10 @@ export class Inventory extends Component {
     });
   };
 
-  async downloadCsv() {
-    const { filters } = this.state;
-    try {
-      const filtersObject = filtersToObject(filters);
-      const formatedFilters = Object.keys(filtersObject).map(key => ({name: key, value: filtersObject[key]}));
-      this.showToast('success', 'Your download should begin automatically...', 3000);
-      await exportCsv(
-        '/syscheck/' + this.props.agent.id,
-        [
-          { name: 'type', value: this.state.selectedTabId === 'files' ? 'file' : this.state.selectedTabId },
-          ...formatedFilters
-        ],
-        `fim-${this.state.selectedTabId}`
-      );
-    } catch (error) {
-      const options: UIErrorLog = {
-        context: `${Inventory.name}.downloadCsv`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
   renderTable() {
     const { filters, syscheck, selectedTabId, customBadges, totalItemsRegistry, totalItemsFile } = this.state;
     return (
-      <div>
-        <FilterBar
-          filters={filters}
-          onFiltersChange={this.onFiltersChange}
-          selectView={selectedTabId}
-          agent={this.props.agent} />
+      <>
         {selectedTabId === 'files' &&
           <InventoryTable
             {...this.props}
@@ -297,8 +236,8 @@ export class Inventory extends Component {
             totalItems={totalItemsRegistry}
             onFiltersChange={this.onFiltersChange} />
         }
-      </div>
-    )
+      </>
+    );
   }
 
   noConfiguredMonitoring() {

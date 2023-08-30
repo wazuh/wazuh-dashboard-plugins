@@ -17,7 +17,7 @@ import WzConfigurationSettingsHeader from '../util-components/configuration-sett
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueYesThenEnabled } from '../utils/utils';
@@ -29,56 +29,99 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 const mainSettings = [
-  { field: 'enabled', label: 'Service status', render: renderValueYesThenEnabled },
-  { field: 'only_future_events', label: 'Collect events generated since Wazuh agent was started' },
-  { field: 'time_delay', label: 'Time in seconds that each scan will monitor until that delay backwards' },
-  { field: 'curl_max_size', label: 'Maximum size allowed for the GitHub API response' },
-  { field: 'interval', label: 'Interval between GitHub wodle executions in seconds' },
+  {
+    field: 'enabled',
+    label: 'Service status',
+    render: renderValueYesThenEnabled,
+  },
+  {
+    field: 'only_future_events',
+    label: 'Collect events generated since Wazuh agent was started',
+  },
+  {
+    field: 'time_delay',
+    label:
+      'Time in seconds that each scan will monitor until that delay backwards',
+  },
+  {
+    field: 'curl_max_size',
+    label: 'Maximum size allowed for the GitHub API response',
+  },
+  {
+    field: 'interval',
+    label: 'Interval between GitHub wodle executions in seconds',
+  },
   { field: 'event_type', label: 'Event type' },
 ];
 
 const columns = [
   { field: 'org_name', label: 'Organization' },
-  { field: 'api_token', label: 'Token' }
+  { field: 'api_token', label: 'Token' },
 ];
 
 const helpLinks = [
   {
     text: 'Using Wazuh to monitor GitHub',
-    href: webDocumentationLink('github/index.html')
+    href: webDocumentationLink('cloud-security/github/index.html'),
   },
   {
     text: 'GitHub module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/github-module.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/github-module.html',
+    ),
+  },
 ];
 
-export const WzConfigurationGitHub = withWzConfig(sections)(({currentConfig, updateBadge, ...rest }) => {
-  const wodleConfiguration = useMemo(() => wodleBuilder(currentConfig, 'github'), [currentConfig]);
-  
-  useEffect(() => {
-    updateBadge(currentConfig &&
-      wodleConfiguration &&
-      wodleConfiguration['github'] &&
-      wodleConfiguration['github'].enabled === 'yes');
-  }, [currentConfig]);
+export const WzConfigurationGitHub = withWzConfig(sections)(
+  ({ currentConfig, updateBadge, ...rest }) => {
+    const wodleConfiguration = useMemo(
+      () => wodleBuilder(currentConfig, 'github'),
+      [currentConfig],
+    );
 
-  return (
-    <WzTabSelector>
-      <WzTabSelectorTab label="General">
-        <GeneralTab wodleConfiguration={wodleConfiguration} currentConfig={currentConfig} {...rest}/>
-      </WzTabSelectorTab>
-      <WzTabSelectorTab label="Credentials">
-        <CredentialsTab wodleConfiguration={wodleConfiguration} currentConfig={currentConfig} {...rest}/>
-      </WzTabSelectorTab>
-    </WzTabSelector>
-  )
-});
+    useEffect(() => {
+      updateBadge(
+        currentConfig &&
+          wodleConfiguration &&
+          wodleConfiguration['github'] &&
+          wodleConfiguration['github'].enabled === 'yes',
+      );
+    }, [currentConfig]);
 
+    return (
+      <WzTabSelector>
+        <WzTabSelectorTab label='General'>
+          <GeneralTab
+            wodleConfiguration={wodleConfiguration}
+            currentConfig={currentConfig}
+            {...rest}
+          />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Credentials'>
+          <CredentialsTab
+            wodleConfiguration={wodleConfiguration}
+            currentConfig={currentConfig}
+            {...rest}
+          />
+        </WzTabSelectorTab>
+      </WzTabSelector>
+    );
+  },
+);
 
 const tabWrapper = compose(
-  withGuard(({currentConfig}) => currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']), ({currentConfig}) => <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>),
-  withGuard(({wodleConfiguration}) => !wodleConfiguration['github'], (props) => <WzNoConfig error='not-present' help={helpLinks}/>),
+  withGuard(
+    ({ currentConfig }) =>
+      currentConfig['wmodules-wmodules'] &&
+      isString(currentConfig['wmodules-wmodules']),
+    ({ currentConfig }) => (
+      <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks} />
+    ),
+  ),
+  withGuard(
+    ({ wodleConfiguration }) => !wodleConfiguration['github'],
+    props => <WzNoConfig error='not-present' help={helpLinks} />,
+  ),
 );
 
 const GeneralTab = tabWrapper(({agent, wodleConfiguration}) => (
@@ -90,17 +133,16 @@ const GeneralTab = tabWrapper(({agent, wodleConfiguration}) => (
     <WzConfigurationSettingsGroup
       config={wodleConfiguration['github']}
       items={mainSettings}
-    />           
+    />
   </WzConfigurationSettingsHeader>
 ));
 
-
-
-const CredentialsTab = tabWrapper(({agent, wodleConfiguration}) => {
-  const credentials = useMemo(() => settingsListBuilder(
-    wodleConfiguration['github'].api_auth,
-    'org_name'
-  ), [wodleConfiguration]);
+const CredentialsTab = tabWrapper(({ agent, wodleConfiguration }) => {
+  const credentials = useMemo(
+    () =>
+      settingsListBuilder(wodleConfiguration['github'].api_auth, 'org_name'),
+    [wodleConfiguration],
+  );
   return (
     <WzConfigurationSettingsHeader
       title="List of organizations to auditing"
@@ -111,5 +153,5 @@ const CredentialsTab = tabWrapper(({agent, wodleConfiguration}) => {
         settings={columns}
       />
     </WzConfigurationSettingsHeader>
-  )  
+  )
 });

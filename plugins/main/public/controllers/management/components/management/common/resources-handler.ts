@@ -2,7 +2,7 @@ import { WzRequest } from '../../../../../react-services';
 import {
   SECTION_DECODERS_SECTION,
   SECTION_RULES_SECTION,
-  SECTION_CDBLIST_SECTION
+  SECTION_CDBLIST_SECTION,
 } from './constants';
 
 type DECODERS = 'decoders';
@@ -16,17 +16,17 @@ export const ResourcesConstants = {
 };
 
 export const resourceDictionary = {
-  [ResourcesConstants.DECODERS]: {    
-    resourcePath: '/decoders',    
-    permissionResource: (value) => `decoder:file:${value}`
+  [ResourcesConstants.DECODERS]: {
+    resourcePath: '/decoders',
+    permissionResource: value => `decoder:file:${value}`,
   },
-  [ResourcesConstants.LISTS]: {    
+  [ResourcesConstants.LISTS]: {
     resourcePath: '/lists',
-    permissionResource: (value) => `list:file:${value}`
+    permissionResource: value => `list:file:${value}`,
   },
-  [ResourcesConstants.RULES]: {    
+  [ResourcesConstants.RULES]: {
     resourcePath: '/rules',
-    permissionResource: (value) => `rule:file:${value}`
+    permissionResource: value => `rule:file:${value}`,
   },
 };
 
@@ -42,34 +42,42 @@ export class ResourcesHandler {
 
   private getResourceFilesPath = (fileName?: string) => {
     const basePath = `${this.getResourcePath()}/files`;
-    return `${basePath}${ fileName? `/${fileName}`: ''}`;
+    return `${basePath}${fileName ? `/${fileName}` : ''}`;
   };
 
   /**
    * Get info of any type of resource Rules, Decoders, CDB lists...
    */
   async getResource(filters = {}) {
-    try {      
-      const result: any = await WzRequest.apiReq('GET', this.getResourcePath(), filters);
-      return (result || {}).data || false ;
+    try {
+      const result: any = await WzRequest.apiReq(
+        'GET',
+        this.getResourcePath(),
+        filters,
+      );
+      return (result || {}).data || false;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
-  
 
   /**
    * Get the content of any type of file Rules, Decoders, CDB lists...
    * @param {String} fileName
    */
-  async getFileContent(fileName) {
+  async getFileContent(fileName, relativeDirname) {
     try {
-      const result: any = await WzRequest.apiReq('GET', this.getResourceFilesPath(fileName), {
-        params:{
-          raw: true
-        }
-      });
-      return ((result || {}).data || '');      
+      const result: any = await WzRequest.apiReq(
+        'GET',
+        this.getResourceFilesPath(fileName),
+        {
+          params: {
+            raw: true,
+            relative_dirname: relativeDirname,
+          },
+        },
+      );
+      return (result || {}).data || '';
     } catch (error) {
       throw error;
     }
@@ -81,35 +89,50 @@ export class ResourcesHandler {
    * @param {String} content
    * @param {Boolean} overwrite
    */
-  async updateFile(fileName: string, content: string, overwrite: boolean) {    
+  async updateFile(
+    fileName: string,
+    content: string,
+    overwrite: boolean,
+    relativeDirname: string,
+  ) {
     try {
-      const result = await WzRequest.apiReq('PUT', this.getResourceFilesPath(fileName), {
-        params: {
-          overwrite: overwrite
+      const result = await WzRequest.apiReq(
+        'PUT',
+        this.getResourceFilesPath(fileName),
+        {
+          params: {
+            overwrite: overwrite,
+            relative_dirname: relativeDirname,
+          },
+          body: content.toString(),
+          origin: 'raw',
         },
-        body: content.toString(),
-        origin: 'raw'
-      });
+      );
       return result;
     } catch (error) {
       throw error;
     }
   }
-  
 
   /**
    * Delete any type of file Rules, Decoders, CDB lists...
    * @param {Resource} resource
    * @param {String} fileName
    */
-  async deleteFile(fileName: string) {
-    let fullPath = `${resourceDictionary[this.resource].resourcePath}/files/${fileName}`;
+  async deleteFile(fileName: string, relativeDirname: string = '') {
     try {
-      const result = await WzRequest.apiReq('DELETE', fullPath, {});
+      const result = await WzRequest.apiReq(
+        'DELETE',
+        this.getResourceFilesPath(fileName),
+        {
+          params: {
+            relative_dirname: relativeDirname,
+          },
+        },
+      );
       return result;
     } catch (error) {
       throw error;
     }
   }
-
 }
