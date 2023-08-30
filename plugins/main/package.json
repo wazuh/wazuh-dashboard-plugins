@@ -3,7 +3,7 @@
   "version": "4.6.0",
   "revision": "01",
   "pluginPlatform": {
-    "version": "2.6.0"
+    "version": "2.8.0"
   },
   "description": "Wazuh dashboard",
   "keywords": [
