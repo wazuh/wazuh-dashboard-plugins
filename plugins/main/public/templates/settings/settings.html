@@ -7,6 +7,17 @@
     ></react-component>
   </div>
 
+  <!-- It must get renderized only in configuration app to show Miscellaneous tab in configuration App -->
+  <div
+    ng-if="!ctrl.load && ctrl.settingsTabsProps && !ctrl.apiIsDown && ctrl.apiTableProps.apiEntries.length && ctrl.compareCurrentAppID('wz-configuration')"
+    class="wz-margin-top-16 md-margin-h"
+  >
+    <react-component
+      name="Tabs"
+      props="ctrl.settingsTabsProps"
+    ></react-component>
+  </div>
+
   <!-- end head -->
   <!-- api -->
   <div ng-if="ctrl.tab === 'api' && !ctrl.load">
