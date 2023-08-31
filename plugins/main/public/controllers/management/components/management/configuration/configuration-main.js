@@ -24,7 +24,7 @@ export default compose(
   withGlobalBreadcrumb(props => {
     let breadcrumb = false;
     if (props.agent.id === '000') {
-      breadcrumb = [{ text: '' }, { text: 'Settings', href: '#/manager' }];
+      breadcrumb = [{ text: '' }, { text: 'Settings' }];
     } else {
       breadcrumb = [
         { text: '' },
