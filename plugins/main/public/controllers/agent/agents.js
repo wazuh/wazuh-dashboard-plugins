@@ -29,7 +29,6 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getSettingDefaultValue } from '../../../common/services/settings';
-import { navigateAppURL } from '../../react-services/navigate-app';
 
 export class AgentsController {
   /**

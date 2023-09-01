@@ -87,7 +87,7 @@ export const OverviewWelcome = withErrorBoundary(
                     No agents were added to this manager.{' '}
                     <EuiButtonEmpty
                       href={getNavigationAppURL(
-                        '/app/wz-endpoints-summary#/agents-preview',
+                        '/app/endpoints-summary#/agents-preview',
                       )}
                     >
                       Add agent

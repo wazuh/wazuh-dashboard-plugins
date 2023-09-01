@@ -209,7 +209,7 @@ class WzGroupAgentsTable extends Component {
                 aria-label='Go to the agent'
                 iconType='eye'
                 onClick={async () => {
-                  navigateAppURL(`/app/wz-it-hygiene#/agents?agent=${item.id}`);
+                  navigateAppURL(`/app/it-hygiene#/agents?agent=${item.id}`);
                 }}
                 color='primary'
               />

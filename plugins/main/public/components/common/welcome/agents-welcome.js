@@ -403,7 +403,7 @@ export const AgentsWelcome = compose(
                       iconType='popout'
                       color='primary'
                       onClick={() => {
-                        navigateAppURL('/app/wz-mitre-attack');
+                        navigateAppURL('/app/mitre-attack');
                         this.router.reload();
                       }}
                       aria-label='Open MITRE'
@@ -514,7 +514,7 @@ export const AgentsWelcome = compose(
             actions={
               <EuiButton
                 href={getNavigationAppURL(
-                  '/app/wz-endpoints-summary#/agents-preview',
+                  '/app/endpoints-summary#/agents-preview',
                 )}
                 color='primary'
                 fill

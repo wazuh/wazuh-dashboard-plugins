@@ -42,7 +42,7 @@ export const WzAgentNeverConnectedPrompt = () => (
     }
     actions={
       <EuiButton
-        href={getNavigationAppURL('/app/wz-endpoints-summary#/agents-preview')}
+        href={getNavigationAppURL('/app/endpoints-summary#/agents-preview')}
         color='primary'
         fill
       >

@@ -54,7 +54,7 @@ export const Stats = withErrorBoundary(
       } else if (sessionStorage.getItem('agents_preview_selected_options')) {
         sessionStorage.removeItem('agents_preview_selected_options');
       }
-      navigateAppURL('/app/wz-endpoints-summary#/agents-preview');
+      navigateAppURL('/app/endpoints-summary#/agents-preview');
     }
 
     renderTitle(total) {

@@ -81,7 +81,7 @@ export function ClusterController(
    * This navigates to agents preview
    */
   $scope.goAgents = () => {
-    navigateAppURL('/app/wz-endpoints-summary#/agents-preview/?');
+    navigateAppURL('/app/endpoints-summary#/agents-preview/?');
   };
 
   /**

@@ -211,7 +211,7 @@ class WzConfigurationSwitch extends Component {
                   key={`agent-group-${key}`}
                   onClick={() => {
                     navigateAppURL(
-                      `/app/wz-groups#/manager/?tab=groups&group=${group}`,
+                      `/app/groups#/manager/?tab=groups&group=${group}`,
                     );
                   }}
                 >

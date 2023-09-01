@@ -114,7 +114,7 @@ export const EventsEnhanceDiscoverCell = {
     ...buttonStyles,
     href: content =>
       getNavigationAppURL(
-        `/app/wz-rules#/manager/rules?tab=rules&redirectRule=${content}`,
+        `/app/rules#/manager/rules?tab=rules&redirectRule=${content}`,
       ),
   }),
   'agent.id': createElementFieldURLRedirection({
@@ -122,7 +122,7 @@ export const EventsEnhanceDiscoverCell = {
     href: content =>
       content !== '000'
         ? getNavigationAppURL(
-            `/app/wz-it-hygiene#/agents?tab=welcome&agent=${content}`,
+            `/app/it-hygiene#/agents?tab=welcome&agent=${content}`,
           )
         : undefined,
   }),

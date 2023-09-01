@@ -117,7 +117,7 @@ function FimTable({ agent }) {
 
 function navigateToFim(agent, router) {
   store.dispatch(updateCurrentAgentData(agent));
-  navigateAppURL('/app/wz-integrity-monitoring');
+  navigateAppURL('/app/integrity-monitoring');
   router.reload();
 }
 

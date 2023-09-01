@@ -62,7 +62,7 @@ export const SampleDataWarning = ({ ...props }) => {
         <p>
           {'The data displayed may contain sample alerts. Go '}
           <EuiLink
-            href={getNavigationAppURL('/app/wz-server-data')}
+            href={getNavigationAppURL('/app/server-data')}
             aria-label='go to configure sample data'
           >
             {'here '}
