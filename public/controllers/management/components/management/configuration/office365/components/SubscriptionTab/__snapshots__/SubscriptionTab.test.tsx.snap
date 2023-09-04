@@ -60,7 +60,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
     helpLinks={
       Array [
         Object {
-          "href": "https://documentation.wazuh.com/4.5/office365/index.html",
+          "href": "https://documentation.wazuh.com/4.5/cloud-security/office365/index.html",
           "text": "Using Wazuh to monitor Office 365",
         },
         Object {
@@ -76,7 +76,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
       help={
         Array [
           Object {
-            "href": "https://documentation.wazuh.com/4.5/office365/index.html",
+            "href": "https://documentation.wazuh.com/4.5/cloud-security/office365/index.html",
             "text": "Using Wazuh to monitor Office 365",
           },
           Object {
@@ -238,7 +238,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                       links={
                         Array [
                           Object {
-                            "href": "https://documentation.wazuh.com/4.5/office365/index.html",
+                            "href": "https://documentation.wazuh.com/4.5/cloud-security/office365/index.html",
                             "text": "Using Wazuh to monitor Office 365",
                           },
                           Object {

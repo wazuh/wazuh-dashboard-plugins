@@ -2,7 +2,9 @@
   "id": "wazuh",
   "version": "4.5.2-02",
   "opensearchDashboardsVersion": "opensearchDashboards",
-  "configPath": ["wazuh"],
+  "configPath": [
+    "wazuh"
+  ],
   "requiredPlugins": [
     "navigation",
     "data",

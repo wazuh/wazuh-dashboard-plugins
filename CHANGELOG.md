@@ -8,7 +8,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.5.2
 
-## Wazuh v4.5.1 - OpenSearch Dashboards 2.6.0 - Revision 01
+### Fixed
+
+- Fixed an error with the commands in the Deploy new agent section for Oracle Linux 6+ agents [#5764](https://github.com/wazuh/wazuh-kibana-app/pull/5764)
+- Fixed broken documentation links in `Management/Configuration` section [#5796](https://github.com/wazuh/wazuh-kibana-app/pull/5796)
+
+## Wazuh v4.5.1 - OpenSearch Dashboards 2.6.0 - Revision 03
 
 ### Added
 
@@ -18,6 +23,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
 - Fixed the agents active coverage stat as NaN in Details panel of Agents section [#5490](https://github.com/wazuh/wazuh-kibana-app/pull/5490)
+- Fixed a broken documentation link to agent labels [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
+- Fixed the PDF report filters applied to tables [#5714](https://github.com/wazuh/wazuh-kibana-app/pull/5714)
+- Fixed outdated year in the PDF report footer [#5766](https://github.com/wazuh/wazuh-kibana-app/pull/5766)
 
 ### Removed
 
@@ -27,6 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed method to perform redirection on agent table buttons [#5539](https://github.com/wazuh/wazuh-kibana-app/pull/5539)
 - Changed windows agent service name in the deploy agent wizard [#5538](https://github.com/wazuh/wazuh-kibana-app/pull/5538)
+- Changed the requests to get the agent labels for the managers [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
 
 ## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
