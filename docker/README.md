@@ -1,6 +1,6 @@
 # Frontend development environments
 
-Install [Docker Desktop][0] as per its instructions, available for Windows, Mac 
+Install [Docker Desktop][0] as per its instructions (make sure that the docker compose version is 2.20.2 or higher), available for Windows, Mac 
 and Linux (Ubuntu, Debian & Fedora).
 This ensures that the development experience between Linux, Mac and Windows is as
 similar as possible.
@@ -10,6 +10,7 @@ step by step as described in their documentation. Make sure that your system
 meets the system requirements before installing Docker Desktop, and read any 
 post-installation note, specially on Linux: [Differences between 
 Docker Desktop for Linux and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#differences-between-docker-desktop-for-linux-and-docker-engine)
+
 
 In general, the environment consist of:
 
