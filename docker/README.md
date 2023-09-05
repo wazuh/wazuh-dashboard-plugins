@@ -11,7 +11,6 @@ meets the system requirements before installing Docker Desktop, and read any
 post-installation note, specially on Linux: [Differences between 
 Docker Desktop for Linux and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#differences-between-docker-desktop-for-linux-and-docker-engine)
 
-
 In general, the environment consist of:
 
 - Lightweight monitoring stack based on [Grafana][1], [Loki][2] and [Prometheus][3].
