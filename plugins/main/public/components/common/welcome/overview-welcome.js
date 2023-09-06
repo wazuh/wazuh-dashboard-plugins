@@ -33,12 +33,10 @@ import './welcome.scss';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { withErrorBoundary } from '../hocs';
 import {
-  LogoDocker,
-  LogoGitHub,
-  LogoGoogleCloud,
-  LogoOffice365,
-} from '../logos';
-import { getNavigationAppURL } from '../../../react-services/navigate-app';
+  getNavigationAppURL,
+  navigateAppURL,
+} from '../../../react-services/navigate-app';
+import { Applications, Categories } from '../../../utils/applications';
 
 export const OverviewWelcome = withErrorBoundary(
   class OverviewWelcome extends Component {
@@ -105,126 +103,67 @@ export const OverviewWelcome = withErrorBoundary(
     }
 
     render() {
+      const appCategories = Applications.reduce((categories, app) => {
+        const existingCategory = categories.find(
+          category => category.label === app.category,
+        );
+        if (existingCategory) {
+          existingCategory.apps.push(app);
+        } else {
+          categories.push({
+            label: app.category,
+            apps: [app],
+          });
+        }
+        return categories;
+      }, []);
+
       return (
         <Fragment>
           <EuiPage className='wz-welcome-page'>
-            <EuiFlexGroup>
+            <EuiFlexGroup gutterSize='l'>
+              {this.props.agentsCountTotal == 0 && this.addAgent()}
               <EuiFlexItem>
-                {this.props.agentsCountTotal == 0 && this.addAgent()}
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiCard
-                      title
-                      description
-                      betaBadgeLabel='Security Information Management'
-                    >
-                      <EuiSpacer size='s' />
-                      <EuiFlexGrid columns={2}>
-                        {this.buildTabCard('general', 'dashboardApp')}
-                        {this.buildTabCard('fim', 'filebeatApp')}
-                        {this.props.extensions.aws &&
-                          this.buildTabCard('aws', 'logoAWSMono')}
-                        {this.props.extensions.office &&
-                          this.buildTabCard('office', LogoOffice365)}
-                        {this.props.extensions.gcp &&
-                          this.buildTabCard('gcp', LogoGoogleCloud)}
-                        {this.props.extensions.github &&
-                          this.buildTabCard('github', LogoGitHub)}
-                      </EuiFlexGrid>
-                    </EuiCard>
-                  </EuiFlexItem>
-                  <EuiFlexItem>
-                    <EuiCard
-                      title
-                      description
-                      betaBadgeLabel='Auditing and Policy Monitoring'
-                    >
-                      <EuiSpacer size='s' />
-                      <EuiFlexGrid columns={2}>
-                        {this.buildTabCard('pm', 'advancedSettingsApp')}
-                        {this.props.extensions.audit &&
-                          this.buildTabCard('audit', 'monitoringApp')}
-                        {this.props.extensions.oscap &&
-                          this.buildTabCard('oscap', 'codeApp')}
-                        {this.props.extensions.ciscat &&
-                          this.buildTabCard('ciscat', 'auditbeatApp')}
-                        {this.buildTabCard('sca', 'securityAnalyticsApp')}
-                      </EuiFlexGrid>
-                    </EuiCard>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-
-                <EuiSpacer size='xl' />
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiCard
-                      title
-                      description
-                      betaBadgeLabel='Threat Detection and Response'
-                    >
-                      <EuiSpacer size='s' />
-                      <EuiFlexGrid columns={2}>
-                        {this.buildTabCard('vuls', 'securityApp')}
-                        {this.props.extensions.virustotal &&
-                          this.buildTabCard('virustotal', 'savedObjectsApp')}
-                        {this.props.extensions.osquery &&
-                          this.buildTabCard('osquery', 'searchProfilerApp')}
-                        {this.props.extensions.docker &&
-                          this.buildTabCard('docker', LogoDocker)}
-                        {this.buildTabCard('mitre', 'spacesApp')}
-                        {/* TODO- Change "spacesApp" icon*/}
-                      </EuiFlexGrid>
-                    </EuiCard>
-                  </EuiFlexItem>
-
-                  <EuiFlexItem>
-                    <EuiCard
-                      title
-                      description
-                      betaBadgeLabel='Regulatory Compliance'
-                    >
-                      <EuiSpacer size='s' />
-                      {!this.props.extensions.pci &&
-                        !this.props.extensions.gdpr &&
-                        !this.props.extensions.hipaa &&
-                        !this.props.extensions.tsc &&
-                        !this.props.extensions.nist && (
-                          <EuiFlexGroup>
-                            <EuiFlexItem>
-                              <EuiCallOut
-                                title={
-                                  <p>
-                                    Click the <EuiIcon type='eye' /> icon to
-                                    show regulatory compliance extensions.
-                                  </p>
+                <EuiFlexGrid columns={2}>
+                  {appCategories.map(({ label, apps }) => (
+                    <EuiFlexItem key={label}>
+                      <EuiCard
+                        title
+                        description
+                        betaBadgeLabel={
+                          Categories.find(category => category.id === label)
+                            ?.label
+                        }
+                      >
+                        <EuiSpacer size='s' />
+                        <EuiFlexGrid columns={2}>
+                          {apps.map(app => (
+                            <EuiFlexItem key={app.id}>
+                              <EuiCard
+                                size='xs'
+                                layout='horizontal'
+                                icon={
+                                  <EuiIcon
+                                    size='xl'
+                                    type={app.euiIconType}
+                                    color='primary'
+                                  />
                                 }
-                                color='success'
-                                iconType='help'
+                                className='homSynopsis__card'
+                                title={app.title}
+                                onClick={() => navigateAppURL(`/app/${app.id}`)}
+                                data-test-subj={`overviewWelcome${this.strtools.capitalize(
+                                  app.id,
+                                )}`}
+                                description={app.description}
                               />
                             </EuiFlexItem>
-                          </EuiFlexGroup>
-                        )}
-                      {(this.props.extensions.pci ||
-                        this.props.extensions.gdpr ||
-                        this.props.extensions.hipaa ||
-                        this.props.extensions.tsc ||
-                        this.props.extensions.nist) && (
-                        <EuiFlexGrid columns={2}>
-                          {this.props.extensions.pci &&
-                            this.buildTabCard('pci', 'visTagCloud')}
-                          {this.props.extensions.nist &&
-                            this.buildTabCard('nist', 'apmApp')}
-                          {this.props.extensions.tsc &&
-                            this.buildTabCard('tsc', 'apmApp')}
-                          {this.props.extensions.gdpr &&
-                            this.buildTabCard('gdpr', 'visBarVertical')}
-                          {this.props.extensions.hipaa &&
-                            this.buildTabCard('hipaa', 'emsApp')}
+                          ))}
                         </EuiFlexGrid>
-                      )}
-                    </EuiCard>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
+                      </EuiCard>
+                    </EuiFlexItem>
+                  ))}
+                </EuiFlexGrid>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiPage>
