@@ -2,13 +2,13 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.8.0 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.8.0 - OpenSearch Dashboards 2.9.0 - Revision 00
 
 ### Added
 
 - Support for Wazuh 4.8.0
 
-## Wazuh v4.7.0 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.7.0 - OpenSearch Dashboards 2.9.0 - Revision 00
 
 ### Added
 
@@ -33,7 +33,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed views in JSON and XML formats from management settings. [#5747](https://github.com/wazuh/wazuh-kibana-app/pull/5747)
 
-## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.6.0 - OpenSearch Dashboards 2.8.0 - Revision 00
 
 ### Added
 
@@ -53,7 +53,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
 - Changed the design of the wizard to add agents. [#5457](https://github.com/wazuh/wazuh-kibana-app/pull/5457)
-- Changed the search bar in Management (Rules, Decoders, CDB List, Groups, Cluster > Nodes) and Modules (Vulnerabilities > Inventory, Security Configuration Assessment > Inventory > {Policy ID} > Checks, MITRE ATT&CK > Intelligence > {Resource}, Integrity monitoring > Inventory > Files, Integrity monitoring > Inventory > Registry), Agent Inventory data, Explore agent modal, Agents [#5363](https://github.com/wazuh/wazuh-kibana-app/pull/5363) [#5442](https://github.com/wazuh/wazuh-kibana-app/pull/5442) [#5443](https://github.com/wazuh/wazuh-kibana-app/pull/5443) [#5444](https://github.com/wazuh/wazuh-kibana-app/pull/5444) [#5445](https://github.com/wazuh/wazuh-kibana-app/pull/5445) [#5447](https://github.com/wazuh/wazuh-kibana-app/pull/5447) [#5452](https://github.com/wazuh/wazuh-kibana-app/pull/5452) [#5491](https://github.com/wazuh/wazuh-kibana-app/pull/5491) [#5785](https://github.com/wazuh/wazuh-kibana-app/pull/5785)
+- Changed the search bar in Management (Rules, Decoders, CDB List, Groups, Cluster > Nodes) and Modules (Vulnerabilities > Inventory, Security Configuration Assessment > Inventory > {Policy ID} > Checks, MITRE ATT&CK > Intelligence > {Resource}, Integrity monitoring > Inventory > Files, Integrity monitoring > Inventory > Registry), Agent Inventory data, Explore agent modal, Agents [#5363](https://github.com/wazuh/wazuh-kibana-app/pull/5363) [#5442](https://github.com/wazuh/wazuh-kibana-app/pull/5442) [#5443](https://github.com/wazuh/wazuh-kibana-app/pull/5443) [#5444](https://github.com/wazuh/wazuh-kibana-app/pull/5444) [#5445](https://github.com/wazuh/wazuh-kibana-app/pull/5445) [#5447](https://github.com/wazuh/wazuh-kibana-app/pull/5447) [#5452](https://github.com/wazuh/wazuh-kibana-app/pull/5452) [#5491](https://github.com/wazuh/wazuh-kibana-app/pull/5491) [#5785](https://github.com/wazuh/wazuh-kibana-app/pull/5785) [#5813](https://github.com/wazuh/wazuh-kibana-app/pull/5813)
 
 ### Fixed
 
@@ -83,7 +83,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed obsolete code that caused duplicate requests to the api in `Management`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Removed unused embedded jquery-ui [#5592](https://github.com/wazuh/wazuh-kibana-app/pull/5592)
 
-## Wazuh v4.5.2 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.5.3 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.5.3
+
+## Wazuh v4.5.2 - OpenSearch Dashboards 2.6.0 - Revision 02
 
 ### Added
 

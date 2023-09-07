@@ -103,6 +103,9 @@ services:
       - wd_certs:/certs/wd
       - wm_certs:/certs/wm
       - idp_certs:/certs/idp
+    networks:
+      - wz-rel
+      - mon
     entrypoint: /bin/bash
     command: >
       -c '
@@ -185,13 +188,13 @@ services:
         hard: 65536
     volumes:
       - wazuh-indexer-data:/var/lib/wazuh-indexer
-      - wi_certs:/usr/share/wazuh-indexer/config/certs/
-      - idp_certs:/usr/share/wazuh-indexer/config/idp/
-      - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/config/opensearch.yml
-      - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/internal_users.yml
-      - ./config/wazuh_indexer/roles.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/roles.yml
-      - ./config/wazuh_indexer/roles_mapping.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/roles_mapping.yml
-      - ${SEC_CONFIG_FILE}:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/config.yml
+      - wi_certs:/usr/share/wazuh-indexer/certs/
+      - idp_certs:/usr/share/wazuh-indexer/idp/
+      - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/opensearch.yml
+      - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/opensearch-security/internal_users.yml
+      - ${SEC_CONFIG_FILE}:/usr/share/wazuh-indexer/opensearch-security/config.yml
+      - ./config/wazuh_indexer/roles.yml:/usr/share/wazuh-indexer/opensearch-security/roles.yml
+      - ./config/wazuh_indexer/roles_mapping.yml:/usr/share/wazuh-indexer/opensearch-security/roles_mapping.yml
     healthcheck:
       test:
         [

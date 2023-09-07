@@ -61,8 +61,8 @@ const searchBarWQLOptionsFiles = {
   filterButtons: [
     {
       id: 'relative-dirname',
-      input: 'relative_dirname=etc/rules',
-      label: 'Custom rules',
+      input: 'relative_dirname=etc/decoders',
+      label: 'Custom decoders',
     },
   ],
 };

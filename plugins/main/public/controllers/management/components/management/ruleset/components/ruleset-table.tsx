@@ -79,7 +79,6 @@ const searchBarWQLOptionsFiles = {
  */
 const FilesTable = ({
   actionButtons,
-  buttonOptions,
   columns,
   searchBarSuggestions,
   filters,
@@ -109,7 +108,6 @@ const FilesTable = ({
 
 const RulesFlyoutTable = ({
   actionButtons,
-  buttonOptions,
   columns,
   searchBarSuggestions,
   filters,
@@ -176,11 +174,6 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
       setIsFlyoutVisible(true);
     }
   }, []);
-
-  // Table custom filter options
-  const buttonOptions = [
-    { label: 'Custom rules', field: 'relative_dirname', value: 'etc/rules' },
-  ];
 
   const updateFilters = filters => {
     setFilters(filters);
@@ -317,7 +310,6 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
       {showingFiles ? (
         <FilesTable
           actionButtons={actionButtons}
-          buttonOptions={buttonOptions}
           columns={columns}
           searchBarSuggestions={apiSuggestsItems.files}
           filters={filters}
@@ -327,7 +319,6 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
       ) : (
         <RulesFlyoutTable
           actionButtons={actionButtons}
-          buttonOptions={buttonOptions}
           columns={columns}
           searchBarSuggestions={apiSuggestsItems.items}
           filters={filters}
