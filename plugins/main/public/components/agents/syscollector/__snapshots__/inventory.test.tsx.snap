@@ -24,7 +24,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Cores:
+              Cores: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -36,7 +36,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Memory:
+              Memory: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -48,7 +48,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Arch:
+              Arch: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -60,7 +60,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Operating system:
+              Operating system: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -72,7 +72,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              CPU:
+              CPU: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -84,7 +84,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Last scan:
+              Last scan: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -114,7 +114,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network interfaces
+              Network interfaces 
               <span>
                 (0)
               </span>
@@ -498,7 +498,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network ports
+              Network ports 
               <span>
                 (0)
               </span>
@@ -832,7 +832,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network settings
+              Network settings 
               <span>
                 (0)
               </span>
@@ -1219,7 +1219,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Packages
+              Packages 
               <span>
                 (0)
               </span>
@@ -1608,7 +1608,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Processes
+              Processes 
               <span>
                 (0)
               </span>
@@ -2053,7 +2053,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Cores:
+              Cores: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2065,7 +2065,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Memory:
+              Memory: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2077,7 +2077,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Arch:
+              Arch: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2089,7 +2089,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Operating system:
+              Operating system: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2101,7 +2101,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              CPU:
+              CPU: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2113,7 +2113,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Last scan:
+              Last scan: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2143,7 +2143,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network interfaces
+              Network interfaces 
               <span>
                 (0)
               </span>
@@ -2510,7 +2510,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network ports
+              Network ports 
               <span>
                 (0)
               </span>
@@ -2863,7 +2863,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network settings
+              Network settings 
               <span>
                 (0)
               </span>
@@ -3233,7 +3233,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Packages
+              Packages 
               <span>
                 (0)
               </span>
@@ -3606,7 +3606,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Processes
+              Processes 
               <span>
                 (0)
               </span>
@@ -4156,7 +4156,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Cores:
+              Cores: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4168,7 +4168,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Memory:
+              Memory: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4180,7 +4180,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Arch:
+              Arch: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4192,7 +4192,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Operating system:
+              Operating system: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4204,7 +4204,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              CPU:
+              CPU: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4216,7 +4216,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Last scan:
+              Last scan: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4246,7 +4246,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network interfaces
+              Network interfaces 
               <span>
                 (0)
               </span>
@@ -4630,7 +4630,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network ports
+              Network ports 
               <span>
                 (0)
               </span>
@@ -4988,7 +4988,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network settings
+              Network settings 
               <span>
                 (0)
               </span>
@@ -5372,7 +5372,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Windows updates
+              Windows updates 
               <span>
                 (0)
               </span>
@@ -5663,7 +5663,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Packages
+              Packages 
               <span>
                 (0)
               </span>
@@ -6028,7 +6028,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Processes
+              Processes 
               <span>
                 (0)
               </span>

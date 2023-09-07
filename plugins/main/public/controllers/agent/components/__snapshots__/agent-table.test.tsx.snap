@@ -20,7 +20,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Agents
+              Agents 
               <span>
                 (0)
               </span>
@@ -578,7 +578,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
             <h1
               class="euiTitle euiTitle--small"
             >
-              Agents
+              Agents 
               <span>
                 (0)
               </span>
@@ -1122,7 +1122,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
             <h1
               class="euiTitle euiTitle--small"
             >
-              Agents
+              Agents 
               <span>
                 (0)
               </span>
