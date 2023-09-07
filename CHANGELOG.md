@@ -8,7 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.5.3
 
-## Wazuh v4.5.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
+## Wazuh v4.5.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 02
 
 ### Added
 
@@ -19,9 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error with the commands in the Deploy new agent section for Oracle Linux 6+ agents [#5764](https://github.com/wazuh/wazuh-kibana-app/pull/5764)
 - Fixed broken documentation links in `Management/Configuration` section [#5796](https://github.com/wazuh/wazuh-kibana-app/pull/5796)
 
-
 ## Wazuh v4.5.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 03
-
 
 ### Added
 
