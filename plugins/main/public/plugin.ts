@@ -235,7 +235,7 @@ export class WazuhPlugin
         },
         {
           category: categoryEndpointSecurity,
-          id: 'wz-endpoints-summary',
+          id: 'endpoints-summary',
           title: i18n.translate('wz-app-endpoints-summary', {
             defaultMessage: 'Endpoints summary',
           }),
@@ -243,7 +243,7 @@ export class WazuhPlugin
         },
         {
           category: categoryEndpointSecurity,
-          id: 'wz-integrity-monitoring',
+          id: 'integrity-monitoring',
           title: i18n.translate('wz-app-integrity-monitoring', {
             defaultMessage: 'Integrity monitoring',
           }),
@@ -258,7 +258,7 @@ export class WazuhPlugin
         },
         {
           category: categoryEndpointSecurity,
-          id: 'wz-policy-monitoring',
+          id: 'policy-monitoring',
           title: i18n.translate('wz-app-policy-monitoring', {
             defaultMessage: 'Policy monitoring',
           }),
@@ -273,7 +273,7 @@ export class WazuhPlugin
         },
         {
           category: categoryEndpointSecurity,
-          id: 'wz-security-configuration-assessment',
+          id: 'security-configuration-assessment',
           title: i18n.translate('wz-app-security-configuration-assessment', {
             defaultMessage: 'Security configuration assessment',
           }),
@@ -288,7 +288,7 @@ export class WazuhPlugin
         },
         {
           category: categoryEndpointSecurity,
-          id: 'wz-system-auditing',
+          id: 'system-auditing',
           title: i18n.translate('wz-app-system-auditing', {
             defaultMessage: 'System auditing',
           }),
@@ -303,7 +303,7 @@ export class WazuhPlugin
         },
         {
           category: categoryEndpointSecurity,
-          id: 'wz-openscap',
+          id: 'openscap',
           title: i18n.translate('wz-app-openscap', {
             defaultMessage: 'OpenSCAP',
           }),
@@ -318,7 +318,7 @@ export class WazuhPlugin
         },
         {
           category: categoryEndpointSecurity,
-          id: 'wz-ciscat',
+          id: 'ciscat',
           title: i18n.translate('wz-app-ciscat', {
             defaultMessage: 'CIS-CAT',
           }),
@@ -333,7 +333,7 @@ export class WazuhPlugin
         },
         {
           category: categoryThreadIntelligence,
-          id: 'wz-security-events',
+          id: 'security-events',
           title: i18n.translate('wz-app-security-events', {
             defaultMessage: 'Security events',
           }),
@@ -348,7 +348,7 @@ export class WazuhPlugin
         },
         {
           category: categoryThreadIntelligence,
-          id: 'wz-vulnerabilities',
+          id: 'vulnerabilities',
           title: i18n.translate('wz-app-vulnerabilities', {
             defaultMessage: 'Vulnerabilities',
           }),
@@ -363,7 +363,7 @@ export class WazuhPlugin
         },
         {
           category: categoryThreadIntelligence,
-          id: 'wz-mitre-attack',
+          id: 'mitre-attack',
           title: i18n.translate('wz-app-mitre-attack', {
             defaultMessage: 'MITRE ATT&CK',
           }),
@@ -378,7 +378,7 @@ export class WazuhPlugin
         },
         {
           category: categoryThreadIntelligence,
-          id: 'wz-virustotal',
+          id: 'virustotal',
           title: i18n.translate('wz-app-virustotal', {
             defaultMessage: 'Virustotal',
           }),
@@ -393,7 +393,7 @@ export class WazuhPlugin
         },
         {
           category: categorySecurityOperations,
-          id: 'wz-pci-dss',
+          id: 'pci-dss',
           title: i18n.translate('wz-app-pci-dss', {
             defaultMessage: 'PCI DSS',
           }),
@@ -408,7 +408,7 @@ export class WazuhPlugin
         },
         {
           category: categorySecurityOperations,
-          id: 'wz-hipaa',
+          id: 'hipaa',
           title: i18n.translate('wz-app-hipaa', {
             defaultMessage: 'HIPAA',
           }),
@@ -423,7 +423,7 @@ export class WazuhPlugin
         },
         {
           category: categorySecurityOperations,
-          id: 'wz-gdpr',
+          id: 'gdpr',
           title: i18n.translate('wz-app-gdpr', {
             defaultMessage: 'GDPR',
           }),
@@ -438,7 +438,7 @@ export class WazuhPlugin
         },
         {
           category: categorySecurityOperations,
-          id: 'wz-nist-800-53',
+          id: 'nist-800-53',
           title: i18n.translate('wz-app-nist-800-53', {
             defaultMessage: 'NIST 800-53',
           }),
@@ -453,7 +453,7 @@ export class WazuhPlugin
         },
         {
           category: categorySecurityOperations,
-          id: 'wz-tsc',
+          id: 'tsc',
           title: i18n.translate('wz-app-tsc', {
             defaultMessage: 'TSC',
           }),
@@ -468,7 +468,7 @@ export class WazuhPlugin
         },
         {
           category: categorySecurityOperations,
-          id: 'wz-it-hygiene',
+          id: 'it-hygiene',
           title: i18n.translate('wz-app-it-hygiene', {
             defaultMessage: 'IT Hygiene',
           }),
@@ -483,7 +483,7 @@ export class WazuhPlugin
         },
         {
           category: categorySecurityOperations,
-          id: 'wz-osquery',
+          id: 'osquery',
           title: i18n.translate('wz-app-osquery', {
             defaultMessage: 'Osquery',
           }),
@@ -498,7 +498,7 @@ export class WazuhPlugin
         },
         {
           category: categoryCloudSecurity,
-          id: 'wz-amazon-web-services',
+          id: 'amazon-web-services',
           title: i18n.translate('wz-app-amazon-web-services', {
             defaultMessage: 'Amazon Web Services',
           }),
@@ -513,7 +513,7 @@ export class WazuhPlugin
         },
         {
           category: categoryCloudSecurity,
-          id: 'wz-google-cloud',
+          id: 'google-cloud',
           title: i18n.translate('wz-app-google-cloud', {
             defaultMessage: 'Google Cloud',
           }),
@@ -528,7 +528,7 @@ export class WazuhPlugin
         },
         {
           category: categoryCloudSecurity,
-          id: 'wz-github',
+          id: 'github',
           title: i18n.translate('wz-app-github', {
             defaultMessage: 'GitHub',
           }),
@@ -543,7 +543,7 @@ export class WazuhPlugin
         },
         {
           category: categoryCloudSecurity,
-          id: 'wz-office365',
+          id: 'office365',
           title: i18n.translate('wz-app-office365', {
             defaultMessage: 'Office 365',
           }),
@@ -558,7 +558,7 @@ export class WazuhPlugin
         },
         {
           category: categoryCloudSecurity,
-          id: 'wz-docker-listener',
+          id: 'docker-listener',
           title: i18n.translate('wz-app-docker-listener', {
             defaultMessage: 'Docker listener',
           }),
@@ -573,7 +573,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-rules',
+          id: 'rules',
           title: i18n.translate('wz-app-rules', {
             defaultMessage: 'Rules',
           }),
@@ -581,7 +581,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-decoders',
+          id: 'decoders',
           title: i18n.translate('wz-app-decoders', {
             defaultMessage: 'Decoders',
           }),
@@ -589,7 +589,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-cdb-lists',
+          id: 'cdb-lists',
           title: i18n.translate('wz-app-lists', {
             defaultMessage: 'CDB Lists',
           }),
@@ -597,7 +597,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-groups',
+          id: 'groups',
           title: i18n.translate('wz-app-groups', {
             defaultMessage: 'Groups',
           }),
@@ -605,7 +605,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-status',
+          id: 'server-status',
           title: i18n.translate('wz-app-status', {
             defaultMessage: 'Status',
           }),
@@ -613,7 +613,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-cluster',
+          id: 'cluster',
           title: i18n.translate('wz-app-cluster', {
             defaultMessage: 'Cluster',
           }),
@@ -621,7 +621,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-statistics',
+          id: 'statistics',
           title: i18n.translate('wz-app-statistics', {
             defaultMessage: 'Statistics',
           }),
@@ -629,7 +629,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-logs',
+          id: 'logs',
           title: i18n.translate('wz-app-logs', {
             defaultMessage: 'Logs',
           }),
@@ -637,7 +637,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-reporting',
+          id: 'reporting',
           title: i18n.translate('wz-app-reporting', {
             defaultMessage: 'Reporting',
           }),
@@ -645,7 +645,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-settings',
+          id: 'settings',
           title: i18n.translate('wz-app-settings', {
             defaultMessage: 'Settings',
           }),
@@ -653,7 +653,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-api-console',
+          id: 'api-console',
           title: i18n.translate('wz-app-api-console', {
             defaultMessage: 'API console',
           }),
@@ -661,7 +661,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-ruleset-test',
+          id: 'ruleset-test',
           title: i18n.translate('wz-app-ruleset-test', {
             defaultMessage: 'Ruleset test',
           }),
@@ -669,7 +669,7 @@ export class WazuhPlugin
         },
         {
           category: categoryServerManagement,
-          id: 'wz-rbac',
+          id: 'rbac',
           title: i18n.translate('wz-app-rbac', {
             defaultMessage: 'RBAC',
           }),
@@ -677,7 +677,7 @@ export class WazuhPlugin
         },
         {
           category: DEFAULT_APP_CATEGORIES.management,
-          id: 'wz-server-api',
+          id: 'server-api',
           title: i18n.translate('wz-app-server-api', {
             defaultMessage: 'Server API',
           }),
@@ -685,7 +685,7 @@ export class WazuhPlugin
         },
         {
           category: DEFAULT_APP_CATEGORIES.management,
-          id: 'wz-modules',
+          id: 'modules',
           title: i18n.translate('wz-app-modules', {
             defaultMessage: 'Modules',
           }),
@@ -693,7 +693,7 @@ export class WazuhPlugin
         },
         {
           category: DEFAULT_APP_CATEGORIES.management,
-          id: 'wz-server-data',
+          id: 'server-data',
           title: i18n.translate('wz-app-server-data', {
             defaultMessage: 'Server data',
           }),
@@ -701,7 +701,7 @@ export class WazuhPlugin
         },
         {
           category: DEFAULT_APP_CATEGORIES.management,
-          id: 'wz-configuration',
+          id: 'configuration',
           title: i18n.translate('wz-app-configuration', {
             defaultMessage: 'Configuration',
           }),
@@ -709,7 +709,7 @@ export class WazuhPlugin
         },
         {
           category: DEFAULT_APP_CATEGORIES.management,
-          id: 'wz-app-logs',
+          id: 'app-logs',
           title: i18n.translate('wz-app-app-logs', {
             defaultMessage: 'Logs',
           }),
@@ -717,7 +717,7 @@ export class WazuhPlugin
         },
         {
           category: DEFAULT_APP_CATEGORIES.management,
-          id: 'wz-about',
+          id: 'about',
           title: i18n.translate('wz-app-about', {
             defaultMessage: 'About',
           }),
