@@ -1,10 +1,10 @@
-version: "2.2"
+version: '2.2'
 
 x-logging: &logging
   logging:
     driver: loki
     options:
-      loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+      loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
 
 services:
   exporter:
@@ -12,15 +12,15 @@ services:
     <<: *logging
     hostname: exporter-osd-${OS_VERSION}
     profiles:
-      - "saml"
-      - "standard"
+      - 'saml'
+      - 'standard'
     networks:
       - os-dev
       - mon
     command:
-      - "--es.uri=https://admin:${PASSWORD}@os1:9200"
-      - "--es.ssl-skip-verify"
-      - "--es.all"
+      - '--es.uri=https://admin:${PASSWORD}@os1:9200'
+      - '--es.ssl-skip-verify'
+      - '--es.all'
 
   imposter:
     image: outofcoffee/imposter
@@ -39,8 +39,8 @@ services:
     image: cfssl/cfssl
     <<: *logging
     profiles:
-      - "saml"
-      - "standard"
+      - 'saml'
+      - 'standard'
     volumes:
       - wi_certs:/certs/wi
       - wd_certs:/certs/wd
@@ -117,7 +117,7 @@ services:
           sleep 300
       '
     healthcheck:
-      test: ["CMD-SHELL", "[ -r /certs/wi/os1.pem ]"]
+      test: ['CMD-SHELL', '[ -r /certs/wi/os1.pem ]']
       interval: 2s
       timeout: 5s
       retries: 10
@@ -126,18 +126,19 @@ services:
     depends_on:
       idpsetup:
         condition: service_completed_successfully
+        required: false
     image: opensearchproject/opensearch:${OS_VERSION}
     <<: *logging
     profiles:
-      - "saml"
-      - "standard"
+      - 'saml'
+      - 'standard'
     environment:
       - cluster.name=os-dev-cluster
       - node.name=os1
       - discovery.seed_hosts=os1
       - cluster.initial_master_nodes=os1
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m' # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
       - OPENSEARCH_PATH_CONF=/usr/share/opensearch/config/
     ulimits:
       memlock:
@@ -162,7 +163,7 @@ services:
     healthcheck:
       test:
         [
-          "CMD-SHELL",
+          'CMD-SHELL',
           "curl -v --cacert config/certs/ca.pem https://os1:9200 2>&1 | grep -q '401 Unauthorized'",
         ]
       interval: 1s
@@ -175,17 +176,17 @@ services:
         condition: service_healthy
     image: elastic/filebeat:7.10.2
     profiles:
-      - "saml"
-      - "standard"
+      - 'saml'
+      - 'standard'
     hostname: filebeat
-    user: "0:0"
+    user: '0:0'
     networks:
       - os-dev
       - mon
     <<: *logging
     # restart: always
     entrypoint:
-      - "/bin/bash"
+      - '/bin/bash'
     command: >
       -c '
         mkdir -p /etc/filebeat
@@ -211,23 +212,23 @@ services:
         condition: service_healthy
     image: quay.io/wazuh/osd-dev:${OSD_VERSION}
     profiles:
-      - "saml"
-      - "standard"
+      - 'saml'
+      - 'standard'
     hostname: osd
     networks:
       - os-dev
       - devel
       - mon
-    user: "1000:1000"
+    user: '1000:1000'
     <<: *logging
     ports:
       - ${OSD_PORT}:5601
     environment:
-      - "LOGS=/proc/1/fd/1"
-    entrypoint: ["tail", "-f", "/dev/null"]
+      - 'LOGS=/proc/1/fd/1'
+    entrypoint: ['tail', '-f', '/dev/null']
     volumes:
       - osd_cache:/home/node/.cache
-      - "${SRC}:/home/node/kbn/plugins/wazuh"
+      - '${SRC}:/home/node/kbn/plugins/wazuh'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
@@ -238,7 +239,7 @@ services:
       generator:
         condition: service_healthy
     profiles:
-      - "saml"
+      - 'saml'
     volumes:
       - wi_certs:/certs/wi
       - wd_certs:/certs/wd
@@ -258,7 +259,7 @@ services:
         sleep 300
       '
     healthcheck:
-      test: ["CMD-SHELL", "[ -r /certs/idp/truststore.jks ]"]
+      test: ['CMD-SHELL', '[ -r /certs/idp/truststore.jks ]']
       interval: 2s
       timeout: 5s
       retries: 10
@@ -269,14 +270,14 @@ services:
       idpsec:
         condition: service_healthy
     profiles:
-      - "saml"
+      - 'saml'
     hostname: idp
     <<: *logging
     networks:
       - os-dev
       - mon
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
@@ -298,7 +299,7 @@ services:
       idp:
         condition: service_healthy
     profiles:
-      - "saml"
+      - 'saml'
     hostname: idpsetup
     <<: *logging
     networks:

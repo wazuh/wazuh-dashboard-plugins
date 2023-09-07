@@ -1,19 +1,9 @@
 #!/usr/bin/env bash
 
 versions=(
-	"4.4.0"
-	"4.4.1"
-	"4.4.2"
-	"4.4.3"
-	"4.4.4"
-  "4.4.5"
 	"4.5.0"
 	"4.5.1"
-  "4.5.2"
-  "4.5.3"
-  "4.6.0"
-  "4.7.0"
-  "4.8.0"
+	"4.5.2"
 )
 
 wazuh_api_version=(
@@ -28,7 +18,7 @@ usage() {
 	echo
 	echo "where"
 	echo "  wazuh_version is one of "${versions[*]}
-	echo "  wazuh_api_version is the patch version of wazuh 4.4, for example " ${wazuh_api_version[*]}
+	echo "  wazuh_api_version is the patch version of wazuh 4.5, for example " ${wazuh_api_version[*]}
 	echo "  action is one of up | down | stop"
 	echo
 	echo "In a minor release, the API should not change the version here bumps the API"
@@ -61,10 +51,10 @@ cat <<EOF >config/imposter/api_info.json
 {
   "data": {
     "title": "Wazuh API REST",
-    "api_version": "4.4.${patch_version}",
+    "api_version": "4.5.${patch_version}",
     "revision": 40316,
     "license_name": "GPL 2.0",
-    "license_url": "https://github.com/wazuh/wazuh/blob/4.4/LICENSE",
+    "license_url": "https://github.com/wazuh/wazuh/blob/4.5/LICENSE",
     "hostname": "imposter",
     "timestamp": "2022-06-13T17:20:03Z"
   },
@@ -94,10 +84,10 @@ up)
 	echo "docker restart ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1"
 	echo
 	echo "3. Copy the pre-release package to the running Wazuh Dashboard container:"
-	echo docker cp wazuh-4.4.${patch_version}-1.zip ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1:/tmp
+	echo docker cp wazuh-4.5.${patch_version}-1.zip ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1:/tmp
 	echo
 	echo "4. Install the package we have just uploaded:"
-	echo "docker exec -ti  ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install file:///tmp/wazuh-4.4.${patch_version}-1.zip"
+	echo "docker exec -ti  ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install file:///tmp/wazuh-4.5.${patch_version}-1.zip"
 	echo
 	echo "5. Restart the Wazuh Dashboard container:"
 	echo "docker restart ${COMPOSE_PROJECT_NAME}-wazuh.dashboard-1"
