@@ -247,7 +247,6 @@ const mapDispatchToProps = (dispatch) => {
 export default compose(
   withGlobalBreadcrumb([
     { text: '' },
-    { text: 'Management', href: '#/manager' },
     { text: 'Status' },
   ]),
   withUserAuthorizationPrompt([

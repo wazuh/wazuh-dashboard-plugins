@@ -63,6 +63,19 @@ export class SettingsController {
     this.$scope.googleGroupsSVG = getHttp().basePath.prepend(
       getAssetURL('images/icons/google_groups.svg'),
     );
+    this.tabs = [
+      { id: 'api', name: 'Server API' },
+      { id: 'modules', name: 'Modules' },
+      { id: 'sample_data', name: 'Server data' },
+      { id: 'configuration', name: 'Configuration' },
+      { id: 'logs', name: 'Logs' },
+      { id: 'miscellaneous', name: 'Miscellaneous' },
+      { id: 'about', name: 'About' },
+    ];
+    this.tabsConfiguration = [
+      { id: 'configuration', name: 'Configuration' },
+      { id: 'miscellaneous', name: 'Miscellaneous' },
+    ];
   }
 
   /**
@@ -70,15 +83,22 @@ export class SettingsController {
    */
   async $onInit() {
     try {
-      const breadcrumb = [{ text: '' }, { text: 'Settings' }];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-
       const location = this.$location.search();
-      if (location && location.tab) {
+      if (location?.tab) {
         this.tab = location.tab;
+        const tabActive = this.tabs.find(tab => tab.id === this.tab);
         if (this.tab === 'about')
           store.dispatch(updateSelectedSettingsSection('about'));
+        const breadcrumb = [
+          { text: '' },
+          { text: tabActive?.name || 'Server API' },
+        ];
+        store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+      } else {
+        const breadcrumb = [{ text: '' }, { text: 'Server API' }];
+        store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       }
+
       // Set component props
       this.setComponentProps();
       // Loading data
@@ -141,11 +161,6 @@ export class SettingsController {
         this.updateClusterInfoInRegistry(id, clusterInfo),
       copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
-
-    let tabs = [
-      { id: 'configuration', name: 'Configuration' },
-      { id: 'miscellaneous', name: 'Miscellaneous' },
-    ];
     this.settingsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
@@ -154,7 +169,7 @@ export class SettingsController {
         }
       },
       selectedTab: this.tab || 'api',
-      tabs,
+      tabs: this.tabsConfiguration,
       wazuhConfig: this.wazuhConfig,
     };
 
