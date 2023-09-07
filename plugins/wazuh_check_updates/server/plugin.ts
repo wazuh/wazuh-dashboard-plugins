@@ -8,7 +8,13 @@ import {
 
 import { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
 import { defineRoutes } from './routes';
-import { getUpdate, getUpdateList } from './services';
+import { jobSchedulerRun } from './services';
+import {
+  availableUpdatesObject,
+  settingsObject,
+  userPreferencesObject,
+} from './services/savedObject/types';
+import { setCore, setInternalSavedObjectsClient } from './plugin-services';
 
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {
@@ -22,6 +28,11 @@ export class WazuhCheckUpdatesPlugin
     this.logger.debug('wazuh_check_updates: Setup');
     const router = core.http.createRouter();
 
+    // Register saved objects types
+    core.savedObjects.registerType(availableUpdatesObject);
+    core.savedObjects.registerType(settingsObject);
+    core.savedObjects.registerType(userPreferencesObject);
+
     // Register server side APIs
     defineRoutes(router);
 
@@ -30,11 +41,16 @@ export class WazuhCheckUpdatesPlugin
 
   public start(core: CoreStart): WazuhCheckUpdatesPluginStart {
     this.logger.debug('wazuhCheckUpdates: Started');
-    return {
-      getUpdate,
-      getUpdateList
-    };
+
+    const internalSavedObjectsClient = core.savedObjects.createInternalRepository();
+    setCore(core);
+    setInternalSavedObjectsClient(internalSavedObjectsClient);
+
+    // Scheduler
+    jobSchedulerRun();
+
+    return {};
   }
 
-  public stop() { }
+  public stop() {}
 }

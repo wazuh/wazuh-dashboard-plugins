@@ -1,9 +1,6 @@
 import { CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
-import {
-  WazuhCheckUpdatesPluginSetup,
-  WazuhCheckUpdatesPluginStart,
-} from './types';
-import { UpdateBar } from './components/updateBar';
+import { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
+import { UpdatesNotification } from './components/updatesNotification';
 
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {
@@ -23,23 +20,14 @@ export class WazuhCheckUpdatesPlugin
     // });
 
     // Return methods that should be available to other plugins
-    return {
-      // getGreeting() {
-      //   return i18n.translate('wazuhCheckUpdates.greetingText', {
-      //     defaultMessage: 'Hello from {name}!',
-      //     values: {
-      //       name: PLUGIN_NAME,
-      //     },
-      //   });
-      // },
-    };
+    return {};
   }
 
   public start(core: CoreStart): WazuhCheckUpdatesPluginStart {
     return {
-      UpdateBar
+      UpdatesNotification,
     };
   }
 
-  public stop() { }
+  public stop() {}
 }

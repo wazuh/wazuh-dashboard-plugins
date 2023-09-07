@@ -6,5 +6,12 @@
     "build": "yarn plugin-helpers build",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "osd": "node ../../scripts/osd"
+  },
+  "dependencies": {
+    "axios-mock-adapter": "^1.21.5",
+    "node-cron": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/node-cron": "^3.0.8"
   }
 }
