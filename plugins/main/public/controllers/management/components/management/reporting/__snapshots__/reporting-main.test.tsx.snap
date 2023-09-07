@@ -2,6 +2,6 @@
 
 exports[`Reporting component renders correctly to match the snapshot 1`] = `
 <WzReduxProvider>
-  <WzReportingOverview />
+  <Component />
 </WzReduxProvider>
 `;

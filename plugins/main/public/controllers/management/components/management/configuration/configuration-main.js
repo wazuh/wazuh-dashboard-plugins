@@ -16,25 +16,20 @@ import {
   withGlobalBreadcrumb,
   withReduxProvider,
 } from '../../../../../components/common/hocs';
-import { compose } from 'redux'
+import { compose } from 'redux';
 
 export default compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb((props) => {
+  withGlobalBreadcrumb(props => {
     let breadcrumb = false;
     if (props.agent.id === '000') {
-      breadcrumb = [
-        { text: '' },
-        { text: 'Management', href: '#/manager' },
-        { text: 'Configuration' },
-      ];
+      breadcrumb = [{ text: '' }, { text: 'Settings' }];
     } else {
       breadcrumb = [
         { text: '' },
         {
-          text: 'Agents',
-          href: '#/agents-preview',
+          text: 'IT Hygiene',
         },
         { agent: props.agent },
         { text: 'Configuration' },
@@ -42,5 +37,5 @@ export default compose(
     }
     $('#breadcrumbNoTitle').attr('title', '');
     return breadcrumb;
-  })
+  }),
 )(WzConfigurationSwitch);

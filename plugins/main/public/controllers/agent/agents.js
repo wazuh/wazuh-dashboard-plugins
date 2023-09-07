@@ -22,8 +22,6 @@ import { getToasts, getDataPlugin } from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { formatUIDate } from '../../react-services/time-service';
-import store from '../../redux/store';
-import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
@@ -50,7 +48,7 @@ export class AgentsController {
     commonData,
     reportingService,
     visFactoryService,
-    csvReq
+    csvReq,
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -75,12 +73,7 @@ export class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
-    this.ignoredTabs = [
-      'syscollector',
-      'welcome',
-      'configuration',
-      'stats'
-    ];
+    this.ignoredTabs = ['syscollector', 'welcome', 'configuration', 'stats'];
 
     this.$scope.expandArray = [
       false,
@@ -133,7 +126,8 @@ export class AgentsController {
       this.$scope.tab = this.commonData.checkTabLocation();
     }
     this.tabHistory = [];
-    if (!this.ignoredTabs.includes(this.$scope.tab)) this.tabHistory.push(this.$scope.tab);
+    if (!this.ignoredTabs.includes(this.$scope.tab))
+      this.tabHistory.push(this.$scope.tab);
 
     // Tab names
     this.$scope.tabNames = TabNames;
@@ -145,15 +139,19 @@ export class AgentsController {
      * @param {Object} item
      * @param {Array<Object>} array
      */
-    this.$scope.inArray = (item, array) => item && Array.isArray(array) && array.includes(item);
+    this.$scope.inArray = (item, array) =>
+      item && Array.isArray(array) && array.includes(item);
 
-    this.$scope.switchSubtab = async (subtab, force = false, onlyAgent = false) =>
-      this.switchSubtab(subtab, force, onlyAgent);
+    this.$scope.switchSubtab = async (
+      subtab,
+      force = false,
+      onlyAgent = false,
+    ) => this.switchSubtab(subtab, force, onlyAgent);
 
     this.changeAgent = false;
 
     this.$scope.switchTab = (tab, force = false) => this.switchTab(tab, force);
-    this.$scope.getAgent = async (newAgentId) => this.getAgent(newAgentId);
+    this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
 
     this.$scope.search = (term, specificPath) =>
@@ -174,7 +172,8 @@ export class AgentsController {
         specificFilter,
       });
 
-    this.$scope.shouldShowComponent = (component) => this.shouldShowComponent(component);
+    this.$scope.shouldShowComponent = component =>
+      this.shouldShowComponent(component);
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
@@ -187,10 +186,13 @@ export class AgentsController {
       this.$location.path('/manager/groups');
     };
 
-    this.$scope.exportConfiguration = (enabledComponents) => {
-      this.reportingService.startConfigReport(this.$scope.agent, 'agentConfig', enabledComponents);
+    this.$scope.exportConfiguration = enabledComponents => {
+      this.reportingService.startConfigReport(
+        this.$scope.agent,
+        'agentConfig',
+        enabledComponents,
+      );
     };
-
 
     //Load
     try {
@@ -213,10 +215,16 @@ export class AgentsController {
     // Config on demand
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
-    this.$scope.isString = (item) => typeof item === 'string';
-    this.$scope.hasSize = (obj) => obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.offsetTimestamp = (text, time) => this.offsetTimestamp(text, time);
-    this.$scope.switchConfigTab = (configurationTab, sections, navigate = true) => {
+    this.$scope.isString = item => typeof item === 'string';
+    this.$scope.hasSize = obj =>
+      obj && typeof obj === 'object' && Object.keys(obj).length;
+    this.$scope.offsetTimestamp = (text, time) =>
+      this.offsetTimestamp(text, time);
+    this.$scope.switchConfigTab = (
+      configurationTab,
+      sections,
+      navigate = true,
+    ) => {
       this.$scope.navigate = navigate;
       try {
         this.$scope.configSubTab = JSON.stringify({
@@ -224,7 +232,10 @@ export class AgentsController {
           sections: sections,
         });
         if (!this.$location.search().configSubTab) {
-          AppState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
+          AppState.setSessionStorageItem(
+            'configSubTab',
+            this.$scope.configSubTab,
+          );
           this.$location.search('configSubTab', true);
         }
       } catch (error) {
@@ -245,7 +256,7 @@ export class AgentsController {
         configurationTab,
         sections,
         this.$scope,
-        this.$scope.agent.id
+        this.$scope.agent.id,
       );
     };
 
@@ -255,12 +266,19 @@ export class AgentsController {
       if (!this.$location.search().configWodle) {
         this.$location.search('configWodle', this.$scope.configWodle);
       }
-      this.configurationHandler.switchWodle(wodleName, this.$scope, this.$scope.agent.id);
+      this.configurationHandler.switchWodle(
+        wodleName,
+        this.$scope,
+        this.$scope.agent.id,
+      );
     };
 
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       this.$scope.navigate = navigate;
-      this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);
+      this.configurationHandler.switchConfigurationTab(
+        configurationTab,
+        this.$scope,
+      );
       if (!this.$scope.navigate) {
         const configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
@@ -270,7 +288,7 @@ export class AgentsController {
             this.$scope.switchConfigTab(
               configSubTabObj.configurationTab,
               configSubTabObj.sections,
-              false
+              false,
             );
           } catch (error) {
             throw new Error(error);
@@ -287,24 +305,27 @@ export class AgentsController {
         this.$location.search('configWodle', null);
       }
     };
-    this.$scope.switchConfigurationSubTab = (configurationSubTab) => {
-      this.configurationHandler.switchConfigurationSubTab(configurationSubTab, this.$scope);
+    this.$scope.switchConfigurationSubTab = configurationSubTab => {
+      this.configurationHandler.switchConfigurationSubTab(
+        configurationSubTab,
+        this.$scope,
+      );
       if (configurationSubTab === 'pm-sca') {
         this.$scope.currentConfig.sca = this.configurationHandler.parseWodle(
           this.$scope.currentConfig,
-          'sca'
+          'sca',
         );
       }
     };
-    this.$scope.updateSelectedItem = (i) => (this.$scope.selectedItem = i);
-    this.$scope.getIntegration = (list) =>
+    this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
+    this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
 
     this.$scope.$on('$routeChangeStart', () => {
       return AppState.removeSessionStorageItem('configSubTab');
     });
 
-    this.$scope.expand = (i) => this.expand(i);
+    this.$scope.expand = i => this.expand(i);
     this.setTabs();
   }
 
@@ -327,7 +348,7 @@ export class AgentsController {
           this.filterHandler,
           this.$scope.tab,
           subtab,
-          this.$scope.agent.id
+          this.$scope.agent.id,
         );
 
         this.changeAgent = false;
@@ -363,25 +384,6 @@ export class AgentsController {
     } else if (this.ignoredTabs.includes(this.$scope.tab)) {
       timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
     }
-    if (tab === 'syscollector') {
-      // TODO: Migrate syscollector to React
-      let breadcrumb = [
-        {
-          text: '',
-        },
-        {
-          text: 'Agents',
-          href: '#/agents-preview',
-        },
-        { agent: this.$scope.agent },
-        {
-          text: 'Inventory Data',
-          className: 'wz-global-breadcrumb-popover',
-        },
-      ];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      $('#breadcrumbNoTitle').attr('title', '');
-    }
 
     // Update agent status
     if (!force && this.$scope.agent) {
@@ -403,7 +405,6 @@ export class AgentsController {
     }
 
     try {
-
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -411,7 +412,8 @@ export class AgentsController {
       }
 
       if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
-      if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
+      if (this.tabHistory.length > 2)
+        this.tabHistory = this.tabHistory.slice(-2);
 
       if (this.$scope.tab === tab && !force) {
         this.$scope.$applyAsync();
@@ -422,7 +424,9 @@ export class AgentsController {
       const sameTab = this.$scope.tab === tab;
       this.$location.search('tab', tab);
       const preserveDiscover =
-        this.tabHistory.length === 2 && this.tabHistory[0] === this.tabHistory[1] && !force;
+        this.tabHistory.length === 2 &&
+        this.tabHistory[0] === this.tabHistory[1] &&
+        !force;
       this.$scope.tab = tab;
 
       const targetSubTab =
@@ -431,7 +435,13 @@ export class AgentsController {
           : 'panels';
 
       if (!this.ignoredTabs.includes(this.$scope.tab)) {
-        this.$scope.switchSubtab(targetSubTab, true, onlyAgent, sameTab, preserveDiscover);
+        this.$scope.switchSubtab(
+          targetSubTab,
+          true,
+          onlyAgent,
+          sameTab,
+          preserveDiscover,
+        );
       }
 
       this.shareAgent.deleteTargetLocation();
@@ -453,9 +463,9 @@ export class AgentsController {
     }
 
     this.$scope.configurationTabsProps = {};
-    this.$scope.buildProps = (tabs) => {
+    this.$scope.buildProps = tabs => {
       const cleanTabs = [];
-      tabs.forEach((x) => {
+      tabs.forEach(x => {
         if (
           this.$scope.configurationTab === 'integrity-monitoring' &&
           x.id === 'fim-whodata' &&
@@ -470,10 +480,13 @@ export class AgentsController {
         });
       });
       this.$scope.configurationTabsProps = {
-        clickAction: (tab) => {
+        clickAction: tab => {
           this.$scope.switchConfigurationSubTab(tab);
         },
-        selectedTab: this.$scope.configurationSubTab || (tabs && tabs.length) ? tabs[0].id : '',
+        selectedTab:
+          this.$scope.configurationSubTab || (tabs && tabs.length)
+            ? tabs[0].id
+            : '',
         tabs: cleanTabs,
       };
     };
@@ -500,18 +513,21 @@ export class AgentsController {
   setTabs() {
     this.$scope.agentsTabsProps = false;
     if (this.$scope.agent) {
-      this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab, true);
+      this.currentPanel = this.commonData.getCurrentPanel(
+        this.$scope.tab,
+        true,
+      );
 
       if (!this.currentPanel) return;
 
       const tabs = this.commonData.getTabsFromCurrentPanel(
         this.currentPanel,
         this.$scope.extensions,
-        this.$scope.tabNames
+        this.$scope.tabNames,
       );
 
       const cleanTabs = [];
-      tabs.forEach((x) => {
+      tabs.forEach(x => {
         if (!hasAgentSupportModule(this.$scope.agent, x.id)) return;
 
         cleanTabs.push({
@@ -521,12 +537,14 @@ export class AgentsController {
       });
 
       this.$scope.agentsTabsProps = {
-        clickAction: (tab) => {
+        clickAction: tab => {
           this.switchTab(tab, true);
         },
         selectedTab:
           this.$scope.tab ||
-          (this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : ''),
+          (this.currentPanel && this.currentPanel.length
+            ? this.currentPanel[0]
+            : ''),
         tabs: cleanTabs,
       };
       this.$scope.$applyAsync();
@@ -566,7 +584,10 @@ export class AgentsController {
    */
   async loadSyscollector(id) {
     try {
-      const syscollectorData = await this.genericReq.request('GET', `/api/syscollector/${id}`);
+      const syscollectorData = await this.genericReq.request(
+        'GET',
+        `/api/syscollector/${id}`,
+      );
       this.$scope.syscollector = syscollectorData?.data || {};
       return;
     } catch (error) {
@@ -600,9 +621,12 @@ export class AgentsController {
 
       if (!this.$scope.agent) return;
       if (agentInfo && this.$scope.agent.os) {
-        this.$scope.agentOS = this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
+        this.$scope.agentOS =
+          this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');
-        this.$scope.agent.agentPlatform = isLinux ? 'linux' : this.$scope.agent.os.platform;
+        this.$scope.agent.agentPlatform = isLinux
+          ? 'linux'
+          : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
         this.$scope.agent.agentPlatform = false;
@@ -611,7 +635,7 @@ export class AgentsController {
       await this.$scope.switchTab(this.$scope.tab, true);
 
       this.loadWelcomeCardsProps();
-      this.$scope.getWelcomeCardsProps = (resultState) => {
+      this.$scope.getWelcomeCardsProps = resultState => {
         return { ...this.$scope.welcomeCardsProps, resultState };
       };
       this.$scope.load = false;
@@ -623,7 +647,11 @@ export class AgentsController {
           this.$scope.emptyAgent = 'Wazuh API timeout.';
         }
       }
-      if (error && typeof error === 'string' && error.includes('Agent does not exist')) {
+      if (
+        error &&
+        typeof error === 'string' &&
+        error.includes('Agent does not exist')
+      ) {
         this.$location.search('agent', null);
         this.$location.path('/agents-preview');
       }
@@ -704,8 +732,6 @@ export class AgentsController {
     this.$location.search('navigation', true);
     this.$location.path('/manager');
   }
-
-
 
   falseAllExpand() {
     this.$scope.expandArray = [
