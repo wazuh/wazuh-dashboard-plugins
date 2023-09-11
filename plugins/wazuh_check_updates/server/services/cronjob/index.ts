@@ -1,20 +1,18 @@
 import cron from 'node-cron';
 import { getUpdates } from '..';
+import { getSettings } from '..';
+import { DEFAULT_CRON_EXPRESSION } from '../../../common';
 
-export async function jobSchedulerRun() {
-  //   const configuration = await getConfiguration();
-  const configuration = {
-    settings: {
-      schedule: '* * * * *',
-      apiBaseUrl: 'api',
-      apiKey: 'sdfsdfsdf',
-    },
-    deployment: { UID: 'uid' },
-  };
-  console.log;
-  const isValidSchedule = cron.validate(configuration?.settings?.schedule);
-  const isValidApiUrl = !!configuration?.settings?.apiBaseUrl?.length;
+export const jobSchedulerRun = async () => {
+  try {
+    const settings = await getSettings();
 
-  if (isValidSchedule && isValidApiUrl)
-    cron.schedule(configuration?.settings?.schedule, () => getUpdates());
-}
+    console.log({ settings });
+
+    cron.schedule(settings.cronExpression || DEFAULT_CRON_EXPRESSION, () => getUpdates());
+  } catch (error) {
+    const message = error instanceof Error ? error.message : error;
+    console.log('wazuh-check-updates:jobSchedulerRun', message);
+    return Promise.reject(error);
+  }
+};

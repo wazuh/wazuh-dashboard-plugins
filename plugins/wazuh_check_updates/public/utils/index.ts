@@ -1,0 +1,1 @@
+export { getCurrentAvailableUpdate } from './getCurrentAvailableUpdate';

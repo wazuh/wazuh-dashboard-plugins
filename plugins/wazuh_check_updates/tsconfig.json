@@ -10,7 +10,8 @@
     "public/**/*.ts",
     "public/**/*.tsx",
     "server/**/*.ts",
-    "../../typings/**/*"
+    "../../typings/**/*",
+    "public/hooks"
   ],
   "exclude": []
 }

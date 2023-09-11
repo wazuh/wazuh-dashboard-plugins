@@ -15,7 +15,7 @@ export const getUpdates = async (): Promise<AvailableUpdates | undefined> => {
 
     mock.onGet(mockUrl).reply(200, mockSuccessResponse);
 
-    const updatesResponse = await axios.get('/', {
+    const updatesResponse = await axios.get(mockUrl, {
       method: 'GET',
     });
 

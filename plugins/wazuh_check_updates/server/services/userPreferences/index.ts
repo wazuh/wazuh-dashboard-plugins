@@ -15,7 +15,7 @@ export const updateUserPreferences = async (
   return newUserPreferences;
 };
 
-const getUserPreferences = async (userId: string): Promise<UserPreferencesWithId> => {
+export const getUserPreferences = async (userId: string): Promise<UserPreferencesWithId> => {
   try {
     const userPreferences = (await getSavedObject(
       SAVED_OBJECT_USER_PREFERENCES

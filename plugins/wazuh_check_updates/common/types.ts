@@ -2,7 +2,7 @@ export interface AvailableUpdates {
   mayor: Update[];
   minor: Update[];
   patch: Update[];
-  last_check: Date | string | undefined;
+  last_check?: Date | string | undefined;
 }
 
 export interface Update {
@@ -24,4 +24,8 @@ export interface UserPreferences {
 
 export interface UserPreferencesWithId extends UserPreferences {
   user_id: string;
+}
+
+export interface CheckUpdatesSettings {
+  cronExpression: string;
 }

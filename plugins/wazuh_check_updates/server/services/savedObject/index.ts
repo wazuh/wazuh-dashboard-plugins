@@ -1,28 +1,34 @@
 import { getInternalSavedObjectsClient } from '../../plugin-services';
-import { AvailableUpdates, UserPreferencesWithId } from '../../../common/types';
+import {
+  AvailableUpdates,
+  CheckUpdatesSettings,
+  UserPreferencesWithId,
+} from '../../../common/types';
 
-export const getSavedObject = async (type: string, id?: string) => {
+type savedObjectType = AvailableUpdates | UserPreferencesWithId | CheckUpdatesSettings;
+
+export const getSavedObject = async (type: string): Promise<savedObjectType> => {
   try {
     const client = getInternalSavedObjectsClient();
     const responseFind = await client.find({
       type: type,
     });
 
-    console.log(responseFind?.saved_objects[0]);
-
-    const result = responseFind.saved_objects?.length
+    const result = (responseFind.saved_objects?.length
       ? responseFind.saved_objects[0].attributes
-      : {};
+      : {}) as savedObjectType;
     return result;
   } catch (error) {
-    console.log(error);
+    const message = error instanceof Error ? error.message : error;
+    console.log('wazuh-check-updates:getSavedObject', message);
+    return Promise.reject(error);
   }
 };
 
 export const setSavedObject = async (
   type: string,
-  value: AvailableUpdates | UserPreferencesWithId
-) => {
+  value: savedObjectType
+): Promise<savedObjectType> => {
   try {
     const client = getInternalSavedObjectsClient();
 
@@ -32,12 +38,12 @@ export const setSavedObject = async (
       refresh: true,
     });
 
-    console.log({ responseCreate });
-
     await getSavedObject(type);
 
     return responseCreate?.attributes;
   } catch (error) {
-    console.log(error);
+    const message = error instanceof Error ? error.message : error;
+    console.log('wazuh-check-updates:setSavedObject', message);
+    return Promise.reject(error);
   }
 };

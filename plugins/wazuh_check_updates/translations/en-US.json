@@ -76,9 +76,12 @@
     }
   },
   "messages": {
-    "wazuhCheckUpdates.updatesBar.message": "¡Wazuh new release is available now!",
-    "wazuhCheckUpdates.updatesBar.linkText": "Go to the release notes for details",
-    "wazuhCheckUpdates.updatesBar.dismissCheckText": "I don't want to know about future releases",
-    "wazuhCheckUpdates.updatesBar.closeButtonText": "Close"
+    "wazuhCheckUpdates.updatesNotification.message": "¡Wazuh new release is available now!",
+    "wazuhCheckUpdates.updatesNotification.linkText": "Go to the release notes for details",
+    "wazuhCheckUpdates.updatesNotification.dismissCheckText": "I don't want to know about future releases",
+    "wazuhCheckUpdates.updatesNotification.closeButtonText": "Close",
+    "wazuhCheckUpdates.upToDateStatus.upToDate": "Up to date",
+    "wazuhCheckUpdates.upToDateStatus.availableUpdates": "Available updates",
+    "wazuhCheckUpdates.upToDateStatus.lastCheck": "Last check"
   }
 }

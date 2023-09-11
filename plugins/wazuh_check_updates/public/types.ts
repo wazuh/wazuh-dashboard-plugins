@@ -4,6 +4,7 @@ export interface WazuhCheckUpdatesPluginSetup {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCheckUpdatesPluginStart {
   UpdatesNotification: () => JSX.Element | null;
+  UpToDateStatus: () => JSX.Element | null;
 }
 
 export interface AppPluginStartDependencies {

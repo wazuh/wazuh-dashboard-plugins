@@ -1,6 +1,8 @@
 import { CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
 import { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
 import { UpdatesNotification } from './components/updatesNotification';
+import { UpToDateStatus } from './components/upToDateStatus';
+import { setCore, setUiSettings } from './plugin-services';
 
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {
@@ -24,8 +26,12 @@ export class WazuhCheckUpdatesPlugin
   }
 
   public start(core: CoreStart): WazuhCheckUpdatesPluginStart {
+    setCore(core);
+    setUiSettings(core.uiSettings);
+
     return {
       UpdatesNotification,
+      UpToDateStatus,
     };
   }
 
