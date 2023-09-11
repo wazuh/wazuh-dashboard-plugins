@@ -46,7 +46,6 @@ import {
 } from './services/request-handler';
 import { DEFAULT_APP_CATEGORIES } from '../../../src/core/public';
 
-const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';
 
 export class WazuhPlugin
@@ -83,9 +82,7 @@ export class WazuhPlugin
         id: `wazuh`,
         title: 'Wazuh',
         icon: core.http.basePath.prepend(
-          logosInitialState?.logos?.[SIDEBAR_LOGO]
-            ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO])
-            : getThemeAssetURL('icon.svg', UI_THEME),
+          getThemeAssetURL('icon.svg', UI_THEME),
         ),
         mount: async (params: AppMountParameters) => {
           try {
@@ -129,9 +126,7 @@ export class WazuhPlugin
                   label: 'Wazuh',
                   order: 0,
                   euiIconType: core.http.basePath.prepend(
-                    logosInitialState?.logos?.[SIDEBAR_LOGO]
-                      ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO])
-                      : getThemeAssetURL('icon.svg', UI_THEME),
+                    getThemeAssetURL('icon.svg', UI_THEME),
                   ),
                 },
               };
@@ -149,9 +144,7 @@ export class WazuhPlugin
           label: 'Wazuh',
           order: 0,
           euiIconType: core.http.basePath.prepend(
-            logosInitialState?.logos?.[SIDEBAR_LOGO]
-              ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO])
-              : getThemeAssetURL('icon.svg', UI_THEME),
+            getThemeAssetURL('icon.svg', UI_THEME),
           ),
         },
         updater$: this.stateUpdater,
@@ -165,9 +158,7 @@ export class WazuhPlugin
         }),
         order: 1,
         euiIconType: core.http.basePath.prepend(
-          logosInitialState?.logos?.[SIDEBAR_LOGO]
-            ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO])
-            : getThemeAssetURL('icon.svg', UI_THEME),
+          getThemeAssetURL('icon.svg', UI_THEME),
         ),
       };
 
@@ -178,9 +169,7 @@ export class WazuhPlugin
         }),
         order: 2,
         euiIconType: core.http.basePath.prepend(
-          logosInitialState?.logos?.[SIDEBAR_LOGO]
-            ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO])
-            : getThemeAssetURL('icon.svg', UI_THEME),
+          getThemeAssetURL('icon.svg', UI_THEME),
         ),
       };
 
@@ -191,9 +180,7 @@ export class WazuhPlugin
         }),
         order: 3,
         euiIconType: core.http.basePath.prepend(
-          logosInitialState?.logos?.[SIDEBAR_LOGO]
-            ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO])
-            : getThemeAssetURL('icon.svg', UI_THEME),
+          getThemeAssetURL('icon.svg', UI_THEME),
         ),
       };
 
@@ -204,9 +191,7 @@ export class WazuhPlugin
         }),
         order: 4,
         euiIconType: core.http.basePath.prepend(
-          logosInitialState?.logos?.[SIDEBAR_LOGO]
-            ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO])
-            : getThemeAssetURL('icon.svg', UI_THEME),
+          getThemeAssetURL('icon.svg', UI_THEME),
         ),
       };
 
@@ -217,9 +202,7 @@ export class WazuhPlugin
         }),
         order: 5,
         euiIconType: core.http.basePath.prepend(
-          logosInitialState?.logos?.[SIDEBAR_LOGO]
-            ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO])
-            : getThemeAssetURL('icon.svg', UI_THEME),
+          getThemeAssetURL('icon.svg', UI_THEME),
         ),
       };
 
