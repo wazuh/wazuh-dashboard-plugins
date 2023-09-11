@@ -40,6 +40,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed repeated requests in the group table when adding a group or refreshing the table [#5465](https://github.com/wazuh/wazuh-kibana-app/pull/5465)
 - Fixed an error in the request body suggestions of API Console [#5521](https://github.com/wazuh/wazuh-kibana-app/pull/5521)
 - Fixed some errors related to relative dirname of rule and decoder files [#5734](https://github.com/wazuh/wazuh-kibana-app/pull/5734)
+- Fixed package URLs in aarch64 commands [#5879](https://github.com/wazuh/wazuh-kibana-app/pull/5879)
 
 ### Removed
 
