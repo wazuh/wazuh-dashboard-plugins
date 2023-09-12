@@ -3,7 +3,7 @@ import { AvailableUpdates } from '../../common/types';
 import { routes } from '../../common/index';
 import { getCore } from '../plugin-services';
 
-export const useGetAvailableUpdates = () => {
+export const useAvailableUpdates = () => {
   const [availableUpdates, setAvailableUpdates] = useState<AvailableUpdates>({
     mayor: [],
     minor: [],
@@ -13,7 +13,7 @@ export const useGetAvailableUpdates = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const refreshAvailableUpdates = (forceUpdate = false) => {
+  const getAvailableUpdates = (forceUpdate = false) => {
     (async () => {
       try {
         setIsLoading(true);
@@ -32,8 +32,8 @@ export const useGetAvailableUpdates = () => {
   };
 
   useEffect(() => {
-    refreshAvailableUpdates();
+    getAvailableUpdates();
   }, []);
 
-  return { isLoading, availableUpdates, refreshAvailableUpdates, error };
+  return { isLoading, availableUpdates, getAvailableUpdates, error };
 };

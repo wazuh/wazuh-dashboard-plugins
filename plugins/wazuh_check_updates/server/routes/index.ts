@@ -2,7 +2,7 @@ import { IRouter } from 'opensearch-dashboards/server';
 import { schema } from '@osd/config-schema';
 
 import { routes, SAVED_OBJECT_UPDATES } from '../../common';
-import { getSavedObject } from '../services';
+import { getSavedObject, getUserPreferences } from '../services';
 import { getUpdates, updateUserPreferences } from '../services';
 import { AvailableUpdates } from '../../common/types';
 
@@ -49,10 +49,37 @@ export function defineRoutes(router: IRouter) {
   );
 
   /********** USER PREFERENCES ROUTES **********/
+  router.get(
+    {
+      path: `${routes.userPreferences}/{userId}`,
+      validate: {
+        params: schema.object({
+          userId: schema.string(),
+        }),
+      },
+    },
+    async (context, { params }, response) => {
+      const { userId } = params;
+      try {
+        const userPreferences = await getUserPreferences(userId);
+
+        return response.ok({
+          body: userPreferences,
+        });
+      } catch (error) {
+        return response.customError({
+          statusCode: 503,
+          // body: {
+          //   error: 'message',
+          // },
+        });
+      }
+    }
+  );
 
   router.patch(
     {
-      path: `${routes.userPreferences}/:userId`,
+      path: `${routes.userPreferences}/{userId}`,
       validate: {
         params: schema.object({
           userId: schema.string(),

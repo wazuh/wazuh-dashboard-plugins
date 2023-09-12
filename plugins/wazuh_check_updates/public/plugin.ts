@@ -3,6 +3,7 @@ import { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './ty
 import { UpdatesNotification } from './components/updatesNotification';
 import { UpToDateStatus } from './components/upToDateStatus';
 import { setCore, setUiSettings } from './plugin-services';
+import { CurrentUpdateDetails } from './components/currentUpdateDetails';
 
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {
@@ -32,6 +33,7 @@ export class WazuhCheckUpdatesPlugin
     return {
       UpdatesNotification,
       UpToDateStatus,
+      CurrentUpdateDetails,
     };
   }
 

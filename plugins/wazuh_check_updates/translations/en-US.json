@@ -82,6 +82,9 @@
     "wazuhCheckUpdates.updatesNotification.closeButtonText": "Close",
     "wazuhCheckUpdates.upToDateStatus.upToDate": "Up to date",
     "wazuhCheckUpdates.upToDateStatus.availableUpdates": "Available updates",
-    "wazuhCheckUpdates.upToDateStatus.lastCheck": "Last check"
+    "wazuhCheckUpdates.upToDateStatus.lastCheck": "Last check",
+    "wazuhCheckUpdates.upToDateStatus.buttonText": "Check updates",
+    "wazuhCheckUpdates.urrentUpdateDetails.releaseNotesLink": "Release notes",
+    "wazuhCheckUpdates.currentUpdateDetails.upgradeGuideLink": "Upgrade guide"
   }
 }

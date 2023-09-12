@@ -9,38 +9,63 @@ import {
 } from '@elastic/eui';
 import React, { useState } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
-import { useGetAvailableUpdates } from '../hooks';
+import { useAvailableUpdates, useUserPreferences } from '../hooks';
 import { getCurrentAvailableUpdate } from '../utils';
 
-export const UpdatesNotification = () => {
+export interface UpdatesNotificationProps {
+  userId: string;
+}
+
+export const UpdatesNotification = ({ userId }: UpdatesNotificationProps) => {
   const [isDismissed, setIsDismissed] = useState(false);
   const [dismissFutureUpdates, setDismissFutureUpdates] = useState(false);
+
+  const {
+    userPreferences,
+    error: userPreferencesError,
+    isLoading: isLoadingUserPreferences,
+    updateUserPreferences,
+  } = useUserPreferences(userId);
 
   const {
     availableUpdates,
     error: getAvailableUpdatesError,
     isLoading: isLoadingAvailableUpdates,
-  } = useGetAvailableUpdates();
+  } = useAvailableUpdates();
 
-  const handleOnChangeDismiss = (checked: boolean) => {
-    setDismissFutureUpdates(checked);
-  };
-
-  const handleOnClose = () => {
-    setIsDismissed(true);
-  };
+  if (userPreferencesError) {
+    console.log(userPreferencesError);
+    return null;
+  }
 
   if (getAvailableUpdatesError) {
     console.log(getAvailableUpdatesError);
     return null;
   }
 
-  if (isLoadingAvailableUpdates) return null;
+  if (
+    isLoadingAvailableUpdates ||
+    isLoadingUserPreferences ||
+    userPreferences.hide_update_notifications
+  )
+    return null;
 
   const currentUpdate = getCurrentAvailableUpdate(availableUpdates);
 
   const releaseNotesUrl = `https://documentation.wazuh.com/current/release-notes/release-${currentUpdate?.semver.mayor}-${currentUpdate?.semver.minor}-${currentUpdate?.semver.patch}.html`;
   const isVisible = !isDismissed && currentUpdate;
+
+  const handleOnChangeDismiss = (checked: boolean) => {
+    setDismissFutureUpdates(checked);
+  };
+
+  const handleOnClose = () => {
+    updateUserPreferences({
+      last_dismissed_update: currentUpdate?.tag,
+      ...(dismissFutureUpdates ? { hide_update_notifications: true } : {}),
+    });
+    setIsDismissed(true);
+  };
 
   return isVisible ? (
     <EuiBottomBar style={{ backgroundColor: 'white', color: '#1a1c21' }}>

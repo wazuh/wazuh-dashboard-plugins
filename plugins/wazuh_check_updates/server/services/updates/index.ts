@@ -11,11 +11,11 @@ export const getUpdates = async (): Promise<AvailableUpdates | undefined> => {
   try {
     console.log('Checking Wazuh available updates...');
 
-    const mockUrl = `/api/ping`;
+    const updatesServiceUrl = `/api/updates`;
 
-    mock.onGet(mockUrl).reply(200, mockSuccessResponse);
+    mock.onGet(updatesServiceUrl).reply(200, mockSuccessResponse);
 
-    const updatesResponse = await axios.get(mockUrl, {
+    const updatesResponse = await axios.get(updatesServiceUrl, {
       method: 'GET',
     });
 

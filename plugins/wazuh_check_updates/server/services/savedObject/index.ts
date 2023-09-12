@@ -1,11 +1,7 @@
 import { getInternalSavedObjectsClient } from '../../plugin-services';
-import {
-  AvailableUpdates,
-  CheckUpdatesSettings,
-  UserPreferencesWithId,
-} from '../../../common/types';
+import { AvailableUpdates, CheckUpdatesSettings, UsersPreferences } from '../../../common/types';
 
-type savedObjectType = AvailableUpdates | UserPreferencesWithId | CheckUpdatesSettings;
+type savedObjectType = AvailableUpdates | UsersPreferences | CheckUpdatesSettings;
 
 export const getSavedObject = async (type: string): Promise<savedObjectType> => {
   try {

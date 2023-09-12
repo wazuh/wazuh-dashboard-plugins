@@ -7,7 +7,7 @@ export const settingsObject: SavedObjectsType = {
   namespaceType: 'agnostic',
   mappings: {
     properties: {
-      schedule: {
+      cronExpression: {
         type: 'text',
       },
     },

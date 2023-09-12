@@ -22,8 +22,8 @@ export interface UserPreferences {
   hide_update_notifications?: boolean;
 }
 
-export interface UserPreferencesWithId extends UserPreferences {
-  user_id: string;
+export interface UsersPreferences {
+  users: ({ user_id: string } & UserPreferences)[];
 }
 
 export interface CheckUpdatesSettings {

@@ -1,33 +1,46 @@
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common';
-import { UserPreferences, UserPreferencesWithId } from '../../../common/types';
+import { UserPreferences, UsersPreferences } from '../../../common/types';
 import { getSavedObject, setSavedObject } from '..';
 
 export const updateUserPreferences = async (
   userId: string,
   preferences: UserPreferences
-): Promise<UserPreferencesWithId> => {
-  const userPreferences = await getUserPreferences(userId);
+): Promise<UserPreferences> => {
+  try {
+    const usersPreferences =
+      ((await getSavedObject(SAVED_OBJECT_USER_PREFERENCES)) as UsersPreferences)?.users || [];
 
-  const newUserPreferences = { ...userPreferences, ...preferences };
+    const userPreferences = usersPreferences?.find((up) => up.user_id === userId) || {};
 
-  await setSavedObject(SAVED_OBJECT_USER_PREFERENCES, newUserPreferences);
+    const newUserPreferences = { ...userPreferences, ...preferences, user_id: userId };
 
-  return newUserPreferences;
+    const newUsersPreferences = [
+      ...usersPreferences?.filter((up) => up.user_id !== userId),
+      newUserPreferences,
+    ];
+
+    await setSavedObject(SAVED_OBJECT_USER_PREFERENCES, { users: newUsersPreferences });
+
+    return newUserPreferences;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : error;
+    console.log('wazuh-check-updates:getUserPreferences', message);
+    return Promise.reject(error);
+  }
 };
 
-export const getUserPreferences = async (userId: string): Promise<UserPreferencesWithId> => {
+export const getUserPreferences = async (userId: string): Promise<UserPreferences> => {
   try {
-    const userPreferences = (await getSavedObject(
+    const usersPreferences = (await getSavedObject(
       SAVED_OBJECT_USER_PREFERENCES
-    )) as UserPreferencesWithId;
-    return userPreferences;
-  } catch {
-    const userPreferences = {
-      user_id: userId,
-      hide_update_notifications: false,
-    };
-    await setSavedObject(SAVED_OBJECT_USER_PREFERENCES, userPreferences);
+    )) as UsersPreferences;
+
+    const userPreferences = usersPreferences?.users?.find((up) => up.user_id === userId) || {};
 
     return userPreferences;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : error;
+    console.log('wazuh-check-updates:getUserPreferences', message);
+    return Promise.reject(error);
   }
 };
