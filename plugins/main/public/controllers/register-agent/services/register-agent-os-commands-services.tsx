@@ -45,8 +45,13 @@ const getAllOptionalsMacos = (
   return Object.entries(paramNameOrderList).reduce(
     (acc, [key, value]) => {
       if (optionals[value]) {
-        acc += `${optionals[value]}\\n`;
+        acc += `${optionals[value]}`;
       }
+
+      if (Number.parseInt(key) + 1 < Object.entries(optionals).length) {
+        acc += ` && `;
+      }
+
       return acc;
     },
     '',
@@ -139,7 +144,7 @@ export const getMacOsInstallCommand = (
 
   // If no variables are set, the echo will be empty
   const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions
-    ? `echo -e "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
+    ? `echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
     : ``;
 
   // Merge environment variables with installation script
