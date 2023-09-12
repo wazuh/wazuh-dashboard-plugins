@@ -30,7 +30,12 @@ export class OptionalParametersManager<Params extends string> implements IOption
    */
     getAllOptionalParams(paramsValues: IOptionalParameters<Params>){
       // get keys for only the optional params with values !== ''
-      const optionalParams = Object.keys(paramsValues).filter(key => paramsValues[key as keyof typeof paramsValues] !== '') as Array<keyof typeof paramsValues>;
+      // when is array must have entries
+      const optionalParams = Object.keys(paramsValues).filter(
+        key => {
+          const value = paramsValues[key as keyof typeof paramsValues];
+          return Array.isArray(value) ? value.length > 0 : value !== ''
+        }) as Array<keyof typeof paramsValues>;
       const resolvedOptionalParams: any = {};
       for(const param of optionalParams){
         if(!this.optionalParamsConfig[param]){
