@@ -85,6 +85,7 @@
     "wazuhCheckUpdates.upToDateStatus.lastCheck": "Last check",
     "wazuhCheckUpdates.upToDateStatus.buttonText": "Check updates",
     "wazuhCheckUpdates.urrentUpdateDetails.releaseNotesLink": "Release notes",
+    "wazuhCheckUpdates.currentUpdateDetails.title": "¡Wazuh new release is available now!",
     "wazuhCheckUpdates.currentUpdateDetails.upgradeGuideLink": "Upgrade guide"
   }
 }

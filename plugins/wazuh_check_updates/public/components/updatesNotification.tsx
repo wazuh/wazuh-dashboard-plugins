@@ -1,4 +1,5 @@
 import {
+  EuiBadge,
   EuiBottomBar,
   EuiButton,
   EuiCheckbox,
@@ -43,14 +44,15 @@ export const UpdatesNotification = ({ userId }: UpdatesNotificationProps) => {
     return null;
   }
 
-  if (
-    isLoadingAvailableUpdates ||
-    isLoadingUserPreferences ||
-    userPreferences.hide_update_notifications
-  )
-    return null;
+  if (isLoadingAvailableUpdates || isLoadingUserPreferences) return null;
 
   const currentUpdate = getCurrentAvailableUpdate(availableUpdates);
+
+  const hideNotification =
+    userPreferences?.hide_update_notifications ||
+    userPreferences?.last_dismissed_update === currentUpdate?.tag;
+
+  if (hideNotification) return null;
 
   const releaseNotesUrl = `https://documentation.wazuh.com/current/release-notes/release-${currentUpdate?.semver.mayor}-${currentUpdate?.semver.minor}-${currentUpdate?.semver.patch}.html`;
   const isVisible = !isDismissed && currentUpdate;
@@ -72,13 +74,16 @@ export const UpdatesNotification = ({ userId }: UpdatesNotificationProps) => {
       <EuiFlexGroup justifyContent="spaceBetween" alignItems="center" gutterSize="m">
         <EuiFlexItem grow={false}>
           <EuiFlexGroup gutterSize="m" alignItems="center">
-            <EuiFlexItem grow={false}>
+            <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
               <EuiText>
                 <FormattedMessage
                   id="wazuhCheckUpdates.updatesNotification.message"
                   defaultMessage="¡Wazuh new release is available now!"
                 />
               </EuiText>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+              <EuiBadge>{currentUpdate.tag}</EuiBadge>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiHeaderLink href={releaseNotesUrl} isActive target="_blank">
@@ -107,7 +112,7 @@ export const UpdatesNotification = ({ userId }: UpdatesNotificationProps) => {
                 onChange={(e) => handleOnChangeDismiss(e.target.checked)}
               />
             </EuiFlexItem>
-            <EuiFlexItem grow={false}>
+            <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
               <EuiButton size="s" iconType="cross" onClick={() => handleOnClose()}>
                 <FormattedMessage
                   id="wazuhCheckUpdates.updatesNotification.closeButtonText"

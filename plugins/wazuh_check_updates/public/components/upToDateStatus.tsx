@@ -56,7 +56,7 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
         </EuiFlexItem>
       ) : null}
       <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-        <EuiButtonEmpty isLoading={isLoading} onClick={handleOnClick} size="s">
+        <EuiButtonEmpty isLoading={isLoading} onClick={handleOnClick} size="xs">
           <FormattedMessage
             id="wazuhCheckUpdates.upToDateStatus.buttonText"
             defaultMessage="Check updates"
