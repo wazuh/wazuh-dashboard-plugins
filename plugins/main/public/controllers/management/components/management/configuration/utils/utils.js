@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import js2xmlparser from 'js2xmlparser';
+import { parse } from 'js2xmlparser';
 import XMLBeautifier from './xml-beautifier';
 
 /**
@@ -29,9 +29,7 @@ export const getXML = currentConfig => {
   const config = {};
   Object.assign(config, currentConfig);
   const cleaned = objectWithoutProperties(config);
-  const XMLContent = XMLBeautifier(
-    js2xmlparser.parse('configuration', cleaned)
-  );
+  const XMLContent = XMLBeautifier(parse('configuration', cleaned));
   return XMLContent;
 };
 
@@ -90,7 +88,7 @@ export const objectWithoutProperties = obj => {
           return undefined;
         }
         return val;
-      })
+      }),
     );
     return result;
   } catch (error) {
