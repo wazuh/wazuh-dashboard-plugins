@@ -42,20 +42,20 @@ const getAllOptionalsMacos = (
     ['serverAddress', 'wazuhPassword', 'agentGroups', 'agentName', 'protocol'];
 
   if (!optionals) return '';
-  return Object.entries(paramNameOrderList).reduce(
-    (acc, [key, value]) => {
-      if (optionals[value]) {
-        acc += `${optionals[value]}`;
-      }
+  
+  const paramsValueList = []
 
-      if (Number.parseInt(key) + 1 < Object.entries(optionals).length) {
-        acc += ` && `;
-      }
+  paramNameOrderList.forEach( paramName => {
+    if(optionals[paramName] && optionals[paramName] !== ''){
+      paramsValueList.push(optionals[paramName]);
+    }
+  })
 
-      return acc;
-    },
-    '',
-  );
+  if(paramsValueList.length){
+    return paramsValueList.join(' && ');
+  }
+
+  return '';
 };
 
 /******* DEB *******/
