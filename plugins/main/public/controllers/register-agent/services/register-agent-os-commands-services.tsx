@@ -42,15 +42,20 @@ const getAllOptionalsMacos = (
     ['serverAddress', 'wazuhPassword', 'agentGroups', 'agentName', 'protocol'];
 
   if (!optionals) return '';
-  return Object.entries(paramNameOrderList).reduce(
-    (acc, [key, value]) => {
-      if (optionals[value]) {
-        acc += `${optionals[value]}\\n`;
-      }
-      return acc;
-    },
-    '',
-  );
+  
+  const paramsValueList = []
+
+  paramNameOrderList.forEach( paramName => {
+    if(optionals[paramName] && optionals[paramName] !== ''){
+      paramsValueList.push(optionals[paramName]);
+    }
+  })
+
+  if(paramsValueList.length){
+    return paramsValueList.join(' && ');
+  }
+
+  return '';
 };
 
 /******* DEB *******/
@@ -139,7 +144,7 @@ export const getMacOsInstallCommand = (
 
   // If no variables are set, the echo will be empty
   const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions
-    ? `echo -e "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
+    ? `echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
     : ``;
 
   // Merge environment variables with installation script
