@@ -85,7 +85,7 @@ export const UpdatesNotification = ({ userId }: UpdatesNotificationProps) => {
             <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
               <EuiBadge>{currentUpdate.tag}</EuiBadge>
             </EuiFlexItem>
-            <EuiFlexItem grow={false}>
+            <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
               <EuiHeaderLink href={releaseNotesUrl} isActive target="_blank">
                 {
                   <FormattedMessage

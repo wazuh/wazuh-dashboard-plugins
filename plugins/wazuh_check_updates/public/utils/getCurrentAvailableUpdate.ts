@@ -1,6 +1,6 @@
 import { AvailableUpdates } from '../../common/types';
 
-export const getCurrentAvailableUpdate = (availableUpdates: AvailableUpdates) => {
+export const getCurrentAvailableUpdate = (availableUpdates: Partial<AvailableUpdates> = {}) => {
   const { patch, minor, mayor } = availableUpdates;
 
   if (patch?.length) return patch[patch.length - 1];

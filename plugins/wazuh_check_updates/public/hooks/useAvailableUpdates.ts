@@ -22,7 +22,7 @@ export const useAvailableUpdates = () => {
             checkAvailableUpdates: forceUpdate,
           },
         });
-        setAvailableUpdates(response.availableUpdates);
+        setAvailableUpdates(response);
         setIsLoading(false);
       } catch (error: any) {
         setError(error);

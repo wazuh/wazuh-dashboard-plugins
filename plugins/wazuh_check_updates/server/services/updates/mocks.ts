@@ -28,6 +28,18 @@ export const mockSuccessResponse: { data: Omit<AvailableUpdates, 'last_check'> }
         tag: 'v4.3.1',
         title: 'Wazuh v4.3.1',
       },
+      {
+        description:
+          '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+        published_date: '2022-06-20T13:20:11Z',
+        semver: {
+          mayor: 4,
+          minor: 3,
+          patch: 2,
+        },
+        tag: 'v4.3.2',
+        title: 'Wazuh v4.3.2',
+      },
     ],
     patch: [],
   },

@@ -11,7 +11,7 @@ export const CurrentUpdateDetails = ({ currentUpdate }: CurrentUpdateDetailsProp
   if (!currentUpdate) return null;
 
   const currentRelease = `${currentUpdate?.semver.mayor}.${currentUpdate?.semver.minor}`;
-  const releaseNotesUrl = `https://documentation.wazuh.com/${currentRelease}/release-notes/release-${currentUpdate?.semver.mayor}-${currentUpdate?.semver.minor}-${currentUpdate?.semver.patch}.html`;
+  const releaseNotesUrl = `https://documentation.wazuh.com/${currentRelease}/release-notes/release-${currentUpdate.semver.mayor}-${currentUpdate.semver.minor}-${currentUpdate.semver.patch}.html`;
   const upgradeGuideUrl = `https://documentation.wazuh.com/${currentRelease}/upgrade-guide/index.html`;
 
   return (
@@ -35,22 +35,18 @@ export const CurrentUpdateDetails = ({ currentUpdate }: CurrentUpdateDetailsProp
       <EuiFlexGroup gutterSize="m">
         <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
           <EuiHeaderLink href={releaseNotesUrl} isActive target="_blank" iconType="list">
-            {
-              <FormattedMessage
-                id="wazuhCheckUpdates.currentUpdateDetails.releaseNotesLink"
-                defaultMessage="Release notes"
-              />
-            }
+            <FormattedMessage
+              id="wazuhCheckUpdates.currentUpdateDetails.releaseNotesLink"
+              defaultMessage="Release notes"
+            />
           </EuiHeaderLink>
         </EuiFlexItem>
         <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
           <EuiHeaderLink href={upgradeGuideUrl} isActive target="_blank" iconType="training">
-            {
-              <FormattedMessage
-                id="wazuhCheckUpdates.currentUpdateDetails.upgradeGuideLink"
-                defaultMessage="Upgrade guide"
-              />
-            }
+            <FormattedMessage
+              id="wazuhCheckUpdates.currentUpdateDetails.upgradeGuideLink"
+              defaultMessage="Upgrade guide"
+            />
           </EuiHeaderLink>
         </EuiFlexItem>
       </EuiFlexGroup>

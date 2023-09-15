@@ -1,4 +1,4 @@
-import { DEFAULT_CRON_EXPRESSION, SAVED_OBJECT_SETTINGS } from '../../../common';
+import { DEFAULT_SCHEDULE, SAVED_OBJECT_SETTINGS } from '../../../common';
 import { CheckUpdatesSettings } from '../../../common/types';
 import { getSavedObject, setSavedObject } from '..';
 
@@ -30,7 +30,7 @@ export const getSettings = async (): Promise<CheckUpdatesSettings> => {
   } catch {
     try {
       const settings = {
-        cronExpression: DEFAULT_CRON_EXPRESSION,
+        schedule: DEFAULT_SCHEDULE,
       };
       await setSavedObject(SAVED_OBJECT_SETTINGS, settings);
 

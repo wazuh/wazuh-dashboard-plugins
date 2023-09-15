@@ -1,4 +1,11 @@
-import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiHealth, EuiToolTip } from '@elastic/eui';
+import {
+  EuiButton,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHealth,
+  EuiIconTip,
+  EuiLoadingSpinner,
+} from '@elastic/eui';
 import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import { useAvailableUpdates } from '../hooks';
@@ -30,38 +37,49 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
 
   return (
     <EuiFlexGroup alignItems="center" gutterSize="m">
-      {!isLoading ? (
-        <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-          <EuiToolTip
-            position="left"
-            title={
-              <FormattedMessage
-                id={`wazuhCheckUpdates.upToDateStatus.lastCheck`}
-                defaultMessage="Last check"
-              />
-            }
-            content={
-              availableUpdates.last_check
-                ? formatUIDate(new Date(availableUpdates.last_check))
-                : '-'
-            }
-          >
-            <EuiHealth color={color}>
-              <FormattedMessage
-                id={`wazuhCheckUpdates.upToDateStatus.${i18nMessageId}`}
-                defaultMessage={defaultMessage}
-              />
-            </EuiHealth>
-          </EuiToolTip>
-        </EuiFlexItem>
-      ) : null}
       <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-        <EuiButtonEmpty isLoading={isLoading} onClick={handleOnClick} size="xs">
+        {!isLoading ? (
+          <EuiFlexGroup gutterSize="none" wrap={false}>
+            <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+              <EuiHealth color={color}>
+                <FormattedMessage
+                  id={`wazuhCheckUpdates.upToDateStatus.${i18nMessageId}`}
+                  defaultMessage={defaultMessage}
+                />
+              </EuiHealth>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+              <EuiIconTip
+                type="iInCircle"
+                color="subdued"
+                title={
+                  <FormattedMessage
+                    id={`wazuhCheckUpdates.upToDateStatus.lastCheck`}
+                    defaultMessage="Last check"
+                  />
+                }
+                content={
+                  availableUpdates.last_check
+                    ? formatUIDate(new Date(availableUpdates.last_check))
+                    : '-'
+                }
+                iconProps={{
+                  className: 'eui-alignTop',
+                }}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        ) : (
+          <EuiLoadingSpinner size="m" />
+        )}
+      </EuiFlexItem>
+      <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+        <EuiButton isLoading={isLoading} onClick={handleOnClick} size="s">
           <FormattedMessage
             id="wazuhCheckUpdates.upToDateStatus.buttonText"
             defaultMessage="Check updates"
           />
-        </EuiButtonEmpty>
+        </EuiButton>
       </EuiFlexItem>
     </EuiFlexGroup>
   );

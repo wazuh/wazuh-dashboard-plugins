@@ -27,5 +27,5 @@ export interface UsersPreferences {
 }
 
 export interface CheckUpdatesSettings {
-  cronExpression: string;
+  schedule: string;
 }
