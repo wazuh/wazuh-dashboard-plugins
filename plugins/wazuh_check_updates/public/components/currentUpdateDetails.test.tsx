@@ -42,7 +42,7 @@ describe('CurrentUpdateDetails component', () => {
     expect(upgradeGuideLink).toHaveAttribute('href', upgradeGuideUrl);
   });
 
-  test('should return null', () => {
+  test('should return null when there is no current update', () => {
     const { container } = render(<CurrentUpdateDetails />);
 
     expect(container).toMatchSnapshot();

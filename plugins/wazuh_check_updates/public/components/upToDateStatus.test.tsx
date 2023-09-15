@@ -85,25 +85,7 @@ describe('UpToDateStatus component', () => {
         patch: [],
       },
       isLoading: false,
-      getAvailableUpdates: jest.fn().mockResolvedValue({
-        last_check: '2023-09-18T14:00:00.000Z',
-        mayor: [
-          {
-            title: 'Wazuh 4.2.6',
-            description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
-            semver: {
-              mayor: 4,
-              minor: 2,
-              patch: 6,
-            },
-            tag: '4.2.6',
-          },
-        ],
-        minor: [],
-        patch: [],
-      }),
+      refreshAvailableUpdates: jest.fn().mockResolvedValue({}),
     }));
 
     const { container, getByRole, getByText } = render(
@@ -148,7 +130,7 @@ describe('UpToDateStatus component', () => {
   test('should retrieve available updates when click the button', async () => {
     mockedUseAvailabeUpdates.mockImplementation(() => ({ isLoading: true }));
 
-    const { container, getByRole } = render(
+    const { container, getByRole, getByText } = render(
       <TestProviders>
         <UpToDateStatus
           setCurrentUpdate={() => ({
@@ -172,5 +154,54 @@ describe('UpToDateStatus component', () => {
     const checkUpdatesButton = getByRole('button', { name: 'Check updates' });
     expect(checkUpdatesButton).toBeInTheDocument();
     await userEvent.click(checkUpdatesButton);
+    waitFor(async () => {
+      const availableUpdates = getByText('Available updates');
+      expect(availableUpdates).toBeInTheDocument();
+
+      const helpIcon = container.getElementsByClassName('euiToolTipAnchor');
+
+      await userEvent.hover(helpIcon[0]);
+      waitFor(() => {
+        expect(getByText('Last check')).toBeInTheDocument();
+        expect(getByText('2023-09-18T14:00:00.000Z')).toBeInTheDocument();
+      });
+
+      const loaders = container.getElementsByClassName('euiLoadingSpinner');
+      expect(loaders.length).toBe(0);
+    });
+  });
+
+  test('should render a initial state with an error', () => {
+    mockedUseAvailabeUpdates.mockImplementation(() => ({
+      isLoading: false,
+      error: 'This is an error',
+    }));
+
+    const { container, getByText } = render(
+      <TestProviders>
+        <UpToDateStatus
+          setCurrentUpdate={() => ({
+            title: 'Wazuh 4.2.6',
+            description:
+              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
+            published_date: '2021-09-30T14:00:00.000Z',
+            semver: {
+              mayor: 4,
+              minor: 2,
+              patch: 6,
+            },
+            tag: '4.2.6',
+          })}
+        />
+      </TestProviders>
+    );
+
+    expect(container).toMatchSnapshot();
+
+    const loaders = container.getElementsByClassName('euiLoadingSpinner');
+    expect(loaders.length).toBe(0);
+
+    const availableUpdates = getByText('Error trying to get available updates');
+    expect(availableUpdates).toBeInTheDocument();
   });
 });

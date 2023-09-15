@@ -11,9 +11,9 @@ export const useAvailableUpdates = () => {
   });
 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState();
 
-  const getAvailableUpdates = (forceUpdate = false) => {
+  const refreshAvailableUpdates = (forceUpdate = false) => {
     (async () => {
       try {
         setIsLoading(true);
@@ -23,17 +23,18 @@ export const useAvailableUpdates = () => {
           },
         });
         setAvailableUpdates(response);
-        setIsLoading(false);
+        setError(undefined);
       } catch (error: any) {
         setError(error);
+      } finally {
         setIsLoading(false);
       }
     })();
   };
 
   useEffect(() => {
-    getAvailableUpdates();
+    refreshAvailableUpdates();
   }, []);
 
-  return { isLoading, availableUpdates, getAvailableUpdates, error };
+  return { isLoading, availableUpdates, refreshAvailableUpdates, error };
 };

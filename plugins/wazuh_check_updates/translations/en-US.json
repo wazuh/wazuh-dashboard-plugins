@@ -82,9 +82,10 @@
     "wazuhCheckUpdates.updatesNotification.closeButtonText": "Close",
     "wazuhCheckUpdates.upToDateStatus.upToDate": "Up to date",
     "wazuhCheckUpdates.upToDateStatus.availableUpdates": "Available updates",
+    "wazuhCheckUpdates.upToDateStatus.getAvailableUpdatesError": "Error trying to get available updates",
     "wazuhCheckUpdates.upToDateStatus.lastCheck": "Last check",
     "wazuhCheckUpdates.upToDateStatus.buttonText": "Check updates",
-    "wazuhCheckUpdates.urrentUpdateDetails.releaseNotesLink": "Release notes",
+    "wazuhCheckUpdates.currentUpdateDetails.releaseNotesLink": "Release notes",
     "wazuhCheckUpdates.currentUpdateDetails.title": "¡Wazuh new release is available now!",
     "wazuhCheckUpdates.currentUpdateDetails.upgradeGuideLink": "Upgrade guide"
   }

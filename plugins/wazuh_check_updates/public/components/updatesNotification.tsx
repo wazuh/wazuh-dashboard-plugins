@@ -54,8 +54,8 @@ export const UpdatesNotification = ({ userId }: UpdatesNotificationProps) => {
 
   if (hideNotification) return null;
 
-  const releaseNotesUrl = `https://documentation.wazuh.com/current/release-notes/release-${currentUpdate?.semver.mayor}-${currentUpdate?.semver.minor}-${currentUpdate?.semver.patch}.html`;
-  const isVisible = !isDismissed && currentUpdate;
+  const releaseNotesUrl = `https://documentation.wazuh.com/${currentUpdate?.semver.mayor}.${currentUpdate?.semver.minor}/release-notes/release-${currentUpdate?.semver.mayor}-${currentUpdate?.semver.minor}-${currentUpdate?.semver.patch}.html`;
+  const isVisible = !isDismissed && !!currentUpdate;
 
   const handleOnChangeDismiss = (checked: boolean) => {
     setDismissFutureUpdates(checked);

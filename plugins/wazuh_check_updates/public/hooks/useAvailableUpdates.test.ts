@@ -86,7 +86,7 @@ describe('useAvailableUpdates hook', () => {
     expect(result.current.isLoading).toBeFalsy();
 
     act(() => {
-      result.current.getAvailableUpdates(true);
+      result.current.refreshAvailableUpdates(true);
     });
 
     expect(result.current.isLoading).toBeTruthy();

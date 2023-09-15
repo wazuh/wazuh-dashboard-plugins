@@ -17,12 +17,10 @@ export interface UpToDateStatusProps {
 }
 
 export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
-  const { availableUpdates, isLoading, getAvailableUpdates } = useAvailableUpdates();
-
-  //TODO: Handle and show error
+  const { availableUpdates, isLoading, refreshAvailableUpdates, error } = useAvailableUpdates();
 
   const handleOnClick = async () => {
-    getAvailableUpdates(true);
+    await refreshAvailableUpdates(true);
   };
 
   const currentUpdate = getCurrentAvailableUpdate(availableUpdates);
@@ -31,9 +29,23 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
 
   const isUpToDate = !currentUpdate;
 
-  const i18nMessageId = isUpToDate ? 'upToDate' : 'availableUpdates';
-  const defaultMessage = isUpToDate ? 'Up to date' : 'Available updates';
-  const color = isUpToDate ? 'success' : 'warning';
+  const getI18nMessageId = () => {
+    if (error) return 'getAvailableUpdatesError';
+    if (isUpToDate) return 'upToDate';
+    return 'availableUpdates';
+  };
+
+  const getDefaultMessage = () => {
+    if (error) return 'Error trying to get available updates';
+    if (isUpToDate) return 'Up to date';
+    return 'Available updates';
+  };
+
+  const getColor = () => {
+    if (error) return 'danger';
+    if (isUpToDate) return 'success';
+    return 'warning';
+  };
 
   return (
     <EuiFlexGroup alignItems="center" gutterSize="m">
@@ -41,10 +53,10 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
         {!isLoading ? (
           <EuiFlexGroup gutterSize="none" wrap={false}>
             <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-              <EuiHealth color={color}>
+              <EuiHealth color={getColor()}>
                 <FormattedMessage
-                  id={`wazuhCheckUpdates.upToDateStatus.${i18nMessageId}`}
-                  defaultMessage={defaultMessage}
+                  id={`wazuhCheckUpdates.upToDateStatus.${getI18nMessageId()}`}
+                  defaultMessage={getDefaultMessage()}
                 />
               </EuiHealth>
             </EuiFlexItem>
@@ -59,7 +71,7 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
                   />
                 }
                 content={
-                  availableUpdates.last_check
+                  availableUpdates?.last_check
                     ? formatUIDate(new Date(availableUpdates.last_check))
                     : '-'
                 }

@@ -6,24 +6,25 @@ import { routes } from '../../common/index';
 export const useUserPreferences = (userId: string) => {
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState();
 
-  const getUserPreferences = () => {
+  const refreshUserPreferences = () => {
     (async () => {
       try {
         setIsLoading(true);
         const response = await getCore().http.get(`${routes.userPreferences}/${userId}`);
         setUserPreferences(response);
-        setIsLoading(false);
+        setError(undefined);
       } catch (error: any) {
         setError(error);
+      } finally {
         setIsLoading(false);
       }
     })();
   };
 
   useEffect(() => {
-    getUserPreferences();
+    refreshUserPreferences();
   }, []);
 
   const updateUserPreferences = async (userPreferences: UserPreferences) => {
