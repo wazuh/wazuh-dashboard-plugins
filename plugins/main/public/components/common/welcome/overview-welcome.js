@@ -40,16 +40,14 @@ import {
   LogoOffice365,
 } from '../logos';
 import { compose } from 'redux';
+import { getNavigationAppURL } from '../../../react-services/navigate-app';
 
 export const OverviewWelcome = compose(
   withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(props => {
-    return [
-      { text: '' },
-      { text: 'Overview' }
-    ];
-  })
+    return [{ text: '' }, { text: 'Overview' }];
+  }),
 )(
   class OverviewWelcome extends Component {
     constructor(props) {
@@ -87,7 +85,11 @@ export const OverviewWelcome = compose(
                 title={
                   <>
                     No agents were added to this manager.{' '}
-                    <EuiButtonEmpty href='#/agents-preview?'>
+                    <EuiButtonEmpty
+                      href={getNavigationAppURL(
+                        '/app/endpoints-summary#/agents-preview',
+                      )}
+                    >
                       Add agent
                     </EuiButtonEmpty>
                   </>

@@ -49,6 +49,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent-status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
+import { navigateAppURL } from '../../../react-services/navigate-app';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -345,10 +346,9 @@ export const AgentsTable = withErrorBoundary(
             <EuiButtonIcon
               onClick={ev => {
                 ev.stopPropagation();
-                AppNavigate.navigateToModule(ev, 'agents', {
-                  tab: 'welcome',
-                  agent: agent.id,
-                });
+                navigateAppURL(
+                  `/app/it-hygiene#/tab=welcome&agent=${agent.id}`,
+                );
               }}
               iconType='eye'
               color={'primary'}
@@ -754,11 +754,8 @@ export const AgentsTable = withErrorBoundary(
         }
         return {
           onClick: ev => {
-            AppNavigate.navigateToModule(ev, 'agents', {
-              tab: 'welcome',
-              agent: item.id,
-            });
             ev.stopPropagation();
+            navigateAppURL(`/app/it-hygiene#/tab=welcome&agent=${item.id}`);
           },
         };
       };

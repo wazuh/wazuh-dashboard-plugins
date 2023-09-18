@@ -24,6 +24,7 @@ import { SyscollectorTable } from './components/syscollector-table';
 import { processColumns, portsColumns, packagesColumns } from './columns';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { getNavigationAppURL } from '../../../react-services/navigate-app';
 
 export function SyscollectorInventory({ agent }) {
   if (agent && agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
@@ -51,7 +52,11 @@ export function SyscollectorInventory({ agent }) {
           </Fragment>
         }
         actions={
-          <EuiButton href='#/agents-preview?' color='primary' fill>
+          <EuiButton
+            href={getNavigationAppURL('/app/endpoints-summary#/agents-preview')}
+            color='primary'
+            fill
+          >
             Back
           </EuiButton>
         }

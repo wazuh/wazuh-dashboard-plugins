@@ -13,23 +13,27 @@
 import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiButton, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import { getNavigationAppURL } from '../../../../../react-services/navigate-app';
 
-const documentationLink = webDocumentationLink('user-manual/agents/agent-connection.html');
+const documentationLink = webDocumentationLink(
+  'user-manual/agents/agent-connection.html',
+);
 
 export const WzAgentNeverConnectedPrompt = () => (
   <EuiEmptyPrompt
-    iconType="securitySignalDetected"
+    iconType='securitySignalDetected'
     style={{ marginTop: 20 }}
     title={<h2>Agent has never connected.</h2>}
     body={
       <Fragment>
         <p>
-          The agent has been registered but has not yet connected to the manager.
+          The agent has been registered but has not yet connected to the
+          manager.
         </p>
         <EuiLink
           href={documentationLink}
-          target="_blank"
-          rel="noopener noreferrer"
+          target='_blank'
+          rel='noopener noreferrer'
           external
         >
           Checking connection with the Wazuh server
@@ -37,8 +41,13 @@ export const WzAgentNeverConnectedPrompt = () => (
       </Fragment>
     }
     actions={
-      <EuiButton href='#/agents-preview?' color="primary" fill>
+      <EuiButton
+        href={getNavigationAppURL('/app/endpoints-summary#/agents-preview')}
+        color='primary'
+        fill
+      >
         Back
       </EuiButton>
-  }
-  />)
+    }
+  />
+);

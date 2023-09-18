@@ -52,8 +52,16 @@ import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import { withErrorBoundary, withGlobalBreadcrumb, withReduxProvider } from '../hocs';
 import { compose } from 'redux';
-import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
+import {
+  API_NAME_AGENT_STATUS,
+  WAZUH_AGENTS_OS_TYPE,
+} from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+import {
+  getNavigationAppURL,
+  navigateAppURL,
+} from '../../../react-services/navigate-app';
 
 export const AgentsWelcome = compose(
   withReduxProvider,
@@ -224,13 +232,15 @@ export const AgentsWelcome = compose(
                 >
                   <EuiButtonEmpty
                     onClick={() => {
-                      window.location.href = `#/overview/?tab=${
-                        menuAgent.id
-                      }&tabView=${
-                        menuAgent.text === 'Security configuration assessment'
-                          ? 'inventory'
-                          : 'panels'
-                      }`;
+                      navigateAppURL(
+                        `/app/${
+                          WAZUH_MODULES[menuAgent.id].appId
+                        }#/overview/?tab=${menuAgent.id}&tabView=${
+                          menuAgent.text === 'Security configuration assessment'
+                            ? 'inventory'
+                            : 'panels'
+                        }`,
+                      );
                       this.router.reload();
                     }}
                     style={{ cursor: 'pointer' }}
@@ -387,7 +397,7 @@ export const AgentsWelcome = compose(
                       iconType='popout'
                       color='primary'
                       onClick={() => {
-                        window.location.href = `#/overview?tab=mitre`;
+                        navigateAppURL('/app/mitre-attack');
                         this.router.reload();
                       }}
                       aria-label='Open MITRE'
@@ -496,7 +506,13 @@ export const AgentsWelcome = compose(
               </Fragment>
             }
             actions={
-              <EuiButton href='#/agents-preview?' color='primary' fill>
+              <EuiButton
+                href={getNavigationAppURL(
+                  '/app/endpoints-summary#/agents-preview',
+                )}
+                color='primary'
+                fill
+              >
                 Back
               </EuiButton>
             }
