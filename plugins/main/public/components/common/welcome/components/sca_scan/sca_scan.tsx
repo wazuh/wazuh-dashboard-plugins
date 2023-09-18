@@ -255,7 +255,7 @@ export const ScaScan = compose(
                           updateCurrentAgentData(this.props.agent),
                         );
                         navigateAppURL(
-                          `/app/security-configuration-assessment#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                          `/app/configuration-assessment#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
                         );
                         this.router.reload();
                       }}
@@ -274,9 +274,7 @@ export const ScaScan = compose(
                         store.dispatch(
                           updateCurrentAgentData(this.props.agent),
                         );
-                        navigateAppURL(
-                          '/app/security-configuration-assessment',
-                        );
+                        navigateAppURL('/app/configuration-assessment');
                         this.router.reload();
                       }}
                       aria-label='Open SCA Scans'
