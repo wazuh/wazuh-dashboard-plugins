@@ -1,5 +1,14 @@
 import React from 'react';
-import { EuiBadge, EuiCallOut, EuiFlexGroup, EuiFlexItem, EuiHeaderLink } from '@elastic/eui';
+import {
+  EuiAccordion,
+  EuiBadge,
+  EuiCallOut,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHeaderLink,
+  EuiText,
+  EuiSpacer,
+} from '@elastic/eui';
 import { Update } from '../../common/types';
 import { FormattedMessage } from '@osd/i18n/react';
 
@@ -50,6 +59,10 @@ export const CurrentUpdateDetails = ({ currentUpdate }: CurrentUpdateDetailsProp
           </EuiHeaderLink>
         </EuiFlexItem>
       </EuiFlexGroup>
+      <EuiSpacer size="m" />
+      <EuiAccordion id="accordionUpdateDetails" buttonContent="Show details" paddingSize="m">
+        <EuiText>{currentUpdate.description}</EuiText>
+      </EuiAccordion>
     </EuiCallOut>
   );
 };
