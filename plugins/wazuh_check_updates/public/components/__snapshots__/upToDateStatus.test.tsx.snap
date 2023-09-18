@@ -1,0 +1,283 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UpToDateStatus component should render a initial state with a loader and a loader button 1`] = `
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+      style="max-width: max-content;"
+    >
+      <span
+        class="euiLoadingSpinner euiLoadingSpinner--medium"
+      />
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+      style="max-width: max-content;"
+    >
+      <button
+        class="euiButton euiButton--primary euiButton--small euiButton-isDisabled"
+        disabled=""
+        type="button"
+      >
+        <span
+          class="euiButtonContent euiButton__content"
+        >
+          <span
+            class="euiLoadingSpinner euiLoadingSpinner--medium euiButtonContent__spinner"
+          />
+          <span
+            class="euiButton__text"
+          >
+            <span>
+              Check updates
+            </span>
+          </span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UpToDateStatus component should render a initial state with an error 1`] = `
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+      style="max-width: max-content;"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+          style="max-width: max-content;"
+        >
+          <div
+            class="euiHealth euiHealth--textSizeS"
+          >
+            <div
+              class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+            >
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--medium euiIcon--danger"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="4"
+                  />
+                </svg>
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <span>
+                  Error trying to get available updates
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+          style="max-width: max-content;"
+        >
+          <span
+            class="euiToolTipAnchor"
+          >
+            <svg
+              aria-label="Info"
+              class="euiIcon euiIcon--medium euiIcon--subdued eui-alignTop"
+              focusable="true"
+              height="16"
+              role="img"
+              tabindex="0"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M7.5 11.508L7.468 8H6.25V7h2.401l.03 3.508H9.8v1H7.5zm-.25-6.202a.83.83 0 01.207-.577c.137-.153.334-.229.59-.229.256 0 .454.076.594.23.14.152.209.345.209.576 0 .228-.07.417-.21.568-.14.15-.337.226-.593.226-.256 0-.453-.075-.59-.226a.81.81 0 01-.207-.568zM8 13A5 5 0 108 3a5 5 0 000 10zm0 1A6 6 0 118 2a6 6 0 010 12z"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+      style="max-width: max-content;"
+    >
+      <button
+        class="euiButton euiButton--primary euiButton--small"
+        type="button"
+      >
+        <span
+          class="euiButtonContent euiButton__content"
+        >
+          <span
+            class="euiButton__text"
+          >
+            <span>
+              Check updates
+            </span>
+          </span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UpToDateStatus component should render the available updates status with a tooltip and a button to check updates without loaders 1`] = `
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+      style="max-width: max-content;"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+          style="max-width: max-content;"
+        >
+          <div
+            class="euiHealth euiHealth--textSizeS"
+          >
+            <div
+              class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+            >
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--medium euiIcon--warning euiIcon-isLoading"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <div
+                class="euiFlexItem euiFlexItem--flexGrowZero"
+              >
+                <span>
+                  Available updates
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+          style="max-width: max-content;"
+        >
+          <span
+            class="euiToolTipAnchor"
+          >
+            <svg
+              aria-hidden="true"
+              aria-label="Info"
+              class="euiIcon euiIcon--medium euiIcon--subdued euiIcon-isLoading eui-alignTop"
+              focusable="true"
+              height="16"
+              role="img"
+              tabindex="0"
+              viewBox="0 0 16 16"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+      style="max-width: max-content;"
+    >
+      <button
+        class="euiButton euiButton--primary euiButton--small"
+        type="button"
+      >
+        <span
+          class="euiButtonContent euiButton__content"
+        >
+          <span
+            class="euiButton__text"
+          >
+            <span>
+              Check updates
+            </span>
+          </span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UpToDateStatus component should retrieve available updates when click the button 1`] = `
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+      style="max-width: max-content;"
+    >
+      <span
+        class="euiLoadingSpinner euiLoadingSpinner--medium"
+      />
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+      style="max-width: max-content;"
+    >
+      <button
+        class="euiButton euiButton--primary euiButton--small euiButton-isDisabled"
+        disabled=""
+        type="button"
+      >
+        <span
+          class="euiButtonContent euiButton__content"
+        >
+          <span
+            class="euiLoadingSpinner euiLoadingSpinner--medium euiButtonContent__spinner"
+          />
+          <span
+            class="euiButton__text"
+          >
+            <span>
+              Check updates
+            </span>
+          </span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+`;

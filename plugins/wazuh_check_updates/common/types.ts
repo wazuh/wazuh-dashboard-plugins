@@ -29,3 +29,5 @@ export interface UsersPreferences {
 export interface CheckUpdatesSettings {
   schedule: string;
 }
+
+export type savedObjectType = AvailableUpdates | UsersPreferences | CheckUpdatesSettings;

@@ -1,12 +1,11 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { schema } from '@osd/config-schema';
+import { routes, SAVED_OBJECT_UPDATES } from '../../../common';
+import { AvailableUpdates } from '../../../common/types';
+import { getUpdates } from '../../services/updates';
+import { getSavedObject } from '../../services/savedObject';
 
-import { routes, SAVED_OBJECT_UPDATES } from '../../common';
-import { getSavedObject } from '../services';
-import { getUpdates } from '../services';
-import { AvailableUpdates } from '../../common/types';
-
-export const updatesRoutes = (router: IRouter) => {
+export const getUpdatesRoute = (router: IRouter) => {
   router.get(
     {
       path: routes.checkUpdates,
@@ -35,11 +34,18 @@ export const updatesRoutes = (router: IRouter) => {
           },
         });
       } catch (error) {
+        const message =
+          error instanceof Error
+            ? error
+            : typeof error === 'string'
+            ? error
+            : 'Error trying to get available updates';
+
         return response.customError({
           statusCode: 503,
-          // body: {
-          //   error: 'message',
-          // },
+          body: {
+            message,
+          },
         });
       }
     }

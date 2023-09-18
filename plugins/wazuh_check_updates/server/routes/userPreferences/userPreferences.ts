@@ -1,39 +1,9 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { schema } from '@osd/config-schema';
+import { routes } from '../../../common';
+import { updateUserPreferences } from '../../services/userPreferences';
 
-import { routes } from '../../common';
-import { getUserPreferences } from '../services';
-import { updateUserPreferences } from '../services';
-
-export const userPreferencesRoutes = (router: IRouter) => {
-  router.get(
-    {
-      path: `${routes.userPreferences}/{userId}`,
-      validate: {
-        params: schema.object({
-          userId: schema.string(),
-        }),
-      },
-    },
-    async (context, { params }, response) => {
-      const { userId } = params;
-      try {
-        const userPreferences = await getUserPreferences(userId);
-
-        return response.ok({
-          body: userPreferences,
-        });
-      } catch (error) {
-        return response.customError({
-          statusCode: 503,
-          // body: {
-          //   error: 'message',
-          // },
-        });
-      }
-    }
-  );
-
+export const updatePreferencesRoutes = (router: IRouter) => {
   router.patch(
     {
       path: `${routes.userPreferences}/{userId}`,
@@ -61,11 +31,18 @@ export const userPreferencesRoutes = (router: IRouter) => {
           body: userPreferences,
         });
       } catch (error) {
+        const message =
+          error instanceof Error
+            ? error
+            : typeof error === 'string'
+            ? error
+            : 'Error trying to update user preferences';
+
         return response.customError({
           statusCode: 503,
-          // body: {
-          //   error,
-          // },
+          body: {
+            message,
+          },
         });
       }
     }

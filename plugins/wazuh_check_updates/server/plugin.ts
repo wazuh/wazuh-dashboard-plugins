@@ -8,13 +8,13 @@ import {
 
 import { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
 import { defineRoutes } from './routes';
-import { jobSchedulerRun } from './services';
 import {
   availableUpdatesObject,
   settingsObject,
   userPreferencesObject,
 } from './services/savedObject/types';
 import { setCore, setInternalSavedObjectsClient } from './plugin-services';
+import { jobSchedulerRun } from './services/cronjob';
 
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {

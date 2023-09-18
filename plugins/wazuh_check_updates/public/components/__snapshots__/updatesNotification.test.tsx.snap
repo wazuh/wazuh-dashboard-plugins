@@ -6,6 +6,8 @@ exports[`UpdatesNotification component should return null when there are no avai
 
 exports[`UpdatesNotification component should return null when user already dismissed the notifications for current update 1`] = `<div />`;
 
+exports[`UpdatesNotification component should return null when user close notification 1`] = `<div />`;
+
 exports[`UpdatesNotification component should return null when user dismissed notifications for future 1`] = `<div />`;
 
 exports[`UpdatesNotification component should return the nofication component 1`] = `<div />`;

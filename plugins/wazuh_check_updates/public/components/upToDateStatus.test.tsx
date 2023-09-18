@@ -1,6 +1,3 @@
-// To launch this file
-// yarn test:jest --verbose public/components/upToDateStatus
-
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
