@@ -254,7 +254,7 @@ export const ScaScan = compose(
                         store.dispatch(
                           updateCurrentAgentData(this.props.agent),
                         );
-                        window.location.href = navigateAppURL(
+                        navigateAppURL(
                           `/app/security-configuration-assessment#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
                         );
                         this.router.reload();

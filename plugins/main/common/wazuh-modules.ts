@@ -11,26 +11,26 @@
  */
 export const WAZUH_MODULES = {
   general: {
-    title: 'Security events',
-    appId: 'security-events',
+    title: 'Threat hunting',
+    appId: 'threat-hunting',
     description:
       'Browse through your security alerts, identifying issues and threats in your environment.',
   },
   fim: {
-    title: 'Integrity monitoring',
-    appId: 'integrity-monitoring',
+    title: 'File integrity monitoring',
+    appId: 'file-integrity-monitoring',
     description:
       'Alerts related to file changes, including permissions, content, ownership and attributes.',
   },
   pm: {
-    title: 'Policy monitoring',
-    appId: 'policy-monitoring',
+    title: 'Malware detection',
+    appId: 'malware-detection',
     description:
       'Verify that your systems are configured according to your security policies baseline.',
   },
   vuls: {
-    title: 'Vulnerabilities',
-    appId: 'vulnerabilities',
+    title: 'Vulnerability detection',
+    appId: 'vulnerability-detection',
     description:
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
   },
@@ -83,7 +83,7 @@ export const WAZUH_MODULES = {
       'Configuration assessment using Center of Internet Security scanner and SCAP checks.',
   },
   aws: {
-    title: 'Amazon AWS',
+    title: 'AWS',
     appId: 'amazon-web-services',
     description:
       'Security events related to your Amazon AWS services, collected directly via AWS API.',
@@ -94,7 +94,7 @@ export const WAZUH_MODULES = {
     description: 'Security events related to your Office 365 services.',
   },
   gcp: {
-    title: 'Google Cloud Platform',
+    title: 'Google Cloud',
     appId: 'google-cloud',
     description:
       'Security events related to your Google Cloud Platform services, collected directly via GCP API.', // TODO GCP
@@ -138,14 +138,14 @@ export const WAZUH_MODULES = {
       'Osquery can be used to expose an operating system as a high-performance relational database.',
   },
   sca: {
-    title: 'Security configuration assessment',
-    appId: 'security-configuration-assessment',
+    title: 'Configuration assessment',
+    appId: 'configuration-assessment',
     description:
       'Scan your assets as part of a configuration assessment audit.',
   },
   docker: {
-    title: 'Docker listener',
-    appId: 'docker-listener',
+    title: 'Docker',
+    appId: 'docker',
     description:
       'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.',
   },

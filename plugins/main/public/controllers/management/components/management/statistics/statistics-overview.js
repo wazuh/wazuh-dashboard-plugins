@@ -200,7 +200,7 @@ export class WzStatisticsOverview extends Component {
               <EuiButtonEmpty
                 onMouseDown={e =>
                   navigateAppURL(
-                    '/app/configuration#/settings?tab=configuration&category=statistics',
+                    '/app/wazuh-plugin-settings#/settings?tab=configuration&category=statistics',
                   )
                 }
                 iconType='gear'
