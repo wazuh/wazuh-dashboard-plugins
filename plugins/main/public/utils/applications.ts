@@ -15,7 +15,8 @@ export const Applications = [
     title: i18n.translate('wz-app-home', {
       defaultMessage: 'Overview',
     }),
-    description: 'This application provides you with an overview of Wazuh Apps',
+    description:
+      'This application provides you with an overview of Wazuh applications.',
     euiIconType: 'lensApp',
     redirectTo: () => '/overview/',
   },
@@ -180,7 +181,7 @@ export const Applications = [
       defaultMessage: 'MITRE ATT&CK',
     }),
     description:
-      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations',
+      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations.',
     euiIconType: 'grokApp',
     redirectTo: () =>
       `/overview/?tab=mitre&tabView=panels${
@@ -288,7 +289,7 @@ export const Applications = [
       defaultMessage: 'TSC',
     }),
     description:
-      'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
+      'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.',
     euiIconType: 'packetbeatApp',
     redirectTo: () =>
       `/overview/?tab=tsc&tabView=panels${
@@ -428,7 +429,7 @@ export const Applications = [
     title: i18n.translate('wz-app-rules', {
       defaultMessage: 'Rules',
     }),
-    description: 'Manage your Wazuh cluster rules',
+    description: 'Manage your Wazuh cluster rules.',
     euiIconType: 'indexRollupApp',
     redirectTo: () => '/manager/?tab=ruleset',
   },
@@ -438,7 +439,7 @@ export const Applications = [
     title: i18n.translate('wz-app-decoders', {
       defaultMessage: 'Decoders',
     }),
-    description: 'Manage your Wazuh cluster decoders',
+    description: 'Manage your Wazuh cluster decoders.',
     euiIconType: 'indexRollupApp',
     redirectTo: () => '/manager/?tab=decoders',
   },
@@ -448,7 +449,7 @@ export const Applications = [
     title: i18n.translate('wz-app-lists', {
       defaultMessage: 'CDB Lists',
     }),
-    description: 'Manage your Wazuh cluster CDB list',
+    description: 'Manage your Wazuh cluster CDB list.',
     euiIconType: 'indexRollupApp',
     redirectTo: () => '/manager/?tab=lists',
   },
@@ -458,7 +459,7 @@ export const Applications = [
     title: i18n.translate('wz-app-groups', {
       defaultMessage: 'Groups',
     }),
-    description: 'Manage your agent groups',
+    description: 'Manage your agent groups.',
     euiIconType: 'usersRolesApp',
     redirectTo: () => '/manager/?tab=groups',
   },
@@ -468,7 +469,7 @@ export const Applications = [
     title: i18n.translate('wz-app-status', {
       defaultMessage: 'Status',
     }),
-    description: 'Manage your Wazuh cluster status',
+    description: 'Manage your Wazuh cluster status.',
     euiIconType: 'uptimeApp',
     redirectTo: () => '/manager/?tab=status',
   },
@@ -478,7 +479,7 @@ export const Applications = [
     title: i18n.translate('wz-app-cluster', {
       defaultMessage: 'Cluster',
     }),
-    description: 'Visualize your Wazuh cluster',
+    description: 'Visualize your Wazuh cluster.',
     euiIconType: 'indexPatternApp',
     redirectTo: () => '/manager/?tab=monitoring',
   },
@@ -488,7 +489,7 @@ export const Applications = [
     title: i18n.translate('wz-app-statistics', {
       defaultMessage: 'Statistics',
     }),
-    description: 'Information about the Wazuh enviroment',
+    description: 'Information about the Wazuh enviroment.',
     euiIconType: 'visualizeApp',
     redirectTo: () => '/manager/?tab=statistics',
   },
@@ -498,7 +499,7 @@ export const Applications = [
     title: i18n.translate('wz-app-logs', {
       defaultMessage: 'Logs',
     }),
-    description: 'Logs from your Wazuh cluster',
+    description: 'Logs from your Wazuh cluster.',
     euiIconType: 'filebeatApp',
     redirectTo: () => '/manager/?tab=logs',
   },
@@ -508,7 +509,7 @@ export const Applications = [
     title: i18n.translate('wz-app-reporting', {
       defaultMessage: 'Reporting',
     }),
-    description: 'Check your stored Wazuh reports',
+    description: 'Check your stored Wazuh reports.',
     euiIconType: 'reportingApp',
     redirectTo: () => '/manager/?tab=reporting',
   },
@@ -518,7 +519,7 @@ export const Applications = [
     title: i18n.translate('wz-app-settings', {
       defaultMessage: 'Settings',
     }),
-    description: 'Manage your Wazuh cluster configuration',
+    description: 'Manage your Wazuh cluster configuration.',
     euiIconType: 'managementApp',
     redirectTo: () => '/manager/?tab=configuration',
   },
@@ -579,7 +580,7 @@ export const Applications = [
     title: i18n.translate('wz-app-server-data', {
       defaultMessage: 'Server data',
     }),
-    description: 'Add sample data with events to the modules',
+    description: 'Add sample data with events to the modules.',
     euiIconType: 'spacesApp',
     redirectTo: () => '/settings?tab=sample_data',
   },
@@ -589,7 +590,7 @@ export const Applications = [
     title: i18n.translate('wz-app-configuration', {
       defaultMessage: 'Configuration',
     }),
-    description: 'Manage your Wazuh cluster configuration',
+    description: 'Manage your Wazuh cluster configuration.',
     euiIconType: 'devToolsApp',
     redirectTo: () => '/settings?tab=configuration',
   },
@@ -599,8 +600,7 @@ export const Applications = [
     title: i18n.translate('wz-app-app-logs', {
       defaultMessage: 'Logs',
     }),
-    description:
-      'Log file located at /usr/share/wazuh-dashboard/data/wazuh/logs/wazuhapp.log',
+    description: 'Explore the logs related to the applications.',
     euiIconType: 'filebeatApp',
     redirectTo: () => '/settings?tab=logs',
   },
