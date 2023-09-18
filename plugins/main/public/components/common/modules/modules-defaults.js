@@ -21,7 +21,8 @@ import ButtonModuleExploreAgent from '../../../controllers/overview/components/o
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
-import { withModuleNotForAgent } from '../hocs';
+import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities'
+import { withModuleNotForAgent, withModuleTabLoader } from '../hocs';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -130,13 +131,19 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   vuls: {
-    init: 'inventory',
+    init: 'dashboard',
     tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent],
+        component: withModuleNotForAgent(DashboardVuls),
+      },
       {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonModuleExploreAgent],
-        component: MainVuls,
+        component: withModuleNotForAgent(InventoryVuls),
       },
       EventsTab,
     ],
