@@ -199,7 +199,7 @@ class WzConfigurationSwitch extends Component {
       agentSynchronized,
       masterNodeInfo,
     } = this.state;
-    const { agent, goGroups } = this.props; // TODO: goGroups and exportConfiguration is used for Manager and depends of AngularJS
+    const { agent } = this.props; // TODO: goGroups and exportConfiguration is used for Manager and depends of AngularJS
     return (
       <EuiPage>
         <EuiPanel>
@@ -211,7 +211,7 @@ class WzConfigurationSwitch extends Component {
                   key={`agent-group-${key}`}
                   onClick={() => {
                     navigateAppURL(
-                      `/app/groups#/manager/?tab=groups&group=${group}`,
+                      `/app/endpoint-groups#/manager/?tab=groups&group=${group}`,
                     );
                   }}
                 >

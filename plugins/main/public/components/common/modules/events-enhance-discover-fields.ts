@@ -131,7 +131,9 @@ export const EventsEnhanceDiscoverCell = {
     href: (content, rowData) => {
       const agentId = (((rowData || {})._source || {}).agent || {}).id;
       return agentId !== '000'
-        ? getNavigationAppURL(`#/agents?tab=welcome&agent=${agentId}`)
+        ? getNavigationAppURL(
+            `/app/it-hygiene#/agents?tab=welcome&agent=${agentId}`,
+          )
         : undefined;
     },
   }),

@@ -18,25 +18,34 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import React from 'react';
 
-const awaitForMyComponent = async (wrapper) => {
+const awaitForMyComponent = async wrapper => {
   await act(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise(resolve => setTimeout(resolve, 0));
     wrapper.update();
   });
 };
 jest.mock('../../../react-services');
 jest.mock('../../../react-services/common-services');
+jest.mock('../../../react-services/navigate-app', () => ({
+  getNavigationAppURL: url => url,
+}));
 describe('Check sample data component', () => {
   it('should render if there is sample data', async () => {
-    WzRequest.genericReq.mockResolvedValue({ data: { sampleAlertsInstalled: true } });
+    WzRequest.genericReq.mockResolvedValue({
+      data: { sampleAlertsInstalled: true },
+    });
     const wrapper = await mount(<SampleDataWarning />);
     await awaitForMyComponent(wrapper);
     expect(wrapper.find('EuiCallOut').exists());
-    expect(wrapper.find('EuiCallOut').props().title).toEqual("This dashboard contains sample data");
+    expect(wrapper.find('EuiCallOut').props().title).toEqual(
+      'This dashboard contains sample data',
+    );
   });
 
   it('should not render if there is no sample data', async () => {
-    WzRequest.genericReq.mockResolvedValue({ data: { sampleAlertsInstalled: false } });
+    WzRequest.genericReq.mockResolvedValue({
+      data: { sampleAlertsInstalled: false },
+    });
     const wrapper = await mount(<SampleDataWarning />);
     await awaitForMyComponent(wrapper);
     expect(wrapper.contains('EuiCallOut')).toBe(false);
@@ -59,7 +68,7 @@ describe('Check sample data component', () => {
     };
     getErrorOrchestrator.mockImplementation(() => {
       return {
-        handleError: (options) => {
+        handleError: options => {
           expect(options).toEqual(mockOptions);
         },
       };

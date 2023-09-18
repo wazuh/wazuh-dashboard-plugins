@@ -752,7 +752,7 @@ export default class WzRuleInfo extends Component {
                 iconType='popout'
                 aria-label='popout'
                 href={getNavigationAppURL(
-                  `/app/security-events#/overview?tab=general&tabView=panels&addRuleFilter=${id}`,
+                  `/app/threat-hunting#/overview?tab=general&tabView=panels&addRuleFilter=${id}`,
                 )}
                 target='blank'
               >

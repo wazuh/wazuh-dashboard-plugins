@@ -25,23 +25,16 @@ import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { compose } from 'redux';
+import { withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 
 class WzGroups extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
-  setGlobalBreadcrumb() {
-    const breadcrumb = [
-      { text: '' },
-      { text: 'Management', href: '#/manager' },
-      { text: 'Groups' },
-    ];
-    store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-  }
 
   async componentDidMount() {
-    this.setGlobalBreadcrumb();
     // Check if there is a group in the URL
     const [_, group] = window.location.href.match(new RegExp('group=' + '([^&]*)')) || [];
     window.location.href = window.location.href.replace(new RegExp('group=' + '[^&]*'), '');
@@ -113,4 +106,12 @@ const mapDispatchToProps = (dispatch) => {
     updateGroupDetail: (groupDetail) => dispatch(updateGroupDetail(groupDetail)),
   };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroups);
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  withGlobalBreadcrumb(props => {
+    return [
+      { text: '' },
+      { text: 'Groups' }
+    ];
+  })
+)(WzGroups);

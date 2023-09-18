@@ -200,7 +200,7 @@ export class WzStatisticsOverview extends Component {
               <EuiButtonEmpty
                 onMouseDown={e =>
                   navigateAppURL(
-                    '/app/configuration#/settings?tab=configuration&category=statistics',
+                    '/app/wazuh-plugin-settings#/settings?tab=configuration&category=statistics',
                   )
                 }
                 iconType='gear'
@@ -264,11 +264,7 @@ export class WzStatisticsOverview extends Component {
 }
 
 export default compose(
-  withGlobalBreadcrumb([
-    { text: '' },
-    { text: 'Management', href: '#/manager' },
-    { text: 'Statistics' },
-  ]),
+  withGlobalBreadcrumb([{ text: '' }, { text: 'Statistics' }]),
   withGuard(props => {
     return !(wzConfig.getConfig() || {})['cron.statistics.status']; // if 'cron.statistics.status' is false, then it renders PromptStatisticsDisabled component
   }, PromptStatisticsDisabled),
