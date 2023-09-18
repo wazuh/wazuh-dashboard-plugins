@@ -40,6 +40,21 @@ import {
 } from '../../../react-services/navigate-app';
 import { Applications, Categories } from '../../../utils/applications';
 
+const appCategories = Applications.reduce((categories, app) => {
+  const existingCategory = categories.find(
+    category => category.label === app.category,
+  );
+  if (existingCategory) {
+    existingCategory.apps.push(app);
+  } else {
+    categories.push({
+      label: app.category,
+      apps: [app],
+    });
+  }
+  return categories;
+}, []);
+
 export const OverviewWelcome = compose(
   withReduxProvider,
   withErrorBoundary,
@@ -103,21 +118,6 @@ export const OverviewWelcome = compose(
     }
 
     render() {
-      const appCategories = Applications.reduce((categories, app) => {
-        const existingCategory = categories.find(
-          category => category.label === app.category,
-        );
-        if (existingCategory) {
-          existingCategory.apps.push(app);
-        } else {
-          categories.push({
-            label: app.category,
-            apps: [app],
-          });
-        }
-        return categories;
-      }, []);
-
       return (
         <Fragment>
           <EuiPage className='wz-welcome-page'>
