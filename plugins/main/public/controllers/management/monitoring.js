@@ -321,11 +321,7 @@ export function ClusterController(
 
   $scope.expandArray = [false, false];
 
-  const breadcrumb = [
-    { text: '' },
-    { text: 'Management', href: '#/manager' },
-    { text: 'Cluster' },
-  ];
+  const breadcrumb = [{ text: '' }, { text: 'Cluster' }];
   store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   if (clusterEnabled) load();
 

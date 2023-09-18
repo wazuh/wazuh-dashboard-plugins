@@ -38,7 +38,6 @@ import {
 } from './components';
 import { AgentInfo } from './agents-info';
 import store from '../../../redux/store';
-import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
@@ -51,7 +50,7 @@ import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
-import { withErrorBoundary, withReduxProvider } from '../hocs';
+import { withErrorBoundary, withGlobalBreadcrumb, withReduxProvider } from '../hocs';
 import { compose } from 'redux';
 import {
   API_NAME_AGENT_STATUS,
@@ -67,6 +66,18 @@ import {
 export const AgentsWelcome = compose(
   withReduxProvider,
   withErrorBoundary,
+  withGlobalBreadcrumb(({ agent }) => {
+    return [
+      { text: '' },
+      {
+        text: 'IT Hygiene',
+      },
+      {
+        text: `${agent.name}`,
+        truncate: true,
+      },
+    ];
+  }),
 )(
   class AgentsWelcome extends Component {
     _isMount = false;
@@ -112,28 +123,11 @@ export const AgentsWelcome = compose(
       this.setState({ maxModules: maxModules, widthWindow: window.innerWidth });
     };
 
-    setGlobalBreadcrumb() {
-      const breadcrumb = [
-        { text: '' },
-        {
-          text: 'Agents',
-          href: '#/agents-preview',
-        },
-        {
-          text: `${this.props.agent.name}`,
-          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
-          truncate: false,
-        },
-      ];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    }
-
     async componentDidMount() {
       this._isMount = true;
       store.dispatch(updateCurrentAgentData(this.props.agent));
       this.updateMenuAgents();
       this.updateWidth();
-      this.setGlobalBreadcrumb();
       const tabVisualizations = new TabVisualizations();
       tabVisualizations.removeAll();
       tabVisualizations.setTab('welcome');

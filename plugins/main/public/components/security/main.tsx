@@ -57,7 +57,7 @@ const tabs = [
 export const WzSecurity = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
+  withGlobalBreadcrumb([{ text: '' }, { text: 'RBAC' }]),
 )(() => {
   const dispatch = useDispatch();
 

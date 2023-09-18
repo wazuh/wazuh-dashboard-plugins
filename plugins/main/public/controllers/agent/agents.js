@@ -22,8 +22,6 @@ import { getToasts, getDataPlugin } from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { formatUIDate } from '../../react-services/time-service';
-import store from '../../redux/store';
-import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
@@ -385,25 +383,6 @@ export class AgentsController {
       });
     } else if (this.ignoredTabs.includes(this.$scope.tab)) {
       timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
-    }
-    if (tab === 'syscollector') {
-      // TODO: Migrate syscollector to React
-      let breadcrumb = [
-        {
-          text: '',
-        },
-        {
-          text: 'Agents',
-          href: '#/agents-preview',
-        },
-        { agent: this.$scope.agent },
-        {
-          text: 'Inventory Data',
-          className: 'wz-global-breadcrumb-popover',
-        },
-      ];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      $('#breadcrumbNoTitle').attr('title', '');
     }
 
     // Update agent status

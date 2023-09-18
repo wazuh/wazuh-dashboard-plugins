@@ -43,7 +43,7 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
 import { WzFieldSearchDelay } from '../../../../../components/common/search';
 
 export default compose(
-  withGlobalBreadcrumb([{ text: '' }, { text: 'Management', href: '#/manager' }, { text: 'Logs' }]),
+  withGlobalBreadcrumb([{ text: '' }, { text: 'Logs' }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
