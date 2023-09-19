@@ -49,7 +49,7 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
 
   return (
     <EuiFlexGroup alignItems="center" gutterSize="m">
-      <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+      <EuiFlexItem grow={false} style={{ maxWidth: 'max-content', minWidth: '150px' }}>
         {!isLoading ? (
           <EuiFlexGroup gutterSize="none" wrap={false}>
             <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
@@ -86,7 +86,7 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
         )}
       </EuiFlexItem>
       <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-        <EuiButton isLoading={isLoading} onClick={handleOnClick} size="s">
+        <EuiButton isLoading={isLoading} onClick={handleOnClick} size="s" iconType="refresh">
           <FormattedMessage
             id="wazuhCheckUpdates.upToDateStatus.buttonText"
             defaultMessage="Check updates"
