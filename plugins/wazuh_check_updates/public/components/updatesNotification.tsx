@@ -23,7 +23,7 @@ export const UpdatesNotification = () => {
     isLoading: isLoadingUserPreferences,
     updateUserPreferences,
   } = useUserPreferences();
-
+  console.log({ userPreferences, userPreferencesError, isLoadingUserPreferences });
   const {
     availableUpdates,
     error: getAvailableUpdatesError,
@@ -97,7 +97,7 @@ export const UpdatesNotification = () => {
           <EuiFlexGroup gutterSize="m" alignItems="center">
             <EuiFlexItem grow={false}>
               <EuiCheckbox
-                id="check-dismiss"
+                id="check-dismiss-in-notification"
                 label={
                   <FormattedMessage
                     id="wazuhCheckUpdates.updatesNotification.dismissCheckText"
