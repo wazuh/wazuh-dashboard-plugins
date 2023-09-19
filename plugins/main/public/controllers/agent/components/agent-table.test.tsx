@@ -222,30 +222,30 @@ const data = [
 ];
 
 const defaultColumns = [
-  "id",
-  "name",
-  "ip",
-  "group",
-  "os.name,os.version",
-  "node_name",
-  "version",
-  "actions",
-  "group_config_status"
+  'id',
+  'name',
+  'ip',
+  'group',
+  'os.name,os.version',
+  'node_name',
+  'version',
+  'actions',
+  'group_config_status',
 ];
 
 const customColumns = [
-  "id",
-  "name",
-  "ip",
-  "version",
-  "actions",
-  "status",
-  "group_config_status"
+  'id',
+  'name',
+  'ip',
+  'version',
+  'actions',
+  'status',
+  'group_config_status',
 ];
 
 const localStorageMock = (function () {
   let store = {
-    'wz-agents-overview-table-visible-fields': null
+    'wz-agents-overview-table-visible-fields': null,
   };
 
   return {
@@ -259,7 +259,7 @@ const localStorageMock = (function () {
 
     clear() {
       store = {
-        'wz-agents-overview-table-visible-fields': null
+        'wz-agents-overview-table-visible-fields': null,
       };
     },
 
@@ -277,7 +277,7 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => { },
+    handleError: options => {},
   }),
 }));
 
@@ -303,7 +303,6 @@ jest.mock('react', () => ({
   useLayoutEffect: jest.requireActual('react').useEffect,
 }));
 
-// TODO: Fix this test
 describe('AgentsTable component', () => {
   WzRequest.apiReq = jest.fn(AgentsTable, 'wzReq').mockResolvedValue({
     data: {
@@ -343,9 +342,9 @@ describe('AgentsTable component', () => {
     wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
-    expect(window.localStorage.getItem('wz-agents-overview-table-visible-fields')).toEqual(
-      JSON.stringify(defaultColumns),
-    );
+    expect(
+      window.localStorage.getItem('wz-agents-overview-table-visible-fields'),
+    ).toEqual(JSON.stringify(defaultColumns));
   });
 
   it('Renders correctly to match the snapshot with no predefined columns selected', () => {
@@ -371,11 +370,10 @@ describe('AgentsTable component', () => {
     wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
-    expect(window.localStorage.getItem('wz-agents-overview-table-visible-fields')).toEqual(
-      null
-    );
+    expect(
+      window.localStorage.getItem('wz-agents-overview-table-visible-fields'),
+    ).toEqual(null);
   });
-
 
   it('Renders correctly to match the snapshot with custom columns', () => {
     window.localStorage.setItem(
@@ -404,9 +402,8 @@ describe('AgentsTable component', () => {
     wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
-    expect(window.localStorage.getItem('wz-agents-overview-table-visible-fields')).toEqual(
-      JSON.stringify(customColumns),
-    );
+    expect(
+      window.localStorage.getItem('wz-agents-overview-table-visible-fields'),
+    ).toEqual(JSON.stringify(customColumns));
   });
-
 });
