@@ -60,7 +60,16 @@ export const CurrentUpdateDetails = ({ currentUpdate }: CurrentUpdateDetailsProp
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size="m" />
-      <EuiAccordion id="accordionUpdateDetails" buttonContent="Show details" paddingSize="m">
+      <EuiAccordion
+        id="accordionUpdateDetails"
+        buttonContent={
+          <FormattedMessage
+            id="wazuhCheckUpdates.currentUpdateDetails.showDetails"
+            defaultMessage="Show details"
+          />
+        }
+        paddingSize="m"
+      >
         <EuiText>{currentUpdate.description}</EuiText>
       </EuiAccordion>
     </EuiCallOut>
