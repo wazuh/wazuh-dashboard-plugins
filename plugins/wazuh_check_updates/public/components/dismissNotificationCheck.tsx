@@ -1,5 +1,5 @@
 import { EuiCheckbox } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import { useUserPreferences } from '../hooks';
 
@@ -8,20 +8,23 @@ export interface DismissNotificationCheckProps {
 }
 
 export const DismissNotificationCheck = ({ userId }: DismissNotificationCheckProps) => {
-  const [dismissFutureUpdates, setDismissFutureUpdates] = useState(false);
+  const [dismissFutureUpdates, setDismissFutureUpdates] = useState<boolean>();
 
   const { userPreferences, error, isLoading, updateUserPreferences } = useUserPreferences(userId);
+
+  useEffect(() => {
+    if (isLoading) return;
+    setDismissFutureUpdates(userPreferences?.hide_update_notifications);
+  }, [userPreferences, isLoading]);
 
   if (error) {
     console.log(error);
     return null;
   }
 
-  if (isLoading) return null;
-
   const handleOnChange = (checked: boolean) => {
     updateUserPreferences({ hide_update_notifications: checked });
-    setDismissFutureUpdates(true);
+    // setDismissFutureUpdates(true);
   };
 
   return (
@@ -33,9 +36,9 @@ export const DismissNotificationCheck = ({ userId }: DismissNotificationCheckPro
           defaultMessage="I don't want to know about future releases"
         />
       }
-      defaultChecked={userPreferences.hide_update_notifications}
       checked={dismissFutureUpdates}
       onChange={(e) => handleOnChange(e.target.checked)}
+      disabled={isLoading}
     />
   );
 };

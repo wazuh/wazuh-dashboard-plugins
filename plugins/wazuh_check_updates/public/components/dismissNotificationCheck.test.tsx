@@ -28,19 +28,6 @@ describe('DismissNotificationCheck component', () => {
     expect(elementWithTag).toBeInTheDocument();
   });
 
-  test('should return null when is loading', () => {
-    mockedUseUserPreferences.mockImplementation(() => ({
-      isLoading: true,
-    }));
-
-    const { container } = render(<CurrentUpdateDetails />);
-
-    expect(container).toMatchSnapshot();
-
-    const firstChild = container.firstChild;
-    expect(firstChild).toBeNull();
-  });
-
   test('should return null when there is an error', () => {
     mockedUseUserPreferences.mockImplementation(() => ({
       error: 'Error',
