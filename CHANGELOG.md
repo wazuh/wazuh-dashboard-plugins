@@ -7,7 +7,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.8.0
-- Create the malware detection dashboard.
+- Create the security event dashboard. [#5892](https://github.com/wazuh/wazuh-kibana-app/pull/5892)
+- Create the malware detection dashboard. [#5899](https://github.com/wazuh/wazuh-kibana-app/pull/5899)
 
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.9.0 - Revision 00
 
