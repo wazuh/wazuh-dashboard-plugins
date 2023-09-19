@@ -1113,7 +1113,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   },
   'customization.logo.app': {
     title: 'App main logo',
-    description: `This logo is used at the top left corner while the user is logging into Wazuh API`,
+    description: `This logo is used as loading indicator while the user is logging into Wazuh API`,
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.filepicker,
     defaultValue: '',
