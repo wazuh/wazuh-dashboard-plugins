@@ -1,22 +1,24 @@
 import { IRouter } from 'opensearch-dashboards/server';
-import { schema } from '@osd/config-schema';
 import { routes } from '../../../common';
 import { getUserPreferences } from '../../services/userPreferences';
 
 export const getUserPreferencesRoutes = (router: IRouter) => {
   router.get(
     {
-      path: `${routes.userPreferences}/{userId}`,
-      validate: {
-        params: schema.object({
-          userId: schema.string(),
-        }),
-      },
+      path: routes.userPreferences,
+      validate: false,
     },
-    async (context, { params }, response) => {
-      const { userId } = params;
+    async (context, request, response) => {
       try {
-        const userPreferences = await getUserPreferences(userId);
+        const user = await context['wazuh_check_updates'].security.getCurrentUser(request, context);
+
+        if (!user?.username)
+          return response.customError({
+            statusCode: 503,
+            body: new Error('Error trying to get username'),
+          });
+
+        const userPreferences = await getUserPreferences(user.username);
 
         return response.ok({
           body: userPreferences,

@@ -23,7 +23,7 @@ export interface UserPreferences {
 }
 
 export interface UsersPreferences {
-  users: ({ user_id: string } & UserPreferences)[];
+  users: ({ username: string } & UserPreferences)[];
 }
 
 export interface CheckUpdatesSettings {

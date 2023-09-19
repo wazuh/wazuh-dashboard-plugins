@@ -25,6 +25,4 @@ exports[`DismissNotificationCheck component should render the check 1`] = `
 </div>
 `;
 
-exports[`DismissNotificationCheck component should return null when is loading 1`] = `<div />`;
-
 exports[`DismissNotificationCheck component should return null when there is an error 1`] = `<div />`;

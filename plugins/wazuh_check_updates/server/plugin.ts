@@ -4,9 +4,9 @@ import {
   CoreStart,
   Plugin,
   Logger,
-} from '../../../src/core/server';
+} from 'opensearch-dashboards/server';
 
-import { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
+import { PluginSetup, WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
 import { defineRoutes } from './routes';
 import {
   availableUpdatesObject,
@@ -15,6 +15,15 @@ import {
 } from './services/savedObject/types';
 import { setCore, setInternalSavedObjectsClient } from './plugin-services';
 import { jobSchedulerRun } from './services/cronjob';
+import { ISecurityFactory, SecurityObj } from './lib/security-factory';
+
+declare module 'opensearch-dashboards/server' {
+  interface RequestHandlerContext {
+    wazuh_check_updates: {
+      security: ISecurityFactory;
+    };
+  }
+}
 
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {
@@ -24,8 +33,17 @@ export class WazuhCheckUpdatesPlugin
     this.logger = initializerContext.logger.get();
   }
 
-  public setup(core: CoreSetup) {
+  public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('wazuh_check_updates: Setup');
+
+    const wazuhSecurity = await SecurityObj(plugins);
+
+    core.http.registerRouteHandlerContext('wazuh_check_updates', () => {
+      return {
+        security: wazuhSecurity,
+      };
+    });
+
     const router = core.http.createRouter();
 
     // Register saved objects types

@@ -3,14 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import { useUserPreferences } from '../hooks';
 
-export interface DismissNotificationCheckProps {
-  userId: string;
-}
-
-export const DismissNotificationCheck = ({ userId }: DismissNotificationCheckProps) => {
+export const DismissNotificationCheck = () => {
   const [dismissFutureUpdates, setDismissFutureUpdates] = useState<boolean>();
 
-  const { userPreferences, error, isLoading, updateUserPreferences } = useUserPreferences(userId);
+  const { userPreferences, error, isLoading, updateUserPreferences } = useUserPreferences();
 
   useEffect(() => {
     if (isLoading) return;
@@ -24,7 +20,6 @@ export const DismissNotificationCheck = ({ userId }: DismissNotificationCheckPro
 
   const handleOnChange = (checked: boolean) => {
     updateUserPreferences({ hide_update_notifications: checked });
-    // setDismissFutureUpdates(true);
   };
 
   return (

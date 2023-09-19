@@ -1,4 +1,4 @@
-import { CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
+import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
 import { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
 import { UpdatesNotification } from './components/updatesNotification';
 import { UpToDateStatus } from './components/upToDateStatus';

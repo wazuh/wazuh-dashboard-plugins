@@ -10,7 +10,7 @@ export const userPreferencesObject: SavedObjectsType = {
       users: {
         type: 'nested',
         properties: {
-          user_id: { type: 'text' },
+          username: { type: 'text' },
           last_dismissed_update: {
             type: 'text',
           },

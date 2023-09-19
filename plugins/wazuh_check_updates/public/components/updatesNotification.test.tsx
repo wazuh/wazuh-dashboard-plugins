@@ -59,7 +59,7 @@ describe('UpdatesNotification component', () => {
 
     const { container, getByText, getByRole } = render(
       <TestProviders>
-        <UpdatesNotification userId="admin" />
+        <UpdatesNotification />
       </TestProviders>
     );
 
@@ -125,7 +125,7 @@ describe('UpdatesNotification component', () => {
 
     const { container, getByRole } = render(
       <TestProviders>
-        <UpdatesNotification userId="admin" />
+        <UpdatesNotification />
       </TestProviders>
     );
 
@@ -149,7 +149,7 @@ describe('UpdatesNotification component', () => {
 
     const { container } = render(
       <TestProviders>
-        <UpdatesNotification userId="admin" />
+        <UpdatesNotification />
       </TestProviders>
     );
 
@@ -169,7 +169,7 @@ describe('UpdatesNotification component', () => {
 
     const { container } = render(
       <TestProviders>
-        <UpdatesNotification userId="admin" />
+        <UpdatesNotification />
       </TestProviders>
     );
 
@@ -209,7 +209,7 @@ describe('UpdatesNotification component', () => {
 
     const { container } = render(
       <TestProviders>
-        <UpdatesNotification userId="admin" />
+        <UpdatesNotification />
       </TestProviders>
     );
 
@@ -261,7 +261,7 @@ describe('UpdatesNotification component', () => {
 
     const { container } = render(
       <TestProviders>
-        <UpdatesNotification userId="admin" />
+        <UpdatesNotification />
       </TestProviders>
     );
 

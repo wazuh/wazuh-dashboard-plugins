@@ -3,19 +3,19 @@ import { UserPreferences, UsersPreferences } from '../../../common/types';
 import { getSavedObject, setSavedObject } from '../savedObject';
 
 export const updateUserPreferences = async (
-  userId: string,
+  username: string,
   preferences: UserPreferences
 ): Promise<UserPreferences> => {
   try {
     const usersPreferences =
       ((await getSavedObject(SAVED_OBJECT_USER_PREFERENCES)) as UsersPreferences)?.users || [];
 
-    const userPreferences = usersPreferences?.find((up) => up.user_id === userId) || {};
+    const userPreferences = usersPreferences?.find((up) => up.username === username) || {};
 
-    const newUserPreferences = { ...userPreferences, ...preferences, user_id: userId };
+    const newUserPreferences = { ...userPreferences, ...preferences, username: username };
 
     const newUsersPreferences = [
-      ...usersPreferences?.filter((up) => up.user_id !== userId),
+      ...usersPreferences?.filter((up) => up.username !== username),
       newUserPreferences,
     ];
 

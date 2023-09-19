@@ -6,11 +6,8 @@ import { updateUserPreferences } from '../../services/userPreferences';
 export const updatePreferencesRoutes = (router: IRouter) => {
   router.patch(
     {
-      path: `${routes.userPreferences}/{userId}`,
+      path: routes.userPreferences,
       validate: {
-        params: schema.object({
-          userId: schema.string(),
-        }),
         body: schema.object({
           last_dismissed_update: schema.maybe(schema.string()),
           hide_update_notifications: schema.maybe(schema.boolean()),
@@ -22,10 +19,17 @@ export const updatePreferencesRoutes = (router: IRouter) => {
         },
       },
     },
-    async (context, { params, body }, response) => {
+    async (context, request, response) => {
       try {
-        const { userId } = params;
-        const userPreferences = await updateUserPreferences(userId, body);
+        const user = await context['wazuh_check_updates'].security.getCurrentUser(request, context);
+
+        if (!user?.username)
+          return response.customError({
+            statusCode: 503,
+            body: new Error('Error trying to get username'),
+          });
+
+        const userPreferences = await updateUserPreferences(user.username, request.body);
 
         return response.ok({
           body: userPreferences,

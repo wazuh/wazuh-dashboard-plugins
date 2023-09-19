@@ -3,7 +3,7 @@ import { UserPreferences } from '../../common/types';
 import { getCore } from '../plugin-services';
 import { routes } from '../../common/index';
 
-export const useUserPreferences = (userId: string) => {
+export const useUserPreferences = () => {
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
@@ -12,7 +12,7 @@ export const useUserPreferences = (userId: string) => {
     (async () => {
       try {
         setIsLoading(true);
-        const response = await getCore().http.get(`${routes.userPreferences}/${userId}`);
+        const response = await getCore().http.get(routes.userPreferences);
         setUserPreferences(response);
         setError(undefined);
       } catch (error: any) {
@@ -30,7 +30,7 @@ export const useUserPreferences = (userId: string) => {
   const updateUserPreferences = async (userPreferences: UserPreferences) => {
     try {
       setIsLoading(true);
-      await getCore().http.patch(`${routes.userPreferences}/${userId}`, {
+      await getCore().http.patch(routes.userPreferences, {
         body: JSON.stringify(userPreferences),
       });
       setUserPreferences(userPreferences);

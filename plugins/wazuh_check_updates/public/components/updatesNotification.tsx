@@ -13,11 +13,7 @@ import { FormattedMessage } from '@osd/i18n/react';
 import { useAvailableUpdates, useUserPreferences } from '../hooks';
 import { getCurrentAvailableUpdate } from '../utils';
 
-export interface UpdatesNotificationProps {
-  userId: string;
-}
-
-export const UpdatesNotification = ({ userId }: UpdatesNotificationProps) => {
+export const UpdatesNotification = () => {
   const [isDismissed, setIsDismissed] = useState(false);
   const [dismissFutureUpdates, setDismissFutureUpdates] = useState(false);
 
@@ -26,7 +22,7 @@ export const UpdatesNotification = ({ userId }: UpdatesNotificationProps) => {
     error: userPreferencesError,
     isLoading: isLoadingUserPreferences,
     updateUserPreferences,
-  } = useUserPreferences(userId);
+  } = useUserPreferences();
 
   const {
     availableUpdates,

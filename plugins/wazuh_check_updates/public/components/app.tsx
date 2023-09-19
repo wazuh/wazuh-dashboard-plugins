@@ -16,7 +16,7 @@ import {
   EuiText,
 } from '@elastic/eui';
 
-import { CoreStart } from '../../../../src/core/public';
+import { CoreStart } from 'opensearch-dashboards/public';
 import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
 
 import { PLUGIN_ID, PLUGIN_NAME } from '../../common';

@@ -18,7 +18,7 @@ describe('DismissNotificationCheck component', () => {
 
     const { container, getByText } = render(
       <TestProviders>
-        <DismissNotificationCheck userId="admin" />
+        <DismissNotificationCheck />
       </TestProviders>
     );
 
