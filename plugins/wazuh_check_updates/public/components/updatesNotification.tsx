@@ -23,7 +23,7 @@ export const UpdatesNotification = () => {
     isLoading: isLoadingUserPreferences,
     updateUserPreferences,
   } = useUserPreferences();
-  console.log({ userPreferences, userPreferencesError, isLoadingUserPreferences });
+
   const {
     availableUpdates,
     error: getAvailableUpdatesError,
