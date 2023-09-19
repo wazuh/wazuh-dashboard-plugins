@@ -20,28 +20,32 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Integration with external APIs',
-    href: webDocumentationLink('user-manual/manager/manual-integration.html')
+    href: webDocumentationLink('user-manual/manager/manual-integration.html'),
   },
   {
     text: 'VirusTotal integration',
-    href: webDocumentationLink('user-manual/capabilities/virustotal-scan/index.html')
+    href: webDocumentationLink(
+      'user-manual/capabilities/malware-detection/virus-total-integration.html',
+    ),
   },
   {
     text: 'Integration reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/integration.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/integration.html',
+    ),
+  },
 ];
 
 const defaultIntegrations = [
   { title: 'Slack', description: 'Get alerts directly on Slack' },
   {
     title: 'VirusTotal',
-    description: 'Get notified when malicious software is found'
+    description: 'Get notified when malicious software is found',
   },
   {
     title: 'PagerDuty',
-    description: 'Get alerts on this streamlined incident resolution software'
-  }
+    description: 'Get alerts on this streamlined incident resolution software',
+  },
 ];
 
 const integrationsSettings = [
@@ -51,16 +55,16 @@ const integrationsSettings = [
   { field: 'group', label: 'Filter alerts by these rule groupst' },
   {
     field: 'event_location',
-    label: 'Filter alerts by location (agent, IP address or file)'
+    label: 'Filter alerts by location (agent, IP address or file)',
   },
-  { field: 'alert_format', label: 'Used format to write alerts' }
+  { field: 'alert_format', label: 'Used format to write alerts' },
 ];
 
 class WzConfigurationIntegrations extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: ''
+      view: '',
     };
   }
   changeView(view) {
@@ -69,7 +73,7 @@ class WzConfigurationIntegrations extends Component {
   buildIntegration(integration) {
     return (
       defaultIntegrations.find(
-        i => i.title && i.title.toLocaleLowerCase() === integration
+        i => i.title && i.title.toLocaleLowerCase() === integration,
       ) || { title: capitalize(integration), description: 'Custom integration' }
     );
   }

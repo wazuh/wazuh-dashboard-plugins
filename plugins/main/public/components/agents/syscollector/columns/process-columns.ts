@@ -1,35 +1,37 @@
+import { KeyEquivalence } from "../../../../../common/csv-key-equivalence";
+
 const windowsColumns = [
-  { id: 'name', width: '10%' },
-  { id: 'pid' },
-  { id: 'ppid' },
-  { id: 'vm_size' },
-  { id: 'priority' },
-  { id: 'nlwp' },
-  { id: 'cmd', width: '30%' },
-];
+  { field: 'name', searchable: true, sortable: true, width: '10%' },
+  { field: 'pid', searchable: true, sortable: true },
+  { field: 'ppid', searchable: true, sortable: true },
+  { field: 'vm_size', searchable: true, sortable: true },
+  { field: 'priority', searchable: true, sortable: true },
+  { field: 'nlwp', searchable: true, sortable: true },
+  { field: 'cmd', searchable: true, sortable: true, width: '30%' },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
 const linuxColumns = [
-  { id: 'name', width: '10%' },
-  { id: 'euser' },
-  { id: 'egroup' },
-  { id: 'pid' },
-  { id: 'ppid' },
-  { id: 'cmd', width: '15%' },
-  { id: 'argvs', width: '15%' },
-  { id: 'vm_size' },
-  { id: 'size' },
-  { id: 'session' },
-  { id: 'nice' },
-  { id: 'state', width: '15%' },
-];
+  { field: 'name', searchable: true, sortable: true, width: '10%' },
+  { field: 'euser', searchable: true, sortable: true },
+  { field: 'egroup', searchable: true, sortable: true },
+  { field: 'pid', searchable: true, sortable: true },
+  { field: 'ppid', searchable: true, sortable: true },
+  { field: 'cmd', searchable: true, sortable: true, width: '15%' },
+  { field: 'argvs', searchable: true, sortable: true, width: '15%' },
+  { field: 'vm_size', searchable: true, sortable: true },
+  { field: 'size', searchable: true, sortable: true },
+  { field: 'session', searchable: true, sortable: true },
+  { field: 'nice', searchable: true, sortable: true },
+  { field: 'state', searchable: true, sortable: true, width: '15%' },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
 const macColumns = [
-  { id: 'name', width: '10%' },
-  { id: 'euser' },
-  { id: 'pid' },
-  { id: 'ppid' },
-  { id: 'vm_size' },
-  { id: 'nice' },
-  { id: 'state', width: '15%' },
-];
+  { field: 'name', searchable: true, sortable: true, width: '10%' },
+  { field: 'euser', searchable: true, sortable: true },
+  { field: 'pid', searchable: true, sortable: true },
+  { field: 'ppid', searchable: true, sortable: true },
+  { field: 'vm_size', searchable: true, sortable: true },
+  { field: 'nice', searchable: true, sortable: true },
+  { field: 'state', searchable: true, sortable: true, width: '15%' },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
 
 export const processColumns = {
   windows: windowsColumns,

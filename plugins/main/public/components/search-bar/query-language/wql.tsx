@@ -7,7 +7,10 @@ import {
   EuiCode,
 } from '@elastic/eui';
 import { tokenizer as tokenizerUQL } from './aql';
-import { PLUGIN_VERSION } from '../../../../common/constants';
+import {
+  PLUGIN_VERSION,
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT,
+} from '../../../../common/constants';
 
 /* UI Query language
 https://documentation.wazuh.com/current/user-manual/api/queries.html
@@ -99,10 +102,14 @@ const suggestionMappingLanguageTokenType = {
  * @returns
  */
 function mapSuggestionCreator(type: ITokenType) {
-  return function ({ ...params }) {
+  return function ({ label, ...params }) {
     return {
       type,
       ...params,
+      /* WORKAROUND: ensure the label is a string. If it is not a string, an warning is
+      displayed in the console related to prop types
+      */
+      ...(typeof label !== 'undefined' ? { label: String(label) } : {}),
     };
   };
 }
@@ -315,6 +322,37 @@ function getTokenNearTo(
 }
 
 /**
+ * It returns the regular expression that validate the token of type value
+ * @returns The regular expression
+ */
+function getTokenValueRegularExpression() {
+  return new RegExp(
+    // Value: A string.
+    '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
+      '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|^[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
+      '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$',
+  );
+}
+
+/**
+ * It filters the values that matche the validation regular expression and returns the first items
+ * defined by SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT constant.
+ * @param suggestions Suggestions provided by the suggestions.value method of each instance of the
+ * search bar
+ * @returns
+ */
+function filterTokenValueSuggestion(
+  suggestions: QLOptionSuggestionEntityItemTyped[],
+) {
+  return suggestions
+    .filter(({ label }: QLOptionSuggestionEntityItemTyped) => {
+      const re = getTokenValueRegularExpression();
+      return re.test(label);
+    })
+    .slice(0, SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT);
+}
+
+/**
  * Get the suggestions from the tokens
  * @param tokens
  * @param language
@@ -407,11 +445,18 @@ export async function getSuggestions(
           operator => operator === lastToken.value,
         )
           ? [
-              ...(
+              /*
+                WORKAROUND: When getting suggestions for the distinct values for any field, the API
+                could reply some values that doesn't match the expected regular expression. If the
+                value is invalid, a validation message is displayed and avoid the search can be run.
+                The goal of this filter is that the suggested values can be used to search. This
+                causes some values could not be displayed as suggestions.
+              */
+              ...filterTokenValueSuggestion(
                 await options.suggestions.value(undefined, {
                   field,
                   operatorCompare,
-                })
+                }),
               ).map(mapSuggestionCreatorValue),
             ]
           : []),
@@ -441,11 +486,18 @@ export async function getSuggestions(
               },
             ]
           : []),
-        ...(
+        /*
+          WORKAROUND: When getting suggestions for the distinct values for any field, the API
+          could reply some values that doesn't match the expected regular expression. If the
+          value is invalid, a validation message is displayed and avoid the search can be run.
+          The goal of this filter is that the suggested values can be used to search. This
+          causes some values could not be displayed as suggestions.
+        */
+        ...filterTokenValueSuggestion(
           await options.suggestions.value(lastToken.formattedValue, {
             field,
             operatorCompare,
-          })
+          }),
         ).map(mapSuggestionCreatorValue),
         ...Object.entries(language.tokens.conjunction.literal).map(
           ([conjunction, description]) => ({
@@ -685,12 +737,7 @@ function getOutput(input: string, options: OptionsQL) {
  * @returns
  */
 function validateTokenValue(token: IToken): string | undefined {
-  const re = new RegExp(
-    // Value: A string.
-    '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
-      '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|^[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
-      '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$',
-  );
+  const re = getTokenValueRegularExpression();
 
   const value = token.formattedValue ?? token.value;
   const match = value.match(re);
@@ -959,7 +1006,7 @@ export const WQL = {
       error: validationStrict,
     };
 
-    const onSearch = () => {
+    const onSearch = output => {
       if (output?.error) {
         params.setQueryLanguageOutput(state => ({
           ...state,
@@ -972,6 +1019,7 @@ export const WQL = {
                 description: error,
               })),
             ),
+            isInvalid: true,
           },
         }));
       } else {
@@ -1024,7 +1072,7 @@ export const WQL = {
             : await getSuggestions(tokens, params.queryLanguage.parameters),
         ),
         // Handler to manage when clicking in a suggestion item
-        onItemClick: item => {
+        onItemClick: currentInput => item => {
           // There is an error, clicking on the item does nothing
           if (item.type.iconType === 'alert') {
             return;
@@ -1032,7 +1080,18 @@ export const WQL = {
           // When the clicked item has the `search` iconType, run the `onSearch` function
           if (item.type.iconType === 'search') {
             // Execute the search action
-            onSearch();
+            // Get the tokens from the input
+            const tokens: ITokens = tokenizer(currentInput);
+
+            const validationStrict = validate(tokens, validators);
+
+            // Get the output of query language
+            const output = {
+              ...getOutput(currentInput, params.queryLanguage.parameters),
+              error: validationStrict,
+            };
+
+            onSearch(output);
           } else {
             // When the clicked item has another iconType
             const lastToken: IToken | undefined = getLastTokenDefined(tokens);
@@ -1051,10 +1110,15 @@ export const WQL = {
                   : item.label;
             } else {
               // add a whitespace for conjunction <whitespace><conjunction>
+              // add a whitespace for grouping operator <whitespace>)
               !/\s$/.test(input) &&
                 (item.type.iconType ===
                   suggestionMappingLanguageTokenType.conjunction.iconType ||
-                  lastToken?.type === 'conjunction') &&
+                  lastToken?.type === 'conjunction' ||
+                  (item.type.iconType ===
+                    suggestionMappingLanguageTokenType.operator_group
+                      .iconType &&
+                    item.label === ')')) &&
                 tokens.push({
                   type: 'whitespace',
                   value: ' ',
@@ -1134,7 +1198,19 @@ export const WQL = {
         // Define the handler when the a key is pressed while the input is focused
         onKeyPress: event => {
           if (event.key === 'Enter') {
-            onSearch();
+            // Get the tokens from the input
+            const input = event.currentTarget.value;
+            const tokens: ITokens = tokenizer(input);
+
+            const validationStrict = validate(tokens, validators);
+
+            // Get the output of query language
+            const output = {
+              ...getOutput(input, params.queryLanguage.parameters),
+              error: validationStrict,
+            };
+
+            onSearch(output);
           }
         },
       },

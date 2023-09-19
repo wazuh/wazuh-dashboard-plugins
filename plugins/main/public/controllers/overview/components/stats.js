@@ -48,11 +48,11 @@ export const Stats = withErrorBoundary(
     goToAgents(status) {
       if (status) {
         sessionStorage.setItem(
-          'agents_preview_selected_options',
-          JSON.stringify([{ field: 'q', value: `status=${status}` }]),
+          'wz-agents-overview-table-filter',
+          JSON.stringify({ q: `id!=000;status=${status}` }),
         );
-      } else if (sessionStorage.getItem('agents_preview_selected_options')) {
-        sessionStorage.removeItem('agents_preview_selected_options');
+      } else if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
+        sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
       navigateAppURL('/app/endpoints-summary#/agents-preview');
     }

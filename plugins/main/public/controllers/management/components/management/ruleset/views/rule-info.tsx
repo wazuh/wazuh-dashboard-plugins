@@ -57,7 +57,10 @@ export default class WzRuleInfo extends Component {
     const handleFileClick = async (event, { filename, relative_dirname }) => {
       event.stopPropagation();
       try {
-        const result = await this.resourcesHandler.getFileContent(filename);
+        const result = await this.resourcesHandler.getFileContent(
+          filename,
+          relative_dirname,
+        );
         const file = {
           name: filename,
           content: result,
@@ -321,7 +324,7 @@ export default class WzRuleInfo extends Component {
             >
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([{ field: 'rule_ids', value: id }])
+                  this.setNewFiltersAndBack({ q: `id=${id}` })
                 }
               >
                 {id}
@@ -338,7 +341,7 @@ export default class WzRuleInfo extends Component {
             >
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([{ field: 'level', value: level }])
+                  this.setNewFiltersAndBack({ q: `level=${level}` })
                 }
               >
                 {level}
@@ -352,9 +355,7 @@ export default class WzRuleInfo extends Component {
             <EuiToolTip position='top' content={`Filter by this file: ${file}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([
-                    { field: 'filename', value: file },
-                  ])
+                  this.setNewFiltersAndBack({ q: `filename=${file}` })
                 }
               >
                 {file}
@@ -368,9 +369,7 @@ export default class WzRuleInfo extends Component {
             <EuiToolTip position='top' content={`Filter by this path: ${path}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([
-                    { field: 'relative_dirname', value: path },
-                  ])
+                  this.setNewFiltersAndBack({ q: `relative_dirname=${path}` })
                 }
               >
                 {path}
@@ -484,7 +483,7 @@ export default class WzRuleInfo extends Component {
         <span key={group}>
           <EuiLink
             onClick={async () =>
-              this.setNewFiltersAndBack([{ field: 'group', value: group }])
+              this.setNewFiltersAndBack({ q: `groups=${group}` })
             }
           >
             <EuiToolTip
@@ -595,7 +594,7 @@ export default class WzRuleInfo extends Component {
           <span key={index}>
             <EuiLink
               onClick={async () =>
-                this.setNewFiltersAndBack([{ field: key, value: element }])
+                this.setNewFiltersAndBack({ q: `${key}=${element}` })
               }
             >
               <EuiToolTip position='top' content='Filter by this compliance'>
@@ -626,9 +625,9 @@ export default class WzRuleInfo extends Component {
           <span key={index}>
             <EuiLink
               onClick={async () =>
-                this.setNewFiltersAndBack([
-                  { field: 'mitre', value: this.state.mitreIds[index] },
-                ])
+                this.setNewFiltersAndBack({
+                  q: `mitre=${this.state.mitreIds[index]}`,
+                })
               }
             >
               <EuiToolTip position='top' content='Filter by this compliance'>
@@ -857,7 +856,7 @@ export default class WzRuleInfo extends Component {
                           {this.state.currentRuleInfo?.filename && (
                             <TableWzAPI
                               tableColumns={this.columns}
-                              tableInitialSortingField={'id'}
+                              tableInitialSortingField='id'
                               endpoint={`/rules?filename=${this.state.currentRuleInfo.filename}`}
                               tableProps={{
                                 rowProps: this.onClickRow,

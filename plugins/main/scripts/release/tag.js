@@ -61,7 +61,7 @@ function getSupportedVersions(pluginVersion) {
     },
     OpenSearch: {
       branch: pluginVersion,
-      versions: ['2.6.0'],
+      versions: ['2.9.0'],
       manifestPluginPath: 'opensearch_dashboards.json',
     },
   };

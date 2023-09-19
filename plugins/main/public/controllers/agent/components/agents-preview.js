@@ -197,7 +197,7 @@ export const AgentsPreview = compose(
     }
 
     removeFilters() {
-      this._isMount && this.setState({ agentTableFilters: [] });
+      this._isMount && this.setState({ agentTableFilters: {} });
     }
 
     showAgent(agent) {
@@ -207,7 +207,7 @@ export const AgentsPreview = compose(
     filterAgentByStatus(status) {
       this._isMount &&
         this.setState({
-          agentTableFilters: [{ field: 'q', value: `status=${status}` }],
+          agentTableFilters: { q: `id!=000;status=${status}` },
         });
     }
     onRenderComplete() {

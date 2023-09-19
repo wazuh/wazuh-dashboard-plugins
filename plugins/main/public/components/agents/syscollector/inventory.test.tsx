@@ -12,7 +12,9 @@ describe('Inventory component', () => {
     };
     const wrapper = render(<SyscollectorInventory agent={agent} />);
     const networkPortsCard = wrapper.find('.euiFlexItem--flexGrow2').last();
-    const networkPortsTitle = networkPortsCard.find('.euiText--medium').text();
+    const networkPortsTitle = networkPortsCard
+      .find('.euiTitle.euiTitle--small')
+      .text();
     const networkPortsColumns = networkPortsCard.find('th');
 
     // This is done because the ID of the tables changes at each execution and breaks the snapshot.
@@ -35,7 +37,7 @@ describe('Inventory component', () => {
     ];
 
     expect(wrapper).toMatchSnapshot();
-    expect(networkPortsTitle.trim()).toEqual('Network ports');
+    expect(networkPortsTitle.trim()).toContain('Network ports');
     expect(networkPortsColumns.length).toEqual(columns.length);
     for (let i = 0; i < columns.length; i++) {
       expect(networkPortsColumns.eq(i).text()).toContain(columns[i]);
@@ -50,7 +52,9 @@ describe('Inventory component', () => {
     };
     const wrapper = render(<SyscollectorInventory agent={agent} />);
     const networkPortsCard = wrapper.find('.euiFlexItem--flexGrow2').last();
-    const networkPortsTitle = networkPortsCard.find('.euiText--medium').text();
+    const networkPortsTitle = networkPortsCard
+      .find('.euiTitle.euiTitle--small')
+      .text();
     const networkPortsColumns = networkPortsCard.find('th');
 
     // This is done because the ID of the tables changes at each execution and breaks the snapshot.
@@ -72,7 +76,7 @@ describe('Inventory component', () => {
     ];
 
     expect(wrapper).toMatchSnapshot();
-    expect(networkPortsTitle.trim()).toEqual('Network ports');
+    expect(networkPortsTitle.trim()).toContain('Network ports');
     expect(networkPortsColumns.length).toEqual(columns.length);
     for (let i = 0; i < columns.length; i++) {
       expect(networkPortsColumns.eq(i).text()).toContain(columns[i]);
@@ -87,7 +91,9 @@ describe('Inventory component', () => {
     };
     const wrapper = render(<SyscollectorInventory agent={agent} />);
     const networkPortsCard = wrapper.find('.euiFlexItem--flexGrow2').last();
-    const networkPortsTitle = networkPortsCard.find('.euiText--medium').text();
+    const networkPortsTitle = networkPortsCard
+      .find('.euiTitle.euiTitle--small')
+      .text();
     const networkPortsColumns = networkPortsCard.find('th');
 
     // This is done because the ID of the tables changes at each execution and breaks the snapshot.
@@ -103,7 +109,7 @@ describe('Inventory component', () => {
     const columns = ['Local port', 'Local IP address', 'State', 'Protocol'];
 
     expect(wrapper).toMatchSnapshot();
-    expect(networkPortsTitle.trim()).toEqual('Network ports');
+    expect(networkPortsTitle.trim()).toContain('Network ports');
     expect(networkPortsColumns.length).toEqual(columns.length);
     for (let i = 0; i < columns.length; i++) {
       expect(networkPortsColumns.eq(i).text()).toContain(columns[i]);

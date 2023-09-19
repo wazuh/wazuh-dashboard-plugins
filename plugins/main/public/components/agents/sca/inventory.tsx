@@ -61,7 +61,7 @@ type InventoryState = {
   loading: boolean;
   checksIsLoading: boolean;
   redirect: boolean;
-  filters: object[];
+  filters: object;
   pageTableChecks: { pageIndex: number; pageSize?: number };
   policies: object[];
   checks: object[];
@@ -81,7 +81,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
       itemIdToExpandedRowMap: {},
       showMoreInfo: false,
       loading: false,
-      filters: [],
+      filters: {},
       pageTableChecks: { pageIndex: 0 },
       policies: [],
       checks: [],
@@ -370,7 +370,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
 
   buttonStat(text, field, value) {
     return (
-      <button onClick={() => this.setState({ filters: [{ field, value }] })}>
+      <button onClick={() => this.setState({ filters: { q: `${field}=${value}`} })}>
         {text}
       </button>
     );
