@@ -4,6 +4,7 @@ import { UpdatesNotification } from './components/updatesNotification';
 import { UpToDateStatus } from './components/upToDateStatus';
 import { setCore, setUiSettings } from './plugin-services';
 import { CurrentUpdateDetails } from './components/currentUpdateDetails';
+import { DismissNotificationCheck } from './components/dismissNotificationCheck';
 
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {
@@ -34,6 +35,7 @@ export class WazuhCheckUpdatesPlugin
       UpdatesNotification,
       UpToDateStatus,
       CurrentUpdateDetails,
+      DismissNotificationCheck,
     };
   }
 

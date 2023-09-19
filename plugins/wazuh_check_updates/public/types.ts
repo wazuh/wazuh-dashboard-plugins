@@ -1,5 +1,6 @@
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { CurrentUpdateDetailsProps } from './components/currentUpdateDetails';
+import { DismissNotificationCheckProps } from './components/dismissNotificationCheck';
 import { UpToDateStatusProps } from './components/upToDateStatus';
 import { UpdatesNotificationProps } from './components/updatesNotification';
 
@@ -9,6 +10,7 @@ export interface WazuhCheckUpdatesPluginStart {
   UpdatesNotification: (props: UpdatesNotificationProps) => JSX.Element | null;
   UpToDateStatus: (props: UpToDateStatusProps) => JSX.Element | null;
   CurrentUpdateDetails: (props: CurrentUpdateDetailsProps) => JSX.Element | null;
+  DismissNotificationCheck: (props: DismissNotificationCheckProps) => JSX.Element | null;
 }
 
 export interface AppPluginStartDependencies {
