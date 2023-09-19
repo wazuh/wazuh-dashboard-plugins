@@ -3,7 +3,7 @@
   "version": "4.5.3",
   "revision": "01",
   "pluginPlatform": {
-    "version": "7.16.0"
+    "version": "7.17.13"
   },
   "description": "Wazuh app",
   "keywords": [
@@ -83,7 +83,7 @@
     "eslint-import-resolver-typescript": "2.7.1",
     "eslint-plugin-async-await": "^0.0.0",
     "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-filenames-simple": "^0.7.0",
+    "eslint-plugin-filenames-simple": "^0.8.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.8",
