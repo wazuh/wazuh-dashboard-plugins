@@ -15,7 +15,6 @@ import {
   EuiFlexItem,
   EuiButtonEmpty
 } from '@elastic/eui';
-import { filtersToObject } from '../../../wz-search-bar/';
 import exportCsv from '../../../../react-services/wz-csv';
 import { getToasts }  from '../../../../kibana-services';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
@@ -34,8 +33,7 @@ export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
 
   const downloadCsv = async () => {
     try {
-      const filtersObject = filtersToObject(filters);
-      const formatedFilters = Object.keys(filtersObject).map(key => ({name: key, value: filtersObject[key]}));
+      const formatedFilters = Object.entries(filters).map(([name, value]) => ({name, value}));
       showToast('success', 'Your download should begin automatically...', 3000);
       await exportCsv(
         endpoint,

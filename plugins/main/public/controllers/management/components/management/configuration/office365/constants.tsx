@@ -10,17 +10,19 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 export const OFFICE_365 = 'office365';
 export const WMODULES_WMODULES = 'wmodules-wmodules';
 export const HELP_LINKS = [
   {
     text: 'Using Wazuh to monitor Office 365',
-    href: webDocumentationLink('office365/index.html'),
+    href: webDocumentationLink('cloud-security/office365/index.html'),
   },
   {
     text: 'Configuration options for the module',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/office365-module.html'),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/office365-module.html',
+    ),
   },
 ];

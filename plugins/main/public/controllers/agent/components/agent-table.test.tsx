@@ -2,8 +2,6 @@ import React from 'react';
 import { render } from 'enzyme';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
-import { AgentSynced } from '../../../components/agents/agent-synced';
-import { AgentStatus } from '../../../components/agents/agent-status';
 import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 
@@ -224,395 +222,30 @@ const data = [
 ];
 
 const defaultColumns = [
-  {
-    field: 'id',
-    name: 'ID',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'name',
-    name: 'Name',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'ip',
-    name: 'IP address',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'group',
-    name: 'Group(s)',
-    sortable: true,
-    show: true,
-    render: groups => (groups !== '-' ? jest.fn() : '-'),
-  },
-  {
-    field: 'os_name',
-    name: 'Operating system',
-    sortable: true,
-    show: true,
-    render: jest.fn(),
-  },
-  {
-    field: 'node_name',
-    name: 'Cluster node',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'version',
-    name: 'Version',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'dateAdd',
-    name: 'Registration date',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'lastKeepAlive',
-    name: 'Last keep alive',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'status',
-    name: 'Status',
-    truncateText: true,
-    sortable: true,
-    show: true,
-    render: status => (
-      <AgentStatus
-        status={status}
-        labelProps={{ className: 'hide-agent-status' }}
-      />
-    ),
-  },
-  {
-    field: 'group_config_status',
-    name: 'Synced',
-    sortable: true,
-    show: false,
-    render: synced => <AgentSynced synced={synced} />,
-  },
-  {
-    align: 'right',
-    width: '5%',
-    field: 'actions',
-    name: 'Actions',
-    show: true,
-    render: agent => jest.fn(),
-  },
+  "id",
+  "name",
+  "ip",
+  "group",
+  "os.name,os.version",
+  "node_name",
+  "version",
+  "actions",
+  "group_config_status"
 ];
 
 const customColumns = [
-  {
-    field: 'id',
-    name: 'ID',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'name',
-    name: 'Name',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'ip',
-    name: 'IP address',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'group',
-    name: 'Group(s)',
-    sortable: true,
-    show: true,
-    render: groups => (groups !== '-' ? jest.fn() : '-'),
-  },
-  {
-    field: 'os_name',
-    name: 'Operating system',
-    sortable: true,
-    show: true,
-    render: jest.fn(),
-  },
-  {
-    field: 'node_name',
-    name: 'Cluster node',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'version',
-    name: 'Version',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'dateAdd',
-    name: 'Registration date',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'lastKeepAlive',
-    name: 'Last keep alive',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'status',
-    name: 'Status',
-    truncateText: true,
-    sortable: true,
-    show: true,
-    render: status => (
-      <AgentStatus
-        status={status}
-        labelProps={{ className: 'hide-agent-status' }}
-      />
-    ),
-  },
-  {
-    field: 'group_config_status',
-    name: 'Synced',
-    sortable: true,
-    show: false,
-    render: synced => <AgentSynced synced={synced} />,
-  },
-  {
-    align: 'right',
-    width: '5%',
-    field: 'actions',
-    name: 'Actions',
-    show: true,
-    render: agent => jest.fn(),
-  },
+  "id",
+  "name",
+  "ip",
+  "version",
+  "actions",
+  "status",
+  "group_config_status"
 ];
 
-const moreColumns = [
-  {
-    field: 'id',
-    name: 'ID',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'name',
-    name: 'Name',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'ip',
-    name: 'IP address',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'group',
-    name: 'Group(s)',
-    sortable: true,
-    show: true,
-    render: groups => (groups !== '-' ? jest.fn() : '-'),
-  },
-  {
-    field: 'os_name',
-    name: 'Operating system',
-    sortable: true,
-    show: true,
-    render: jest.fn(),
-  },
-  {
-    field: 'node_name',
-    name: 'Cluster node',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'version',
-    name: 'Version',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'dateAdd',
-    name: 'Registration date',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'lastKeepAlive',
-    name: 'Last keep alive',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'status',
-    name: 'Status',
-    truncateText: true,
-    sortable: true,
-    show: true,
-    render: status => (
-      <AgentStatus
-        status={status}
-        labelProps={{ className: 'hide-agent-status' }}
-      />
-    ),
-  },
-  {
-    field: 'group_config_status',
-    name: 'Synced',
-    sortable: true,
-    show: false,
-    render: synced => <AgentSynced synced={synced} />,
-  },
-  {
-    align: 'right',
-    width: '5%',
-    field: 'actions',
-    name: 'Actions',
-    show: true,
-    render: agent => jest.fn(),
-  },
-  {
-    field: 'Test',
-    name: 'Test',
-    show: true,
-  },
-];
-
-const moreCustomColumns = [
-  {
-    field: 'id',
-    name: 'ID',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'name',
-    name: 'Name',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'ip',
-    name: 'IP address',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'group',
-    name: 'Group(s)',
-    sortable: true,
-    show: true,
-    render: groups => (groups !== '-' ? jest.fn() : '-'),
-  },
-  {
-    field: 'os_name',
-    name: 'Operating system',
-    sortable: true,
-    show: true,
-    render: jest.fn(),
-  },
-  {
-    field: 'node_name',
-    name: 'Cluster node',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'version',
-    name: 'Version',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'dateAdd',
-    name: 'Registration date',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'lastKeepAlive',
-    name: 'Last keep alive',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'status',
-    name: 'Status',
-    truncateText: true,
-    sortable: true,
-    show: true,
-    render: status => (
-      <AgentStatus
-        status={status}
-        labelProps={{ className: 'hide-agent-status' }}
-      />
-    ),
-  },
-  {
-    field: 'group_config_status',
-    name: 'Synced',
-    sortable: true,
-    show: false,
-    render: synced => <AgentSynced synced={synced} />,
-  },
-  {
-    align: 'right',
-    width: '5%',
-    field: 'actions',
-    name: 'Actions',
-    show: true,
-    render: agent => jest.fn(),
-  },
-  {
-    field: 'Test',
-    name: 'Test',
-    show: true,
-  },
-];
-
-const lessColumns = [
-  {
-    field: 'id',
-    name: 'ID',
-    sortable: true,
-    show: true,
-  },
-  {
-    field: 'name',
-    name: 'Name',
-    sortable: true,
-    show: true,
-  },
-];
-
-const lessCustomColumns = [
-  {
-    field: 'id',
-    name: 'ID',
-    sortable: true,
-    show: false,
-  },
-  {
-    field: 'name',
-    name: 'Name',
-    sortable: true,
-    show: false,
-  },
-];
 const localStorageMock = (function () {
   let store = {
-    columnsSelectedTableAgent: JSON.stringify(defaultColumns),
+    'wz-agents-overview-table-visible-fields': null
   };
 
   return {
@@ -625,7 +258,9 @@ const localStorageMock = (function () {
     },
 
     clear() {
-      store = { columnsSelectedTableAgent: JSON.stringify(defaultColumns) };
+      store = {
+        'wz-agents-overview-table-visible-fields': null
+      };
     },
 
     removeItem(key) {
@@ -642,7 +277,7 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => {},
+    handleError: options => { },
   }),
 }));
 
@@ -668,6 +303,7 @@ jest.mock('react', () => ({
   useLayoutEffect: jest.requireActual('react').useEffect,
 }));
 
+// TODO: Fix this test
 describe('AgentsTable component', () => {
   WzRequest.apiReq = jest.fn(AgentsTable, 'wzReq').mockResolvedValue({
     data: {
@@ -681,6 +317,10 @@ describe('AgentsTable component', () => {
 
   const store = mockStore(permissionsStore);
   it('Renders correctly to match the snapshot', () => {
+    window.localStorage.setItem(
+      'wz-agents-overview-table-visible-fields',
+      JSON.stringify(defaultColumns),
+    );
     const wrapper = render(
       <Provider store={store}>
         <AgentsTable
@@ -703,16 +343,12 @@ describe('AgentsTable component', () => {
     wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
-    expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
+    expect(window.localStorage.getItem('wz-agents-overview-table-visible-fields')).toEqual(
       JSON.stringify(defaultColumns),
     );
   });
 
-  it('Renders correctly to match the snapshot with less columns', () => {
-    window.localStorage.setItem(
-      'columnsSelectedTableAgent',
-      JSON.stringify(lessColumns),
-    );
+  it('Renders correctly to match the snapshot with no predefined columns selected', () => {
     const wrapper = render(
       <Provider store={store}>
         <AgentsTable
@@ -735,46 +371,15 @@ describe('AgentsTable component', () => {
     wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
-    expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
-      JSON.stringify(defaultColumns),
+    expect(window.localStorage.getItem('wz-agents-overview-table-visible-fields')).toEqual(
+      null
     );
   });
 
-  it('Renders correctly to match the snapshot with more columns', () => {
-    window.localStorage.setItem(
-      'columnsSelectedTableAgent',
-      JSON.stringify(moreColumns),
-    );
-    const wrapper = render(
-      <Provider store={store}>
-        <AgentsTable
-          filters={[]}
-          removeFilters={() => jest.fn()}
-          wzReq={WzRequest.apiReq}
-          addingNewAgent={() => jest.fn()}
-          downloadCsv={() => jest.fn()}
-          clickAction={() => jest.fn()}
-          formatUIDate={date => jest.fn()}
-          reload={() => jest.fn()}
-        />
-      </Provider>,
-    );
-
-    // Set table id to avoid snapshot changes
-
-    const tableId = '__table_d2010f13-1198-11ee-ab9b-75fc624fc672';
-
-    wrapper.find('table')[0]['attribs']['id'] = tableId;
-
-    expect(wrapper).toMatchSnapshot();
-    expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
-      JSON.stringify(defaultColumns),
-    );
-  });
 
   it('Renders correctly to match the snapshot with custom columns', () => {
     window.localStorage.setItem(
-      'columnsSelectedTableAgent',
+      'wz-agents-overview-table-visible-fields',
       JSON.stringify(customColumns),
     );
     const wrapper = render(
@@ -799,72 +404,9 @@ describe('AgentsTable component', () => {
     wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
-    expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
+    expect(window.localStorage.getItem('wz-agents-overview-table-visible-fields')).toEqual(
       JSON.stringify(customColumns),
     );
   });
 
-  it('Renders correctly to match the snapshot with less custom columns', () => {
-    window.localStorage.setItem(
-      'columnsSelectedTableAgent',
-      JSON.stringify(lessCustomColumns),
-    );
-    const wrapper = render(
-      <Provider store={store}>
-        <AgentsTable
-          filters={[]}
-          removeFilters={() => jest.fn()}
-          wzReq={WzRequest.apiReq}
-          addingNewAgent={() => jest.fn()}
-          downloadCsv={() => jest.fn()}
-          clickAction={() => jest.fn()}
-          formatUIDate={date => jest.fn()}
-          reload={() => jest.fn()}
-        />
-      </Provider>,
-    );
-
-    // Set table id to avoid snapshot changes
-
-    const tableId = '__table_d2068d51-1198-11ee-ab9b-75fc624fc672';
-
-    wrapper.find('table')[0]['attribs']['id'] = tableId;
-
-    expect(wrapper).toMatchSnapshot();
-    expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
-      JSON.stringify(customColumns),
-    );
-  });
-
-  it('Renders correctly to match the snapshot with more custom columns', () => {
-    window.localStorage.setItem(
-      'columnsSelectedTableAgent',
-      JSON.stringify(moreCustomColumns),
-    );
-    const wrapper = render(
-      <Provider store={store}>
-        <AgentsTable
-          filters={[]}
-          removeFilters={() => jest.fn()}
-          wzReq={WzRequest.apiReq}
-          addingNewAgent={() => jest.fn()}
-          downloadCsv={() => jest.fn()}
-          clickAction={() => jest.fn()}
-          formatUIDate={date => jest.fn()}
-          reload={() => jest.fn()}
-        />
-      </Provider>,
-    );
-
-    // Set table id to avoid snapshot changes
-
-    const tableId = '__table_d2097381-1198-11ee-ab9b-75fc624fc672';
-
-    wrapper.find('table')[0]['attribs']['id'] = tableId;
-
-    expect(wrapper).toMatchSnapshot();
-    expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
-      JSON.stringify(customColumns),
-    );
-  });
 });

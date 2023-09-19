@@ -163,40 +163,51 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
               />
             </div>
           </div>
-          <div
-            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-          >
+          <div>
             <div
-              class="euiFlexItem"
+              class="euiSuggestInput"
             >
-              <div>
+              <div
+                class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                id="popover"
+              >
                 <div
-                  class="euiSuggestInput"
+                  class="euiPopover__anchor"
                 >
-                  <div
-                    class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-                    id="popover"
-                  >
+                  <div>
                     <div
-                      class="euiPopover__anchor"
+                      class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
                     >
-                      <div>
+                      <div
+                        class="euiFormControlLayout__childrenWrapper"
+                      >
+                        <input
+                          class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                          placeholder="Search"
+                          type="text"
+                          value=""
+                        />
+                      </div>
+                      <div
+                        class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                      >
                         <div
-                          class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                          class="euiPopover__anchor"
                         >
-                          <div
-                            style="display:flex"
-                          />
-                          <div
-                            class="euiFormControlLayout__childrenWrapper"
+                          <button
+                            class="euiButtonEmpty euiButtonEmpty--primary"
+                            type="button"
                           >
-                            <input
-                              class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                              placeholder="Search in Groups"
-                              type="text"
-                              value=""
-                            />
-                          </div>
+                            <span
+                              class="euiButtonContent euiButtonEmpty__content"
+                            >
+                              <span
+                                class="euiButtonEmpty__text"
+                              >
+                                WQL
+                              </span>
+                            </span>
+                          </button>
                         </div>
                       </div>
                     </div>
