@@ -1,11 +1,11 @@
-import { ASSETS_PUBLIC_URL, PLUGIN_PLATFORM_NAME } from "./constants";
+import { ASSETS_PUBLIC_URL, PLUGIN_PLATFORM_NAME } from './constants';
 
 export const configEquivalences = {
-  pattern: "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
-  'customization.logo.app':`Set the name of the app logo stored at ${ASSETS_PUBLIC_URL}`,
-  'customization.logo.sidebar':`Set the name of the sidebar logo stored at ${ASSETS_PUBLIC_URL}`,
-  'customization.logo.healthcheck':`Set the name of the health-check logo stored at ${ASSETS_PUBLIC_URL}`,
-  'customization.logo.reports':`Set the name of the reports logo (.png) stored at ${ASSETS_PUBLIC_URL}`,
+  pattern:
+    "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
+  'customization.logo.app': `Set the name of the app logo stored at ${ASSETS_PUBLIC_URL}.  It is used while the user is logging into Wazuh API.`,
+  'customization.logo.healthcheck': `Set the name of the health-check logo stored at ${ASSETS_PUBLIC_URL}`,
+  'customization.logo.reports': `Set the name of the reports logo (.png) stored at ${ASSETS_PUBLIC_URL}`,
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':
@@ -15,16 +15,14 @@ export const configEquivalences = {
     'Enable or disable the setup health check when opening the app.',
   'checks.fields':
     'Enable or disable the known fields health check when opening the app.',
-    'checks.metaFields':
-      `Change the default value of the ${PLUGIN_PLATFORM_NAME} metaField configuration`,
-    'checks.timeFilter':
-      `Change the default value of the ${PLUGIN_PLATFORM_NAME} timeFilter configuration`,
-    'checks.maxBuckets':
-      `Change the default value of the ${PLUGIN_PLATFORM_NAME} max buckets configuration`,
+  'checks.metaFields': `Change the default value of the ${PLUGIN_PLATFORM_NAME} metaField configuration`,
+  'checks.timeFilter': `Change the default value of the ${PLUGIN_PLATFORM_NAME} timeFilter configuration`,
+  'checks.maxBuckets': `Change the default value of the ${PLUGIN_PLATFORM_NAME} max buckets configuration`,
   'extensions.pci': 'Enable or disable the PCI DSS tab on Overview and Agents.',
   'extensions.gdpr': 'Enable or disable the GDPR tab on Overview and Agents.',
   'extensions.hipaa': 'Enable or disable the HIPAA tab on Overview and Agents.',
-  'extensions.nist': 'Enable or disable the NIST 800-53 tab on Overview and Agents.',
+  'extensions.nist':
+    'Enable or disable the NIST 800-53 tab on Overview and Agents.',
   'extensions.tsc': 'Enable or disable the TSC tab on Overview and Agents.',
   'extensions.audit': 'Enable or disable the Audit tab on Overview and Agents.',
   'extensions.oscap':
@@ -32,7 +30,8 @@ export const configEquivalences = {
   'extensions.ciscat':
     'Enable or disable the CIS-CAT tab on Overview and Agents.',
   'extensions.aws': 'Enable or disable the Amazon (AWS) tab on Overview.',
-  'extensions.gcp': 'Enable or disable the Google Cloud Platform tab on Overview.',
+  'extensions.gcp':
+    'Enable or disable the Google Cloud Platform tab on Overview.',
   'extensions.virustotal':
     'Enable or disable the VirusTotal tab on Overview and Agents.',
   'extensions.osquery':
@@ -58,32 +57,33 @@ export const configEquivalences = {
     'Define the interval in which a new wazuh-monitoring index will be created.',
   'wazuh.monitoring.pattern':
     'Default index pattern to use for Wazuh monitoring.',
-  hideManagerAlerts:
-    'Hide the alerts of the manager in every dashboard.',
-  'logs.level':
-    'Logging level of the App.',
+  hideManagerAlerts: 'Hide the alerts of the manager in every dashboard.',
+  'logs.level': 'Logging level of the App.',
   'enrollment.dns':
     'Specifies the Wazuh registration server, used for the agent enrollment.',
   'enrollment.password':
     'Specifies the password used to authenticate during the agent enrollment.',
-  'cron.prefix':
-    'Define the index prefix of predefined jobs.',
-  'cron.statistics.status':
-    'Enable or disable the statistics tasks.',
+  'cron.prefix': 'Define the index prefix of predefined jobs.',
+  'cron.statistics.status': 'Enable or disable the statistics tasks.',
   'cron.statistics.apis':
     'Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.',
-  'cron.statistics.interval': 'Define the frequency of task execution using cron schedule expressions.',
-  'cron.statistics.index.name': 'Define the name of the index in which the documents will be saved.',
-  'cron.statistics.index.creation': 'Define the interval in which a new index will be created.',
-  'cron.statistics.index.shards': 'Define the number of shards to use for the statistics indices.',
-  'cron.statistics.index.replicas': 'Define the number of replicas to use for the statistics indices.',
-  'alerts.sample.prefix': 'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  'cron.statistics.interval':
+    'Define the frequency of task execution using cron schedule expressions.',
+  'cron.statistics.index.name':
+    'Define the name of the index in which the documents will be saved.',
+  'cron.statistics.index.creation':
+    'Define the interval in which a new index will be created.',
+  'cron.statistics.index.shards':
+    'Define the number of shards to use for the statistics indices.',
+  'cron.statistics.index.replicas':
+    'Define the number of replicas to use for the statistics indices.',
+  'alerts.sample.prefix':
+    'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
 };
 
 export const nameEquivalence = {
   pattern: 'Index pattern',
   'customization.logo.app': 'Logo App',
-  'customization.logo.sidebar': 'Logo Sidebar',
   'customization.logo.healthcheck': 'Logo Health Check',
   'customization.logo.reports': 'Logo Reports',
   'checks.pattern': 'Index pattern',
@@ -115,7 +115,7 @@ export const nameEquivalence = {
   'cron.statistics.index.shards': 'Index shards',
   'cron.statistics.index.replicas': 'Index replicas',
   'alerts.sample.prefix': 'Sample alerts prefix',
-}
+};
 
 const HEALTH_CHECK = 'Health Check';
 const GENERAL = 'General';
@@ -123,14 +123,20 @@ const SECURITY = 'Security';
 const MONITORING = 'Monitoring';
 const STATISTICS = 'Statistics';
 const CUSTOMIZATION = 'Logo Customization';
-export const categoriesNames = [HEALTH_CHECK, GENERAL, SECURITY, MONITORING, STATISTICS, CUSTOMIZATION];
+export const categoriesNames = [
+  HEALTH_CHECK,
+  GENERAL,
+  SECURITY,
+  MONITORING,
+  STATISTICS,
+  CUSTOMIZATION,
+];
 
 export const categoriesEquivalence = {
   pattern: GENERAL,
-  'customization.logo.app':CUSTOMIZATION,
-  'customization.logo.sidebar':CUSTOMIZATION,
-  'customization.logo.healthcheck':CUSTOMIZATION,
-  'customization.logo.reports':CUSTOMIZATION,
+  'customization.logo.app': CUSTOMIZATION,
+  'customization.logo.healthcheck': CUSTOMIZATION,
+  'customization.logo.reports': CUSTOMIZATION,
   'checks.pattern': HEALTH_CHECK,
   'checks.template': HEALTH_CHECK,
   'checks.api': HEALTH_CHECK,
@@ -160,19 +166,18 @@ export const categoriesEquivalence = {
   'cron.statistics.index.shards': STATISTICS,
   'cron.statistics.index.replicas': STATISTICS,
   'alerts.sample.prefix': GENERAL,
-}
+};
 
 const TEXT = 'text';
 const NUMBER = 'number';
 const LIST = 'list';
 const BOOLEAN = 'boolean';
 const ARRAY = 'array';
-const INTERVAL = 'interval'
+const INTERVAL = 'interval';
 
 export const formEquivalence = {
   pattern: { type: TEXT },
   'customization.logo.app': { type: TEXT },
-  'customization.logo.sidebar': { type: TEXT },
   'customization.logo.healthcheck': { type: TEXT },
   'customization.logo.reports': { type: TEXT },
   'checks.pattern': { type: BOOLEAN },
@@ -191,24 +196,26 @@ export const formEquivalence = {
   'wazuh.monitoring.shards': { type: NUMBER },
   'wazuh.monitoring.replicas': { type: NUMBER },
   'wazuh.monitoring.creation': {
-    type: LIST, params: {
+    type: LIST,
+    params: {
       options: [
         { text: 'Hourly', value: 'h' },
         { text: 'Daily', value: 'd' },
         { text: 'Weekly', value: 'w' },
         { text: 'Monthly', value: 'm' },
-      ]
-    }
+      ],
+    },
   },
   'wazuh.monitoring.pattern': { type: TEXT },
   hideManagerAlerts: { type: BOOLEAN },
   'logs.level': {
-    type: LIST, params: {
+    type: LIST,
+    params: {
       options: [
         { text: 'Info', value: 'info' },
         { text: 'Debug', value: 'debug' },
-      ]
-    }
+      ],
+    },
   },
   'enrollment.dns': { type: TEXT },
   'cron.prefix': { type: TEXT },
@@ -217,16 +224,17 @@ export const formEquivalence = {
   'cron.statistics.interval': { type: INTERVAL },
   'cron.statistics.index.name': { type: TEXT },
   'cron.statistics.index.creation': {
-    type: LIST, params: {
+    type: LIST,
+    params: {
       options: [
         { text: 'Hourly', value: 'h' },
         { text: 'Daily', value: 'd' },
         { text: 'Weekly', value: 'w' },
         { text: 'Monthly', value: 'm' },
-      ]
-    }
+      ],
+    },
   },
   'cron.statistics.index.shards': { type: NUMBER },
   'cron.statistics.index.replicas': { type: NUMBER },
   'alerts.sample.prefix': { type: TEXT },
-}
+};
