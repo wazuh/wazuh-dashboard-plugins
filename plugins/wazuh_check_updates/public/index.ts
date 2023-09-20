@@ -1,5 +1,3 @@
-import './index.scss';
-
 import { WazuhCheckUpdatesPlugin } from './plugin';
 
 // This exports static code and TypeScript types,
