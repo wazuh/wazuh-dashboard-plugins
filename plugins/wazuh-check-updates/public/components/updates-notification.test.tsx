@@ -75,7 +75,7 @@ describe('UpdatesNotification component', () => {
     const releaseNotesLink = getByRole('link', { name: 'Go to the release notes for details' });
     expect(releaseNotesLink).toHaveAttribute('href', releaseNotesUrl);
 
-    const dismissCheck = getByText("I don't want to know about future releases");
+    const dismissCheck = getByText('Disable updates notifications');
     expect(dismissCheck).toBeInTheDocument();
 
     const checkUpdatesButton = getByRole('button', { name: 'Close' });

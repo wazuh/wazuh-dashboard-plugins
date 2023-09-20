@@ -43,7 +43,13 @@ export const CurrentUpdateDetails = ({ currentUpdate }: CurrentUpdateDetailsProp
     >
       <EuiFlexGroup gutterSize="m">
         <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-          <EuiHeaderLink href={releaseNotesUrl} isActive target="_blank" iconType="list">
+          <EuiHeaderLink
+            href={releaseNotesUrl}
+            isActive
+            target="_blank"
+            iconType="popout"
+            iconSide="right"
+          >
             <FormattedMessage
               id="wazuhCheckUpdates.currentUpdateDetails.releaseNotesLink"
               defaultMessage="Release notes"
@@ -51,7 +57,13 @@ export const CurrentUpdateDetails = ({ currentUpdate }: CurrentUpdateDetailsProp
           </EuiHeaderLink>
         </EuiFlexItem>
         <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-          <EuiHeaderLink href={upgradeGuideUrl} isActive target="_blank" iconType="training">
+          <EuiHeaderLink
+            href={upgradeGuideUrl}
+            isActive
+            target="_blank"
+            iconType="popout"
+            iconSide="right"
+          >
             <FormattedMessage
               id="wazuhCheckUpdates.currentUpdateDetails.upgradeGuideLink"
               defaultMessage="Upgrade guide"

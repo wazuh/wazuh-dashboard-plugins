@@ -27,8 +27,8 @@ export const DismissNotificationCheck = () => {
       id="check-dismiss"
       label={
         <FormattedMessage
-          id="wazuhCheckUpdates.updatesNotification.dismissCheckText"
-          defaultMessage="I don't want to know about future releases"
+          id="wazuhCheckUpdates.dismissNotificationCheck.checkText"
+          defaultMessage="Disable updates notifications"
         />
       }
       checked={dismissFutureUpdates}

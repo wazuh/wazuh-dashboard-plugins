@@ -82,7 +82,13 @@ export const UpdatesNotification = () => {
               <EuiBadge>{currentUpdate.tag}</EuiBadge>
             </EuiFlexItem>
             <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-              <EuiHeaderLink href={releaseNotesUrl} isActive target="_blank">
+              <EuiHeaderLink
+                href={releaseNotesUrl}
+                isActive
+                target="_blank"
+                iconType="popout"
+                iconSide="right"
+              >
                 {
                   <FormattedMessage
                     id="wazuhCheckUpdates.updatesNotification.linkText"
@@ -101,7 +107,7 @@ export const UpdatesNotification = () => {
                 label={
                   <FormattedMessage
                     id="wazuhCheckUpdates.updatesNotification.dismissCheckText"
-                    defaultMessage="I don't want to know about future releases"
+                    defaultMessage="Disable updates notifications"
                   />
                 }
                 checked={dismissFutureUpdates}

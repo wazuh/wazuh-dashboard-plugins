@@ -24,7 +24,7 @@ describe('DismissNotificationCheck component', () => {
 
     expect(container).toMatchSnapshot();
 
-    const elementWithTag = getByText("I don't want to know about future releases");
+    const elementWithTag = getByText('Disable updates notifications');
     expect(elementWithTag).toBeInTheDocument();
   });
 

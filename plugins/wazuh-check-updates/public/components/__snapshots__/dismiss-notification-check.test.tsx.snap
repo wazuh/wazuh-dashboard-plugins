@@ -18,7 +18,7 @@ exports[`DismissNotificationCheck component should render the check 1`] = `
       for="check-dismiss"
     >
       <span>
-        I don't want to know about future releases
+        Disable updates notifications
       </span>
     </label>
   </div>

@@ -75,7 +75,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
               target="_blank"
             >
               <span
-                class="euiButtonContent euiButtonEmpty__content"
+                class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
               >
                 <svg
                   aria-hidden="true"
@@ -108,7 +108,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
               target="_blank"
             >
               <span
-                class="euiButtonContent euiButtonEmpty__content"
+                class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
               >
                 <svg
                   aria-hidden="true"
@@ -144,7 +144,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
               aria-controls="accordionUpdateDetails"
               aria-expanded="false"
               class="euiAccordion__button"
-              id="i0645afc0-57ed-11ee-bf00-a5a7ea5e524d"
+              id="i015744f0-57f3-11ee-8574-39620ce38f0b"
               type="button"
             >
               <span
@@ -171,7 +171,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
             </button>
           </div>
           <div
-            aria-labelledby="i0645afc0-57ed-11ee-bf00-a5a7ea5e524d"
+            aria-labelledby="i015744f0-57f3-11ee-8574-39620ce38f0b"
             class="euiAccordion__childWrapper"
             id="accordionUpdateDetails"
             role="region"
