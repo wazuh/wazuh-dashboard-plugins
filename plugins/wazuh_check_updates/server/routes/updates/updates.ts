@@ -34,17 +34,17 @@ export const getUpdatesRoute = (router: IRouter) => {
           },
         });
       } catch (error) {
-        const message =
+        const finalError =
           error instanceof Error
             ? error
             : typeof error === 'string'
-            ? error
-            : 'Error trying to get available updates';
+            ? new Error(error)
+            : new Error('Error trying to get available updates');
 
         return response.customError({
           statusCode: 503,
           body: {
-            message,
+            message: finalError.message,
           },
         });
       }
