@@ -23,7 +23,15 @@ export const getUpdatesRoute = (router: IRouter) => {
           patch: [],
         };
 
-        if (request.query.checkAvailableUpdates === 'true') await getUpdates();
+        if (request.query.checkAvailableUpdates === 'true') {
+          const updates = await getUpdates();
+          return response.ok({
+            body: {
+              ...defaultValues,
+              ...updates,
+            },
+          });
+        }
 
         const result = (await getSavedObject(SAVED_OBJECT_UPDATES)) as AvailableUpdates;
 

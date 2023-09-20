@@ -5,7 +5,7 @@ import { AvailableUpdates } from '../../../common/types';
 import { SAVED_OBJECT_UPDATES } from '../../../common';
 import { setSavedObject } from '../savedObject';
 
-export const getUpdates = async (): Promise<AvailableUpdates | undefined> => {
+export const getUpdates = async (): Promise<AvailableUpdates> => {
   const mock = new MockAdapter(axios);
 
   try {
@@ -17,7 +17,11 @@ export const getUpdates = async (): Promise<AvailableUpdates | undefined> => {
 
     const updates = updatesResponse?.data?.data || {};
 
-    setSavedObject(SAVED_OBJECT_UPDATES, { ...updates, last_check: new Date() });
+    const updatesToSave = { ...updates, last_check: new Date() };
+
+    await setSavedObject(SAVED_OBJECT_UPDATES, updatesToSave);
+
+    return updatesToSave;
   } catch (error) {
     const message = error instanceof Error ? error.message : error;
     console.log('wazuh-check-updates:getUpdates', message);
