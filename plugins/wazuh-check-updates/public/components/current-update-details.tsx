@@ -70,7 +70,11 @@ export const CurrentUpdateDetails = ({ currentUpdate }: CurrentUpdateDetailsProp
         }
         paddingSize="m"
       >
-        <EuiText>{currentUpdate.description}</EuiText>
+        <EuiText>
+          {currentUpdate.description.split('\r\n').map((line, index) => (
+            <p key={index}>{line}</p>
+          ))}
+        </EuiText>
       </EuiAccordion>
     </EuiCallOut>
   );
