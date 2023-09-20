@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AvailableUpdates } from '../../common/types';
-import { routes } from '../../common/index';
+import { routes } from '../../common/constants';
 import { getCore } from '../plugin-services';
 
 export const useAvailableUpdates = () => {

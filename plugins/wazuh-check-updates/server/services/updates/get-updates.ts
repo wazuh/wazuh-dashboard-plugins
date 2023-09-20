@@ -2,8 +2,9 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { mockSuccessResponse } from './mocks';
 import { AvailableUpdates } from '../../../common/types';
-import { SAVED_OBJECT_UPDATES } from '../../../common';
+import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { setSavedObject } from '../savedObject';
+import { log } from '../../lib/logger';
 
 export const getUpdates = async (): Promise<AvailableUpdates> => {
   const mock = new MockAdapter(axios);
@@ -23,8 +24,13 @@ export const getUpdates = async (): Promise<AvailableUpdates> => {
 
     return updatesToSave;
   } catch (error) {
-    const message = error instanceof Error ? error.message : error;
-    console.log('wazuh-check-updates:getUpdates', message);
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+        ? error
+        : 'Error trying to get available updates';
+    log('wazuh-check-updates:getUpdates', message);
     return Promise.reject(error);
   }
 };

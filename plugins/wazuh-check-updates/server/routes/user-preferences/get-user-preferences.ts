@@ -1,5 +1,5 @@
 import { IRouter } from 'opensearch-dashboards/server';
-import { routes } from '../../../common';
+import { routes } from '../../../common/constants';
 import { getUserPreferences } from '../../services/userPreferences';
 
 export const getUserPreferencesRoutes = (router: IRouter) => {

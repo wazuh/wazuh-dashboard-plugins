@@ -144,7 +144,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
               aria-controls="accordionUpdateDetails"
               aria-expanded="false"
               class="euiAccordion__button"
-              id="i1babaea1-57d9-11ee-9d68-c5e8db8099bb"
+              id="i0645afc0-57ed-11ee-bf00-a5a7ea5e524d"
               type="button"
             >
               <span
@@ -171,7 +171,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
             </button>
           </div>
           <div
-            aria-labelledby="i1babaea1-57d9-11ee-9d68-c5e8db8099bb"
+            aria-labelledby="i0645afc0-57ed-11ee-bf00-a5a7ea5e524d"
             class="euiAccordion__childWrapper"
             id="accordionUpdateDetails"
             role="region"
@@ -184,7 +184,9 @@ exports[`CurrentUpdateDetails component should render the current update tag and
                 <div
                   class="euiText euiText--medium"
                 >
-                  Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.
+                  <p>
+                    Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.
+                  </p>
                 </div>
               </div>
             </div>

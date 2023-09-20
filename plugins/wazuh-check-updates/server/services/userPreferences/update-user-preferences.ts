@@ -1,5 +1,6 @@
-import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common';
+import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
 import { UserPreferences, UsersPreferences } from '../../../common/types';
+import { log } from '../../lib/logger';
 import { getSavedObject, setSavedObject } from '../savedObject';
 
 export const updateUserPreferences = async (
@@ -24,8 +25,13 @@ export const updateUserPreferences = async (
 
     return newUserPreferences;
   } catch (error) {
-    const message = error instanceof Error ? error.message : error;
-    console.log('wazuh-check-updates:getUserPreferences', message);
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+        ? error
+        : 'Error trying to update user preferences';
+    log('wazuh-check-updates:getUserPreferences', message);
     return Promise.reject(error);
   }
 };

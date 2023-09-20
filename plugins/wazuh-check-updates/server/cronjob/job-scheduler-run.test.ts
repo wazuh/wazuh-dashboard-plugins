@@ -1,16 +1,16 @@
 import cron from 'node-cron';
-import { getSettings } from '../settings';
-import { getUpdates } from '../updates';
+import { getSettings } from '../services/settings';
+import { getUpdates } from '../services/updates';
 import { jobSchedulerRun } from './job-scheduler-run';
 
 const mockedCron = cron.schedule as jest.Mock;
 jest.mock('node-cron');
 
 const mockedGetSettings = getSettings as jest.Mock;
-jest.mock('../settings');
+jest.mock('../services/settings');
 
 const mockedGetUpdates = getUpdates as jest.Mock;
-jest.mock('../updates');
+jest.mock('../services/updates');
 
 describe('jobSchedulerRun function', () => {
   afterEach(() => {

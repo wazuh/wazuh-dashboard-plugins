@@ -1,5 +1,5 @@
 import { SavedObjectsType } from 'opensearch-dashboards/server';
-import { SAVED_OBJECT_SETTINGS } from '../../../../common';
+import { SAVED_OBJECT_SETTINGS } from '../../../../common/constants';
 
 export const settingsObject: SavedObjectsType = {
   name: SAVED_OBJECT_SETTINGS,

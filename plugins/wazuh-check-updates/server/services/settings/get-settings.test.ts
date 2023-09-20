@@ -1,7 +1,7 @@
 import { getSavedObject } from '../savedObject/get-saved-object';
 import { setSavedObject } from '../savedObject/set-saved-object';
 import { getSettings } from './get-settings';
-import { DEFAULT_SCHEDULE, SAVED_OBJECT_SETTINGS } from '../../../common';
+import { DEFAULT_SCHEDULE, SAVED_OBJECT_SETTINGS } from '../../../common/constants';
 
 const mockedGetSavedObject = getSavedObject as jest.Mock;
 jest.mock('../savedObject/get-saved-object');

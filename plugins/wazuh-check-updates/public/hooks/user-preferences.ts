@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { UserPreferences } from '../../common/types';
 import { getCore } from '../plugin-services';
-import { routes } from '../../common/index';
+import { routes } from '../../common/constants';
 
 export const useUserPreferences = () => {
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({});

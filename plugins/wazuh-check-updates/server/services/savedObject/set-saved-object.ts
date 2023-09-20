@@ -1,4 +1,5 @@
 import { savedObjectType } from '../../../common/types';
+import { log } from '../../lib/logger';
 import { getInternalSavedObjectsClient } from '../../plugin-services';
 
 export const setSavedObject = async (
@@ -16,8 +17,13 @@ export const setSavedObject = async (
 
     return responseCreate?.attributes;
   } catch (error) {
-    const message = error instanceof Error ? error.message : error;
-    console.log('wazuh-check-updates:setSavedObject', message);
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+        ? error
+        : 'Error trying to update saved object';
+    log('wazuh-check-updates:setSavedObject', message);
     return Promise.reject(error);
   }
 };

@@ -1,5 +1,6 @@
-import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common';
+import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
 import { UserPreferences, UsersPreferences } from '../../../common/types';
+import { log } from '../../lib/logger';
 import { getSavedObject } from '../savedObject';
 
 export const getUserPreferences = async (username: string): Promise<UserPreferences> => {
@@ -12,8 +13,13 @@ export const getUserPreferences = async (username: string): Promise<UserPreferen
 
     return userPreferences;
   } catch (error) {
-    const message = error instanceof Error ? error.message : error;
-    console.log('wazuh-check-updates:getUserPreferences', message);
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+        ? error
+        : 'Error trying to get user preferences';
+    log('wazuh-check-updates:getUserPreferences', message);
     return Promise.reject(error);
   }
 };

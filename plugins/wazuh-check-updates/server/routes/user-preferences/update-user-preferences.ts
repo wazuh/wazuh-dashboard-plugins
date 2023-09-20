@@ -1,6 +1,6 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { schema } from '@osd/config-schema';
-import { routes } from '../../../common';
+import { routes } from '../../../common/constants';
 import { updateUserPreferences } from '../../services/userPreferences';
 
 export const updatePreferencesRoutes = (router: IRouter) => {

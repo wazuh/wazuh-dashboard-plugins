@@ -1,6 +1,6 @@
 import { getSavedObject } from '../savedObject/get-saved-object';
 import { getUserPreferences } from './get-user-preferences';
-import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common';
+import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
 
 const mockedGetSavedObject = getSavedObject as jest.Mock;
 jest.mock('../savedObject/get-saved-object');

@@ -1,6 +1,6 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { schema } from '@osd/config-schema';
-import { routes, SAVED_OBJECT_UPDATES } from '../../../common';
+import { routes, SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { AvailableUpdates } from '../../../common/types';
 import { getUpdates } from '../../services/updates';
 import { getSavedObject } from '../../services/savedObject';

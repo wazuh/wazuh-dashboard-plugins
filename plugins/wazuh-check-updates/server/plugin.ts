@@ -14,12 +14,13 @@ import {
   userPreferencesObject,
 } from './services/savedObject/types';
 import { setCore, setInternalSavedObjectsClient } from './plugin-services';
-import { jobSchedulerRun } from './services/cronjob';
+import { jobSchedulerRun } from './cronjob';
 import { ISecurityFactory, SecurityObj } from './lib/security-factory';
 
 declare module 'opensearch-dashboards/server' {
   interface RequestHandlerContext {
     wazuh_check_updates: {
+      logger: Logger;
       security: ISecurityFactory;
     };
   }
@@ -40,6 +41,7 @@ export class WazuhCheckUpdatesPlugin
 
     core.http.registerRouteHandlerContext('wazuh_check_updates', () => {
       return {
+        logger: this.logger,
         security: wazuhSecurity,
       };
     });
