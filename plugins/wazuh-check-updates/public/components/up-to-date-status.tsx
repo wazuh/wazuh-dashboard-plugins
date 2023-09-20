@@ -26,11 +26,8 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
   const currentUpdate = getCurrentAvailableUpdate(availableUpdates);
 
   useEffect(() => {
-    if (!availableUpdates) {
-      return;
-    }
     setCurrentUpdate(currentUpdate);
-  }, [availableUpdates]);
+  }, [currentUpdate]);
 
   const isUpToDate = !currentUpdate;
 
