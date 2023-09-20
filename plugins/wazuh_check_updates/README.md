@@ -1,22 +1,24 @@
-# wazuh_check_updates1
+# Wazuh Check Updates Plugin
 
-A OpenSearch Dashboards plugin
+The **Wazuh Check Updates Plugin** is a extension for Wazuh that allows you to seamlessly query an external service to retrieve information about the latest available updates and their corresponding features. This dedicated plugin has been designed to work in conjunction with the primary Wazuh plugin, enhancing its capabilities to notify users whenever new updates become accessible. With a focus on modularity, the Check Updates Plugin provides various components to manage updates and notification preferences.
 
----
+## Features
 
-## Development
+### 1. Notification of New Updates
 
-See the [OpenSearch Dashboards contributing
-guide](https://github.com/opensearch-project/OpenSearch-Dashboards/blob/main/CONTRIBUTING.md) for instructions
-setting up your development environment.
+The core functionality of the plugin is to notify users about the availability of new updates. It continuously queries an external service to check for updates and sends notifications to users when new updates are detected.
 
-    ## Scripts
-    <dl>
-      <dt><code>yarn osd bootstrap</code></dt>
-      <dd>Execute this to install node_modules and setup the dependencies in your plugin and in OpenSearch Dashboards
-      </dd>
+### 2. Deployment Status
 
-      <dt><code>yarn plugin-helpers build</code></dt>
-      <dd>Execute this to create a distributable version of this plugin that can be installed in OpenSearch Dashboards
-      </dd>
-    </dl>
+Stay informed about the deployment status of updates. The plugin offers a component that allows you to easily view the status of updates.
+
+### 3. Update Details
+
+Get detailed information about the latest update, including links to release notes and updagrade guide, as well as the update description.
+
+## Software and libraries used
+
+- [OpenSearch](https://opensearch.org/)
+- [Elastic UI Framework](https://eui.elastic.co/)
+- [Node.js](https://nodejs.org)
+- [React](https://reactjs.org)
