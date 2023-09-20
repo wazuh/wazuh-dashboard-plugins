@@ -9,7 +9,9 @@ export const getUserPreferences = async (username: string): Promise<UserPreferen
       SAVED_OBJECT_USER_PREFERENCES
     )) as UsersPreferences;
 
-    const userPreferences = usersPreferences?.users?.find((up) => up.username === username) || {};
+    const userPreferences =
+      usersPreferences?.users?.find((usersPreference) => usersPreference.username === username) ||
+      {};
 
     return userPreferences;
   } catch (error) {
