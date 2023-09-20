@@ -42,14 +42,22 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
   };
 
   const getDefaultMessage = () => {
-    if (error) return 'Error trying to get available updates';
-    if (isUpToDate) return 'Up to date';
+    if (error) {
+      return 'Error trying to get available updates';
+    }
+    if (isUpToDate) {
+      return 'Up to date';
+    }
     return 'Available updates';
   };
 
   const getColor = () => {
-    if (error) return 'danger';
-    if (isUpToDate) return 'success';
+    if (error) {
+      return 'danger';
+    }
+    if (isUpToDate) {
+      return 'success';
+    }
     return 'warning';
   };
 

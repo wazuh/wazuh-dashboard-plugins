@@ -12,11 +12,12 @@ export const getUserPreferencesRoutes = (router: IRouter) => {
       try {
         const user = await context['wazuh_check_updates'].security.getCurrentUser(request, context);
 
-        if (!user?.username)
+        if (!user?.username) {
           return response.customError({
             statusCode: 503,
             body: new Error('Error trying to get username'),
           });
+        }
 
         const userPreferences = await getUserPreferences(user.username);
 

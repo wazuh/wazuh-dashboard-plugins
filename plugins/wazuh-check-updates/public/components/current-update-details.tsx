@@ -17,7 +17,9 @@ export interface CurrentUpdateDetailsProps {
 }
 
 export const CurrentUpdateDetails = ({ currentUpdate }: CurrentUpdateDetailsProps) => {
-  if (!currentUpdate) return null;
+  if (!currentUpdate) {
+    return null;
+  }
 
   const currentRelease = `${currentUpdate?.semver.mayor}.${currentUpdate?.semver.minor}`;
   const releaseNotesUrl = `https://documentation.wazuh.com/${currentRelease}/release-notes/release-${currentUpdate.semver.mayor}-${currentUpdate.semver.minor}-${currentUpdate.semver.patch}.html`;

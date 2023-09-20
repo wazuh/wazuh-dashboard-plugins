@@ -9,7 +9,9 @@ export const DismissNotificationCheck = () => {
   const { userPreferences, error, isLoading, updateUserPreferences } = useUserPreferences();
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) {
+      return;
+    }
     setDismissFutureUpdates(userPreferences?.hide_update_notifications);
   }, [userPreferences, isLoading]);
 

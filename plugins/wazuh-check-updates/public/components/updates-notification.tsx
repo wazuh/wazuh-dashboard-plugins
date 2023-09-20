@@ -40,7 +40,9 @@ export const UpdatesNotification = () => {
     return null;
   }
 
-  if (isLoadingAvailableUpdates || isLoadingUserPreferences) return null;
+  if (isLoadingAvailableUpdates || isLoadingUserPreferences) {
+    return null;
+  }
 
   const currentUpdate = getCurrentAvailableUpdate(availableUpdates);
 
@@ -48,7 +50,9 @@ export const UpdatesNotification = () => {
     userPreferences?.hide_update_notifications ||
     userPreferences?.last_dismissed_update === currentUpdate?.tag;
 
-  if (hideNotification) return null;
+  if (hideNotification) {
+    return null;
+  }
 
   const releaseNotesUrl = `https://documentation.wazuh.com/${currentUpdate?.semver.mayor}.${currentUpdate?.semver.minor}/release-notes/release-${currentUpdate?.semver.mayor}-${currentUpdate?.semver.minor}-${currentUpdate?.semver.patch}.html`;
   const isVisible = !isDismissed && !!currentUpdate;
