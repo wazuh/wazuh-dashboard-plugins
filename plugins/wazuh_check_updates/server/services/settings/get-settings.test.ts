@@ -1,13 +1,13 @@
-import { getSavedObject } from '../savedObject/getSavedObject';
-import { setSavedObject } from '../savedObject/setSavedObject';
-import { getSettings } from './getSettings';
+import { getSavedObject } from '../savedObject/get-saved-object';
+import { setSavedObject } from '../savedObject/set-saved-object';
+import { getSettings } from './get-settings';
 import { DEFAULT_SCHEDULE, SAVED_OBJECT_SETTINGS } from '../../../common';
 
 const mockedGetSavedObject = getSavedObject as jest.Mock;
-jest.mock('../savedObject/getSavedObject');
+jest.mock('../savedObject/get-saved-object');
 
 const mockedSetSavedObject = setSavedObject as jest.Mock;
-jest.mock('../savedObject/setSavedObject');
+jest.mock('../savedObject/set-saved-object');
 
 describe('getSettings function', () => {
   afterEach(() => {

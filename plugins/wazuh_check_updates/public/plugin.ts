@@ -1,10 +1,10 @@
 import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
 import { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
-import { UpdatesNotification } from './components/updatesNotification';
-import { UpToDateStatus } from './components/upToDateStatus';
+import { UpdatesNotification } from './components/updates-notification';
+import { UpToDateStatus } from './components/up-to-date-status';
 import { setCore, setUiSettings } from './plugin-services';
-import { CurrentUpdateDetails } from './components/currentUpdateDetails';
-import { DismissNotificationCheck } from './components/dismissNotificationCheck';
+import { CurrentUpdateDetails } from './components/current-update-details';
+import { DismissNotificationCheck } from './components/dismiss-notification-check';
 
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {

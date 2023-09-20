@@ -4,17 +4,17 @@ import '@testing-library/jest-dom';
 import { TestProviders } from '../test/test-utils';
 import { useAvailableUpdates, useUserPreferences } from '../hooks';
 import { getCurrentAvailableUpdate } from '../utils';
-import { UpdatesNotification } from './updatesNotification';
+import { UpdatesNotification } from './updates-notification';
 import userEvent from '@testing-library/user-event';
 
 const mockedUseAvailabeUpdates = useAvailableUpdates as jest.Mock;
-jest.mock('../hooks/useAvailableUpdates');
+jest.mock('../hooks/available-updates');
 
 const mockedUseUserPreferences = useUserPreferences as jest.Mock;
-jest.mock('../hooks/useUserPreferences');
+jest.mock('../hooks/user-preferences');
 
 const mockedGetCurrentAvailableUpdate = getCurrentAvailableUpdate as jest.Mock;
-jest.mock('../utils/getCurrentAvailableUpdate');
+jest.mock('../utils/get-current-available-update');
 
 describe('UpdatesNotification component', () => {
   test('should return the nofication component', () => {

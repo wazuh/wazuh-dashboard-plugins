@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { useUserPreferences } from './useUserPreferences';
+import { useUserPreferences } from './user-preferences';
 import { UserPreferences } from '../../common/types';
 import { getCore } from '../plugin-services';
 
@@ -22,7 +22,7 @@ describe('useUserPreferences hook', () => {
       last_dismissed_update: 'v4.3.1',
       hide_update_notifications: false,
     };
-    const { result, waitForNextUpdate } = renderHook(() => useUserPreferences('admin'));
+    const { result, waitForNextUpdate } = renderHook(() => useUserPreferences());
 
     expect(result.current.isLoading).toBeTruthy();
     await waitForNextUpdate();
@@ -35,7 +35,7 @@ describe('useUserPreferences hook', () => {
       last_dismissed_update: 'v4.3.1',
       hide_update_notifications: false,
     };
-    const { result, waitForNextUpdate } = renderHook(() => useUserPreferences('admin'));
+    const { result, waitForNextUpdate } = renderHook(() => useUserPreferences());
 
     await waitForNextUpdate();
     expect(result.current.isLoading).toBeFalsy();
@@ -56,7 +56,7 @@ describe('useUserPreferences hook', () => {
     const core = getCore();
     core.http.get = jest.fn().mockRejectedValue(mockErrorMessage);
 
-    const { result, waitForNextUpdate } = renderHook(() => useUserPreferences('admin'));
+    const { result, waitForNextUpdate } = renderHook(() => useUserPreferences());
 
     expect(result.current.isLoading).toBeTruthy();
     await waitForNextUpdate();
@@ -74,7 +74,7 @@ describe('useUserPreferences hook', () => {
       .spyOn(getCore().http, 'patch')
       .mockImplementation(() => Promise.reject(mockErrorMessage));
 
-    const { result, waitForNextUpdate } = renderHook(() => useUserPreferences('admin'));
+    const { result, waitForNextUpdate } = renderHook(() => useUserPreferences());
 
     expect(result.current.isLoading).toBeTruthy();
     await waitForNextUpdate();

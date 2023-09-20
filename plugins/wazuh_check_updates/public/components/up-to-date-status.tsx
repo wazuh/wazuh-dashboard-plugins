@@ -6,7 +6,7 @@ import {
   EuiIconTip,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import { useAvailableUpdates } from '../hooks';
 import { formatUIDate, getCurrentAvailableUpdate } from '../utils';
@@ -25,13 +25,22 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
 
   const currentUpdate = getCurrentAvailableUpdate(availableUpdates);
 
-  setCurrentUpdate(currentUpdate);
+  useEffect(() => {
+    if (!availableUpdates) {
+      return;
+    }
+    setCurrentUpdate(currentUpdate);
+  }, [availableUpdates]);
 
   const isUpToDate = !currentUpdate;
 
   const getI18nMessageId = () => {
-    if (error) return 'getAvailableUpdatesError';
-    if (isUpToDate) return 'upToDate';
+    if (error) {
+      return 'getAvailableUpdatesError';
+    }
+    if (isUpToDate) {
+      return 'upToDate';
+    }
     return 'availableUpdates';
   };
 

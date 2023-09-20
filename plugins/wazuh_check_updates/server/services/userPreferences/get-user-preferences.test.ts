@@ -1,15 +1,11 @@
-import { updateUserPreferences } from '.';
-import { getSavedObject } from '../savedObject/getSavedObject';
-import { setSavedObject } from '../savedObject/setSavedObject';
+import { getSavedObject } from '../savedObject/get-saved-object';
+import { getUserPreferences } from './get-user-preferences';
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common';
 
 const mockedGetSavedObject = getSavedObject as jest.Mock;
-jest.mock('../savedObject/getSavedObject');
+jest.mock('../savedObject/get-saved-object');
 
-const mockedSetSavedObject = setSavedObject as jest.Mock;
-jest.mock('../savedObject/setSavedObject');
-
-describe('updateUserPreferences function', () => {
+describe('getUserPreferences function', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -21,12 +17,7 @@ describe('updateUserPreferences function', () => {
       ],
     }));
 
-    mockedSetSavedObject.mockImplementation(() => {});
-
-    const response = await updateUserPreferences('admin', {
-      last_dismissed_update: 'v4.3.1',
-      hide_update_notifications: false,
-    });
+    const response = await getUserPreferences('admin');
 
     expect(getSavedObject).toHaveBeenCalledTimes(1);
     expect(getSavedObject).toHaveBeenCalledWith(SAVED_OBJECT_USER_PREFERENCES);
@@ -39,12 +30,9 @@ describe('updateUserPreferences function', () => {
   });
 
   test('should return an error', async () => {
-    mockedSetSavedObject.mockRejectedValue(new Error('getSavedObject error'));
+    mockedGetSavedObject.mockRejectedValue(new Error('getSavedObject error'));
 
-    const promise = updateUserPreferences('admin', {
-      last_dismissed_update: 'v4.3.1',
-      hide_update_notifications: false,
-    });
+    const promise = getUserPreferences('admin');
 
     expect(getSavedObject).toHaveBeenCalledTimes(1);
 

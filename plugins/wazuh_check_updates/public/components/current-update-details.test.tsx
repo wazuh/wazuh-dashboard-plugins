@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { CurrentUpdateDetails } from './currentUpdateDetails';
+import { CurrentUpdateDetails } from './current-update-details';
 import { TestProviders } from '../test/test-utils';
 
 describe('CurrentUpdateDetails component', () => {

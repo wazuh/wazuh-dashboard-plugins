@@ -3,13 +3,13 @@ import { render, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TestProviders } from '../test/test-utils';
-import { UpToDateStatus } from './upToDateStatus';
+import { UpToDateStatus } from './up-to-date-status';
 import { useAvailableUpdates } from '../hooks';
 
 const mockedUseAvailabeUpdates = useAvailableUpdates as jest.Mock;
-jest.mock('../hooks/useAvailableUpdates');
+jest.mock('../hooks/available-updates');
 
-jest.mock('../utils/getCurrentAvailableUpdate', () => ({
+jest.mock('../utils/get-current-available-update', () => ({
   getCurrentAvailableUpdate: jest.fn().mockReturnValue({
     title: 'Wazuh 4.2.6',
     description:

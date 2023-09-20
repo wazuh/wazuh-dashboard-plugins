@@ -1,2 +1,2 @@
-export { useAvailableUpdates } from './useAvailableUpdates';
-export { useUserPreferences } from './useUserPreferences';
+export { useAvailableUpdates } from './available-updates';
+export { useUserPreferences } from './user-preferences';

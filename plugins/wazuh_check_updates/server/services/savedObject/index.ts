@@ -1,2 +1,2 @@
-export { getSavedObject } from './getSavedObject';
-export { setSavedObject } from './setSavedObject';
+export { getSavedObject } from './get-saved-object';
+export { setSavedObject } from './set-saved-object';

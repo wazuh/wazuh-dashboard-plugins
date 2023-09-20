@@ -1,2 +1,2 @@
-export { updateUserPreferences } from './updateUserPreferences';
-export { getUserPreferences } from './getUserPreferences';
+export { updateUserPreferences } from './update-user-preferences';
+export { getUserPreferences } from './get-user-preferences';

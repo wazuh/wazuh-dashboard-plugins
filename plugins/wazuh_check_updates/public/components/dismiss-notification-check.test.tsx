@@ -1,13 +1,13 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { CurrentUpdateDetails } from './currentUpdateDetails';
+import { CurrentUpdateDetails } from './current-update-details';
 import { TestProviders } from '../test/test-utils';
-import { DismissNotificationCheck } from './dismissNotificationCheck';
+import { DismissNotificationCheck } from './dismiss-notification-check';
 import { useUserPreferences } from '../hooks';
 
 const mockedUseUserPreferences = useUserPreferences as jest.Mock;
-jest.mock('../hooks/useUserPreferences');
+jest.mock('../hooks/user-preferences');
 
 describe('DismissNotificationCheck component', () => {
   test('should render the check', () => {

@@ -1,5 +1,5 @@
 import { getInternalSavedObjectsClient } from '../../plugin-services';
-import { setSavedObject } from './setSavedObject';
+import { setSavedObject } from './set-saved-object';
 
 const mockedGetInternalObjectsClient = getInternalSavedObjectsClient as jest.Mock;
 jest.mock('../../plugin-services');

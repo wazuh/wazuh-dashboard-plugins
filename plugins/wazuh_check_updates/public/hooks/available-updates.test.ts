@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { useAvailableUpdates } from './useAvailableUpdates';
+import { useAvailableUpdates } from './available-updates';
 import { AvailableUpdates } from '../../common/types';
 import { getCore } from '../plugin-services';
 

@@ -1,6 +1,6 @@
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
-import { CurrentUpdateDetailsProps } from './components/currentUpdateDetails';
-import { UpToDateStatusProps } from './components/upToDateStatus';
+import { CurrentUpdateDetailsProps } from './components/current-update-details';
+import { UpToDateStatusProps } from './components/up-to-date-status';
 
 export interface WazuhCheckUpdatesPluginSetup {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

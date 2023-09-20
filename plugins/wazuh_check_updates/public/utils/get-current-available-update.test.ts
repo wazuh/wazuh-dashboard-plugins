@@ -1,4 +1,4 @@
-import { getCurrentAvailableUpdate } from './getCurrentAvailableUpdate';
+import { getCurrentAvailableUpdate } from './get-current-available-update';
 
 describe('getCurrentAvailableUpdate function', () => {
   test('should return an available update', () => {

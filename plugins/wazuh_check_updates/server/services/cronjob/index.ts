@@ -1,1 +1,1 @@
-export { jobSchedulerRun } from './jobSchedulerRun';
+export { jobSchedulerRun } from './job-scheduler-run';

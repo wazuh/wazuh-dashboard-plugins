@@ -1,2 +1,2 @@
-export { getSettings } from './getSettings';
-export { updateSettings } from './updateSettings';
+export { getSettings } from './get-settings';
+export { updateSettings } from './update-settings';

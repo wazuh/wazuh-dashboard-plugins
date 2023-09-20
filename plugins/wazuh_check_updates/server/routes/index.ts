@@ -1,6 +1,6 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { updatesRoutes } from './updates';
-import { userPreferencesRoutes } from './userPreferences';
+import { userPreferencesRoutes } from './user-preferences';
 
 export function defineRoutes(router: IRouter) {
   updatesRoutes(router);

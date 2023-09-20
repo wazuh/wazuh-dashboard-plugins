@@ -1,1 +1,1 @@
-export { getUpdates } from './getUpdates';
+export { getUpdates } from './get-updates';

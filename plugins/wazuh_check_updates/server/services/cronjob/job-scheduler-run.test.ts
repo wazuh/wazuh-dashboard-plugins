@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { getSettings } from '../settings';
 import { getUpdates } from '../updates';
-import { jobSchedulerRun } from './jobSchedulerRun';
+import { jobSchedulerRun } from './job-scheduler-run';
 
 const mockedCron = cron.schedule as jest.Mock;
 jest.mock('node-cron');
