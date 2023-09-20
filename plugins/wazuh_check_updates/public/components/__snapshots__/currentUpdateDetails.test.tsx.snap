@@ -29,7 +29,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
             style="max-width: max-content;"
           >
             <span>
-              ¡Wazuh new release is available now!
+              Wazuh new release is available now!
             </span>
           </div>
           <div

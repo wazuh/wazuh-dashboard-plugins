@@ -74,7 +74,7 @@ export const UpdatesNotification = () => {
               <EuiText>
                 <FormattedMessage
                   id="wazuhCheckUpdates.updatesNotification.message"
-                  defaultMessage="¡Wazuh new release is available now!"
+                  defaultMessage="Wazuh new release is available now!"
                 />
               </EuiText>
             </EuiFlexItem>

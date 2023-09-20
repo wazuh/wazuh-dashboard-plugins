@@ -65,7 +65,7 @@ describe('UpdatesNotification component', () => {
 
     expect(container).toMatchSnapshot();
 
-    const message = getByText('¡Wazuh new release is available now!');
+    const message = getByText('Wazuh new release is available now!');
     expect(message).toBeInTheDocument();
 
     const elementWithTag = getByText('v4.2.6');

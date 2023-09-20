@@ -30,7 +30,7 @@ export const CurrentUpdateDetails = ({ currentUpdate }: CurrentUpdateDetailsProp
           <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
             <FormattedMessage
               id="wazuhCheckUpdates.currentUpdateDetails.title"
-              defaultMessage="¡Wazuh new release is available now!"
+              defaultMessage="Wazuh new release is available now!"
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
