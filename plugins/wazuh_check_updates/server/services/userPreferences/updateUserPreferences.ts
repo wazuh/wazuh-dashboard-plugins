@@ -10,7 +10,8 @@ export const updateUserPreferences = async (
     const usersPreferences =
       ((await getSavedObject(SAVED_OBJECT_USER_PREFERENCES)) as UsersPreferences)?.users || [];
 
-    const userPreferences = usersPreferences?.find((up) => up.username === username) || {};
+    const userPreferences =
+      usersPreferences?.find((userPreference) => userPreference.username === username) || {};
 
     const newUserPreferences = { ...userPreferences, ...preferences, username: username };
 
