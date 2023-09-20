@@ -35,18 +35,16 @@ export const updatePreferencesRoutes = (router: IRouter) => {
           body: userPreferences,
         });
       } catch (error) {
-        const message =
+        const finalError =
           error instanceof Error
             ? error
             : typeof error === 'string'
-            ? error
-            : 'Error trying to update user preferences';
+            ? new Error(error)
+            : new Error('Error trying to update user preferences');
 
         return response.customError({
           statusCode: 503,
-          body: {
-            message,
-          },
+          body: finalError,
         });
       }
     }

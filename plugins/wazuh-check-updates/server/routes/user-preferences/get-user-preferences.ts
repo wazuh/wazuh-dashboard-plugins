@@ -24,18 +24,16 @@ export const getUserPreferencesRoutes = (router: IRouter) => {
           body: userPreferences,
         });
       } catch (error) {
-        const message =
+        const finalError =
           error instanceof Error
             ? error
             : typeof error === 'string'
-            ? error
-            : 'Error trying to get user preferences';
+            ? new Error(error)
+            : new Error('Error trying to get user preferences');
 
         return response.customError({
           statusCode: 503,
-          body: {
-            message,
-          },
+          body: finalError,
         });
       }
     }

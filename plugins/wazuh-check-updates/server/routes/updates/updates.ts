@@ -51,9 +51,7 @@ export const getUpdatesRoute = (router: IRouter) => {
 
         return response.customError({
           statusCode: 503,
-          body: {
-            message: finalError.message,
-          },
+          body: finalError,
         });
       }
     }
