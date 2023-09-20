@@ -144,7 +144,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
               aria-controls="accordionUpdateDetails"
               aria-expanded="false"
               class="euiAccordion__button"
-              id="i015744f0-57f3-11ee-8574-39620ce38f0b"
+              id="ia5908751-5804-11ee-a361-bd1595d5c7bc"
               type="button"
             >
               <span
@@ -171,7 +171,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
             </button>
           </div>
           <div
-            aria-labelledby="i015744f0-57f3-11ee-8574-39620ce38f0b"
+            aria-labelledby="ia5908751-5804-11ee-a361-bd1595d5c7bc"
             class="euiAccordion__childWrapper"
             id="accordionUpdateDetails"
             role="region"
