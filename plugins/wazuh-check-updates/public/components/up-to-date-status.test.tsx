@@ -2,7 +2,6 @@ import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { TestProviders } from '../test/test-utils';
 import { UpToDateStatus } from './up-to-date-status';
 import { useAvailableUpdates } from '../hooks';
 
@@ -33,22 +32,20 @@ describe('UpToDateStatus component', () => {
     mockedUseAvailabeUpdates.mockImplementation(() => ({ isLoading: true }));
 
     const { container, getByRole } = render(
-      <TestProviders>
-        <UpToDateStatus
-          setCurrentUpdate={() => ({
-            title: 'Wazuh 4.2.6',
-            description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
-            semver: {
-              mayor: 4,
-              minor: 2,
-              patch: 6,
-            },
-            tag: '4.2.6',
-          })}
-        />
-      </TestProviders>
+      <UpToDateStatus
+        setCurrentUpdate={() => ({
+          title: 'Wazuh 4.2.6',
+          description:
+            'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
+          published_date: '2021-09-30T14:00:00.000Z',
+          semver: {
+            mayor: 4,
+            minor: 2,
+            patch: 6,
+          },
+          tag: '4.2.6',
+        })}
+      />
     );
 
     expect(container).toMatchSnapshot();
@@ -86,22 +83,20 @@ describe('UpToDateStatus component', () => {
     }));
 
     const { container, getByRole, getByText } = render(
-      <TestProviders>
-        <UpToDateStatus
-          setCurrentUpdate={() => ({
-            title: 'Wazuh 4.2.6',
-            description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
-            semver: {
-              mayor: 4,
-              minor: 2,
-              patch: 6,
-            },
-            tag: '4.2.6',
-          })}
-        />
-      </TestProviders>
+      <UpToDateStatus
+        setCurrentUpdate={() => ({
+          title: 'Wazuh 4.2.6',
+          description:
+            'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
+          published_date: '2021-09-30T14:00:00.000Z',
+          semver: {
+            mayor: 4,
+            minor: 2,
+            patch: 6,
+          },
+          tag: '4.2.6',
+        })}
+      />
     );
 
     expect(container).toMatchSnapshot();
@@ -128,22 +123,20 @@ describe('UpToDateStatus component', () => {
     mockedUseAvailabeUpdates.mockImplementation(() => ({ isLoading: true }));
 
     const { container, getByRole, getByText } = render(
-      <TestProviders>
-        <UpToDateStatus
-          setCurrentUpdate={() => ({
-            title: 'Wazuh 4.2.6',
-            description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
-            semver: {
-              mayor: 4,
-              minor: 2,
-              patch: 6,
-            },
-            tag: '4.2.6',
-          })}
-        />
-      </TestProviders>
+      <UpToDateStatus
+        setCurrentUpdate={() => ({
+          title: 'Wazuh 4.2.6',
+          description:
+            'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
+          published_date: '2021-09-30T14:00:00.000Z',
+          semver: {
+            mayor: 4,
+            minor: 2,
+            patch: 6,
+          },
+          tag: '4.2.6',
+        })}
+      />
     );
 
     expect(container).toMatchSnapshot();
@@ -175,22 +168,20 @@ describe('UpToDateStatus component', () => {
     }));
 
     const { container, getByText } = render(
-      <TestProviders>
-        <UpToDateStatus
-          setCurrentUpdate={() => ({
-            title: 'Wazuh 4.2.6',
-            description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
-            semver: {
-              mayor: 4,
-              minor: 2,
-              patch: 6,
-            },
-            tag: '4.2.6',
-          })}
-        />
-      </TestProviders>
+      <UpToDateStatus
+        setCurrentUpdate={() => ({
+          title: 'Wazuh 4.2.6',
+          description:
+            'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
+          published_date: '2021-09-30T14:00:00.000Z',
+          semver: {
+            mayor: 4,
+            minor: 2,
+            patch: 6,
+          },
+          tag: '4.2.6',
+        })}
+      />
     );
 
     expect(container).toMatchSnapshot();

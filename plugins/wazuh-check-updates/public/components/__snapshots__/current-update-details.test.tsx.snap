@@ -28,9 +28,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
             class="euiFlexItem euiFlexItem--flexGrowZero"
             style="max-width: max-content;"
           >
-            <span>
-              Wazuh new release is available now!
-            </span>
+            Wazuh new release is available now!
           </div>
           <div
             class="euiFlexItem euiFlexItem--flexGrowZero"
@@ -90,9 +88,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
                 <span
                   class="euiButtonEmpty__text"
                 >
-                  <span>
-                    Release notes
-                  </span>
+                  Release notes
                 </span>
               </span>
             </a>
@@ -123,9 +119,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
                 <span
                   class="euiButtonEmpty__text"
                 >
-                  <span>
-                    Upgrade guide
-                  </span>
+                  Upgrade guide
                 </span>
               </span>
             </a>
@@ -144,7 +138,7 @@ exports[`CurrentUpdateDetails component should render the current update tag and
               aria-controls="accordionUpdateDetails"
               aria-expanded="false"
               class="euiAccordion__button"
-              id="ia5908751-5804-11ee-a361-bd1595d5c7bc"
+              id="i3907db31-589d-11ee-b8dd-21e3a87a93cb"
               type="button"
             >
               <span
@@ -164,14 +158,12 @@ exports[`CurrentUpdateDetails component should render the current update tag and
               <span
                 class="euiIEFlexWrapFix"
               >
-                <span>
-                  Show details
-                </span>
+                Show details
               </span>
             </button>
           </div>
           <div
-            aria-labelledby="ia5908751-5804-11ee-a361-bd1595d5c7bc"
+            aria-labelledby="i3907db31-589d-11ee-b8dd-21e3a87a93cb"
             class="euiAccordion__childWrapper"
             id="accordionUpdateDetails"
             role="region"

@@ -31,9 +31,7 @@ exports[`UpToDateStatus component should render a initial state with a loader an
           <span
             class="euiButton__text"
           >
-            <span>
-              Check updates
-            </span>
+            Check updates
           </span>
         </span>
       </button>
@@ -87,9 +85,7 @@ exports[`UpToDateStatus component should render a initial state with an error 1`
               <div
                 class="euiFlexItem euiFlexItem--flexGrowZero"
               >
-                <span>
-                  Error trying to get available updates
-                </span>
+                Error trying to get available updates
               </div>
             </div>
           </div>
@@ -149,9 +145,7 @@ exports[`UpToDateStatus component should render a initial state with an error 1`
           <span
             class="euiButton__text"
           >
-            <span>
-              Check updates
-            </span>
+            Check updates
           </span>
         </span>
       </button>
@@ -199,9 +193,7 @@ exports[`UpToDateStatus component should render the available updates status wit
               <div
                 class="euiFlexItem euiFlexItem--flexGrowZero"
               >
-                <span>
-                  Available updates
-                </span>
+                Available updates
               </div>
             </div>
           </div>
@@ -253,9 +245,7 @@ exports[`UpToDateStatus component should render the available updates status wit
           <span
             class="euiButton__text"
           >
-            <span>
-              Check updates
-            </span>
+            Check updates
           </span>
         </span>
       </button>
@@ -295,9 +285,7 @@ exports[`UpToDateStatus component should retrieve available updates when click t
           <span
             class="euiButton__text"
           >
-            <span>
-              Check updates
-            </span>
+            Check updates
           </span>
         </span>
       </button>

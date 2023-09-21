@@ -17,9 +17,7 @@ exports[`DismissNotificationCheck component should render the check 1`] = `
       class="euiCheckbox__label"
       for="check-dismiss"
     >
-      <span>
-        Disable updates notifications
-      </span>
+      Disable updates notifications
     </label>
   </div>
 </div>

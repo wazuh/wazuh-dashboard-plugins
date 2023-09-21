@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { TestProviders } from '../test/test-utils';
 import { useAvailableUpdates, useUserPreferences } from '../hooks';
 import { getCurrentAvailableUpdate } from '../utils';
 import { UpdatesNotification } from './updates-notification';
@@ -57,11 +56,7 @@ describe('UpdatesNotification component', () => {
       tag: 'v4.2.6',
     }));
 
-    const { container, getByText, getByRole } = render(
-      <TestProviders>
-        <UpdatesNotification />
-      </TestProviders>
-    );
+    const { container, getByText, getByRole } = render(<UpdatesNotification />);
 
     expect(container).toMatchSnapshot();
 
@@ -123,11 +118,7 @@ describe('UpdatesNotification component', () => {
       tag: 'v4.2.6',
     }));
 
-    const { container, getByRole } = render(
-      <TestProviders>
-        <UpdatesNotification />
-      </TestProviders>
-    );
+    const { container, getByRole } = render(<UpdatesNotification />);
 
     const closeButton = getByRole('button', { name: 'Close' });
     expect(closeButton).toBeInTheDocument();
@@ -147,11 +138,7 @@ describe('UpdatesNotification component', () => {
     }));
     mockedGetCurrentAvailableUpdate.mockImplementation(() => undefined);
 
-    const { container } = render(
-      <TestProviders>
-        <UpdatesNotification />
-      </TestProviders>
-    );
+    const { container } = render(<UpdatesNotification />);
 
     expect(container).toMatchSnapshot();
 
@@ -167,11 +154,7 @@ describe('UpdatesNotification component', () => {
     }));
     mockedGetCurrentAvailableUpdate.mockImplementation(() => undefined);
 
-    const { container } = render(
-      <TestProviders>
-        <UpdatesNotification />
-      </TestProviders>
-    );
+    const { container } = render(<UpdatesNotification />);
 
     expect(container).toMatchSnapshot();
 
@@ -207,11 +190,7 @@ describe('UpdatesNotification component', () => {
       userPreferences: { hide_update_notifications: true, last_dismissed_update: 'v4.2.1' },
     }));
 
-    const { container } = render(
-      <TestProviders>
-        <UpdatesNotification />
-      </TestProviders>
-    );
+    const { container } = render(<UpdatesNotification />);
 
     expect(container).toMatchSnapshot();
 
@@ -259,11 +238,7 @@ describe('UpdatesNotification component', () => {
       tag: 'v4.2.6',
     }));
 
-    const { container } = render(
-      <TestProviders>
-        <UpdatesNotification />
-      </TestProviders>
-    );
+    const { container } = render(<UpdatesNotification />);
 
     expect(container).toMatchSnapshot();
 

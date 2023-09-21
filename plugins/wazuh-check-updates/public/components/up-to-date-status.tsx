@@ -7,7 +7,7 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import React, { useEffect } from 'react';
-import { FormattedMessage } from '@osd/i18n/react';
+import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { useAvailableUpdates } from '../hooks';
 import { formatUIDate, getCurrentAvailableUpdate } from '../utils';
 import { Update } from '../../common/types';
@@ -62,51 +62,53 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
   };
 
   return (
-    <EuiFlexGroup alignItems="center" gutterSize="m">
-      <EuiFlexItem grow={false} style={{ maxWidth: 'max-content', minWidth: '150px' }}>
-        {!isLoading ? (
-          <EuiFlexGroup gutterSize="none" wrap={false}>
-            <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-              <EuiHealth color={getColor()}>
-                <FormattedMessage
-                  id={`wazuhCheckUpdates.upToDateStatus.${getI18nMessageId()}`}
-                  defaultMessage={getDefaultMessage()}
-                />
-              </EuiHealth>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-              <EuiIconTip
-                type="iInCircle"
-                color="subdued"
-                title={
+    <I18nProvider>
+      <EuiFlexGroup alignItems="center" gutterSize="m">
+        <EuiFlexItem grow={false} style={{ maxWidth: 'max-content', minWidth: '150px' }}>
+          {!isLoading ? (
+            <EuiFlexGroup gutterSize="none" wrap={false}>
+              <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+                <EuiHealth color={getColor()}>
                   <FormattedMessage
-                    id={`wazuhCheckUpdates.upToDateStatus.lastCheck`}
-                    defaultMessage="Last check"
+                    id={`wazuhCheckUpdates.upToDateStatus.${getI18nMessageId()}`}
+                    defaultMessage={getDefaultMessage()}
                   />
-                }
-                content={
-                  availableUpdates?.last_check
-                    ? formatUIDate(new Date(availableUpdates.last_check))
-                    : '-'
-                }
-                iconProps={{
-                  className: 'eui-alignTop',
-                }}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        ) : (
-          <EuiLoadingSpinner size="m" />
-        )}
-      </EuiFlexItem>
-      <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-        <EuiButton isLoading={isLoading} onClick={handleOnClick} size="s" iconType="refresh">
-          <FormattedMessage
-            id="wazuhCheckUpdates.upToDateStatus.buttonText"
-            defaultMessage="Check updates"
-          />
-        </EuiButton>
-      </EuiFlexItem>
-    </EuiFlexGroup>
+                </EuiHealth>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+                <EuiIconTip
+                  type="iInCircle"
+                  color="subdued"
+                  title={
+                    <FormattedMessage
+                      id={`wazuhCheckUpdates.upToDateStatus.lastCheck`}
+                      defaultMessage="Last check"
+                    />
+                  }
+                  content={
+                    availableUpdates?.last_check
+                      ? formatUIDate(new Date(availableUpdates.last_check))
+                      : '-'
+                  }
+                  iconProps={{
+                    className: 'eui-alignTop',
+                  }}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          ) : (
+            <EuiLoadingSpinner size="m" />
+          )}
+        </EuiFlexItem>
+        <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+          <EuiButton isLoading={isLoading} onClick={handleOnClick} size="s" iconType="refresh">
+            <FormattedMessage
+              id="wazuhCheckUpdates.upToDateStatus.buttonText"
+              defaultMessage="Check updates"
+            />
+          </EuiButton>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </I18nProvider>
   );
 };

@@ -2,7 +2,6 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CurrentUpdateDetails } from './current-update-details';
-import { TestProviders } from '../test/test-utils';
 import { DismissNotificationCheck } from './dismiss-notification-check';
 import { useUserPreferences } from '../hooks';
 
@@ -16,11 +15,7 @@ describe('DismissNotificationCheck component', () => {
       userPreferences: { hide_update_notifications: false, last_dismissed_update: 'v4.2.1' },
     }));
 
-    const { container, getByText } = render(
-      <TestProviders>
-        <DismissNotificationCheck />
-      </TestProviders>
-    );
+    const { container, getByText } = render(<DismissNotificationCheck />);
 
     expect(container).toMatchSnapshot();
 

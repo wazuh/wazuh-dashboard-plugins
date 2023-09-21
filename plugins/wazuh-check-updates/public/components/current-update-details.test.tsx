@@ -2,27 +2,26 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CurrentUpdateDetails } from './current-update-details';
-import { TestProviders } from '../test/test-utils';
 
 describe('CurrentUpdateDetails component', () => {
   test('should render the current update tag and links to the Relese Notes and the Upgrade Guide', () => {
     const { container, getByText, getByRole } = render(
-      <TestProviders>
-        <CurrentUpdateDetails
-          currentUpdate={{
-            title: 'Wazuh 4.2.6',
-            description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
-            semver: {
-              mayor: 4,
-              minor: 2,
-              patch: 6,
-            },
-            tag: '4.2.6',
-          }}
-        />
-      </TestProviders>
+      // <TestProviders>
+      <CurrentUpdateDetails
+        currentUpdate={{
+          title: 'Wazuh 4.2.6',
+          description:
+            'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
+          published_date: '2021-09-30T14:00:00.000Z',
+          semver: {
+            mayor: 4,
+            minor: 2,
+            patch: 6,
+          },
+          tag: '4.2.6',
+        }}
+      />
+      // </TestProviders>
     );
 
     expect(container).toMatchSnapshot();
