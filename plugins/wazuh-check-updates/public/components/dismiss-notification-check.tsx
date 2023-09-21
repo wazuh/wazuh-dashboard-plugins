@@ -16,7 +16,6 @@ export const DismissNotificationCheck = () => {
   }, [userPreferences, isLoading]);
 
   if (error) {
-    console.log(error);
     return null;
   }
 

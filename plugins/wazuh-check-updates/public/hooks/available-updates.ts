@@ -17,24 +17,29 @@ export const useAvailableUpdates = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
 
-  const refreshAvailableUpdates = (forceUpdate = false) => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        const response = await getCore().http.get(`${routes.checkUpdates}`, {
-          query: {
-            checkAvailableUpdates: forceUpdate,
-          },
-        });
-        setAvailableUpdates(response);
-        setError(undefined);
-      } catch (error: any) {
-        setAvailableUpdates(defaultAvailableUpdates);
-        setError(error);
-      } finally {
-        setIsLoading(false);
+  const refreshAvailableUpdates = async (forceUpdate = false, returnError = false) => {
+    try {
+      setIsLoading(true);
+      const response = await getCore().http.get(`${routes.checkUpdates}`, {
+        query: {
+          checkAvailableUpdates: forceUpdate,
+        },
+      });
+      setAvailableUpdates(response);
+      setError(undefined);
+    } catch (error: any) {
+      setAvailableUpdates(defaultAvailableUpdates);
+      setError(error);
+      if (returnError) {
+        return error instanceof Error
+          ? error
+          : typeof error === 'string'
+          ? new Error(error)
+          : new Error('Error trying to get available updates');
       }
-    })();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

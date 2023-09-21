@@ -2,32 +2,61 @@ import {
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiGlobalToastList,
   EuiHealth,
   EuiIconTip,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { useAvailableUpdates } from '../hooks';
 import { formatUIDate, getCurrentAvailableUpdate } from '../utils';
 import { Update } from '../../common/types';
+import { Toast } from '@elastic/eui/src/components/toast/global_toast_list';
 
 export interface UpToDateStatusProps {
   setCurrentUpdate: (currentUpdate?: Update) => void;
 }
 
+let toastId = 0;
+
 export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const addToastHandler = (error: any) => {
+    const toast = {
+      id: `${toastId++}`,
+      title: (
+        <FormattedMessage
+          id={`wazuhCheckUpdates.upToDateStatus.onClickButtonError`}
+          defaultMessage="Error trying to get updates"
+        />
+      ),
+      color: 'danger',
+      iconType: 'alert',
+      text: error.body.message,
+    } as Toast;
+    setToasts(toasts.concat(toast));
+  };
+
+  const removeToast = (removedToast: Toast) => {
+    setToasts(toasts.filter((toast) => toast.id !== removedToast.id));
+  };
+
   const { availableUpdates, isLoading, refreshAvailableUpdates, error } = useAvailableUpdates();
 
   const handleOnClick = async () => {
-    await refreshAvailableUpdates(true);
+    const response = await refreshAvailableUpdates(true, true);
+    if (response instanceof Error) {
+      addToastHandler(response);
+    }
   };
 
-  const currentUpdate = getCurrentAvailableUpdate(availableUpdates);
-
   useEffect(() => {
-    setCurrentUpdate(currentUpdate);
-  }, [currentUpdate]);
+    setCurrentUpdate(getCurrentAvailableUpdate(availableUpdates));
+  }, [availableUpdates]);
+
+  const currentUpdate = getCurrentAvailableUpdate(availableUpdates);
 
   const isUpToDate = !currentUpdate;
 
@@ -109,6 +138,7 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
           </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
+      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
     </I18nProvider>
   );
 };

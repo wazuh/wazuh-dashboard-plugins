@@ -31,12 +31,10 @@ export const UpdatesNotification = () => {
   } = useAvailableUpdates();
 
   if (userPreferencesError) {
-    console.log(userPreferencesError);
     return null;
   }
 
   if (getAvailableUpdatesError) {
-    console.log(getAvailableUpdatesError);
     return null;
   }
 
