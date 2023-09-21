@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { mockSuccessResponse } from './mocks';
 import { AvailableUpdates } from '../../../common/types';
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
-import { setSavedObject } from '../savedObject';
+import { setSavedObject } from '../saved-object';
 import { log } from '../../lib/logger';
 
 export const getUpdates = async (): Promise<AvailableUpdates> => {

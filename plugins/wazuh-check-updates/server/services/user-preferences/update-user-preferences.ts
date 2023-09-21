@@ -1,7 +1,7 @@
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
 import { UserPreferences, UsersPreferences } from '../../../common/types';
 import { log } from '../../lib/logger';
-import { getSavedObject, setSavedObject } from '../savedObject';
+import { getSavedObject, setSavedObject } from '../saved-object';
 
 export const updateUserPreferences = async (
   username: string,

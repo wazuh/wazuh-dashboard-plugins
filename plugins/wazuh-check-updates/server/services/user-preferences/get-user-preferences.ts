@@ -1,7 +1,7 @@
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
 import { UserPreferences, UsersPreferences } from '../../../common/types';
 import { log } from '../../lib/logger';
-import { getSavedObject } from '../savedObject';
+import { getSavedObject } from '../saved-object';
 
 export const getUserPreferences = async (username: string): Promise<UserPreferences> => {
   try {

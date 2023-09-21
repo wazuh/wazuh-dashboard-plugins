@@ -1,7 +1,7 @@
 import { DEFAULT_SCHEDULE, SAVED_OBJECT_SETTINGS } from '../../../common/constants';
 import { CheckUpdatesSettings } from '../../../common/types';
 import { log } from '../../lib/logger';
-import { getSavedObject, setSavedObject } from '../savedObject';
+import { getSavedObject, setSavedObject } from '../saved-object';
 
 export const getSettings = async (): Promise<CheckUpdatesSettings> => {
   try {

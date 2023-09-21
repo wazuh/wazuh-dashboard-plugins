@@ -1,9 +1,9 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { schema } from '@osd/config-schema';
 import { routes } from '../../../common/constants';
-import { updateUserPreferences } from '../../services/userPreferences';
+import { updateUserPreferences } from '../../services/user-preferences';
 
-export const updatePreferencesRoutes = (router: IRouter) => {
+export const updateUserPreferencesRoutes = (router: IRouter) => {
   router.patch(
     {
       path: routes.userPreferences,

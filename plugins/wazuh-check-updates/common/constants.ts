@@ -10,8 +10,8 @@ export const SAVED_OBJECT_USER_PREFERENCES = 'wazuh-check-updates-user-preferenc
 export const DEFAULT_SCHEDULE = '* */12 * * *';
 
 export enum routes {
-  checkUpdates = '/api/wazuh_check_updates/updates',
-  userPreferences = '/api/wazuh_check_updates/user_preferences',
+  checkUpdates = '/api/wazuh-check-updates/updates',
+  userPreferences = '/api/wazuh-check-updates/user-preferences',
 }
 
 // Security

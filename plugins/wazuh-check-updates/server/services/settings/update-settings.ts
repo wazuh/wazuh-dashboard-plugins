@@ -2,7 +2,7 @@ import { getSettings } from '.';
 import { SAVED_OBJECT_SETTINGS } from '../../../common/constants';
 import { CheckUpdatesSettings } from '../../../common/types';
 import { log } from '../../lib/logger';
-import { setSavedObject } from '../savedObject';
+import { setSavedObject } from '../saved-object';
 
 export const updateSettings = async (
   settings: Partial<CheckUpdatesSettings>

@@ -12,7 +12,7 @@ import {
   availableUpdatesObject,
   settingsObject,
   userPreferencesObject,
-} from './services/savedObject/types';
+} from './services/saved-object/types';
 import { setCore, setInternalSavedObjectsClient } from './plugin-services';
 import { jobSchedulerRun } from './cronjob';
 import { ISecurityFactory, SecurityObj } from './lib/security-factory';

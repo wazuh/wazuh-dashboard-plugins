@@ -1,13 +1,13 @@
 import { updateSettings } from '.';
-import { getSavedObject } from '../savedObject/get-saved-object';
-import { setSavedObject } from '../savedObject/set-saved-object';
+import { getSavedObject } from '../saved-object/get-saved-object';
+import { setSavedObject } from '../saved-object/set-saved-object';
 import { SAVED_OBJECT_SETTINGS } from '../../../common/constants';
 
 const mockedGetSavedObject = getSavedObject as jest.Mock;
-jest.mock('../savedObject/get-saved-object');
+jest.mock('../saved-object/get-saved-object');
 
 const mockedSetSavedObject = setSavedObject as jest.Mock;
-jest.mock('../savedObject/set-saved-object');
+jest.mock('../saved-object/set-saved-object');
 
 describe('updateSettings function', () => {
   afterEach(() => {
