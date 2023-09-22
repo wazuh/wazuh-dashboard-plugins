@@ -8,7 +8,7 @@ import { getUserPreferences } from '../../services/user-preferences';
 import { getUserPreferencesRoutes } from './get-user-preferences';
 
 const serverAddress = '127.0.0.1';
-const port = 10002;
+const port = Math.floor(Math.random() * 60000) + 5000;
 axios.defaults.baseURL = `http://${serverAddress}:${port}`;
 
 const mockedGetUserPreferences = getUserPreferences as jest.Mock;
