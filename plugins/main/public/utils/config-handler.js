@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import js2xmlparser from 'js2xmlparser';
+import { parse } from 'js2xmlparser';
 import XMLBeautifier from './xml-beautifier';
 import { queryConfig } from '../react-services/query-config';
 import { objectWithoutProperties } from './remove-hash-key.js';
@@ -32,7 +32,7 @@ export class ConfigurationHandler {
       const wmodulesArray =
         ((config || {})['wmodules-wmodules'] || {}).wmodules || [];
       const result = wmodulesArray.filter(
-        item => typeof item[wodleKey] !== 'undefined'
+        item => typeof item[wodleKey] !== 'undefined',
       );
       return result.length ? result[0][wodleKey] : false;
     } catch (error) {
@@ -50,7 +50,7 @@ export class ConfigurationHandler {
     sections,
     $scope,
     agentId = false,
-    node = false
+    node = false,
   ) {
     try {
       $scope.load = true;
@@ -62,7 +62,7 @@ export class ConfigurationHandler {
       $scope.currentConfig = await queryConfig(
         agentId || '000',
         sections,
-        node
+        node,
       );
 
       if ($scope.configurationSubTab === 'pm-sca') {
@@ -72,7 +72,7 @@ export class ConfigurationHandler {
       if (sections[0].component === 'integrator') {
         this.buildIntegrations(
           $scope.currentConfig['integrator-integration'].integration,
-          $scope
+          $scope,
         );
       } else {
         $scope.integrations = {};
@@ -80,17 +80,15 @@ export class ConfigurationHandler {
 
       if (($scope.currentConfig['logcollector-localfile'] || {}).localfile) {
         const data = $scope.currentConfig['logcollector-localfile'].localfile;
-        $scope.currentConfig['logcollector-localfile'][
-          'localfile-logs'
-        ] = data.filter(item => typeof item.file !== 'undefined');
-        $scope.currentConfig['logcollector-localfile'][
-          'localfile-commands'
-        ] = data.filter(item => typeof item.file === 'undefined');
+        $scope.currentConfig['logcollector-localfile']['localfile-logs'] =
+          data.filter(item => typeof item.file !== 'undefined');
+        $scope.currentConfig['logcollector-localfile']['localfile-commands'] =
+          data.filter(item => typeof item.file === 'undefined');
 
         const sanitizeLocalfile = file => {
           if (file.target) {
             file.targetStr = '';
-            file.target.forEach(function(target, idx) {
+            file.target.forEach(function (target, idx) {
               file.targetStr = file.targetStr.concat(target);
               if (idx != file.target.length - 1) {
                 file.targetStr = file.targetStr.concat(', ');
@@ -131,7 +129,7 @@ export class ConfigurationHandler {
       $scope.currentConfig = await queryConfig(
         agentId || '000',
         [{ component: 'wmodules', configuration: 'wmodules' }],
-        node
+        node,
       );
 
       // Filter by provided wodleName
@@ -141,7 +139,7 @@ export class ConfigurationHandler {
         (($scope.currentConfig || {})['wmodules-wmodules'] || {}).wmodules
       ) {
         result = $scope.currentConfig['wmodules-wmodules'].wmodules.filter(
-          item => typeof item[wodleName] !== 'undefined'
+          item => typeof item[wodleName] !== 'undefined',
         );
       }
 
@@ -169,10 +167,9 @@ export class ConfigurationHandler {
   async isWodleEnabled(wodleName, agentId = false) {
     try {
       // Get wodles configuration
-      const wodlesConfig = await queryConfig(
-        agentId || '000',
-        [{ component: 'wmodules', configuration: 'wmodules' }],
-      );
+      const wodlesConfig = await queryConfig(agentId || '000', [
+        { component: 'wmodules', configuration: 'wmodules' },
+      ]);
 
       // Filter by provided wodleName
       let result = [];
@@ -184,7 +181,7 @@ export class ConfigurationHandler {
         result = wodlesConfig['wmodules-wmodules'].wmodules.filter(
           item =>
             typeof item[wodleName] !== 'undefined' &&
-            item[wodleName].disabled === 'no'
+            item[wodleName].disabled === 'no',
         );
       }
 
@@ -233,9 +230,7 @@ export class ConfigurationHandler {
     } else {
       try {
         const cleaned = objectWithoutProperties(config);
-        $scope.XMLContent = XMLBeautifier(
-          js2xmlparser.parse('configuration', cleaned)
-        );
+        $scope.XMLContent = XMLBeautifier(parse('configuration', cleaned));
         $scope.$broadcast('XMLContentReady', { data: $scope.XMLContent });
       } catch (error) {
         $scope.XMLContent = false;
@@ -246,7 +241,7 @@ export class ConfigurationHandler {
 
   json2xml(data) {
     if (data) {
-      const result = XMLBeautifier(js2xmlparser.parse('configuration', data));
+      const result = XMLBeautifier(parse('configuration', data));
       return result;
     }
     return false;

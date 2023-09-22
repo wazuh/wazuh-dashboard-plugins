@@ -23,7 +23,7 @@ const popoverServerAddress = (
     Learn about{' '}
     <EuiLink
       href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#groups',
+        'user-manual/reference/ossec-conf/client.html#manager-address',
         PLUGIN_VERSION_SHORT,
       )}
       target='_blank'
