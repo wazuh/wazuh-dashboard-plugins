@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
 import { UserPreferences, UsersPreferences } from '../../../common/types';
 import { log } from '../../lib/logger';
@@ -12,8 +13,9 @@ export const getUserPreferences = async (username: string): Promise<UserPreferen
     const userPreferences =
       usersPreferences?.users?.find((usersPreference) => usersPreference.username === username) ||
       {};
+    const userPreferencesWithoutUsername = _.omit(userPreferences, 'username');
 
-    return userPreferences;
+    return userPreferencesWithoutUsername;
   } catch (error) {
     const message =
       error instanceof Error
