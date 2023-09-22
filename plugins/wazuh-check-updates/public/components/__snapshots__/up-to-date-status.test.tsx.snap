@@ -36,12 +36,12 @@ exports[`UpToDateStatus component should render a initial state with a loader an
         </span>
       </button>
     </div>
+    <div
+      aria-live="polite"
+      class="euiGlobalToastList euiGlobalToastList--right"
+      role="region"
+    />
   </div>
-  <div
-    aria-live="polite"
-    class="euiGlobalToastList euiGlobalToastList--right"
-    role="region"
-  />
 </div>
 `;
 
@@ -155,12 +155,12 @@ exports[`UpToDateStatus component should render a initial state with an error 1`
         </span>
       </button>
     </div>
+    <div
+      aria-live="polite"
+      class="euiGlobalToastList euiGlobalToastList--right"
+      role="region"
+    />
   </div>
-  <div
-    aria-live="polite"
-    class="euiGlobalToastList euiGlobalToastList--right"
-    role="region"
-  />
 </div>
 `;
 
@@ -260,12 +260,12 @@ exports[`UpToDateStatus component should render the available updates status wit
         </span>
       </button>
     </div>
+    <div
+      aria-live="polite"
+      class="euiGlobalToastList euiGlobalToastList--right"
+      role="region"
+    />
   </div>
-  <div
-    aria-live="polite"
-    class="euiGlobalToastList euiGlobalToastList--right"
-    role="region"
-  />
 </div>
 `;
 
@@ -305,11 +305,11 @@ exports[`UpToDateStatus component should retrieve available updates when click t
         </span>
       </button>
     </div>
+    <div
+      aria-live="polite"
+      class="euiGlobalToastList euiGlobalToastList--right"
+      role="region"
+    />
   </div>
-  <div
-    aria-live="polite"
-    class="euiGlobalToastList euiGlobalToastList--right"
-    role="region"
-  />
 </div>
 `;

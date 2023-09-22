@@ -3,6 +3,13 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CurrentUpdateDetails } from './current-update-details';
 
+jest.mock(
+  '../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  })
+);
+
 describe('CurrentUpdateDetails component', () => {
   test('should render the current update tag and links to the Relese Notes and the Upgrade Guide', () => {
     const { container, getByText, getByRole } = render(

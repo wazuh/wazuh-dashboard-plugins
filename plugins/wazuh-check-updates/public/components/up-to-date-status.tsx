@@ -137,8 +137,8 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
             />
           </EuiButton>
         </EuiFlexItem>
+        <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
       </EuiFlexGroup>
-      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
     </I18nProvider>
   );
 };

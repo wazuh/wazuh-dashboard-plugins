@@ -5,6 +5,13 @@ import '@testing-library/jest-dom';
 import { UpToDateStatus } from './up-to-date-status';
 import { useAvailableUpdates } from '../hooks';
 
+jest.mock(
+  '../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  })
+);
+
 const mockedUseAvailabeUpdates = useAvailableUpdates as jest.Mock;
 jest.mock('../hooks/available-updates');
 

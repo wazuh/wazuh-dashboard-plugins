@@ -5,6 +5,13 @@ import { CurrentUpdateDetails } from './current-update-details';
 import { DismissNotificationCheck } from './dismiss-notification-check';
 import { useUserPreferences } from '../hooks';
 
+jest.mock(
+  '../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  })
+);
+
 const mockedUseUserPreferences = useUserPreferences as jest.Mock;
 jest.mock('../hooks/user-preferences');
 

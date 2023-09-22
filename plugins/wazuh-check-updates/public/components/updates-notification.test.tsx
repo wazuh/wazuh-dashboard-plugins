@@ -6,6 +6,13 @@ import { getCurrentAvailableUpdate } from '../utils';
 import { UpdatesNotification } from './updates-notification';
 import userEvent from '@testing-library/user-event';
 
+jest.mock(
+  '../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  })
+);
+
 const mockedUseAvailabeUpdates = useAvailableUpdates as jest.Mock;
 jest.mock('../hooks/available-updates');
 
