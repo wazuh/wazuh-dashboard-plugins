@@ -22,12 +22,8 @@ export interface UserPreferences {
   hide_update_notifications?: boolean;
 }
 
-export interface UsersPreferences {
-  users: ({ username: string } & UserPreferences)[];
-}
-
 export interface CheckUpdatesSettings {
-  schedule: string;
+  schedule?: string;
 }
 
-export type savedObjectType = AvailableUpdates | UsersPreferences | CheckUpdatesSettings;
+export type savedObjectType = AvailableUpdates | UserPreferences | CheckUpdatesSettings;

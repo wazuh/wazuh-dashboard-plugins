@@ -11,7 +11,7 @@ describe('getSavedObject function', () => {
 
   test('should return saved object', async () => {
     mockedGetInternalObjectsClient.mockImplementation(() => ({
-      find: () => ({ saved_objects: [{ attributes: 'value' }] }),
+      get: () => ({ attributes: 'value' }),
     }));
 
     const response = await getSavedObject('type');
@@ -21,7 +21,7 @@ describe('getSavedObject function', () => {
 
   test('should return an empty object', async () => {
     mockedGetInternalObjectsClient.mockImplementation(() => ({
-      find: () => ({}),
+      get: jest.fn().mockRejectedValue({ output: { statusCode: 404 } }),
     }));
 
     const response = await getSavedObject('type');
@@ -31,7 +31,7 @@ describe('getSavedObject function', () => {
 
   test('should return an error', async () => {
     mockedGetInternalObjectsClient.mockImplementation(() => ({
-      find: jest.fn().mockRejectedValue(new Error('getSavedObject error')),
+      get: jest.fn().mockRejectedValue(new Error('getSavedObject error')),
     }));
 
     const promise = getSavedObject('type');

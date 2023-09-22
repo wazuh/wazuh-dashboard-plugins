@@ -1,5 +1,5 @@
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
-import { UserPreferences, UsersPreferences } from '../../../common/types';
+import { UserPreferences } from '../../../common/types';
 import { log } from '../../lib/logger';
 import { getSavedObject, setSavedObject } from '../saved-object';
 
@@ -8,20 +8,12 @@ export const updateUserPreferences = async (
   preferences: UserPreferences
 ): Promise<UserPreferences> => {
   try {
-    const usersPreferences =
-      ((await getSavedObject(SAVED_OBJECT_USER_PREFERENCES)) as UsersPreferences)?.users || [];
-
     const userPreferences =
-      usersPreferences?.find((userPreference) => userPreference.username === username) || {};
+      ((await getSavedObject(SAVED_OBJECT_USER_PREFERENCES, username)) as UserPreferences) || {};
 
-    const newUserPreferences = { ...userPreferences, ...preferences, username: username };
+    const newUserPreferences = { ...userPreferences, ...preferences };
 
-    const newUsersPreferences = [
-      ...usersPreferences?.filter((up) => up.username !== username),
-      newUserPreferences,
-    ];
-
-    await setSavedObject(SAVED_OBJECT_USER_PREFERENCES, { users: newUsersPreferences });
+    await setSavedObject(SAVED_OBJECT_USER_PREFERENCES, newUserPreferences, username);
 
     return newUserPreferences;
   } catch (error) {

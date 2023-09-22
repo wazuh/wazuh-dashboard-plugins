@@ -26,7 +26,8 @@ describe('getSettings function', () => {
   });
 
   test('should return default settings', async () => {
-    mockedGetSavedObject.mockRejectedValue(new Error('getSavedObject error'));
+    mockedGetSavedObject.mockImplementation(() => ({}));
+
     mockedSetSavedObject.mockImplementation(() => {});
 
     const response = await getSettings();

@@ -12,15 +12,15 @@ describe('getUserPreferences function', () => {
 
   test('should return user preferences', async () => {
     mockedGetSavedObject.mockImplementation(() => ({
-      users: [
-        { username: 'admin', last_dismissed_update: 'v4.3.1', hide_update_notifications: false },
-      ],
+      username: 'admin',
+      last_dismissed_update: 'v4.3.1',
+      hide_update_notifications: false,
     }));
 
     const response = await getUserPreferences('admin');
 
     expect(getSavedObject).toHaveBeenCalledTimes(1);
-    expect(getSavedObject).toHaveBeenCalledWith(SAVED_OBJECT_USER_PREFERENCES);
+    expect(getSavedObject).toHaveBeenCalledWith(SAVED_OBJECT_USER_PREFERENCES, 'admin');
 
     expect(response).toEqual({
       last_dismissed_update: 'v4.3.1',

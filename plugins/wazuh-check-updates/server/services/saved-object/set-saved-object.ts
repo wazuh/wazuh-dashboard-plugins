@@ -4,13 +4,14 @@ import { getInternalSavedObjectsClient } from '../../plugin-services';
 
 export const setSavedObject = async (
   type: string,
-  value: savedObjectType
+  value: savedObjectType,
+  id?: string
 ): Promise<savedObjectType> => {
   try {
     const client = getInternalSavedObjectsClient();
 
     const responseCreate = await client.create(type, value, {
-      id: type,
+      id: id || type,
       overwrite: true,
       refresh: true,
     });
