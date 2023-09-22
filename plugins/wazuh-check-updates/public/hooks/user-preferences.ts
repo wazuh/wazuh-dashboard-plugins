@@ -34,9 +34,9 @@ export const useUserPreferences = () => {
         body: JSON.stringify(userPreferences),
       });
       setUserPreferences(userPreferences);
-      setIsLoading(false);
     } catch (error: any) {
       setError(error);
+    } finally {
       setIsLoading(false);
     }
   };
