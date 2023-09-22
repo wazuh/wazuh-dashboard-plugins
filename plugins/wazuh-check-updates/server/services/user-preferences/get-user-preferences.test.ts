@@ -23,7 +23,6 @@ describe('getUserPreferences function', () => {
     expect(getSavedObject).toHaveBeenCalledWith(SAVED_OBJECT_USER_PREFERENCES);
 
     expect(response).toEqual({
-      username: 'admin',
       last_dismissed_update: 'v4.3.1',
       hide_update_notifications: false,
     });
