@@ -2,13 +2,13 @@
 
 This is a utility for generating sample Wazuh security alerts. 
 
-The code is based in a feature included in the Wazuh plugin Wazuh dashboard.
+The code is based in a feature included in the Wazuh plugin for Wazuh dashboard.
 
 A command line interface was created to use it.
 
 ## Requirements
 
-- NodeJS or Docker
+- Node.js or Docker
 
 ## Usage
 
@@ -20,7 +20,7 @@ node cli.js [options]
 
 ### Usage with Docker
 
-If want to use Docker use this command to create and access the container:
+If you want to use Docker, use this command to create and access the container:
 
 
 ```sh
@@ -77,12 +77,12 @@ docker run --rm -w "/home/node/app" -v "$(pwd):/home/node/app" node:lts-alpine \
 
 Insert the data into the index, using the Bulk API:
 
-- Without authentication (http):
+- Without authentication (HTTP):
     ```sh
     curl <server_address>/_bulk -H "Content-Type: application/x-ndjson" --data-binary "@output.ndjson"
     ```
 
-- With authentication (https):
+- With authentication (HTTPS):
     ```sh
     curl -k -u <username>:<password> <server_address>/_bulk -H "Content-Type: application/x-ndjson" --data-binary "@output.ndjson"
     ```
