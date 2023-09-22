@@ -34,7 +34,7 @@ export const UpToDateStatus = ({ setCurrentUpdate }: UpToDateStatusProps) => {
       ),
       color: 'danger',
       iconType: 'alert',
-      text: error.body.message,
+      text: error?.body?.message,
     } as Toast;
     setToasts(toasts.concat(toast));
   };
