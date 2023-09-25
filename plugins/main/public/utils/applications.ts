@@ -8,615 +8,697 @@ import {
 } from '../components/common/logos';
 import { DEFAULT_APP_CATEGORIES } from '../../../../src/core/public';
 
-export const Applications = [
-  {
-    category: 'wz-category-endpoint-security',
-    id: 'wz-home',
-    title: i18n.translate('wz-app-home', {
-      defaultMessage: 'Overview',
-    }),
-    description:
+const overview = {
+  category: 'wz-category-home',
+  id: 'wz-home',
+  title: i18n.translate('wz-app-home', {
+    defaultMessage: 'Overview',
+  }),
+  description: i18n.translate('overview-description', {
+    defaultMessage:
       'This application provides you with an overview of Wazuh applications.',
-    euiIconType: 'lensApp',
-    redirectTo: () => '/overview/',
-  },
-  {
-    category: 'wz-category-endpoint-security',
-    id: 'endpoints-summary',
-    title: i18n.translate('wz-app-endpoints-summary', {
-      defaultMessage: 'Endpoints summary',
-    }),
-    description: 'Summary of agents and their status.',
-    euiIconType: 'usersRolesApp',
-    redirectTo: () => '/agents-preview/',
-  },
-  {
-    category: 'wz-category-endpoint-security',
-    id: 'integrity-monitoring',
-    title: i18n.translate('wz-app-integrity-monitoring', {
-      defaultMessage: 'Integrity monitoring',
-    }),
-    description:
-      'Alerts related to file changes, including permissions, content, ownership and attributes.',
-    euiIconType: 'indexRollupApp',
-    redirectTo: () =>
-      `/overview/?tab=fim&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-endpoint-security',
-    id: 'policy-monitoring',
-    title: i18n.translate('wz-app-policy-monitoring', {
-      defaultMessage: 'Policy monitoring',
-    }),
-    description:
+  }),
+  euiIconType: 'lensApp',
+  showInOverviewApp: false,
+  redirectTo: () => '/overview/',
+};
+
+const fileIntegrityMonitoring = {
+  category: 'wz-category-endpoint-security',
+  id: 'file-integrity-monitoring',
+  title: i18n.translate('wz-app-file-integrity-monitoring', {
+    defaultMessage: 'File integrity monitoring',
+  }),
+  description: i18n.translate('file-integrity-monitoring-description', {
+    defaultMessage:
+      'Alerts related to file changes, including permissions, content, ownership, and attributes.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=fim&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const endpointSumary = {
+  category: 'wz-category-server-management',
+  id: 'endpoints-summary',
+  title: i18n.translate('wz-app-endpoints-summary', {
+    defaultMessage: 'Endpoints summary',
+  }),
+  description: i18n.translate('endpoints-summary-description', {
+    defaultMessage: 'Summary of agents and their status.',
+  }),
+  euiIconType: 'usersRolesApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/agents-preview/',
+};
+
+const malwareDetection = {
+  category: 'wz-category-endpoint-security',
+  id: 'malware-detection',
+  title: i18n.translate('wz-app-malware-detection', {
+    defaultMessage: 'Malware detection',
+  }),
+  description: i18n.translate('malware-detection-description', {
+    defaultMessage:
       'Verify that your systems are configured according to your security policies baseline.',
-    euiIconType: 'indexRollupApp',
-    redirectTo: () =>
-      `/overview/?tab=pm&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-endpoint-security',
-    id: 'security-configuration-assessment',
-    title: i18n.translate('wz-app-security-configuration-assessment', {
-      defaultMessage: 'Security configuration assessment',
-    }),
-    description:
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=pm&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const configurationAssessment = {
+  category: 'wz-category-endpoint-security',
+  id: 'configuration-assessment',
+  title: i18n.translate('wz-app-configuration-assessment', {
+    defaultMessage: 'Configuration assessment',
+  }),
+  description: i18n.translate('configuration-assessment-description', {
+    defaultMessage:
       'Scan your assets as part of a configuration assessment audit.',
-    euiIconType: 'managementApp',
-    redirectTo: () =>
-      `/overview/?tab=sca&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-endpoint-security',
-    id: 'system-auditing',
-    title: i18n.translate('wz-app-system-auditing', {
-      defaultMessage: 'System auditing',
-    }),
-    description:
-      'Audit users behavior, monitoring command execution and alerting on access to critical files.',
-    euiIconType: 'searchProfilerApp',
-    redirectTo: () =>
-      `/overview/?tab=audit&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-endpoint-security',
-    id: 'openscap',
-    title: i18n.translate('wz-app-openscap', {
-      defaultMessage: 'OpenSCAP',
-    }),
-    description:
-      'Configuration assessment and automation of compliance monitoring using SCAP checks.',
-    euiIconType: 'metricbeatApp',
-    redirectTo: () =>
-      `/overview/?tab=oscap&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-endpoint-security',
-    id: 'ciscat',
-    title: i18n.translate('wz-app-ciscat', {
-      defaultMessage: 'CIS-CAT',
-    }),
-    description:
-      'Configuration assessment using Center of Internet Security scanner and SCAP checks.',
-    euiIconType: 'metricbeatApp',
-    redirectTo: () =>
-      `/overview/?tab=ciscat&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-thread-intelligence',
-    id: 'security-events',
-    title: i18n.translate('wz-app-security-events', {
-      defaultMessage: 'Security events',
-    }),
-    description:
+  }),
+  euiIconType: 'managementApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=sca&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const threatHunting = {
+  category: 'wz-category-thread-intelligence',
+  id: 'threat-hunting',
+  title: i18n.translate('wz-app-threat-hunting', {
+    defaultMessage: 'Threat Hunting',
+  }),
+  description: i18n.translate('threat-hunting-description', {
+    defaultMessage:
       'Browse through your security alerts, identifying issues and threats in your environment.',
-    euiIconType: 'securityAnalyticsApp',
-    redirectTo: () =>
-      `/overview/?tab=general&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-thread-intelligence',
-    id: 'vulnerabilities',
-    title: i18n.translate('wz-app-vulnerabilities', {
-      defaultMessage: 'Vulnerabilities',
-    }),
-    description:
+  }),
+  euiIconType: 'securityAnalyticsApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=general&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const vulnerabilityDetection = {
+  category: 'wz-category-thread-intelligence',
+  id: 'vulnerability-detection',
+  title: i18n.translate('wz-app-vulnerability-detection', {
+    defaultMessage: 'Vulnerability detection',
+  }),
+  description: i18n.translate('vulnerability-detection-description', {
+    defaultMessage:
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
-    euiIconType: 'heartbeatApp',
-    redirectTo: () =>
-      `/overview/?tab=vuls&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-thread-intelligence',
-    id: 'mitre-attack',
-    title: i18n.translate('wz-app-mitre-attack', {
-      defaultMessage: 'MITRE ATT&CK',
-    }),
-    description:
+  }),
+  euiIconType: 'heartbeatApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=vuls&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const mitreAttack = {
+  category: 'wz-category-thread-intelligence',
+  id: 'mitre-attack',
+  title: i18n.translate('wz-app-mitre-attack', {
+    defaultMessage: 'MITRE ATT&CK',
+  }),
+  description: i18n.translate('mitre-attack-description', {
+    defaultMessage:
       'Security events from the knowledge base of adversary tactics and techniques based on real-world observations.',
-    euiIconType: 'grokApp',
-    redirectTo: () =>
-      `/overview/?tab=mitre&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-thread-intelligence',
-    id: 'virustotal',
-    title: i18n.translate('wz-app-virustotal', {
-      defaultMessage: 'Virustotal',
-    }),
-    description:
+  }),
+  euiIconType: 'grokApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=mitre&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const virustotal = {
+  category: 'wz-category-thread-intelligence',
+  id: 'virustotal',
+  title: i18n.translate('wz-app-virustotal', {
+    defaultMessage: 'Virustotal',
+  }),
+  description: i18n.translate('virustotal-description', {
+    defaultMessage:
       'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.',
-    euiIconType: 'monitoringApp',
-    redirectTo: () =>
-      `/overview/?tab=virustotal&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-security-operations',
-    id: 'pci-dss',
-    title: i18n.translate('wz-app-pci-dss', {
-      defaultMessage: 'PCI DSS',
-    }),
-    description:
-      'Global security standard for entities that process, store or transmit payment cardholder data.',
-    euiIconType: 'sqlApp',
-    redirectTo: () =>
-      `/overview/?tab=pci&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-security-operations',
-    id: 'hipaa',
-    title: i18n.translate('wz-app-hipaa', {
-      defaultMessage: 'HIPAA',
-    }),
-    description:
+  }),
+  euiIconType: 'monitoringApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=virustotal&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const pciDss = {
+  category: 'wz-category-security-operations',
+  id: 'pci-dss',
+  title: i18n.translate('wz-app-pci-dss', {
+    defaultMessage: 'PCI DSS',
+  }),
+  description: i18n.translate('pci-dss-description', {
+    defaultMessage:
+      'Global security standard for entities that process, store, or transmit payment cardholder data.',
+  }),
+  euiIconType: 'sqlApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=pci&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const hipaa = {
+  category: 'wz-category-security-operations',
+  id: 'hipaa',
+  title: i18n.translate('wz-app-hipaa', {
+    defaultMessage: 'HIPAA',
+  }),
+  description: i18n.translate('hipaa-description', {
+    defaultMessage:
       'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.',
-    euiIconType: 'monitoringApp',
-    redirectTo: () =>
-      `/overview/?tab=hipaa&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-security-operations',
-    id: 'gdpr',
-    title: i18n.translate('wz-app-gdpr', {
-      defaultMessage: 'GDPR',
-    }),
-    description:
+  }),
+  euiIconType: 'monitoringApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=hipaa&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const gdpr = {
+  category: 'wz-category-security-operations',
+  id: 'gdpr',
+  title: i18n.translate('wz-app-gdpr', {
+    defaultMessage: 'GDPR',
+  }),
+  description: i18n.translate('gdpr-description', {
+    defaultMessage:
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
-    euiIconType: 'sqlApp',
-    redirectTo: () =>
-      `/overview/?tab=gdpr&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-security-operations',
-    id: 'nist-800-53',
-    title: i18n.translate('wz-app-nist-800-53', {
-      defaultMessage: 'NIST 800-53',
-    }),
-    description:
+  }),
+  euiIconType: 'sqlApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=gdpr&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const nist80053 = {
+  category: 'wz-category-security-operations',
+  id: 'nist-800-53',
+  title: i18n.translate('wz-app-nist-800-53', {
+    defaultMessage: 'NIST 800-53',
+  }),
+  description: i18n.translate('nist-800-53-description', {
+    defaultMessage:
       'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.',
-    euiIconType: 'notebookApp',
-    redirectTo: () =>
-      `/overview/?tab=nist&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-security-operations',
-    id: 'tsc',
-    title: i18n.translate('wz-app-tsc', {
-      defaultMessage: 'TSC',
-    }),
-    description:
+  }),
+  euiIconType: 'notebookApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=nist&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const tsc = {
+  category: 'wz-category-security-operations',
+  id: 'tsc',
+  title: i18n.translate('wz-app-tsc', {
+    defaultMessage: 'TSC',
+  }),
+  description: i18n.translate('tsc-description', {
+    defaultMessage:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.',
-    euiIconType: 'packetbeatApp',
-    redirectTo: () =>
-      `/overview/?tab=tsc&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-security-operations',
-    id: 'it-hygiene',
-    title: i18n.translate('wz-app-it-hygiene', {
-      defaultMessage: 'IT Hygiene',
-    }),
-    description:
-      'Applications, network configuration, open ports and processes running on your monitored systems.',
-    euiIconType: 'visualizeApp',
-    redirectTo: () =>
-      `/agents/?tab=welcome${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agent=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-security-operations',
-    id: 'osquery',
-    title: i18n.translate('wz-app-osquery', {
-      defaultMessage: 'Osquery',
-    }),
-    description:
-      'Osquery can be used to expose an operating system as a high-performance relational database.',
-    euiIconType: 'sqlApp',
-    redirectTo: () =>
-      `/overview/?tab=osquery&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-cloud-security',
-    id: 'amazon-web-services',
-    title: i18n.translate('wz-app-amazon-web-services', {
-      defaultMessage: 'Amazon Web Services',
-    }),
-    description:
+  }),
+  euiIconType: 'packetbeatApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=tsc&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const itHygiene = {
+  category: 'wz-category-security-operations',
+  id: 'it-hygiene',
+  title: i18n.translate('wz-app-it-hygiene', {
+    defaultMessage: 'IT Hygiene',
+  }),
+  description: i18n.translate('it-hygiene-description', {
+    defaultMessage:
+      'Applications, network configuration, open ports, and processes running on your monitored systems.',
+  }),
+  euiIconType: 'visualizeApp',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/agents/?tab=welcome${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agent=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const amazonWebServices = {
+  category: 'wz-category-cloud-security',
+  id: 'amazon-web-services',
+  title: i18n.translate('wz-app-amazon-web-services', {
+    defaultMessage: 'Amazon Web Services',
+  }),
+  description: i18n.translate('amazon-web-services-description', {
+    defaultMessage:
       'Security events related to your Amazon AWS services, collected directly via AWS API.',
-    euiIconType: 'logoAWSMono',
-    redirectTo: () =>
-      `/overview/?tab=aws&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-cloud-security',
-    id: 'google-cloud',
-    title: i18n.translate('wz-app-google-cloud', {
-      defaultMessage: 'Google Cloud',
-    }),
-    description:
+  }),
+  euiIconType: 'logoAWSMono',
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=aws&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const googleCloud = {
+  category: 'wz-category-cloud-security',
+  id: 'google-cloud',
+  title: i18n.translate('wz-app-google-cloud', {
+    defaultMessage: 'Google Cloud',
+  }),
+  description: i18n.translate('google-cloud-description', {
+    defaultMessage:
       'Security events related to your Google Cloud Platform services, collected directly via GCP API.',
-    euiIconType: LogoGoogleCloud,
-    redirectTo: () =>
-      `/overview/?tab=gcp&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-cloud-security',
-    id: 'github',
-    title: i18n.translate('wz-app-github', {
-      defaultMessage: 'GitHub',
-    }),
-    description:
-      'Monitoring events from audit logs of your GitHub organitations',
-    euiIconType: LogoGitHub,
-    redirectTo: () =>
-      `/overview/?tab=github&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-cloud-security',
-    id: 'office365',
-    title: i18n.translate('wz-app-office365', {
-      defaultMessage: 'Office 365',
-    }),
-    description: 'Security events related to your Office 365 services.',
-    euiIconType: LogoOffice365,
-    redirectTo: () =>
-      `/overview/?tab=office&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-cloud-security',
-    id: 'docker-listener',
-    title: i18n.translate('wz-app-docker-listener', {
-      defaultMessage: 'Docker listener',
-    }),
-    description:
+  }),
+  euiIconType: LogoGoogleCloud,
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=gcp&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const github = {
+  category: 'wz-category-cloud-security',
+  id: 'github',
+  title: i18n.translate('wz-app-github', {
+    defaultMessage: 'GitHub',
+  }),
+  description: i18n.translate('github-description', {
+    defaultMessage:
+      'Monitoring events from audit logs of your GitHub organizations.',
+  }),
+  euiIconType: LogoGitHub,
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=github&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const office365 = {
+  category: 'wz-category-cloud-security',
+  id: 'office365',
+  title: i18n.translate('wz-app-office365', {
+    defaultMessage: 'Office 365',
+  }),
+  description: i18n.translate('office365-description', {
+    defaultMessage: 'Security events related to your Office 365 services.',
+  }),
+  euiIconType: LogoOffice365,
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=office&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const docker = {
+  category: 'wz-category-cloud-security',
+  id: 'docker',
+  title: i18n.translate('wz-app-docker', {
+    defaultMessage: 'Docker',
+  }),
+  description: i18n.translate('docker-description', {
+    defaultMessage:
       'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.',
-    euiIconType: LogoDocker,
-    redirectTo: () =>
-      `/overview/?tab=docker&tabView=panels${
-        store.getState()?.appStateReducers?.currentAgentData?.id
-          ? `&agentId=${
-              store.getState()?.appStateReducers?.currentAgentData?.id
-            }`
-          : ''
-      }`,
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'rules',
-    title: i18n.translate('wz-app-rules', {
-      defaultMessage: 'Rules',
-    }),
-    description: 'Manage your Wazuh cluster rules.',
-    euiIconType: 'indexRollupApp',
-    redirectTo: () => '/manager/?tab=ruleset',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'decoders',
-    title: i18n.translate('wz-app-decoders', {
-      defaultMessage: 'Decoders',
-    }),
-    description: 'Manage your Wazuh cluster decoders.',
-    euiIconType: 'indexRollupApp',
-    redirectTo: () => '/manager/?tab=decoders',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'cdb-lists',
-    title: i18n.translate('wz-app-lists', {
-      defaultMessage: 'CDB Lists',
-    }),
-    description: 'Manage your Wazuh cluster CDB list.',
-    euiIconType: 'indexRollupApp',
-    redirectTo: () => '/manager/?tab=lists',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'groups',
-    title: i18n.translate('wz-app-groups', {
-      defaultMessage: 'Groups',
-    }),
-    description: 'Manage your agent groups.',
-    euiIconType: 'usersRolesApp',
-    redirectTo: () => '/manager/?tab=groups',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'server-status',
-    title: i18n.translate('wz-app-status', {
-      defaultMessage: 'Status',
-    }),
-    description: 'Manage your Wazuh cluster status.',
-    euiIconType: 'uptimeApp',
-    redirectTo: () => '/manager/?tab=status',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'cluster',
-    title: i18n.translate('wz-app-cluster', {
-      defaultMessage: 'Cluster',
-    }),
-    description: 'Visualize your Wazuh cluster.',
-    euiIconType: 'indexPatternApp',
-    redirectTo: () => '/manager/?tab=monitoring',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'statistics',
-    title: i18n.translate('wz-app-statistics', {
-      defaultMessage: 'Statistics',
-    }),
-    description: 'Information about the Wazuh enviroment.',
-    euiIconType: 'visualizeApp',
-    redirectTo: () => '/manager/?tab=statistics',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'logs',
-    title: i18n.translate('wz-app-logs', {
-      defaultMessage: 'Logs',
-    }),
-    description: 'Logs from your Wazuh cluster.',
-    euiIconType: 'filebeatApp',
-    redirectTo: () => '/manager/?tab=logs',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'reporting',
-    title: i18n.translate('wz-app-reporting', {
-      defaultMessage: 'Reporting',
-    }),
-    description: 'Check your stored Wazuh reports.',
-    euiIconType: 'reportingApp',
-    redirectTo: () => '/manager/?tab=reporting',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'settings',
-    title: i18n.translate('wz-app-settings', {
-      defaultMessage: 'Settings',
-    }),
-    description: 'Manage your Wazuh cluster configuration.',
-    euiIconType: 'managementApp',
-    redirectTo: () => '/manager/?tab=configuration',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'api-console',
-    title: i18n.translate('wz-app-api-console', {
-      defaultMessage: 'API console',
-    }),
-    description: 'Test the Wazuh API endpoints.',
-    euiIconType: 'uptimeApp',
-    redirectTo: () => '/wazuh-dev/?tab=devTools',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'ruleset-test',
-    title: i18n.translate('wz-app-ruleset-test', {
-      defaultMessage: 'Ruleset test',
-    }),
-    description: 'Check your ruleset testing logs.',
-    euiIconType: 'consoleApp',
-    redirectTo: () => '/wazuh-dev/?tab=logtest',
-  },
-  {
-    category: 'wz-category-server-management',
-    id: 'rbac',
-    title: i18n.translate('wz-app-rbac', {
-      defaultMessage: 'RBAC',
-    }),
-    description:
+  }),
+  euiIconType: LogoDocker,
+  showInOverviewApp: true,
+  redirectTo: () =>
+    `/overview/?tab=docker&tabView=panels${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
+const rules = {
+  category: 'wz-category-server-management',
+  id: 'rules',
+  title: i18n.translate('wz-app-rules', {
+    defaultMessage: 'Rules',
+  }),
+  description: i18n.translate('rules-description', {
+    defaultMessage: 'Manage your Wazuh cluster rules.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=ruleset',
+};
+
+const decoders = {
+  category: 'wz-category-server-management',
+  id: 'decoders',
+  title: i18n.translate('wz-app-decoders', {
+    defaultMessage: 'Decoders',
+  }),
+  description: i18n.translate('decoders-description', {
+    defaultMessage: 'Manage your Wazuh cluster decoders.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=decoders',
+};
+
+const cdbLists = {
+  category: 'wz-category-server-management',
+  id: 'cdb-lists',
+  title: i18n.translate('wz-app-lists', {
+    defaultMessage: 'CDB Lists',
+  }),
+  description: i18n.translate('cdb-lists-description', {
+    defaultMessage: 'Manage your Wazuh cluster CDB list.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=lists',
+};
+
+const endpointGroups = {
+  category: 'wz-category-server-management',
+  id: 'endpoint-groups',
+  title: i18n.translate('wz-app-endpoint-groups', {
+    defaultMessage: 'Endpoint groups',
+  }),
+  description: i18n.translate('endpoint-groups-description', {
+    defaultMessage: 'Manage your agent groups.',
+  }),
+  euiIconType: 'usersRolesApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=groups',
+};
+
+const serverStatus = {
+  category: 'wz-category-server-management',
+  id: 'server-status',
+  title: i18n.translate('wz-app-status', {
+    defaultMessage: 'Status',
+  }),
+  description: i18n.translate('server-status-description', {
+    defaultMessage: 'Manage your Wazuh cluster status.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=status',
+};
+
+const cluster = {
+  category: 'wz-category-server-management',
+  id: 'cluster',
+  title: i18n.translate('wz-app-cluster', {
+    defaultMessage: 'Cluster',
+  }),
+  description: i18n.translate('cluster-description', {
+    defaultMessage: 'Manage your Wazuh cluster.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=cluster',
+};
+
+const statistics = {
+  category: 'wz-category-server-management',
+  id: 'statistics',
+  title: i18n.translate('wz-app-statistics', {
+    defaultMessage: 'Statistics',
+  }),
+  description: i18n.translate('statistics-description', {
+    defaultMessage: 'Information about the Wazuh enviroment.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=statistics',
+};
+
+const logs = {
+  category: 'wz-category-server-management',
+  id: 'logs',
+  title: i18n.translate('wz-app-logs', {
+    defaultMessage: 'Logs',
+  }),
+  description: i18n.translate('logs-description', {
+    defaultMessage: 'Logs from your Wazuh cluster.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=logs',
+};
+
+const reporting = {
+  category: 'management',
+  id: 'reporting',
+  title: i18n.translate('wz-app-reporting', {
+    defaultMessage: 'Reporting',
+  }),
+  description: i18n.translate('reporting-description', {
+    defaultMessage: 'Check your stored Wazuh reports.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=reporting',
+};
+
+const settings = {
+  category: 'wz-category-server-management',
+  id: 'settings',
+  title: i18n.translate('wz-app-settings', {
+    defaultMessage: 'Settings',
+  }),
+  description: i18n.translate('settings-description', {
+    defaultMessage: 'Manage your Wazuh cluster configuration.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=configuration',
+};
+
+const devTools = {
+  category: 'wz-category-security-operations',
+  id: 'dev-tools',
+  title: i18n.translate('wz-app-dev-tools', {
+    defaultMessage: 'Dev Tools',
+  }),
+  description: i18n.translate('dev-tools-description', {
+    defaultMessage: 'Test the Wazuh API endpoints.',
+  }),
+  euiIconType: 'devToolsApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/dev-tools',
+};
+
+const rulesetTest = {
+  category: 'wz-category-security-operations',
+  id: 'ruleset-test',
+  title: i18n.translate('wz-app-ruleset-test', {
+    defaultMessage: 'Ruleset test',
+  }),
+  description: i18n.translate('ruleset-test-description', {
+    defaultMessage: 'Check your ruleset testing logs.',
+  }),
+  euiIconType: 'visualizeApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/ruleset-test',
+};
+
+const security = {
+  category: 'wz-category-security-operations',
+  id: 'security',
+  title: i18n.translate('wz-app-security', {
+    defaultMessage: 'Security',
+  }),
+  description: i18n.translate('security-description', {
+    defaultMessage:
       'Manage permissions to system resources based on the roles and policies.',
-    euiIconType: 'managementApp',
-    redirectTo: () => '/security/?tab=users',
-  },
-  {
-    category: 'management',
-    id: 'server-api',
-    title: i18n.translate('wz-app-server-api', {
-      defaultMessage: 'Server API',
-    }),
-    description: 'Manage and configure the API entries.',
-    euiIconType: 'devToolsApp',
-    redirectTo: () => '/settings?tab=api',
-  },
-  {
-    category: 'management',
-    id: 'modules',
-    title: i18n.translate('wz-app-modules', {
-      defaultMessage: 'Modules',
-    }),
-    description: 'Manage your Wazuh App preview.',
-    euiIconType: 'gisApp',
-    redirectTo: () => '/settings?tab=modules',
-  },
-  {
-    category: 'management',
-    id: 'server-data',
-    title: i18n.translate('wz-app-server-data', {
-      defaultMessage: 'Server data',
-    }),
-    description: 'Add sample data with events to the modules.',
-    euiIconType: 'spacesApp',
-    redirectTo: () => '/settings?tab=sample_data',
-  },
-  {
-    category: 'management',
-    id: 'configuration',
-    title: i18n.translate('wz-app-configuration', {
-      defaultMessage: 'Configuration',
-    }),
-    description: 'Manage your Wazuh cluster configuration.',
-    euiIconType: 'devToolsApp',
-    redirectTo: () => '/settings?tab=configuration',
-  },
-  {
-    category: 'management',
-    id: 'app-logs',
-    title: i18n.translate('wz-app-app-logs', {
-      defaultMessage: 'Logs',
-    }),
-    description: 'Explore the logs related to the applications.',
-    euiIconType: 'filebeatApp',
-    redirectTo: () => '/settings?tab=logs',
-  },
-  {
-    category: 'management',
-    id: 'about',
-    title: i18n.translate('wz-app-about', {
-      defaultMessage: 'About',
-    }),
-    description: 'Show information about App Versions and community links.',
-    euiIconType: 'graphApp',
-    redirectTo: () => '/settings?tab=about',
-  },
+  }),
+  euiIconType: 'securityAnalyticsApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/security',
+};
+
+const serverApi = {
+  category: 'management',
+  id: 'server-api',
+  title: i18n.translate('wz-app-server-api', {
+    defaultMessage: 'Server API',
+  }),
+  description: i18n.translate('server-api-description', {
+    defaultMessage: 'Manage and configure the API entries.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=server-api',
+};
+
+const serverData = {
+  category: 'management',
+  id: 'server-data',
+  title: i18n.translate('wz-app-server-data', {
+    defaultMessage: 'Server data',
+  }),
+  description: i18n.translate('server-data-description', {
+    defaultMessage: 'Add sample data with events to the modules.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=server-data',
+};
+
+const wazuhPluginSettings = {
+  category: 'management',
+  id: 'wazuh-plugin-settings',
+  title: i18n.translate('wz-app-wazuh-plugin-settings', {
+    defaultMessage: 'Wazuh plugin settings',
+  }),
+  description: i18n.translate('wazuh-plugin-settings-description', {
+    defaultMessage: 'Manage your Wazuh cluster configuration.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=wazuh-plugin-settings',
+};
+
+const wazuhPluginLogs = {
+  category: 'management',
+  id: 'wazuh-plugin-logs',
+  title: i18n.translate('wz-app-wazuh-plugin-logs', {
+    defaultMessage: 'Wazuh plugin logs',
+  }),
+  description: i18n.translate('wazuh-plugin-logs-description', {
+    defaultMessage: 'Explore the logs related to the applications.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=wazuh-plugin-logs',
+};
+
+const wazuhPluginAbout = {
+  category: 'management',
+  id: 'wazuh-plugin-about',
+  title: i18n.translate('wz-app-wazuh-plugin-about', {
+    defaultMessage: 'Wazuh plugin about',
+  }),
+  description: i18n.translate('wazuh-plugin-about-description', {
+    defaultMessage: 'Show information about App Versions and community links.',
+  }),
+  euiIconType: 'indexRollupApp',
+  showInOverviewApp: true,
+  redirectTo: () => '/manager/?tab=wazuh-plugin-about',
+};
+
+export const Applications = [
+  fileIntegrityMonitoring,
+  overview,
+  malwareDetection,
+  configurationAssessment,
+  threatHunting,
+  vulnerabilityDetection,
+  mitreAttack,
+  virustotal,
+  pciDss,
+  hipaa,
+  gdpr,
+  nist80053,
+  tsc,
+  itHygiene,
+  devTools,
+  rulesetTest,
+  security,
+  amazonWebServices,
+  googleCloud,
+  github,
+  office365,
+  docker,
+  endpointSumary,
+  rules,
+  decoders,
+  cdbLists,
+  endpointGroups,
+  serverStatus,
+  cluster,
+  statistics,
+  logs,
+  settings,
+  reporting,
+  serverApi,
+  serverData,
+  wazuhPluginSettings,
+  wazuhPluginLogs,
+  wazuhPluginAbout,
 ];
 
 export const Categories = [
+  {
+    id: 'wz-category-home',
+    label: i18n.translate('wz-app-category-home', {
+      defaultMessage: 'Home',
+    }),
+    order: 0,
+    euiIconType: 'appSearchApp',
+  },
   {
     id: 'wz-category-endpoint-security',
     label: i18n.translate('wz-app-category-endpoint-security', {

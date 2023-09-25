@@ -44,16 +44,23 @@ const appCategories = Applications.reduce((categories, app) => {
   const existingCategory = categories.find(
     category => category.label === app.category,
   );
-  if (existingCategory) {
-    existingCategory.apps.push(app);
-  } else {
-    categories.push({
-      label: app.category,
-      apps: [app],
-    });
+  if (app.showInOverviewApp) {
+    if (existingCategory) {
+      existingCategory.apps.push(app);
+    } else {
+      categories.push({
+        label: app.category,
+        apps: [app],
+      });
+    }
   }
   return categories;
-}, []);
+}, []).sort((a, b) => {
+  return (
+    Categories.find(category => a.label === category.id).order -
+    Categories.find(category => b.label === category.id).order
+  );
+});
 
 export const OverviewWelcome = compose(
   withReduxProvider,
@@ -122,7 +129,7 @@ export const OverviewWelcome = compose(
         <Fragment>
           <EuiPage className='wz-welcome-page'>
             <EuiFlexGroup gutterSize='l'>
-              {this.props.agentsCountTotal == 0 && this.addAgent()}
+              {this.props.agentsCountTotal === 0 && this.addAgent()}
               <EuiFlexItem>
                 <EuiFlexGrid columns={2}>
                   {appCategories.map(({ label, apps }) => (
