@@ -9,7 +9,7 @@ import { getUpdatesRoute } from './get-updates';
 import axios from 'axios';
 
 const serverAddress = '127.0.0.1';
-const port = Math.floor(Math.random() * 60000) + 5000;
+const port = 10002; //assign a different port in each unit test
 axios.defaults.baseURL = `http://${serverAddress}:${port}`;
 
 const mockedGetUpdates = getUpdates as jest.Mock;
