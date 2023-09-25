@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DismissNotificationCheck component should render the check 1`] = `
+<div>
+  <div
+    class="euiCheckbox"
+  >
+    <input
+      class="euiCheckbox__input"
+      id="check-dismiss"
+      type="checkbox"
+    />
+    <div
+      class="euiCheckbox__square"
+    />
+    <label
+      class="euiCheckbox__label"
+      for="check-dismiss"
+    >
+      Disable updates notifications
+    </label>
+  </div>
+</div>
+`;
+
+exports[`DismissNotificationCheck component should return null when there is an error 1`] = `<div />`;

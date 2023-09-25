@@ -1,0 +1,95 @@
+{
+  "formats": {
+    "number": {
+      "currency": {
+        "style": "currency"
+      },
+      "percent": {
+        "style": "percent"
+      }
+    },
+    "date": {
+      "short": {
+        "month": "numeric",
+        "day": "numeric",
+        "year": "2-digit"
+      },
+      "medium": {
+        "month": "short",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "long": {
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "full": {
+        "weekday": "long",
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      }
+    },
+    "time": {
+      "short": {
+        "hour": "numeric",
+        "minute": "numeric"
+      },
+      "medium": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric"
+      },
+      "long": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      },
+      "full": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      }
+    },
+    "relative": {
+      "years": {
+        "units": "year"
+      },
+      "months": {
+        "units": "month"
+      },
+      "days": {
+        "units": "day"
+      },
+      "hours": {
+        "units": "hour"
+      },
+      "minutes": {
+        "units": "minute"
+      },
+      "seconds": {
+        "units": "second"
+      }
+    }
+  },
+  "messages": {
+    "wazuhCheckUpdates.updatesNotification.message": "Wazuh new release is available now!",
+    "wazuhCheckUpdates.updatesNotification.linkText": "Go to the release notes for details",
+    "wazuhCheckUpdates.updatesNotification.dismissCheckText": "Disable updates notifications",
+    "wazuhCheckUpdates.updatesNotification.closeButtonText": "Close",
+    "wazuhCheckUpdates.upToDateStatus.upToDate": "Up to date",
+    "wazuhCheckUpdates.upToDateStatus.availableUpdates": "Available updates",
+    "wazuhCheckUpdates.upToDateStatus.getAvailableUpdatesError": "Error trying to get available updates",
+    "wazuhCheckUpdates.upToDateStatus.lastCheck": "Last check",
+    "wazuhCheckUpdates.upToDateStatus.buttonText": "Check updates",
+    "wazuhCheckUpdates.upToDateStatus.onClickButtonError": "Error trying to get updates",
+    "wazuhCheckUpdates.currentUpdateDetails.releaseNotesLink": "Release notes",
+    "wazuhCheckUpdates.currentUpdateDetails.title": "Wazuh new release is available now!",
+    "wazuhCheckUpdates.currentUpdateDetails.upgradeGuideLink": "Upgrade guide",
+    "wazuhCheckUpdates.currentUpdateDetails.showDetails": "Show details",
+    "wazuhCheckUpdates.dismissNotificationCheck.checkText": "Disable updates notifications"
+  }
+}
