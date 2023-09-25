@@ -25,6 +25,7 @@ import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
 import { SettingsAboutAppInfo } from './appInfo';
 import { SettingsAboutBottomInfo } from './bottomInfo';
 import { Update } from '../../../../../wazuh-check-updates/common/types';
+import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
 
 interface SettingsAboutProvider {
   appInfo: {
@@ -39,10 +40,18 @@ const SettingsAboutProvider = (props: SettingsAboutProvider) => {
 
   const [currentUpdate, setCurrentUpdate] = useState<Update | undefined>();
 
+  const { CurrentUpdateDetails } = getWazuhCheckUpdatesPlugin();
+
   return (
     <EuiPage paddingSize="m">
       <EuiPageBody>
         <SettingsAboutAppInfo appInfo={appInfo} setCurrentUpdate={setCurrentUpdate} />
+        {currentUpdate ? (
+          <>
+            <EuiSpacer size="l" />
+            <CurrentUpdateDetails currentUpdate={currentUpdate} />
+          </>
+        ) : null}
         <EuiSpacer size="l" />
         <SettingsAboutBottomInfo pluginAppName={pluginAppName} />
       </EuiPageBody>
