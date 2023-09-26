@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SettingsAbout component should render a component with a loader 1`] = `
+<div>
+  <div
+    class="euiPage euiPage--paddingMedium euiPage--grow"
+  >
+    <div
+      class="euiPageBody euiPageBody--borderRadiusNone"
+    >
+      <div>
+        General info
+      </div>
+      <div
+        class="euiSpacer euiSpacer--l"
+      />
+      <div
+        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      >
+        <span
+          class="euiLoadingContent"
+        >
+          <span
+            class="euiLoadingContent__singleLine"
+          >
+            <span
+              class="euiLoadingContent__singleLineBackground"
+            />
+          </span>
+          <span
+            class="euiLoadingContent__singleLine"
+          >
+            <span
+              class="euiLoadingContent__singleLineBackground"
+            />
+          </span>
+          <span
+            class="euiLoadingContent__singleLine"
+          >
+            <span
+              class="euiLoadingContent__singleLineBackground"
+            />
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SettingsAbout component should render a component without a loader 1`] = `
+<div>
+  <div
+    class="euiPage euiPage--paddingMedium euiPage--grow"
+  >
+    <div
+      class="euiPageBody euiPageBody--borderRadiusNone"
+    >
+      <div>
+        General info
+      </div>
+      <div
+        class="euiSpacer euiSpacer--l"
+      />
+      <div
+        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      >
+        <div>
+          App info
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

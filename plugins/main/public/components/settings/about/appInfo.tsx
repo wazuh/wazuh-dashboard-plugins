@@ -1,9 +1,16 @@
-import { EuiCallOut, EuiFlexGroup, EuiFlexItem, EuiLoadingSpinner, EuiText } from '@elastic/eui';
+import {
+  EuiCallOut,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiLoadingSpinner,
+  EuiText,
+  EuiSpacer,
+} from '@elastic/eui';
 import React from 'react';
 import { Update } from '../../../../../wazuh-check-updates/common/types';
 import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
 
-interface SettingsAboutProvider {
+interface SettingsAboutAppInfoProps {
   appInfo: {
     'app-version': string;
     installationDate: string;
@@ -12,11 +19,11 @@ interface SettingsAboutProvider {
   setCurrentUpdate: (update: Update | undefined) => void;
 }
 
-export const SettingsAboutAppInfo = ({ appInfo, setCurrentUpdate }: SettingsAboutProvider) => {
-  const { UpToDateStatus } = getWazuhCheckUpdatesPlugin();
+export const SettingsAboutAppInfo = ({ appInfo, setCurrentUpdate }: SettingsAboutAppInfoProps) => {
+  const { UpToDateStatus, DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
 
   return (
-    <EuiCallOut>
+    <>
       <EuiFlexGroup
         direction="row"
         responsive
@@ -24,54 +31,34 @@ export const SettingsAboutAppInfo = ({ appInfo, setCurrentUpdate }: SettingsAbou
         justifyContent="flexStart"
         gutterSize="m"
       >
-        <EuiFlexItem>
-          <EuiFlexGroup
-            direction="row"
-            responsive
-            alignItems="center"
-            justifyContent="flexStart"
-            gutterSize="s"
-          >
-            <EuiFlexItem grow={false}>
-              <EuiText>
-                <div className="wz-text-truncatable">
-                  {'App version: '}
-                  <span className="wz-text-bold">
-                    {appInfo ? appInfo['app-version'] : <EuiLoadingSpinner size="s" />}
-                  </span>
-                </div>
-              </EuiText>
-            </EuiFlexItem>
-            {appInfo ? (
-              <>
-                <EuiFlexItem grow={false}>
-                  <UpToDateStatus setCurrentUpdate={setCurrentUpdate} />
-                </EuiFlexItem>
-              </>
-            ) : null}
-          </EuiFlexGroup>
-        </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem grow={false}>
           <EuiText>
             <div className="wz-text-truncatable">
-              {'App revision: '}
-              <span className="wz-text-bold">
-                {appInfo ? appInfo['revision'] : <EuiLoadingSpinner size="s" />}
-              </span>
+              {'App version: '}
+              <span className="wz-text-bold">{appInfo['app-version']}</span>
             </div>
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem>
-          <EuiText>
-            <div className="wz-text-truncatable">
-              {'Install date: '}
-              <span className="wz-text-bold">
-                {appInfo ? appInfo['installationDate'] : <EuiLoadingSpinner size="s" />}
-              </span>
-            </div>
-          </EuiText>
+          <UpToDateStatus setCurrentUpdate={setCurrentUpdate} />
         </EuiFlexItem>
       </EuiFlexGroup>
-    </EuiCallOut>
+      <EuiSpacer />
+      <EuiText>
+        <div className="wz-text-truncatable">
+          {'App revision: '}
+          <span className="wz-text-bold">{appInfo['revision']}</span>
+        </div>
+      </EuiText>
+      <EuiSpacer />
+      <EuiText>
+        <div className="wz-text-truncatable">
+          {'Install date: '}
+          <span className="wz-text-bold">{appInfo['installationDate']}</span>
+        </div>
+      </EuiText>
+      <EuiSpacer />
+      <DismissNotificationCheck />
+    </>
   );
 };

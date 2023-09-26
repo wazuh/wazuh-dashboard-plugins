@@ -11,27 +11,19 @@ import React from 'react';
 import { getHttp } from '../../../kibana-services';
 import { getAssetURL } from '../../../utils/assets';
 
-interface SettingsAboutBottomInfoProps {
+interface SettingsAboutGeneralInfoProps {
   pluginAppName: string;
 }
 
-export const SettingsAboutBottomInfo = ({ pluginAppName }: SettingsAboutBottomInfoProps) => {
+export const SettingsAboutGeneralInfo = ({ pluginAppName }: SettingsAboutGeneralInfoProps) => {
   const googleGroupsSVG = getHttp().basePath.prepend(getAssetURL('images/icons/google_groups.svg'));
 
   const Section = ({ title, content }: { title: string; content: React.ReactNode }) => (
     <EuiFlexItem>
-      <EuiPanel paddingSize="l" hasShadow={false}>
-        <EuiFlexGroup gutterSize="l" direction="row" responsive>
-          <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize="l" direction="row" responsive>
-              <EuiFlexItem>
-                <EuiTitle size="m">
-                  <h2>{title}</h2>
-                </EuiTitle>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+      <EuiPanel paddingSize="l">
+        <EuiTitle size="m">
+          <h2>{title}</h2>
+        </EuiTitle>
         <EuiSpacer size="l" />
         {content}
       </EuiPanel>
@@ -55,7 +47,7 @@ export const SettingsAboutBottomInfo = ({ pluginAppName }: SettingsAboutBottomIn
       <Section
         title="Community"
         content={
-          <>
+          <div>
             <EuiText size="m">
               <p>Enjoy your Wazuh experience and please don't hesitate to give us your feedback.</p>
             </EuiText>
@@ -68,6 +60,7 @@ export const SettingsAboutBottomInfo = ({ pluginAppName }: SettingsAboutBottomIn
             >
               <EuiFlexItem grow={false}>
                 <EuiButtonIcon
+                  aria-label="Slack"
                   iconType="logoSlack"
                   iconSize="xxl"
                   href="https://wazuh.com/community/join-us-on-slack/"
@@ -78,6 +71,7 @@ export const SettingsAboutBottomInfo = ({ pluginAppName }: SettingsAboutBottomIn
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButtonIcon
+                  aria-label="Google Groups"
                   iconType={googleGroupsSVG}
                   iconSize="xxl"
                   href="https://groups.google.com/forum/#!forum/wazuh"
@@ -88,6 +82,7 @@ export const SettingsAboutBottomInfo = ({ pluginAppName }: SettingsAboutBottomIn
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButtonIcon
+                  aria-label="Github"
                   iconType="logoGithub"
                   iconSize="xxl"
                   href="https://github.com/wazuh/wazuh-kibana-app"
@@ -97,7 +92,7 @@ export const SettingsAboutBottomInfo = ({ pluginAppName }: SettingsAboutBottomIn
                 </EuiButtonIcon>
               </EuiFlexItem>
             </EuiFlexGroup>
-          </>
+          </div>
         }
       />
     </EuiFlexGroup>

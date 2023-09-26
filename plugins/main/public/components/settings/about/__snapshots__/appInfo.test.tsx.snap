@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SettingsAboutAppInfo component should render version, revision, install date and UpToDateStatus and DismissNotificationCheck components 1`] = `
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <div
+        class="euiText euiText--medium"
+      >
+        <div
+          class="wz-text-truncatable"
+        >
+          App version: 
+          <span
+            class="wz-text-bold"
+          >
+            4.8.0
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      class="euiFlexItem"
+    >
+      <div>
+        Up to date status component
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiText euiText--medium"
+  >
+    <div
+      class="wz-text-truncatable"
+    >
+      App revision: 
+      <span
+        class="wz-text-bold"
+      >
+        01
+      </span>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiText euiText--medium"
+  >
+    <div
+      class="wz-text-truncatable"
+    >
+      Install date: 
+      <span
+        class="wz-text-bold"
+      >
+        Sep 25, 2023 @ 14:03:40.816
+      </span>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div>
+    Dismiss notification check component
+  </div>
+</div>
+`;
