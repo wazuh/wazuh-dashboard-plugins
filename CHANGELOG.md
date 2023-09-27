@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Create the log data analysis dashboard. [#5910](https://github.com/wazuh/wazuh-kibana-app/pull/5910)
 - Create the malware detection dashboard. [#5899](https://github.com/wazuh/wazuh-kibana-app/pull/5899)
 - Update integrity monitoring dashboard. [#5929](https://github.com/wazuh/wazuh-kibana-app/pull/5929)
+- Update regulatory compliance dashboard. [#5942](https://github.com/wazuh/wazuh-kibana-app/pull/5942)
 
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.9.0 - Revision 00
 
