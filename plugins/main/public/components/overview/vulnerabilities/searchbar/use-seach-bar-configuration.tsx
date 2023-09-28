@@ -24,7 +24,7 @@ type tUserSearchBarResponse = {
  * @param props 
  * @returns 
  */
-const useSearchBar = (props: tUseSearchBarProps): tUserSearchBarResponse => {
+const useSearchBarConfiguration = (props: tUseSearchBarProps): tUserSearchBarResponse => {
     // dependencies
     const filterManager = useFilterManager().filterManager as FilterManager;
     const [query, setQuery] = props.query ? useState(props.query) : useQueryManager();
@@ -123,4 +123,4 @@ const useSearchBar = (props: tUseSearchBarProps): tUserSearchBarResponse => {
     }
 }
 
-export default useSearchBar;
+export default useSearchBarConfiguration;
