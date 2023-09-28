@@ -17,8 +17,9 @@ import { EnableModules } from '../../components/settings/modules/modules';
 import { WzConfigurationSettings } from '../../components/settings/configuration/configuration';
 import SettingsLogs from '../../components/settings/settings-logs/logs';
 import { SettingsMiscellaneous } from '../../components/settings/miscellaneous/miscellaneous';
-import {WzSampleDataWrapper} from '../../components/add-modules-data/WzSampleDataWrapper'
+import { WzSampleDataWrapper } from '../../components/add-modules-data/WzSampleDataWrapper';
 import { getAngularModule } from '../../kibana-services';
+import { SettingsAbout } from '../../components/settings/about';
 
 const app = getAngularModule();
 
@@ -30,6 +31,7 @@ SettingsMiscellaneous.displayName = 'SettingsMiscellaneous';
 ApiTable.displayName = 'ApiTable';
 AddApi.displayName = 'AddApi';
 ApiIsDown.displayName = 'ApiIsDown';
+SettingsAbout.displayName = 'SettingsAbout';
 
 app
   .controller('settingsController', SettingsController)
@@ -40,4 +42,5 @@ app
   .value('SettingsMiscelaneous', SettingsMiscellaneous)
   .value('ApiTable', ApiTable)
   .value('AddApi', AddApi)
-  .value('ApiIsDown', ApiIsDown);
+  .value('ApiIsDown', ApiIsDown)
+  .value('SettingsAbout', SettingsAbout);

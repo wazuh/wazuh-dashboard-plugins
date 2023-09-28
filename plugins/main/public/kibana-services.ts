@@ -13,6 +13,7 @@ import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { VisualizationsStart } from '../../../src/plugins/visualizations/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AppPluginStartDependencies } from './types';
+import { WazuhCheckUpdatesPluginStart } from '../../wazuh-check-updates/public';
 
 let angularModule: any = null;
 let discoverModule: any = null;
@@ -34,6 +35,8 @@ export const [getVisualizationsPlugin, setVisualizationsPlugin] =
   createGetterSetter<VisualizationsStart>('VisualizationsPlugin');
 export const [getNavigationPlugin, setNavigationPlugin] =
   createGetterSetter<NavigationPublicPluginStart>('NavigationPlugin');
+export const [getWazuhCheckUpdatesPlugin, setWazuhCheckUpdatesPlugin] =
+  createGetterSetter<WazuhCheckUpdatesPluginStart>('WazuhCheckUpdatesPlugin');
 
 /**
  * set bootstrapped inner angular module
