@@ -70,14 +70,18 @@ export const UpdatesNotification = () => {
   return isVisible ? (
     <I18nProvider>
       <EuiBottomBar style={{ backgroundColor: 'white', color: '#1a1c21' }}>
-        <EuiFlexGroup justifyContent="spaceBetween" alignItems="center" gutterSize="m">
+        <EuiFlexGroup
+          justifyContent='spaceBetween'
+          alignItems='center'
+          gutterSize='m'
+        >
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize="m" alignItems="center">
+            <EuiFlexGroup gutterSize='m' alignItems='center'>
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
                 <EuiText>
                   <FormattedMessage
-                    id="wazuhCheckUpdates.updatesNotification.message"
-                    defaultMessage="Wazuh new release is available now!"
+                    id='wazuhCheckUpdates.updatesNotification.message'
+                    defaultMessage='Wazuh new release is available now!'
                   />
                 </EuiText>
               </EuiFlexItem>
@@ -88,14 +92,14 @@ export const UpdatesNotification = () => {
                 <EuiHeaderLink
                   href={releaseNotesUrl}
                   isActive
-                  target="_blank"
-                  iconType="popout"
-                  iconSide="right"
+                  target='_blank'
+                  iconType='popout'
+                  iconSide='right'
                 >
                   {
                     <FormattedMessage
-                      id="wazuhCheckUpdates.updatesNotification.linkText"
-                      defaultMessage="Go to the release notes for details"
+                      id='wazuhCheckUpdates.updatesNotification.linkText'
+                      defaultMessage='Go to the release notes for details'
                     />
                   }
                 </EuiHeaderLink>
@@ -103,25 +107,29 @@ export const UpdatesNotification = () => {
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize="m" alignItems="center">
+            <EuiFlexGroup gutterSize='m' alignItems='center'>
               <EuiFlexItem grow={false}>
                 <EuiCheckbox
-                  id="check-dismiss-in-notification"
+                  id='check-dismiss-in-notification'
                   label={
                     <FormattedMessage
-                      id="wazuhCheckUpdates.updatesNotification.dismissCheckText"
-                      defaultMessage="Disable updates notifications"
+                      id='wazuhCheckUpdates.updatesNotification.dismissCheckText'
+                      defaultMessage='Disable updates notifications'
                     />
                   }
                   checked={dismissFutureUpdates}
-                  onChange={(e) => handleOnChangeDismiss(e.target.checked)}
+                  onChange={e => handleOnChangeDismiss(e.target.checked)}
                 />
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <EuiButton size="s" iconType="cross" onClick={() => handleOnClose()}>
+                <EuiButton
+                  size='s'
+                  iconType='cross'
+                  onClick={() => handleOnClose()}
+                >
                   <FormattedMessage
-                    id="wazuhCheckUpdates.updatesNotification.closeButtonText"
-                    defaultMessage="Close"
+                    id='wazuhCheckUpdates.updatesNotification.closeButtonText'
+                    defaultMessage='Close'
                   />
                 </EuiButton>
               </EuiFlexItem>
