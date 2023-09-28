@@ -1,28 +1,49 @@
-/*
- * Wazuh app - React component for Settings > About
- *
- * Copyright (C) 2015-2023 Wazuh, Inc.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * Find more information about this on the LICENSE file.
- *
- */
+import React, { useState } from 'react';
+import { EuiLoadingContent, EuiPage, EuiPageBody, EuiPanel, EuiSpacer } from '@elastic/eui';
+import { SettingsAboutAppInfo } from './appInfo';
+import { SettingsAboutGeneralInfo } from './generalInfo';
+import { Update } from '../../../../../wazuh-check-updates/common/types';
+import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
 
-import { compose } from 'redux';
-import {
-  withUserAuthorizationPrompt,
-  withErrorBoundary,
-  withReduxProvider,
-} from '../../common/hocs';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
-import { SettingsAboutPage } from './aboutPage';
+interface SettingsAboutProps {
+  appInfo?: {
+    'app-version': string;
+    installationDate: string;
+    revision: string;
+  };
+  pluginAppName: string;
+}
 
-export const SettingsAbout = compose(
-  withErrorBoundary,
-  withReduxProvider,
-  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
-)(SettingsAboutPage);
+export const SettingsAbout = (props: SettingsAboutProps) => {
+  const { appInfo, pluginAppName } = props;
+
+  const [currentUpdate, setCurrentUpdate] = useState<Update | undefined>();
+
+  const { CurrentUpdateDetails } = getWazuhCheckUpdatesPlugin();
+
+  const isLoading = !appInfo;
+
+  return (
+    <EuiPage paddingSize="m">
+      <EuiPageBody>
+        <SettingsAboutGeneralInfo pluginAppName={pluginAppName} />
+        <EuiSpacer size="l" />
+        <EuiPanel paddingSize="l">
+          {isLoading ? (
+            <EuiLoadingContent lines={3} />
+          ) : (
+            <>
+              <SettingsAboutAppInfo appInfo={appInfo} setCurrentUpdate={setCurrentUpdate} />
+              {currentUpdate ? (
+                <>
+                  <EuiSpacer size="l" />
+                  <CurrentUpdateDetails currentUpdate={currentUpdate} />
+                </>
+              ) : null}
+            </>
+          )}
+        </EuiPanel>
+      </EuiPageBody>
+    </EuiPage>
+  );
+};

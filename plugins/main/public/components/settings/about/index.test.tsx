@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { SettingsAboutPage } from './aboutPage';
+import { SettingsAbout } from '.';
 
 jest.mock('../../../kibana-services', () => ({
   getWazuhCheckUpdatesPlugin: jest.fn().mockReturnValue({
@@ -19,7 +19,7 @@ jest.mock('./generalInfo', () => ({
 
 describe('SettingsAbout component', () => {
   test('should render a component with a loader', () => {
-    const { container } = render(<SettingsAboutPage pluginAppName="Wazuh dashboard" />);
+    const { container } = render(<SettingsAbout pluginAppName="Wazuh dashboard" />);
 
     expect(container).toMatchSnapshot();
 
@@ -29,7 +29,7 @@ describe('SettingsAbout component', () => {
 
   test('should render a component without a loader', () => {
     const { container, getByText } = render(
-      <SettingsAboutPage
+      <SettingsAbout
         appInfo={{
           'app-version': '4.8.0',
           revision: '01',
