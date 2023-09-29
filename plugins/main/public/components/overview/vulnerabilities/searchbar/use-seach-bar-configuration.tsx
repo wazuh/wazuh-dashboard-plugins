@@ -32,7 +32,6 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
     // states
     const [isLoading, setIsLoading] = useState(false);
     const [indexPatternSelected, setIndexPatternSelected] = useState<IIndexPattern>();
-    const [error, setError] = useState();
 
     useEffect(() => {
         setIsLoading(true);
@@ -102,8 +101,8 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
         isLoading,
         ...indexPatternSelected && { indexPatterns: [indexPatternSelected] }, // indexPattern cannot be empty or empty []
         filters: filterManager.getFilters(),
-        query: query,
-        timeHistory: timeHistory,
+        query,
+        timeHistory,
         dateRangeFrom: timeFilter.from,
         dateRangeTo: timeFilter.to,
         onFiltersUpdated: (filters: Filter[]) => {

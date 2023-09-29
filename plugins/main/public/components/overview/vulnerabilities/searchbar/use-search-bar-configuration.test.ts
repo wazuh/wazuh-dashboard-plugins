@@ -8,7 +8,6 @@ import {
   Query,
   TimeRange,
 } from '../../../../../../../src/plugins/data/public';
-import { createFilterManagerMock } from '../../../../../../../src/plugins/data/public/query/filter_manager/filter_manager.mock';
 // wazuh plugin dependencies
 import useSearchBar from './use-seach-bar-configuration';
 import { getDataPlugin } from '../../../../kibana-services';
