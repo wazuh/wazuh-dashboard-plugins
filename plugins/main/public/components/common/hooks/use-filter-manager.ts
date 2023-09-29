@@ -13,8 +13,14 @@ import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect, useMemo } from 'react';
 import { Filter } from 'src/plugins/data/public';
 import _ from 'lodash';
+import { FilterManager } from '../../../../../../src/plugins/data/public';
 
-export const useFilterManager = () => {
+type tUseFilterManagerReturn = {
+  filterManager: FilterManager;
+  filters: Filter[];
+}
+
+export const useFilterManager = () : tUseFilterManagerReturn => {
   const filterManager = useMemo(() => getDataPlugin().query.filterManager, []);
   const [filters, setFilters] = useState<Filter[]>(filterManager.getFilters());
 
