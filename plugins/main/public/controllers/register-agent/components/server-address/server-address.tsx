@@ -47,7 +47,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
     );
   const closeServerAddress = () => setIsPopoverServerAddress(false);
   const [rememberServerAddress, setRememberServerAddress] = useState(false);
-  const [defaultServerAddress, setDefaultServerAddress] = useState(formField.initialValue ? formField.initialValue : '')
+  const [defaultServerAddress, setDefaultServerAddress] = useState(formField?.initialValue ? formField?.initialValue : '')
 
   const handleToggleRememberAddress = async (event) => {
     setRememberServerAddress(event.target.checked);
