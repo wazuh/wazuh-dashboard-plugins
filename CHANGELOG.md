@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Create the incident response dashboard. [#5934](https://github.com/wazuh/wazuh-kibana-app/pull/5934)
 - Update integrity monitoring dashboard. [#5929](https://github.com/wazuh/wazuh-kibana-app/pull/5929)
 - Update containers security dashboard. [#5944](https://github.com/wazuh/wazuh-kibana-app/pull/5944)
+- Update regulatory compliance dashboard. [#5942](https://github.com/wazuh/wazuh-kibana-app/pull/5942)
 - Update cloud security dashboard. [#5943](https://github.com/wazuh/wazuh-kibana-app/pull/5943)
 
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.9.0 - Revision 00
