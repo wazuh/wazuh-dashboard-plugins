@@ -9,28 +9,18 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 // Eui components
 import {
   EuiFlexItem,
-  EuiButtonEmpty,
   EuiPopover,
   EuiFormRow,
   EuiFieldText,
-  EuiSpacer,
   EuiFlexGroup,
-  EuiButton,
 } from '@elastic/eui';
 
-import { connect } from 'react-redux';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
-import {
-  updateLoadingStatus,
-  updateIsProcessing,
-} from '../../../../../redux/actions/groupsActions';
-
-import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
 import { getToasts } from '../../../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -45,14 +35,10 @@ class WzGroupsActionButtons extends Component {
     super(props);
 
     this.state = {
-      generatingCsv: false,
       isPopoverOpen: false,
       newGroupName: '',
     };
-    this.exportCsv = exportCsv;
 
-    this.groupsHandler = GroupsHandler;
-    this.refreshTimeoutId = null;
   }
 
   componentDidMount() {
@@ -66,41 +52,6 @@ class WzGroupsActionButtons extends Component {
 
   componentWillUnmount() {
     this._isMounted = false;
-  }
-
-  /**
-   * Refresh the items
-   */
-  async refresh() {
-    try {
-      this.props.updateIsProcessing(true);
-      this.onRefreshLoading();
-    } catch (error) {
-      const options = {
-        context: `${WzGroupsActionButtons.name}.refresh`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.message || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
-  onRefreshLoading() {
-    clearInterval(this.refreshTimeoutId);
-
-    this.props.updateLoadingStatus(true);
-    this.refreshTimeoutId = setInterval(() => {
-      if (!this.props.state.isProcessing) {
-        this.props.updateLoadingStatus(false);
-        clearInterval(this.refreshTimeoutId);
-      }
-    }, 100);
   }
 
   togglePopover() {
@@ -169,13 +120,11 @@ class WzGroupsActionButtons extends Component {
   async createGroup() {
     try {
       if (this.isOkNameGroup(this.state.newGroupName)) {
-        this.props.updateLoadingStatus(true);
-        await this.groupsHandler.saveGroup(this.state.newGroupName);
+        await GroupsHandler.saveGroup(this.state.newGroupName);
         this.showToast('success', 'Success', 'The group has been created successfully', 2000);
         this.clearGroupName();
 
-        this.props.updateIsProcessing(true);
-        this.props.updateLoadingStatus(false);
+        this.props.reloadTable();
         this.closePopover();
       }
     } catch (error) {
@@ -192,40 +141,8 @@ class WzGroupsActionButtons extends Component {
         },
       };
       getErrorOrchestrator().handleError(options);
-      this.props.updateLoadingStatus(false);
       throw new Error(error);
     }
-  }
-
-  /**
-   * Generates a CSV
-   */
-  async generateCsv() {
-    try {
-      this.setState({ generatingCsv: true });
-      const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv('/groups', filters, 'Groups');
-      this.showToast(
-        'success',
-        'Success',
-        'CSV. Your download should begin automatically...',
-        2000
-      );
-    } catch (error) {
-      const options = {
-        context: `${WzGroupsActionButtons.name}.generateCsv`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `Error when exporting the CSV file: ${error.message || error}`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-    this.setState({ generatingCsv: false });
   }
 
   showToast = (color, title, text, time) => {
@@ -255,78 +172,41 @@ class WzGroupsActionButtons extends Component {
       </WzButtonPermissions>
     );
 
-    // Export button
-    const exportButton = (
-      <EuiButtonEmpty
-        iconType="exportAction"
-        onClick={async () => await this.generateCsv()}
-        isLoading={this.state.generatingCsv}
-      >
-        Export formatted
-      </EuiButtonEmpty>
-    );
-
-    // Refresh
-    const refreshButton = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
-        Refresh
-      </EuiButtonEmpty>
-    );
-
     return (
-      <Fragment>
-        <EuiFlexItem grow={false}>
-          <EuiPopover
-            id="popover"
-            button={newGroupButton}
-            isOpen={this.state.isPopoverOpen}
-            closePopover={() => this.closePopover()}
-          >
-            <EuiFlexGroup direction={'column'}>
-              <EuiFlexItem>
-                <EuiFormRow label="Introduce the group name" id="">
-                  <EuiFieldText
-                    className="groupNameInput"
-                    value={this.state.newGroupName}
-                    onChange={this.onChangeNewGroupName}
-                    aria-label=""
-                  />
-                </EuiFormRow>
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <WzButtonPermissions
-                  permissions={[{ action: 'group:create', resource: '*:*:*' }]}
-                  iconType="save"
-                  isDisabled={!this.isOkNameGroup(this.state.newGroupName)}
-                  fill
-                  onClick={async () => {
-                    await this.createGroup();
-                  }}
-                >
-                  Save new group
-                </WzButtonPermissions>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiPopover>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>{exportButton}</EuiFlexItem>
-        <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
-      </Fragment>
+      <EuiPopover
+        id="popover"
+        button={newGroupButton}
+        isOpen={this.state.isPopoverOpen}
+        closePopover={() => this.closePopover()}
+      >
+        <EuiFlexGroup direction={'column'}>
+          <EuiFlexItem>
+            <EuiFormRow label="Introduce the group name" id="">
+              <EuiFieldText
+                className="groupNameInput"
+                value={this.state.newGroupName}
+                onChange={this.onChangeNewGroupName}
+                aria-label=""
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <WzButtonPermissions
+              permissions={[{ action: 'group:create', resource: '*:*:*' }]}
+              iconType="save"
+              isDisabled={!this.isOkNameGroup(this.state.newGroupName)}
+              fill
+              onClick={async () => {
+                await this.createGroup();
+              }}
+            >
+              Save new group
+            </WzButtonPermissions>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiPopover>
     );
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    state: state.groupsReducers,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtons);
+export default WzGroupsActionButtons;

@@ -6,6 +6,17 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
   reload={[Function]}
   rowProps={[Function]}
   searchBarSuggestions={Array []}
+  searchBarWQL={
+    Object {
+      "options": Object {
+        "searchTermFields": Array [],
+      },
+      "suggestions": Object {
+        "field": [Function],
+        "value": [Function],
+      },
+    }
+  }
   tableColumns={
     Array [
       Object {
@@ -44,222 +55,494 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
   }
   tableProps={Object {}}
 >
-  <WzSearchBar
-    filters={Array []}
-    noDeleteFiltersOnUpdateSuggests={true}
-    onFiltersChange={[Function]}
-    placeholder="Filter or search"
-    suggestions={Array []}
+  <SearchBar
+    defaultMode="wql"
+    input=""
+    modes={
+      Array [
+        Object {
+          "id": "wql",
+          "options": Object {
+            "searchTermFields": Array [],
+          },
+          "suggestions": Object {
+            "field": [Function],
+            "value": [Function],
+          },
+        },
+      ]
+    }
+    onSearch={[Function]}
   >
-    <EuiFlexGroup>
-      <div
-        className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
-      >
-        <EuiFlexItem>
+    <EuiSuggest
+      append={
+        <EuiPopover
+          anchorPosition="downCenter"
+          button={
+            <EuiButtonEmpty
+              onClick={[Function]}
+            >
+              WQL
+            </EuiButtonEmpty>
+          }
+          closePopover={[Function]}
+          display="inlineBlock"
+          hasArrow={true}
+          isOpen={false}
+          ownFocus={true}
+          panelPaddingSize="m"
+        >
+          <EuiPopoverTitle>
+            SYNTAX OPTIONS
+          </EuiPopoverTitle>
           <div
-            className="euiFlexItem"
+            style={
+              Object {
+                "width": "350px",
+              }
+            }
           >
-            <EuiSuggest
-              inputRef={[Function]}
-              isInvalid={false}
-              isPopoverOpen={false}
-              onClosePopover={[Function]}
-              onInputChange={[Function]}
-              onItemClick={[Function]}
-              onKeyPress={[Function]}
-              onPopoverFocus={[Function]}
-              placeholder="Filter or search"
-              prepend={
-                <WzSearchBadges
-                  filters={Array []}
-                  onFiltersChange={[Function]}
+            <EuiText>
+              WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.
+            </EuiText>
+            <React.Fragment>
+              <EuiSpacer />
+              <div>
+                <EuiLink
+                  href="https://documentation.wazuh.com/4.8/user-manual/wazuh-dashboard/queries.html"
+                  rel="noopener noreferrer"
+                  target="__blank"
+                >
+                  Documentation
+                </EuiLink>
+              </div>
+            </React.Fragment>
+          </div>
+        </EuiPopover>
+      }
+      inputRef={
+        Object {
+          "current": <input
+            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+            placeholder="Search"
+            type="text"
+            value=""
+          />,
+        }
+      }
+      isPopoverOpen={false}
+      onChange={[Function]}
+      onClosePopover={[Function]}
+      onInputChange={[Function]}
+      onKeyPress={[Function]}
+      onPopoverFocus={[Function]}
+      placeholder="Search"
+      suggestions={Array []}
+      value=""
+    >
+      <div
+        onChange={[Function]}
+      >
+        <EuiSuggestInput
+          append={
+            <EuiPopover
+              anchorPosition="downCenter"
+              button={
+                <EuiButtonEmpty
+                  onClick={[Function]}
+                >
+                  WQL
+                </EuiButtonEmpty>
+              }
+              closePopover={[Function]}
+              display="inlineBlock"
+              hasArrow={true}
+              isOpen={false}
+              ownFocus={true}
+              panelPaddingSize="m"
+            >
+              <EuiPopoverTitle>
+                SYNTAX OPTIONS
+              </EuiPopoverTitle>
+              <div
+                style={
+                  Object {
+                    "width": "350px",
+                  }
+                }
+              >
+                <EuiText>
+                  WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.
+                </EuiText>
+                <React.Fragment>
+                  <EuiSpacer />
+                  <div>
+                    <EuiLink
+                      href="https://documentation.wazuh.com/4.8/user-manual/wazuh-dashboard/queries.html"
+                      rel="noopener noreferrer"
+                      target="__blank"
+                    >
+                      Documentation
+                    </EuiLink>
+                  </div>
+                </React.Fragment>
+              </div>
+            </EuiPopover>
+          }
+          inputRef={
+            Object {
+              "current": <input
+                class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                placeholder="Search"
+                type="text"
+                value=""
+              />,
+            }
+          }
+          isPopoverOpen={false}
+          onChange={[Function]}
+          onClosePopover={[Function]}
+          onKeyPress={[Function]}
+          onPopoverFocus={[Function]}
+          placeholder="Search"
+          sendValue={[Function]}
+          status="unchanged"
+          suggestions={Array []}
+          value=""
+        >
+          <div
+            className="euiSuggestInput"
+          >
+            <EuiInputPopover
+              anchorPosition="downLeft"
+              attachToAnchor={true}
+              closePopover={[Function]}
+              disableFocusTrap={false}
+              display="block"
+              fullWidth={true}
+              id="popover"
+              input={
+                <EuiFieldText
+                  append={
+                    Array [
+                      <EuiPopover
+                        anchorPosition="downCenter"
+                        button={
+                          <EuiButtonEmpty
+                            onClick={[Function]}
+                          >
+                            WQL
+                          </EuiButtonEmpty>
+                        }
+                        closePopover={[Function]}
+                        display="inlineBlock"
+                        hasArrow={true}
+                        isOpen={false}
+                        ownFocus={true}
+                        panelPaddingSize="m"
+                      >
+                        <EuiPopoverTitle>
+                          SYNTAX OPTIONS
+                        </EuiPopoverTitle>
+                        <div
+                          style={
+                            Object {
+                              "width": "350px",
+                            }
+                          }
+                        >
+                          <EuiText>
+                            WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.
+                          </EuiText>
+                          <React.Fragment>
+                            <EuiSpacer />
+                            <div>
+                              <EuiLink
+                                href="https://documentation.wazuh.com/4.8/user-manual/wazuh-dashboard/queries.html"
+                                rel="noopener noreferrer"
+                                target="__blank"
+                              >
+                                Documentation
+                              </EuiLink>
+                            </div>
+                          </React.Fragment>
+                        </div>
+                      </EuiPopover>,
+                    ]
+                  }
+                  fullWidth={true}
+                  inputRef={
+                    Object {
+                      "current": <input
+                        class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                        placeholder="Search"
+                        type="text"
+                        value=""
+                      />,
+                    }
+                  }
+                  isLoading={false}
+                  onChange={[Function]}
+                  onFocus={[Function]}
+                  onKeyPress={[Function]}
+                  placeholder="Search"
+                  value=""
                 />
               }
-              status="unchanged"
-              suggestions={Array []}
-              value=""
+              isOpen={false}
+              panelPaddingSize="none"
             >
-              <div
-                onChange={[Function]}
+              <EuiPopover
+                anchorPosition="downLeft"
+                attachToAnchor={true}
+                button={
+                  <EuiResizeObserver
+                    onResize={[Function]}
+                  >
+                    [Function]
+                  </EuiResizeObserver>
+                }
+                buttonRef={[Function]}
+                className="euiInputPopover euiInputPopover--fullWidth"
+                closePopover={[Function]}
+                display="block"
+                hasArrow={true}
+                id="popover"
+                isOpen={false}
+                ownFocus={false}
+                panelPaddingSize="none"
+                panelRef={[Function]}
               >
-                <EuiSuggestInput
-                  inputRef={[Function]}
-                  isInvalid={false}
-                  isPopoverOpen={false}
-                  onClosePopover={[Function]}
-                  onKeyPress={[Function]}
-                  onPopoverFocus={[Function]}
-                  placeholder="Filter or search"
-                  prepend={
-                    <WzSearchBadges
-                      filters={Array []}
-                      onFiltersChange={[Function]}
-                    />
-                  }
-                  sendValue={[Function]}
-                  status="unchanged"
-                  suggestions={Array []}
-                  value=""
+                <EuiOutsideClickDetector
+                  onOutsideClick={[Function]}
                 >
                   <div
-                    className="euiSuggestInput"
+                    className="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                    id="popover"
+                    onKeyDown={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseUp={[Function]}
+                    onTouchEnd={[Function]}
+                    onTouchStart={[Function]}
                   >
-                    <EuiInputPopover
-                      anchorPosition="downLeft"
-                      attachToAnchor={true}
-                      closePopover={[Function]}
-                      disableFocusTrap={false}
-                      display="block"
-                      fullWidth={true}
-                      id="popover"
-                      input={
-                        <EuiFieldText
-                          append={Array []}
-                          fullWidth={true}
-                          inputRef={[Function]}
-                          isInvalid={false}
-                          isLoading={false}
-                          onChange={[Function]}
-                          onFocus={[Function]}
-                          onKeyPress={[Function]}
-                          placeholder="Filter or search"
-                          prepend={
-                            <WzSearchBadges
-                              filters={Array []}
-                              onFiltersChange={[Function]}
-                            />
-                          }
-                          value=""
-                        />
-                      }
-                      isOpen={false}
-                      panelPaddingSize="none"
+                    <div
+                      className="euiPopover__anchor"
                     >
-                      <EuiPopover
-                        anchorPosition="downLeft"
-                        attachToAnchor={true}
-                        button={
-                          <EuiResizeObserver
-                            onResize={[Function]}
-                          >
-                            [Function]
-                          </EuiResizeObserver>
-                        }
-                        buttonRef={[Function]}
-                        className="euiInputPopover euiInputPopover--fullWidth"
-                        closePopover={[Function]}
-                        display="block"
-                        hasArrow={true}
-                        id="popover"
-                        isOpen={false}
-                        ownFocus={false}
-                        panelPaddingSize="none"
-                        panelRef={[Function]}
+                      <EuiResizeObserver
+                        onResize={[Function]}
                       >
-                        <EuiOutsideClickDetector
-                          onOutsideClick={[Function]}
-                        >
-                          <div
-                            className="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-                            id="popover"
-                            onKeyDown={[Function]}
-                            onMouseDown={[Function]}
-                            onMouseUp={[Function]}
-                            onTouchEnd={[Function]}
-                            onTouchStart={[Function]}
-                          >
-                            <div
-                              className="euiPopover__anchor"
-                            >
-                              <EuiResizeObserver
-                                onResize={[Function]}
-                              >
-                                <div>
-                                  <EuiFieldText
-                                    append={Array []}
-                                    fullWidth={true}
-                                    inputRef={[Function]}
-                                    isInvalid={false}
-                                    isLoading={false}
-                                    onChange={[Function]}
-                                    onFocus={[Function]}
-                                    onKeyPress={[Function]}
-                                    placeholder="Filter or search"
-                                    prepend={
-                                      <WzSearchBadges
-                                        filters={Array []}
-                                        onFiltersChange={[Function]}
-                                      />
+                        <div>
+                          <EuiFieldText
+                            append={
+                              Array [
+                                <EuiPopover
+                                  anchorPosition="downCenter"
+                                  button={
+                                    <EuiButtonEmpty
+                                      onClick={[Function]}
+                                    >
+                                      WQL
+                                    </EuiButtonEmpty>
+                                  }
+                                  closePopover={[Function]}
+                                  display="inlineBlock"
+                                  hasArrow={true}
+                                  isOpen={false}
+                                  ownFocus={true}
+                                  panelPaddingSize="m"
+                                >
+                                  <EuiPopoverTitle>
+                                    SYNTAX OPTIONS
+                                  </EuiPopoverTitle>
+                                  <div
+                                    style={
+                                      Object {
+                                        "width": "350px",
+                                      }
                                     }
-                                    value=""
                                   >
-                                    <EuiFormControlLayout
-                                      append={Array []}
-                                      fullWidth={true}
-                                      isLoading={false}
-                                      prepend={
-                                        <WzSearchBadges
-                                          filters={Array []}
-                                          onFiltersChange={[Function]}
-                                        />
+                                    <EuiText>
+                                      WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.
+                                    </EuiText>
+                                    <React.Fragment>
+                                      <EuiSpacer />
+                                      <div>
+                                        <EuiLink
+                                          href="https://documentation.wazuh.com/4.8/user-manual/wazuh-dashboard/queries.html"
+                                          rel="noopener noreferrer"
+                                          target="__blank"
+                                        >
+                                          Documentation
+                                        </EuiLink>
+                                      </div>
+                                    </React.Fragment>
+                                  </div>
+                                </EuiPopover>,
+                              ]
+                            }
+                            fullWidth={true}
+                            inputRef={
+                              Object {
+                                "current": <input
+                                  class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                                  placeholder="Search"
+                                  type="text"
+                                  value=""
+                                />,
+                              }
+                            }
+                            isLoading={false}
+                            onChange={[Function]}
+                            onFocus={[Function]}
+                            onKeyPress={[Function]}
+                            placeholder="Search"
+                            value=""
+                          >
+                            <EuiFormControlLayout
+                              append={
+                                Array [
+                                  <EuiPopover
+                                    anchorPosition="downCenter"
+                                    button={
+                                      <EuiButtonEmpty
+                                        onClick={[Function]}
+                                      >
+                                        WQL
+                                      </EuiButtonEmpty>
+                                    }
+                                    closePopover={[Function]}
+                                    display="inlineBlock"
+                                    hasArrow={true}
+                                    isOpen={false}
+                                    ownFocus={true}
+                                    panelPaddingSize="m"
+                                  >
+                                    <EuiPopoverTitle>
+                                      SYNTAX OPTIONS
+                                    </EuiPopoverTitle>
+                                    <div
+                                      style={
+                                        Object {
+                                          "width": "350px",
+                                        }
                                       }
                                     >
-                                      <div
-                                        className="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                                      <EuiText>
+                                        WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.
+                                      </EuiText>
+                                      <React.Fragment>
+                                        <EuiSpacer />
+                                        <div>
+                                          <EuiLink
+                                            href="https://documentation.wazuh.com/4.8/user-manual/wazuh-dashboard/queries.html"
+                                            rel="noopener noreferrer"
+                                            target="__blank"
+                                          >
+                                            Documentation
+                                          </EuiLink>
+                                        </div>
+                                      </React.Fragment>
+                                    </div>
+                                  </EuiPopover>,
+                                ]
+                              }
+                              fullWidth={true}
+                              isLoading={false}
+                            >
+                              <div
+                                className="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                              >
+                                <div
+                                  className="euiFormControlLayout__childrenWrapper"
+                                >
+                                  <EuiValidatableControl>
+                                    <input
+                                      className="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                                      onChange={[Function]}
+                                      onFocus={[Function]}
+                                      onKeyPress={[Function]}
+                                      placeholder="Search"
+                                      type="text"
+                                      value=""
+                                    />
+                                  </EuiValidatableControl>
+                                  <EuiFormControlLayoutIcons
+                                    isLoading={false}
+                                  />
+                                </div>
+                                <EuiPopover
+                                  anchorPosition="downCenter"
+                                  button={
+                                    <EuiButtonEmpty
+                                      onClick={[Function]}
+                                    >
+                                      WQL
+                                    </EuiButtonEmpty>
+                                  }
+                                  className="euiFormControlLayout__append"
+                                  closePopover={[Function]}
+                                  display="inlineBlock"
+                                  hasArrow={true}
+                                  isOpen={false}
+                                  key="0/.0"
+                                  ownFocus={true}
+                                  panelPaddingSize="m"
+                                >
+                                  <div
+                                    className="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                                  >
+                                    <div
+                                      className="euiPopover__anchor"
+                                    >
+                                      <EuiButtonEmpty
+                                        onClick={[Function]}
                                       >
-                                        <WzSearchBadges
-                                          className="euiFormControlLayout__prepend"
-                                          filters={Array []}
-                                          key="0/.0"
-                                          onFiltersChange={[Function]}
+                                        <button
+                                          className="euiButtonEmpty euiButtonEmpty--primary"
+                                          disabled={false}
+                                          onClick={[Function]}
+                                          type="button"
                                         >
-                                          <div
-                                            style={
+                                          <EuiButtonContent
+                                            className="euiButtonEmpty__content"
+                                            iconSide="left"
+                                            iconSize="m"
+                                            textProps={
                                               Object {
-                                                "display": "flex",
+                                                "className": "euiButtonEmpty__text",
                                               }
                                             }
-                                          />
-                                        </WzSearchBadges>
-                                        <div
-                                          className="euiFormControlLayout__childrenWrapper"
-                                        >
-                                          <EuiValidatableControl
-                                            isInvalid={false}
                                           >
-                                            <input
-                                              className="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                                              onChange={[Function]}
-                                              onFocus={[Function]}
-                                              onKeyPress={[Function]}
-                                              placeholder="Filter or search"
-                                              type="text"
-                                              value=""
-                                            />
-                                          </EuiValidatableControl>
-                                          <EuiFormControlLayoutIcons
-                                            isLoading={false}
-                                          />
-                                        </div>
-                                      </div>
-                                    </EuiFormControlLayout>
-                                  </EuiFieldText>
-                                </div>
-                              </EuiResizeObserver>
-                            </div>
-                          </div>
-                        </EuiOutsideClickDetector>
-                      </EuiPopover>
-                    </EuiInputPopover>
+                                            <span
+                                              className="euiButtonContent euiButtonEmpty__content"
+                                            >
+                                              <span
+                                                className="euiButtonEmpty__text"
+                                              >
+                                                WQL
+                                              </span>
+                                            </span>
+                                          </EuiButtonContent>
+                                        </button>
+                                      </EuiButtonEmpty>
+                                    </div>
+                                  </div>
+                                </EuiPopover>
+                              </div>
+                            </EuiFormControlLayout>
+                          </EuiFieldText>
+                        </div>
+                      </EuiResizeObserver>
+                    </div>
                   </div>
-                </EuiSuggestInput>
-              </div>
-            </EuiSuggest>
+                </EuiOutsideClickDetector>
+              </EuiPopover>
+            </EuiInputPopover>
           </div>
-        </EuiFlexItem>
+        </EuiSuggestInput>
       </div>
-    </EuiFlexGroup>
-  </WzSearchBar>
+    </EuiSuggest>
+  </SearchBar>
   <EuiSpacer
     size="s"
   >

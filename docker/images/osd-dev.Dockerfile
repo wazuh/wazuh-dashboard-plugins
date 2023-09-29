@@ -22,5 +22,5 @@ RUN mkdir -p /home/node/kbn/data/wazuh/config
 
 FROM node:${NODE_VERSION}
 USER node
-COPY --from=base /home/node/kbn /home/node/kbn
+COPY --chown=node:node --from=base /home/node/kbn /home/node/kbn
 WORKDIR /home/node/kbn

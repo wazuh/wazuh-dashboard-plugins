@@ -83,40 +83,13 @@ class WzGroupDetail extends Component {
 
   renderAgents() {
     return (
-      <Fragment>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-              From here you can list and manage your agents
-            </EuiText>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <WzGroupAgentsTable {...this.props} />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </Fragment>
+      <WzGroupAgentsTable {...this.props} />
     );
   }
 
   renderFiles() {
     return (
-      <Fragment>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-              From here you can list and see your group files, also, you can
-              edit the group configuration
-            </EuiText>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <WzGroupFilesTable />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </Fragment>
+      <WzGroupFilesTable />
     );
   }
 
@@ -142,7 +115,7 @@ class WzGroupDetail extends Component {
                   </EuiToolTip>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                  <EuiTitle>
+                  <EuiTitle size="s">
                     <h1>{itemDetail.name}</h1>
                   </EuiTitle>
                 </EuiFlexItem>
