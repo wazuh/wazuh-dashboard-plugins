@@ -16,7 +16,7 @@ const emptyInitialConfiguration: DashboardContainerInput = {
 
 export const useDashboardConfiguration = (initialConfiguration?: DashboardContainerInput) => {
   const [configuration, setConfiguration] = useState<DashboardContainerInput>(
-    initialConfiguration ? initialConfiguration : emptyInitialConfiguration
+    initialConfiguration ?? emptyInitialConfiguration
   );
 
   const updateConfiguration = (updatedConfig: Partial<DashboardContainerInput>) => {
