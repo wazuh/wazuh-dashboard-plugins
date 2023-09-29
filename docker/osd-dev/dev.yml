@@ -228,6 +228,7 @@ services:
     volumes:
       - osd_cache:/home/node/.cache
       - '${SRC}/main:/home/node/kbn/plugins/wazuh'
+      - '${SRC}/wazuh-core:/home/node/kbn/plugins/wazuh-core'
       - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
