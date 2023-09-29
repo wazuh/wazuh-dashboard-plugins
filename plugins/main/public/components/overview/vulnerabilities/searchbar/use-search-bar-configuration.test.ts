@@ -74,7 +74,7 @@ describe('[hook] useSearchBarConfiguration', () => {
     spyUseQueryManager.mockImplementation(() => [mockQueryResult, jest.fn()]);
   });
 
-  it('should return default app index pattern when not receives a default index pattern', async () => {
+  it('should return default app index pattern when not receiving a default index pattern', async () => {
     jest
       .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
       .mockResolvedValue(mockedDefaultIndexPatternData);
@@ -87,7 +87,7 @@ describe('[hook] useSearchBarConfiguration', () => {
     ]);
   });
 
-  it('should return the same index pattern when receives a default index pattern', async () => {
+  it('should return the same index pattern when receiving a default index pattern', async () => {
     const exampleIndexPatternId = 'wazuh-index-pattern';
     const mockedIndexPatternData: Partial<IndexPattern> = {
       // used partial not avoid fill all the interface, it's only for testing purpose
@@ -105,7 +105,7 @@ describe('[hook] useSearchBarConfiguration', () => {
     expect(result.current.searchBarProps.indexPatterns).toMatchObject([mockedIndexPatternData]);
   });
 
-  it('should show ERROR message and get the default app index pattern when not found the index pattern data by the id received', async () => {
+  it('should show an ERROR message and get the default app index pattern when not found the index pattern data by the ID received', async () => {
     const INDEX_NOT_FOUND_ERROR = new Error('Index Pattern not found');
     jest.spyOn(mockDataPlugin.indexPatterns, 'get').mockImplementation(() => {
       throw INDEX_NOT_FOUND_ERROR;
@@ -132,7 +132,7 @@ describe('[hook] useSearchBarConfiguration', () => {
     expect(mockedConsoleError).toBeCalledWith(INDEX_NOT_FOUND_ERROR);
   });
 
-  it('should return the same filters and applies to the filter manager when are received by props', async () => {
+  it('should return the same filters and apply them to the filter manager when are received by props', async () => {
     const defaultFilters: Filter[] = [
       {
         query: 'something to filter',
