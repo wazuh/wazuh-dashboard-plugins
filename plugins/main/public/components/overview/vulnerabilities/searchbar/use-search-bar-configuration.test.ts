@@ -212,7 +212,6 @@ describe('[hook] useSearchBarConfiguration', () => {
       })
     );
     await waitForNextUpdate();
-    console.log(result.current.searchBarProps);
     expect(result.current.searchBarProps.indexPatterns).toMatchObject([
       mockedExampleIndexPatternData,
     ]);
