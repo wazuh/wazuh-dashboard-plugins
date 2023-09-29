@@ -10,8 +10,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Create the security event dashboard. [#5892](https://github.com/wazuh/wazuh-kibana-app/pull/5892)
 - Create the log data analysis dashboard. [#5910](https://github.com/wazuh/wazuh-kibana-app/pull/5910)
 - Create the malware detection dashboard. [#5899](https://github.com/wazuh/wazuh-kibana-app/pull/5899)
+- Create the incident response dashboard. [#5934](https://github.com/wazuh/wazuh-kibana-app/pull/5934)
 - Update integrity monitoring dashboard. [#5929](https://github.com/wazuh/wazuh-kibana-app/pull/5929)
 - Update containers security dashboard. [#5944](https://github.com/wazuh/wazuh-kibana-app/pull/5944)
+- Update cloud security dashboard. [#5943](https://github.com/wazuh/wazuh-kibana-app/pull/5943)
 
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.9.0 - Revision 00
 
