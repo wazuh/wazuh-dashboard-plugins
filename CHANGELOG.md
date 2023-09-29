@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Create the malware detection dashboard. [#5899](https://github.com/wazuh/wazuh-kibana-app/pull/5899)
 - Create the incident response dashboard. [#5934](https://github.com/wazuh/wazuh-kibana-app/pull/5934)
 - Update integrity monitoring dashboard. [#5929](https://github.com/wazuh/wazuh-kibana-app/pull/5929)
+- Update containers security dashboard. [#5944](https://github.com/wazuh/wazuh-kibana-app/pull/5944)
 - Update regulatory compliance dashboard. [#5942](https://github.com/wazuh/wazuh-kibana-app/pull/5942)
 - Update cloud security dashboard. [#5943](https://github.com/wazuh/wazuh-kibana-app/pull/5943)
 
