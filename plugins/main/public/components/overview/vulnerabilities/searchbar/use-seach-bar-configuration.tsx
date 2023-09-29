@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { SearchBarProps, FilterManager, TimeRange, Query } from '../../../../../../../src/plugins/data/public'
 import { Filter, IIndexPattern, IndexPatternsContract } from '../../../../../../../src/plugins/data/public';
-import { getPlugins } from '../../../../kibana-services';
+import { getPlugins, getDataPlugin } from '../../../../kibana-services';
 
 import { useFilterManager, useQueryManager, useTimeFilter } from '../../../common/hooks';
 import { AUTHORIZED_AGENTS } from '../../../../../common/constants';
@@ -24,14 +24,15 @@ type tUserSearchBarResponse = {
  * @param props 
  * @returns 
  */
-const useSearchBarConfiguration = (props: tUseSearchBarProps): tUserSearchBarResponse => {
+const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarResponse => {
     // dependencies
     const filterManager = useFilterManager().filterManager as FilterManager;
-    const [query, setQuery] = props.query ? useState(props.query) : useQueryManager();
+    const [query, setQuery] = props?.query ? useState(props?.query) : useQueryManager();
     const { timeFilter, timeHistory, setTimeFilter } = useTimeFilter();
     // states
     const [isLoading, setIsLoading] = useState(false);
     const [indexPatternSelected, setIndexPatternSelected] = useState<IIndexPattern>();
+    const [error, setError] = useState();
 
     useEffect(() => {
         setIsLoading(true);
@@ -43,7 +44,7 @@ const useSearchBarConfiguration = (props: tUseSearchBarProps): tUserSearchBarRes
      * Initialize the searchbar props with the corresponding index pattern and filters
      */
     const initSearchBar = async () => {
-        const indexPattern = await getIndexPattern(props.defaultIndexPatternID);
+        const indexPattern = await getIndexPattern(props?.defaultIndexPatternID);
         setIndexPatternSelected(indexPattern);
         const filters = await getInitialFilters(indexPattern);
         filterManager.setFilters(filters);
@@ -55,18 +56,19 @@ const useSearchBarConfiguration = (props: tUseSearchBarProps): tUserSearchBarRes
      * @returns 
      */
     const getIndexPattern = async (indexPatternID?: string) => {
-        const indexPatternService = getPlugins().data.indexPatterns as IndexPatternsContract;
-        try {
-            if(indexPatternID){
+        const indexPatternService = getDataPlugin().indexPatterns as IndexPatternsContract;
+        if(indexPatternID){
+            try{
                 return await indexPatternService.get(indexPatternID);
-            }else{
-                const defaultIndexPattern = await indexPatternService.getDefault();
-                return defaultIndexPattern;
+            }catch(error){
+                // when the index pattern id not exists will get the default
+                console.error(error);
+                return await indexPatternService.getDefault();
             }
-        }catch(error){
-            // ToDo: create error to show context information
-            throw error;
-        }   
+        }else{
+            return await indexPatternService.getDefault();
+        }
+       
     }
 
     /**
@@ -76,10 +78,10 @@ const useSearchBarConfiguration = (props: tUseSearchBarProps): tUserSearchBarRes
      * @returns 
      */
     const getInitialFilters = async (indexPattern: IIndexPattern) => {
-        const indexPatternService = getPlugins().data.indexPatterns as IndexPatternsContract;
+        const indexPatternService = getDataPlugin().indexPatterns as IndexPatternsContract;
         let initialFilters: Filter[] = [];
-        if(props.filters){
-            initialFilters = props.filters;
+        if(props?.filters){
+            return props?.filters;
         }
         if(indexPattern){
             // get filtermanager and filters
@@ -107,19 +109,19 @@ const useSearchBarConfiguration = (props: tUseSearchBarProps): tUserSearchBarRes
         onFiltersUpdated: (filters: Filter[]) => {
             // its necessary execute setter to apply filters
             filterManager.setFilters(filters);
-            props.onFiltersUpdated && props.onFiltersUpdated(filters);
+            props?.onFiltersUpdated && props?.onFiltersUpdated(filters);
         },
         onQuerySubmit: (payload: { dateRange: TimeRange; query?: Query }, _isUpdate?: boolean): void => {
             const { dateRange, query } = payload;
             // its necessary execute setter to apply query filters
             setTimeFilter(dateRange);
             setQuery(query)
-            props.onQuerySubmitted && props.onQuerySubmitted(payload);
+            props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
         }
     }
 
     return {
-        searchBarProps
+        searchBarProps,
     }
 }
 
