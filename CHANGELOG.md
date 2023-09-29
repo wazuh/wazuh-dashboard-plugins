@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.8.0
+- Added remember server address check [#5680](https://github.com/wazuh/wazuh-kibana-app/pull/5680)
 
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.9.0 - Revision 00
 
