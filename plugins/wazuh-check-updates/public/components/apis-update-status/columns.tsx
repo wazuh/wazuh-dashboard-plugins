@@ -76,12 +76,58 @@ export const apisUpdateStatusColumns = [
     },
   },
   {
-    field: 'availableUpdates',
-    name: 'Available updates',
+    field: 'majorAvailableUpdates',
+    name: 'Major available updates',
     render: (availableUpdates: APIAvailableUpdates, item: any) =>
       item.upToDate ? null : (
         <EuiFlexGroup gutterSize="m" alignItems="center">
-          {availableUpdates.minor.map((version) => (
+          {item.availableUpdates.minor.map((version) => (
+            <EuiFlexItem grow={false}>
+              <EuiBadge color="hollow">
+                {version.tag}
+                <EuiIconTip
+                  type="iInCircle"
+                  color="subdued"
+                  title={version.title}
+                  content={version.description}
+                  iconProps={{ className: 'eui-alignTop' }}
+                />
+              </EuiBadge>
+            </EuiFlexItem>
+          ))}
+        </EuiFlexGroup>
+      ),
+  },
+  {
+    field: 'minorAvailableUpdates',
+    name: 'Minor available updates',
+    render: (availableUpdates: APIAvailableUpdates, item: any) =>
+      item.upToDate ? null : (
+        <EuiFlexGroup gutterSize="m" alignItems="center">
+          {item.availableUpdates.minor.map((version) => (
+            <EuiFlexItem grow={false}>
+              <EuiBadge color="hollow">
+                {version.tag}
+                <EuiIconTip
+                  type="iInCircle"
+                  color="subdued"
+                  title={version.title}
+                  content={version.description}
+                  iconProps={{ className: 'eui-alignTop' }}
+                />
+              </EuiBadge>
+            </EuiFlexItem>
+          ))}
+        </EuiFlexGroup>
+      ),
+  },
+  {
+    field: 'patchAvailableUpdates',
+    name: 'Patch available updates',
+    render: (availableUpdates: APIAvailableUpdates, item: any) =>
+      item.upToDate ? null : (
+        <EuiFlexGroup gutterSize="m" alignItems="center">
+          {item.availableUpdates.minor.map((version) => (
             <EuiFlexItem grow={false}>
               <EuiBadge color="hollow">
                 {version.tag}

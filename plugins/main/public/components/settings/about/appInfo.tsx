@@ -1,13 +1,12 @@
 import {
-  EuiCallOut,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiLoadingSpinner,
   EuiText,
   EuiSpacer,
+  EuiTitle,
+  EuiHorizontalRule,
 } from '@elastic/eui';
 import React from 'react';
-import { Update } from '../../../../../wazuh-check-updates/common/types';
 import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
 
 interface SettingsAboutAppInfoProps {
@@ -23,37 +22,43 @@ export const SettingsAboutAppInfo = ({ appInfo }: SettingsAboutAppInfoProps) => 
 
   return (
     <>
+      <EuiTitle>
+        <h2>Wazuh Dashboard version</h2>
+      </EuiTitle>
+      <EuiSpacer size="l" />
       <EuiFlexGroup
         direction="row"
         responsive
         alignItems="center"
         justifyContent="flexStart"
-        gutterSize="m"
+        gutterSize="xl"
       >
         <EuiFlexItem grow={false}>
           <EuiText>
             <div className="wz-text-truncatable">
-              {'App version: '}
+              {'Version: '}
               <span className="wz-text-bold">{appInfo['app-version']}</span>
             </div>
           </EuiText>
         </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiText>
+            <div className="wz-text-truncatable">
+              {'Revision: '}
+              <span className="wz-text-bold">{appInfo['revision']}</span>
+            </div>
+          </EuiText>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiText>
+            <div className="wz-text-truncatable">
+              {'Install date: '}
+              <span className="wz-text-bold">{appInfo['installationDate']}</span>
+            </div>
+          </EuiText>
+        </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer />
-      <EuiText>
-        <div className="wz-text-truncatable">
-          {'App revision: '}
-          <span className="wz-text-bold">{appInfo['revision']}</span>
-        </div>
-      </EuiText>
-      <EuiSpacer />
-      <EuiText>
-        <div className="wz-text-truncatable">
-          {'Install date: '}
-          <span className="wz-text-bold">{appInfo['installationDate']}</span>
-        </div>
-      </EuiText>
-      <EuiSpacer />
+      <EuiHorizontalRule margin="l" />
       <APIsUpdateStatus />
     </>
   );
