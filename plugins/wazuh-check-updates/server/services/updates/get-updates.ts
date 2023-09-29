@@ -6,7 +6,7 @@ import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { setSavedObject } from '../saved-object';
 import { log } from '../../lib/logger';
 
-export const getUpdates = async (): Promise<AvailableUpdates> => {
+export const getUpdates = async (apiId: string): Promise<AvailableUpdates> => {
   const mock = new MockAdapter(axios);
 
   try {
@@ -20,7 +20,7 @@ export const getUpdates = async (): Promise<AvailableUpdates> => {
 
     const updatesToSave = { ...updates, last_check: new Date() };
 
-    await setSavedObject(SAVED_OBJECT_UPDATES, updatesToSave);
+    await setSavedObject(SAVED_OBJECT_UPDATES, updatesToSave, apiId);
 
     return updatesToSave;
   } catch (error) {

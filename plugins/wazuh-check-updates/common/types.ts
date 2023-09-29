@@ -1,4 +1,8 @@
 export interface AvailableUpdates {
+  [apiId: string]: APIAvailableUpdates;
+}
+
+export interface APIAvailableUpdates {
   mayor: Update[];
   minor: Update[];
   patch: Update[];
@@ -26,4 +30,4 @@ export interface CheckUpdatesSettings {
   schedule?: string;
 }
 
-export type savedObjectType = AvailableUpdates | UserPreferences | CheckUpdatesSettings;
+export type savedObjectType = APIAvailableUpdates | UserPreferences | CheckUpdatesSettings;

@@ -16,11 +16,10 @@ interface SettingsAboutAppInfoProps {
     installationDate: string;
     revision: string;
   };
-  setCurrentUpdate: (update: Update | undefined) => void;
 }
 
-export const SettingsAboutAppInfo = ({ appInfo, setCurrentUpdate }: SettingsAboutAppInfoProps) => {
-  const { UpToDateStatus, DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
+export const SettingsAboutAppInfo = ({ appInfo }: SettingsAboutAppInfoProps) => {
+  const { APIsUpdateStatus } = getWazuhCheckUpdatesPlugin();
 
   return (
     <>
@@ -39,9 +38,6 @@ export const SettingsAboutAppInfo = ({ appInfo, setCurrentUpdate }: SettingsAbou
             </div>
           </EuiText>
         </EuiFlexItem>
-        <EuiFlexItem>
-          <UpToDateStatus setCurrentUpdate={setCurrentUpdate} />
-        </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer />
       <EuiText>
@@ -58,7 +54,7 @@ export const SettingsAboutAppInfo = ({ appInfo, setCurrentUpdate }: SettingsAbou
         </div>
       </EuiText>
       <EuiSpacer />
-      <DismissNotificationCheck />
+      <APIsUpdateStatus />
     </>
   );
 };
