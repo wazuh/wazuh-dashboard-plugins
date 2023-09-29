@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { SearchBarProps, FilterManager, TimeRange, Query } from '../../../../../../../src/plugins/data/public'
 import { Filter, IIndexPattern, IndexPatternsContract } from '../../../../../../../src/plugins/data/public';
-import { getPlugins, getDataPlugin } from '../../../../kibana-services';
+import { getDataPlugin } from '../../../../kibana-services';
 
 import { useFilterManager, useQueryManager, useTimeFilter } from '../../../common/hooks';
 import { AUTHORIZED_AGENTS } from '../../../../../common/constants';
@@ -114,7 +114,7 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
             const { dateRange, query } = payload;
             // its necessary execute setter to apply query filters
             setTimeFilter(dateRange);
-            setQuery(query)
+            setQuery(query);
             props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
         }
     }

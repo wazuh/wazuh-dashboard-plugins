@@ -9,7 +9,7 @@ import {
   TimeRange,
 } from '../../../../../../../src/plugins/data/public';
 // wazuh plugin dependencies
-import useSearchBar from './use-seach-bar-configuration';
+import useSearchBar from './use-search-bar-configuration';
 import { getDataPlugin } from '../../../../kibana-services';
 import * as timeFilterHook from '../../../common/hooks/use-time-filter';
 import * as queryManagerHook from '../../../common/hooks/use-query';
