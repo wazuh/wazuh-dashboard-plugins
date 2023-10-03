@@ -724,7 +724,7 @@ export const Categories = [
   {
     id: 'wz-category-server-management',
     label: 'Server management',
-    order: 5,
+    order: 6,
     euiIconType: 'indexRollupApp',
   },
   DEFAULT_APP_CATEGORIES.management,
