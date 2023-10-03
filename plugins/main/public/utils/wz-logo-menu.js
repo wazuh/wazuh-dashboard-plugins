@@ -13,7 +13,9 @@
 // Remove plugin platform Wazuh name and breadcrumb
 export const changeWazuhNavLogo = () => {
   const interval = setInterval(() => {
-    const nav = document.querySelector('[data-test-subj="breadcrumbs"]  > .euiBreadcrumb');
+    const nav = document.querySelector(
+      '[data-test-subj="breadcrumbs"]  > .euiBreadcrumbWall',
+    );
     if (nav) {
       clearInterval(interval);
       nav.style.display = 'none';
