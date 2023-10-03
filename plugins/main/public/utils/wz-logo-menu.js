@@ -22,3 +22,12 @@ export const changeWazuhNavLogo = () => {
     }
   }, 200);
 };
+
+export const removeDisplayNoneBreadcrumb = () => {
+  const nav = document.querySelector(
+    '[data-test-subj="breadcrumbs"]  > .euiBreadcrumbWall',
+  );
+  if (nav) {
+    nav.style.display = 'block';
+  }
+};

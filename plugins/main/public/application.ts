@@ -1,4 +1,5 @@
 import angular from 'angular';
+import { removeDisplayNoneBreadcrumb } from './utils/wz-logo-menu';
 
 /**
  * Here's where Discover's inner angular is mounted and rendered
@@ -6,7 +7,10 @@ import angular from 'angular';
 export async function renderApp(moduleName: string, element: HTMLElement) {
   await import('./app');
   const $injector = mountWazuhApp(moduleName, element);
-  return () => $injector.get('$rootScope').$destroy();
+  return () => {
+    removeDisplayNoneBreadcrumb();
+    return $injector.get('$rootScope').$destroy();
+  };
 }
 
 function mountWazuhApp(moduleName: string, element: HTMLElement) {
