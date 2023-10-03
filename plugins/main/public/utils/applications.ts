@@ -693,37 +693,49 @@ export const Applications = [
 export const Categories = [
   {
     id: 'wz-category-home',
-    label: 'Home',
+    label: i18n.translate('wz-app-category-home', {
+      defaultMessage: 'Home',
+    }),
     order: 0,
     euiIconType: 'appSearchApp',
   },
   {
     id: 'wz-category-endpoint-security',
-    label: 'Endpoint security',
+    label: i18n.translate('wz-app-category-endpoint-security', {
+      defaultMessage: 'Endpoint security',
+    }),
     order: 1,
     euiIconType: 'monitoringApp',
   },
   {
     id: 'wz-category-thread-intelligence',
-    label: 'Thread intelligence',
+    label: i18n.translate('wz-app-category-thread-intelligence', {
+      defaultMessage: 'Thread intelligence',
+    }),
     order: 2,
     euiIconType: 'lensApp',
   },
   {
     id: 'wz-category-security-operations',
-    label: 'Security operations',
+    label: i18n.translate('wz-app-category-security-operations', {
+      defaultMessage: 'Security operations',
+    }),
     order: 3,
     euiIconType: 'securityApp',
   },
   {
     id: 'wz-category-cloud-security',
-    label: 'Cloud security',
+    label: i18n.translate('wz-app-category-cloud-security', {
+      defaultMessage: 'Cloud security',
+    }),
     order: 4,
     euiIconType: 'watchesApp',
   },
   {
     id: 'wz-category-server-management',
-    label: 'Server management',
+    label: i18n.translate('wz-app-category-server-management', {
+      defaultMessage: 'Server management',
+    }),
     order: 6,
     euiIconType: 'indexRollupApp',
   },
