@@ -239,6 +239,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'suse11' ||
         this.state.selectedVersion === 'suse12' ||
         this.state.selectedVersion === 'oraclelinux5' ||
+        this.state.selectedVersion === 'oraclelinux6' ||
         this.state.selectedVersion === '22' ||
         this.state.selectedVersion === 'amazonlinux2' ||
         this.state.selectedVersion === 'debian8' ||
@@ -254,7 +255,6 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'redhat6' ||
         this.state.selectedVersion === 'centos5' ||
         this.state.selectedVersion === 'centos6' ||
-        this.state.selectedVersion === 'oraclelinux6' ||
         this.state.selectedVersion === 'amazonlinux1' ||
         this.state.selectedVersion === 'debian7' ||
         this.state.selectedVersion === 'ubuntu14'
@@ -271,7 +271,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'windowsserver2008' ||
         this.state.selectedVersion === 'windows7'
       ) {
-        return 'NET START WazuhSvc';
+        return 'NET START Wazuh';
       } else {
         return '';
       }
@@ -1005,7 +1005,7 @@ export const RegisterAgent = withErrorBoundary(
         : ``;
 
       // Merge environment variables with installation script
-      const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion}-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
+      const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion}-1.${this.state.selectedArchitecture}.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
 
       /*** end macOS installation script customization ***/
 
