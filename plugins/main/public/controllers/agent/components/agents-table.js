@@ -101,7 +101,7 @@ export const AgentsTable = withErrorBoundary(
               onClick={ev => {
                 ev.stopPropagation();
                 navigateAppURL(
-                  `/app/it-hygiene#/tab=welcome&agent=${agent.id}`,
+                  `/app/it-hygiene#/agents?tab=welcome&agent=${agent.id}`,
                 );
               }}
               iconType='eye'
@@ -294,7 +294,9 @@ export const AgentsTable = withErrorBoundary(
         return {
           onClick: ev => {
             ev.stopPropagation();
-            navigateAppURL(`/app/it-hygiene#/tab=welcome&agent=${item.id}`);
+            navigateAppURL(
+              `/app/it-hygiene#/agents?tab=welcome&agent=${item.id}`,
+            );
           },
         };
       };
