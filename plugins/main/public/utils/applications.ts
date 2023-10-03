@@ -590,7 +590,7 @@ const serverApi = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
-  redirectTo: () => '/manager/?tab=server-api',
+  redirectTo: () => '/settings?tab=api',
 };
 
 const serverData = {
@@ -604,7 +604,7 @@ const serverData = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
-  redirectTo: () => '/manager/?tab=server-data',
+  redirectTo: () => '/settings?tab=sample_data',
 };
 
 const wazuhPluginSettings = {
@@ -618,7 +618,7 @@ const wazuhPluginSettings = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
-  redirectTo: () => '/manager/?tab=wazuh-plugin-settings',
+  redirectTo: () => '/settings?tab=configuration',
 };
 
 const wazuhPluginLogs = {
@@ -632,7 +632,7 @@ const wazuhPluginLogs = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
-  redirectTo: () => '/manager/?tab=wazuh-plugin-logs',
+  redirectTo: () => '/settings?tab=logs',
 };
 
 const wazuhPluginAbout = {
@@ -646,7 +646,7 @@ const wazuhPluginAbout = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
-  redirectTo: () => '/manager/?tab=wazuh-plugin-about',
+  redirectTo: () => '/settings?tab=about',
 };
 
 export const Applications = [
@@ -693,49 +693,37 @@ export const Applications = [
 export const Categories = [
   {
     id: 'wz-category-home',
-    label: i18n.translate('wz-app-category-home', {
-      defaultMessage: 'Home',
-    }),
+    label: 'Home',
     order: 0,
     euiIconType: 'appSearchApp',
   },
   {
     id: 'wz-category-endpoint-security',
-    label: i18n.translate('wz-app-category-endpoint-security', {
-      defaultMessage: 'Endpoint security',
-    }),
+    label: 'Endpoint security',
     order: 1,
     euiIconType: 'monitoringApp',
   },
   {
     id: 'wz-category-thread-intelligence',
-    label: i18n.translate('wz-app-category-thread-intelligence', {
-      defaultMessage: 'Thread intelligence',
-    }),
+    label: 'Thread intelligence',
     order: 2,
     euiIconType: 'lensApp',
   },
   {
     id: 'wz-category-security-operations',
-    label: i18n.translate('wz-app-category-security-operations', {
-      defaultMessage: 'Security operations',
-    }),
+    label: 'Security operations',
     order: 3,
     euiIconType: 'securityApp',
   },
   {
     id: 'wz-category-cloud-security',
-    label: i18n.translate('wz-app-category-cloud-security', {
-      defaultMessage: 'Cloud security',
-    }),
+    label: 'Cloud security',
     order: 4,
     euiIconType: 'watchesApp',
   },
   {
     id: 'wz-category-server-management',
-    label: i18n.translate('wz-app-category-server-management', {
-      defaultMessage: 'Server management',
-    }),
+    label: 'Server management',
     order: 5,
     euiIconType: 'indexRollupApp',
   },
