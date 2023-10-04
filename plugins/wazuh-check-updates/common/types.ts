@@ -1,12 +1,20 @@
-export interface AvailableUpdates {
-  [apiId: string]: APIAvailableUpdates;
+export enum API_UPDATES_STATUS {
+  UP_TO_DATE = 'upToDate',
+  AVAILABLE_UPDATES = 'availableUpdates',
+  ERROR = 'error',
 }
 
-export interface APIAvailableUpdates {
-  mayor: Update[];
-  minor: Update[];
-  patch: Update[];
+export interface ResponseApiAvailableUpdates {
+  apiId: string;
+  version: string;
+  lastMayor?: Update;
+  lastMinor?: Update;
+  lastPatch?: Update;
   last_check?: Date | string | undefined;
+}
+
+export interface ApiAvailableUpdates extends ResponseApiAvailableUpdates {
+  status: API_UPDATES_STATUS;
 }
 
 export interface Update {
@@ -30,4 +38,9 @@ export interface CheckUpdatesSettings {
   schedule?: string;
 }
 
-export type savedObjectType = APIAvailableUpdates | UserPreferences | CheckUpdatesSettings;
+export interface AvailableUpdates {
+  apiAvailableUpdates: ApiAvailableUpdates[];
+  last_check: Date;
+}
+
+export type savedObjectType = AvailableUpdates | UserPreferences | CheckUpdatesSettings;

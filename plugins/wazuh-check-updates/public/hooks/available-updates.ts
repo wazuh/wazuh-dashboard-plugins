@@ -1,18 +1,11 @@
 import { useState, useEffect } from 'react';
-import { AvailableUpdates } from '../../common/types';
+import { ApiAvailableUpdates } from '../../common/types';
 import { routes } from '../../common/constants';
 import { getCore } from '../plugin-services';
 
 export const useAvailableUpdates = () => {
-  const defaultAvailableUpdates = {
-    mayor: [],
-    minor: [],
-    patch: [],
-  };
-
-  const [availableUpdates, setAvailableUpdates] = useState<AvailableUpdates>(
-    defaultAvailableUpdates
-  );
+  const [apiAvailableUpdates, setApiAvailableUpdates] = useState<ApiAvailableUpdates[]>([]);
+  const [lastCheck, setLastCheck] = useState<Date>();
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
@@ -20,15 +13,15 @@ export const useAvailableUpdates = () => {
   const refreshAvailableUpdates = async (forceUpdate = false, returnError = false) => {
     try {
       setIsLoading(true);
-      const response = await getCore().http.get(`${routes.checkUpdates}`, {
+      const response = await getCore().http.get(routes.checkUpdates, {
         query: {
           checkAvailableUpdates: forceUpdate,
         },
       });
-      setAvailableUpdates(response);
+      setApiAvailableUpdates(response?.apiAvailableUpdates || []);
+      setLastCheck(response?.last_check);
       setError(undefined);
     } catch (error: any) {
-      setAvailableUpdates(defaultAvailableUpdates);
       setError(error);
       if (returnError) {
         return error instanceof Error
@@ -46,5 +39,5 @@ export const useAvailableUpdates = () => {
     refreshAvailableUpdates();
   }, []);
 
-  return { isLoading, availableUpdates, refreshAvailableUpdates, error };
+  return { isLoading, apiAvailableUpdates, refreshAvailableUpdates, error, lastCheck };
 };

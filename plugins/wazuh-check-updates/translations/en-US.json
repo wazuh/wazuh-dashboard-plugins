@@ -87,10 +87,15 @@
     "wazuhCheckUpdates.apisUpdateStatus.buttonText": "Check updates",
     "wazuhCheckUpdates.apisUpdateStatus.onClickButtonError": "Error trying to get updates",
     "wazuhCheckUpdates.apisUpdateStatus.tableTitle": "Wazuh APIs version",
+    "wazuhCheckUpdates.apisUpdateStatus.errorCallOut": "Error trying to get updates",
     "wazuhCheckUpdates.currentUpdateDetails.releaseNotesLink": "Release notes",
     "wazuhCheckUpdates.currentUpdateDetails.title": "Wazuh new release is available now!",
     "wazuhCheckUpdates.currentUpdateDetails.upgradeGuideLink": "Upgrade guide",
     "wazuhCheckUpdates.currentUpdateDetails.showDetails": "Show details",
-    "wazuhCheckUpdates.dismissNotificationCheck.checkText": "Disable updates notifications"
+    "wazuhCheckUpdates.dismissNotificationCheck.checkText": "Disable updates notifications",
+    "wazuhCheckUpdates.updateModal.closeModal": "Close",
+    "wazuhCheckUpdates.updateModal.publishedDate": "Published",
+    "wazuhCheckUpdates.updateModal.releaseNotesLink": "Release notes",
+    "wazuhCheckUpdates.updateModal.upgradeGuideLink": "Upgrade guide"
   }
 }

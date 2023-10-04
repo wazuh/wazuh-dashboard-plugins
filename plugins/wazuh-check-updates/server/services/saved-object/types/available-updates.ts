@@ -2,7 +2,6 @@ import { SavedObjectsFieldMapping, SavedObjectsType } from 'opensearch-dashboard
 import { SAVED_OBJECT_UPDATES } from '../../../../common/constants';
 
 const updateObjectType: SavedObjectsFieldMapping = {
-  type: 'nested',
   properties: {
     description: {
       type: 'text',
@@ -42,9 +41,26 @@ export const availableUpdatesObject: SavedObjectsType = {
       last_check: {
         type: 'date',
       },
-      mayor: updateObjectType,
-      minor: updateObjectType,
-      patch: updateObjectType,
+      apiAvailableUpdates: {
+        type: 'nested',
+        properties: {
+          apiId: {
+            type: 'text',
+          },
+          version: {
+            type: 'text',
+          },
+          status: {
+            type: 'text',
+          },
+          last_check: {
+            type: 'date',
+          },
+          lastMayor: updateObjectType,
+          lastMinor: updateObjectType,
+          lastPatch: updateObjectType,
+        },
+      },
     },
   },
   migrations: {},
