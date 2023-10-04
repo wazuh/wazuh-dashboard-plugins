@@ -477,7 +477,7 @@ const cluster = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
-  redirectTo: () => '/manager/?tab=cluster',
+  redirectTo: () => '/manager/?tab=monitoring',
 };
 
 const statistics = {
@@ -547,7 +547,7 @@ const devTools = {
   }),
   euiIconType: 'devToolsApp',
   showInOverviewApp: true,
-  redirectTo: () => '/dev-tools',
+  redirectTo: () => '/wazuh-dev/?tab=devTools',
 };
 
 const rulesetTest = {
@@ -561,7 +561,7 @@ const rulesetTest = {
   }),
   euiIconType: 'visualizeApp',
   showInOverviewApp: true,
-  redirectTo: () => '/ruleset-test',
+  redirectTo: () => '/wazuh-dev/?tab=logtest',
 };
 
 const security = {
