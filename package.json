@@ -3,7 +3,7 @@
   "version": "4.5.3",
   "revision": "02",
   "pluginPlatform": {
-    "version": "7.16.0"
+    "version": "7.17.0"
   },
   "description": "Wazuh app",
   "keywords": [
