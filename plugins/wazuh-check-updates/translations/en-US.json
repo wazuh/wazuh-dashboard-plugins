@@ -76,8 +76,8 @@
     }
   },
   "messages": {
-    "wazuhCheckUpdates.updatesNotification.message": "Wazuh new release is available now!",
-    "wazuhCheckUpdates.updatesNotification.linkText": "Go to the release notes for details",
+    "wazuhCheckUpdates.updatesNotification.message": "Wazuh new release is available!",
+    "wazuhCheckUpdates.updatesNotification.linkText": "Go to the about page for details",
     "wazuhCheckUpdates.updatesNotification.dismissCheckText": "Disable updates notifications",
     "wazuhCheckUpdates.updatesNotification.closeButtonText": "Close",
     "wazuhCheckUpdates.apisUpdateStatus.upToDate": "Up to date",

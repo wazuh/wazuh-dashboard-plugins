@@ -2,6 +2,7 @@ import {
   EuiBadge,
   EuiBottomBar,
   EuiButton,
+  EuiButtonEmpty,
   EuiCheckbox,
   EuiFlexGroup,
   EuiFlexItem,
@@ -11,7 +12,9 @@ import {
 import React, { useState } from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { useAvailableUpdates, useUserPreferences } from '../hooks';
-import { getCurrentAvailableUpdate } from '../utils';
+import { areThereNewUpdates } from '../utils';
+import { last } from 'lodash';
+import { getHttp } from '../plugin-services';
 
 export const UpdatesNotification = () => {
   const [isDismissed, setIsDismissed] = useState(false);
@@ -25,7 +28,7 @@ export const UpdatesNotification = () => {
   } = useUserPreferences();
 
   const {
-    availableUpdates,
+    apisAvailableUpdates,
     error: getAvailableUpdatesError,
     isLoading: isLoadingAvailableUpdates,
   } = useAvailableUpdates();
@@ -42,18 +45,16 @@ export const UpdatesNotification = () => {
     return null;
   }
 
-  const currentUpdate = getCurrentAvailableUpdate(availableUpdates);
-
-  const hideNotification =
-    userPreferences?.hide_update_notifications ||
-    userPreferences?.last_dismissed_update === currentUpdate?.tag;
-
-  if (hideNotification) {
+  if (userPreferences?.hide_update_notifications) {
     return null;
   }
 
-  const releaseNotesUrl = `https://documentation.wazuh.com/${currentUpdate?.semver.mayor}.${currentUpdate?.semver.minor}/release-notes/release-${currentUpdate?.semver.mayor}-${currentUpdate?.semver.minor}-${currentUpdate?.semver.patch}.html`;
-  const isVisible = !isDismissed && !!currentUpdate;
+  if (isDismissed) return null;
+
+  const mustNotifyUser = areThereNewUpdates(
+    apisAvailableUpdates,
+    userPreferences.last_dismissed_updates
+  );
 
   const handleOnChangeDismiss = (checked: boolean) => {
     setDismissFutureUpdates(checked);
@@ -61,15 +62,23 @@ export const UpdatesNotification = () => {
 
   const handleOnClose = () => {
     updateUserPreferences({
-      last_dismissed_update: currentUpdate?.tag,
+      last_dismissed_updates: apisAvailableUpdates.map((apiAvailableUpdates) => {
+        const { apiId, lastMayor, lastMinor, lastPatch } = apiAvailableUpdates;
+        return {
+          apiId,
+          mayor: lastMayor?.tag,
+          minor: lastMinor?.tag,
+          patch: lastPatch?.tag,
+        };
+      }),
       ...(dismissFutureUpdates ? { hide_update_notifications: true } : {}),
     });
     setIsDismissed(true);
   };
 
-  return isVisible ? (
+  return mustNotifyUser ? (
     <I18nProvider>
-      <EuiBottomBar style={{ backgroundColor: 'white', color: '#1a1c21' }}>
+      <EuiBottomBar>
         <EuiFlexGroup justifyContent="spaceBetween" alignItems="center" gutterSize="m">
           <EuiFlexItem grow={false}>
             <EuiFlexGroup gutterSize="m" alignItems="center">
@@ -77,28 +86,25 @@ export const UpdatesNotification = () => {
                 <EuiText>
                   <FormattedMessage
                     id="wazuhCheckUpdates.updatesNotification.message"
-                    defaultMessage="Wazuh new release is available now!"
+                    defaultMessage="Wazuh new release is available!"
                   />
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <EuiBadge>{currentUpdate.tag}</EuiBadge>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <EuiHeaderLink
-                  href={releaseNotesUrl}
-                  isActive
-                  target="_blank"
-                  iconType="popout"
-                  iconSide="right"
-                >
+                <EuiButtonEmpty href={getHttp().basePath.prepend('/app/wazuh#/settings?tab=about')}>
+                  <FormattedMessage
+                    id="wazuhCheckUpdates.updatesNotification.linkText"
+                    defaultMessage="Go to the about page for details"
+                  />
+                </EuiButtonEmpty>
+                {/* <EuiHeaderLink href="" isActive target="_blank" iconType="popout" iconSide="right">
                   {
                     <FormattedMessage
                       id="wazuhCheckUpdates.updatesNotification.linkText"
                       defaultMessage="Go to the release notes for details"
                     />
                   }
-                </EuiHeaderLink>
+                </EuiHeaderLink> */}
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>

@@ -7,8 +7,22 @@ export const userPreferencesObject: SavedObjectsType = {
   namespaceType: 'agnostic',
   mappings: {
     properties: {
-      last_dismissed_update: {
-        type: 'text',
+      last_dismissed_updates: {
+        type: 'nested',
+        properties: {
+          apiId: {
+            type: 'text',
+          },
+          mayor: {
+            type: 'text',
+          },
+          minor: {
+            type: 'text',
+          },
+          patch: {
+            type: 'text',
+          },
+        },
       },
       hide_update_notifications: {
         type: 'boolean',

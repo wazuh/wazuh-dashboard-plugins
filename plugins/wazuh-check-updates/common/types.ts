@@ -29,8 +29,15 @@ export interface Update {
   title: string;
 }
 
+export interface UserPreferencesDimissedUpdate {
+  apiId: string;
+  mayor?: string;
+  minor?: string;
+  patch?: string;
+}
+
 export interface UserPreferences {
-  last_dismissed_update?: string;
+  last_dismissed_updates?: UserPreferencesDimissedUpdate[];
   hide_update_notifications?: boolean;
 }
 
