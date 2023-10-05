@@ -1,14 +1,15 @@
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText,
   EuiSpacer,
   EuiTitle,
   EuiHorizontalRule,
   EuiDescriptionList,
+  EuiCallOut,
 } from '@elastic/eui';
-import React from 'react';
+import React, { useState } from 'react';
 import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
+import { ApiAvailableUpdates } from '../../../../../wazuh-check-updates/common/types';
 
 interface SettingsAboutAppInfoProps {
   appInfo: {
@@ -19,7 +20,13 @@ interface SettingsAboutAppInfoProps {
 }
 
 export const SettingsAboutAppInfo = ({ appInfo }: SettingsAboutAppInfoProps) => {
+  const [apisAvailableUpdates, setApisAvailableUpdates] = useState<ApiAvailableUpdates[]>();
+
   const { ApisUpdateStatus } = getWazuhCheckUpdatesPlugin();
+
+  const showVersionWarning = !!apisAvailableUpdates?.find(
+    (apiAvailableUpdates) => apiAvailableUpdates.version !== appInfo['app-version']
+  );
 
   return (
     <>
@@ -59,8 +66,18 @@ export const SettingsAboutAppInfo = ({ appInfo }: SettingsAboutAppInfoProps) => 
           />
         </EuiFlexItem>
       </EuiFlexGroup>
+      {showVersionWarning ? (
+        <>
+          <EuiSpacer size="l" />
+          <EuiCallOut
+            title="Wazuh Dashboard version must be the same as APIs"
+            color="warning"
+            iconType="alert"
+          />
+        </>
+      ) : null}
       <EuiHorizontalRule margin="l" />
-      <ApisUpdateStatus />
+      <ApisUpdateStatus setApisAvailableUpdates={setApisAvailableUpdates} />
     </>
   );
 };

@@ -6,9 +6,12 @@ import { log } from '../lib/logger';
 
 export const jobSchedulerRun = async () => {
   try {
+    //The first time should get the updates from the Wazuh API
+    await getUpdates(true);
+
     const settings = await getSettings();
 
-    cron.schedule(settings?.schedule || DEFAULT_SCHEDULE, () => getUpdates());
+    cron.schedule(settings?.schedule || DEFAULT_SCHEDULE, () => getUpdates(true));
   } catch (error) {
     const message =
       error instanceof Error

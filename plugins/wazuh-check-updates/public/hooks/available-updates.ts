@@ -4,7 +4,7 @@ import { routes } from '../../common/constants';
 import { getCore } from '../plugin-services';
 
 export const useAvailableUpdates = () => {
-  const [apiAvailableUpdates, setApiAvailableUpdates] = useState<ApiAvailableUpdates[]>([]);
+  const [apisAvailableUpdates, setApisAvailableUpdates] = useState<ApiAvailableUpdates[]>([]);
   const [lastCheck, setLastCheck] = useState<Date>();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -18,7 +18,7 @@ export const useAvailableUpdates = () => {
           checkAvailableUpdates: forceUpdate,
         },
       });
-      setApiAvailableUpdates(response?.apiAvailableUpdates || []);
+      setApisAvailableUpdates(response?.apiAvailableUpdates || []);
       setLastCheck(response?.last_check);
       setError(undefined);
     } catch (error: any) {
@@ -39,5 +39,5 @@ export const useAvailableUpdates = () => {
     refreshAvailableUpdates();
   }, []);
 
-  return { isLoading, apiAvailableUpdates, refreshAvailableUpdates, error, lastCheck };
+  return { isLoading, apisAvailableUpdates, refreshAvailableUpdates, error, lastCheck };
 };

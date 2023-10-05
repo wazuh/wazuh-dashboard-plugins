@@ -8,17 +8,22 @@ import {
   EuiSpacer,
   EuiTitle,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { useAvailableUpdates } from '../../hooks';
 import { Toast } from '@elastic/eui/src/components/toast/global_toast_list';
 import { DismissNotificationCheck } from '../dismiss-notification-check';
 import { ApisUpdateTable } from './table';
 import { formatUIDate } from '../../utils';
+import { ApiAvailableUpdates } from '../../../common/types';
+
+export interface ApisUpdateStatusProps {
+  setApisAvailableUpdates: (apisAvailableUpdates: ApiAvailableUpdates[]) => void;
+}
 
 let toastId = 0;
 
-export const ApisUpdateStatus = () => {
+export const ApisUpdateStatus = ({ setApisAvailableUpdates }: ApisUpdateStatusProps) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const addToastHandler = (error: any) => {
@@ -42,12 +47,16 @@ export const ApisUpdateStatus = () => {
   };
 
   const {
-    apiAvailableUpdates,
+    apisAvailableUpdates,
     isLoading,
     refreshAvailableUpdates,
     error,
     lastCheck,
   } = useAvailableUpdates();
+
+  useEffect(() => {
+    setApisAvailableUpdates(apisAvailableUpdates);
+  }, [apisAvailableUpdates]);
 
   if (error) {
     return (
@@ -114,7 +123,7 @@ export const ApisUpdateStatus = () => {
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size="m" />
-      <ApisUpdateTable apiAvailableUpdates={apiAvailableUpdates} isLoading={isLoading} />
+      <ApisUpdateTable apisAvailableUpdates={apisAvailableUpdates} isLoading={isLoading} />
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
     </I18nProvider>
   );

@@ -5,13 +5,13 @@ import { ApiAvailableUpdates } from '../../../../common/types';
 
 export interface ApisUpdateTableProps {
   isLoading: boolean;
-  apiAvailableUpdates: ApiAvailableUpdates[];
+  apisAvailableUpdates: ApiAvailableUpdates[];
 }
 
-export const ApisUpdateTable = ({ isLoading, apiAvailableUpdates }: ApisUpdateTableProps) => {
+export const ApisUpdateTable = ({ isLoading, apisAvailableUpdates }: ApisUpdateTableProps) => {
   return (
     <EuiInMemoryTable
-      items={apiAvailableUpdates}
+      items={apisAvailableUpdates}
       columns={getApisUpdateStatusColumns()}
       responsive
       loading={isLoading}
