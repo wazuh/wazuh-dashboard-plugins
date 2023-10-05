@@ -1,6 +1,74 @@
+import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
+import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+
 const VULNERABILITIES_INDEX_PATTERN_ID = 'wazuh-inventory-cve';
 
-const getVisStateSeverityCritical = indexPatternId => {
+const getVisStateFilter = (
+  indexPatternId: string,
+  title: string,
+  label: string,
+  fieldName: string
+) => {
+  return {
+    title: title,
+    type: 'table',
+    params: {
+      perPage: 5,
+      percentageCol: '',
+      row: true,
+      showMetricsAtAllLevels: false,
+      showPartialRows: false,
+      showTotal: false,
+      totalFunc: 'sum',
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'Vulnerabilities',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: fieldName,
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: label,
+          },
+          schema: 'bucket',
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateSeverityCritical = (indexPatternId: string) => {
   return {
     title: 'Critical',
     type: 'metric',
@@ -84,7 +152,7 @@ const getVisStateSeverityCritical = indexPatternId => {
   };
 };
 
-const getVisStateSeverityHigh = indexPatternId => {
+const getVisStateSeverityHigh = (indexPatternId: string) => {
   return {
     title: 'High',
     type: 'metric',
@@ -173,7 +241,7 @@ const getVisStateSeverityHigh = indexPatternId => {
   };
 };
 
-const getVisStateSeverityMedium = indexPatternId => {
+const getVisStateSeverityMedium = (indexPatternId: string) => {
   return {
     title: 'Medium',
     type: 'metric',
@@ -255,7 +323,7 @@ const getVisStateSeverityMedium = indexPatternId => {
   };
 };
 
-const getVisStateSeverityLow = indexPatternId => {
+const getVisStateSeverityLow = (indexPatternId: string) => {
   return {
     title: 'Low',
     type: 'metric',
@@ -337,7 +405,7 @@ const getVisStateSeverityLow = indexPatternId => {
   };
 };
 
-const getVisStateTopVulnerabilities = indexPatternId => {
+const getVisStateTopVulnerabilities = (indexPatternId: string) => {
   return {
     title: 'Most detected vulnerabilities horizontal',
     type: 'horizontal_bar',
@@ -479,7 +547,7 @@ const getVisStateTopVulnerabilities = indexPatternId => {
   };
 };
 
-const getVisStateTopVulnerabilitiesEndpoints = indexPatternId => {
+const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
   return {
     title: 'The most vulnerable endpoints horizontal',
     type: 'horizontal_bar',
@@ -629,7 +697,7 @@ const getVisStateTopVulnerabilitiesEndpoints = indexPatternId => {
   };
 };
 
-const getVisStateInventoryTable = indexPatternId => {
+const getVisStateInventoryTable = (indexPatternId: string) => {
   return {
     title: 'Inventory table',
     type: 'table',
@@ -791,7 +859,7 @@ const getVisStateInventoryTable = indexPatternId => {
   };
 };
 
-const getVisStateOpenVsCloseVulnerabilities = indexPatternId => {
+const getVisStateOpenVsCloseVulnerabilities = (indexPatternId: string) => {
   return {
     title: 'Open vs. Close',
     type: 'line',
@@ -938,14 +1006,92 @@ const getVisStateOpenVsCloseVulnerabilities = indexPatternId => {
   };
 };
 
-export const getDashboardPanels = () => {
+export const getDashboardPanels = (): {
+  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
+} => {
   return {
+    packageSelector: {
+      gridData: {
+        w: 12,
+        h: 12,
+        x: 0,
+        y: 0,
+        i: 'packageSelector',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'packageSelector',
+        savedVis: getVisStateFilter(
+          VULNERABILITIES_INDEX_PATTERN_ID,
+          'Package name filter',
+          'Package',
+          'package.name'
+        ),
+      },
+    },
+    packageNameSelector: {
+      gridData: {
+        w: 12,
+        h: 12,
+        x: 12,
+        y: 0,
+        i: 'packageNameSelector',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'packageNameSelector',
+        savedVis: getVisStateFilter(
+          VULNERABILITIES_INDEX_PATTERN_ID,
+          'Operating system filter',
+          'Operating system',
+          'package.architecture'
+        ),
+      },
+    },
+    groupFilter: {
+      gridData: {
+        w: 12,
+        h: 12,
+        x: 24,
+        y: 0,
+        i: 'groupFilter',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'groupFilter',
+        savedVis: getVisStateFilter(
+          VULNERABILITIES_INDEX_PATTERN_ID,
+          'Agent filter',
+          'Agent',
+          'agent.id'
+        ),
+      },
+    },
+    otherFilter: {
+      gridData: {
+        w: 12,
+        h: 12,
+        x: 36,
+        y: 0,
+        i: 'otherFilter',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'otherFilter',
+        savedVis: getVisStateFilter(
+          VULNERABILITIES_INDEX_PATTERN_ID,
+          'Severity filter',
+          'Severity',
+          'vulnerability.severity'
+        ),
+      },
+    },
     '1': {
       gridData: {
         w: 12,
-        h: 8,
+        h: 6,
         x: 0,
-        y: 0,
+        y: 12,
         i: '1',
       },
       type: 'visualization',
@@ -957,9 +1103,9 @@ export const getDashboardPanels = () => {
     '2': {
       gridData: {
         w: 12,
-        h: 8,
+        h: 6,
         x: 12,
-        y: 0,
+        y: 12,
         i: '2',
       },
       type: 'visualization',
@@ -971,9 +1117,9 @@ export const getDashboardPanels = () => {
     '3': {
       gridData: {
         w: 12,
-        h: 8,
+        h: 6,
         x: 24,
-        y: 0,
+        y: 12,
         i: '3',
       },
       type: 'visualization',
@@ -985,9 +1131,9 @@ export const getDashboardPanels = () => {
     '4': {
       gridData: {
         w: 12,
-        h: 8,
+        h: 6,
         x: 36,
-        y: 0,
+        y: 12,
         i: '4',
       },
       type: 'visualization',
@@ -1001,7 +1147,7 @@ export const getDashboardPanels = () => {
         w: 48,
         h: 12,
         x: 0,
-        y: 12,
+        y: 24,
         i: '5',
       },
       type: 'visualization',
@@ -1015,7 +1161,7 @@ export const getDashboardPanels = () => {
         w: 24,
         h: 10,
         x: 0,
-        y: 24,
+        y: 36,
         i: '6',
       },
       type: 'visualization',
@@ -1029,15 +1175,13 @@ export const getDashboardPanels = () => {
         w: 24,
         h: 10,
         x: 24,
-        y: 24,
+        y: 36,
         i: '7',
       },
       type: 'visualization',
       explicitInput: {
         id: '7',
-        savedVis: getVisStateTopVulnerabilitiesEndpoints(
-          VULNERABILITIES_INDEX_PATTERN_ID,
-        ),
+        savedVis: getVisStateTopVulnerabilitiesEndpoints(VULNERABILITIES_INDEX_PATTERN_ID),
       },
     },
     '8': {
@@ -1045,7 +1189,7 @@ export const getDashboardPanels = () => {
         w: 48,
         h: 12,
         x: 0,
-        y: 34,
+        y: 44,
         i: '8',
       },
       type: 'visualization',

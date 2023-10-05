@@ -1,57 +1,51 @@
 import React from 'react';
-import { KbnSearchBar } from '../../../../kbn-search-bar';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { TimeRange, Query, Filter } from '../../../../../../../../src/plugins/data/public';
 import { getDashboardPanels } from './dashboard-panels';
-import { useDashboardConfiguration } from '../hooks/use-dashboard-configuration';
+import { I18nProvider } from '@osd/i18n/react';
+import useSearchBarConfiguration from '../../searchbar/use-search-bar-configuration';
+import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 
 const plugins = getPlugins();
+
+const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 export const DashboardVuls: React.FC = () => {
-  const { configuration, updateConfiguration } = useDashboardConfiguration({
-    viewMode: ViewMode.VIEW,
-    panels: getDashboardPanels(),
-    isFullScreenMode: false,
-    filters: [],
-    useMargins: true,
-    id: 'random-id',
-    timeRange: plugins.data.query.timefilter.timefilter.getTime(),
-    title: 'new title',
-    description: 'description',
-    query: plugins.data.query.queryString.getQuery(),
-    refreshConfig: {
-      pause: false,
-      value: 15,
-    },
-    hidePanelTitles: false,
+  const { searchBarProps } = useSearchBarConfiguration({
+    defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
   });
-
-  const handleQueryUpdate = ({ dateRange, query }: { dateRange: TimeRange; query: Query }) => {
-    updateConfiguration({
-      ...configuration,
-      query,
-      timeRange: dateRange,
-    });
-  };
-
-  const handleFiltersUpdate = (filters: Filter[]) => {
-    updateConfiguration({
-      ...configuration,
-      filters,
-    });
-  };
 
   return (
     <>
-      <KbnSearchBar
-        appName="vulnerability detector module"
-        onFiltersUpdated={handleFiltersUpdate}
-        onQuerySubmit={handleQueryUpdate}
+      <I18nProvider>
+        {' '}
+        {/* The searchbar is not rendered when is not wrapped by the i18n provider */}
+        <SearchBar {...searchBarProps} />
+      </I18nProvider>
+      <DashboardByRenderer
+        input={{
+          viewMode: ViewMode.VIEW,
+          panels: getDashboardPanels(),
+          isFullScreenMode: false,
+          filters: searchBarProps.filters ?? [],
+          useMargins: true,
+          id: 'vulnerability-detector-dashboard-tab',
+          timeRange: {
+            from: searchBarProps.dateRangeFrom,
+            to: searchBarProps.dateRangeTo,
+          },
+          title: 'Vulnerability detector dashboard',
+          description: 'Dashboard of the Vulnerability detector',
+          query: searchBarProps.query,
+          refreshConfig: {
+            pause: false,
+            value: 15,
+          },
+          hidePanelTitles: false,
+        }}
       />
-      <DashboardByRenderer input={configuration} />
     </>
   );
 };
