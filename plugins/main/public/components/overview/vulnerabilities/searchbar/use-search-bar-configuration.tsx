@@ -12,7 +12,7 @@ type tUseSearchBarCustomInputs = {
     onFiltersUpdated?: (filters: Filter[]) => void;
     onQuerySubmitted?: (payload: { dateRange: TimeRange; query?: Query }, isUpdate?: boolean) => void;
 }
-type tUseSearchBarProps =  Partial<SearchBarProps> & tUseSearchBarCustomInputs;
+type tUseSearchBarProps = Partial<SearchBarProps> & tUseSearchBarCustomInputs;
 
 // Output types
 type tUserSearchBarResponse = {
@@ -56,18 +56,18 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
      */
     const getIndexPattern = async (indexPatternID?: string) => {
         const indexPatternService = getDataPlugin().indexPatterns as IndexPatternsContract;
-        if(indexPatternID){
-            try{
+        if (indexPatternID) {
+            try {
                 return await indexPatternService.get(indexPatternID);
-            }catch(error){
+            } catch (error) {
                 // when the index pattern id not exists will get the default
                 console.error(error);
                 return await indexPatternService.getDefault();
             }
-        }else{
+        } else {
             return await indexPatternService.getDefault();
         }
-       
+
     }
 
     /**
@@ -79,19 +79,29 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
     const getInitialFilters = async (indexPattern: IIndexPattern) => {
         const indexPatternService = getDataPlugin().indexPatterns as IndexPatternsContract;
         let initialFilters: Filter[] = [];
-        if(props?.filters){
+        if (props?.filters) {
             return props?.filters;
         }
-        if(indexPattern){
+        if (indexPattern) {
             // get filtermanager and filters
             // if the index is the same, get filters stored
             // else clear filters
             const defaultIndexPattern = await indexPatternService.getDefault() as IIndexPattern;
-            initialFilters = defaultIndexPattern.id === indexPattern.id ? filterManager.getFilters(): []
-        }else{
+            initialFilters = defaultIndexPattern.id === indexPattern.id ? filterManager.getFilters() : []
+        } else {
             initialFilters = [];
         }
-        return initialFilters.filter(filter => filter.meta.controlledBy !== AUTHORIZED_AGENTS);
+        return initialFilters;
+    }
+
+    /**
+     * Return filters from filters manager.
+     * Additionally solve the known issue with the auto loaded agent.id filters from the searchbar 
+     * @returns 
+     */
+    const getFilters = () => {
+        const filters = filterManager ? filterManager.getFilters() : [];
+        return filters.filter(filter => filter.meta.controlledBy !== AUTHORIZED_AGENTS); // remove auto loaded agent.id filters
     }
 
     /**
@@ -100,7 +110,7 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
     const searchBarProps: Partial<SearchBarProps> = {
         isLoading,
         ...indexPatternSelected && { indexPatterns: [indexPatternSelected] }, // indexPattern cannot be empty or empty []
-        filters: filterManager.getFilters(),
+        filters: getFilters(),
         query,
         timeHistory,
         dateRangeFrom: timeFilter.from,
