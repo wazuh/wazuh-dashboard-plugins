@@ -5,3 +5,4 @@ export const [getInternalSavedObjectsClient, setInternalSavedObjectsClient] = cr
   ISavedObjectsRepository
 >('SavedObjectsRepository');
 export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
+export const [getPlugins, setPlugins] = createGetterSetter<CoreStart>('Core');

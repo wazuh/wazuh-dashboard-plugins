@@ -6,14 +6,19 @@ import {
   Logger,
 } from 'opensearch-dashboards/server';
 
-import { PluginSetup, WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
+import {
+  PluginSetup,
+  WazuhCheckUpdatesPluginSetup,
+  WazuhCheckUpdatesPluginStart,
+  AppPluginStartDependencies
+} from './types';
 import { defineRoutes } from './routes';
 import {
   availableUpdatesObject,
   settingsObject,
   userPreferencesObject,
 } from './services/saved-object/types';
-import { setCore, setInternalSavedObjectsClient } from './plugin-services';
+import { setCore, setPlugins, setInternalSavedObjectsClient } from './plugin-services';
 import { jobSchedulerRun } from './cronjob';
 import { ISecurityFactory, SecurityObj } from './lib/security-factory';
 
@@ -59,11 +64,12 @@ export class WazuhCheckUpdatesPlugin
     return {};
   }
 
-  public start(core: CoreStart): WazuhCheckUpdatesPluginStart {
+  public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhCheckUpdatesPluginStart {
     this.logger.debug('wazuhCheckUpdates: Started');
 
     const internalSavedObjectsClient = core.savedObjects.createInternalRepository();
     setCore(core);
+    setPlugins(plugins);
     setInternalSavedObjectsClient(internalSavedObjectsClient);
 
     // Scheduler
@@ -72,5 +78,5 @@ export class WazuhCheckUpdatesPlugin
     return {};
   }
 
-  public stop() {}
+  public stop() { }
 }

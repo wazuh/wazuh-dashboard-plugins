@@ -24,7 +24,7 @@ export const getUpdatesRoute = (router: IRouter) => {
         };
 
         if (request.query.checkAvailableUpdates === 'true') {
-          const updates = await getUpdates();
+          const updates = await getUpdates(context, request, response);
           return response.ok({
             body: {
               ...defaultValues,

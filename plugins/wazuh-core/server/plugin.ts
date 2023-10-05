@@ -9,7 +9,7 @@ import {
 import { PluginSetup, WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setCore } from './plugin-services';
 import { ISecurityFactory, SecurityObj } from './lib/security-factory';
-import { getUpdates } from './services/updates';
+import { WazuhApiCtrl } from './controllers/wazuh-api';
 import { log } from './lib/logger';
 
 declare module 'opensearch-dashboards/server' {
@@ -49,10 +49,10 @@ export class WazuhCorePlugin implements Plugin<WazuhCorePluginSetup, WazuhCorePl
     setCore(core);
 
     return {
-      getUpdates,
+      WazuhApiCtrl,
       log,
     };
   }
 
-  public stop() {}
+  public stop() { }
 }
