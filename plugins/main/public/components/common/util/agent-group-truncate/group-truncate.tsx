@@ -52,7 +52,7 @@ export class GroupTruncate extends React.Component {
     switch (this.props.action) {
       case 'redirect':
         return navigateAppURL(
-          `/app/endpoint-groups#/manager/?tab=groups&group=${group}`,
+          `/app/groups#/manager/?tab=groups&group=${group}`,
         );
       case 'filter':
         return this.filterAction(group);
