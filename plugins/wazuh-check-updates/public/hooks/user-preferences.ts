@@ -12,7 +12,7 @@ export const useUserPreferences = () => {
     (async () => {
       try {
         setIsLoading(true);
-        const response = await getCore().http.get(routes.userPreferences);
+        const response = (await getCore().http.get(routes.userPreferences)) as UserPreferences;
         setUserPreferences(response);
         setError(undefined);
       } catch (error: any) {

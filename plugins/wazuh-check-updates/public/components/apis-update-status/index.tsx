@@ -82,49 +82,51 @@ export const ApisUpdateStatus = ({ setApisAvailableUpdates }: ApisUpdateStatusPr
 
   return (
     <I18nProvider>
-      <EuiTitle>
-        <h2>
-          <FormattedMessage
-            id={`wazuhCheckUpdates.apisUpdateStatus.tableTitle`}
-            defaultMessage="Wazuh APIs version"
-          />
-        </h2>
-      </EuiTitle>
-      <EuiSpacer size="l" />
-      <EuiFlexGroup justifyContent="spaceBetween" gutterSize="m" alignItems="center">
-        <EuiFlexItem grow={false}>
-          <EuiButton isLoading={isLoading} onClick={handleOnClick} size="s" iconType="refresh">
+      <>
+        <EuiTitle>
+          <h2>
             <FormattedMessage
-              id="wazuhCheckUpdates.apisUpdateStatus.buttonText"
-              defaultMessage="Check updates"
+              id={`wazuhCheckUpdates.apisUpdateStatus.tableTitle`}
+              defaultMessage="Wazuh APIs version"
             />
-          </EuiButton>
-        </EuiFlexItem>
-        {lastCheck ? (
-          <EuiFlexItem>
-            <EuiDescriptionList
-              compressed
-              listItems={[
-                {
-                  title: (
-                    <FormattedMessage
-                      id={`wazuhCheckUpdates.apisUpdateStatus.lastCheck`}
-                      defaultMessage="Last check"
-                    />
-                  ),
-                  description: formatUIDate(new Date(lastCheck)),
-                },
-              ]}
-            />
+          </h2>
+        </EuiTitle>
+        <EuiSpacer size="l" />
+        <EuiFlexGroup justifyContent="spaceBetween" gutterSize="m" alignItems="center">
+          <EuiFlexItem grow={false}>
+            <EuiButton isLoading={isLoading} onClick={handleOnClick} size="s" iconType="refresh">
+              <FormattedMessage
+                id="wazuhCheckUpdates.apisUpdateStatus.buttonText"
+                defaultMessage="Check updates"
+              />
+            </EuiButton>
           </EuiFlexItem>
-        ) : null}
-        <EuiFlexItem grow={false}>
-          <DismissNotificationCheck />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiSpacer size="m" />
-      <ApisUpdateTable apisAvailableUpdates={apisAvailableUpdates} isLoading={isLoading} />
-      <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
+          {lastCheck ? (
+            <EuiFlexItem>
+              <EuiDescriptionList
+                compressed
+                listItems={[
+                  {
+                    title: (
+                      <FormattedMessage
+                        id={`wazuhCheckUpdates.apisUpdateStatus.lastCheck`}
+                        defaultMessage="Last check"
+                      />
+                    ),
+                    description: formatUIDate(new Date(lastCheck)),
+                  },
+                ]}
+              />
+            </EuiFlexItem>
+          ) : null}
+          <EuiFlexItem grow={false}>
+            <DismissNotificationCheck />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer size="m" />
+        <ApisUpdateTable apisAvailableUpdates={apisAvailableUpdates} isLoading={isLoading} />
+        <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={6000} />
+      </>
     </I18nProvider>
   );
 };

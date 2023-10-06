@@ -10,16 +10,16 @@ export const userPreferencesObject: SavedObjectsType = {
       last_dismissed_updates: {
         type: 'nested',
         properties: {
-          apiId: {
+          api_id: {
             type: 'text',
           },
-          mayor: {
+          last_major: {
             type: 'text',
           },
-          minor: {
+          last_minor: {
             type: 'text',
           },
-          patch: {
+          last_patch: {
             type: 'text',
           },
         },

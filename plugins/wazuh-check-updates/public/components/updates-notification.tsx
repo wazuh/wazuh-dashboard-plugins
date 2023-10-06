@@ -1,19 +1,16 @@
 import {
-  EuiBadge,
   EuiBottomBar,
   EuiButton,
   EuiButtonEmpty,
   EuiCheckbox,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiHeaderLink,
   EuiText,
 } from '@elastic/eui';
 import React, { useState } from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { useAvailableUpdates, useUserPreferences } from '../hooks';
 import { areThereNewUpdates } from '../utils';
-import { last } from 'lodash';
 import { getHttp } from '../plugin-services';
 
 export const UpdatesNotification = () => {
@@ -63,12 +60,17 @@ export const UpdatesNotification = () => {
   const handleOnClose = () => {
     updateUserPreferences({
       last_dismissed_updates: apisAvailableUpdates.map((apiAvailableUpdates) => {
-        const { apiId, lastMayor, lastMinor, lastPatch } = apiAvailableUpdates;
+        const {
+          api_id,
+          last_available_major,
+          last_available_minor,
+          last_available_patch,
+        } = apiAvailableUpdates;
         return {
-          apiId,
-          mayor: lastMayor?.tag,
-          minor: lastMinor?.tag,
-          patch: lastPatch?.tag,
+          api_id,
+          last_major: last_available_major?.tag,
+          last_minor: last_available_minor?.tag,
+          last_patch: last_available_patch?.tag,
         };
       }),
       ...(dismissFutureUpdates ? { hide_update_notifications: true } : {}),
@@ -97,14 +99,6 @@ export const UpdatesNotification = () => {
                     defaultMessage="Go to the about page for details"
                   />
                 </EuiButtonEmpty>
-                {/* <EuiHeaderLink href="" isActive target="_blank" iconType="popout" iconSide="right">
-                  {
-                    <FormattedMessage
-                      id="wazuhCheckUpdates.updatesNotification.linkText"
-                      defaultMessage="Go to the release notes for details"
-                    />
-                  }
-                </EuiHeaderLink> */}
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>

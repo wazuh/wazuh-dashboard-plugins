@@ -28,9 +28,9 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
 
     const updates = (updatesResponse?.data?.data || []) as ResponseApiAvailableUpdates[];
 
-    const apiAvailableUpdates = updates?.map((update) => {
+    const apisAvailableUpdates = updates?.map((update) => {
       const status =
-        update.lastMayor || update.lastMinor || update.lastPatch
+        update.last_major || update.last_minor || update.last_patch
           ? API_UPDATES_STATUS.AVAILABLE_UPDATES
           : API_UPDATES_STATUS.UP_TO_DATE;
 
@@ -41,8 +41,8 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
     });
 
     const savedObject = {
-      apiAvailableUpdates,
-      last_check: new Date(),
+      apis_available_updates: apisAvailableUpdates,
+      last_check_date: new Date(),
     };
 
     await setSavedObject(SAVED_OBJECT_UPDATES, savedObject);

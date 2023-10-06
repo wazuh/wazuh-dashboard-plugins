@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ApiAvailableUpdates } from '../../common/types';
+import { ApiAvailableUpdates, AvailableUpdates } from '../../common/types';
 import { routes } from '../../common/constants';
 import { getCore } from '../plugin-services';
 
@@ -13,13 +13,13 @@ export const useAvailableUpdates = () => {
   const refreshAvailableUpdates = async (forceUpdate = false, returnError = false) => {
     try {
       setIsLoading(true);
-      const response = await getCore().http.get(routes.checkUpdates, {
+      const response = (await getCore().http.get(routes.checkUpdates, {
         query: {
           checkAvailableUpdates: forceUpdate,
         },
-      });
-      setApisAvailableUpdates(response?.apiAvailableUpdates || []);
-      setLastCheck(response?.last_check);
+      })) as AvailableUpdates;
+      setApisAvailableUpdates(response?.apis_available_updates || []);
+      setLastCheck(response?.last_check_date);
       setError(undefined);
     } catch (error: any) {
       setError(error);

@@ -5,19 +5,30 @@ export const areThereNewUpdates = (
   lastDismissedUpdates?: UserPreferencesDimissedUpdate[]
 ) => {
   const notifyUser = !!apisAvailableUpdates?.find((apiAvailableUpdates) => {
-    const { apiId, lastMayor, lastMinor, lastPatch } = apiAvailableUpdates;
+    const {
+      api_id,
+      last_available_major,
+      last_available_minor,
+      last_available_patch,
+    } = apiAvailableUpdates;
 
     const apiDismissed = lastDismissedUpdates?.find(
-      (lastDismissedUpdate) => lastDismissedUpdate.apiId === apiId
+      (lastDismissedUpdate) => lastDismissedUpdate.api_id === api_id
     );
 
-    if (!apiDismissed && (lastMayor?.tag || lastMinor?.tag || lastPatch?.tag)) {
+    if (
+      !apiDismissed &&
+      (last_available_major?.tag || last_available_minor?.tag || last_available_patch?.tag)
+    ) {
       return true;
     }
 
-    const isNewMajor = lastMayor?.tag && lastMayor.tag !== apiDismissed?.mayor;
-    const isNewMinor = lastMinor?.tag && lastMinor.tag !== apiDismissed?.minor;
-    const isNewPatch = lastPatch?.tag && lastPatch.tag !== apiDismissed?.patch;
+    const isNewMajor =
+      last_available_major?.tag && last_available_major.tag !== apiDismissed?.last_major;
+    const isNewMinor =
+      last_available_minor?.tag && last_available_minor.tag !== apiDismissed?.last_minor;
+    const isNewPatch =
+      last_available_patch?.tag && last_available_patch.tag !== apiDismissed?.last_patch;
 
     return isNewMajor || isNewMinor || isNewPatch;
   });

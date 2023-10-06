@@ -24,6 +24,9 @@ describe('jobSchedulerRun function', () => {
 
     const response = await jobSchedulerRun();
 
+    expect(getUpdates).toHaveBeenCalledTimes(1);
+    expect(getUpdates).toHaveBeenCalledWith(true);
+
     expect(getSettings).toHaveBeenCalledTimes(1);
     expect(getSettings).toHaveBeenCalledWith();
 

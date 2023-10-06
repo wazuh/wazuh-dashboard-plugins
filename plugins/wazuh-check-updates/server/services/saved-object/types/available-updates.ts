@@ -12,7 +12,7 @@ const updateObjectType: SavedObjectsFieldMapping = {
     semver: {
       type: 'nested',
       properties: {
-        mayor: {
+        major: {
           type: 'integer',
         },
         minor: {
@@ -38,27 +38,27 @@ export const availableUpdatesObject: SavedObjectsType = {
   namespaceType: 'agnostic',
   mappings: {
     properties: {
-      last_check: {
+      last_check_date: {
         type: 'date',
       },
-      apiAvailableUpdates: {
+      apis_available_updates: {
         type: 'nested',
         properties: {
-          apiId: {
+          api_id: {
             type: 'text',
           },
-          version: {
+          current_version: {
             type: 'text',
           },
           status: {
             type: 'text',
           },
-          last_check: {
+          last_check_date: {
             type: 'date',
           },
-          lastMayor: updateObjectType,
-          lastMinor: updateObjectType,
-          lastPatch: updateObjectType,
+          last_available_major: updateObjectType,
+          last_available_minor: updateObjectType,
+          last_available_patch: updateObjectType,
         },
       },
     },

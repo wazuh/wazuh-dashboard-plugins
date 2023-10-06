@@ -5,12 +5,12 @@ export enum API_UPDATES_STATUS {
 }
 
 export interface ResponseApiAvailableUpdates {
-  apiId: string;
-  version: string;
-  lastMayor?: Update;
-  lastMinor?: Update;
-  lastPatch?: Update;
-  last_check?: Date | string | undefined;
+  api_id: string;
+  current_version: string;
+  last_available_major?: Update;
+  last_available_minor?: Update;
+  last_available_patch?: Update;
+  last_check_date?: Date | string | undefined;
 }
 
 export interface ApiAvailableUpdates extends ResponseApiAvailableUpdates {
@@ -21,7 +21,7 @@ export interface Update {
   description: string;
   published_date: string;
   semver: {
-    mayor: number;
+    major: number;
     minor: number;
     patch: number;
   };
@@ -30,10 +30,10 @@ export interface Update {
 }
 
 export interface UserPreferencesDimissedUpdate {
-  apiId: string;
-  mayor?: string;
-  minor?: string;
-  patch?: string;
+  api_id: string;
+  last_major?: string;
+  last_minor?: string;
+  last_patch?: string;
 }
 
 export interface UserPreferences {
@@ -46,8 +46,8 @@ export interface CheckUpdatesSettings {
 }
 
 export interface AvailableUpdates {
-  apiAvailableUpdates: ApiAvailableUpdates[];
-  last_check: Date;
+  apis_available_updates: ApiAvailableUpdates[];
+  last_check_date: Date;
 }
 
 export type savedObjectType = AvailableUpdates | UserPreferences | CheckUpdatesSettings;

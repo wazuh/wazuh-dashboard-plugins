@@ -7,12 +7,12 @@ import { UpdateBadge } from './update-badge';
 export const getApisUpdateStatusColumns = () => {
   const baseColumns = [
     {
-      field: 'apiId',
+      field: 'api_id',
       name: 'ID',
       width: '100px',
     },
     {
-      field: 'version',
+      field: 'current_version',
       name: 'Version',
       width: '100px',
     },
@@ -65,9 +65,9 @@ export const getApisUpdateStatusColumns = () => {
 
   const finalColumns = [
     ...baseColumns,
-    updatesColumn('lastMayor', 'Last major'),
-    updatesColumn('lastMinor', 'Last minor'),
-    updatesColumn('lastPatch', 'Last patch'),
+    updatesColumn('last_available_major', 'Last major'),
+    updatesColumn('last_available_minor', 'Last minor'),
+    updatesColumn('last_available_patch', 'Last patch'),
   ];
 
   return finalColumns;

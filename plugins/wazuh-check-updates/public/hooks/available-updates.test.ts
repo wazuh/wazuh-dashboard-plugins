@@ -7,15 +7,15 @@ jest.mock('../plugin-services', () => ({
   getCore: jest.fn().mockReturnValue({
     http: {
       get: jest.fn().mockResolvedValue({
-        last_check: '2021-09-30T14:00:00.000Z',
-        mayor: [
+        last_check_date: '2021-09-30T14:00:00.000Z',
+        major: [
           {
             title: 'Wazuh 4.2.6',
             description:
               'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
             published_date: '2021-09-30T14:00:00.000Z',
             semver: {
-              mayor: 4,
+              major: 4,
               minor: 2,
               patch: 6,
             },
@@ -32,15 +32,15 @@ jest.mock('../plugin-services', () => ({
 describe('useAvailableUpdates hook', () => {
   test('should fetch initial data without any error', async () => {
     const mockAvailableUpdates: AvailableUpdates = {
-      last_check: '2021-09-30T14:00:00.000Z',
-      mayor: [
+      last_check_date: '2021-09-30T14:00:00.000Z',
+      major: [
         {
           title: 'Wazuh 4.2.6',
           description:
             'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
           published_date: '2021-09-30T14:00:00.000Z',
           semver: {
-            mayor: 4,
+            major: 4,
             minor: 2,
             patch: 6,
           },
@@ -62,15 +62,15 @@ describe('useAvailableUpdates hook', () => {
 
   test('should update availableUpdates', async () => {
     const mockAvailableUpdates: AvailableUpdates = {
-      last_check: '2021-09-30T14:00:00.000Z',
-      mayor: [
+      last_check_date: '2021-09-30T14:00:00.000Z',
+      major: [
         {
           title: 'Wazuh 4.2.6',
           description:
             'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
           published_date: '2021-09-30T14:00:00.000Z',
           semver: {
-            mayor: 4,
+            major: 4,
             minor: 2,
             patch: 6,
           },
