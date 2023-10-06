@@ -12,8 +12,12 @@ describe('getUserPreferences function', () => {
 
   test('should return user preferences', async () => {
     mockedGetSavedObject.mockImplementation(() => ({
-      username: 'admin',
-      last_dismissed_update: 'v4.3.1',
+      last_dismissed_updates: [
+        {
+          api_id: 'api id',
+          last_patch: '4.3.1',
+        },
+      ],
       hide_update_notifications: false,
     }));
 
@@ -23,7 +27,12 @@ describe('getUserPreferences function', () => {
     expect(getSavedObject).toHaveBeenCalledWith(SAVED_OBJECT_USER_PREFERENCES, 'admin');
 
     expect(response).toEqual({
-      last_dismissed_update: 'v4.3.1',
+      last_dismissed_updates: [
+        {
+          api_id: 'api id',
+          last_patch: '4.3.1',
+        },
+      ],
       hide_update_notifications: false,
     });
   });

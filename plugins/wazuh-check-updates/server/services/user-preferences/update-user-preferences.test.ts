@@ -16,14 +16,24 @@ describe('updateUserPreferences function', () => {
 
   test('should return user preferences', async () => {
     mockedGetSavedObject.mockImplementation(() => ({
-      last_dismissed_update: 'v4.3.1',
+      last_dismissed_updates: [
+        {
+          api_id: 'api id',
+          last_patch: '4.3.1',
+        },
+      ],
       hide_update_notifications: false,
     }));
 
     mockedSetSavedObject.mockImplementation(() => {});
 
     const response = await updateUserPreferences('admin', {
-      last_dismissed_update: 'v4.3.1',
+      last_dismissed_updates: [
+        {
+          api_id: 'api id',
+          last_patch: '4.3.1',
+        },
+      ],
       hide_update_notifications: false,
     });
 
@@ -31,7 +41,12 @@ describe('updateUserPreferences function', () => {
     expect(getSavedObject).toHaveBeenCalledWith(SAVED_OBJECT_USER_PREFERENCES, 'admin');
 
     expect(response).toEqual({
-      last_dismissed_update: 'v4.3.1',
+      last_dismissed_updates: [
+        {
+          api_id: 'api id',
+          last_patch: '4.3.1',
+        },
+      ],
       hide_update_notifications: false,
     });
   });
@@ -40,7 +55,12 @@ describe('updateUserPreferences function', () => {
     mockedSetSavedObject.mockRejectedValue(new Error('getSavedObject error'));
 
     const promise = updateUserPreferences('admin', {
-      last_dismissed_update: 'v4.3.1',
+      last_dismissed_updates: [
+        {
+          api_id: 'api id',
+          last_patch: '4.3.1',
+        },
+      ],
       hide_update_notifications: false,
     });
 
