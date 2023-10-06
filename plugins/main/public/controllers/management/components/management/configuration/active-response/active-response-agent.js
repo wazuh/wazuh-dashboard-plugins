@@ -14,9 +14,8 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-
 import withWzConfig from '../util-hocs/wz-config';
 
 import { compose } from 'redux';
@@ -80,18 +79,16 @@ class WzConfigurationActiveResponseAgent extends Component {
         {currentConfig['com-active-response'] &&
           !isString(currentConfig['com-active-response']) &&
           currentConfig['com-active-response']['active-response'] && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Active response settings"
               description="Find here all the Active response settings for this agent"
-              currentConfig={currentConfig}
-              minusHeight={this.props.agent.id === '000' ? 280 : 355}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationSettingsGroup
                 config={currentConfig['com-active-response']['active-response']}
                 items={mainSettings}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
@@ -105,7 +102,6 @@ const mapStateToProps = state => ({
 const sectionsAgent = [{ component: 'com', configuration: 'active-response' }];
 
 WzConfigurationActiveResponseAgent.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

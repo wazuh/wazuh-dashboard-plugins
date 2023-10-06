@@ -33,7 +33,8 @@
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
         "version": "Wazuh v4.4.0",
-        "group_config_status": "synced"
+        "group_config_status": "synced",
+        "status_code": 0
       },
       {
         "os": {
@@ -62,7 +63,8 @@
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
         "version": "Wazuh v4.4.0",
-        "group_config_status": "not synced"
+        "group_config_status": "not synced",
+        "status_code": 0
       },
       {
         "os": {
@@ -87,8 +89,9 @@
         "manager": "wazuh-manager-master-0",
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
-        "version": "Wazuh v4.4.0",
-        "group_config_status": "synced"
+        "version": "Wazuh v4.5.0",
+        "group_config_status": "synced",
+        "status_code": 0
       },
       {
         "os": {
@@ -117,7 +120,8 @@
         "ip": "111.111.1.111",
         "mergedSum": "e669d89eba52f6897060fc65a45300ac",
         "configSum": "97fccbb67e250b7c80aadc8d0dc59abe",
-        "group_config_status": "not synced"
+        "group_config_status": "not synced",
+        "status_code": 1
       },
       {
         "status": "never_connected",
@@ -127,7 +131,8 @@
         "registerIP": "any",
         "id": "004",
         "ip": "any",
-        "group_config_status": "not synced"
+        "group_config_status": "not synced",
+        "status_code": 4
       },
       {
         "os": {
@@ -151,7 +156,8 @@
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
         "version": "Wazuh v4.5.0",
-        "group_config_status": "synced"
+        "group_config_status": "synced",
+        "status_code": 2
       },
       {
         "os": {
@@ -161,6 +167,7 @@
           "version": "18.04.6 LTS"
         },
         "group_config_status": "not synced",
+        "status_code": 0,
         "ip": "172.19.0.27",
         "status": "pending",
         "name": "Pending agent",
@@ -181,7 +188,8 @@
         "registerIP": "any",
         "id": "007",
         "ip": "any",
-        "group_config_status": "not synced"
+        "group_config_status": "not synced",
+        "status_code": 5
       },
       {
         "status": "never_connected",
@@ -191,7 +199,8 @@
         "registerIP": "any",
         "id": "008",
         "ip": "any",
-        "group_config_status": "not synced"
+        "group_config_status": "not synced",
+        "status_code": 1
       },
       {
         "status": "never_connected",
@@ -201,7 +210,8 @@
         "registerIP": "any",
         "id": "009",
         "ip": "any",
-        "group_config_status": "not synced"
+        "group_config_status": "not synced",
+        "status_code": 2
       },
       {
         "os": {

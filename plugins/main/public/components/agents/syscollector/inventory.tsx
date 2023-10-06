@@ -75,15 +75,15 @@ export function SyscollectorInventory({ agent }) {
   }
 
   let soPlatform;
-  if (((agent.os || {}).uname || '').includes('Linux')) {
+  if (agent?.os?.uname?.includes('Linux')) {
     soPlatform = 'linux';
-  } else if ((agent.os || {}).platform === 'windows') {
+  } else if (agent?.os?.platform === 'windows') {
     soPlatform = 'windows';
-  } else if ((agent.os || {}).platform === 'darwin') {
+  } else if (agent?.os?.platform === 'darwin') {
     soPlatform = 'apple';
-  } else if (((agent.os || {}).uname.toLowerCase() || '').includes('freebsd')) {
+  } else if (agent?.os?.uname?.toLowerCase().includes('freebsd')) {
     soPlatform = 'freebsd';
-  } else if (((agent.os || {}).uname.toLowerCase() || '').includes('sunos')) {
+  } else if (agent?.os?.uname?.toLowerCase().includes('sunos')) {
     soPlatform = 'solaris';
   }
 

@@ -61,7 +61,7 @@ function getSupportedVersions(pluginVersion) {
     },
     OpenSearch: {
       branch: pluginVersion,
-      versions: ['2.8.0'],
+      versions: ['2.9.0'],
       manifestPluginPath: 'opensearch_dashboards.json',
     },
   };
@@ -294,13 +294,13 @@ async function question(question) {
 async function requireConfirmation({ ignoreConfirmation }) {
   logger.warn(
     'Ensure the base branches are created in the remote and they have updated the files: ' +
-    'README.md, CHANGELOG.md, unit tests files, API data files. ' +
-    'It does not modify these files.',
+      'README.md, CHANGELOG.md, unit tests files, API data files. ' +
+      'It does not modify these files.',
   );
 
   logger.warn(
     'This script will commit and push the tags to the remote repository, ' +
-    'deleting any unpushed changes.',
+      'deleting any unpushed changes.',
   );
 
   if (!ignoreConfirmation) {

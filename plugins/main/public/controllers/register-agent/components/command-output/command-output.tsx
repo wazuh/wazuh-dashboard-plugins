@@ -9,6 +9,7 @@ import {
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
 import { tOperatingSystem } from '../../core/config/os-commands-definitions';
+import { osdfucatePasswordInCommand } from '../../services/wazuh-password-service';
 
 interface ICommandSectionProps {
   commandText: string;
@@ -20,13 +21,6 @@ interface ICommandSectionProps {
 
 export default function CommandOutput(props: ICommandSectionProps) {
   const { commandText, showCommand, onCopy, os, password } = props;
-  const getHighlightCodeLanguage = (os: 'WINDOWS' | string) => {
-    if (os.toLowerCase() === 'windows') {
-      return 'powershell';
-    } else {
-      return 'bash';
-    }
-  };
   const [havePassword, setHavePassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -45,27 +39,22 @@ export default function CommandOutput(props: ICommandSectionProps) {
       setHavePassword(false);
       setCommandToShow(commandText);
     }
-  }, [password, commandText, showPassword])
+  }, [password, commandText, showPassword]);
 
   const osdfucatePassword = (password: string) => {
-    if(!password) return;
-    if(!commandText) return;
+    if (!password) return;
+    if (!commandText) return;
 
-    if(showPassword){
+    if (showPassword) {
       setCommandToShow(commandText);
-    }else{
-    // search password in commandText and replace with * for every character
-      const findPassword = commandText.search(password);
-      if (findPassword > -1) {
-        let command = commandText;
-        setCommandToShow(command.replace(/WAZUH_REGISTRATION_PASSWORD='([^']+)'/,`WAZUH_REGISTRATION_PASSWORD='${'*'.repeat(password.length)}'`));
-      }
+    } else {
+      setCommandToShow(osdfucatePasswordInCommand(password, commandText, os));
     }
-  }
+  };
 
   const onChangeShowPassword = (event: EuiSwitchEvent) => {
     setShowPassword(event.target.checked);
-  }
+  };
 
   return (
     <Fragment>
@@ -76,7 +65,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
             style={{
               zIndex: '100',
             }}
-            language={getHighlightCodeLanguage(os || '')}
+            language='tsx'
           >
             {showCommand ? commandToShow : ''}
           </EuiCodeBlock>
@@ -96,7 +85,13 @@ export default function CommandOutput(props: ICommandSectionProps) {
           )}
         </div>
         <EuiSpacer size='s' />
-        {showCommand && havePassword ? <EuiSwitch checked={showPassword} label='Show password' onChange={onChangeShowPassword}/> : null}
+        {showCommand && havePassword ? (
+          <EuiSwitch
+            checked={showPassword}
+            label='Show password'
+            onChange={onChangeShowPassword}
+          />
+        ) : null}
       </EuiText>
     </Fragment>
   );

@@ -13,11 +13,9 @@
 import React, { Component, Fragment } from 'react';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-
 import withWzConfig from '../util-hocs/wz-config';
-
 import {
   isString,
   renderValueNoThenEnabled,
@@ -77,18 +75,16 @@ class WzConfigurationClientBuffer extends Component {
         {currentConfig['agent-buffer'] &&
           !isString(currentConfig['agent-buffer']) &&
           currentConfig['agent-buffer'].buffer && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Main settings"
               description="These settings determine the event processing rate for the agent"
-              currentConfig={currentConfig}
-              minusHeight={355}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationSettingsGroup
                 config={currentConfig['agent-buffer'].buffer}
                 items={mainSettings}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
@@ -96,9 +92,5 @@ class WzConfigurationClientBuffer extends Component {
 }
 
 const sections = [{ component: 'agent', configuration: 'buffer' }];
-
-WzConfigurationClientBuffer.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default withWzConfig(sections)(WzConfigurationClientBuffer);

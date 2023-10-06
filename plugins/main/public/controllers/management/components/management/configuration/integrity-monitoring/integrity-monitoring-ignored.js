@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
 
@@ -56,12 +56,10 @@ class WzConfigurationMonitoringIgnored extends Component {
         (currentConfig['syscheck-syscheck'].syscheck.ignore ||
         currentConfig['syscheck-syscheck'].syscheck.ignore_sregex ) ? (
           <Fragment>
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Ignored files and directories"
               description="These files and directories are ignored from the integrity scan"
-              currentConfig={currentConfig['syscheck-syscheck']}
-              minusHeight={this.props.agent.id === '000' ? 320 : 415}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               {currentConfig['syscheck-syscheck'].syscheck.ignore && (
                 <EuiBasicTable
@@ -82,7 +80,7 @@ class WzConfigurationMonitoringIgnored extends Component {
                   />
                 </Fragment>
               )}
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           </Fragment>
         ) : null}
         {((agent || {}).os || {}).platform === 'windows' &&
@@ -103,12 +101,10 @@ class WzConfigurationMonitoringIgnored extends Component {
             currentConfig['syscheck-syscheck'].syscheck.ignore_sregex ||
             currentConfig['syscheck-syscheck'].syscheck.registry_ignore ||
             currentConfig['syscheck-syscheck'].syscheck.registry_ignore_sregex) && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Ignored"
               description="A list of registry entries that will be ignored"
-              currentConfig={currentConfig}
-              minusHeight={this.props.agent.id === '000' ? 320 : 415}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               {currentConfig['syscheck-syscheck'].syscheck.registry_ignore && (
                 <EuiBasicTable
@@ -154,7 +150,7 @@ class WzConfigurationMonitoringIgnored extends Component {
                     />
                   </Fragment>
               )}
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
@@ -162,7 +158,6 @@ class WzConfigurationMonitoringIgnored extends Component {
 }
 
 WzConfigurationMonitoringIgnored.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   agent: PropTypes.object
 };
 

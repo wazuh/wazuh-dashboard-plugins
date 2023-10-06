@@ -23,6 +23,12 @@ export const RolesTable = ({
   editRole,
   updateRoles,
 }) => {
+  const [rolesState, setRolesState] = useState([]);
+
+  useEffect(() => {
+    setRolesState(roles);
+  }, [roles]);
+
   const getRowProps = item => {
     const { id } = item;
     return {
@@ -34,15 +40,18 @@ export const RolesTable = ({
   const onConfirmDeleteRole = item => {
     return async () => {
       try {
-        const response = await WzRequest.apiReq('DELETE', `/security/roles/`, {
+        const response = await WzRequest.apiReq('DELETE', '/security/roles/', {
           params: {
             role_ids: item.id,
           },
         });
-        const data = (response.data || {}).data;
-        if (data.failed_items && data.failed_items.length) {
+        const data = response?.data?.data;
+        if (data?.failed_items && data?.failed_items?.length) {
           return;
         }
+        // Workaround for tooltip problem does not disappear
+        // when deleting a role if the following role is a reserved role
+        setRolesState([]);
         ErrorHandler.info('Role was successfully deleted');
         await updateRoles();
       } catch (error) {
@@ -187,7 +196,7 @@ export const RolesTable = ({
 
   return (
     <EuiInMemoryTable
-      items={roles}
+      items={rolesState}
       columns={columns}
       search={search}
       pagination={true}

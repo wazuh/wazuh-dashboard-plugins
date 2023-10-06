@@ -1,13 +1,19 @@
-import { 
-  getLinuxStartCommand, 
-  getMacOsInstallCommand, 
-  getMacosStartCommand, 
-  getWindowsInstallCommand, 
-  getWindowsStartCommand, 
+import {
+  getLinuxStartCommand,
+  getMacOsInstallCommand,
+  getMacosStartCommand,
+  getWindowsInstallCommand,
+  getWindowsStartCommand,
   getDEBAMD64InstallCommand,
   getRPMAMD64InstallCommand,
   getRPMARM64InstallCommand,
-  getDEBARM64InstallCommand} from '../../services/register-agent-os-commands-services';
+  getDEBARM64InstallCommand,
+} from '../../services/register-agent-os-commands-services';
+import {
+  scapeSpecialCharsForLinux,
+  scapeSpecialCharsForMacOS,
+  scapeSpecialCharsForWindows,
+} from '../../services/wazuh-password-service';
 import { IOSDefinition, tOptionalParams } from '../register-commands/types';
 
 // Defined OS combinations
@@ -98,7 +104,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
     {
       architecture: 'RPM aarch64',
       urlPackage: props =>
-      `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.aarch64.rpm`,
+        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.aarch64.rpm`,
       installCommand: props => getRPMARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
@@ -151,21 +157,21 @@ export const osCommandsDefinitions = [
 export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
   serverAddress: {
     property: 'WAZUH_MANAGER',
-    getParamCommand: props => {
+    getParamCommand: (props, selectedOS) => {
       const { property, value } = props;
       return value !== '' ? `${property}='${value}'` : '';
     },
   },
   agentName: {
     property: 'WAZUH_AGENT_NAME',
-    getParamCommand: props => {
+    getParamCommand: (props, selectedOS) => {
       const { property, value } = props;
       return value !== '' ? `${property}='${value}'` : '';
     },
   },
   agentGroups: {
     property: 'WAZUH_AGENT_GROUP',
-    getParamCommand: props => {
+    getParamCommand: (props, selectedOS) => {
       const { property, value } = props;
       let parsedValue = value;
       if (Array.isArray(value)) {
@@ -176,16 +182,33 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
   },
   protocol: {
     property: 'WAZUH_PROTOCOL',
-    getParamCommand: props => {
+    getParamCommand: (props, selectedOS) => {
       const { property, value } = props;
       return value !== '' ? `${property}='${value}'` : '';
     },
   },
   wazuhPassword: {
     property: 'WAZUH_REGISTRATION_PASSWORD',
-    getParamCommand: props => {
+    getParamCommand: (props, selectedOS) => {
       const { property, value } = props;
-      return value !== '' ? `${property}='${value}'` : '';
+      if (!value) {
+        return '';
+      }
+      if (selectedOS) {
+        let osName = selectedOS.name.toLocaleLowerCase();
+        switch (osName) {
+          case 'linux':
+            return `${property}=$'${scapeSpecialCharsForLinux(value)}'`;
+          case 'macos':
+            return `${property}='${scapeSpecialCharsForMacOS(value)}'`;
+          case 'windows':
+            return `${property}='${scapeSpecialCharsForWindows(value)}'`;
+          default:
+            return `${property}=$'${value}'`;
+        }
+      }
+
+      return value !== '' ? `${property}=$'${value}'` : '';
     },
   },
 };

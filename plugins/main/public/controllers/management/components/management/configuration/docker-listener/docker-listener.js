@@ -12,7 +12,7 @@
 import React, { Component, Fragment } from 'react';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import {
   isString,
@@ -20,7 +20,6 @@ import {
   renderValueNoThenEnabled,
   renderValueOrYes,
 } from '../utils/utils';
-
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
@@ -98,18 +97,16 @@ class WzConfigurationDockerListener extends Component {
             <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig['docker-listener'] && (
-          <WzConfigurationSettingsTabSelector
-            title='Main settings'
-            description='General Docker listener settings'
-            currentConfig={this.wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 240 : 355}
-            helpLinks={helpLinks}
+          <WzConfigurationSettingsHeader
+            title="Main settings"
+            description="General Docker listener settings"
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={this.wodleConfig['docker-listener']}
               items={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );
@@ -117,9 +114,5 @@ class WzConfigurationDockerListener extends Component {
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
-
-WzConfigurationDockerListener.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default withWzConfig(sections)(WzConfigurationDockerListener);

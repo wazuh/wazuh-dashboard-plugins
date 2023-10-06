@@ -68,7 +68,6 @@ const mapStateToProps = state => ({
 });
 
 WzConfigurationAlerts.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
