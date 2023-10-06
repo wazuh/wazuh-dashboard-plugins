@@ -15,15 +15,32 @@ export const getUpdates = async (context, request, response): Promise<AvailableU
 
     const { wazuhCore } = await getPlugins();
 
-    const wazuhApiCtrl = new wazuhCore.WazuhApiCtrl();
-    request.body = {
-      ...request.body,
-      method:"GET",
-      path:"/agents",
-      id:"imposter"
-    }
-  
-    const apiResponse = wazuhApiCtrl.requestApi(context, request, response);
+    // const wazuhApiCtrl = new wazuhCore.WazuhApiCtrl();
+    // request.body = {
+    //   ...request.body,
+    //   method:"GET",
+    //   path:"/agents",
+    //   id:"imposter"
+    // }
+    
+    const wazuhHostsController = new wazuhCore.WazuhHostsCtrl();
+    // const manageHosts = new wazuhCore.ManageHosts();
+    // const hosts = await manageHosts.getHosts();
+    const fakeResponseEndpoint = {
+      ok: (body: any) => body,
+      custom: (body: any) => body,
+    };
+    const hostsResponse: {body: []} = await wazuhHostsController.getHostsEntries(false, false, fakeResponseEndpoint);
+
+    const data = request.body;
+    const method = "GET";
+    const path = "/agents";
+    const options = {apiHostID: hostsResponse.body[0].id,
+      forceRefresh:true
+    };
+    // Make a request for each API configured
+    
+    const apiResponse = await wazuhCore.wazuhApiClient.client.asInternalUser.request(method, path, data, options)
 
     mock.onGet(updatesServiceUrl).reply(200, mockSuccessResponse);
 
