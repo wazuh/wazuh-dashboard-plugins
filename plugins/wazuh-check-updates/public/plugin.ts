@@ -1,7 +1,7 @@
 import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
 import { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
 import { UpdatesNotification } from './components/updates-notification';
-import { setCore, setUiSettings, setHttp } from './plugin-services';
+import { setCore, setUiSettings } from './plugin-services';
 import { ApisUpdateStatus } from './components/apis-update-status';
 
 export class WazuhCheckUpdatesPlugin
@@ -13,7 +13,6 @@ export class WazuhCheckUpdatesPlugin
   public start(core: CoreStart): WazuhCheckUpdatesPluginStart {
     setCore(core);
     setUiSettings(core.uiSettings);
-    setHttp(core.http);
 
     return {
       UpdatesNotification,

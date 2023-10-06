@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { useAvailableUpdates, useUserPreferences } from '../hooks';
 import { areThereNewUpdates } from '../utils';
-import { getHttp } from '../plugin-services';
+import { getCore } from '../plugin-services';
 
 export const UpdatesNotification = () => {
   const [isDismissed, setIsDismissed] = useState(false);
@@ -93,7 +93,9 @@ export const UpdatesNotification = () => {
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <EuiButtonEmpty href={getHttp().basePath.prepend('/app/wazuh#/settings?tab=about')}>
+                <EuiButtonEmpty
+                  href={getCore().http.basePath.prepend('/app/wazuh#/settings?tab=about')}
+                >
                   <FormattedMessage
                     id="wazuhCheckUpdates.updatesNotification.linkText"
                     defaultMessage="Go to the about page for details"

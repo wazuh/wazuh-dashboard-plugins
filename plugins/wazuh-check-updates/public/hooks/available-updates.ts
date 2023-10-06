@@ -5,7 +5,7 @@ import { getCore } from '../plugin-services';
 
 export const useAvailableUpdates = () => {
   const [apisAvailableUpdates, setApisAvailableUpdates] = useState<ApiAvailableUpdates[]>([]);
-  const [lastCheck, setLastCheck] = useState<Date>();
+  const [lastCheck, setLastCheck] = useState<string>();
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();

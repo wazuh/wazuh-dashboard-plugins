@@ -10,7 +10,7 @@ export interface ResponseApiAvailableUpdates {
   last_available_major?: Update;
   last_available_minor?: Update;
   last_available_patch?: Update;
-  last_check_date?: Date | string;
+  last_check_date?: string;
 }
 
 export interface ApiAvailableUpdates extends ResponseApiAvailableUpdates {
@@ -47,7 +47,7 @@ export interface CheckUpdatesSettings {
 
 export interface AvailableUpdates {
   apis_available_updates: ApiAvailableUpdates[];
-  last_check_date: Date | string;
+  last_check_date: string;
 }
 
 export type savedObjectType = AvailableUpdates | UserPreferences | CheckUpdatesSettings;

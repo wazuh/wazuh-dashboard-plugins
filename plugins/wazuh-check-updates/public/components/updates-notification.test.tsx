@@ -2,9 +2,10 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useAvailableUpdates, useUserPreferences } from '../hooks';
-import { getCurrentAvailableUpdate } from '../utils';
+import { areThereNewUpdates } from '../utils';
 import { UpdatesNotification } from './updates-notification';
 import userEvent from '@testing-library/user-event';
+import { API_UPDATES_STATUS } from '../../common/types';
 
 jest.mock(
   '../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
@@ -13,69 +14,72 @@ jest.mock(
   })
 );
 
+jest.mock('../plugin-services', () => ({
+  getCore: jest.fn().mockReturnValue({
+    http: {
+      basePath: {
+        prepend: () => 'http://url',
+      },
+    },
+  }),
+}));
+
 const mockedUseAvailabeUpdates = useAvailableUpdates as jest.Mock;
 jest.mock('../hooks/available-updates');
 
 const mockedUseUserPreferences = useUserPreferences as jest.Mock;
 jest.mock('../hooks/user-preferences');
 
-const mockedGetCurrentAvailableUpdate = getCurrentAvailableUpdate as jest.Mock;
-jest.mock('../utils/get-current-available-update');
+const mockedAreThereNewUpdates = areThereNewUpdates as jest.Mock;
+jest.mock('../utils/are-there-new-updates');
 
 describe('UpdatesNotification component', () => {
   test('should return the nofication component', () => {
     mockedUseAvailabeUpdates.mockImplementation(() => ({
       isLoading: false,
-      availableUpdates: {
-        last_check_date: '2021-09-30T14:00:00.000Z',
-        major: [
-          {
-            title: 'Wazuh 4.2.6',
+      apisAvailableUpdates: [
+        {
+          api_id: 'api id',
+          current_version: '4.3.1',
+          status: 'availableUpdates' as API_UPDATES_STATUS,
+          last_available_patch: {
             description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
+              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+            published_date: '2022-05-18T10:12:43Z',
             semver: {
               major: 4,
-              minor: 2,
-              patch: 6,
+              minor: 3,
+              patch: 8,
             },
-            tag: 'v4.2.6',
+            tag: 'v4.3.8',
+            title: 'Wazuh v4.3.8',
           },
-        ],
-        minor: [],
-        patch: [],
-      },
+        },
+      ],
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
-      userPreferences: { hide_update_notifications: false, last_dismissed_update: 'v4.2.1' },
-    }));
-    mockedGetCurrentAvailableUpdate.mockImplementation(() => ({
-      title: 'Wazuh 4.2.6',
-      description:
-        'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-      published_date: '2021-09-30T14:00:00.000Z',
-      semver: {
-        major: 4,
-        minor: 2,
-        patch: 6,
+      userPreferences: {
+        last_dismissed_updates: [
+          {
+            api_id: 'api id',
+            last_patch: 'v4.3.1',
+          },
+        ],
+        hide_update_notifications: false,
       },
-      tag: 'v4.2.6',
     }));
+    mockedAreThereNewUpdates.mockImplementation(() => true);
 
     const { container, getByText, getByRole } = render(<UpdatesNotification />);
 
     expect(container).toMatchSnapshot();
 
-    const message = getByText('Wazuh new release is available now!');
+    const message = getByText('Wazuh new release is available!');
     expect(message).toBeInTheDocument();
 
-    const elementWithTag = getByText('v4.2.6');
-    expect(elementWithTag).toBeInTheDocument();
-
-    const releaseNotesUrl = 'https://documentation.wazuh.com/4.2/release-notes/release-4-2-6.html';
-    const releaseNotesLink = getByRole('link', { name: 'Go to the release notes for details' });
-    expect(releaseNotesLink).toHaveAttribute('href', releaseNotesUrl);
+    const releaseNotesLink = getByRole('link', { name: 'Go to the about page for details' });
+    expect(releaseNotesLink).toBeInTheDocument();
 
     const dismissCheck = getByText('Disable updates notifications');
     expect(dismissCheck).toBeInTheDocument();
@@ -87,43 +91,40 @@ describe('UpdatesNotification component', () => {
   test('should return null when user close notification', async () => {
     mockedUseAvailabeUpdates.mockImplementation(() => ({
       isLoading: false,
-      availableUpdates: {
-        last_check_date: '2021-09-30T14:00:00.000Z',
-        major: [
-          {
-            title: 'Wazuh 4.2.6',
+      apisAvailableUpdates: [
+        {
+          api_id: 'api id',
+          current_version: '4.3.1',
+          status: 'availableUpdates' as API_UPDATES_STATUS,
+          last_available_patch: {
             description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
+              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+            published_date: '2022-05-18T10:12:43Z',
             semver: {
               major: 4,
-              minor: 2,
-              patch: 6,
+              minor: 3,
+              patch: 8,
             },
-            tag: 'v4.2.6',
+            tag: 'v4.3.8',
+            title: 'Wazuh v4.3.8',
           },
-        ],
-        minor: [],
-        patch: [],
-      },
+        },
+      ],
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
-      userPreferences: { hide_update_notifications: false, last_dismissed_update: 'v4.2.1' },
+      userPreferences: {
+        last_dismissed_updates: [
+          {
+            api_id: 'api id',
+            last_patch: 'v4.3.1',
+          },
+        ],
+        hide_update_notifications: false,
+      },
       updateUserPreferences: () => {},
     }));
-    mockedGetCurrentAvailableUpdate.mockImplementation(() => ({
-      title: 'Wazuh 4.2.6',
-      description:
-        'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-      published_date: '2021-09-30T14:00:00.000Z',
-      semver: {
-        major: 4,
-        minor: 2,
-        patch: 6,
-      },
-      tag: 'v4.2.6',
-    }));
+    mockedAreThereNewUpdates.mockImplementation(() => true);
 
     const { container, getByRole } = render(<UpdatesNotification />);
 
@@ -141,9 +142,8 @@ describe('UpdatesNotification component', () => {
     mockedUseAvailabeUpdates.mockImplementation(() => ({ isLoading: true }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: true,
-      userPreferences: { hide_update_notifications: false, last_dismissed_update: 'v4.2.1' },
     }));
-    mockedGetCurrentAvailableUpdate.mockImplementation(() => undefined);
+    mockedAreThereNewUpdates.mockImplementation(() => undefined);
 
     const { container } = render(<UpdatesNotification />);
 
@@ -157,9 +157,9 @@ describe('UpdatesNotification component', () => {
     mockedUseAvailabeUpdates.mockImplementation(() => ({ isLoading: false }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
-      userPreferences: { hide_update_notifications: false, last_dismissed_update: 'v4.2.1' },
+      userPreferences: { hide_update_notifications: false },
     }));
-    mockedGetCurrentAvailableUpdate.mockImplementation(() => undefined);
+    mockedAreThereNewUpdates.mockImplementation(() => undefined);
 
     const { container } = render(<UpdatesNotification />);
 
@@ -172,30 +172,39 @@ describe('UpdatesNotification component', () => {
   test('should return null when user dismissed notifications for future', () => {
     mockedUseAvailabeUpdates.mockImplementation(() => ({
       isLoading: false,
-      availableUpdates: {
-        last_check_date: '2021-09-30T14:00:00.000Z',
-        major: [
-          {
-            title: 'Wazuh 4.2.6',
+      apisAvailableUpdates: [
+        {
+          api_id: 'api id',
+          current_version: '4.3.1',
+          status: 'availableUpdates' as API_UPDATES_STATUS,
+          last_available_patch: {
             description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
+              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+            published_date: '2022-05-18T10:12:43Z',
             semver: {
               major: 4,
-              minor: 2,
-              patch: 6,
+              minor: 3,
+              patch: 8,
             },
-            tag: 'v4.2.6',
+            tag: 'v4.3.8',
+            title: 'Wazuh v4.3.8',
           },
-        ],
-        minor: [],
-        patch: [],
-      },
+        },
+      ],
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
-      userPreferences: { hide_update_notifications: true, last_dismissed_update: 'v4.2.1' },
+      userPreferences: {
+        last_dismissed_updates: [
+          {
+            api_id: 'api id',
+            last_patch: 'v4.3.1',
+          },
+        ],
+        hide_update_notifications: true,
+      },
     }));
+    mockedAreThereNewUpdates.mockImplementation(() => true);
 
     const { container } = render(<UpdatesNotification />);
 
@@ -205,45 +214,42 @@ describe('UpdatesNotification component', () => {
     expect(firstChild).toBeNull();
   });
 
-  test('should return null when user already dismissed the notifications for current update', () => {
+  test('should return null when user already dismissed the notifications for available updates', () => {
     mockedUseAvailabeUpdates.mockImplementation(() => ({
       isLoading: false,
-      availableUpdates: {
-        last_check_date: '2021-09-30T14:00:00.000Z',
-        major: [
-          {
-            title: 'Wazuh 4.2.6',
+      apisAvailableUpdates: [
+        {
+          api_id: 'api id',
+          current_version: '4.3.1',
+          status: 'availableUpdates' as API_UPDATES_STATUS,
+          last_available_patch: {
             description:
-              'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-            published_date: '2021-09-30T14:00:00.000Z',
+              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+            published_date: '2022-05-18T10:12:43Z',
             semver: {
               major: 4,
-              minor: 2,
-              patch: 6,
+              minor: 3,
+              patch: 8,
             },
-            tag: 'v4.2.6',
+            tag: 'v4.3.8',
+            title: 'Wazuh v4.3.8',
           },
-        ],
-        minor: [],
-        patch: [],
-      },
+        },
+      ],
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
-      userPreferences: { hide_update_notifications: false, last_dismissed_update: 'v4.2.6' },
-    }));
-    mockedGetCurrentAvailableUpdate.mockImplementation(() => ({
-      title: 'Wazuh 4.2.6',
-      description:
-        'Wazuh 4.2.6 is now available. This version includes several bug fixes and improvements.',
-      published_date: '2021-09-30T14:00:00.000Z',
-      semver: {
-        major: 4,
-        minor: 2,
-        patch: 6,
+      userPreferences: {
+        last_dismissed_updates: [
+          {
+            api_id: 'api id',
+            last_patch: 'v4.3.8',
+          },
+        ],
+        hide_update_notifications: false,
       },
-      tag: 'v4.2.6',
     }));
+    mockedAreThereNewUpdates.mockImplementation(() => false);
 
     const { container } = render(<UpdatesNotification />);
 
