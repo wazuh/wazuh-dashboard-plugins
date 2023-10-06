@@ -20,7 +20,8 @@ class WzGlobalBreadcrumb extends Component {
     const breadcrumbs = this.props.state.breadcrumb.map(breadcrumb =>
       breadcrumb.agent
         ? {
-            className: 'euiLink euiLink--subdued osdBreadcrumbs',
+            className:
+              'euiLink euiLink--subdued osdBreadcrumbs wz-vertical-align-middle',
             onClick: ev => {
               ev.stopPropagation();
               navigateAppURL(
