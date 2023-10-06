@@ -44,16 +44,23 @@ const appCategories = Applications.reduce((categories, app) => {
   const existingCategory = categories.find(
     category => category.label === app.category,
   );
-  if (existingCategory) {
-    existingCategory.apps.push(app);
-  } else {
-    categories.push({
-      label: app.category,
-      apps: [app],
-    });
+  if (app.showInOverviewApp) {
+    if (existingCategory) {
+      existingCategory.apps.push(app);
+    } else {
+      categories.push({
+        label: app.category,
+        apps: [app],
+      });
+    }
   }
   return categories;
-}, []);
+}, []).sort((a, b) => {
+  return (
+    Categories.find(category => a.label === category.id).order -
+    Categories.find(category => b.label === category.id).order
+  );
+});
 
 export const OverviewWelcome = compose(
   withReduxProvider,
@@ -122,48 +129,52 @@ export const OverviewWelcome = compose(
         <Fragment>
           <EuiPage className='wz-welcome-page'>
             <EuiFlexGroup gutterSize='l'>
-              {this.props.agentsCountTotal == 0 && this.addAgent()}
               <EuiFlexItem>
-                <EuiFlexGrid columns={2}>
-                  {appCategories.map(({ label, apps }) => (
-                    <EuiFlexItem key={label}>
-                      <EuiCard
-                        title
-                        description
-                        betaBadgeLabel={
-                          Categories.find(category => category.id === label)
-                            ?.label
-                        }
-                      >
-                        <EuiSpacer size='s' />
-                        <EuiFlexGrid columns={2}>
-                          {apps.map(app => (
-                            <EuiFlexItem key={app.id}>
-                              <EuiCard
-                                size='xs'
-                                layout='horizontal'
-                                icon={
-                                  <EuiIcon
-                                    size='xl'
-                                    type={app.euiIconType}
-                                    color='primary'
-                                  />
-                                }
-                                className='homSynopsis__card'
-                                title={app.title}
-                                onClick={() => navigateAppURL(`/app/${app.id}`)}
-                                data-test-subj={`overviewWelcome${this.strtools.capitalize(
-                                  app.id,
-                                )}`}
-                                description={app.description}
-                              />
-                            </EuiFlexItem>
-                          ))}
-                        </EuiFlexGrid>
-                      </EuiCard>
-                    </EuiFlexItem>
-                  ))}
-                </EuiFlexGrid>
+                {this.props.agentsCountTotal === 0 && this.addAgent()}
+                <EuiFlexGroup>
+                  <EuiFlexGrid columns={2}>
+                    {appCategories.map(({ label, apps }) => (
+                      <EuiFlexItem key={label}>
+                        <EuiCard
+                          title
+                          description
+                          betaBadgeLabel={
+                            Categories.find(category => category.id === label)
+                              ?.label
+                          }
+                        >
+                          <EuiSpacer size='s' />
+                          <EuiFlexGrid columns={2}>
+                            {apps.map(app => (
+                              <EuiFlexItem key={app.id}>
+                                <EuiCard
+                                  size='xs'
+                                  layout='horizontal'
+                                  icon={
+                                    <EuiIcon
+                                      size='xl'
+                                      type={app.euiIconType}
+                                      color='primary'
+                                    />
+                                  }
+                                  className='homSynopsis__card'
+                                  title={app.title}
+                                  onClick={() =>
+                                    navigateAppURL(`/app/${app.id}`)
+                                  }
+                                  data-test-subj={`overviewWelcome${this.strtools.capitalize(
+                                    app.id,
+                                  )}`}
+                                  description={app.description}
+                                />
+                              </EuiFlexItem>
+                            ))}
+                          </EuiFlexGrid>
+                        </EuiCard>
+                      </EuiFlexItem>
+                    ))}
+                  </EuiFlexGrid>
+                </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiPage>
