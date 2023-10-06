@@ -2,6 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.9.0 - Revision 00
 
 ### Added
@@ -27,7 +28,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed views in JSON and XML formats from management settings. [#5747](https://github.com/wazuh/wazuh-kibana-app/pull/5747)
 
-## Wazuh v4.6.0 - OpenSearch Dashboards 2.8.0 - Revision 00
+## Wazuh v4.6.0 - OpenSearch Dashboards 2.8.0 - Revision 02
+
 
 ### Added
 
@@ -79,11 +81,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed obsolete code that caused duplicate requests to the api in `Management`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Removed unused embedded jquery-ui [#5592](https://github.com/wazuh/wazuh-kibana-app/pull/5592)
 
-## Wazuh v4.5.3 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.5.3 - OpenSearch Dashboards 2.6.0 - Revision 02
 
 ### Added
 
 - Support for Wazuh 4.5.3
+
+### Changed
+
+- Changed the command to install the agent on SUSE uses zypper [#5925](https://github.com/wazuh/wazuh-kibana-app/pull/5925)
 
 ## Wazuh v4.5.2 - OpenSearch Dashboards 2.6.0 - Revision 02
 
