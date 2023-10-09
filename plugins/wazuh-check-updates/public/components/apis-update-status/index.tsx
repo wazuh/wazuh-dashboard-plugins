@@ -1,5 +1,6 @@
 import {
   EuiButton,
+  EuiCallOut,
   EuiDescriptionList,
   EuiFlexGroup,
   EuiFlexItem,
@@ -50,12 +51,28 @@ export const ApisUpdateStatus = ({ setApisAvailableUpdates }: ApisUpdateStatusPr
     apisAvailableUpdates,
     isLoading,
     refreshAvailableUpdates,
+    error,
     lastCheck,
   } = useAvailableUpdates();
 
   useEffect(() => {
     setApisAvailableUpdates(apisAvailableUpdates);
   }, [apisAvailableUpdates]);
+
+  if (error) {
+    return (
+      <EuiCallOut
+        color="danger"
+        iconType="alert"
+        title={
+          <FormattedMessage
+            id={`wazuhCheckUpdates.apisUpdateStatus.errorCallOut`}
+            defaultMessage="Error trying to get APIs version and available updates"
+          />
+        }
+      />
+    );
+  }
 
   const handleOnClick = async () => {
     const response = await refreshAvailableUpdates(true, true);
