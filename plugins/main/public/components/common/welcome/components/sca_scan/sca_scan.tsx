@@ -31,12 +31,11 @@ import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { WzRequest } from '../../../../../react-services';
 import { formatUIDate } from '../../../../../react-services/time-service';
-import { getAngularModule } from '../../../../../kibana-services';
+import { getAngularModule, getCore } from '../../../../../kibana-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
 import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
-import { navigateAppURL } from '../../../../../react-services/navigate-app';
 
 type Props = {
   agent: { [key in string]: any };
@@ -254,8 +253,11 @@ export const ScaScan = compose(
                         store.dispatch(
                           updateCurrentAgentData(this.props.agent),
                         );
-                        navigateAppURL(
-                          `/app/configuration-assessment#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                        getCore().application.navigateToApp(
+                          'configuration-assessment',
+                          {
+                            path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                          },
                         );
                         this.router.reload();
                       }}
@@ -274,7 +276,9 @@ export const ScaScan = compose(
                         store.dispatch(
                           updateCurrentAgentData(this.props.agent),
                         );
-                        navigateAppURL('/app/configuration-assessment');
+                        getCore().application.navigateToApp(
+                          'configuration-assessment',
+                        );
                         this.router.reload();
                       }}
                       aria-label='Open SCA Scans'

@@ -44,7 +44,7 @@ import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { navigateAppURL } from '../../../../../react-services/navigate-app';
+import { getCore } from '../../../../../kibana-services';
 const wzConfig = new WazuhConfig();
 
 export class WzStatisticsOverview extends Component {
@@ -199,9 +199,9 @@ export class WzStatisticsOverview extends Component {
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 onMouseDown={e =>
-                  navigateAppURL(
-                    '/app/settings#/settings?tab=configuration&category=statistics',
-                  )
+                  getCore().application.navigateToApp('wazuh-plugin-settings', {
+                    path: '#/settings?tab=configuration&category=task:statistics',
+                  })
                 }
                 iconType='gear'
                 iconSide='left'
