@@ -1,6 +1,5 @@
 import {
   EuiButton,
-  EuiCallOut,
   EuiDescriptionList,
   EuiFlexGroup,
   EuiFlexItem,
@@ -21,14 +20,15 @@ export interface ApisUpdateStatusProps {
   setApisAvailableUpdates: (apisAvailableUpdates: ApiAvailableUpdates[]) => void;
 }
 
-let toastId = 0;
-
 export const ApisUpdateStatus = ({ setApisAvailableUpdates }: ApisUpdateStatusProps) => {
+  const [toastId, setToastId] = useState(0);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const addToastHandler = (error: any) => {
+    const newToastId = toastId + 1;
+    setToastId(newToastId);
     const toast = {
-      id: `${toastId++}`,
+      id: `${newToastId}`,
       title: (
         <FormattedMessage
           id={`wazuhCheckUpdates.apisUpdateStatus.onClickButtonError`}
@@ -50,28 +50,12 @@ export const ApisUpdateStatus = ({ setApisAvailableUpdates }: ApisUpdateStatusPr
     apisAvailableUpdates,
     isLoading,
     refreshAvailableUpdates,
-    error,
     lastCheck,
   } = useAvailableUpdates();
 
   useEffect(() => {
     setApisAvailableUpdates(apisAvailableUpdates);
   }, [apisAvailableUpdates]);
-
-  if (error) {
-    return (
-      <EuiCallOut
-        color="danger"
-        iconType="alert"
-        title={
-          <FormattedMessage
-            id={`wazuhCheckUpdates.apisUpdateStatus.errorCallOut`}
-            defaultMessage="Error trying to get APIs version and available updates"
-          />
-        }
-      />
-    );
-  }
 
   const handleOnClick = async () => {
     const response = await refreshAvailableUpdates(true, true);
