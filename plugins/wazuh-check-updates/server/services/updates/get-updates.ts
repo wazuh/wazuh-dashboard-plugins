@@ -30,7 +30,7 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
 
     const apisAvailableUpdates = updates?.map((update) => {
       const status =
-        update.last_major || update.last_minor || update.last_patch
+        update.last_available_patch || update.last_available_minor || update.last_available_patch
           ? API_UPDATES_STATUS.AVAILABLE_UPDATES
           : API_UPDATES_STATUS.UP_TO_DATE;
 
