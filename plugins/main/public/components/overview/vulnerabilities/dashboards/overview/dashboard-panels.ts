@@ -1,7 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-
-const VULNERABILITIES_INDEX_PATTERN_ID = 'wazuh-inventory-cve';
+import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 
 const getVisStateFilter = (
   indexPatternId: string,
@@ -12,6 +11,7 @@ const getVisStateFilter = (
   return {
     title: title,
     type: 'table',
+
     params: {
       perPage: 5,
       percentageCol: '',
@@ -42,7 +42,7 @@ const getVisStateFilter = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Vulnerabilities',
+            customLabel: 'Count',
           },
           schema: 'metric',
         },
@@ -1006,7 +1006,7 @@ const getVisStateOpenVsCloseVulnerabilities = (indexPatternId: string) => {
   };
 };
 
-export const getDashboardPanels = (): {
+export const getDashboardFilters = (): {
   [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
 } => {
   return {
@@ -1023,7 +1023,7 @@ export const getDashboardPanels = (): {
         id: 'packageSelector',
         savedVis: getVisStateFilter(
           VULNERABILITIES_INDEX_PATTERN_ID,
-          'Package name filter',
+          'Top Packages vulnerabilities',
           'Package',
           'package.name'
         ),
@@ -1042,9 +1042,9 @@ export const getDashboardPanels = (): {
         id: 'packageNameSelector',
         savedVis: getVisStateFilter(
           VULNERABILITIES_INDEX_PATTERN_ID,
-          'Operating system filter',
+          'Top Operating system vulnerabilities',
           'Operating system',
-          'package.architecture'
+          'host.os.name'
         ),
       },
     },
@@ -1080,12 +1080,19 @@ export const getDashboardPanels = (): {
         id: 'otherFilter',
         savedVis: getVisStateFilter(
           VULNERABILITIES_INDEX_PATTERN_ID,
-          'Severity filter',
-          'Severity',
-          'vulnerability.severity'
+          'Top vulnerabilities',
+          'Vulnerability',
+          'vulnerability.id'
         ),
       },
     },
+  };
+};
+
+export const getDashboardPanels = (): {
+  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
+} => {
+  return {
     '1': {
       gridData: {
         w: 12,

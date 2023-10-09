@@ -5,6 +5,7 @@ import { getDashboardPanels } from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBarConfiguration from '../../searchbar/use-search-bar-configuration';
 import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
+import { DashboardFilters } from './dashboard-filters/dashboard-filters';
 
 const plugins = getPlugins();
 
@@ -15,15 +16,15 @@ const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 export const DashboardVuls: React.FC = () => {
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
+    filters: [],
   });
 
   return (
     <>
       <I18nProvider>
-        {' '}
-        {/* The searchbar is not rendered when is not wrapped by the i18n provider */}
-        <SearchBar {...searchBarProps} />
+        <SearchBar appName="vulnerability-detector-searchbar" {...searchBarProps} />
       </I18nProvider>
+      <DashboardFilters searchBarProps={searchBarProps} />
       <DashboardByRenderer
         input={{
           viewMode: ViewMode.VIEW,
