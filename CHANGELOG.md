@@ -7,9 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.8.0
-- Added `wazuh-check-updates` plugin. [#5897](https://github.com/wazuh/wazuh-kibana-app/pull/5897) [#5984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5984)
-- Added new updates availability information to the About page. [#5939](https://github.com/wazuh/wazuh-kibana-app/pull/5939)
-- Added new update notifications to the main plugin. [#5984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5984)
+- Added the ability to check if there are available updates from the UI.
 
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
