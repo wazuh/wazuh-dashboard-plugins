@@ -1,15 +1,17 @@
 export interface AvailableUpdates {
-  mayor: Update[];
-  minor: Update[];
-  patch: Update[];
-  last_check?: Date | string | undefined;
+  api_id: string
+  last_available_major: Update;
+  last_available_minor: Update[];
+  last_available_patch: Update[];
+  last_check_date?: Date | string | undefined;
+  current_version?: string | undefined;
 }
 
 export interface Update {
   description: string;
   published_date: string;
   semver: {
-    mayor: number;
+    major: number;
     minor: number;
     patch: number;
   };

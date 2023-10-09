@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module to export all the controllers
- * Copyright (C) 2015-2022 Wazuh, Inc.
+ * Copyright (C) 2015-2023 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,8 +9,4 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { WazuhElasticCtrl } from './wazuh-elastic';
-export { WazuhApiCtrl } from './wazuh-api';
-export { WazuhReportingCtrl } from './wazuh-reporting';
 export { WazuhHostsCtrl } from './wazuh-hosts';
-export * from './wazuh-utils';
