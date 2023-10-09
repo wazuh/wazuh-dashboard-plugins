@@ -1,5 +1,82 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`SettingsAboutAppInfo component should render version, revision, install date and ApisUpdateStatus component 1`] = `
+<div>
+  <h2
+    class="euiTitle euiTitle--medium"
+  >
+    Wazuh Dashboard version
+  </h2>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
+  >
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Version
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          4.8.0
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Revision
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          01
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Install date
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          Sep 25, 2023 @ 14:03:40.816
+        </dd>
+      </dl>
+    </div>
+  </div>
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginLarge"
+  />
+  <div>
+    APIs Updates Status component
+  </div>
+</div>
+`;
+
 exports[`SettingsAboutAppInfo component should render version, revision, install date and UpToDateStatus and DismissNotificationCheck components 1`] = `
 <div>
   <div
