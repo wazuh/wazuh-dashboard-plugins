@@ -1,14 +1,15 @@
 import {
-  EuiCallOut,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiLoadingSpinner,
-  EuiText,
   EuiSpacer,
+  EuiTitle,
+  EuiHorizontalRule,
+  EuiDescriptionList,
+  EuiCallOut,
 } from '@elastic/eui';
-import React from 'react';
-import { Update } from '../../../../../wazuh-check-updates/common/types';
+import React, { useState } from 'react';
 import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
+import { ApiAvailableUpdates } from '../../../../../wazuh-check-updates/common/types';
 
 interface SettingsAboutAppInfoProps {
   appInfo: {
@@ -16,49 +17,67 @@ interface SettingsAboutAppInfoProps {
     installationDate: string;
     revision: string;
   };
-  setCurrentUpdate: (update: Update | undefined) => void;
 }
 
-export const SettingsAboutAppInfo = ({ appInfo, setCurrentUpdate }: SettingsAboutAppInfoProps) => {
-  const { UpToDateStatus, DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
+export const SettingsAboutAppInfo = ({ appInfo }: SettingsAboutAppInfoProps) => {
+  const [apisAvailableUpdates, setApisAvailableUpdates] = useState<ApiAvailableUpdates[]>();
+
+  const { ApisUpdateStatus } = getWazuhCheckUpdatesPlugin();
+
+  const showVersionWarning = !!apisAvailableUpdates?.find(
+    (apiAvailableUpdates) => apiAvailableUpdates.version !== appInfo['app-version']
+  );
 
   return (
     <>
-      <EuiFlexGroup
-        direction="row"
-        responsive
-        alignItems="center"
-        justifyContent="flexStart"
-        gutterSize="m"
-      >
+      <EuiTitle>
+        <h2>Wazuh Dashboard version</h2>
+      </EuiTitle>
+      <EuiSpacer size="l" />
+      <EuiFlexGroup responsive={false} wrap alignItems="center">
         <EuiFlexItem grow={false}>
-          <EuiText>
-            <div className="wz-text-truncatable">
-              {'App version: '}
-              <span className="wz-text-bold">{appInfo['app-version']}</span>
-            </div>
-          </EuiText>
+          <EuiDescriptionList
+            listItems={[
+              {
+                title: 'Version',
+                description: appInfo['app-version'],
+              },
+            ]}
+          />
         </EuiFlexItem>
-        <EuiFlexItem>
-          <UpToDateStatus setCurrentUpdate={setCurrentUpdate} />
+        <EuiFlexItem grow={false}>
+          <EuiDescriptionList
+            listItems={[
+              {
+                title: 'Revision',
+                description: appInfo['revision'],
+              },
+            ]}
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiDescriptionList
+            listItems={[
+              {
+                title: 'Install date',
+                description: appInfo['installationDate'],
+              },
+            ]}
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer />
-      <EuiText>
-        <div className="wz-text-truncatable">
-          {'App revision: '}
-          <span className="wz-text-bold">{appInfo['revision']}</span>
-        </div>
-      </EuiText>
-      <EuiSpacer />
-      <EuiText>
-        <div className="wz-text-truncatable">
-          {'Install date: '}
-          <span className="wz-text-bold">{appInfo['installationDate']}</span>
-        </div>
-      </EuiText>
-      <EuiSpacer />
-      <DismissNotificationCheck />
+      {showVersionWarning ? (
+        <>
+          <EuiSpacer size="l" />
+          <EuiCallOut
+            title="Wazuh Dashboard version must be the same as APIs"
+            color="warning"
+            iconType="alert"
+          />
+        </>
+      ) : null}
+      <EuiHorizontalRule margin="l" />
+      <ApisUpdateStatus setApisAvailableUpdates={setApisAvailableUpdates} />
     </>
   );
 };

@@ -7,7 +7,7 @@ export const SAVED_OBJECT_UPDATES = 'wazuh-check-updates-available-updates';
 export const SAVED_OBJECT_SETTINGS = 'wazuh-check-updates-settings';
 export const SAVED_OBJECT_USER_PREFERENCES = 'wazuh-check-updates-user-preferences';
 
-export const DEFAULT_SCHEDULE = '* */12 * * *';
+export const DEFAULT_SCHEDULE = '0 0 * * *';
 
 export enum routes {
   checkUpdates = '/api/wazuh-check-updates/updates',

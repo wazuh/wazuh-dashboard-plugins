@@ -1,75 +1,78 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SettingsAboutAppInfo component should render version, revision, install date and UpToDateStatus and DismissNotificationCheck components 1`] = `
+exports[`SettingsAboutAppInfo component should render version, revision, install date and ApisUpdateStatus component 1`] = `
 <div>
+  <h2
+    class="euiTitle euiTitle--medium"
+  >
+    Wazuh Dashboard version
+  </h2>
   <div
-    class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+    class="euiSpacer euiSpacer--l"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
   >
     <div
       class="euiFlexItem euiFlexItem--flexGrowZero"
     >
-      <div
-        class="euiText euiText--medium"
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
       >
-        <div
-          class="wz-text-truncatable"
+        <dt
+          class="euiDescriptionList__title"
         >
-          App version: 
-          <span
-            class="wz-text-bold"
-          >
-            4.8.0
-          </span>
-        </div>
-      </div>
+          Version
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          4.8.0
+        </dd>
+      </dl>
     </div>
     <div
-      class="euiFlexItem"
+      class="euiFlexItem euiFlexItem--flexGrowZero"
     >
-      <div>
-        Up to date status component
-      </div>
-    </div>
-  </div>
-  <div
-    class="euiSpacer euiSpacer--l"
-  />
-  <div
-    class="euiText euiText--medium"
-  >
-    <div
-      class="wz-text-truncatable"
-    >
-      App revision: 
-      <span
-        class="wz-text-bold"
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
       >
-        01
-      </span>
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Revision
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          01
+        </dd>
+      </dl>
     </div>
-  </div>
-  <div
-    class="euiSpacer euiSpacer--l"
-  />
-  <div
-    class="euiText euiText--medium"
-  >
     <div
-      class="wz-text-truncatable"
+      class="euiFlexItem euiFlexItem--flexGrowZero"
     >
-      Install date: 
-      <span
-        class="wz-text-bold"
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
       >
-        Sep 25, 2023 @ 14:03:40.816
-      </span>
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Install date
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          Sep 25, 2023 @ 14:03:40.816
+        </dd>
+      </dl>
     </div>
   </div>
-  <div
-    class="euiSpacer euiSpacer--l"
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginLarge"
   />
   <div>
-    Dismiss notification check component
+    APIs Updates Status component
   </div>
 </div>
 `;

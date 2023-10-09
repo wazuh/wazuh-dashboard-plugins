@@ -1,9 +1,7 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { schema } from '@osd/config-schema';
-import { routes, SAVED_OBJECT_UPDATES } from '../../../common/constants';
-import { AvailableUpdates } from '../../../common/types';
+import { routes } from '../../../common/constants';
 import { getUpdates } from '../../services/updates';
-import { getSavedObject } from '../../services/saved-object';
 
 export const getUpdatesRoute = (router: IRouter) => {
   router.get(
@@ -17,29 +15,9 @@ export const getUpdatesRoute = (router: IRouter) => {
     },
     async (context, request, response) => {
       try {
-        const defaultValues = {
-          mayor: [],
-          minor: [],
-          patch: [],
-        };
-
-        if (request.query.checkAvailableUpdates === 'true') {
-          const updates = await getUpdates();
-          return response.ok({
-            body: {
-              ...defaultValues,
-              ...updates,
-            },
-          });
-        }
-
-        const result = (await getSavedObject(SAVED_OBJECT_UPDATES)) as AvailableUpdates;
-
+        const updates = await getUpdates(request.query?.checkAvailableUpdates === 'true');
         return response.ok({
-          body: {
-            ...defaultValues,
-            ...result,
-          },
+          body: updates,
         });
       } catch (error) {
         const finalError =
@@ -47,7 +25,7 @@ export const getUpdatesRoute = (router: IRouter) => {
             ? error
             : typeof error === 'string'
             ? new Error(error)
-            : new Error('Error trying to get available updates');
+            : new Error(`Error trying to get available updates`);
 
         return response.customError({
           statusCode: 503,

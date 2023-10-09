@@ -6,6 +6,7 @@ import { routes } from '../../../common/constants';
 import axios from 'axios';
 import { updateUserPreferences } from '../../services/user-preferences';
 import { updateUserPreferencesRoutes } from './update-user-preferences';
+import { UserPreferences } from '../../../common/types';
 
 const serverAddress = '127.0.0.1';
 const port = 10004; //assign a different port in each unit test
@@ -72,8 +73,13 @@ describe(`[endpoint] PATCH ${routes.userPreferences}`, () => {
   });
 
   test('update user preferences', async () => {
-    const mockResponse = {
-      last_dismissed_update: 'v4.3.1',
+    const mockResponse: UserPreferences = {
+      last_dismissed_updates: [
+        {
+          api_id: 'api id',
+          last_patch: '4.3.1',
+        },
+      ],
       hide_update_notifications: false,
     };
 

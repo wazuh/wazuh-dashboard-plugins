@@ -2,7 +2,6 @@ import { SavedObjectsFieldMapping, SavedObjectsType } from 'opensearch-dashboard
 import { SAVED_OBJECT_UPDATES } from '../../../../common/constants';
 
 const updateObjectType: SavedObjectsFieldMapping = {
-  type: 'nested',
   properties: {
     description: {
       type: 'text',
@@ -13,7 +12,7 @@ const updateObjectType: SavedObjectsFieldMapping = {
     semver: {
       type: 'nested',
       properties: {
-        mayor: {
+        major: {
           type: 'integer',
         },
         minor: {
@@ -39,12 +38,29 @@ export const availableUpdatesObject: SavedObjectsType = {
   namespaceType: 'agnostic',
   mappings: {
     properties: {
-      last_check: {
+      last_check_date: {
         type: 'date',
       },
-      mayor: updateObjectType,
-      minor: updateObjectType,
-      patch: updateObjectType,
+      apis_available_updates: {
+        type: 'nested',
+        properties: {
+          api_id: {
+            type: 'text',
+          },
+          current_version: {
+            type: 'text',
+          },
+          status: {
+            type: 'text',
+          },
+          last_check_date: {
+            type: 'date',
+          },
+          last_available_major: updateObjectType,
+          last_available_minor: updateObjectType,
+          last_available_patch: updateObjectType,
+        },
+      },
     },
   },
   migrations: {},

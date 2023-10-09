@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { CurrentUpdateDetails } from './current-update-details';
 import { DismissNotificationCheck } from './dismiss-notification-check';
 import { useUserPreferences } from '../hooks';
 
@@ -19,7 +18,16 @@ describe('DismissNotificationCheck component', () => {
   test('should render the check', () => {
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
-      userPreferences: { hide_update_notifications: false, last_dismissed_update: 'v4.2.1' },
+      userPreferences: {
+        last_dismissed_updates: [
+          {
+            api_id: 'api id',
+            last_patch: 'v4.3.1',
+          },
+        ],
+        hide_update_notifications: false,
+      },
+      updateUserPreferences: () => {},
     }));
 
     const { container, getByText } = render(<DismissNotificationCheck />);
@@ -35,7 +43,7 @@ describe('DismissNotificationCheck component', () => {
       error: 'Error',
     }));
 
-    const { container } = render(<CurrentUpdateDetails />);
+    const { container } = render(<DismissNotificationCheck />);
 
     expect(container).toMatchSnapshot();
 

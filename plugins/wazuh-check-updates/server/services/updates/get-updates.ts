@@ -1,28 +1,53 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { mockSuccessResponse } from './mocks';
-import { AvailableUpdates } from '../../../common/types';
+import {
+  API_UPDATES_STATUS,
+  AvailableUpdates,
+  ResponseApiAvailableUpdates,
+} from '../../../common/types';
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
-import { setSavedObject } from '../saved-object';
+import { getSavedObject, setSavedObject } from '../saved-object';
 import { log } from '../../lib/logger';
 
-export const getUpdates = async (): Promise<AvailableUpdates> => {
+export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<AvailableUpdates> => {
   const mock = new MockAdapter(axios);
 
   try {
+    if (!checkAvailableUpdates) {
+      const availableUpdates = (await getSavedObject(SAVED_OBJECT_UPDATES)) as AvailableUpdates;
+
+      return availableUpdates;
+    }
+
     const updatesServiceUrl = `/api/updates`;
 
     mock.onGet(updatesServiceUrl).reply(200, mockSuccessResponse);
 
     const updatesResponse = await axios.get(updatesServiceUrl);
 
-    const updates = updatesResponse?.data?.data || {};
+    const updates = (updatesResponse?.data?.data || []) as ResponseApiAvailableUpdates[];
 
-    const updatesToSave = { ...updates, last_check: new Date() };
+    const apisAvailableUpdates = updates?.map((update) => {
+      const status =
+        update.last_available_patch || update.last_available_minor || update.last_available_patch
+          ? API_UPDATES_STATUS.AVAILABLE_UPDATES
+          : API_UPDATES_STATUS.UP_TO_DATE;
 
-    await setSavedObject(SAVED_OBJECT_UPDATES, updatesToSave);
+      return {
+        ...update,
+        status,
+      };
+    });
 
-    return updatesToSave;
+    const savedObject = {
+      apis_available_updates: apisAvailableUpdates,
+      last_check_date: new Date(),
+    };
+
+    await setSavedObject(SAVED_OBJECT_UPDATES, savedObject);
+
+    return savedObject;
   } catch (error) {
     const message =
       error instanceof Error

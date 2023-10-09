@@ -9,7 +9,16 @@ export const updateUserPreferencesRoutes = (router: IRouter) => {
       path: routes.userPreferences,
       validate: {
         body: schema.object({
-          last_dismissed_update: schema.maybe(schema.string()),
+          last_dismissed_updates: schema.maybe(
+            schema.arrayOf(
+              schema.object({
+                api_id: schema.string(),
+                last_major: schema.maybe(schema.string()),
+                last_minor: schema.maybe(schema.string()),
+                last_patch: schema.maybe(schema.string()),
+              })
+            )
+          ),
           hide_update_notifications: schema.maybe(schema.boolean()),
         }),
       },
