@@ -44,6 +44,7 @@ import {
   unregisterInterceptor,
 } from './services/request-handler';
 import { Applications, Categories } from './utils/applications';
+import { syncHistoryLocations } from './kibana-integrations/discover/kibana_services';
 
 const innerAngularName = 'app/wazuh';
 
@@ -104,6 +105,10 @@ export class WazuhPlugin
               // Set the flag in the telemetry saved object as the notice was seen and dismissed
               this.hideTelemetryBanner && (await this.hideTelemetryBanner());
               setScopedHistory(params.history);
+              // Discover currently uses two history instances:
+              // one from Kibana Platform and another from history package.
+              // Below function is used every time Discover app is loaded to synchronize both instances
+              syncHistoryLocations();
               // Load application bundle
               const { renderApp } = await import('./application');
               // Get start services as specified in kibana.json
@@ -111,10 +116,7 @@ export class WazuhPlugin
               setErrorOrchestrator(ErrorOrchestratorService);
               setHttp(core.http);
               setCookies(new Cookies());
-              if (
-                !AppState.checkCookies() ||
-                params.history.parentHistory.action === 'PUSH'
-              ) {
+              if (!AppState.checkCookies()) {
                 window.location.reload();
               }
               await this.initializeInnerAngular();
