@@ -37,7 +37,7 @@ export const UpdateBadge = ({ update }: UpdateProps) => {
   };
 
   const minorVersion = `${semver.major}.${semver.minor}`;
-  const releaseNotesUrl = `https://documentation.wazuh.com/${minorVersion}/release-notes/release-${semver.major}-${semver.minor}-${semver.patch}.html`;
+  const releaseNotesUrl = `https://documentation.wazuh.com/current/release-notes/release-${semver.major}-${semver.minor}-${semver.patch}.html`;
   const upgradeGuideUrl = `https://documentation.wazuh.com/${minorVersion}/upgrade-guide/index.html`;
 
   return (
