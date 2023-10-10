@@ -16,10 +16,10 @@ import {
   PLUGIN_PLATFORM_NAME,
   WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
 } from '../../common/constants';
-import { APIUserAllowRunAs } from '../lib/cache-api-user-has-run-as';
-import { log } from '../lib/logger';
-import { ManageHosts } from '../lib/manage-hosts';
-import { UpdateRegistry } from '../lib/update-registry';
+import { APIUserAllowRunAs } from '../services/cache-api-user-has-run-as';
+import { log } from '../services/logger';
+import { ManageHosts } from '../services/manage-hosts';
+import { UpdateRegistry } from '../services/update-registry';
 
 export class WazuhHostsCtrl {
   manageHosts: ManageHosts;
@@ -41,10 +41,21 @@ export class WazuhHostsCtrl {
       const removePassword = true;
       const hosts = await this.manageHosts.getHosts();
       const registry = await this.updateRegistry.getHosts();
-      const result = await this.joinHostRegistry(hosts, registry, removePassword);
+      const result = await this.joinHostRegistry(
+        hosts,
+        registry,
+        removePassword,
+      );
       return result;
     } catch (error) {
-      if (error && error.message && ['ENOENT: no such file or directory', WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH].every(text => error.message.includes(text))) {
+      if (
+        error &&
+        error.message &&
+        [
+          'ENOENT: no such file or directory',
+          WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
+        ].every(text => error.message.includes(text))
+      ) {
         throw new Error(`Error getting the hosts entries: The \'${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}\' directory could not exist in your ${PLUGIN_PLATFORM_NAME} installation.
             If this doesn't exist, create it and give the permissions 'sudo mkdir ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH};sudo chown -R ${PLUGIN_PLATFORM_INSTALLATION_USER}:${PLUGIN_PLATFORM_INSTALLATION_USER_GROUP} ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}'. After, restart the ${PLUGIN_PLATFORM_NAME} service.`);
       }
@@ -59,24 +70,30 @@ export class WazuhHostsCtrl {
    * @param {Object} registry
    * @param {Boolean} removePassword
    */
-  async joinHostRegistry(hosts: any, registry: any, removePassword: boolean = true) {
+  async joinHostRegistry(
+    hosts: any,
+    registry: any,
+    removePassword: boolean = true,
+  ) {
     try {
       if (!Array.isArray(hosts)) {
         throw new Error('Hosts configuration error in wazuh.yml');
       }
 
-      return await Promise.all(hosts.map(async h => {
-        const id = Object.keys(h)[0];
-        const api = Object.assign(h[id], { id: id });
-        const host = Object.assign(api, registry[id]);
-        // Add to run_as from API user. Use the cached value or get it doing a request
-        host.allow_run_as = await APIUserAllowRunAs.check(id);
-        if (removePassword) {
-          delete host.password;
-          delete host.token;
-        };
-        return host;
-      }));
+      return await Promise.all(
+        hosts.map(async h => {
+          const id = Object.keys(h)[0];
+          const api = Object.assign(h[id], { id: id });
+          const host = Object.assign(api, registry[id]);
+          // Add to run_as from API user. Use the cached value or get it doing a request
+          host.allow_run_as = await APIUserAllowRunAs.check(id);
+          if (removePassword) {
+            delete host.password;
+            delete host.token;
+          }
+          return host;
+        }),
+      );
     } catch (error) {
       throw new Error(error);
     }

@@ -11,7 +11,7 @@ export const DEFAULT_SCHEDULE = '0 0 * * *';
 
 export enum routes {
   checkUpdates = '/api/wazuh-check-updates/updates',
-  userPreferences = '/api/wazuh-check-updates/user-preferences',
+  userPreferences = '/api/wazuh-check-updates/user-preferences/me',
 }
 
 // Security

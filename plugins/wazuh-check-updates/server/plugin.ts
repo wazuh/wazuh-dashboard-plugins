@@ -10,7 +10,7 @@ import {
   PluginSetup,
   WazuhCheckUpdatesPluginSetup,
   WazuhCheckUpdatesPluginStart,
-  AppPluginStartDependencies
+  AppPluginStartDependencies,
 } from './types';
 import { defineRoutes } from './routes';
 import {
@@ -18,7 +18,7 @@ import {
   settingsObject,
   userPreferencesObject,
 } from './services/saved-object/types';
-import { setCore, setPlugins, setInternalSavedObjectsClient } from './plugin-services';
+import { setCore, setWazuhCore, setInternalSavedObjectsClient } from './plugin-services';
 import { jobSchedulerRun } from './cronjob';
 import { ISecurityFactory, SecurityObj } from './lib/security-factory';
 
@@ -69,7 +69,7 @@ export class WazuhCheckUpdatesPlugin
 
     const internalSavedObjectsClient = core.savedObjects.createInternalRepository();
     setCore(core);
-    setPlugins(plugins);
+    setWazuhCore(plugins.wazuhCore);
     setInternalSavedObjectsClient(internalSavedObjectsClient);
 
     // Scheduler
@@ -78,5 +78,5 @@ export class WazuhCheckUpdatesPlugin
     return {};
   }
 
-  public stop() { }
+  public stop() {}
 }

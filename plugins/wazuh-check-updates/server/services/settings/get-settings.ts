@@ -1,6 +1,6 @@
 import { DEFAULT_SCHEDULE, SAVED_OBJECT_SETTINGS } from '../../../common/constants';
 import { CheckUpdatesSettings } from '../../../common/types';
-import { log } from '../../lib/logger';
+import { getWazuhCore } from '../../plugin-services';
 import { getSavedObject, setSavedObject } from '../saved-object';
 
 export const getSettings = async (): Promise<CheckUpdatesSettings> => {
@@ -23,6 +23,11 @@ export const getSettings = async (): Promise<CheckUpdatesSettings> => {
         : typeof error === 'string'
         ? error
         : 'Error trying to get settings';
+
+    const {
+      services: { log },
+    } = getWazuhCore();
+
     log('wazuh-check-updates:getSettings', message);
     return Promise.reject(error);
   }

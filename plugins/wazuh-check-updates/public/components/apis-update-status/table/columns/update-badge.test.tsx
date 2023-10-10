@@ -8,11 +8,15 @@ jest.mock(
   '../../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
-jest.mock('../../../../utils', () => ({
-  formatUIDate: jest.fn().mockReturnValue('2022-05-18T10:12:43Z'),
+jest.mock('../../../../plugin-services', () => ({
+  getWazuhCore: jest.fn().mockReturnValue({
+    utils: {
+      formatUIDate: jest.fn().mockReturnValue('2023-09-18T14:00:00.000Z'),
+    },
+  }),
 }));
 
 describe('UpdateBadge component', () => {
@@ -31,7 +35,7 @@ describe('UpdateBadge component', () => {
           tag: 'v4.3.8',
           title: 'Wazuh v4.3.8',
         }}
-      />
+      />,
     );
 
     expect(container).toMatchSnapshot();
@@ -54,7 +58,7 @@ describe('UpdateBadge component', () => {
           tag: 'v4.3.8',
           title: 'Wazuh v4.3.8',
         }}
-      />
+      />,
     );
 
     expect(container).toMatchSnapshot();

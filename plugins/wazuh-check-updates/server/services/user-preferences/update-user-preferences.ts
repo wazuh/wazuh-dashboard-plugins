@@ -1,6 +1,6 @@
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
 import { UserPreferences } from '../../../common/types';
-import { log } from '../../lib/logger';
+import { getWazuhCore } from '../../plugin-services';
 import { getSavedObject, setSavedObject } from '../saved-object';
 
 export const updateUserPreferences = async (
@@ -23,6 +23,11 @@ export const updateUserPreferences = async (
         : typeof error === 'string'
         ? error
         : 'Error trying to update user preferences';
+
+    const {
+      services: { log },
+    } = getWazuhCore();
+
     log('wazuh-check-updates:getUserPreferences', message);
     return Promise.reject(error);
   }

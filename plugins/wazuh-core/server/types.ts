@@ -1,11 +1,25 @@
-import { AvailableUpdates } from '../common/types';
+import { AxiosResponse } from 'axios';
+import { APIInterceptorRequestOptionsInternalUser } from './services/api-interceptor';
+import { WazuhHostsCtrl } from './controllers';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginSetup {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginStart {
-  getUpdates: () => Promise<AvailableUpdates[]>;
-  log: (location: string, message: string, level?: string) => void;
+  controllers:{
+    WazuhHostsCtrl: typeof WazuhHostsCtrl
+  },
+  services:{
+    log: (location: string, message: string, level?: string) => void;
+    wazuhApiClient: {
+      client: {
+          asInternalUser: {
+              authenticate: (apiHostID: string) => Promise<string>;
+              request: (method: string, path: string, data: any, options: APIInterceptorRequestOptionsInternalUser) => Promise<AxiosResponse<any, any>>;
+          };
+      };
+  }
+}
 }
 
 export type PluginSetup = {

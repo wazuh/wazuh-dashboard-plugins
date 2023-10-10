@@ -1,9 +1,11 @@
 import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setCore, setUiSettings } from './plugin-services';
-import { formatUIDate } from './utils';
+import * as utils from './utils';
 
-export class WazuhCorePlugin implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart> {
+export class WazuhCorePlugin
+  implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
+{
   public setup(core: CoreSetup): WazuhCorePluginSetup {
     return {};
   }
@@ -13,7 +15,7 @@ export class WazuhCorePlugin implements Plugin<WazuhCorePluginSetup, WazuhCorePl
     setUiSettings(core.uiSettings);
 
     return {
-      formatUIDate,
+      utils,
     };
   }
 

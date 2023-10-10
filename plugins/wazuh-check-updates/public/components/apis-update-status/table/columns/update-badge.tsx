@@ -17,7 +17,7 @@ import {
 } from '@elastic/eui';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { Markdown } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { formatUIDate } from '../../../../utils';
+import { getWazuhCore } from '../../../../plugin-services';
 
 export interface UpdateProps {
   update: Update;
@@ -25,6 +25,10 @@ export interface UpdateProps {
 
 export const UpdateBadge = ({ update }: UpdateProps) => {
   const { title, description, tag, semver, published_date } = update;
+
+  const {
+    utils: { formatUIDate },
+  } = getWazuhCore();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -44,7 +48,7 @@ export const UpdateBadge = ({ update }: UpdateProps) => {
     <I18nProvider>
       <>
         <EuiBadge
-          color="hollow"
+          color='hollow'
           onClickAriaLabel={`update-${tag}`}
           onMouseDown={(e: MouseEvent<HTMLButtonElement>) => {
             e.stopPropagation();
@@ -71,7 +75,7 @@ export const UpdateBadge = ({ update }: UpdateProps) => {
                       title: (
                         <FormattedMessage
                           id={`wazuhCheckUpdates.updateModal.publishedDate`}
-                          defaultMessage="Published"
+                          defaultMessage='Published'
                         />
                       ),
                       description: formatUIDate(new Date(published_date)),
@@ -81,18 +85,18 @@ export const UpdateBadge = ({ update }: UpdateProps) => {
                 <EuiSpacer />
                 <EuiFlexGroup responsive={false} wrap>
                   <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                    <EuiLink href={releaseNotesUrl} target="_blank" external>
+                    <EuiLink href={releaseNotesUrl} target='_blank' external>
                       <FormattedMessage
-                        id="wazuhCheckUpdates.updateModal.releaseNotesLink"
-                        defaultMessage="Release notes"
+                        id='wazuhCheckUpdates.updateModal.releaseNotesLink'
+                        defaultMessage='Release notes'
                       />
                     </EuiLink>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                    <EuiLink href={upgradeGuideUrl} target="_blank" external>
+                    <EuiLink href={upgradeGuideUrl} target='_blank' external>
                       <FormattedMessage
-                        id="wazuhCheckUpdates.updateModal.upgradeGuideLink"
-                        defaultMessage="Upgrade guide"
+                        id='wazuhCheckUpdates.updateModal.upgradeGuideLink'
+                        defaultMessage='Upgrade guide'
                       />
                     </EuiLink>
                   </EuiFlexItem>
@@ -105,7 +109,7 @@ export const UpdateBadge = ({ update }: UpdateProps) => {
                 <EuiButton fill onClick={handleOnCloseModal}>
                   <FormattedMessage
                     id={`wazuhCheckUpdates.updateModal.closeModal`}
-                    defaultMessage="Close"
+                    defaultMessage='Close'
                   />
                 </EuiButton>
               </EuiModalFooter>

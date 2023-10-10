@@ -1,6 +1,5 @@
-import { getInternalSavedObjectsClient } from '../../plugin-services';
+import { getInternalSavedObjectsClient, getWazuhCore } from '../../plugin-services';
 import { savedObjectType } from '../../../common/types';
-import { log } from '../../lib/logger';
 
 export const getSavedObject = async (type: string, id?: string): Promise<savedObjectType> => {
   try {
@@ -20,6 +19,11 @@ export const getSavedObject = async (type: string, id?: string): Promise<savedOb
         : typeof error === 'string'
         ? error
         : 'Error trying to get saved object';
+
+    const {
+      services: { log },
+    } = getWazuhCore();
+
     log('wazuh-check-updates:getSavedObject', message);
     return Promise.reject(error);
   }
