@@ -15,7 +15,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import React, { useState, useEffect } from 'react';
 import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { getNavigationAppURL } from '../../../react-services/navigate-app';
+import { getCore } from '../../../kibana-services';
 
 export const SampleDataWarning = ({ ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
@@ -62,7 +62,7 @@ export const SampleDataWarning = ({ ...props }) => {
         <p>
           {'The data displayed may contain sample alerts. Go '}
           <EuiLink
-            href={getNavigationAppURL('/app/server-data')}
+            href={getCore().application.getUrlForApp('server-data')}
             aria-label='go to configure sample data'
           >
             {'here '}

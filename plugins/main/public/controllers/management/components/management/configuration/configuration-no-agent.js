@@ -13,7 +13,7 @@
 import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiButton, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import { getNavigationAppURL } from '../../../../../react-services/navigate-app';
+import { getCore } from '../../../../../kibana-services';
 
 const documentationLink = webDocumentationLink(
   'user-manual/agents/agent-connection.html',
@@ -42,7 +42,9 @@ export const WzAgentNeverConnectedPrompt = () => (
     }
     actions={
       <EuiButton
-        href={getNavigationAppURL('/app/endpoints-summary#/agents-preview')}
+        href={getCore().application.getUrlForApp('endpoints-summary', {
+          path: '#/agents-preview',
+        })}
         color='primary'
         fill
       >
