@@ -13,16 +13,15 @@ const mockedGetUpdates = getUpdates as jest.Mock;
 jest.mock('../services/updates');
 
 describe('jobSchedulerRun function', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   test('schedule job to check updates', async () => {
     mockedCron.mockImplementation(() => {});
     mockedGetSettings.mockImplementation(() => ({ schedule: '* * * * *' }));
     mockedGetUpdates.mockImplementation(() => ({}));
 
     const response = await jobSchedulerRun();
+
+    expect(getUpdates).toHaveBeenCalledTimes(1);
+    expect(getUpdates).toHaveBeenCalledWith(true);
 
     expect(getSettings).toHaveBeenCalledTimes(1);
     expect(getSettings).toHaveBeenCalledWith();

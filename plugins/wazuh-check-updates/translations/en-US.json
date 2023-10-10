@@ -76,20 +76,23 @@
     }
   },
   "messages": {
-    "wazuhCheckUpdates.updatesNotification.message": "Wazuh new release is available now!",
-    "wazuhCheckUpdates.updatesNotification.linkText": "Go to the release notes for details",
+    "wazuhCheckUpdates.updatesNotification.message": "Wazuh new release is available!",
+    "wazuhCheckUpdates.updatesNotification.linkText": "Go to the about page for details",
     "wazuhCheckUpdates.updatesNotification.dismissCheckText": "Disable updates notifications",
     "wazuhCheckUpdates.updatesNotification.closeButtonText": "Close",
-    "wazuhCheckUpdates.upToDateStatus.upToDate": "Up to date",
-    "wazuhCheckUpdates.upToDateStatus.availableUpdates": "Available updates",
-    "wazuhCheckUpdates.upToDateStatus.getAvailableUpdatesError": "Error trying to get available updates",
-    "wazuhCheckUpdates.upToDateStatus.lastCheck": "Last check",
-    "wazuhCheckUpdates.upToDateStatus.buttonText": "Check updates",
-    "wazuhCheckUpdates.upToDateStatus.onClickButtonError": "Error trying to get updates",
-    "wazuhCheckUpdates.currentUpdateDetails.releaseNotesLink": "Release notes",
-    "wazuhCheckUpdates.currentUpdateDetails.title": "Wazuh new release is available now!",
-    "wazuhCheckUpdates.currentUpdateDetails.upgradeGuideLink": "Upgrade guide",
-    "wazuhCheckUpdates.currentUpdateDetails.showDetails": "Show details",
-    "wazuhCheckUpdates.dismissNotificationCheck.checkText": "Disable updates notifications"
+    "wazuhCheckUpdates.apisUpdateStatus.upToDate": "Up to date",
+    "wazuhCheckUpdates.apisUpdateStatus.availableUpdates": "Available updates",
+    "wazuhCheckUpdates.apisUpdateStatus.error": "Error checking updates",
+    "wazuhCheckUpdates.apisUpdateStatus.lastCheck": "Last check",
+    "wazuhCheckUpdates.apisUpdateStatus.buttonText": "Check updates",
+    "wazuhCheckUpdates.apisUpdateStatus.onClickButtonError": "Error trying to get updates",
+    "wazuhCheckUpdates.apisUpdateStatus.tableTitle": "Wazuh APIs version",
+    "wazuhCheckUpdates.apisUpdateStatus.errorCallOut": "Error trying to get APIs version and available updates",
+    "wazuhCheckUpdates.dismissNotificationCheck.checkText": "Disable updates notifications",
+    "wazuhCheckUpdates.dismissNotificationCheck.checkHelp": "This setting determines if a notification will appear every time an update is released",
+    "wazuhCheckUpdates.updateModal.closeModal": "Close",
+    "wazuhCheckUpdates.updateModal.publishedDate": "Published",
+    "wazuhCheckUpdates.updateModal.releaseNotesLink": "Release notes",
+    "wazuhCheckUpdates.updateModal.upgradeGuideLink": "Upgrade guide"
   }
 }

@@ -7,9 +7,8 @@
   "requiredPlugins": [
     "navigation",
     "opensearchDashboardsUtils",
+    "opensearchDashboardsReact",
     "wazuhCore"
   ],
-  "optionalPlugins": [
-    "securityDashboards"
-  ]
+  "optionalPlugins": ["securityDashboards"]
 }

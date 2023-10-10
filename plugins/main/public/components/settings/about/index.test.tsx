@@ -3,12 +3,6 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SettingsAbout } from '.';
 
-jest.mock('../../../kibana-services', () => ({
-  getWazuhCheckUpdatesPlugin: jest.fn().mockReturnValue({
-    CurrentUpdateDetails: () => <div>Current update</div>,
-  }),
-}));
-
 jest.mock('./appInfo', () => ({
   SettingsAboutAppInfo: jest.fn().mockReturnValue(<div>App info</div>),
 }));
@@ -43,5 +37,8 @@ describe('SettingsAbout component', () => {
 
     const loaders = container.getElementsByClassName('euiLoadingContent');
     expect(loaders.length).toBe(0);
+
+    const appInfo = getByText('App info');
+    expect(appInfo).toBeInTheDocument();
   });
 });
