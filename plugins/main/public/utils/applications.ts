@@ -53,7 +53,7 @@ const endpointSumary = {
     defaultMessage: 'Summary of agents and their status.',
   }),
   euiIconType: 'usersRolesApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/agents-preview/',
 };
 
@@ -98,7 +98,7 @@ const configurationAssessment = {
 };
 
 const threatHunting = {
-  category: 'wz-category-thread-intelligence',
+  category: 'wz-category-threat-intelligence',
   id: 'threat-hunting',
   title: i18n.translate('wz-app-threat-hunting', {
     defaultMessage: 'Threat Hunting',
@@ -118,7 +118,7 @@ const threatHunting = {
 };
 
 const vulnerabilityDetection = {
-  category: 'wz-category-thread-intelligence',
+  category: 'wz-category-threat-intelligence',
   id: 'vulnerability-detection',
   title: i18n.translate('wz-app-vulnerability-detection', {
     defaultMessage: 'Vulnerability detection',
@@ -138,7 +138,7 @@ const vulnerabilityDetection = {
 };
 
 const mitreAttack = {
-  category: 'wz-category-thread-intelligence',
+  category: 'wz-category-threat-intelligence',
   id: 'mitre-attack',
   title: i18n.translate('wz-app-mitre-attack', {
     defaultMessage: 'MITRE ATT&CK',
@@ -158,7 +158,7 @@ const mitreAttack = {
 };
 
 const virustotal = {
-  category: 'wz-category-thread-intelligence',
+  category: 'wz-category-threat-intelligence',
   id: 'virustotal',
   title: i18n.translate('wz-app-virustotal', {
     defaultMessage: 'Virustotal',
@@ -406,7 +406,7 @@ const rules = {
     defaultMessage: 'Manage your Wazuh cluster rules.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=ruleset',
 };
 
@@ -420,7 +420,7 @@ const decoders = {
     defaultMessage: 'Manage your Wazuh cluster decoders.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=decoders',
 };
 
@@ -434,7 +434,7 @@ const cdbLists = {
     defaultMessage: 'Manage your Wazuh cluster CDB list.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=lists',
 };
 
@@ -448,7 +448,7 @@ const endpointGroups = {
     defaultMessage: 'Manage your agent groups.',
   }),
   euiIconType: 'usersRolesApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=groups',
 };
 
@@ -462,7 +462,7 @@ const serverStatus = {
     defaultMessage: 'Manage your Wazuh cluster status.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=status',
 };
 
@@ -476,7 +476,7 @@ const cluster = {
     defaultMessage: 'Manage your Wazuh cluster.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=monitoring',
 };
 
@@ -490,7 +490,7 @@ const statistics = {
     defaultMessage: 'Information about the Wazuh enviroment.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=statistics',
 };
 
@@ -504,7 +504,7 @@ const logs = {
     defaultMessage: 'Logs from your Wazuh cluster.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=logs',
 };
 
@@ -518,7 +518,7 @@ const reporting = {
     defaultMessage: 'Check your stored Wazuh reports.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=reporting',
 };
 
@@ -532,12 +532,12 @@ const settings = {
     defaultMessage: 'Manage your Wazuh cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/manager/?tab=configuration',
 };
 
 const devTools = {
-  category: 'wz-category-security-operations',
+  category: 'wz-category-server-management',
   id: 'dev-tools',
   title: i18n.translate('wz-app-dev-tools', {
     defaultMessage: 'Dev Tools',
@@ -546,12 +546,12 @@ const devTools = {
     defaultMessage: 'Test the Wazuh API endpoints.',
   }),
   euiIconType: 'devToolsApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/wazuh-dev/?tab=devTools',
 };
 
 const rulesetTest = {
-  category: 'wz-category-security-operations',
+  category: 'wz-category-server-management',
   id: 'ruleset-test',
   title: i18n.translate('wz-app-ruleset-test', {
     defaultMessage: 'Ruleset test',
@@ -560,12 +560,12 @@ const rulesetTest = {
     defaultMessage: 'Check your ruleset testing logs.',
   }),
   euiIconType: 'visualizeApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/wazuh-dev/?tab=logtest',
 };
 
 const security = {
-  category: 'wz-category-security-operations',
+  category: 'wz-category-server-management',
   id: 'security',
   title: i18n.translate('wz-app-security', {
     defaultMessage: 'Security',
@@ -575,7 +575,7 @@ const security = {
       'Manage permissions to system resources based on the roles and policies.',
   }),
   euiIconType: 'securityAnalyticsApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/security',
 };
 
@@ -589,7 +589,7 @@ const serverApi = {
     defaultMessage: 'Manage and configure the API entries.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/settings?tab=api',
 };
 
@@ -603,7 +603,7 @@ const serverData = {
     defaultMessage: 'Add sample data with events to the modules.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/settings?tab=sample_data',
 };
 
@@ -617,7 +617,7 @@ const wazuhPluginSettings = {
     defaultMessage: 'Manage your Wazuh cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/settings?tab=configuration',
 };
 
@@ -631,7 +631,7 @@ const wazuhPluginLogs = {
     defaultMessage: 'Explore the logs related to the applications.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/settings?tab=logs',
 };
 
@@ -645,7 +645,7 @@ const wazuhPluginAbout = {
     defaultMessage: 'Show information about App Versions and community links.',
   }),
   euiIconType: 'indexRollupApp',
-  showInOverviewApp: true,
+  showInOverviewApp: false,
   redirectTo: () => '/settings?tab=about',
 };
 
@@ -708,9 +708,9 @@ export const Categories = [
     euiIconType: 'monitoringApp',
   },
   {
-    id: 'wz-category-thread-intelligence',
-    label: i18n.translate('wz-app-category-thread-intelligence', {
-      defaultMessage: 'Thread intelligence',
+    id: 'wz-category-threat-intelligence',
+    label: i18n.translate('wz-app-category-threat-intelligence', {
+      defaultMessage: 'Threat intelligence',
     }),
     order: 2,
     euiIconType: 'lensApp',

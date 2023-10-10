@@ -80,7 +80,9 @@ export function ClusterController(
    * This navigates to agents preview
    */
   $scope.goAgents = () => {
-    getCore().application.navigateToApp('endpoints-summary');
+    getCore().application.navigateToApp('endpoints-summary', {
+      path: '#/agents-preview',
+    });
   };
 
   /**

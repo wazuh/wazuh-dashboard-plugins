@@ -30,7 +30,7 @@ import {
 } from '../services';
 import { CheckResult } from '../components/check-result';
 import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
-import { getHttp, getWzCurrentAppID } from '../../../kibana-services';
+import { getCore, getHttp, getWzCurrentAppID } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
   WAZUH_INDEX_TYPE_MONITORING,
@@ -274,7 +274,9 @@ function HealthCheckComponent() {
               <EuiFlexItem grow={false}>
                 <EuiButton
                   fill
-                  href={getHttp().basePath.prepend('/app/wz-server-api')}
+                  href={getCore().application.getUrlForApp(
+                    'server-api',
+                  )}
                 >
                   Go to Settings
                 </EuiButton>
