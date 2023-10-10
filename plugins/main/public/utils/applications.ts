@@ -98,7 +98,7 @@ const configurationAssessment = {
 };
 
 const threatHunting = {
-  category: 'wz-category-thread-intelligence',
+  category: 'wz-category-threat-intelligence',
   id: 'threat-hunting',
   title: i18n.translate('wz-app-threat-hunting', {
     defaultMessage: 'Threat Hunting',
@@ -118,7 +118,7 @@ const threatHunting = {
 };
 
 const vulnerabilityDetection = {
-  category: 'wz-category-thread-intelligence',
+  category: 'wz-category-threat-intelligence',
   id: 'vulnerability-detection',
   title: i18n.translate('wz-app-vulnerability-detection', {
     defaultMessage: 'Vulnerability detection',
@@ -138,7 +138,7 @@ const vulnerabilityDetection = {
 };
 
 const mitreAttack = {
-  category: 'wz-category-thread-intelligence',
+  category: 'wz-category-threat-intelligence',
   id: 'mitre-attack',
   title: i18n.translate('wz-app-mitre-attack', {
     defaultMessage: 'MITRE ATT&CK',
@@ -158,7 +158,7 @@ const mitreAttack = {
 };
 
 const virustotal = {
-  category: 'wz-category-thread-intelligence',
+  category: 'wz-category-threat-intelligence',
   id: 'virustotal',
   title: i18n.translate('wz-app-virustotal', {
     defaultMessage: 'Virustotal',
@@ -708,9 +708,9 @@ export const Categories = [
     euiIconType: 'monitoringApp',
   },
   {
-    id: 'wz-category-thread-intelligence',
-    label: i18n.translate('wz-app-category-thread-intelligence', {
-      defaultMessage: 'Thread intelligence',
+    id: 'wz-category-threat-intelligence',
+    label: i18n.translate('wz-app-category-threat-intelligence', {
+      defaultMessage: 'Threat intelligence',
     }),
     order: 2,
     euiIconType: 'lensApp',
