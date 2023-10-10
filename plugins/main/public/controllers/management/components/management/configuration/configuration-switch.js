@@ -82,7 +82,7 @@ import {
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { WzConfigurationOffice365 } from './office365/office365';
-import { navigateAppURL } from '../../../../../react-services/navigate-app';
+import { getCore } from '../../../../../kibana-services';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -210,9 +210,9 @@ class WzConfigurationSwitch extends Component {
                 <EuiButtonEmpty
                   key={`agent-group-${key}`}
                   onClick={() => {
-                    navigateAppURL(
-                      `/app/groups#/manager/?tab=groups&group=${group}`,
-                    );
+                    getCore().application.navigateToApp('endpoint-groups', {
+                      path: `#/manager/?tab=groups&group=${group}`,
+                    });
                   }}
                 >
                   {group}

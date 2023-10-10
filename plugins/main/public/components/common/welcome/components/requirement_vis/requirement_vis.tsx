@@ -19,12 +19,11 @@ import { getRequirementAlerts } from './lib';
 import { useTimeFilter } from '../../../hooks';
 import { useDispatch } from 'react-redux';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
-import { getAngularModule } from '../../../../../kibana-services';
+import { getAngularModule, getCore } from '../../../../../kibana-services';
 import { getIndexPattern } from '../../../../overview/mitre/lib';
 import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
 import rison from 'rison-node';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
-import { navigateAppURL } from '../../../../../react-services/navigate-app';
 
 const selectionOptionsCompliance = [
   { value: 'pci_dss', text: 'PCI DSS' },
@@ -74,10 +73,9 @@ export function RequirementVis(props) {
         .map(e => e.join('='))
         .join('&');
       // TODO: redirection to gdpr will fail
-      navigateAppURL(
-        `/app/${WAZUH_MODULES[params.tab].appId}#/overview?${url}`,
-      );
-      route.reload();
+      getCore().application.navigateToApp(WAZUH_MODULES[params.tab].appId, {
+        path: `#/overview?${url}`,
+      });
     } catch (error) {}
   };
 

@@ -34,10 +34,10 @@ import {
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
 } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-import { getNavigationAppURL } from '../../../react-services/navigate-app';
 import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services';
 import { get as getLodash } from 'lodash';
+import { getCore } from '../../../kibana-services';
 
 const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
@@ -68,7 +68,9 @@ export function SyscollectorInventory({ agent }) {
         }
         actions={
           <EuiButton
-            href={getNavigationAppURL('/app/endpoints-summary#/agents-preview')}
+            href={getCore().application.getUrlForApp('endpoints-summary', {
+              path: '#/agents-preview',
+            })}
             color='primary'
             fill
           >

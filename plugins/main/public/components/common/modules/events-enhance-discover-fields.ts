@@ -13,7 +13,7 @@
 import { FlyoutDetail } from '../../../components/agents/fim/inventory/flyout';
 import { FlyoutTechnique } from '../../overview/mitre/components/techniques/components/flyout-technique';
 import { AppNavigate } from '../../../react-services/app-navigate';
-import { getNavigationAppURL } from '../../../react-services/navigate-app';
+import { getCore } from '../../../kibana-services';
 
 // Field to add to elements enchanced
 const CUSTOM_ATTRIBUTE_ENHANCED_DISCOVER_FIELD =
@@ -113,17 +113,17 @@ export const EventsEnhanceDiscoverCell = {
   'rule.id': createElementFieldURLRedirection({
     ...buttonStyles,
     href: content =>
-      getNavigationAppURL(
-        `/app/rules#/manager/rules?tab=rules&redirectRule=${content}`,
-      ),
+      getCore().application.getUrlForApp('rules', {
+        path: `#/manager/rules?tab=rules&redirectRule=${content}`,
+      }),
   }),
   'agent.id': createElementFieldURLRedirection({
     ...buttonStyles,
     href: content =>
       content !== '000'
-        ? getNavigationAppURL(
-            `/app/it-hygiene#/agents?tab=welcome&agent=${content}`,
-          )
+        ? getCore().application.getUrlForApp('it-hygiene', {
+            path: `#/agents?tab=welcome&agent=${content}`,
+          })
         : undefined,
   }),
   'agent.name': createElementFieldURLRedirection({
@@ -131,9 +131,9 @@ export const EventsEnhanceDiscoverCell = {
     href: (content, rowData) => {
       const agentId = (((rowData || {})._source || {}).agent || {}).id;
       return agentId !== '000'
-        ? getNavigationAppURL(
-            `/app/it-hygiene#/agents?tab=welcome&agent=${agentId}`,
-          )
+        ? getCore().application.getUrlForApp('it-hygiene', {
+            path: `#/agents?tab=welcome&agent=${agentId}`,
+          })
         : undefined;
     },
   }),

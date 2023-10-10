@@ -48,9 +48,13 @@ import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
-import { getAngularModule } from '../../../kibana-services';
+import { getAngularModule, getCore } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
-import { withErrorBoundary, withGlobalBreadcrumb, withReduxProvider } from '../hocs';
+import {
+  withErrorBoundary,
+  withGlobalBreadcrumb,
+  withReduxProvider,
+} from '../hocs';
 import { compose } from 'redux';
 import {
   API_NAME_AGENT_STATUS,
@@ -58,10 +62,6 @@ import {
 } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import {
-  getNavigationAppURL,
-  navigateAppURL,
-} from '../../../react-services/navigate-app';
 
 export const AgentsWelcome = compose(
   withReduxProvider,
@@ -232,23 +232,20 @@ export const AgentsWelcome = compose(
                 >
                   <EuiButtonEmpty
                     onClick={() => {
-                      navigateAppURL(
-                        `/app/${
-                          WAZUH_MODULES[menuAgent.id].appId
-                        }#/overview/?tab=${menuAgent.id}&tabView=${
-                          menuAgent.text === 'Security configuration assessment'
-                            ? 'inventory'
-                            : 'panels'
-                        }`,
+                      getCore().application.navigateToApp(
+                        WAZUH_MODULES[menuAgent.id].appId,
+                        {
+                          path: `#/overview/?tab=${menuAgent.id}&tabView=${
+                            menuAgent.text === 'SCA' ? 'inventory' : 'panels'
+                          }`,
+                        },
                       );
                       this.router.reload();
                     }}
                     style={{ cursor: 'pointer' }}
                   >
                     <span>
-                      {menuAgent.text !== 'Security configuration assessment'
-                        ? menuAgent.text
-                        : 'SCA'}
+                      {menuAgent.text}
                       &nbsp;
                     </span>
                   </EuiButtonEmpty>
@@ -397,8 +394,7 @@ export const AgentsWelcome = compose(
                       iconType='popout'
                       color='primary'
                       onClick={() => {
-                        navigateAppURL('/app/mitre-attack');
-                        this.router.reload();
+                        getCore().application.navigateToApp('mitre-attack');
                       }}
                       aria-label='Open MITRE'
                     />
@@ -507,9 +503,9 @@ export const AgentsWelcome = compose(
             }
             actions={
               <EuiButton
-                href={getNavigationAppURL(
-                  '/app/endpoints-summary#/agents-preview',
-                )}
+                href={getCore().application.getUrlForApp('endpoints-summary', {
+                  path: '#/agents-preview',
+                })}
                 color='primary'
                 fill
               >

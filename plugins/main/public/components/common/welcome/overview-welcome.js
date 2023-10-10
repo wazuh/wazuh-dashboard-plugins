@@ -34,11 +34,8 @@ import {
   withReduxProvider,
 } from '../hocs';
 import { compose } from 'redux';
-import {
-  getNavigationAppURL,
-  navigateAppURL,
-} from '../../../react-services/navigate-app';
 import { Applications, Categories } from '../../../utils/applications';
+import { getCore } from '../../../kibana-services';
 
 const appCategories = Applications.reduce((categories, app) => {
   const existingCategory = categories.find(
@@ -106,8 +103,9 @@ export const OverviewWelcome = compose(
                   <>
                     No agents were added to this manager.{' '}
                     <EuiButtonEmpty
-                      href={getNavigationAppURL(
-                        '/app/endpoints-summary#/agents-preview',
+                      href={getCore().application.getUrlForApp(
+                        'endpoints-summary',
+                        { path: '#/agents-preview' },
                       )}
                     >
                       Add agent
@@ -160,7 +158,7 @@ export const OverviewWelcome = compose(
                                   className='homSynopsis__card'
                                   title={app.title}
                                   onClick={() =>
-                                    navigateAppURL(`/app/${app.id}`)
+                                    getCore().application.navigateToApp(app.id)
                                   }
                                   data-test-subj={`overviewWelcome${this.strtools.capitalize(
                                     app.id,
