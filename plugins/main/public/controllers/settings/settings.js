@@ -289,13 +289,6 @@ export class SettingsController {
 
       ErrorHandler.info(`API with id ${idApi} set as default`);
 
-      this.getCurrentAPIIndex();
-      const extensions = await AppState.getExtensions(id);
-      if (currentApi && !extensions) {
-        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        AppState.setExtensions(id, extensions);
-      }
-
       this.$scope.$applyAsync();
       return this.currentDefault;
     } catch (error) {
@@ -343,12 +336,6 @@ export class SettingsController {
 
       if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) {
         return;
-      }
-      const extensions = await AppState.getExtensions(this.currentDefault);
-      if (currentApi && !extensions) {
-        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        const apiExtensions = extensions || {};
-        AppState.setExtensions(id, apiExtensions);
       }
 
       this.$scope.$applyAsync();
