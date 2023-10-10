@@ -25,7 +25,7 @@ import {
   agentStatusLabelByAgentStatus,
   agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
-import { navigateAppURL } from '../../../react-services/navigate-app';
+import { getCore } from '../../../kibana-services';
 
 export const Stats = withErrorBoundary(
   class Stats extends Component {
@@ -54,7 +54,9 @@ export const Stats = withErrorBoundary(
       } else if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
-      navigateAppURL('/app/endpoints-summary#/agents-preview');
+      getCore().application.navigateToApp('endpoints-summary', {
+        path: '#/agents-preview',
+      });
     }
 
     renderTitle(total) {

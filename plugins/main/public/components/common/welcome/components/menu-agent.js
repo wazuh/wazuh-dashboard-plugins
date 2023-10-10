@@ -20,11 +20,14 @@ import {
 import { connect } from 'react-redux';
 import { AppState } from '../../../../react-services/app-state';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
-import { getAngularModule, getToasts } from '../../../../kibana-services';
+import {
+  getAngularModule,
+  getCore,
+  getToasts,
+} from '../../../../kibana-services';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import { getAgentSections } from './agent-sections';
 import { WAZUH_MODULES } from '../../../../../common/wazuh-modules';
-import { navigateAppURL } from '../../../../react-services/navigate-app';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -82,9 +85,9 @@ class WzMenuAgent extends Component {
     this.props.closePopover();
     if (this.props.currentTab !== section) {
       // do not redirect if we already are in that tab
-      navigateAppURL(
-        `/app/${WAZUH_MODULES[section].appId}#/overview/?tab=${section}`,
-      );
+      getCore().application.navigateToApp(WAZUH_MODULES[section].appId, {
+        path: `#/overview/?tab=${section}`,
+      });
       this.props.updateCurrentAgentData(this.props.isAgent);
       this.router.reload();
     }

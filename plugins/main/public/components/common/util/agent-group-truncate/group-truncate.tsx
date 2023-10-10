@@ -20,7 +20,7 @@ import {
   EuiBadge,
   EuiPopover,
 } from '@elastic/eui';
-import { navigateAppURL } from '../../../../react-services/navigate-app';
+import { getCore } from '../../../../kibana-services';
 
 export class GroupTruncate extends React.Component {
   _isMount = false;
@@ -51,9 +51,9 @@ export class GroupTruncate extends React.Component {
   action(index, group) {
     switch (this.props.action) {
       case 'redirect':
-        return navigateAppURL(
-          `/app/groups#/manager/?tab=groups&group=${group}`,
-        );
+        return getCore().application.navigateToApp('endpoint-groups', {
+          path: `#/manager/?tab=groups&group=${group}`,
+        });
       case 'filter':
         return this.filterAction(group);
       default:
