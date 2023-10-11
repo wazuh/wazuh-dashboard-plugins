@@ -95,7 +95,12 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent],
+        component: MainSca,
+      },
       EventsTab,
     ],
     buttons: ['settings'],
