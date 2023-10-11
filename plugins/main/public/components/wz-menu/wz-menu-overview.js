@@ -10,7 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiFlexGrid, EuiButtonEmpty, EuiSideNav, EuiIcon } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiFlexGrid,
+  EuiButtonEmpty,
+  EuiSideNav,
+  EuiIcon,
+} from '@elastic/eui';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
 import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
@@ -26,7 +33,7 @@ class WzMenuOverview extends Component {
     super(props);
     this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
     this.state = {
-      extensions: []
+      extensions: [],
     };
 
     this.overviewSections = {
@@ -75,7 +82,8 @@ class WzMenuOverview extends Component {
       },
       sca: {
         id: WAZUH_MODULES_ID.SECURITY_CONFIGURATION_ASSESSMENT,
-        cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.SECURITY_CONFIGURATION_ASSESSMENT,
+        cyTestId:
+          WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.SECURITY_CONFIGURATION_ASSESSMENT,
         text: 'Security configuration assessment',
       },
       audit: {
@@ -156,34 +164,32 @@ class WzMenuOverview extends Component {
       this.overviewSections.office,
       this.overviewSections.aws,
       this.overviewSections.gcp,
-      this.overviewSections.github
+      this.overviewSections.github,
     ];
     this.auditingItems = [
       this.overviewSections.pm,
       this.overviewSections.audit,
       this.overviewSections.oscap,
       this.overviewSections.ciscat,
-      this.overviewSections.sca
+      this.overviewSections.sca,
     ];
     this.threatDetectionItems = [
       this.overviewSections.vuls,
       this.overviewSections.virustotal,
       this.overviewSections.osquery,
       this.overviewSections.docker,
-      this.overviewSections.mitre
+      this.overviewSections.mitre,
     ];
     this.regulatoryComplianceItems = [
       this.overviewSections.pci,
       this.overviewSections.gdpr,
       this.overviewSections.hipaa,
       this.overviewSections.nist,
-      this.overviewSections.tsc
+      this.overviewSections.tsc,
     ];
   }
 
-  async componentDidMount() {
-    const extensions = await AppState.getExtensions(this.currentApi);
-    this.setState({ extensions });
+  componentDidMount() {
     const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
   }
@@ -192,19 +198,20 @@ class WzMenuOverview extends Component {
     this.props.closePopover();
     const params = { tab: section };
     if (this.props.currentAgentData.id)
-      params["agentId"] = this.props.currentAgentData.id;
-    if (section === "sca") { // SCA initial tab is inventory
-      params["tabView"] = "inventory"
+      params['agentId'] = this.props.currentAgentData.id;
+    if (section === 'sca') {
+      // SCA initial tab is inventory
+      params['tabView'] = 'inventory';
     }
 
     if (this.props.currentTab !== section) {
       // do not redirect if we already are in that tab
       if (!this.props.isAgent) {
-        AppNavigate.navigateToModule(ev, 'overview', params)
+        AppNavigate.navigateToModule(ev, 'overview', params);
       } else {
         if (!this.props.switchTab) {
           this.props.updateCurrentAgentData(this.props.isAgent);
-          AppNavigate.navigateToModule(ev, 'overview', params)
+          AppNavigate.navigateToModule(ev, 'overview', params);
         } else {
           this.props.switchTab(section);
         }
@@ -215,9 +222,16 @@ class WzMenuOverview extends Component {
   createItems = items => {
     const keyExists = key => Object.keys(this.state.extensions).includes(key);
     const keyIsTrue = key => (this.state.extensions || [])[key];
-    return items.filter(item => 
-      (Object.keys(this.props.currentAgentData).length ? hasAgentSupportModule(this.props.currentAgentData, item.id) : true) && Object.keys(this.state.extensions).length && (!keyExists(item.id) || keyIsTrue(item.id))
-    ).map(item => this.createItem(item));
+    return items
+      .filter(
+        item =>
+          (Object.keys(this.props.currentAgentData).length
+            ? hasAgentSupportModule(this.props.currentAgentData, item.id)
+            : true) &&
+          Object.keys(this.state.extensions).length &&
+          (!keyExists(item.id) || keyIsTrue(item.id)),
+      )
+      .map(item => this.createItem(item));
   };
 
   createItem = (item, data = {}) => {
@@ -228,8 +242,8 @@ class WzMenuOverview extends Component {
       name: item.text,
       'data-test-subj': item.cyTestId,
       isSelected: this.props.currentTab === item.id,
-      onClick: () => { },
-      onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
+      onClick: () => {},
+      onMouseDown: ev => this.clickMenuItem(ev, item.id),
     };
   };
 
@@ -239,57 +253,58 @@ class WzMenuOverview extends Component {
   }
 
   render() {
-
     const securityInformation = [
       {
         name: this.overviewSections.securityInformation.text,
         id: this.overviewSections.securityInformation.id,
-        icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems(this.securityInformationItems)
-      }
+        icon: <EuiIcon type='managementApp' color='primary' />,
+        items: this.createItems(this.securityInformationItems),
+      },
     ];
 
     const auditing = [
       {
         name: this.overviewSections.auditing.text,
         id: this.overviewSections.auditing.id,
-        icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems(this.auditingItems)
-      }
+        icon: <EuiIcon type='managementApp' color='primary' />,
+        items: this.createItems(this.auditingItems),
+      },
     ];
 
     const threatDetection = [
       {
         name: this.overviewSections.threatDetection.text,
         id: this.overviewSections.threatDetection.id,
-        icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems(this.threatDetectionItems)
-      }
+        icon: <EuiIcon type='reportingApp' color='primary' />,
+        items: this.createItems(this.threatDetectionItems),
+      },
     ];
 
     const regulatoryCompliance = [
       {
         name: this.overviewSections.regulatoryCompliance.text,
         id: this.overviewSections.regulatoryCompliance.id,
-        icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems(this.regulatoryComplianceItems)
-      }
+        icon: <EuiIcon type='reportingApp' color='primary' />,
+        items: this.createItems(this.regulatoryComplianceItems),
+      },
     ];
 
-    const agentData = store.getState().appStateReducers.currentAgentData
+    const agentData = store.getState().appStateReducers.currentAgentData;
 
     return (
-      <div className="WzManagementSideMenu wz-menu-overview">
-        {Object.keys(this.state.extensions).length && (
+      <div className='WzManagementSideMenu wz-menu-overview'>
+        {(Object.keys(this.state.extensions).length && (
           <div>
             {!agentData.id && (
               <EuiFlexGroup>
                 <EuiFlexItem grow={false} style={{ marginLeft: 14 }}>
-                  <EuiButtonEmpty iconType="apps"
+                  <EuiButtonEmpty
+                    iconType='apps'
                     onClick={() => {
                       this.props.closePopover();
                       window.location.href = '#/overview';
-                    }}>
+                    }}
+                  >
                     Modules directory
                   </EuiButtonEmpty>
                 </EuiFlexItem>
@@ -303,10 +318,7 @@ class WzMenuOverview extends Component {
                 />
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiSideNav
-                  items={auditing}
-                  style={{ padding: '4px 12px' }}
-                />
+                <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiSideNav
@@ -322,8 +334,7 @@ class WzMenuOverview extends Component {
               </EuiFlexItem>
             </EuiFlexGrid>
           </div>
-        ) || (<div style={{ width: 300 }}></div>
-          )}
+        )) || <div style={{ width: 300 }}></div>}
       </div>
     );
   }
@@ -332,15 +343,13 @@ class WzMenuOverview extends Component {
 const mapStateToProps = state => {
   return {
     currentAgentData: state.appStateReducers.currentAgentData,
-    currentTab: state.appStateReducers.currentTab
+    currentTab: state.appStateReducers.currentTab,
   };
 };
 
 const mapDispatchToProps = dispatch => ({
-  updateCurrentAgentData: (agentData) => dispatch(updateCurrentAgentData(agentData))
+  updateCurrentAgentData: agentData =>
+    dispatch(updateCurrentAgentData(agentData)),
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzMenuOverview);
+export default connect(mapStateToProps, mapDispatchToProps)(WzMenuOverview);
