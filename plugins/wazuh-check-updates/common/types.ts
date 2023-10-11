@@ -5,8 +5,8 @@ export enum API_UPDATES_STATUS {
 }
 
 export interface ResponseApiAvailableUpdates {
-  api_id: string;
-  current_version: string;
+  current_version?: string;
+  update_check?: boolean;
   last_available_major?: Update;
   last_available_minor?: Update;
   last_available_patch?: Update;
@@ -14,6 +14,7 @@ export interface ResponseApiAvailableUpdates {
 }
 
 export interface ApiAvailableUpdates extends ResponseApiAvailableUpdates {
+  api_id: string;
   status: API_UPDATES_STATUS;
 }
 
@@ -47,7 +48,7 @@ export interface CheckUpdatesSettings {
 
 export interface AvailableUpdates {
   apis_available_updates: ApiAvailableUpdates[];
-  last_check_date: string;
+  last_check_date: Date;
 }
 
 export type savedObjectType = AvailableUpdates | UserPreferences | CheckUpdatesSettings;

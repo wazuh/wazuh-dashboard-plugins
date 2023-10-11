@@ -1,0 +1,28 @@
+{
+  "name": "wazuh-core",
+  "version": "4.8.0",
+  "private": true,
+  "scripts": {
+    "build": "yarn plugin-helpers build",
+    "plugin-helpers": "node ../../scripts/plugin_helpers",
+    "osd": "node ../../scripts/osd",
+    "test:ui:runner": "node ../../scripts/functional_test_runner.js",
+    "test:server": "plugin-helpers test:server",
+    "test:browser": "plugin-helpers test:browser",
+    "test:jest": "node scripts/jest",
+    "test:jest:runner": "node scripts/runner test"
+  },
+  "dependencies": {
+    "axios": "^1.5.0",
+    "json2csv": "^4.1.2",
+    "jwt-decode": "^3.1.2",
+    "node-cron": "^3.0.2",
+    "md5": "^2.3.0",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "@testing-library/user-event": "^14.5.0",
+    "@types/": "testing-library/user-event",
+    "@types/md5": "^2.3.2"
+  }
+}

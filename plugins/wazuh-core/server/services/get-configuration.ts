@@ -1,6 +1,7 @@
 import fs from 'fs';
 import yml from 'js-yaml';
 import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_CACHE_TIME } from '../../common/constants';
+import { getSettingsDefault } from '../../common/services/settings';
 
 let cachedConfiguration: any = null;
 let lastAssign: number = new Date().getTime();
@@ -14,6 +15,7 @@ export function getConfiguration(options: { force?: boolean } = {}) {
   try {
     const now = new Date().getTime();
     const dateDiffer = now - lastAssign;
+    const defaultConfiguration = getSettingsDefault();
     if (!cachedConfiguration || dateDiffer >= WAZUH_CONFIGURATION_CACHE_TIME || options?.force) {
       cachedConfiguration = obfuscateHostsConfiguration(
         readPluginConfigurationFile(WAZUH_DATA_CONFIG_APP_PATH),
@@ -22,7 +24,7 @@ export function getConfiguration(options: { force?: boolean } = {}) {
 
       lastAssign = now;
     }
-    return cachedConfiguration;
+    return { ...defaultConfiguration, ...cachedConfiguration };
   } catch (error) {
     return false;
   }

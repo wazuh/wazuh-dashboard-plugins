@@ -1,6 +1,3 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import { mockSuccessResponse } from './mocks';
 import {
   API_UPDATES_STATUS,
   AvailableUpdates,
@@ -8,11 +5,9 @@ import {
 } from '../../../common/types';
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { getSavedObject, setSavedObject } from '../saved-object';
-import { log } from '../../lib/logger';
+import { getWazuhCore } from '../../plugin-services';
 
 export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<AvailableUpdates> => {
-  const mock = new MockAdapter(axios);
-
   try {
     if (!checkAvailableUpdates) {
       const availableUpdates = (await getSavedObject(SAVED_OBJECT_UPDATES)) as AvailableUpdates;
@@ -20,25 +15,53 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
       return availableUpdates;
     }
 
-    const updatesServiceUrl = `/api/updates`;
+    const {
+      controllers: { WazuhHostsCtrl },
+      services: { wazuhApiClient },
+    } = getWazuhCore();
+    const wazuhHostsController = new WazuhHostsCtrl();
 
-    mock.onGet(updatesServiceUrl).reply(200, mockSuccessResponse);
+    const hosts: { id: string }[] = await wazuhHostsController.getHostsEntries();
 
-    const updatesResponse = await axios.get(updatesServiceUrl);
+    const apisAvailableUpdates = await Promise.all(
+      hosts?.map(async (api) => {
+        const data = {};
+        const method = 'GET';
+        const path = '/manager/version/check';
+        const options = {
+          apiHostID: api.id,
+          forceRefresh: true,
+        };
+        try {
+          const response = await wazuhApiClient.client.asInternalUser.request(
+            method,
+            path,
+            data,
+            options
+          );
 
-    const updates = (updatesResponse?.data?.data || []) as ResponseApiAvailableUpdates[];
+          const update = response.data.data as ResponseApiAvailableUpdates;
 
-    const apisAvailableUpdates = updates?.map((update) => {
-      const status =
-        update.last_available_patch || update.last_available_minor || update.last_available_patch
-          ? API_UPDATES_STATUS.AVAILABLE_UPDATES
-          : API_UPDATES_STATUS.UP_TO_DATE;
+          const status =
+            update.last_available_patch ||
+            update.last_available_minor ||
+            update.last_available_patch
+              ? API_UPDATES_STATUS.AVAILABLE_UPDATES
+              : API_UPDATES_STATUS.UP_TO_DATE;
 
-      return {
-        ...update,
-        status,
-      };
-    });
+          return {
+            ...update,
+            api_id: api.id,
+            status,
+          };
+        } catch (error) {
+          return {
+            api_id: api.id,
+            status: API_UPDATES_STATUS.ERROR,
+          };
+        }
+      })
+    );
 
     const savedObject = {
       apis_available_updates: apisAvailableUpdates,
@@ -55,6 +78,11 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
         : typeof error === 'string'
         ? error
         : 'Error trying to get available updates';
+
+    const {
+      services: { log },
+    } = getWazuhCore();
+
     log('wazuh-check-updates:getUpdates', message);
     return Promise.reject(error);
   }

@@ -1,5 +1,5 @@
-import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { ApisUpdateStatusProps } from './components/apis-update-status';
+import { WazuhCorePluginStart } from '../../wazuh-core/public';
 
 export interface WazuhCheckUpdatesPluginSetup {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -9,5 +9,5 @@ export interface WazuhCheckUpdatesPluginStart {
 }
 
 export interface AppPluginStartDependencies {
-  navigation: NavigationPublicPluginStart;
+  wazuhCore: WazuhCorePluginStart;
 }

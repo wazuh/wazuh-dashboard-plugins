@@ -15,7 +15,9 @@ export const getUpdatesRoute = (router: IRouter) => {
     },
     async (context, request, response) => {
       try {
-        const updates = await getUpdates(request.query?.checkAvailableUpdates === 'true');
+        const updates = await getUpdates(
+          request.query?.checkAvailableUpdates === 'true',
+        );
         return response.ok({
           body: updates,
         });
@@ -32,6 +34,6 @@ export const getUpdatesRoute = (router: IRouter) => {
           body: finalError,
         });
       }
-    }
+    },
   );
 };

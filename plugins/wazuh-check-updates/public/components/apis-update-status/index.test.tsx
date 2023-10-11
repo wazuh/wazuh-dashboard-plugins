@@ -13,11 +13,19 @@ jest.mock('../dismiss-notification-check', () => ({
 }));
 
 jest.mock('./table', () => ({
-  ApisUpdateTable: jest.fn().mockReturnValue(<div>APIs Updates Table component</div>),
+  ApisUpdateTable: jest
+    .fn()
+    .mockReturnValue(<div>APIs Updates Table component</div>),
 }));
 
-jest.mock('../../utils', () => ({
-  formatUIDate: jest.fn().mockReturnValue('2023-09-18T14:00:00.000Z'),
+jest.mock('../../../../plugin-services', () => ({
+  getWazuhCore: jest
+    .fn()
+    .mockReturnValue({
+      utils: {
+        formatUIDate: jest.fn().mockReturnValue('2023-09-18T14:00:00.000Z'),
+      },
+    }),
 }));
 
 const mockedUseAvailabeUpdates = useAvailableUpdates as jest.Mock;
@@ -51,12 +59,14 @@ describe('UpdatesNotification component', () => {
     }));
 
     const { container, getByText } = render(
-      <ApisUpdateStatus setApisAvailableUpdates={() => {}} />
+      <ApisUpdateStatus setApisAvailableUpdates={() => {}} />,
     );
 
     expect(container).toMatchSnapshot();
 
-    const dismissNotificationCheck = getByText('Dismiss Notification Check component');
+    const dismissNotificationCheck = getByText(
+      'Dismiss Notification Check component',
+    );
     expect(dismissNotificationCheck).toBeInTheDocument();
 
     const apisUpdateTable = getByText('APIs Updates Table component');
@@ -93,7 +103,7 @@ describe('UpdatesNotification component', () => {
     }));
 
     const { container, getByRole, getByText } = render(
-      <ApisUpdateStatus setApisAvailableUpdates={() => {}} />
+      <ApisUpdateStatus setApisAvailableUpdates={() => {}} />,
     );
 
     expect(container).toMatchSnapshot();
