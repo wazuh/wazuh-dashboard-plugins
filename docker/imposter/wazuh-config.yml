@@ -511,10 +511,6 @@ resources:
       statusCode: 200
       scriptFile: manager/configuration.js
 
-  # Version manager
-  - method: GET
-    path: /manager/version
-
   # Get available updates
   - method: GET
     path: /manager/version/check
