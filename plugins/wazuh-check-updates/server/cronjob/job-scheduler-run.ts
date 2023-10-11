@@ -7,7 +7,7 @@ import { getWazuhCore } from '../plugin-services';
 export const jobSchedulerRun = async () => {
   try {
     //The first time should get the updates from the Wazuh API
-    // await getUpdates(true);
+    await getUpdates(true);
 
     const settings = await getSettings();
 
