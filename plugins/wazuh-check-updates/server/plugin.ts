@@ -15,7 +15,7 @@ import {
 import { defineRoutes } from './routes';
 import { availableUpdatesObject, userPreferencesObject } from './services/saved-object/types';
 import { setCore, setWazuhCore, setInternalSavedObjectsClient } from './plugin-services';
-import { ISecurityFactory, SecurityObj } from './lib/security-factory';
+import { ISecurityFactory } from '../../wazuh-core/server/services/security-factory';
 
 declare module 'opensearch-dashboards/server' {
   interface RequestHandlerContext {
@@ -37,12 +37,10 @@ export class WazuhCheckUpdatesPlugin
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('wazuh_check_updates: Setup');
 
-    const wazuhSecurity = await SecurityObj(plugins);
-
     core.http.registerRouteHandlerContext('wazuh_check_updates', () => {
       return {
         logger: this.logger,
-        security: wazuhSecurity,
+        security: plugins.wazuhCore.wazuhSecurity,
       };
     });
 

@@ -11,4 +11,5 @@
  */
 
 export { log } from './logger';
-export {wazuhApiClient} from './api-client';
+export { wazuhApiClient } from './api-client';
+export * as securityFactory from './security-factory';
