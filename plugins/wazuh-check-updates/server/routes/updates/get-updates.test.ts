@@ -74,7 +74,7 @@ describe(`[endpoint] GET ${routes.checkUpdates}`, () => {
 
   test('get available updates', async () => {
     const mockResponse: AvailableUpdates = {
-      last_check_date: '2023-09-30T14:00:00.000Z',
+      last_check_date: new Date('2023-09-30T14:00:00.000Z'),
       apis_available_updates: [
         {
           api_id: 'api id',
@@ -99,6 +99,6 @@ describe(`[endpoint] GET ${routes.checkUpdates}`, () => {
     mockedGetUpdates.mockImplementation(() => mockResponse);
     const response = await axios.get(`${routes.checkUpdates}?checkAvailableUpdates=true`);
 
-    expect(response.data).toEqual(mockResponse);
+    expect(response.data).toEqual({ ...mockResponse, last_check_date: '2023-09-30T14:00:00.000Z' });
   });
 });

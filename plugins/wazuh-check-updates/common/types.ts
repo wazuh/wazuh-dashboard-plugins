@@ -1,6 +1,7 @@
 export enum API_UPDATES_STATUS {
   UP_TO_DATE = 'upToDate',
   AVAILABLE_UPDATES = 'availableUpdates',
+  DISABLED = 'disabled',
   ERROR = 'error',
 }
 
@@ -42,13 +43,9 @@ export interface UserPreferences {
   hide_update_notifications?: boolean;
 }
 
-export interface CheckUpdatesSettings {
-  schedule?: string;
-}
-
 export interface AvailableUpdates {
   apis_available_updates: ApiAvailableUpdates[];
   last_check_date: Date;
 }
 
-export type savedObjectType = AvailableUpdates | UserPreferences | CheckUpdatesSettings;
+export type savedObjectType = AvailableUpdates | UserPreferences;

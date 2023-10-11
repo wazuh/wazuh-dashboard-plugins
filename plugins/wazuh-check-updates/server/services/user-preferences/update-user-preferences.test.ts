@@ -2,12 +2,16 @@ import { updateUserPreferences } from '.';
 import { getSavedObject } from '../saved-object/get-saved-object';
 import { setSavedObject } from '../saved-object/set-saved-object';
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
+import { getWazuhCore } from '../../plugin-services';
 
 const mockedGetSavedObject = getSavedObject as jest.Mock;
 jest.mock('../saved-object/get-saved-object');
 
 const mockedSetSavedObject = setSavedObject as jest.Mock;
 jest.mock('../saved-object/set-saved-object');
+
+const mockedGetWazuhCore = getWazuhCore as jest.Mock;
+jest.mock('../../plugin-services');
 
 describe('updateUserPreferences function', () => {
   afterEach(() => {
@@ -53,6 +57,10 @@ describe('updateUserPreferences function', () => {
 
   test('should return an error', async () => {
     mockedSetSavedObject.mockRejectedValue(new Error('getSavedObject error'));
+
+    mockedGetWazuhCore.mockImplementation(() => ({
+      services: { log: jest.fn().mockImplementation(() => {}) },
+    }));
 
     const promise = updateUserPreferences('admin', {
       last_dismissed_updates: [

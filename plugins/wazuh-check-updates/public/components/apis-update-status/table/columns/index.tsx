@@ -28,6 +28,9 @@ export const getApisUpdateStatusColumns = () => {
           if (status === API_UPDATES_STATUS.AVAILABLE_UPDATES) {
             return 'Available updates';
           }
+          if (status === API_UPDATES_STATUS.DISABLED) {
+            return 'Checking updates disabled';
+          }
           return 'Error checking updates';
         };
 
@@ -37,6 +40,9 @@ export const getApisUpdateStatusColumns = () => {
           }
           if (status === API_UPDATES_STATUS.AVAILABLE_UPDATES) {
             return 'warning';
+          }
+          if (status === API_UPDATES_STATUS.DISABLED) {
+            return 'subdued';
           }
           return 'danger';
         };

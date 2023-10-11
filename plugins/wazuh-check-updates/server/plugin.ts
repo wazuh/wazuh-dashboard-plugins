@@ -13,11 +13,7 @@ import {
   AppPluginStartDependencies,
 } from './types';
 import { defineRoutes } from './routes';
-import {
-  availableUpdatesObject,
-  settingsObject,
-  userPreferencesObject,
-} from './services/saved-object/types';
+import { availableUpdatesObject, userPreferencesObject } from './services/saved-object/types';
 import { setCore, setWazuhCore, setInternalSavedObjectsClient } from './plugin-services';
 import { ISecurityFactory, SecurityObj } from './lib/security-factory';
 
@@ -54,7 +50,6 @@ export class WazuhCheckUpdatesPlugin
 
     // Register saved objects types
     core.savedObjects.registerType(availableUpdatesObject);
-    core.savedObjects.registerType(settingsObject);
     core.savedObjects.registerType(userPreferencesObject);
 
     // Register server side APIs

@@ -43,9 +43,11 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
           const update = response.data.data as ResponseApiAvailableUpdates;
 
           const status =
-            update.last_available_patch ||
-            update.last_available_minor ||
-            update.last_available_patch
+            update?.update_check === false
+              ? API_UPDATES_STATUS.DISABLED
+              : update.last_available_patch ||
+                update.last_available_minor ||
+                update.last_available_patch
               ? API_UPDATES_STATUS.AVAILABLE_UPDATES
               : API_UPDATES_STATUS.UP_TO_DATE;
 

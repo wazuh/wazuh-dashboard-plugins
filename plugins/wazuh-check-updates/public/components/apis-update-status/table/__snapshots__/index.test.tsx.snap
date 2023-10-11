@@ -35,7 +35,6 @@ exports[`ApisUpdateTable component should return the ApisUpdateTable component 1
               data-test-subj="tableHeaderCell_api_id_0"
               role="columnheader"
               scope="col"
-              style="width: 100px;"
             >
               <span
                 class="euiTableCellContent"
@@ -53,7 +52,6 @@ exports[`ApisUpdateTable component should return the ApisUpdateTable component 1
               data-test-subj="tableHeaderCell_current_version_1"
               role="columnheader"
               scope="col"
-              style="width: 100px;"
             >
               <span
                 class="euiTableCellContent"
@@ -71,7 +69,6 @@ exports[`ApisUpdateTable component should return the ApisUpdateTable component 1
               data-test-subj="tableHeaderCell_status_2"
               role="columnheader"
               scope="col"
-              style="width: 200px;"
             >
               <span
                 class="euiTableCellContent"
@@ -84,60 +81,6 @@ exports[`ApisUpdateTable component should return the ApisUpdateTable component 1
                 </span>
               </span>
             </th>
-            <th
-              class="euiTableHeaderCell"
-              data-test-subj="tableHeaderCell_last_available_major_3"
-              role="columnheader"
-              scope="col"
-              style="width: 200px;"
-            >
-              <span
-                class="euiTableCellContent"
-              >
-                <span
-                  class="euiTableCellContent__text"
-                  title="Last major"
-                >
-                  Last major
-                </span>
-              </span>
-            </th>
-            <th
-              class="euiTableHeaderCell"
-              data-test-subj="tableHeaderCell_last_available_minor_4"
-              role="columnheader"
-              scope="col"
-              style="width: 200px;"
-            >
-              <span
-                class="euiTableCellContent"
-              >
-                <span
-                  class="euiTableCellContent__text"
-                  title="Last minor"
-                >
-                  Last minor
-                </span>
-              </span>
-            </th>
-            <th
-              class="euiTableHeaderCell"
-              data-test-subj="tableHeaderCell_last_available_patch_5"
-              role="columnheader"
-              scope="col"
-              style="width: 200px;"
-            >
-              <span
-                class="euiTableCellContent"
-              >
-                <span
-                  class="euiTableCellContent__text"
-                  title="Last patch"
-                >
-                  Last patch
-                </span>
-              </span>
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -146,7 +89,6 @@ exports[`ApisUpdateTable component should return the ApisUpdateTable component 1
           >
             <td
               class="euiTableRowCell"
-              style="width: 100px;"
             >
               <div
                 class="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
@@ -165,7 +107,6 @@ exports[`ApisUpdateTable component should return the ApisUpdateTable component 1
             </td>
             <td
               class="euiTableRowCell"
-              style="width: 100px;"
             >
               <div
                 class="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
@@ -184,7 +125,6 @@ exports[`ApisUpdateTable component should return the ApisUpdateTable component 1
             </td>
             <td
               class="euiTableRowCell"
-              style="width: 200px;"
             >
               <div
                 class="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
@@ -192,91 +132,13 @@ exports[`ApisUpdateTable component should return the ApisUpdateTable component 1
                 Update status
               </div>
               <div
-                class="euiTableCellContent euiTableCellContent--overflowingContent"
+                class="euiTableCellContent"
               >
-                <div
-                  class="euiHealth euiHealth--textSizeS"
+                <span
+                  class="euiTableCellContent__text"
                 >
-                  <div
-                    class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
-                  >
-                    <div
-                      class="euiFlexItem euiFlexItem--flexGrowZero"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="euiIcon euiIcon--medium euiIcon--warning euiIcon-isLoading"
-                        focusable="false"
-                        height="16"
-                        role="img"
-                        viewBox="0 0 16 16"
-                        width="16"
-                        xmlns="http://www.w3.org/2000/svg"
-                      />
-                    </div>
-                    <div
-                      class="euiFlexItem euiFlexItem--flexGrowZero"
-                    >
-                      Available updates
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </td>
-            <td
-              class="euiTableRowCell"
-              style="width: 200px;"
-            >
-              <div
-                class="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
-              >
-                Last major
-              </div>
-              <div
-                class="euiTableCellContent euiTableCellContent--overflowingContent"
-              />
-            </td>
-            <td
-              class="euiTableRowCell"
-              style="width: 200px;"
-            >
-              <div
-                class="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
-              >
-                Last minor
-              </div>
-              <div
-                class="euiTableCellContent euiTableCellContent--overflowingContent"
-              />
-            </td>
-            <td
-              class="euiTableRowCell"
-              style="width: 200px;"
-            >
-              <div
-                class="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
-              >
-                Last patch
-              </div>
-              <div
-                class="euiTableCellContent euiTableCellContent--overflowingContent"
-              >
-                <button
-                  aria-label="update-v4.3.8"
-                  class="euiBadge euiBadge-isClickable euiBadge--hollow euiBadge--iconLeft"
-                  style="max-width: max-content;"
-                  title="v4.3.8"
-                >
-                  <span
-                    class="euiBadge__content"
-                  >
-                    <span
-                      class="euiBadge__text"
-                    >
-                      v4.3.8
-                    </span>
-                  </span>
-                </button>
+                  availableUpdates
+                </span>
               </div>
             </td>
           </tr>

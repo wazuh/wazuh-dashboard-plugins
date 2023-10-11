@@ -83,6 +83,7 @@
     "wazuhCheckUpdates.apisUpdateStatus.upToDate": "Up to date",
     "wazuhCheckUpdates.apisUpdateStatus.availableUpdates": "Available updates",
     "wazuhCheckUpdates.apisUpdateStatus.error": "Error checking updates",
+    "wazuhCheckUpdates.apisUpdateStatus.disabled": "Checking updates disabled",
     "wazuhCheckUpdates.apisUpdateStatus.lastCheck": "Last check",
     "wazuhCheckUpdates.apisUpdateStatus.buttonText": "Check updates",
     "wazuhCheckUpdates.apisUpdateStatus.onClickButtonError": "Error trying to get updates",
