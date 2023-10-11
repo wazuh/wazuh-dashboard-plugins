@@ -50,6 +50,9 @@ export const availableUpdatesObject: SavedObjectsType = {
           current_version: {
             type: 'text',
           },
+          update_check: {
+            type: 'boolean',
+          },
           status: {
             type: 'text',
           },
