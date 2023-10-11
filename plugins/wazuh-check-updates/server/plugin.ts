@@ -19,7 +19,6 @@ import {
   userPreferencesObject,
 } from './services/saved-object/types';
 import { setCore, setWazuhCore, setInternalSavedObjectsClient } from './plugin-services';
-import { jobSchedulerRun } from './cronjob';
 import { ISecurityFactory, SecurityObj } from './lib/security-factory';
 
 declare module 'opensearch-dashboards/server' {
@@ -71,9 +70,6 @@ export class WazuhCheckUpdatesPlugin
     setCore(core);
     setWazuhCore(plugins.wazuhCore);
     setInternalSavedObjectsClient(internalSavedObjectsClient);
-
-    // Scheduler
-    jobSchedulerRun();
 
     return {};
   }
