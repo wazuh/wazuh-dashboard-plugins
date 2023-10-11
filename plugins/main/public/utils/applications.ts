@@ -20,10 +20,11 @@ const overview = {
   }),
   euiIconType: 'lensApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/overview/',
 };
 
-const fileIntegrityMonitoring = {
+export const fileIntegrityMonitoring = {
   category: 'wz-category-endpoint-security',
   id: 'file-integrity-monitoring',
   title: i18n.translate('wz-app-file-integrity-monitoring', {
@@ -35,6 +36,7 @@ const fileIntegrityMonitoring = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=fim&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -54,6 +56,7 @@ const endpointSumary = {
   }),
   euiIconType: 'usersRolesApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/agents-preview/',
 };
 
@@ -69,6 +72,7 @@ const malwareDetection = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=pm&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -77,7 +81,7 @@ const malwareDetection = {
     }`,
 };
 
-const configurationAssessment = {
+export const configurationAssessment = {
   category: 'wz-category-endpoint-security',
   id: 'configuration-assessment',
   title: i18n.translate('wz-app-configuration-assessment', {
@@ -89,6 +93,7 @@ const configurationAssessment = {
   }),
   euiIconType: 'managementApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=sca&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -97,11 +102,11 @@ const configurationAssessment = {
     }`,
 };
 
-const threatHunting = {
+export const threatHunting = {
   category: 'wz-category-threat-intelligence',
   id: 'threat-hunting',
   title: i18n.translate('wz-app-threat-hunting', {
-    defaultMessage: 'Threat Hunting',
+    defaultMessage: 'Threat hunting',
   }),
   description: i18n.translate('threat-hunting-description', {
     defaultMessage:
@@ -109,6 +114,7 @@ const threatHunting = {
   }),
   euiIconType: 'securityAnalyticsApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=general&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -117,7 +123,7 @@ const threatHunting = {
     }`,
 };
 
-const vulnerabilityDetection = {
+export const vulnerabilityDetection = {
   category: 'wz-category-threat-intelligence',
   id: 'vulnerability-detection',
   title: i18n.translate('wz-app-vulnerability-detection', {
@@ -129,6 +135,7 @@ const vulnerabilityDetection = {
   }),
   euiIconType: 'heartbeatApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=vuls&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -137,7 +144,7 @@ const vulnerabilityDetection = {
     }`,
 };
 
-const mitreAttack = {
+export const mitreAttack = {
   category: 'wz-category-threat-intelligence',
   id: 'mitre-attack',
   title: i18n.translate('wz-app-mitre-attack', {
@@ -149,6 +156,7 @@ const mitreAttack = {
   }),
   euiIconType: 'grokApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=mitre&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -169,6 +177,7 @@ const virustotal = {
   }),
   euiIconType: 'monitoringApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=virustotal&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -189,6 +198,7 @@ const pciDss = {
   }),
   euiIconType: 'sqlApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=pci&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -209,6 +219,7 @@ const hipaa = {
   }),
   euiIconType: 'monitoringApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=hipaa&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -229,6 +240,7 @@ const gdpr = {
   }),
   euiIconType: 'sqlApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=gdpr&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -249,6 +261,7 @@ const nist80053 = {
   }),
   euiIconType: 'notebookApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=nist&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -269,6 +282,7 @@ const tsc = {
   }),
   euiIconType: 'packetbeatApp',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=tsc&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -289,6 +303,7 @@ const itHygiene = {
   }),
   euiIconType: 'visualizeApp',
   showInOverviewApp: true,
+  showInAgentMenu: false,
   redirectTo: () =>
     `/agents/?tab=welcome${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -309,6 +324,7 @@ const amazonWebServices = {
   }),
   euiIconType: 'logoAWSMono',
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=aws&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -329,6 +345,7 @@ const googleCloud = {
   }),
   euiIconType: LogoGoogleCloud,
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=gcp&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -349,6 +366,7 @@ const github = {
   }),
   euiIconType: LogoGitHub,
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=github&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -368,6 +386,7 @@ const office365 = {
   }),
   euiIconType: LogoOffice365,
   showInOverviewApp: true,
+  showInAgentMenu: false,
   redirectTo: () =>
     `/overview/?tab=office&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -388,6 +407,7 @@ const docker = {
   }),
   euiIconType: LogoDocker,
   showInOverviewApp: true,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=docker&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -407,6 +427,7 @@ const rules = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=ruleset',
 };
 
@@ -421,6 +442,7 @@ const decoders = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=decoders',
 };
 
@@ -435,6 +457,7 @@ const cdbLists = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=lists',
 };
 
@@ -449,6 +472,7 @@ const endpointGroups = {
   }),
   euiIconType: 'usersRolesApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=groups',
 };
 
@@ -463,6 +487,7 @@ const serverStatus = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=status',
 };
 
@@ -477,6 +502,7 @@ const cluster = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=monitoring',
 };
 
@@ -491,6 +517,7 @@ const statistics = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=statistics',
 };
 
@@ -505,6 +532,7 @@ const logs = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=logs',
 };
 
@@ -519,6 +547,7 @@ const reporting = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=reporting',
 };
 
@@ -533,7 +562,7 @@ const settings = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
-  redirectTo: () => '/manager/?tab=configuration',
+  showInAgentMenu: false,
 };
 
 const devTools = {
@@ -547,6 +576,7 @@ const devTools = {
   }),
   euiIconType: 'devToolsApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/wazuh-dev/?tab=devTools',
 };
 
@@ -561,6 +591,7 @@ const rulesetTest = {
   }),
   euiIconType: 'visualizeApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/wazuh-dev/?tab=logtest',
 };
 
@@ -576,6 +607,7 @@ const security = {
   }),
   euiIconType: 'securityAnalyticsApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/security',
 };
 
@@ -590,6 +622,7 @@ const serverApi = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/settings?tab=api',
 };
 
@@ -604,6 +637,7 @@ const serverData = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/settings?tab=sample_data',
 };
 
@@ -618,7 +652,7 @@ const wazuhPluginSettings = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
-  redirectTo: () => '/settings?tab=configuration',
+  showInAgentMenu: false,
 };
 
 const wazuhPluginLogs = {
@@ -632,6 +666,7 @@ const wazuhPluginLogs = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/settings?tab=logs',
 };
 
@@ -646,6 +681,7 @@ const wazuhPluginAbout = {
   }),
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
+  showInAgentMenu: false,
   redirectTo: () => '/settings?tab=about',
 };
 
