@@ -13,14 +13,22 @@ export const useAvailableUpdates = () => {
   const refreshAvailableUpdates = async (forceUpdate = false, returnError = false) => {
     try {
       setIsLoading(true);
+
+      const checkUpdates = sessionStorage.getItem('checkUpdates');
+      const alreadyCheckUpdates = checkUpdates === 'executed';
+
       const response = (await getCore().http.get(routes.checkUpdates, {
         query: {
-          checkAvailableUpdates: forceUpdate,
+          checkAvailableUpdates: forceUpdate || !alreadyCheckUpdates,
         },
       })) as AvailableUpdates;
       setApisAvailableUpdates(response?.apis_available_updates || []);
       setLastCheck(response?.last_check_date);
       setError(undefined);
+
+      if (!alreadyCheckUpdates) {
+        sessionStorage.setItem('checkUpdates', 'executed');
+      }
     } catch (error: any) {
       if (returnError) {
         return error instanceof Error
