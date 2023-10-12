@@ -3,15 +3,16 @@ import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/
 import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 
 const getVisStateFilter = (
+  id: string,
   indexPatternId: string,
   title: string,
   label: string,
   fieldName: string
 ) => {
   return {
-    title: title,
+    id,
+    title,
     type: 'table',
-
     params: {
       perPage: 5,
       percentageCol: '',
@@ -70,6 +71,7 @@ const getVisStateFilter = (
 
 const getVisStateSeverityCritical = (indexPatternId: string) => {
   return {
+    id: 'severity_critical_vulnerabilities',
     title: 'Critical',
     type: 'metric',
     params: {
@@ -84,11 +86,11 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
         colorsRange: [
           {
             from: 0,
-            to: 20,
+            to: 0,
           },
           {
-            from: 41,
-            to: 47,
+            from: 0,
+            to: 0,
           },
         ],
         labels: {
@@ -100,7 +102,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 30,
+          fontSize: 50,
         },
       },
     },
@@ -126,7 +128,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: '',
+            customLabel: ' ',
           },
           schema: 'metric',
         },
@@ -141,7 +143,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"critical"',
                   language: 'kuery',
                 },
-                label: 'Critical Severity Alerts',
+                label: '- Critical Severity Alerts',
               },
             ],
           },
@@ -154,6 +156,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
 
 const getVisStateSeverityHigh = (indexPatternId: string) => {
   return {
+    id: 'severity_high_vulnerabilities',
     title: 'High',
     type: 'metric',
     params: {
@@ -168,11 +171,11 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
         colorsRange: [
           {
             from: 0,
-            to: 50,
+            to: 0,
           },
           {
-            from: 51,
-            to: 100,
+            from: 0,
+            to: 0,
           },
         ],
         labels: {
@@ -184,7 +187,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 30,
+          fontSize: 50,
         },
       },
     },
@@ -216,7 +219,9 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: {},
+          params: {
+            customLabel: ' ',
+          },
           schema: 'metric',
         },
         {
@@ -230,7 +235,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"high"',
                   language: 'kuery',
                 },
-                label: 'High Severity Alerts',
+                label: '- High Severity Alerts',
               },
             ],
           },
@@ -243,6 +248,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
 
 const getVisStateSeverityMedium = (indexPatternId: string) => {
   return {
+    id: 'severity_medium_vulnerabilities',
     title: 'Medium',
     type: 'metric',
     params: {
@@ -257,23 +263,23 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
         colorsRange: [
           {
             from: 0,
-            to: 100,
+            to: 0,
           },
           {
-            from: 100,
-            to: 200,
+            from: 0,
+            to: 0,
           },
         ],
         labels: {
           show: true,
         },
-        invertColors: false,
+        invertColors: true,
         style: {
           bgFill: '#000',
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 30,
+          fontSize: 50,
         },
       },
     },
@@ -298,7 +304,9 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: {},
+          params: {
+            customLabel: ' ',
+          },
           schema: 'metric',
         },
         {
@@ -312,7 +320,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"medium"',
                   language: 'kuery',
                 },
-                label: 'Medium Severity Alerts',
+                label: '- Medium Severity Alerts',
               },
             ],
           },
@@ -325,6 +333,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
 
 const getVisStateSeverityLow = (indexPatternId: string) => {
   return {
+    id: 'severity_low_vulnerabilities',
     title: 'Low',
     type: 'metric',
     params: {
@@ -339,23 +348,23 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
         colorsRange: [
           {
             from: 0,
-            to: 500000,
+            to: 0,
           },
           {
-            from: 500000,
-            to: 500001,
+            from: 0,
+            to: 0,
           },
         ],
         labels: {
           show: true,
         },
-        invertColors: true,
+        invertColors: false,
         style: {
           bgFill: '#000',
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 30,
+          fontSize: 50,
         },
       },
     },
@@ -380,7 +389,9 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: {},
+          params: {
+            customLabel: ' ',
+          },
           schema: 'metric',
         },
         {
@@ -394,7 +405,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"low"',
                   language: 'kuery',
                 },
-                label: 'Low Severity Alerts',
+                label: '- Low Severity Alerts',
               },
             ],
           },
@@ -407,6 +418,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
 
 const getVisStateTopVulnerabilities = (indexPatternId: string) => {
   return {
+    id: 'most_detected_vulnerabilities',
     title: 'Most detected vulnerabilities horizontal',
     type: 'horizontal_bar',
     params: {
@@ -549,6 +561,7 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
 
 const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
   return {
+    id: 'most_vulnerable_endpoints_vulnerabilities',
     title: 'The most vulnerable endpoints horizontal',
     type: 'horizontal_bar',
     params: {
@@ -699,6 +712,7 @@ const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
 
 const getVisStateInventoryTable = (indexPatternId: string) => {
   return {
+    id: 'inventory_table_vulnerabilities',
     title: 'Inventory table',
     type: 'table',
     params: {
@@ -861,6 +875,7 @@ const getVisStateInventoryTable = (indexPatternId: string) => {
 
 const getVisStateOpenVsCloseVulnerabilities = (indexPatternId: string) => {
   return {
+    id: 'open_vs_close_vulnerabilities',
     title: 'Open vs. Close',
     type: 'line',
     params: {
@@ -1010,18 +1025,19 @@ export const getDashboardFilters = (): {
   [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
 } => {
   return {
-    packageSelector: {
+    topPackageSelector: {
       gridData: {
         w: 12,
         h: 12,
         x: 0,
         y: 0,
-        i: 'packageSelector',
+        i: 'topPackageSelector',
       },
       type: 'visualization',
       explicitInput: {
-        id: 'packageSelector',
+        id: 'topPackageSelector',
         savedVis: getVisStateFilter(
+          'topPackageSelector',
           VULNERABILITIES_INDEX_PATTERN_ID,
           'Top Packages vulnerabilities',
           'Package',
@@ -1029,18 +1045,19 @@ export const getDashboardFilters = (): {
         ),
       },
     },
-    packageNameSelector: {
+    topOSVulnerabilities: {
       gridData: {
         w: 12,
         h: 12,
         x: 12,
         y: 0,
-        i: 'packageNameSelector',
+        i: 'topOSVulnerabilities',
       },
       type: 'visualization',
       explicitInput: {
-        id: 'packageNameSelector',
+        id: 'topOSVulnerabilities',
         savedVis: getVisStateFilter(
+          'topOSVulnerabilities',
           VULNERABILITIES_INDEX_PATTERN_ID,
           'Top Operating system vulnerabilities',
           'Operating system',
@@ -1048,18 +1065,19 @@ export const getDashboardFilters = (): {
         ),
       },
     },
-    groupFilter: {
+    topAgentVulnerabilities: {
       gridData: {
         w: 12,
         h: 12,
         x: 24,
         y: 0,
-        i: 'groupFilter',
+        i: 'topAgentVulnerabilities',
       },
       type: 'visualization',
       explicitInput: {
-        id: 'groupFilter',
+        id: 'topAgentVulnerabilities',
         savedVis: getVisStateFilter(
+          'topAgentVulnerabilities',
           VULNERABILITIES_INDEX_PATTERN_ID,
           'Agent filter',
           'Agent',
@@ -1067,18 +1085,19 @@ export const getDashboardFilters = (): {
         ),
       },
     },
-    otherFilter: {
+    topVulnerabilities: {
       gridData: {
         w: 12,
         h: 12,
         x: 36,
         y: 0,
-        i: 'otherFilter',
+        i: 'topVulnerabilities',
       },
       type: 'visualization',
       explicitInput: {
-        id: 'otherFilter',
+        id: 'topVulnerabilities',
         savedVis: getVisStateFilter(
+          'topVulnerabilities',
           VULNERABILITIES_INDEX_PATTERN_ID,
           'Top vulnerabilities',
           'Vulnerability',
@@ -1098,7 +1117,7 @@ export const getDashboardPanels = (): {
         w: 12,
         h: 6,
         x: 0,
-        y: 12,
+        y: 0,
         i: '1',
       },
       type: 'visualization',
@@ -1112,7 +1131,7 @@ export const getDashboardPanels = (): {
         w: 12,
         h: 6,
         x: 12,
-        y: 12,
+        y: 0,
         i: '2',
       },
       type: 'visualization',
@@ -1126,7 +1145,7 @@ export const getDashboardPanels = (): {
         w: 12,
         h: 6,
         x: 24,
-        y: 12,
+        y: 0,
         i: '3',
       },
       type: 'visualization',
@@ -1140,7 +1159,7 @@ export const getDashboardPanels = (): {
         w: 12,
         h: 6,
         x: 36,
-        y: 12,
+        y: 0,
         i: '4',
       },
       type: 'visualization',
@@ -1154,7 +1173,7 @@ export const getDashboardPanels = (): {
         w: 48,
         h: 12,
         x: 0,
-        y: 24,
+        y: 12,
         i: '5',
       },
       type: 'visualization',
@@ -1168,7 +1187,7 @@ export const getDashboardPanels = (): {
         w: 24,
         h: 10,
         x: 0,
-        y: 36,
+        y: 24,
         i: '6',
       },
       type: 'visualization',
@@ -1182,7 +1201,7 @@ export const getDashboardPanels = (): {
         w: 24,
         h: 10,
         x: 24,
-        y: 36,
+        y: 24,
         i: '7',
       },
       type: 'visualization',
@@ -1196,7 +1215,7 @@ export const getDashboardPanels = (): {
         w: 48,
         h: 12,
         x: 0,
-        y: 44,
+        y: 34,
         i: '8',
       },
       type: 'visualization',

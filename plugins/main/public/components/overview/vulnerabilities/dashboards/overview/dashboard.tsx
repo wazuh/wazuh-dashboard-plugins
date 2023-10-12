@@ -22,7 +22,10 @@ export const DashboardVuls: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <SearchBar appName="vulnerability-detector-searchbar" {...searchBarProps} />
+        <SearchBar
+          appName='vulnerability-detector-searchbar'
+          {...searchBarProps}
+        />
       </I18nProvider>
       <DashboardFilters searchBarProps={searchBarProps} />
       <DashboardByRenderer
@@ -44,7 +47,8 @@ export const DashboardVuls: React.FC = () => {
             pause: false,
             value: 15,
           },
-          hidePanelTitles: false,
+          hidePanelTitles: true,
+          disableTriggers: true
         }}
       />
     </>
