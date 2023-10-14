@@ -2,6 +2,16 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.5.3 - OpenSearch Dashboards 2.6.0 - Revision 02-hl
+
+### Added
+
+- Support for Wazuh 4.5.3
+
+### Changed
+
+- Changed the command to install the agent on SUSE uses zypper [#5925](https://github.com/wazuh/wazuh-kibana-app/pull/5925)
+
 ## Wazuh v4.5.2 - OpenSearch Dashboards 2.6.0 - Revision 02-hl
 
 ### Added

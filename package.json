@@ -1,6 +1,6 @@
 {
   "name": "wazuh",
-  "version": "4.5.2",
+  "version": "4.5.3",
   "revision": "02-hl",
   "pluginPlatform": {
     "version": "2.6.0"
