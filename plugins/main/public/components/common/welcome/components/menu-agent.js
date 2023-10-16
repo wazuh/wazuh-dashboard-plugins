@@ -31,7 +31,6 @@ class WzMenuAgent extends Component {
     super(props);
     this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
     this.state = {
-      extensions: [],
       hoverAddFilter: '',
     };
 
@@ -93,14 +92,9 @@ class WzMenuAgent extends Component {
   }
 
   createItems = items => {
-    const keyExists = key => Object.keys(this.state.extensions).includes(key);
-    const keyIsTrue = key => (this.state.extensions || [])[key];
     return items
-      .filter(
-        item =>
-          hasAgentSupportModule(this.props.currentAgentData, item.id) &&
-          Object.keys(this.state.extensions).length &&
-          (!keyExists(item.id) || keyIsTrue(item.id)),
+      .filter(item =>
+        hasAgentSupportModule(this.props.currentAgentData, item.id),
       )
       .map(item => this.createItem(item));
   };
@@ -197,33 +191,31 @@ class WzMenuAgent extends Component {
 
     return (
       <div className='WzManagementSideMenu'>
-        {(Object.keys(this.state.extensions).length && (
-          <div>
-            <EuiFlexGrid columns={2}>
-              <EuiFlexItem>
-                <EuiSideNav
-                  items={securityInformation}
-                  style={{ padding: '4px 12px' }}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiSideNav
-                  items={threatDetection}
-                  style={{ padding: '4px 12px' }}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiSideNav
-                  items={regulatoryCompliance}
-                  style={{ padding: '4px 12px' }}
-                />
-              </EuiFlexItem>
-            </EuiFlexGrid>
-          </div>
-        )) || <div style={{ width: 300 }}></div>}
+        <div>
+          <EuiFlexGrid columns={2}>
+            <EuiFlexItem>
+              <EuiSideNav
+                items={securityInformation}
+                style={{ padding: '4px 12px' }}
+              />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiSideNav
+                items={threatDetection}
+                style={{ padding: '4px 12px' }}
+              />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiSideNav
+                items={regulatoryCompliance}
+                style={{ padding: '4px 12px' }}
+              />
+            </EuiFlexItem>
+          </EuiFlexGrid>
+        </div>
       </div>
     );
   }

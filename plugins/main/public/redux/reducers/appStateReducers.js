@@ -15,7 +15,6 @@ const initialState = {
   showMenu: false,
   wazuhNotReadyYet: '',
   currentTab: '',
-  extensions: {},
   selected_settings_section: '',
   currentPlatform: false,
   currentAgentData: JSON.parse(
@@ -57,13 +56,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       currentTab: action.currentTab,
-    };
-  }
-
-  if (action.type === 'UPDATE_EXTENSIONS') {
-    return {
-      ...state,
-      extensions: action.extensions,
     };
   }
 

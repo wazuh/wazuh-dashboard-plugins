@@ -73,10 +73,6 @@ export const OverviewWelcome = compose(
     constructor(props) {
       super(props);
       this.strtools = new StringsTools();
-
-      this.state = {
-        extensions: this.props.extensions,
-      };
     }
 
     buildTabCard(tab, icon) {

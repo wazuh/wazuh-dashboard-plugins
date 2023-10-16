@@ -40,7 +40,6 @@ export function WazuhApiRoutes(router: IRouter) {
           //   cluster: schema.string()
           // }),
           // run_as: schema.boolean(),
-          // extensions: schema.any(),
           // allow_run_as: schema.number()
         }),
       },

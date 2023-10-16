@@ -50,7 +50,11 @@ import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
-import { withErrorBoundary, withGlobalBreadcrumb, withReduxProvider } from '../hocs';
+import {
+  withErrorBoundary,
+  withGlobalBreadcrumb,
+  withReduxProvider,
+} from '../hocs';
 import { compose } from 'redux';
 import {
   API_NAME_AGENT_STATUS,
@@ -87,7 +91,6 @@ export const AgentsWelcome = compose(
       this.offset = 275;
 
       this.state = {
-        extensions: this.props.extensions,
         lastScans: [],
         isLoading: true,
         sortField: 'start_scan',
@@ -181,32 +184,6 @@ export const AgentsWelcome = compose(
       };
 
       let menuAgent = JSON.parse(window.localStorage.getItem('menuAgent'));
-
-      // Check if pinned modules to agent menu are enabled in Settings/Modules, if not then modify localstorage removing the disabled modules
-      if (menuAgent) {
-        const needUpdateMenuAgent = Object.keys(menuAgent)
-          .map(moduleName => menuAgent[moduleName])
-          .reduce((accum, item) => {
-            if (
-              typeof this.props.extensions[item.id] !== 'undefined' &&
-              this.props.extensions[item.id] === false
-            ) {
-              delete menuAgent[item.id];
-              accum = true;
-            }
-            return accum;
-          }, false);
-        if (needUpdateMenuAgent) {
-          // Update the pinned modules matching to enabled modules in Setings/Modules
-          window.localStorage.setItem('menuAgent', JSON.stringify(menuAgent));
-        }
-      } else {
-        menuAgent = defaultMenuAgents;
-        window.localStorage.setItem(
-          'menuAgent',
-          JSON.stringify(defaultMenuAgents),
-        );
-      }
       this.setState({ menuAgent: menuAgent });
     }
 

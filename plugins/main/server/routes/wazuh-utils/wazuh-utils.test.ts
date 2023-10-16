@@ -364,30 +364,6 @@ hosts:
     ${'enrollment.password'}            | ${''}                                                            | ${400}             | ${'[request body.enrollment.password]: Value can not be empty.'}
     ${'enrollment.password'}            | ${'test space'}                                                  | ${200}             | ${null}
     ${'enrollment.password'}            | ${true}                                                          | ${400}             | ${'[request body.enrollment.password]: expected value of type [string] but got [boolean]'}
-    ${'extensions.audit'}               | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.audit'}               | ${0}                                                             | ${400}             | ${'[request body.extensions.audit]: expected value of type [boolean] but got [number]'}
-    ${'extensions.aws'}                 | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.aws'}                 | ${0}                                                             | ${400}             | ${'[request body.extensions.aws]: expected value of type [boolean] but got [number]'}
-    ${'extensions.ciscat'}              | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.ciscat'}              | ${0}                                                             | ${400}             | ${'[request body.extensions.ciscat]: expected value of type [boolean] but got [number]'}
-    ${'extensions.gcp'}                 | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.gcp'}                 | ${0}                                                             | ${400}             | ${'[request body.extensions.gcp]: expected value of type [boolean] but got [number]'}
-    ${'extensions.gdpr'}                | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.gdpr'}                | ${0}                                                             | ${400}             | ${'[request body.extensions.gdpr]: expected value of type [boolean] but got [number]'}
-    ${'extensions.hipaa'}               | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.hipaa'}               | ${0}                                                             | ${400}             | ${'[request body.extensions.hipaa]: expected value of type [boolean] but got [number]'}
-    ${'extensions.nist'}                | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.nist'}                | ${0}                                                             | ${400}             | ${'[request body.extensions.nist]: expected value of type [boolean] but got [number]'}
-    ${'extensions.oscap'}               | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.oscap'}               | ${0}                                                             | ${400}             | ${'[request body.extensions.oscap]: expected value of type [boolean] but got [number]'}
-    ${'extensions.osquery'}             | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.osquery'}             | ${0}                                                             | ${400}             | ${'[request body.extensions.osquery]: expected value of type [boolean] but got [number]'}
-    ${'extensions.pci'}                 | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.pci'}                 | ${0}                                                             | ${400}             | ${'[request body.extensions.pci]: expected value of type [boolean] but got [number]'}
-    ${'extensions.tsc'}                 | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.tsc'}                 | ${0}                                                             | ${400}             | ${'[request body.extensions.tsc]: expected value of type [boolean] but got [number]'}
-    ${'extensions.virustotal'}          | ${true}                                                          | ${200}             | ${null}
-    ${'extensions.virustotal'}          | ${0}                                                             | ${400}             | ${'[request body.extensions.virustotal]: expected value of type [boolean] but got [number]'}
     ${'ip.ignore'}                      | ${['test']}                                                      | ${200}             | ${null}
     ${'ip.ignore'}                      | ${['test*']}                                                     | ${200}             | ${null}
     ${'ip.ignore'}                      | ${['']}                                                          | ${400}             | ${'[request body.ip.ignore.0]: Value can not be empty.'}
