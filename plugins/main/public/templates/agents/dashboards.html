@@ -4,35 +4,17 @@
     ng-show="load && tab !== 'configuration' && tab !== 'sca' && tabView === 'panels'"
     ng-style="tab === 'welcome' && {'padding':16}"
   >
-    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}"></react-component>
+    <react-component
+      name="EuiProgress"
+      props="{size: 'xs', color: 'primary'}"
+    ></react-component>
   </div>
   <!-- end head -->
 
   <!-- agents-welcome -->
   <div ng-if="tab === 'welcome'">
-    <div layout="column" layout-align="start stretch" ng-show="!load && !agent">
-      <div layout="row" class="layout-padding">
-        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card" flex>
-          <md-card-content class="wz-text-center">
-            <div layout="row" layout-padding>
-              <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
-              <span
-                class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
-                >Could not fetch data for this agent.
-                <span ng-if="emptyAgent">Reason: {{emptyAgent}}</span></span
-              >
-            </div>
-            <div layout="row" layout-padding ng-if="emptyAgent">
-              <span class="cursor-pointer" ng-click="getAgent()"
-                ><i class="fa fa-fw fa-refresh" aria-hidden="true"></i> Try again</span
-              >
-            </div>
-          </md-card-content>
-        </div>
-      </div>
-    </div>
-    <div ng-show="!load && agent">
-      <div ng-if="welcomeCardsProps">
+    <div ng-show="!load">
+      <div>
         <react-component
           name="AgentsWelcome"
           props="getWelcomeCardsProps(resultState)"
@@ -43,7 +25,9 @@
   <!-- end agents-welcome -->
   <!-- agents module -->
   <div ng-if="agent">
-    <div ng-if="tab !== 'welcome' && agent && agent.status !== 'never_connected'">
+    <div
+      ng-if="tab !== 'welcome' && agent && agent.status !== 'never_connected'"
+    >
       <react-component
         name="MainModule"
         props="{agent, section: tab, disabledReport: resultState !== 'ready', cardsProps: getWelcomeCardsProps(resultState), goGroups: goGroups, exportConfiguration: exportConfiguration}"
@@ -68,7 +52,9 @@
       ng-if="tabView === 'panels' && !showMitre && showModuleDashboard && !rendered && resultState !== 'none'"
       class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
     >
-      <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+      <div
+        class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center"
+      >
         <div class="euiSpacer euiSpacer--m"></div>
         <span class="euiLoadingChart euiLoadingChart--large">
           <span class="euiLoadingChart__bar"></span>
@@ -86,7 +72,9 @@
       ng-if="reportBusy && reportStatus && showModuleDashboard"
       class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
     >
-      <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+      <div
+        class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center"
+      >
         <div class="euiSpacer euiSpacer--m"></div>
         <span class="euiLoadingChart euiLoadingChart--large">
           <span class="euiLoadingChart__bar"></span>
@@ -127,13 +115,23 @@
   </div>
   <!-- end agents module -->
   <!-- agents syscollector -->
-  <div ng-if="tab === 'syscollector'" ng-show="!load" class="euiPageBody wz-module-body-main">
-    <react-component name="MainSyscollector" props="{agent: agent}"></react-component>
+  <div
+    ng-if="tab === 'syscollector'"
+    ng-show="!load"
+    class="euiPageBody wz-module-body-main"
+  >
+    <react-component
+      name="MainSyscollector"
+      props="{agent: agent}"
+    ></react-component>
   </div>
   <!-- end agents syscollector-->
   <!-- agents stats -->
   <div ng-if="tab === 'stats'" class="euiPageBody wz-module-body-main">
-    <react-component name="MainAgentStats" props="{agent: agent}"></react-component>
+    <react-component
+      name="MainAgentStats"
+      props="{agent: agent}"
+    ></react-component>
   </div>
   <!-- end agents stats-->
   <react-component

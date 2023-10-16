@@ -63,6 +63,9 @@ export class AgentsController {
     this.csvReq = csvReq;
     this.wazuhConfig = new WazuhConfig();
     this.genericReq = GenericRequest;
+    this.$scope.$watch('tab', function (newValue, oldValue) {
+      console.log('tab changed', { newValue, oldValue });
+    });
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -608,6 +611,19 @@ export class AgentsController {
       const globalAgent = this.shareAgent.getAgent();
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
+
+      if (!id) {
+        this.$scope.load = false;
+        // We set some properties used by the rendered component to work and allowing
+        // to manage when there is not selected agent.
+        await this.$scope.switchTab(this.$scope.tab, true);
+        this.loadWelcomeCardsProps();
+        this.$scope.getWelcomeCardsProps = resultState => {
+          return { ...this.$scope.welcomeCardsProps, resultState };
+        };
+        this.$scope.$applyAsync();
+        return;
+      }
 
       const data = await WzRequest.apiReq('GET', `/agents`, {
         params: {

@@ -77,7 +77,7 @@ export class CommonData {
    */
   removeDuplicateRuleGroups(group) {
     if (!this.globalState || !this.globalState.filters) return;
-    const globalRuleGroupFilters = this.globalState.filters.map((item) => {
+    const globalRuleGroupFilters = this.globalState.filters.map(item => {
       if (
         item.query &&
         item.query.match &&
@@ -101,7 +101,7 @@ export class CommonData {
    */
   removeDuplicateExists(condition) {
     if (!this.globalState || !this.globalState.filters) return;
-    const globalRuleExistsFilters = this.globalState.filters.map((item) => {
+    const globalRuleExistsFilters = this.globalState.filters.map(item => {
       if (item.exists && item.exists.field) {
         return item.exists.field;
       }
@@ -110,7 +110,10 @@ export class CommonData {
     });
 
     if (globalRuleExistsFilters.includes(condition)) {
-      this.globalState.filters.splice(globalRuleExistsFilters.indexOf(condition), 1);
+      this.globalState.filters.splice(
+        globalRuleExistsFilters.indexOf(condition),
+        1,
+      );
     }
   }
 
@@ -144,16 +147,18 @@ export class CommonData {
         osquery: { group: 'osquery' },
         sca: { group: 'sca' },
         docker: { group: 'docker' },
-        github: { group: 'github' }
+        github: { group: 'github' },
       };
 
       const filters = [];
       const isCluster = AppState.getClusterInfo().status == 'enabled';
       filters.push(
         filterHandler.managerQuery(
-          isCluster ? AppState.getClusterInfo().cluster : AppState.getClusterInfo().manager,
           isCluster
-        )
+            ? AppState.getClusterInfo().cluster
+            : AppState.getClusterInfo().manager,
+          isCluster,
+        ),
       );
       if (tab !== 'general' && tab !== 'welcome') {
         if (tab === 'pci') {
@@ -187,7 +192,10 @@ export class CommonData {
         let filter = filterHandler.ruleIdQuery(id);
         filter.$state.isImplicit = false;
         filters.push(filter);
-        this.$window.location.href = this.$window.location.href.replace(regex, '');
+        this.$window.location.href = this.$window.location.href.replace(
+          regex,
+          '',
+        );
       }
 
       if (agent) filters.push(filterHandler.agentQuery(agent));
@@ -195,7 +203,9 @@ export class CommonData {
       const discoverScope = await ModulesHelper.getDiscoverScope();
       discoverScope.loadFilters(filters, tab);
     } catch (error) {
-      throw new Error('An error occurred while creating custom filters for visualizations');
+      throw new Error(
+        'An error occurred while creating custom filters for visualizations',
+      );
     }
   }
 
@@ -203,7 +213,8 @@ export class CommonData {
     var rtn = sourceURL.split('?')[0],
       param,
       params_arr = [],
-      queryString = sourceURL.indexOf('?') !== -1 ? sourceURL.split('?')[1] : '';
+      queryString =
+        sourceURL.indexOf('?') !== -1 ? sourceURL.split('?')[1] : '';
     if (queryString !== '') {
       params_arr = queryString.split('&');
       for (var i = params_arr.length - 1; i >= 0; i -= 1) {
@@ -335,7 +346,8 @@ export class CommonData {
     };
 
     if (result.end && result.start) {
-      result.duration = (new Date(result.end) - new Date(result.start)) / 1000 / 60;
+      result.duration =
+        (new Date(result.end) - new Date(result.start)) / 1000 / 60;
       result.duration = Math.round(result.duration * 100) / 100;
       if (result.duration <= 0) {
         result.inProgress = true;
@@ -387,8 +399,9 @@ export class CommonData {
         return this.$location.search().agent;
       } else {
         this.shareAgent.deleteAgent();
-        this.$location.search('agent', globalAgent.id);
-        return globalAgent.id;
+        const agentId = globalAgent?.id || null;
+        agentId && this.$location.search('agent', agentId);
+        return agentId;
       }
     }
   }
@@ -427,11 +440,11 @@ export class CommonData {
   }
 
   getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {
-    const keyExists = (key) => Object.keys(extensions).includes(key);
-    const keyIsTrue = (key) => (extensions || [])[key];
+    const keyExists = key => Object.keys(extensions).includes(key);
+    const keyIsTrue = key => (extensions || [])[key];
 
     let tabs = [];
-    currentPanel.forEach((x) => {
+    currentPanel.forEach(x => {
       if (!keyExists(x) || keyIsTrue(x)) {
         tabs.push({
           id: x,

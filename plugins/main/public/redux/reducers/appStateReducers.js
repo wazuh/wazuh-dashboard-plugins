@@ -21,7 +21,6 @@ const initialState = {
   currentAgentData: JSON.parse(
     window.sessionStorage.getItem('wz-shared-selected-agent') || '{}',
   ),
-  showExploreAgentModal: false,
   showExploreAgentModalGlobal: false,
   userPermissions: false,
   userRoles: [],
@@ -82,13 +81,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       currentAgentData: action.currentAgentData,
-    };
-  }
-
-  if (action.type === 'SHOW_EXPLORE_AGENT_MODAL') {
-    return {
-      ...state,
-      showExploreAgentModal: action.showExploreAgentModal,
     };
   }
 

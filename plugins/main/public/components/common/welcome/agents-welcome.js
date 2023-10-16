@@ -47,12 +47,16 @@ import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
 import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
-import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
+import {
+  showExploreAgentModalGlobal,
+  updateCurrentAgentData,
+} from '../../../redux/actions/appStateActions';
 import { getAngularModule, getCore } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import {
   withErrorBoundary,
   withGlobalBreadcrumb,
+  withGuard,
   withReduxProvider,
 } from '../hocs';
 import { compose } from 'redux';
@@ -62,22 +66,42 @@ import {
 } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+import { PromptNoSelectedAgent } from '../../agents/prompts';
+import { connect } from 'react-redux';
+
+const mapStateToProps = state => ({
+  agent: state.appStateReducers.currentAgentData,
+});
+
+const mapDispatchToProps = dispatch => ({
+  showExploreAgentModalGlobal: data =>
+    dispatch(showExploreAgentModalGlobal(data)),
+});
 
 export const AgentsWelcome = compose(
   withReduxProvider,
   withErrorBoundary,
+  connect(mapStateToProps, mapDispatchToProps),
   withGlobalBreadcrumb(({ agent }) => {
     return [
       { text: '' },
       {
         text: 'IT Hygiene',
       },
-      {
-        text: `${agent.name}`,
-        truncate: true,
-      },
+      ...(agent?.name
+        ? [
+            {
+              text: `${agent.name}`,
+              truncate: true,
+            },
+          ]
+        : []),
     ];
   }),
+  withGuard(
+    props => !(props.agent && props.agent.id),
+    () => <PromptNoSelectedAgent body='You need to select an agent.' />,
+  ),
 )(
   class AgentsWelcome extends Component {
     _isMount = false;
@@ -336,6 +360,13 @@ export const AgentsWelcome = compose(
                 </EuiFlexItem>
               )}
               <EuiFlexItem className='wz-agent-empty-item'></EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <EuiButtonEmpty
+                  onClick={this.props.showExploreAgentModalGlobal}
+                >
+                  Explore agent
+                </EuiButtonEmpty>
+              </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
                   iconType='inspect'

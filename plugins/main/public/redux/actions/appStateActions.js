@@ -17,7 +17,7 @@
 export const updateCurrentApi = currentAPI => {
   return {
     type: 'UPDATE_CURRENT_API',
-    currentAPI: currentAPI
+    currentAPI: currentAPI,
   };
 };
 
@@ -28,7 +28,7 @@ export const updateCurrentApi = currentAPI => {
 export const updateShowMenu = showMenu => {
   return {
     type: 'SHOW_MENU',
-    showMenu: showMenu
+    showMenu: showMenu,
   };
 };
 
@@ -39,7 +39,7 @@ export const updateShowMenu = showMenu => {
 export const updateWazuhNotReadyYet = wazuhNotReadyYet => {
   return {
     type: 'UPDATE_WAZUH_NOT_READY_YET',
-    wazuhNotReadyYet: wazuhNotReadyYet
+    wazuhNotReadyYet: wazuhNotReadyYet,
   };
 };
 
@@ -50,10 +50,9 @@ export const updateWazuhNotReadyYet = wazuhNotReadyYet => {
 export const updateCurrentTab = currentTab => {
   return {
     type: 'UPDATE_WAZUH_CURRENT_TAB',
-    currentTab: currentTab
+    currentTab: currentTab,
   };
 };
-
 
 /**
  * Updates extensions in the appState store
@@ -64,7 +63,7 @@ export const updateExtensions = (id, extensions) => {
   tmpExtensions[id] = extensions;
   return {
     type: 'UPDATE_EXTENSIONS',
-    extensions: tmpExtensions
+    extensions: tmpExtensions,
   };
 };
 
@@ -75,43 +74,29 @@ export const updateExtensions = (id, extensions) => {
 export const updateCurrentPlatform = currentPlatform => {
   return {
     type: 'UPDATE_CURRENT_PLATFORM',
-    currentPlatform
+    currentPlatform,
   };
 };
-
 
 /**
  * Updates currentAgentData in the appState store
  * @param extensions
  */
-export const updateCurrentAgentData = (data) => {
+export const updateCurrentAgentData = data => {
   return {
     type: 'UPDATE_SELECTED_AGENT_DATA',
-    currentAgentData: data
+    currentAgentData: data,
   };
 };
-
-
-/**
- * Updates showExploreAgentModal in the appState store
- * @param extensions
- */
-export const showExploreAgentModal = (shouldShow) => {
-  return {
-    type: 'SHOW_EXPLORE_AGENT_MODAL',
-    showExploreAgentModal: shouldShow
-  };
-};
-
 
 /**
  * Updates showExploreAgentModalGlobal in the appState store
  * @param extensions
  */
-export const showExploreAgentModalGlobal = (shouldShow) => {
+export const showExploreAgentModalGlobal = shouldShow => {
   return {
     type: 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL',
-    showExploreAgentModalGlobal: shouldShow
+    showExploreAgentModalGlobal: shouldShow,
   };
 };
 
@@ -122,7 +107,7 @@ export const showExploreAgentModalGlobal = (shouldShow) => {
 export const updateUserRoles = userRoles => {
   return {
     type: 'UPDATE_USER_ROLES',
-    userRoles
+    userRoles,
   };
 };
 
@@ -133,19 +118,19 @@ export const updateUserRoles = userRoles => {
 export const updateUserPermissions = userPermissions => {
   return {
     type: 'UPDATE_USER_PERMISSIONS',
-    userPermissions
+    userPermissions,
   };
 };
 
 /**
-* Updates selectedSettingsSection in the appState store
-* @param selected_settings_section
-*/
+ * Updates selectedSettingsSection in the appState store
+ * @param selected_settings_section
+ */
 export const updateSelectedSettingsSection = selected_settings_section => {
- return {
-   type: 'UPDATE_SELECTED_SETTINGS_SECTION',
-   selected_settings_section
- };
+  return {
+    type: 'UPDATE_SELECTED_SETTINGS_SECTION',
+    selected_settings_section,
+  };
 };
 
 /**
@@ -155,18 +140,18 @@ export const updateSelectedSettingsSection = selected_settings_section => {
 export const updateSelectedToolsSection = selected_tools_section => {
   return {
     type: 'UPDATE_SELECTED_TOOLS_SECTION',
-    selected_tools_section
+    selected_tools_section,
   };
 };
 
 /**
-* Updates toastNotification in the appState store
-* @param toastNotification
-*/
+ * Updates toastNotification in the appState store
+ * @param toastNotification
+ */
 export const updateToastNotificationsModal = toastNotification => {
   return {
     type: 'UPDATE_TOAST_NOTIFICATIONS_MODAL',
-    toastNotification
+    toastNotification,
   };
 };
 
@@ -174,10 +159,10 @@ export const updateToastNotificationsModal = toastNotification => {
  * Updates showFlyoutLogtest in the appState store
  * @param showFlyout
  */
-export const showFlyoutLogtest = (showFlyout) => {
+export const showFlyoutLogtest = showFlyout => {
   return {
     type: 'SHOW_FLYOUT_LOGTEST',
-    showFlyoutLogtest: showFlyout
+    showFlyoutLogtest: showFlyout,
   };
 };
 
@@ -185,10 +170,10 @@ export const showFlyoutLogtest = (showFlyout) => {
  * Updates dockedFlyoutLogtest in the appState store
  * @param dockedFlyout
  */
-export const updateDockedLogtest = (dockedFlyout) => {
+export const updateDockedLogtest = dockedFlyout => {
   return {
     type: 'UPDATE_DOCKED_LOGTEST',
-    dockedFlyoutLogtest: dockedFlyout
+    dockedFlyoutLogtest: dockedFlyout,
   };
 };
 
@@ -196,13 +181,12 @@ export const updateDockedLogtest = (dockedFlyout) => {
  * Updates the status of whether the user is logged in
  * @param withUserLogged
  */
-export const updateWithUserLogged = (withUserLogged) => {
+export const updateWithUserLogged = withUserLogged => {
   return {
     type: 'UPDATE_WITH_USER_LOGGED',
-   withUserLogged,
+    withUserLogged,
   };
 };
-
 
 /**
  * Updates allowedAgents in the appState store
@@ -211,7 +195,7 @@ export const updateWithUserLogged = (withUserLogged) => {
 export const updateAllowedAgents = allowedAgents => {
   return {
     type: 'GET_ALLOWED_AGENTS',
-    allowedAgents
+    allowedAgents,
   };
 };
 
@@ -219,9 +203,9 @@ export const updateAllowedAgents = allowedAgents => {
  * Updates logtestToken in the appState store
  * @param logtestToken
  */
-export const updateLogtestToken = (logtestToken) => {
+export const updateLogtestToken = logtestToken => {
   return {
     type: 'UPDATE_LOGTEST_TOKEN',
-    logtestToken: logtestToken
+    logtestToken: logtestToken,
   };
 };
