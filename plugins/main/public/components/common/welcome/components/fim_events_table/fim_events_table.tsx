@@ -89,7 +89,7 @@ function FimTable({ agent }) {
   const timeFilter = useTimeFilter();
   useEffect(() => {
     getFimAlerts(agent.id, timeFilter, sort).then(setFimAlerts);
-  }, [timeFilter, sort]);
+  }, [timeFilter, sort, agent.id]);
   return (
     <Fragment>
       <EuiBasicTable

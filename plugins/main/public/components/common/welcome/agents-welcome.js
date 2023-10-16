@@ -60,10 +60,7 @@ import {
   withReduxProvider,
 } from '../hocs';
 import { compose } from 'redux';
-import {
-  API_NAME_AGENT_STATUS,
-  WAZUH_AGENTS_OS_TYPE,
-} from '../../../../common/constants';
+import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { PromptNoSelectedAgent } from '../../agents/prompts';
@@ -415,19 +412,19 @@ export const AgentsWelcome = compose(
                 <EuiFlexItem>
                   <h2 className='embPanel__title wz-headline-title'>
                     <EuiText size='xs'>
-                      <h2>MITRE</h2>
+                      <h2>MITRE ATT&CK</h2>
                     </EuiText>
                   </h2>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
-                  <EuiToolTip position='top' content='Open MITRE'>
+                  <EuiToolTip position='top' content='Open MITRE ATT&CK'>
                     <EuiButtonIcon
                       iconType='popout'
                       color='primary'
                       onClick={() => {
                         getCore().application.navigateToApp('mitre-attack');
                       }}
-                      aria-label='Open MITRE'
+                      aria-label='Open MITRE ATT&CK'
                     />
                   </EuiToolTip>
                 </EuiFlexItem>
