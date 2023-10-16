@@ -155,6 +155,15 @@ export function jobInitializeRun(context) {
         packageJSON.revision !== source.revision ||
         packageJSON.version !== source['app-version'];
 
+      // Generate the hosts data
+      const registryHostsData = Object.entries(source.hosts).reduce(
+        (accum, [hostID, hostData]) => {
+          accum[hostID] = hostData;
+          return accum;
+        },
+        {},
+      );
+
       // Rebuild the registry file if revision or version fields are differents
       if (isUpgradedApp) {
         log(
