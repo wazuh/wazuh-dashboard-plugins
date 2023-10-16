@@ -56,7 +56,7 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
       checkLogger.info(`Valid index patterns found: ${listValidIndexPatterns.length || 0}`);
       if(!AppState.getCurrentPattern()){
         // Check the index pattern saved objects can be found using `GET /api/saved_objects/_find` endpoint.
-        // Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+        // Related issue: https://github.com/wazuh/wazuh-dashboard-plugins/issues/4293
         await validateIntegritySavedObjects([defaultPatternId], checkLogger);
 
         AppState.setCurrentPattern(defaultPatternId);
@@ -76,7 +76,7 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
       const indexPatternID = listValidIndexPatterns[0].id;
 
       // Check the index pattern saved objects can be found using `GET /api/saved_objects/_find` endpoint.
-        // Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+      // Related issue: https://github.com/wazuh/wazuh-dashboard-plugins/issues/4293
       await validateIntegritySavedObjects([indexPatternID], checkLogger);
 
       AppState.setCurrentPattern(indexPatternID);
@@ -102,7 +102,7 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
       checkLogger.info(`Index pattern id exists [${defaultPatternId}]: ${indexPatternDefaultFound ? 'yes': 'no'}`);
       if(indexPatternDefaultFound){
         // Check the index pattern saved objects can be found using `GET /api/saved_objects/_find` endpoint.
-        // Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+        // Related issue: https://github.com/wazuh/wazuh-dashboard-plugins/issues/4293
         await validateIntegritySavedObjects([indexPatternDefaultFound.id], checkLogger);
 
         AppState.setCurrentPattern(indexPatternDefaultFound.id);
@@ -117,7 +117,7 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
 };
 
 // Check the index pattern saved objects can be found using `GET /api/saved_objects/_find` endpoint.
-// Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+// Related issue: https://github.com/wazuh/wazuh-dashboard-plugins/issues/4293
 const validateIntegritySavedObjects = async (indexPatternSavedObjectIDs: string[], checkLogger: CheckLogger): Promise<void> => {
   checkLogger.info(`Checking the integrity of saved objects. Validating ${indexPatternSavedObjectIDs.join(',')} can be found...`);
   await SavedObject.validateIndexPatternSavedObjectCanBeFound(indexPatternSavedObjectIDs);

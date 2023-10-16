@@ -281,7 +281,7 @@ export class SavedObject {
 
   /**
    * Check if it exists the index pattern saved objects using the `GET /api/saved_objects/_find` endpoint.
-   * It is usefull to validate if the endpoint works as expected. Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+   * It is usefull to validate if the endpoint works as expected. Related issue: https://github.com/wazuh/wazuh-dashboard-plugins/issues/4293
    * @param {string[]} indexPatternIDs
    */
   static async validateIndexPatternSavedObjectCanBeFound(indexPatternIDs){

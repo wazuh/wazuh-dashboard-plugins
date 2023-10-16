@@ -49,7 +49,7 @@ export const checkPatternSupportService = (pattern: string, indexType : string) 
 
   const indexPatternSavedObjectIDs = [pattern];
   // Check the index pattern saved objects can be found using `GET /api/saved_objects/_find` endpoint.
-  // Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+  // Related issue: https://github.com/wazuh/wazuh-dashboard-plugins/issues/4293
   checkLogger.info(`Checking the integrity of saved objects. Validating ${indexPatternSavedObjectIDs.join(',')} can be found...`);
   await SavedObject.validateIndexPatternSavedObjectCanBeFound(indexPatternSavedObjectIDs);
   checkLogger.info('Integrity of saved objects: [ok]');

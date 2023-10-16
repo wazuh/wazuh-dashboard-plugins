@@ -30,4 +30,4 @@ Example:
 
 ### Supported versions
 
-Same as on [previous releases](https://github.com/wazuh/wazuh-kibana-app/wiki/Compatibility)
+Same as on [previous releases](https://github.com/wazuh/wazuh-dashboard-plugins/wiki/Compatibility)
