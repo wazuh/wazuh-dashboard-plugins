@@ -198,7 +198,9 @@ export const MitreTopTactics = ({ agentId }) => {
     <EuiEmptyPrompt
       iconType='stats'
       title={<h4>No results</h4>}
-      body={<p>No Mitre results were found in the selected time range.</p>}
+      body={
+        <p>No MITRE ATT&CK results were found in the selected time range.</p>
+      }
     />
   );
 
