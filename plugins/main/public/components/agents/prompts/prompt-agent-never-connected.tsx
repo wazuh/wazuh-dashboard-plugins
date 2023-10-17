@@ -12,9 +12,9 @@
 
 import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiButton, EuiLink } from '@elastic/eui';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { useDispatch } from 'react-redux';
-import { showExploreAgentModalGlobal } from '../../../../../redux/actions/appStateActions';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { showExploreAgentModalGlobal } from '../../../redux/actions/appStateActions';
 
 const documentationLink = webDocumentationLink(
   'user-manual/agents/agent-connection.html',

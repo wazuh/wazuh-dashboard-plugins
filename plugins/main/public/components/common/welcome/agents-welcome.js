@@ -167,6 +167,8 @@ export const AgentsWelcome = compose(
 
     async componentDidMount() {
       this._isMount = true;
+      /* WORKAROUND: ensure the $scope.agent is synced with the agent stored in Redux (this.props.agent). See agents.js controller.
+       */
       this.props.setAgent(this.props.agent);
       this.updateMenuAgents();
       this.updateWidth();
@@ -189,6 +191,8 @@ export const AgentsWelcome = compose(
     }
 
     componentDidUpdate(prevProps) {
+      /* WORKAROUND: ensure the $scope.agent is synced with the agent stored in Redux (this.props.agent). See agents.js controller.
+       */
       if (prevProps.agent.id !== this.props.agent.id) {
         this.props.setAgent(this.props.agent);
       }
