@@ -47,8 +47,8 @@ export const DashboardVuls: React.FC = () => {
             pause: false,
             value: 15,
           },
-          hidePanelTitles: true,
-          disableTriggers: true
+          hidePanelTitles: false,
+          disableTriggers: true,
         }}
       />
     </>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { getPlugins } from '../../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../../src/plugins/embeddable/public';
-import { getDashboardFilters } from '../dashboard-panels';
 import './vulnerability-detector-filters.scss';
+import { getDashboardFilters } from './dashboard-panels-filters';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;

@@ -2,73 +2,6 @@ import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboa
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 
-const getVisStateFilter = (
-  id: string,
-  indexPatternId: string,
-  title: string,
-  label: string,
-  fieldName: string
-) => {
-  return {
-    id,
-    title,
-    type: 'table',
-    params: {
-      perPage: 5,
-      percentageCol: '',
-      row: true,
-      showMetricsAtAllLevels: false,
-      showPartialRows: false,
-      showTotal: false,
-      totalFunc: 'sum',
-    },
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {
-            customLabel: 'Count',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'terms',
-          params: {
-            field: fieldName,
-            orderBy: '1',
-            order: 'desc',
-            size: 5,
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: label,
-          },
-          schema: 'bucket',
-        },
-      ],
-    },
-  };
-};
-
 const getVisStateSeverityCritical = (indexPatternId: string) => {
   return {
     id: 'severity_critical_vulnerabilities',
@@ -993,8 +926,11 @@ const getVisStateOpenVsCloseVulnerabilities = (indexPatternId: string) => {
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
             interval: 'auto',
+            // eslint-disable-next-line camelcase
             drop_partials: false,
+            // eslint-disable-next-line camelcase
             min_doc_count: 1,
+            // eslint-disable-next-line camelcase
             extended_bounds: {},
           },
           schema: 'segment',
@@ -1021,95 +957,11 @@ const getVisStateOpenVsCloseVulnerabilities = (indexPatternId: string) => {
   };
 };
 
-export const getDashboardFilters = (): {
-  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
-} => {
-  return {
-    topPackageSelector: {
-      gridData: {
-        w: 12,
-        h: 12,
-        x: 0,
-        y: 0,
-        i: 'topPackageSelector',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'topPackageSelector',
-        savedVis: getVisStateFilter(
-          'topPackageSelector',
-          VULNERABILITIES_INDEX_PATTERN_ID,
-          'Top Packages vulnerabilities',
-          'Package',
-          'package.name'
-        ),
-      },
-    },
-    topOSVulnerabilities: {
-      gridData: {
-        w: 12,
-        h: 12,
-        x: 12,
-        y: 0,
-        i: 'topOSVulnerabilities',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'topOSVulnerabilities',
-        savedVis: getVisStateFilter(
-          'topOSVulnerabilities',
-          VULNERABILITIES_INDEX_PATTERN_ID,
-          'Top Operating system vulnerabilities',
-          'Operating system',
-          'host.os.name'
-        ),
-      },
-    },
-    topAgentVulnerabilities: {
-      gridData: {
-        w: 12,
-        h: 12,
-        x: 24,
-        y: 0,
-        i: 'topAgentVulnerabilities',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'topAgentVulnerabilities',
-        savedVis: getVisStateFilter(
-          'topAgentVulnerabilities',
-          VULNERABILITIES_INDEX_PATTERN_ID,
-          'Agent filter',
-          'Agent',
-          'agent.id'
-        ),
-      },
-    },
-    topVulnerabilities: {
-      gridData: {
-        w: 12,
-        h: 12,
-        x: 36,
-        y: 0,
-        i: 'topVulnerabilities',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'topVulnerabilities',
-        savedVis: getVisStateFilter(
-          'topVulnerabilities',
-          VULNERABILITIES_INDEX_PATTERN_ID,
-          'Top vulnerabilities',
-          'Vulnerability',
-          'vulnerability.id'
-        ),
-      },
-    },
-  };
-};
 
 export const getDashboardPanels = (): {
-  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
 } => {
   return {
     '1': {
@@ -1193,7 +1045,9 @@ export const getDashboardPanels = (): {
       type: 'visualization',
       explicitInput: {
         id: '6',
-        savedVis: getVisStateTopVulnerabilities(VULNERABILITIES_INDEX_PATTERN_ID),
+        savedVis: getVisStateTopVulnerabilities(
+          VULNERABILITIES_INDEX_PATTERN_ID,
+        ),
       },
     },
     '7': {
@@ -1207,7 +1061,9 @@ export const getDashboardPanels = (): {
       type: 'visualization',
       explicitInput: {
         id: '7',
-        savedVis: getVisStateTopVulnerabilitiesEndpoints(VULNERABILITIES_INDEX_PATTERN_ID),
+        savedVis: getVisStateTopVulnerabilitiesEndpoints(
+          VULNERABILITIES_INDEX_PATTERN_ID,
+        ),
       },
     },
     '8': {
