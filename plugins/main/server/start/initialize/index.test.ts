@@ -154,7 +154,25 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         installationDate: '2022-07-25T13:55:04.363Z',
         lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {
-          default: {},
+          default: {
+            extensions: {
+              pci: true,
+              gdpr: true,
+              hipaa: true,
+              nist: true,
+              tsc: true,
+              audit: true,
+              oscap: false,
+              ciscat: false,
+              aws: false,
+              office: false,
+              github: false,
+              gcp: false,
+              virustotal: false,
+              osquery: false,
+              docker: false,
+            },
+          },
         },
       },
       after: {
@@ -176,7 +194,65 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         installationDate: '2022-07-25T13:55:04.363Z',
         lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {
-          default: {},
+          default: {
+            extensions: {
+              pci: true,
+              gdpr: true,
+              hipaa: true,
+              nist: true,
+              tsc: true,
+              audit: true,
+              oscap: false,
+              ciscat: false,
+              aws: false,
+              office: false,
+              github: false,
+              gcp: false,
+              virustotal: false,
+              osquery: false,
+              docker: false,
+            },
+          },
+          default2: {
+            prop1: 3,
+            prop2: 8,
+            extensions: {
+              pci: true,
+              gdpr: true,
+              hipaa: true,
+              nist: true,
+              tsc: true,
+              audit: true,
+              oscap: false,
+              ciscat: false,
+              aws: false,
+              office: false,
+              github: false,
+              gcp: false,
+              virustotal: false,
+              osquery: false,
+              docker: false,
+            },
+          },
+          custom: {
+            extensions: {
+              pci: true,
+              gdpr: true,
+              hipaa: true,
+              nist: true,
+              tsc: true,
+              audit: true,
+              oscap: false,
+              ciscat: false,
+              aws: false,
+              office: false,
+              github: false,
+              gcp: false,
+              virustotal: false,
+              osquery: false,
+              docker: false,
+            },
+          },
         },
       },
       after: {
@@ -187,28 +263,11 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {
           default: {},
-        },
-      },
-    },
-    {
-      before: {
-        name: 'Wazuh dashboard',
-        'app-version': '0.0.0',
-        revision: '0',
-        installationDate: '2022-07-25T13:55:04.363Z',
-        lastRestart: '2022-07-25T13:55:04.363Z',
-        hosts: {
-          default: {},
-        },
-      },
-      after: {
-        name: 'Wazuh dashboard',
-        'app-version': packageInfo.version,
-        revision: packageInfo.revision,
-        installationDate: '2022-07-25T13:55:04.363Z',
-        lastRestart: '2022-07-25T13:55:04.363Z',
-        hosts: {
-          default: {},
+          custom: {},
+          default2: {
+            prop1: 3,
+            prop2: 8,
+          },
         },
       },
     },
@@ -229,9 +288,11 @@ describe('[initialize] `wazuh-registry.json` created', () => {
   });
 
   it.each`
-    titleTest                                                        | contentRegistryFile
-    ${'Registry file is not rebuilt due version and revision match'} | ${JSON.stringify(contentRegistryFile[0].after)}
-    ${'Registry file is rebuilt due to version/revision changed'}    | ${JSON.stringify(contentRegistryFile[1].after)}
+    titleTest                                                                                                     | contentRegistryFile
+    ${'Registry file is not rebuilt due version and revision match'}                                              | ${JSON.stringify(contentRegistryFile[0].after)}
+    ${'Registry file is rebuilt due to version/revision changed'}                                                 | ${JSON.stringify(contentRegistryFile[1].after)}
+    ${'Registry file is rebuilt due to version/revision changed and host extensions has been deleted'}            | ${JSON.stringify(contentRegistryFile[2].after)}
+    ${'Registry file is rebuilt due to version/revision changed and host(multiples) extensions has been deleted'} | ${JSON.stringify(contentRegistryFile[3].after)}
   `(
     `$titleTest:
       content: $contentRegistryFile`,
@@ -256,6 +317,14 @@ describe('[initialize] `wazuh-registry.json` created', () => {
       expect(Object.keys(contentRegistryFile.hosts)).toHaveLength(
         Object.keys(contentRegistryExpected.hosts).length,
       );
+      Object.keys(contentRegistryFile.hosts).forEach(element => {
+        expect(
+          contentRegistryFile.hosts[element]['extensions'],
+        ).toBeUndefined();
+        expect(contentRegistryFile.hosts[element]).toEqual(
+          contentRegistryExpected.hosts[element],
+        );
+      });
     },
   );
 });

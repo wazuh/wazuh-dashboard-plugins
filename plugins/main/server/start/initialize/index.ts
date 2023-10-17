@@ -155,24 +155,30 @@ export function jobInitializeRun(context) {
         packageJSON.revision !== source.revision ||
         packageJSON.version !== source['app-version'];
 
-      // Generate the hosts data
-      const registryHostsData = Object.entries(source.hosts).reduce(
-        (accum, [hostID, hostData]) => {
-          accum[hostID] = hostData;
-          return accum;
-        },
-        {},
-      );
-
       // Rebuild the registry file if revision or version fields are differents
       if (isUpgradedApp) {
+        // Generate the hosts data
+        const registryHostsData = Object.entries(source.hosts).reduce(
+          (accum, [hostID, hostData]) => {
+            // We have removed the 'extensions' property from the host as module
+            // logic has been eliminated, so this is a migration process.
+            if (hostData.extensions) {
+              delete hostData.extensions;
+            }
+            accum[hostID] = hostData;
+            return accum;
+          },
+          {},
+        );
+
         log(
           'initialize:checkwazuhRegistry',
           'Wazuh app revision or version changed, regenerating wazuh-registry.json.',
           'info',
         );
 
-        // Rebuild the registry file with the migrated host data (extensions are migrated to these supported by the installed plugin).
+        // Rebuild the registry file with the migrated host data (extensions are
+        // migrated to these supported by the installed plugin).
         await saveConfiguration(registryHostsData);
 
         log(
