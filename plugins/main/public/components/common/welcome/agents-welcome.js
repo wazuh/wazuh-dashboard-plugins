@@ -13,7 +13,6 @@
  */
 import React, { Component, Fragment } from 'react';
 import {
-  EuiLink,
   EuiPanel,
   EuiFlexItem,
   EuiFlexGroup,
@@ -22,12 +21,10 @@ import {
   EuiFlexGrid,
   EuiButtonEmpty,
   EuiPage,
-  EuiButton,
   EuiPopover,
   EuiLoadingChart,
   EuiToolTip,
   EuiButtonIcon,
-  EuiEmptyPrompt,
   EuiPageBody,
 } from '@elastic/eui';
 import {
@@ -37,7 +34,6 @@ import {
   RequirementVis,
 } from './components';
 import { AgentInfo } from './agents-info';
-import store from '../../../redux/store';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
@@ -51,7 +47,11 @@ import {
   showExploreAgentModalGlobal,
   updateCurrentAgentData,
 } from '../../../redux/actions/appStateActions';
-import { getAngularModule, getCore } from '../../../kibana-services';
+import {
+  getAngularModule,
+  getCore,
+  getDataPlugin,
+} from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import {
   withErrorBoundary,
@@ -61,10 +61,13 @@ import {
 } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { PromptNoSelectedAgent } from '../../agents/prompts';
+import {
+  PromptAgentNeverConnected,
+  PromptNoSelectedAgent,
+} from '../../agents/prompts';
 import { connect } from 'react-redux';
+import { WzButton } from '../buttons';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,
@@ -73,6 +76,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   showExploreAgentModalGlobal: data =>
     dispatch(showExploreAgentModalGlobal(data)),
+  updateCurrentAgentData: data => dispatch(updateCurrentAgentData(data)),
 });
 
 export const AgentsWelcome = compose(
@@ -98,6 +102,10 @@ export const AgentsWelcome = compose(
   withGuard(
     props => !(props.agent && props.agent.id),
     () => <PromptNoSelectedAgent body='You need to select an agent.' />,
+  ),
+  withGuard(
+    props => props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    PromptAgentNeverConnected,
   ),
 )(
   class AgentsWelcome extends Component {
@@ -144,9 +152,22 @@ export const AgentsWelcome = compose(
       this.setState({ maxModules: maxModules, widthWindow: window.innerWidth });
     };
 
+    /* TODO: we should to create a unique Explore agent button instead
+      of duplicating it. It was duplicated due to the differences of requirements
+      in the Explore agent button for the modules and agent welcome
+    */
+    async removeAgentsFilter() {
+      await this.props.setAgent(false);
+      const currentAppliedFilters = getDataPlugin().query.filterManager.filters;
+      const agentFilters = currentAppliedFilters.filter(x => {
+        return x.meta.key !== 'agent.id';
+      });
+      getDataPlugin().query.filterManager.setFilters(agentFilters);
+    }
+
     async componentDidMount() {
       this._isMount = true;
-      store.dispatch(updateCurrentAgentData(this.props.agent));
+      this.props.setAgent(this.props.agent);
       this.updateMenuAgents();
       this.updateWidth();
       const tabVisualizations = new TabVisualizations();
@@ -165,6 +186,12 @@ export const AgentsWelcome = compose(
         null,
         this.props.agent.id,
       );
+    }
+
+    componentDidUpdate(prevProps) {
+      if (prevProps.agent.id !== this.props.agent.id) {
+        this.props.setAgent(this.props.agent);
+      }
     }
 
     updateMenuAgents() {
@@ -314,6 +341,7 @@ export const AgentsWelcome = compose(
 
     renderTitle() {
       const notNeedStatus = true;
+      const thereAreAgentSelected = Boolean(this.props.agent?.id);
       return (
         <EuiFlexGroup>
           <EuiFlexItem className='wz-module-header-agent-title'>
@@ -358,11 +386,36 @@ export const AgentsWelcome = compose(
               )}
               <EuiFlexItem className='wz-agent-empty-item'></EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                <EuiButtonEmpty
-                  onClick={this.props.showExploreAgentModalGlobal}
-                >
-                  Explore agent
-                </EuiButtonEmpty>
+                {/* Explore agent button. TODO: See the comment on removeAgentsFilter method. */}
+                <div style={{ display: 'inline-flex' }}>
+                  <EuiButtonEmpty
+                    onClick={this.props.showExploreAgentModalGlobal}
+                    color='primary'
+                    iconType='watchesApp'
+                    style={
+                      thereAreAgentSelected
+                        ? { background: 'rgba(0, 107, 180, 0.1)' }
+                        : undefined
+                    }
+                  >
+                    {thereAreAgentSelected
+                      ? `${this.props.agent.name} (${this.props.agent.id})`
+                      : 'Explore agent'}
+                  </EuiButtonEmpty>
+                  {thereAreAgentSelected && (
+                    <WzButton
+                      buttonType='icon'
+                      className='wz-unpin-agent'
+                      iconType='pinFilled'
+                      onClick={() => {
+                        this.props.updateCurrentAgentData({});
+                        this.removeAgentsFilter();
+                      }}
+                      tooltip={{ position: 'bottom', content: 'Unpin agent' }}
+                      aria-label='Unpin agent'
+                    />
+                  )}
+                </div>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
@@ -504,45 +557,6 @@ export const AgentsWelcome = compose(
 
     render() {
       const title = this.renderTitle();
-
-      if (this.props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
-        return (
-          <EuiEmptyPrompt
-            iconType='securitySignalDetected'
-            style={{ marginTop: 20 }}
-            title={<h2>Agent has never connected.</h2>}
-            body={
-              <Fragment>
-                <p>
-                  The agent has been registered but has not yet connected to the
-                  manager.
-                </p>
-                <EuiLink
-                  href={webDocumentationLink(
-                    'user-manual/agents/agent-connection.html',
-                  )}
-                  external
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  Checking connection with the Wazuh server
-                </EuiLink>
-              </Fragment>
-            }
-            actions={
-              <EuiButton
-                href={getCore().application.getUrlForApp('endpoints-summary', {
-                  path: '#/agents-preview',
-                })}
-                color='primary'
-                fill
-              >
-                Back
-              </EuiButton>
-            }
-          />
-        );
-      }
 
       return (
         <div className='wz-module wz-module-welcome'>

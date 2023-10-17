@@ -63,9 +63,6 @@ export class AgentsController {
     this.csvReq = csvReq;
     this.wazuhConfig = new WazuhConfig();
     this.genericReq = GenericRequest;
-    this.$scope.$watch('tab', function (newValue, oldValue) {
-      console.log('tab changed', { newValue, oldValue });
-    });
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -691,6 +688,10 @@ export class AgentsController {
     return result;
   }
 
+  setAgent(agent) {
+    this.$scope.agent = agent;
+  }
+
   /**
    * Get available welcome cards after getting the agent
    */
@@ -700,6 +701,7 @@ export class AgentsController {
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
+      setAgent: agent => this.setAgent(agent),
       goGroups: (agent, group) => this.goGroups(agent, group),
       setExtensions: (api, extensions) => {
         AppState.setExtensions(api, extensions);
