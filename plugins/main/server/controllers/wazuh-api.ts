@@ -1248,41 +1248,6 @@ export class WazuhApiCtrl {
       );
     }
   }
-  /**
-   * Check if user assigned roles disable Wazuh Plugin
-   * @param context
-   * @param request
-   * @param response
-   * @returns {object} Returns { isWazuhDisabled: boolean parsed integer }
-   */
-  async isWazuhDisabled(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const disabledRoles = (await getConfiguration())['disabled_roles'] || [];
-      const data = (
-        await context.wazuh.security.getCurrentUser(request, context)
-      ).authContext;
-
-      const isWazuhDisabled = +(data.roles || []).some(role =>
-        disabledRoles.includes(role),
-      );
-
-      return response.ok({
-        body: { isWazuhDisabled },
-      });
-    } catch (error) {
-      log('wazuh-api:isWazuhDisabled', error.message || error);
-      return ErrorResponse(
-        error.message || error,
-        3035,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        response,
-      );
-    }
-  }
 
   /**
    * Gets custom logos configuration (path)

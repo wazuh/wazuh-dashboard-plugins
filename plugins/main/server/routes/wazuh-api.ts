@@ -138,16 +138,6 @@ export function WazuhApiRoutes(router: IRouter) {
       ctrl.getSyscollector(context, request, response),
   );
 
-  // Return logged in user has wazuh disabled by role
-  router.get(
-    {
-      path: '/api/check-wazuh',
-      validate: false,
-    },
-    async (context, request, response) =>
-      ctrl.isWazuhDisabled(context, request, response),
-  );
-
   // Return app logos configuration
   router.get(
     {
