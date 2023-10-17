@@ -4,26 +4,26 @@ import { FormattedMessage } from '@osd/i18n/react';
 import { ApiAvailableUpdates, API_UPDATES_STATUS, Update } from '../../../../../common/types';
 import { UpdateBadge } from './update-badge';
 
-const API_UPDATES_STATUS_COLUMN = {
-  [API_UPDATES_STATUS.UP_TO_DATE]: {
-    defaultMessage: 'Up to date',
-    color: 'success',
-  },
-  [API_UPDATES_STATUS.AVAILABLE_UPDATES]: {
-    defaultMessage: 'Available updates',
-    color: 'warning',
-  },
-  [API_UPDATES_STATUS.DISABLED]: {
-    defaultMessage: 'Checking updates disabled',
-    color: 'subdued',
-  },
-  [API_UPDATES_STATUS.ERROR]: {
-    defaultMessage: 'Error checking updates',
-    color: 'danger',
-  },
-};
-
 export const getApisUpdateStatusColumns = () => {
+  const API_UPDATES_STATUS_COLUMN = {
+    [API_UPDATES_STATUS.UP_TO_DATE]: {
+      defaultMessage: 'Up to date',
+      color: 'success',
+    },
+    [API_UPDATES_STATUS.AVAILABLE_UPDATES]: {
+      defaultMessage: 'Available updates',
+      color: 'warning',
+    },
+    [API_UPDATES_STATUS.DISABLED]: {
+      defaultMessage: 'Checking updates disabled',
+      color: 'subdued',
+    },
+    [API_UPDATES_STATUS.ERROR]: {
+      defaultMessage: 'Error checking updates',
+      color: 'danger',
+    },
+  };
+
   const baseColumns = [
     {
       field: 'api_id',
