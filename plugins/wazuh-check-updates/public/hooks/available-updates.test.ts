@@ -35,7 +35,7 @@ jest.mock('../plugin-services', () => ({
 describe('useAvailableUpdates hook', () => {
   test('should fetch initial data without any error', async () => {
     const mockAvailableUpdates: AvailableUpdates = {
-      last_check_date: '2023-09-30T14:00:00.000Z',
+      last_check_date: new Date('2023-09-30T14:00:00.000Z'),
       apis_available_updates: [
         {
           api_id: 'api id',
@@ -70,7 +70,7 @@ describe('useAvailableUpdates hook', () => {
 
   test('should update availableUpdates', async () => {
     const mockAvailableUpdates: AvailableUpdates = {
-      last_check_date: '2023-09-30T14:00:00.000Z',
+      last_check_date: new Date('2023-09-30T14:00:00.000Z'),
       apis_available_updates: [
         {
           api_id: 'api id',

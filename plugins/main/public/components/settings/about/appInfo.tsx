@@ -31,7 +31,7 @@ export const SettingsAboutAppInfo = ({ appInfo }: SettingsAboutAppInfoProps) => 
   return (
     <>
       <EuiTitle>
-        <h2>Wazuh Dashboard version</h2>
+        <h2>Dashboard version</h2>
       </EuiTitle>
       <EuiSpacer size="l" />
       <EuiFlexGroup responsive={false} wrap alignItems="center">
@@ -70,7 +70,7 @@ export const SettingsAboutAppInfo = ({ appInfo }: SettingsAboutAppInfoProps) => 
         <>
           <EuiSpacer size="l" />
           <EuiCallOut
-            title="Wazuh Dashboard version must be the same as APIs"
+            title="Dashboard version must be the same as APIs"
             color="warning"
             iconType="alert"
           />

@@ -96,7 +96,7 @@ export const ApisUpdateStatus = ({
           <h2>
             <FormattedMessage
               id={`wazuhCheckUpdates.apisUpdateStatus.tableTitle`}
-              defaultMessage='Wazuh APIs version'
+              defaultMessage='APIs version'
             />
           </h2>
         </EuiTitle>

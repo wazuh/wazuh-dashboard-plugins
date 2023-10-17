@@ -1,9 +1,13 @@
 import { getSavedObject } from '../saved-object/get-saved-object';
 import { getUserPreferences } from './get-user-preferences';
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
+import { getWazuhCore } from '../../plugin-services';
 
 const mockedGetSavedObject = getSavedObject as jest.Mock;
 jest.mock('../saved-object/get-saved-object');
+
+const mockedGetWazuhCore = getWazuhCore as jest.Mock;
+jest.mock('../../plugin-services');
 
 describe('getUserPreferences function', () => {
   afterEach(() => {
@@ -39,6 +43,10 @@ describe('getUserPreferences function', () => {
 
   test('should return an error', async () => {
     mockedGetSavedObject.mockRejectedValue(new Error('getSavedObject error'));
+
+    mockedGetWazuhCore.mockImplementation(() => ({
+      services: { log: jest.fn().mockImplementation(() => {}) },
+    }));
 
     const promise = getUserPreferences('admin');
 

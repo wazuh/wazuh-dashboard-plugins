@@ -5,7 +5,7 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
   <h2
     class="euiTitle euiTitle--medium"
   >
-    Wazuh Dashboard version
+    Dashboard version
   </h2>
   <div
     class="euiSpacer euiSpacer--l"

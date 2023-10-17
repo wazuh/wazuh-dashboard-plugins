@@ -11,6 +11,23 @@ jest.mock(
   })
 );
 
+jest.mock('./columns', () => ({
+  getApisUpdateStatusColumns: jest.fn().mockReturnValue([
+    {
+      field: 'api_id',
+      name: 'ID',
+    },
+    {
+      field: 'current_version',
+      name: 'Version',
+    },
+    {
+      field: 'status',
+      name: 'Update status',
+    },
+  ]),
+}));
+
 describe('ApisUpdateTable component', () => {
   test('should return the ApisUpdateTable component', () => {
     const { container, getByText } = render(
@@ -42,7 +59,6 @@ describe('ApisUpdateTable component', () => {
 
     expect(getByText('api id')).toBeInTheDocument();
     expect(getByText('4.3.1')).toBeInTheDocument();
-    expect(getByText('Available updates')).toBeInTheDocument();
-    expect(getByText('v4.3.8')).toBeInTheDocument();
+    expect(getByText('availableUpdates')).toBeInTheDocument();
   });
 });

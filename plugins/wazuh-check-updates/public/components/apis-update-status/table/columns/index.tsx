@@ -5,6 +5,25 @@ import { ApiAvailableUpdates, API_UPDATES_STATUS, Update } from '../../../../../
 import { UpdateBadge } from './update-badge';
 
 export const getApisUpdateStatusColumns = () => {
+  const API_UPDATES_STATUS_COLUMN = {
+    [API_UPDATES_STATUS.UP_TO_DATE]: {
+      defaultMessage: 'Up to date',
+      color: 'success',
+    },
+    [API_UPDATES_STATUS.AVAILABLE_UPDATES]: {
+      defaultMessage: 'Available updates',
+      color: 'warning',
+    },
+    [API_UPDATES_STATUS.DISABLED]: {
+      defaultMessage: 'Checking updates disabled',
+      color: 'subdued',
+    },
+    [API_UPDATES_STATUS.ERROR]: {
+      defaultMessage: 'Error checking updates',
+      color: 'danger',
+    },
+  };
+
   const baseColumns = [
     {
       field: 'api_id',
@@ -22,23 +41,11 @@ export const getApisUpdateStatusColumns = () => {
       width: '200px',
       render: (status: API_UPDATES_STATUS, api: ApiAvailableUpdates) => {
         const getDefaultMessage = () => {
-          if (status === API_UPDATES_STATUS.UP_TO_DATE) {
-            return 'Up to date';
-          }
-          if (status === API_UPDATES_STATUS.AVAILABLE_UPDATES) {
-            return 'Available updates';
-          }
-          return 'Error checking updates';
+          return API_UPDATES_STATUS_COLUMN[status]?.defaultMessage || 'Error checking updates';
         };
 
         const getColor = () => {
-          if (status === API_UPDATES_STATUS.UP_TO_DATE) {
-            return 'success';
-          }
-          if (status === API_UPDATES_STATUS.AVAILABLE_UPDATES) {
-            return 'warning';
-          }
-          return 'danger';
+          return API_UPDATES_STATUS_COLUMN[status]?.color || 'danger';
         };
 
         return (

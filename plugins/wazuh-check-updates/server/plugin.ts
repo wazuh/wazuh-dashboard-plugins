@@ -13,14 +13,9 @@ import {
   AppPluginStartDependencies,
 } from './types';
 import { defineRoutes } from './routes';
-import {
-  availableUpdatesObject,
-  settingsObject,
-  userPreferencesObject,
-} from './services/saved-object/types';
+import { availableUpdatesObject, userPreferencesObject } from './services/saved-object/types';
 import { setCore, setWazuhCore, setInternalSavedObjectsClient } from './plugin-services';
-import { jobSchedulerRun } from './cronjob';
-import { ISecurityFactory, SecurityObj } from './lib/security-factory';
+import { ISecurityFactory } from '../../wazuh-core/server/services/security-factory';
 
 declare module 'opensearch-dashboards/server' {
   interface RequestHandlerContext {
@@ -42,12 +37,10 @@ export class WazuhCheckUpdatesPlugin
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('wazuh_check_updates: Setup');
 
-    const wazuhSecurity = await SecurityObj(plugins);
-
     core.http.registerRouteHandlerContext('wazuh_check_updates', () => {
       return {
         logger: this.logger,
-        security: wazuhSecurity,
+        security: plugins.wazuhCore.wazuhSecurity,
       };
     });
 
@@ -55,7 +48,6 @@ export class WazuhCheckUpdatesPlugin
 
     // Register saved objects types
     core.savedObjects.registerType(availableUpdatesObject);
-    core.savedObjects.registerType(settingsObject);
     core.savedObjects.registerType(userPreferencesObject);
 
     // Register server side APIs
@@ -71,9 +63,6 @@ export class WazuhCheckUpdatesPlugin
     setCore(core);
     setWazuhCore(plugins.wazuhCore);
     setInternalSavedObjectsClient(internalSavedObjectsClient);
-
-    // Scheduler
-    jobSchedulerRun();
 
     return {};
   }

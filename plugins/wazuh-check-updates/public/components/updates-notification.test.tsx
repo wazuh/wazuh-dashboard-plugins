@@ -75,7 +75,7 @@ describe('UpdatesNotification component', () => {
 
     expect(container).toMatchSnapshot();
 
-    const message = getByText('Wazuh new release is available!');
+    const message = getByText('New release is available!');
     expect(message).toBeInTheDocument();
 
     const releaseNotesLink = getByRole('link', { name: 'Go to the about page for details' });
