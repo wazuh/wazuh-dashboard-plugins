@@ -1277,53 +1277,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.string({ validate: this.validate.bind(this) });
     },
   },
-  disabled_roles: {
-    title: 'Disable roles',
-    description: 'Disabled the plugin visibility for users with the roles.',
-    category: SettingCategory.SECURITY,
-    type: EpluginSettingType.editor,
-    defaultValue: [],
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
-    options: {
-      editor: {
-        language: 'json',
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: any): any {
-      return JSON.stringify(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): any {
-      try {
-        return JSON.parse(value);
-      } catch (error) {
-        return value;
-      }
-    },
-    validate: SettingsValidator.json(
-      SettingsValidator.compose(
-        SettingsValidator.array(
-          SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-            SettingsValidator.hasNoSpaces,
-          ),
-        ),
-      ),
-    ),
-    validateBackend: function (schema) {
-      return schema.arrayOf(
-        schema.string({
-          validate: SettingsValidator.compose(
-            SettingsValidator.isNotEmptyString,
-            SettingsValidator.hasNoSpaces,
-          ),
-        }),
-      );
-    },
-  },
   'enrollment.dns': {
     title: 'Enrollment DNS',
     description:

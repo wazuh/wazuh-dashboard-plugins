@@ -68,72 +68,61 @@ export class WazuhPlugin
       console.error('plugin.ts: Error getting logos configuration', error);
     }
 
-    //Check if user has wazuh disabled and avoid registering the application if not
-    let response = { isWazuhDisabled: 1 };
-    try {
-      response = await core.http.get('/api/check-wazuh');
-    } catch (error) {
-      console.error('plugin.ts: Error checking if Wazuh is enabled', error);
-    }
-
-    if (!response.isWazuhDisabled) {
-      // Register the applications
-      Applications.forEach(app => {
-        const { category, id, title, description, euiIconType, redirectTo } =
-          app;
-        core.application.register({
-          id,
-          title,
-          mount: async (params: AppMountParameters) => {
-            try {
-              // Set the dynamic redirection
-              setWzMainParams(redirectTo());
-              setWzCurrentAppID(id);
-              initializeInterceptor(core);
-              if (!this.initializeInnerAngular) {
-                throw Error(
-                  'Wazuh plugin method initializeInnerAngular is undefined',
-                );
-              }
-
-              // Update redux app state logos with the custom logos
-              if (logosInitialState?.logos) {
-                store.dispatch(updateAppConfig(logosInitialState.logos));
-              }
-              // hide the telemetry banner.
-              // Set the flag in the telemetry saved object as the notice was seen and dismissed
-              this.hideTelemetryBanner && (await this.hideTelemetryBanner());
-              setScopedHistory(params.history);
-              // Load application bundle
-              const { renderApp } = await import('./application');
-              // Get start services as specified in kibana.json
-              const [coreStart, depsStart] = await core.getStartServices();
-              setErrorOrchestrator(ErrorOrchestratorService);
-              setHttp(core.http);
-              setCookies(new Cookies());
-              if (
-                !AppState.checkCookies() ||
-                params.history.parentHistory.action === 'PUSH'
-              ) {
-                window.location.reload();
-              }
-              await this.initializeInnerAngular();
-              params.element.classList.add('dscAppWrapper', 'wz-app');
-              const unmount = await renderApp(innerAngularName, params.element);
-              return () => {
-                unmount();
-                unregisterInterceptor();
-              };
-            } catch (error) {
-              console.debug(error);
+    // Register the applications
+    Applications.forEach(app => {
+      const { category, id, title, description, euiIconType, redirectTo } = app;
+      core.application.register({
+        id,
+        title,
+        mount: async (params: AppMountParameters) => {
+          try {
+            // Set the dynamic redirection
+            setWzMainParams(redirectTo());
+            setWzCurrentAppID(id);
+            initializeInterceptor(core);
+            if (!this.initializeInnerAngular) {
+              throw Error(
+                'Wazuh plugin method initializeInnerAngular is undefined',
+              );
             }
-          },
-          category: Categories.find(
-            ({ id: categoryID }) => categoryID === category,
-          ),
-        });
+
+            // Update redux app state logos with the custom logos
+            if (logosInitialState?.logos) {
+              store.dispatch(updateAppConfig(logosInitialState.logos));
+            }
+            // hide the telemetry banner.
+            // Set the flag in the telemetry saved object as the notice was seen and dismissed
+            this.hideTelemetryBanner && (await this.hideTelemetryBanner());
+            setScopedHistory(params.history);
+            // Load application bundle
+            const { renderApp } = await import('./application');
+            // Get start services as specified in kibana.json
+            const [coreStart, depsStart] = await core.getStartServices();
+            setErrorOrchestrator(ErrorOrchestratorService);
+            setHttp(core.http);
+            setCookies(new Cookies());
+            if (
+              !AppState.checkCookies() ||
+              params.history.parentHistory.action === 'PUSH'
+            ) {
+              window.location.reload();
+            }
+            await this.initializeInnerAngular();
+            params.element.classList.add('dscAppWrapper', 'wz-app');
+            const unmount = await renderApp(innerAngularName, params.element);
+            return () => {
+              unmount();
+              unregisterInterceptor();
+            };
+          } catch (error) {
+            console.debug(error);
+          }
+        },
+        category: Categories.find(
+          ({ id: categoryID }) => categoryID === category,
+        ),
       });
-    }
+    });
     return {};
   }
   public start(
