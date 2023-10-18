@@ -62,6 +62,19 @@ export class OverviewController {
     this.visFactoryService = VisFactoryHandler;
     this.rawVisualizations = new RawVisualizations();
     this.wzReq = (...args) => WzRequest.apiReq(...args);
+    // Tab names
+    this.tabNames = TabNames;
+
+    this.tabView = this.commonData.checkTabViewLocation();
+    this.tab = this.commonData.checkTabLocation();
+
+    // This object represents the number of visualizations per tab; used to show a progress bar
+    this.tabVisualizations.assign('overview');
+
+    this.currentOverviewSectionProps = {
+      switchTab: (tab, force) => this.switchTab(tab, force),
+      currentTab: this.tab
+    };
   }
 
   /**
@@ -69,7 +82,6 @@ export class OverviewController {
    */
   async $onInit() {
     this.rawVisualizations.setType("");
-    this.wodlesConfiguration = false;
     this.TabDescription = WAZUH_MODULES;
     this.$rootScope.reportStatus = false;
 
@@ -83,16 +95,6 @@ export class OverviewController {
 
     this.wzMonitoringEnabled = false;
 
-    // Tab names
-    this.tabNames = TabNames;
-
-    this.tabView = this.commonData.checkTabViewLocation();
-    this.tab = this.commonData.checkTabLocation();
-
-    // This object represents the number of visualizations per tab; used to show a progress bar
-    this.tabVisualizations.assign('overview');
-
-    this.wodlesConfiguration = null;
 
     this.init();
 
@@ -111,10 +113,6 @@ export class OverviewController {
       extensions: this.extensions,
     };
 
-    this.currentOverviewSectionProps = {
-      switchTab: (tab, force) => this.switchTab(tab, force),
-      currentTab: this.tab
-    };
 
 
 
