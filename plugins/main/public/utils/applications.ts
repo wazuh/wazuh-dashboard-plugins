@@ -563,6 +563,7 @@ const settings = {
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
   showInAgentMenu: false,
+  redirectTo: () => '/manager/?tab=configuration',
 };
 
 const devTools = {
@@ -653,6 +654,7 @@ const wazuhPluginSettings = {
   euiIconType: 'indexRollupApp',
   showInOverviewApp: false,
   showInAgentMenu: false,
+  redirectTo: () => '/settings?tab=configuration',
 };
 
 const wazuhPluginLogs = {
