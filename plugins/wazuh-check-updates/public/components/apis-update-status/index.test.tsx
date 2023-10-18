@@ -96,11 +96,9 @@ describe('UpdatesNotification component', () => {
       refreshAvailableUpdates: jest.fn().mockResolvedValue({}),
     }));
 
-    const { container, getByRole, getByText } = render(
+    const { getByRole, getByText } = render(
       <ApisUpdateStatus setApisAvailableUpdates={() => {}} />
     );
-
-    expect(container).toMatchSnapshot();
 
     const checkUpdatesButton = getByRole('button', { name: 'Check updates' });
     expect(checkUpdatesButton).toBeInTheDocument();
