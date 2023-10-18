@@ -132,7 +132,7 @@ jobs:
             quay.io/wazuh/${platform}-dev:${platform_version} \
             bash -c '
               yarn config set registry https://registry.yarnpkg.com;
-              cd /home/node/kbn/plugins/wazuh && yarn && ${{ inputs.command }};
+              cd /home/node/kbn/plugins/wazuh-check-updates && yarn && ${{ inputs.command }};
             '
 
       - name: Step 07 - Upload artifact to GitHub
