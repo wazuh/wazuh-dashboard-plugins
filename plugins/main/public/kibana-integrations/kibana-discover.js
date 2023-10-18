@@ -722,7 +722,6 @@ function discoverController(
       // WAZUH query from search bar
       discoverPendingUpdates.removeAll();
       discoverPendingUpdates.addItem($scope.state.query, filterManager.filters);
-      $scope.fetch();
       /////
       $fetchObservable.next();
     }
