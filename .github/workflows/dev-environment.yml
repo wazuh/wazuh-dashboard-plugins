@@ -41,6 +41,7 @@ on:
 
 env:
   MAIN_PLUGIN_PATH: 'wazuh/plugins/main'
+  CHECK_UPDATES_PLUGIN_PATH: 'wazuh/plugins/wazuh-check-updates'
 
 jobs:
   # Deploy the plugin in a development environment and run a command
@@ -60,7 +61,7 @@ jobs:
       - name: Step 02 - Change code ownership
         run: sudo chown 1000:1000 -R wazuh;
 
-      - name: Step 03 - Set up the environment and run the command
+      - name: Step 03 - Set up the environment and run the command for Main plugin
         run: |
           # Detect which platform to use from source code
           platform=kbn;
@@ -103,4 +104,49 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: ./${{ env.MAIN_PLUGIN_PATH }}/target/test-coverage/coverage-summary.json
-          title: "Code coverage (Jest)"
+          title: 'Main plugin code coverage (Jest)'
+
+      - name: Step 06 - Set up the environment and run the command for Wazuh Check Updates plugin
+        run: |
+          # Detect which platform to use from source code
+          platform=kbn;
+          echo "Detecting platform [kbn, osd]...";
+          find ${{ env.CHECK_UPDATES_PLUGIN_PATH }}/opensearch_dashboards.json && { platform=osd; };
+          echo "Platform is $platform";
+
+          # Read the platform version from the package.json file
+          echo "Reading the platform version from the package.json...";
+          # Support plugins whose version is defined under pluginPlatform or Kibana properties
+          platform_version=$(jq -r '.pluginPlatform.version, .kibana.version | select(. != null)' ${{ env.CHECK_UPDATES_PLUGIN_PATH }}/package.json);
+          echo "Plugin platform version: $platform_version";
+
+          # Set the environment variable to the correct platform
+          [ "$platform" = "kbn" ] && { docker_env_plugin_platform="KIBANA_VERSION"; };
+          [ "$platform" = "osd" ] && { docker_env_plugin_platform="OPENSEARCH_DASHBOARDS_VERSION"; };
+
+          # Up the environment and run the command
+          docker run -t --rm \
+            -e ${docker_env_plugin_platform}=${platform_version} \
+            -v `pwd`/${{ env.CHECK_UPDATES_PLUGIN_PATH }}:/home/node/kbn/plugins/wazuh-check-updates \
+            ${{ inputs.docker_run_extra_args }} \
+            quay.io/wazuh/${platform}-dev:${platform_version} \
+            bash -c '
+              yarn config set registry https://registry.yarnpkg.com;
+              cd /home/node/kbn/plugins/wazuh && yarn && ${{ inputs.command }};
+            '
+
+      - name: Step 07 - Upload artifact to GitHub
+        if: ${{ inputs.artifact_name && inputs.artifact_path }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: ${{env.CHECK_UPDATES_PLUGIN_PATH}}/${{ inputs.artifact_path }}
+          if-no-files-found: 'error'
+
+      - name: Step 08 - Upload coverage results to GitHub
+        if: ${{ inputs.notify_jest_coverage_summary && github.event_name == 'pull_request' }}
+        uses: AthleticNet/comment-test-coverage@1.2.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./${{ env.CHECK_UPDATES_PLUGIN_PATH }}/target/test-coverage/coverage-summary.json
+          title: 'Wazuh Check Updates plugin code coverage (Jest)'
