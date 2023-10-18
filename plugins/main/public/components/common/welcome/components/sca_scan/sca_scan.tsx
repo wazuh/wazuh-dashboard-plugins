@@ -259,7 +259,7 @@ export const ScaScan = compose(
                         this.router.reload();
                       }}
                     >
-                      <h2>SCA: Lastest scans la tabla</h2>
+                      <h2>SCA: Lastest scans</h2>
                     </EuiLink>
                   </EuiTitle>
                 </EuiFlexItem>
