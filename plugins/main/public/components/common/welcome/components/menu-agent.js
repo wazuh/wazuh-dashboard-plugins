@@ -95,6 +95,7 @@ class WzMenuAgent extends Component {
       id: item.id,
       name: (
         <EuiFlexGroup
+          responsive={false}
           onMouseEnter={() => {
             this.setState({ hoverAddFilter: item.id });
           }}
