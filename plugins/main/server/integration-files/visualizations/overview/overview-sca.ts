@@ -107,7 +107,7 @@ export default [
           percentageCol: '',
           query: {
             language: 'kuery',
-            query: '', // Deja este campo vacío para que los usuarios puedan ingresar sus consultas
+            query: '',
           },
         },
       }),
