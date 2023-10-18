@@ -85,8 +85,6 @@ export const MainSca = compose(
 )(function MainSca({ selectView, currentAgentData, agent, ...rest }) {
   const agentData =
     currentAgentData && currentAgentData.id ? currentAgentData : agent;
-  console.log(selectView, 'selectView');
-  console.log(agent, 'agentmain');
 
   return (
     <>
