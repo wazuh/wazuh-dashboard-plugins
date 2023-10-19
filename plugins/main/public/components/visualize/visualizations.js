@@ -798,31 +798,56 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: 'Top 5 images',
-            id: 'Wazuh-App-Overview-Docker-top-5-images',
-            width: 25,
-          },
-          {
             title: 'Top 5 events',
-            id: 'Wazuh-App-Overview-Docker-top-5-actions',
-            width: 25,
+            id: 'Wazuh-App-Overview-Docker-top-5-events',
+            width: 30,
           },
           {
-            title: 'Resources usage over time',
-            id: 'Wazuh-App-Overview-Docker-Types-over-time',
-            width: 50,
+            title: 'Events by source over time',
+            id: 'Wazuh-App-Overview-Docker-Events-By-Source-Over-Time',
+            width: 70,
           },
         ],
       },
       {
-        height: 300,
+        height: 400,
         vis: [
           {
-            title: 'Events occurred evolution',
-            id: 'Wazuh-App-Overview-Docker-Actions-over-time',
+            title: 'Events',
+            id: 'Wazuh-App-Overview-Docker-Events',
+            width: 100,
           },
         ],
       },
+      // {
+      //   height: 300,
+      //   vis: [
+      //     {
+      //       title: 'Top 5 images',
+      //       id: 'Wazuh-App-Overview-Docker-top-5-images',
+      //       width: 25,
+      //     },
+      //     {
+      //       title: 'Top 5 events',
+      //       id: 'Wazuh-App-Overview-Docker-top-5-actions',
+      //       width: 25,
+      //     },
+      //     {
+      //       title: 'Resources usage over time',
+      //       id: 'Wazuh-App-Overview-Docker-Types-over-time',
+      //       width: 50,
+      //     },
+      //   ],
+      // },
+      // {
+      //   height: 300,
+      //   vis: [
+      //     {
+      //       title: 'Events occurred evolution',
+      //       id: 'Wazuh-App-Overview-Docker-Actions-over-time',
+      //     },
+      //   ],
+      // },
     ],
   },
   oscap: {
