@@ -48,7 +48,7 @@ import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
-import { getAngularModule, getCore } from '../../../kibana-services';
+import { getAngularModule, getChrome, getCore } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import {
   withErrorBoundary,
@@ -89,10 +89,13 @@ export const AgentsWelcome = compose(
 )(
   class AgentsWelcome extends Component {
     _isMount = false;
+    sidebarSizeDefault;
     constructor(props) {
       super(props);
 
       this.offset = 275;
+
+      this.sidebarSizeDefault = 320;
 
       this.state = {
         lastScans: [],
@@ -104,11 +107,17 @@ export const AgentsWelcome = compose(
         menuAgent: [],
         maxModules: 6,
         widthWindow: window.innerWidth,
+        isLocked: false,
       };
     }
 
     updateWidth = () => {
-      let menuSize = window.innerWidth - this.offset;
+      let menuSize;
+      if (this.state.isLocked) {
+        menuSize = window.innerWidth - this.offset - this.sidebarSizeDefault;
+      } else {
+        menuSize = window.innerWidth - this.offset;
+      }
       let maxModules = 6;
       if (menuSize > 1250) {
         maxModules = 6;
@@ -143,6 +152,13 @@ export const AgentsWelcome = compose(
       });
       const filterHandler = new FilterHandler(AppState.getCurrentPattern());
       const $injector = getAngularModule().$injector;
+      this.drawerLokedSubscribtion = getChrome()
+        .getIsNavDrawerLocked$()
+        .subscribe((isLocked) => {
+          this.setState({ isLocked }, () => {
+            this.updateWidth()
+          } );
+        });
       this.router = $injector.get('$route');
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line
       await VisFactoryHandler.buildAgentsVisualizations(
@@ -151,6 +167,10 @@ export const AgentsWelcome = compose(
         null,
         this.props.agent.id,
       );
+    }
+
+    componentWillUnmount() {
+      this.drawerLokedSubscribtion?.unsubscribe();
     }
 
     updatePinnedApplications(applications) {
@@ -265,11 +285,11 @@ export const AgentsWelcome = compose(
     renderTitle() {
       const notNeedStatus = true;
       return (
-        <EuiFlexGroup>
-          <EuiFlexItem className='wz-module-header-agent-title'>
+        <EuiFlexGroup justifyContent='spaceBetween'>
+          <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
             <EuiFlexGroup>
               {(this.state.maxModules !== null && this.renderModules()) || (
-                <EuiFlexItem style={{ marginTop: 7 }}>
+                <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                   <EuiPopover
                     button={
                       <EuiButtonEmpty
@@ -309,7 +329,10 @@ export const AgentsWelcome = compose(
                   </EuiPopover>
                 </EuiFlexItem>
               )}
-              <EuiFlexItem className='wz-agent-empty-item'></EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
+            <EuiFlexGroup>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
                   iconType='inspect'
@@ -495,7 +518,7 @@ export const AgentsWelcome = compose(
           <div className='wz-module-header-agent wz-module-header-agent-wrapper'>
             <div className='wz-module-header-agent-main'>{title}</div>
           </div>
-          <div className='wz-module-agent-body wz-module-agents-padding-responsive'>
+          <div className='wz-module-agents-padding-responsive'>
             <EuiPage>
               <EuiPageBody component='div'>
                 <div className='wz-module-header-nav'>
