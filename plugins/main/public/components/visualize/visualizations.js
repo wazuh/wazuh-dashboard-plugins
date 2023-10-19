@@ -118,44 +118,55 @@ export const visualizations = {
           {
             title: 'Alerts by action over time',
             id: 'Wazuh-App-Agents-FIM-Alerts-by-action-over-time',
+            width: 100,
           },
         ],
       },
       {
-        height: 300,
+        height: 400,
         vis: [
           {
-            title: 'Top 5 agents',
-            id: 'Wazuh-App-Overview-FIM-Top-5-agents-pie',
-            width: 30,
-          },
-          {
-            title: 'Events summary',
-            id: 'Wazuh-App-Overview-FIM-Events-summary',
-            width: 70,
+            title: 'Recent events',
+            id: 'Wazuh-App-Overview-FIM-Recent-Events',
+            width: 100,
           },
         ],
       },
-      {
-        height: 350,
-        vis: [
-          {
-            title: 'Rule distribution',
-            id: 'Wazuh-App-Overview-FIM-Top-5-rules',
-            width: 33,
-          },
-          {
-            title: 'Actions',
-            id: 'Wazuh-App-Overview-FIM-Common-actions',
-            width: 33,
-          },
-          {
-            title: 'Top 5 users',
-            id: 'Wazuh-App-Overview-FIM-top-agents-user',
-            width: 34,
-          },
-        ],
-      },
+      // {
+      //   height: 300,
+      //   vis: [
+      //     {
+      //       title: 'Top 5 agents',
+      //       id: 'Wazuh-App-Overview-FIM-Top-5-agents-pie',
+      //       width: 30,
+      //     },
+      //     {
+      //       title: 'Events summary',
+      //       id: 'Wazuh-App-Overview-FIM-Events-summary',
+      //       width: 70,
+      //     },
+      //   ],
+      // },
+      // {
+      //   height: 350,
+      //   vis: [
+      //     {
+      //       title: 'Rule distribution',
+      //       id: 'Wazuh-App-Overview-FIM-Top-5-rules',
+      //       width: 33,
+      //     },
+      //     {
+      //       title: 'Actions',
+      //       id: 'Wazuh-App-Overview-FIM-Common-actions',
+      //       width: 33,
+      //     },
+      //     {
+      //       title: 'Top 5 users',
+      //       id: 'Wazuh-App-Overview-FIM-top-agents-user',
+      //       width: 34,
+      //     },
+      //   ],
+      // },
     ],
   },
   office: {
@@ -319,39 +330,45 @@ export const visualizations = {
             width: 50,
           },
           {
-            title: 'Top 10 agents by alerts number',
-            id: 'Wazuh-App-Overview-PCI-DSS-Agents',
-            width: 50,
-          },
-        ],
-      },
-      {
-        height: 300,
-        vis: [
-          {
-            title: 'Top requirements over time',
-            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
-          },
-        ],
-      },
-      {
-        height: 530,
-        vis: [
-          {
-            title: 'Last alerts',
-            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
-          },
-        ],
-      },
-      {
-        height: 255,
-        vis: [
-          {
             title: 'Requirements by agent',
             id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
+            width: 50,
+          },
+          // {
+          //   title: 'Top 10 agents by alerts number',
+          //   id: 'Wazuh-App-Overview-PCI-DSS-Agents',
+          //   width: 50,
+          // },
+        ],
+      },
+      {
+        height: 400,
+        vis: [
+          {
+            title: 'Recent events',
+            id: 'Wazuh-App-Agents-PCI-DSS-Recent-Events',
+            width: 100,
           },
         ],
       },
+      // {
+      //   height: 300,
+      //   vis: [
+      //     {
+      //       title: 'Top requirements over time',
+      //       id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
+      //     },
+      //   ],
+      // },
+      // {
+      //   height: 530,
+      //   vis: [
+      //     {
+      //       title: 'Last alerts',
+      //       id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
+      //     },
+      //   ],
+      // },
     ],
   },
   gdpr: {
