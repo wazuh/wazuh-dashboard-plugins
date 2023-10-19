@@ -284,6 +284,11 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
     this.setState({ lookingPolicy: policy });
   };
   render() {
+    // const isLookingPolicyLoading =
+    //   this.state.loadingPolicy || !this.state.lookingPolicy;
+
+    console.log(this.state.lookingPolicy, 'this.state.lookingPolicy');
+    console.log(this.state.loading, 'this.state.loading');
     const buttonPopover = (
       <EuiButtonEmpty
         iconType='iInCircle'
@@ -334,11 +339,12 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
                   </EuiButton>
                 </EuiCallOut>
               )}
-            {this.props.currentAgentData.id &&
+            {this.props.currentAgentData?.id &&
               (this.props.currentAgentData || {}).os &&
               this.state.policies.length > 0 &&
               !this.state.loading &&
-              !this.state.checksIsLoading && (
+              !this.state.checksIsLoading &&
+              this.state.lookingPolicy && (
                 <div className='sca-module-wrapper-donut'>
                   {this.state.policies.length && (
                     <EuiFlexGroup
