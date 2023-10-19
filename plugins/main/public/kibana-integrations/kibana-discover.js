@@ -1117,7 +1117,6 @@ function discoverController(
       evt.stopPropagation();
       if ($scope.tabView === 'discover') {
         $scope.rows = false;
-        $scope.fetch();
       }
       $scope.handleRefresh({
         query: $scope.state.query
