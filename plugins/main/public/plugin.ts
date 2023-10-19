@@ -80,11 +80,11 @@ export class WazuhPlugin
     if (!response.isWazuhDisabled) {
       // Register the applications
       Applications.forEach(app => {
-        const { category, id, title, description, euiIconType, redirectTo } =
-          app;
+        const { category, id, title, redirectTo, order } = app;
         core.application.register({
           id,
           title,
+          order,
           mount: async (params: AppMountParameters) => {
             try {
               // Set the dynamic redirection
