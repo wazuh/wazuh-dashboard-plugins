@@ -14,38 +14,23 @@ export const visualizations = {
   general: {
     rows: [
       {
-        height: 200,
+        height: 180,
         vis: [
           {
             title: 'Total',
             id: 'Wazuh-App-Overview-General-Total',
             width: 25,
           },
-        ],
-      },
-      {
-        height: 200,
-        vis: [
           {
             title: 'Level 12 or above alerts',
             id: 'Wazuh-App-Overview-General-Level-12-Or-Above-Alerts',
             width: 25,
           },
-        ],
-      },
-      {
-        height: 200,
-        vis: [
           {
             title: 'Authentication failure',
             id: 'Wazuh-App-Overview-General-Authentication-Failure',
             width: 25,
           },
-        ],
-      },
-      {
-        height: 200,
-        vis: [
           {
             title: 'Authentication success',
             id: 'Wazuh-App-Overview-General-Authentication-Success',
@@ -53,6 +38,36 @@ export const visualizations = {
           },
         ],
       },
+      // {
+      //   height: 200,
+      //   vis: [
+      //     {
+      //       title: 'Level 12 or above alerts',
+      //       id: 'Wazuh-App-Overview-General-Level-12-Or-Above-Alerts',
+      //       width: 25,
+      //     },
+      //   ],
+      // },
+      // {
+      //   height: 200,
+      //   vis: [
+      //     {
+      //       title: 'Authentication failure',
+      //       id: 'Wazuh-App-Overview-General-Authentication-Failure',
+      //       width: 25,
+      //     },
+      //   ],
+      // },
+      // {
+      //   height: 200,
+      //   vis: [
+      //     {
+      //       title: 'Authentication success',
+      //       id: 'Wazuh-App-Overview-General-Authentication-Success',
+      //       width: 25,
+      //     },
+      //   ],
+      // },
       {
         height: 360,
         vis: [
@@ -65,6 +80,16 @@ export const visualizations = {
             title: 'Top MITRE ATT&CKS',
             id: 'Wazuh-App-Overview-General-Alerts-Top-Mitre',
             width: 40,
+          },
+        ],
+      },
+      {
+        height: 360,
+        vis: [
+          {
+            title: 'Security alerts',
+            id: 'Wazuh-App-Overview-General-Security-alerts',
+            width: 100,
           },
         ],
       },
