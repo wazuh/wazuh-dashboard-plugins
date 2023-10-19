@@ -73,6 +73,8 @@ export const Events = compose(
         }
         if (fields) {
           scope.state.columns = fields;
+          scope.addColumn(false);
+          scope.removeColumn(false);
         }
         this.fetchWatch = scope.$watchCollection('fetchStatus', (fetchStatus) => {
           if (scope.fetchStatus === 'complete') {
@@ -195,7 +197,7 @@ export const Events = compose(
         }
       }
     }
-
+  
     checkUnknownFields(rowDetailField) {
       const fieldCell =
         rowDetailField.parentNode.childNodes && rowDetailField.parentNode.childNodes[2];

@@ -1109,6 +1109,7 @@ function discoverController(
     'changeTabView',
     async (evt, parameters) => {
       $scope.resultState = 'loading';
+      $scope.$applyAsync();
       $scope.tabView = parameters.tabView || 'panels';
       $scope.tab = parameters.tab;
       $scope.showMain = $scope.tabView === 'discover';
@@ -1116,10 +1117,12 @@ function discoverController(
       evt.stopPropagation();
       if ($scope.tabView === 'discover') {
         $scope.rows = false;
+        $scope.fetch();
       }
       $scope.handleRefresh({
         query: $scope.state.query
       }, false);
+      $scope.$applyAsync();
     }
   );
 
