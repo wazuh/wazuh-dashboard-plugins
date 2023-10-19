@@ -8,6 +8,27 @@ import {
 } from '../components/common/logos';
 import { DEFAULT_APP_CATEGORIES } from '../../../../src/core/public';
 
+/* Applications
+Convention: the order of each application must according to the order of the category
+that is included.
+
+Example:
+Category order of the application: 100
+Application order: one of 100-199 range: 100, 101, 102, etc...
+*/
+
+/* Categories ID
+Wazuh:
+Home: 0
+Endpoint security: 100
+Threat intelligence: 200
+Security operations: 300
+Cloud security: 400
+Explore (added to Wazuh dashboard default categories): 500
+Server management: 600
+Dashboard/indexer management (added to Wazuh dashboard default categories): 9000
+*/
+
 const overview = {
   category: 'wz-category-home',
   id: 'wz-home',
@@ -19,6 +40,7 @@ const overview = {
       'This application provides you with an overview of Wazuh applications.',
   }),
   euiIconType: 'lensApp',
+  order: 1,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/overview/',
@@ -37,6 +59,7 @@ export const fileIntegrityMonitoring = {
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
+  order: 102,
   redirectTo: () =>
     `/overview/?tab=fim&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -55,6 +78,7 @@ const endpointSumary = {
     defaultMessage: 'Summary of agents and their status.',
   }),
   euiIconType: 'usersRolesApp',
+  order: 600,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/agents-preview/',
@@ -71,6 +95,7 @@ const malwareDetection = {
       'Verify that your systems are configured according to your security policies baseline.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 101,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -91,6 +116,7 @@ export const configurationAssessment = {
     defaultMessage:
       'Scan your assets as part of a configuration assessment audit.',
   }),
+  order: 100,
   euiIconType: 'managementApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
@@ -113,6 +139,7 @@ export const threatHunting = {
       'Browse through your security alerts, identifying issues and threats in your environment.',
   }),
   euiIconType: 'securityAnalyticsApp',
+  order: 200,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -134,6 +161,7 @@ export const vulnerabilityDetection = {
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
   }),
   euiIconType: 'heartbeatApp',
+  order: 201,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -155,6 +183,7 @@ export const mitreAttack = {
       'Security events from the knowledge base of adversary tactics and techniques based on real-world observations.',
   }),
   euiIconType: 'grokApp',
+  order: 202,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -176,6 +205,7 @@ const virustotal = {
       'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.',
   }),
   euiIconType: 'monitoringApp',
+  order: 203,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -197,6 +227,7 @@ const pciDss = {
       'Global security standard for entities that process, store, or transmit payment cardholder data.',
   }),
   euiIconType: 'sqlApp',
+  order: 300,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -218,6 +249,7 @@ const hipaa = {
       'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.',
   }),
   euiIconType: 'monitoringApp',
+  order: 302,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -239,6 +271,7 @@ const gdpr = {
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
   }),
   euiIconType: 'sqlApp',
+  order: 301,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -262,6 +295,7 @@ const nist80053 = {
   euiIconType: 'notebookApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
+  order: 303,
   redirectTo: () =>
     `/overview/?tab=nist&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -281,6 +315,7 @@ const tsc = {
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.',
   }),
   euiIconType: 'packetbeatApp',
+  order: 304,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -302,6 +337,7 @@ const itHygiene = {
       'Applications, network configuration, open ports, and processes running on your monitored systems.',
   }),
   euiIconType: 'visualizeApp',
+  order: 305,
   showInOverviewApp: true,
   showInAgentMenu: false,
   redirectTo: () =>
@@ -323,6 +359,7 @@ const amazonWebServices = {
       'Security events related to your Amazon AWS services, collected directly via AWS API.',
   }),
   euiIconType: 'logoAWSMono',
+  order: 400,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -344,6 +381,7 @@ const googleCloud = {
       'Security events related to your Google Cloud Platform services, collected directly via GCP API.',
   }),
   euiIconType: LogoGoogleCloud,
+  order: 401,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -365,6 +403,7 @@ const github = {
       'Monitoring events from audit logs of your GitHub organizations.',
   }),
   euiIconType: LogoGitHub,
+  order: 402,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -385,6 +424,7 @@ const office365 = {
     defaultMessage: 'Security events related to your Office 365 services.',
   }),
   euiIconType: LogoOffice365,
+  order: 403,
   showInOverviewApp: true,
   showInAgentMenu: false,
   redirectTo: () =>
@@ -406,6 +446,7 @@ const docker = {
       'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.',
   }),
   euiIconType: LogoDocker,
+  order: 404,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -426,6 +467,7 @@ const rules = {
     defaultMessage: 'Manage your Wazuh cluster rules.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 602,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=ruleset',
@@ -441,6 +483,7 @@ const decoders = {
     defaultMessage: 'Manage your Wazuh cluster decoders.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 603,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=decoders',
@@ -456,6 +499,7 @@ const cdbLists = {
     defaultMessage: 'Manage your Wazuh cluster CDB list.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 604,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=lists',
@@ -471,6 +515,7 @@ const endpointGroups = {
     defaultMessage: 'Manage your agent groups.',
   }),
   euiIconType: 'usersRolesApp',
+  order: 601,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=groups',
@@ -486,6 +531,7 @@ const serverStatus = {
     defaultMessage: 'Manage your Wazuh cluster status.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 605,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=status',
@@ -501,6 +547,7 @@ const cluster = {
     defaultMessage: 'Manage your Wazuh cluster.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 606,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=monitoring',
@@ -516,6 +563,7 @@ const statistics = {
     defaultMessage: 'Information about the Wazuh enviroment.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 607,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=statistics',
@@ -531,6 +579,7 @@ const logs = {
     defaultMessage: 'Logs from your Wazuh cluster.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 608,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=logs',
@@ -546,6 +595,7 @@ const reporting = {
     defaultMessage: 'Check your stored Wazuh reports.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 8900,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=reporting',
@@ -561,6 +611,7 @@ const settings = {
     defaultMessage: 'Manage your Wazuh cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 609,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=configuration',
@@ -576,6 +627,7 @@ const devTools = {
     defaultMessage: 'Test the Wazuh API endpoints.',
   }),
   euiIconType: 'devToolsApp',
+  order: 610,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/wazuh-dev/?tab=devTools',
@@ -591,6 +643,7 @@ const rulesetTest = {
     defaultMessage: 'Check your ruleset testing logs.',
   }),
   euiIconType: 'visualizeApp',
+  order: 611,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/wazuh-dev/?tab=logtest',
@@ -607,6 +660,7 @@ const security = {
       'Manage permissions to system resources based on the roles and policies.',
   }),
   euiIconType: 'securityAnalyticsApp',
+  order: 612,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/security',
@@ -622,6 +676,7 @@ const serverApi = {
     defaultMessage: 'Manage and configure the API entries.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 8901,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=api',
@@ -637,6 +692,7 @@ const serverData = {
     defaultMessage: 'Add sample data with events to the modules.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 8902,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=sample_data',
@@ -652,6 +708,7 @@ const wazuhPluginSettings = {
     defaultMessage: 'Manage your Wazuh cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 8903,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=configuration',
@@ -667,6 +724,7 @@ const wazuhPluginLogs = {
     defaultMessage: 'Explore the logs related to the applications.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 8904,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=logs',
@@ -682,6 +740,7 @@ const wazuhPluginAbout = {
     defaultMessage: 'Show information about App Versions and community links.',
   }),
   euiIconType: 'indexRollupApp',
+  order: 8905,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=about',
@@ -726,8 +785,18 @@ export const Applications = [
   wazuhPluginSettings,
   wazuhPluginLogs,
   wazuhPluginAbout,
-];
+].sort((a, b) => {
+  // Sort applications by order
+  if (a.order < b.order) {
+    return -1;
+  } else if (a.order > b.order) {
+    return 1;
+  } else {
+    return 0;
+  }
+});
 
+// Categories
 export const Categories = [
   {
     id: 'wz-category-home',
@@ -742,7 +811,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-endpoint-security', {
       defaultMessage: 'Endpoint security',
     }),
-    order: 1,
+    order: 100,
     euiIconType: 'monitoringApp',
   },
   {
@@ -750,7 +819,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-threat-intelligence', {
       defaultMessage: 'Threat intelligence',
     }),
-    order: 2,
+    order: 200,
     euiIconType: 'lensApp',
   },
   {
@@ -758,7 +827,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-security-operations', {
       defaultMessage: 'Security operations',
     }),
-    order: 3,
+    order: 300,
     euiIconType: 'securityApp',
   },
   {
@@ -766,7 +835,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-cloud-security', {
       defaultMessage: 'Cloud security',
     }),
-    order: 4,
+    order: 400,
     euiIconType: 'watchesApp',
   },
   {
@@ -774,7 +843,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-server-management', {
       defaultMessage: 'Server management',
     }),
-    order: 6,
+    order: 600,
     euiIconType: 'indexRollupApp',
   },
   DEFAULT_APP_CATEGORIES.management,
