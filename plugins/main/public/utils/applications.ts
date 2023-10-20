@@ -649,7 +649,7 @@ const rulesetTest = {
   redirectTo: () => '/wazuh-dev/?tab=logtest',
 };
 
-const security = {
+export const security = {
   category: 'wz-category-server-management',
   id: 'security',
   title: i18n.translate('wz-app-security', {
@@ -663,10 +663,10 @@ const security = {
   order: 612,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/security',
+  redirectTo: () => '/security?tab=users',
 };
 
-const serverApi = {
+export const serverApi = {
   category: 'management',
   id: 'server-api',
   title: i18n.translate('wz-app-server-api', {

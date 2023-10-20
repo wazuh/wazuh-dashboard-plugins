@@ -15,7 +15,6 @@ const initialState = {
   showMenu: false,
   wazuhNotReadyYet: '',
   currentTab: '',
-  selected_settings_section: '',
   currentPlatform: false,
   currentAgentData: JSON.parse(
     window.sessionStorage.getItem('wz-shared-selected-agent') || '{}',
@@ -102,13 +101,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       userPermissions: action.userPermissions,
-    };
-  }
-
-  if (action.type === 'UPDATE_SELECTED_SETTINGS_SECTION') {
-    return {
-      ...state,
-      selected_settings_section: action.selected_settings_section,
     };
   }
 
