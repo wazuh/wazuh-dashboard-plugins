@@ -925,34 +925,61 @@ export const visualizations = {
   pm: {
     rows: [
       {
-        height: 290,
+        height: 300,
         vis: [
           {
-            title: 'Events over time',
-            id: 'Wazuh-App-Overview-PM-Events-over-time',
-            width: 50,
+            title: 'Emotet malware activity',
+            id: 'Wazuh-App-Overview-PM-Emotet-Malware-Activity',
+            width: 30,
           },
           {
-            title: 'Rule distribution',
-            id: 'Wazuh-App-Overview-PM-Top-5-rules',
-            width: 25,
-          },
-          {
-            title: 'Top 5 agents',
-            id: 'Wazuh-App-Overview-PM-Top-5-agents-pie',
-            width: 25,
+            title: 'Rootkits activity over time',
+            id: 'Wazuh-App-Overview-PM-Rootkits-Activity-Over-Time',
+            width: 70,
           },
         ],
       },
+
       {
-        height: 240,
+        height: 400,
         vis: [
           {
-            title: 'Events per control type evolution',
-            id: 'Wazuh-App-Overview-PM-Events-per-agent-evolution',
+            title: 'Security alerts',
+            id: 'Wazuh-App-Overview-PM-Security-Alerts',
+            width: 100,
           },
         ],
       },
+
+      // {
+      //   height: 290,
+      //   vis: [
+      //     {
+      //       title: 'Events over time',
+      //       id: 'Wazuh-App-Overview-PM-Events-over-time',
+      //       width: 50,
+      //     },
+      //     {
+      //       title: 'Rule distribution',
+      //       id: 'Wazuh-App-Overview-PM-Top-5-rules',
+      //       width: 25,
+      //     },
+      //     {
+      //       title: 'Top 5 agents',
+      //       id: 'Wazuh-App-Overview-PM-Top-5-agents-pie',
+      //       width: 25,
+      //     },
+      //   ],
+      // },
+      // {
+      //   height: 240,
+      //   vis: [
+      //     {
+      //       title: 'Events per control type evolution',
+      //       id: 'Wazuh-App-Overview-PM-Events-per-agent-evolution',
+      //     },
+      //   ],
+      // },
     ],
   },
   audit: {
