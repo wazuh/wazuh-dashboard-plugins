@@ -49,6 +49,7 @@ import {
 } from '../../../redux/actions/appStateActions';
 import {
   getAngularModule,
+  getChrome,
   getCore,
   getDataPlugin,
 } from '../../../kibana-services';
@@ -68,6 +69,14 @@ import {
 } from '../../agents/prompts';
 import { connect } from 'react-redux';
 import { WzButton } from '../buttons';
+import {
+  Applications,
+  configurationAssessment,
+  fileIntegrityMonitoring,
+  mitreAttack,
+  threatHunting,
+  vulnerabilityDetection,
+} from '../../../utils/applications';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,
@@ -110,27 +119,35 @@ export const AgentsWelcome = compose(
 )(
   class AgentsWelcome extends Component {
     _isMount = false;
+    sidebarSizeDefault;
     constructor(props) {
       super(props);
 
       this.offset = 275;
 
+      this.sidebarSizeDefault = 320;
+
       this.state = {
-        extensions: this.props.extensions,
         lastScans: [],
         isLoading: true,
         sortField: 'start_scan',
         sortDirection: 'desc',
         actionAgents: true, // Hide actions agents
         selectedRequirement: 'pci',
-        menuAgent: {},
+        menuAgent: [],
         maxModules: 6,
         widthWindow: window.innerWidth,
+        isLocked: false,
       };
     }
 
     updateWidth = () => {
-      let menuSize = window.innerWidth - this.offset;
+      let menuSize;
+      if (this.state.isLocked) {
+        menuSize = window.innerWidth - this.offset - this.sidebarSizeDefault;
+      } else {
+        menuSize = window.innerWidth - this.offset;
+      }
       let maxModules = 6;
       if (menuSize > 1250) {
         maxModules = 6;
@@ -170,7 +187,7 @@ export const AgentsWelcome = compose(
       /* WORKAROUND: ensure the $scope.agent is synced with the agent stored in Redux (this.props.agent). See agents.js controller.
        */
       this.props.setAgent(this.props.agent);
-      this.updateMenuAgents();
+      this.updatePinnedApplications();
       this.updateWidth();
       const tabVisualizations = new TabVisualizations();
       tabVisualizations.removeAll();
@@ -180,6 +197,13 @@ export const AgentsWelcome = compose(
       });
       const filterHandler = new FilterHandler(AppState.getCurrentPattern());
       const $injector = getAngularModule().$injector;
+      this.drawerLokedSubscribtion = getChrome()
+        .getIsNavDrawerLocked$()
+        .subscribe(isLocked => {
+          this.setState({ isLocked }, () => {
+            this.updateWidth();
+          });
+        });
       this.router = $injector.get('$route');
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line
       await VisFactoryHandler.buildAgentsVisualizations(
@@ -197,84 +221,52 @@ export const AgentsWelcome = compose(
         this.props.setAgent(this.props.agent);
       }
     }
+    componentWillUnmount() {
+      this.drawerLokedSubscribtion?.unsubscribe();
+    }
 
-    updateMenuAgents() {
-      const defaultMenuAgents = {
-        general: {
-          id: 'general',
-          text: 'Security events',
-          isPin: true,
-        },
-        fim: {
-          id: 'fim',
-          text: 'Integrity monitoring',
-          isPin: true,
-        },
-        sca: {
-          id: 'sca',
-          text: 'SCA',
-          isPin: true,
-        },
-        audit: {
-          id: 'audit',
-          text: 'System Auditing',
-          isPin: true,
-        },
-        vuls: {
-          id: 'vuls',
-          text: 'Vulnerabilities',
-          isPin: true,
-        },
-        mitre: {
-          id: 'mitre',
-          text: 'MITRE ATT&CK',
-          isPin: true,
-        },
-      };
+    updatePinnedApplications(applications) {
+      let pinnedApplications;
 
-      let menuAgent = JSON.parse(window.localStorage.getItem('menuAgent'));
-
-      // Check if pinned modules to agent menu are enabled in Settings/Modules, if not then modify localstorage removing the disabled modules
-      if (menuAgent) {
-        const needUpdateMenuAgent = Object.keys(menuAgent)
-          .map(moduleName => menuAgent[moduleName])
-          .reduce((accum, item) => {
-            if (
-              typeof this.props.extensions[item.id] !== 'undefined' &&
-              this.props.extensions[item.id] === false
-            ) {
-              delete menuAgent[item.id];
-              accum = true;
-            }
-            return accum;
-          }, false);
-        if (needUpdateMenuAgent) {
-          // Update the pinned modules matching to enabled modules in Setings/Modules
-          window.localStorage.setItem('menuAgent', JSON.stringify(menuAgent));
-        }
+      if (applications) {
+        pinnedApplications = applications;
       } else {
-        menuAgent = defaultMenuAgents;
-        window.localStorage.setItem(
-          'menuAgent',
-          JSON.stringify(defaultMenuAgents),
-        );
+        pinnedApplications = window.localStorage.getItem(
+          'wz-menu-agent-apps-pinned',
+        )
+          ? JSON.parse(window.localStorage.getItem('wz-menu-agent-apps-pinned'))
+          : [
+              // Default pinned applications
+              threatHunting.id,
+              fileIntegrityMonitoring.id,
+              configurationAssessment.id,
+              vulnerabilityDetection.id,
+              mitreAttack.id,
+            ];
       }
-      this.setState({ menuAgent: menuAgent });
+
+      // Ensure the pinned applications are supported
+      pinnedApplications = pinnedApplications.filter(pinnedApplication =>
+        Applications.some(({ id }) => id === pinnedApplication),
+      );
+
+      window.localStorage.setItem(
+        'wz-menu-agent-apps-pinned',
+        JSON.stringify(pinnedApplications),
+      );
+      this.setState({ menuAgent: pinnedApplications });
     }
 
     renderModules() {
-      const menuAgent = [
-        ...Object.keys(this.state.menuAgent).map(item => {
-          return this.state.menuAgent[item];
-        }),
-      ];
-
       return (
         <Fragment>
-          {menuAgent.map((menuAgent, i) => {
+          {this.state.menuAgent.map((applicationId, i) => {
+            const moduleID = Object.keys(WAZUH_MODULES).find(
+              key => WAZUH_MODULES[key]?.appId === applicationId,
+            ).appId;
             if (
               i < this.state.maxModules &&
-              hasAgentSupportModule(this.props.agent, menuAgent.id)
+              hasAgentSupportModule(this.props.agent, moduleID)
             ) {
               return (
                 <EuiFlexItem
@@ -284,20 +276,16 @@ export const AgentsWelcome = compose(
                 >
                   <EuiButtonEmpty
                     onClick={() => {
-                      getCore().application.navigateToApp(
-                        WAZUH_MODULES[menuAgent.id].appId,
-                        {
-                          path: `#/overview/?tab=${menuAgent.id}&tabView=${
-                            menuAgent.text === 'SCA' ? 'inventory' : 'panels'
-                          }`,
-                        },
-                      );
+                      getCore().application.navigateToApp(applicationId);
                       this.router.reload();
                     }}
                     style={{ cursor: 'pointer' }}
                   >
                     <span>
-                      {menuAgent.text}
+                      {
+                        Applications.find(({ id }) => id === applicationId)
+                          .title
+                      }
                       &nbsp;
                     </span>
                   </EuiButtonEmpty>
@@ -328,7 +316,10 @@ export const AgentsWelcome = compose(
                   <div style={{ maxWidth: 730 }}>
                     <MenuAgent
                       isAgent={this.props.agent}
-                      updateMenuAgents={() => this.updateMenuAgents()}
+                      pinnedApplications={this.state.menuAgent}
+                      updatePinnedApplications={applications =>
+                        this.updatePinnedApplications(applications)
+                      }
                       closePopover={() => {
                         this.setState({ switchModule: false });
                       }}
@@ -347,11 +338,11 @@ export const AgentsWelcome = compose(
       const notNeedStatus = true;
       const thereAreAgentSelected = Boolean(this.props.agent?.id);
       return (
-        <EuiFlexGroup>
-          <EuiFlexItem className='wz-module-header-agent-title'>
+        <EuiFlexGroup justifyContent='spaceBetween'>
+          <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
             <EuiFlexGroup>
               {(this.state.maxModules !== null && this.renderModules()) || (
-                <EuiFlexItem style={{ marginTop: 7 }}>
+                <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                   <EuiPopover
                     button={
                       <EuiButtonEmpty
@@ -363,7 +354,7 @@ export const AgentsWelcome = compose(
                           })
                         }
                       >
-                        Modules
+                        Applications
                       </EuiButtonEmpty>
                     }
                     isOpen={this.state.switchModule}
@@ -376,7 +367,10 @@ export const AgentsWelcome = compose(
                         <div style={{ maxWidth: 730 }}>
                           <MenuAgent
                             isAgent={this.props.agent}
-                            updateMenuAgents={() => this.updateMenuAgents()}
+                            pinnedApplications={this.state.menuAgent}
+                            updatePinnedApplications={applications =>
+                              this.updatePinnedApplications(applications)
+                            }
                             closePopover={() => {
                               this.setState({ switchModule: false });
                             }}
@@ -388,7 +382,10 @@ export const AgentsWelcome = compose(
                   </EuiPopover>
                 </EuiFlexItem>
               )}
-              <EuiFlexItem className='wz-agent-empty-item'></EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
+            <EuiFlexGroup>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 {/* Explore agent button. TODO: See the comment on removeAgentsFilter method. */}
                 <div style={{ display: 'inline-flex' }}>
@@ -567,7 +564,7 @@ export const AgentsWelcome = compose(
           <div className='wz-module-header-agent wz-module-header-agent-wrapper'>
             <div className='wz-module-header-agent-main'>{title}</div>
           </div>
-          <div className='wz-module-agent-body wz-module-agents-padding-responsive'>
+          <div className='wz-module-agents-padding-responsive'>
             <EuiPage>
               <EuiPageBody component='div'>
                 <div className='wz-module-header-nav'>

@@ -55,21 +55,8 @@ export const updateCurrentTab = currentTab => {
 };
 
 /**
- * Updates extensions in the appState store
- * @param extensions
- */
-export const updateExtensions = (id, extensions) => {
-  const tmpExtensions = {};
-  tmpExtensions[id] = extensions;
-  return {
-    type: 'UPDATE_EXTENSIONS',
-    extensions: tmpExtensions,
-  };
-};
-
-/**
  * Updates currentPlatform in the appState store
- * @param extensions
+ * @param currentPlatform
  */
 export const updateCurrentPlatform = currentPlatform => {
   return {
@@ -80,7 +67,7 @@ export const updateCurrentPlatform = currentPlatform => {
 
 /**
  * Updates currentAgentData in the appState store
- * @param extensions
+ * @param data
  */
 export const updateCurrentAgentData = data => {
   return {
@@ -91,7 +78,7 @@ export const updateCurrentAgentData = data => {
 
 /**
  * Updates showExploreAgentModalGlobal in the appState store
- * @param extensions
+ * @param shouldShow
  */
 export const showExploreAgentModalGlobal = shouldShow => {
   return {
@@ -102,7 +89,7 @@ export const showExploreAgentModalGlobal = shouldShow => {
 
 /**
  * Updates userRoles in the appState store
- * @param extensions
+ * @param userRoles
  */
 export const updateUserRoles = userRoles => {
   return {
@@ -113,34 +100,12 @@ export const updateUserRoles = userRoles => {
 
 /**
  * Updates userPermissions in the appState store
- * @param extensions
+ * @param userPermissions
  */
 export const updateUserPermissions = userPermissions => {
   return {
     type: 'UPDATE_USER_PERMISSIONS',
     userPermissions,
-  };
-};
-
-/**
- * Updates selectedSettingsSection in the appState store
- * @param selected_settings_section
- */
-export const updateSelectedSettingsSection = selected_settings_section => {
-  return {
-    type: 'UPDATE_SELECTED_SETTINGS_SECTION',
-    selected_settings_section,
-  };
-};
-
-/**
- * Updates selectedToolsSection in the appState store
- * @param selected_tools_section
- */
-export const updateSelectedToolsSection = selected_tools_section => {
-  return {
-    type: 'UPDATE_SELECTED_TOOLS_SECTION',
-    selected_tools_section,
   };
 };
 

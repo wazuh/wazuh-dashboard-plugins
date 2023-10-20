@@ -1150,70 +1150,6 @@ export class WazuhApiCtrl {
   }
 
   /**
-   * This get the extensions
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} extensions object or ErrorResponse
-   */
-  async setExtensions(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const { id, extensions } = request.body;
-      // Update cluster information in the wazuh-registry.json
-      await this.updateRegistry.updateAPIExtensions(id, extensions);
-      return response.ok({
-        body: {
-          statusCode: HTTP_STATUS_CODES.OK,
-        },
-      });
-    } catch (error) {
-      log('wazuh-api:setExtensions', error.message || error);
-      return ErrorResponse(
-        error.message || 'Could not set extensions',
-        4001,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        response,
-      );
-    }
-  }
-
-  /**
-   * This get the extensions
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} extensions object or ErrorResponse
-   */
-  getExtensions(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const source = JSON.parse(
-        fs.readFileSync(this.updateRegistry.file, 'utf8'),
-      );
-      return response.ok({
-        body: {
-          extensions: (source.hosts[request.params.id] || {}).extensions || {},
-        },
-      });
-    } catch (error) {
-      log('wazuh-api:getExtensions', error.message || error);
-      return ErrorResponse(
-        error.message || 'Could not fetch wazuh-version registry',
-        4001,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        response,
-      );
-    }
-  }
-
-  /**
    * This get the wazuh setup settings
    * @param {Object} context
    * @param {Object} request
@@ -1304,41 +1240,6 @@ export class WazuhApiCtrl {
       });
     } catch (error) {
       log('wazuh-api:getSyscollector', error.message || error);
-      return ErrorResponse(
-        error.message || error,
-        3035,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        response,
-      );
-    }
-  }
-  /**
-   * Check if user assigned roles disable Wazuh Plugin
-   * @param context
-   * @param request
-   * @param response
-   * @returns {object} Returns { isWazuhDisabled: boolean parsed integer }
-   */
-  async isWazuhDisabled(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const disabledRoles = (await getConfiguration())['disabled_roles'] || [];
-      const data = (
-        await context.wazuh.security.getCurrentUser(request, context)
-      ).authContext;
-
-      const isWazuhDisabled = +(data.roles || []).some(role =>
-        disabledRoles.includes(role),
-      );
-
-      return response.ok({
-        body: { isWazuhDisabled },
-      });
-    } catch (error) {
-      log('wazuh-api:isWazuhDisabled', error.message || error);
       return ErrorResponse(
         error.message || error,
         3035,

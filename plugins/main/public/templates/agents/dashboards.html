@@ -115,11 +115,7 @@
   </div>
   <!-- end agents module -->
   <!-- agents syscollector -->
-  <div
-    ng-if="tab === 'syscollector'"
-    ng-show="!load"
-    class="euiPageBody wz-module-body-main"
-  >
+  <div ng-if="tab === 'syscollector'" ng-show="!load" class="euiPageBody">
     <react-component
       name="MainSyscollector"
       props="{agent: agent}"
@@ -127,7 +123,7 @@
   </div>
   <!-- end agents syscollector-->
   <!-- agents stats -->
-  <div ng-if="tab === 'stats'" class="euiPageBody wz-module-body-main">
+  <div ng-if="tab === 'stats'" class="euiPageBody">
     <react-component
       name="MainAgentStats"
       props="{agent: agent}"
@@ -135,7 +131,6 @@
   </div>
   <!-- end agents stats-->
   <react-component
-    class="wz-module-body-main"
     ng-if="tab === 'configuration' && agent"
     name="WzManagementConfiguration"
     props="{agent: agent, goGroups: goGroups, exportConfiguration: exportConfiguration}"

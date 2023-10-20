@@ -439,18 +439,13 @@ export class CommonData {
       : false;
   }
 
-  getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {
-    const keyExists = key => Object.keys(extensions).includes(key);
-    const keyIsTrue = key => (extensions || [])[key];
-
+  getTabsFromCurrentPanel(currentPanel, tabNames) {
     let tabs = [];
     currentPanel.forEach(x => {
-      if (!keyExists(x) || keyIsTrue(x)) {
-        tabs.push({
-          id: x,
-          name: tabNames[x],
-        });
-      }
+      tabs.push({
+        id: x,
+        name: tabNames[x],
+      });
     });
     return tabs;
   }
