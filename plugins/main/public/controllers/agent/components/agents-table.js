@@ -35,10 +35,10 @@ import {
 } from '../../../../common/constants';
 import { AgentStatus } from '../../../components/agents/agent-status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
-import { navigateAppURL } from '../../../react-services/navigate-app';
 import { TableWzAPI } from '../../../components/common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
+import { getCore } from '../../../kibana-services';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -100,9 +100,9 @@ export const AgentsTable = withErrorBoundary(
             <EuiButtonIcon
               onClick={ev => {
                 ev.stopPropagation();
-                navigateAppURL(
-                  `/app/it-hygiene#/agents?tab=welcome&agent=${agent.id}`,
-                );
+                getCore().application.navigateToApp('it-hygiene', {
+                  path: `#/agents?tab=welcome&agent=${agent.id}`,
+                });
               }}
               iconType='eye'
               color={'primary'}
@@ -293,10 +293,9 @@ export const AgentsTable = withErrorBoundary(
         }
         return {
           onClick: ev => {
-            ev.stopPropagation();
-            navigateAppURL(
-              `/app/it-hygiene#/agents?tab=welcome&agent=${item.id}`,
-            );
+            getCore().application.navigateToApp('it-hygiene', {
+              path: `#/agents?tab=welcome&agent=${item.id}`,
+            });
           },
         };
       };

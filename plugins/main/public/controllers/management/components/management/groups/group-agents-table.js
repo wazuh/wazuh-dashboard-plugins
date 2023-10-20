@@ -14,7 +14,7 @@ import { EuiCallOut, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
-import { getToasts } from '../../../../../kibana-services';
+import { getCore, getToasts } from '../../../../../kibana-services';
 import {
   updateLoadingStatus,
   updateFileContent,
@@ -37,7 +37,6 @@ import {
 import { get as getLodash } from 'lodash';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { navigateAppURL } from '../../../../../react-services/navigate-app';
 import { AgentStatus } from '../../../../../components/agents/agent-status';
 import { WzRequest } from '../../../../../react-services';
 
@@ -67,7 +66,6 @@ class WzGroupAgentsTable extends Component {
         align: 'left',
         searchable: true,
         sortable: true,
-        show: true,
       },
       {
         field: 'os.name,os.version',
@@ -84,7 +82,6 @@ class WzGroupAgentsTable extends Component {
         align: 'left',
         searchable: true,
         sortable: true,
-        show: true,
       },
       {
         field: 'status',
@@ -121,7 +118,9 @@ class WzGroupAgentsTable extends Component {
                 aria-label='Go to the agent'
                 iconType='eye'
                 onClick={async () => {
-                  navigateAppURL(`/app/it-hygiene#/agents?agent=${item.id}`);
+                  getCore().application.navigateToApp('it-hygiene', {
+                    path: `#/agents?agent=${item.id}`,
+                  });
                 }}
                 color='primary'
               />

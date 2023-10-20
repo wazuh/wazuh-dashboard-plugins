@@ -32,8 +32,7 @@ import { getFimAlerts } from './lib';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout';
 import { EuiLink } from '@elastic/eui';
-import { getDataPlugin } from '../../../../../kibana-services';
-import { navigateAppURL } from '../../../../../react-services/navigate-app';
+import { getCore, getDataPlugin } from '../../../../../kibana-services';
 
 export function FimEventsTable({ agent, router }) {
   return (
@@ -117,8 +116,7 @@ function FimTable({ agent }) {
 
 function navigateToFim(agent, router) {
   store.dispatch(updateCurrentAgentData(agent));
-  navigateAppURL('/app/file-integrity-monitoring');
-  router.reload();
+  getCore().application.navigateToApp('file-integrity-monitoring');
 }
 
 const columns = (setFile, setIsOpen) => [

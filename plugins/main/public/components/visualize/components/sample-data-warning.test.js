@@ -17,6 +17,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import React from 'react';
+import { getCore } from '../../../kibana-services';
 
 const awaitForMyComponent = async wrapper => {
   await act(async () => {
@@ -26,9 +27,14 @@ const awaitForMyComponent = async wrapper => {
 };
 jest.mock('../../../react-services');
 jest.mock('../../../react-services/common-services');
-jest.mock('../../../react-services/navigate-app', () => ({
-  getNavigationAppURL: url => url,
+jest.mock('../../../kibana-services');
+
+getCore.mockImplementation(() => ({
+  application: {
+    getUrlForApp: (appId, options) => `/app/${appId}`,
+  },
 }));
+
 describe('Check sample data component', () => {
   it('should render if there is sample data', async () => {
     WzRequest.genericReq.mockResolvedValue({
