@@ -21,12 +21,16 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { formatUIDate } from '../../react-services/time-service';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
 import { UI_LOGGER_LEVELS, PLUGIN_APP_NAME } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getAssetURL } from '../../utils/assets';
 import { getHttp, getWzCurrentAppID } from '../../kibana-services';
+import {
+  Applications,
+  serverApi,
+  wazuhPluginSettings,
+} from '../../utils/applications';
 
 export class SettingsController {
   /**
@@ -63,15 +67,6 @@ export class SettingsController {
     this.$scope.googleGroupsSVG = getHttp().basePath.prepend(
       getAssetURL('images/icons/google_groups.svg'),
     );
-    this.tabs = [
-      { id: 'api', name: 'Server API' },
-      { id: 'modules', name: 'Modules' },
-      { id: 'sample_data', name: 'Server data' },
-      { id: 'configuration', name: 'Configuration' },
-      { id: 'logs', name: 'Logs' },
-      { id: 'miscellaneous', name: 'Miscellaneous' },
-      { id: 'about', name: 'About' },
-    ];
     this.tabsConfiguration = [
       { id: 'configuration', name: 'Configuration' },
       { id: 'miscellaneous', name: 'Miscellaneous' },
@@ -86,16 +81,13 @@ export class SettingsController {
       const location = this.$location.search();
       if (location?.tab) {
         this.tab = location.tab;
-        const tabActive = this.tabs.find(tab => tab.id === this.tab);
-        if (this.tab === 'about')
-          store.dispatch(updateSelectedSettingsSection('about'));
-        const breadcrumb = [
-          { text: '' },
-          { text: tabActive?.name || 'Server API' },
-        ];
+        const tabActiveName = Applications.find(
+          ({ id }) => getWzCurrentAppID() === id,
+        ).title;
+        const breadcrumb = [{ text: '' }, { text: tabActiveName }];
         store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       } else {
-        const breadcrumb = [{ text: '' }, { text: 'Server API' }];
+        const breadcrumb = [{ text: '' }, { text: serverApi.title }];
         store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       }
 
@@ -169,7 +161,11 @@ export class SettingsController {
         }
       },
       selectedTab: this.tab || 'api',
-      tabs: this.tabsConfiguration,
+      // Define tabs for Wazuh plugin settings application
+      tabs:
+        getWzCurrentAppID() === wazuhPluginSettings.id
+          ? this.tabsConfiguration
+          : null,
       wazuhConfig: this.wazuhConfig,
     };
 
@@ -185,7 +181,6 @@ export class SettingsController {
    * @param {Object} tab
    */
   switchTab(tab) {
-    if (tab === 'about') store.dispatch(updateSelectedSettingsSection('about'));
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }
@@ -290,11 +285,6 @@ export class SettingsController {
       ErrorHandler.info(`API with id ${idApi} set as default`);
 
       this.getCurrentAPIIndex();
-      const extensions = await AppState.getExtensions(id);
-      if (currentApi && !extensions) {
-        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        AppState.setExtensions(id, extensions);
-      }
 
       this.$scope.$applyAsync();
       return this.currentDefault;
@@ -343,12 +333,6 @@ export class SettingsController {
 
       if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) {
         return;
-      }
-      const extensions = await AppState.getExtensions(this.currentDefault);
-      if (currentApi && !extensions) {
-        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        const apiExtensions = extensions || {};
-        AppState.setExtensions(id, apiExtensions);
       }
 
       this.$scope.$applyAsync();

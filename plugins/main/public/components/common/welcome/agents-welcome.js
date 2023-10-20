@@ -154,10 +154,10 @@ export const AgentsWelcome = compose(
       const $injector = getAngularModule().$injector;
       this.drawerLokedSubscribtion = getChrome()
         .getIsNavDrawerLocked$()
-        .subscribe((isLocked) => {
+        .subscribe(isLocked => {
           this.setState({ isLocked }, () => {
-            this.updateWidth()
-          } );
+            this.updateWidth();
+          });
         });
       this.router = $injector.get('$route');
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line

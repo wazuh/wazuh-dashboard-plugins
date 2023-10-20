@@ -111,10 +111,6 @@ export class AgentsController {
     this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
-    const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = await AppState.getExtensions(currentApi);
-    this.$scope.extensions = extensions;
-
     // Getting possible target location
     this.targetLocation = this.shareAgent.getTargetLocation();
 
@@ -522,7 +518,6 @@ export class AgentsController {
 
       const tabs = this.commonData.getTabsFromCurrentPanel(
         this.currentPanel,
-        this.$scope.extensions,
         this.$scope.tabNames,
       );
 
@@ -665,30 +660,15 @@ export class AgentsController {
     return hasAgentSupportModule(this.$scope.agent, component);
   }
 
-  cleanExtensions(extensions) {
-    const result = {};
-    for (const extension in extensions) {
-      if (hasAgentSupportModule(this.$scope.agent, extension)) {
-        result[extension] = extensions[extension];
-      }
-    }
-    return result;
-  }
-
   /**
    * Get available welcome cards after getting the agent
    */
   loadWelcomeCardsProps() {
     this.$scope.welcomeCardsProps = {
       switchTab: (tab, force) => this.switchTab(tab, force),
-      extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
       goGroups: (agent, group) => this.goGroups(agent, group),
-      setExtensions: (api, extensions) => {
-        AppState.setExtensions(api, extensions);
-        this.$scope.extensions = extensions;
-      },
     };
   }
 

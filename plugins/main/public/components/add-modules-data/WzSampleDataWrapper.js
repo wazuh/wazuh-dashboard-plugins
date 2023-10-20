@@ -13,21 +13,22 @@
  */
 import React, { Component } from 'react';
 import {
-    EuiPage,
-    EuiPageBody,
-    EuiPanel,
-    EuiFlexGroup,
-    EuiFlexItem,
-    EuiTitle,
-    EuiText,
-    EuiSpacer
+  EuiPage,
+  EuiPageBody,
+  EuiPanel,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTitle,
+  EuiText,
+  EuiSpacer,
 } from '@elastic/eui';
-import WzSampleData from './sample-data'
-import WzReduxProvider from '../../redux/wz-redux-provider';
-import { withUserAuthorizationPrompt, withErrorBoundary, withReduxProvider } from '../../components/common/hocs';
-import store from '../../redux/store';
+import WzSampleData from './sample-data';
+import {
+  withUserAuthorizationPrompt,
+  withErrorBoundary,
+  withReduxProvider,
+} from '../../components/common/hocs';
 import { compose } from 'redux';
-import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 
 export class WzSampleDataProvider extends Component {
@@ -36,34 +37,30 @@ export class WzSampleDataProvider extends Component {
     this.state = {};
   }
 
-  componentDidMount(){
-    store.dispatch(updateSelectedSettingsSection('sample_data'));
-  }
-
   render() {
     return (
-    <EuiPage>
-      <EuiPanel paddingSize="l">
-        <EuiPageBody>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiTitle>
-                <h2>Sample data</h2>
-              </EuiTitle>
-              <EuiText color="subdued">
-                Add sample data with events to the modules
-              </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer />
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <WzSampleData {...this.props} />  
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPageBody>
-      </EuiPanel>
-    </EuiPage>
+      <EuiPage>
+        <EuiPanel paddingSize='l'>
+          <EuiPageBody>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle>
+                  <h2>Sample data</h2>
+                </EuiTitle>
+                <EuiText color='subdued'>
+                  Add sample data with events to the modules
+                </EuiText>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer />
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <WzSampleData {...this.props} />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPageBody>
+        </EuiPanel>
+      </EuiPage>
     );
   }
 }
@@ -71,5 +68,5 @@ export class WzSampleDataProvider extends Component {
 export const WzSampleDataWrapper = compose(
   withErrorBoundary,
   withReduxProvider,
-  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
+  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME]),
 )(WzSampleDataProvider);
