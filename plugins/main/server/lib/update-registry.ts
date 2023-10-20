@@ -113,9 +113,10 @@ export class UpdateRegistry {
   async migrateToRegistry(id, clusterInfo) {
     try {
       const content = await this.readContent();
-      if (!Object.keys(content).includes('hosts'))
+      if (!Object.keys(content).includes('hosts')) {
         Object.assign(content, { hosts: {} });
-      const info = { cluster_info: clusterInfo};
+      }
+      const info = { cluster_info: clusterInfo };
       content.hosts[id] = info;
       await this.writeContent(content);
       log(

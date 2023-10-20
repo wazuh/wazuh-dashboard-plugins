@@ -698,7 +698,7 @@ const serverData = {
   redirectTo: () => '/settings?tab=sample_data',
 };
 
-const wazuhPluginSettings = {
+export const wazuhPluginSettings = {
   category: 'management',
   id: 'wazuh-plugin-settings',
   title: i18n.translate('wz-app-wazuh-plugin-settings', {

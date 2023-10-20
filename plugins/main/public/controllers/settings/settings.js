@@ -27,6 +27,7 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getAssetURL } from '../../utils/assets';
 import { getHttp, getWzCurrentAppID } from '../../kibana-services';
+import { wazuhPluginSettings } from '../../utils/applications';
 
 export class SettingsController {
   /**
@@ -169,7 +170,11 @@ export class SettingsController {
         }
       },
       selectedTab: this.tab || 'api',
-      tabs: this.tabsConfiguration,
+      // Define tabs for Wazuh plugin settings application
+      tabs:
+        getWzCurrentAppID() === wazuhPluginSettings.id
+          ? this.tabsConfiguration
+          : null,
       wazuhConfig: this.wazuhConfig,
     };
 
@@ -288,6 +293,8 @@ export class SettingsController {
       const idApi = api.id;
 
       ErrorHandler.info(`API with id ${idApi} set as default`);
+
+      this.getCurrentAPIIndex();
 
       this.$scope.$applyAsync();
       return this.currentDefault;
