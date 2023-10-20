@@ -72,10 +72,7 @@ class Dashboard extends Component {
           `/sca/${this.props.currentAgentData.id}`,
           { q: 'policy_id=' + id },
         );
-        await this.loadScaPolicy(
-          policy?.data?.data?.affected_items[0]?.policy_id || [],
-          false,
-        );
+        await this.loadScaPolicy(id, false);
         await this.initialize();
         window.location.href = window.location.href.replace(
           new RegExp('redirectPolicy=' + '[^&]*'),
