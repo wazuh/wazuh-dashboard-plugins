@@ -106,17 +106,16 @@ export class UpdateRegistry {
   }
 
   /**
-   * Migrates the cluster information and extensions associated to an API id
+   * Migrates the cluster information associated to an API id
    * @param {String} id
    * @param {Object} clusterInfo
-   * @param {Object} clusterExtensions
    */
-  async migrateToRegistry(id, clusterInfo, clusterExtensions) {
+  async migrateToRegistry(id, clusterInfo) {
     try {
       const content = await this.readContent();
       if (!Object.keys(content).includes('hosts'))
         Object.assign(content, { hosts: {} });
-      const info = { cluster_info: clusterInfo, extensions: clusterExtensions };
+      const info = { cluster_info: clusterInfo};
       content.hosts[id] = info;
       await this.writeContent(content);
       log(

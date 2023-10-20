@@ -175,7 +175,6 @@ export class ManageHosts {
           username: host.api_username,
           password: this.decodeApiPassword(host.api_password),
           cluster_info: host.cluster_info,
-          extensions: host.extensions,
         };
         entries.push(api);
       });
@@ -292,7 +291,6 @@ export class ManageHosts {
       this.updateRegistry.migrateToRegistry(
         id,
         host.cluster_info,
-        host.extensions,
       );
       log('manage-hosts:addHost', `Host ${id} was properly added`, 'debug');
       return id;
