@@ -65,7 +65,7 @@ export const getApisUpdateStatusColumns = () => {
     name,
     width: '200px',
     render: (lastUpdate: Update, api: ApiAvailableUpdates) =>
-      api.status !== API_UPDATES_STATUS.ERROR && lastUpdate ? (
+      api.status !== API_UPDATES_STATUS.ERROR && lastUpdate?.tag ? (
         <UpdateBadge update={lastUpdate} />
       ) : null,
   });
