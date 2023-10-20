@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { UI_COLOR_AGENT_STATUS } from "../../../../common/constants";
+import { UI_COLOR_AGENT_STATUS } from '../../../../common/constants';
 
 export default [
   {
@@ -86,7 +86,12 @@ export default [
             enabled: true,
             type: 'terms',
             schema: 'group',
-            params: { field: 'status', size: 5, order: 'desc', orderBy: '_term' },
+            params: {
+              field: 'status',
+              size: 5,
+              order: 'desc',
+              orderBy: '_term',
+            },
           },
           {
             id: '4',
@@ -98,7 +103,14 @@ export default [
         ],
       }),
       uiStateJSON: JSON.stringify({
-        vis: { colors: { active: UI_COLOR_AGENT_STATUS.active, disconnected: UI_COLOR_AGENT_STATUS.disconnected, pending: UI_COLOR_AGENT_STATUS.pending, never_connected: UI_COLOR_AGENT_STATUS.never_connected } },
+        vis: {
+          colors: {
+            active: UI_COLOR_AGENT_STATUS.active,
+            disconnected: UI_COLOR_AGENT_STATUS.disconnected,
+            pending: UI_COLOR_AGENT_STATUS.pending,
+            never_connected: UI_COLOR_AGENT_STATUS.never_connected,
+          },
+        },
       }),
       description: '',
       version: 1,
@@ -139,7 +151,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -152,7 +169,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -189,7 +208,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -202,7 +226,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -267,7 +293,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -280,7 +311,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -292,7 +325,8 @@ export default [
                 index: 'wazuh-alerts',
                 type: 'phrases',
                 key: 'rule.groups',
-                value: 'win_authentication_failed, authentication_failed, authentication_failures',
+                value:
+                  'win_authentication_failed, authentication_failed, authentication_failures',
                 params: [
                   'win_authentication_failed',
                   'authentication_failed',
@@ -362,7 +396,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -375,7 +414,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -420,11 +461,59 @@ export default [
     _source: {
       title: 'Alert level evolution',
       visState: JSON.stringify({
-        title: 'Alert level evolution',
-        type: 'area',
+        title: 'Alerts evolution',
+        type: 'histogram',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {
+              customLabel: 'Count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-24h',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'agent.name',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+            },
+            schema: 'group',
+          },
+        ],
         params: {
-          type: 'area',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          type: 'histogram',
+          grid: {
+            categoryLines: false,
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -432,8 +521,14 @@ export default [
               position: 'bottom',
               show: true,
               style: {},
-              scale: { type: 'linear' },
-              labels: { show: true, filter: true, truncate: 100 },
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
               title: {},
             },
           ],
@@ -445,21 +540,34 @@ export default [
               position: 'left',
               show: true,
               style: {},
-              scale: { type: 'linear', mode: 'normal' },
-              labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-              title: { text: 'Count' },
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Count',
+              },
             },
           ],
           seriesParams: [
             {
-              show: 'true',
-              type: 'area',
+              show: true,
+              type: 'histogram',
               mode: 'stacked',
-              data: { label: 'Count', id: '1' },
-              drawLinesBetweenPoints: true,
-              showCircles: true,
-              interpolate: 'cardinal',
+              data: {
+                label: 'Count',
+                id: '1',
+              },
               valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              showCircles: true,
             },
           ],
           addTooltip: true,
@@ -467,43 +575,18 @@ export default [
           legendPosition: 'right',
           times: [],
           addTimeMarker: false,
+          labels: {
+            show: false,
+          },
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
+          row: true,
         },
-        aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
-          {
-            id: '2',
-            enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              timeRange: { from: 'now-24h', to: 'now', mode: 'quick' },
-              useNormalizedEsInterval: true,
-              interval: 'auto',
-              time_zone: 'Europe/Berlin',
-              drop_partials: false,
-              customInterval: '2h',
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
-          },
-          {
-            id: '3',
-            enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: {
-              field: 'rule.level',
-              size: '15',
-              order: 'desc',
-              orderBy: '1',
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
-          },
-        ],
       }),
       uiStateJSON: '{}',
       description: '',
@@ -523,24 +606,31 @@ export default [
     _source: {
       title: 'Alerts',
       visState: JSON.stringify({
+        title: 'Top Mitre ATT&K tactics',
         type: 'pie',
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
+          },
           {
             id: '2',
             enabled: true,
             type: 'terms',
-            schema: 'segment',
             params: {
-              field: 'rule.mitre.technique',
+              field: 'rule.mitre.tactic',
               orderBy: '1',
               order: 'desc',
-              size: 20,
+              size: 5,
               otherBucket: false,
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
             },
+            schema: 'segment',
           },
         ],
         params: {
@@ -548,10 +638,14 @@ export default [
           addTooltip: true,
           addLegend: true,
           legendPosition: 'right',
-          isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          isDonut: false,
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
-        title: 'mitre top',
       }),
       uiStateJSON: '{}',
       description: '',
@@ -567,41 +661,53 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-General-Top-5-agents',
+    _id: 'Wazuh-App-Overview-General-Total',
     _source: {
-      title: 'Top 5 agents',
+      title: 'Total',
       visState: JSON.stringify({
-        title: 'Top 5 agents',
-        type: 'pie',
-        params: {
-          type: 'pie',
-          addTooltip: true,
-          addLegend: true,
-          legendPosition: 'right',
-          isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
-        },
+        title: 'Total',
+        type: 'metric',
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
           {
-            id: '2',
+            id: '1',
             enabled: true,
-            type: 'terms',
-            schema: 'segment',
+            type: 'count',
             params: {
-              field: 'agent.name',
-              size: 5,
-              order: 'desc',
-              orderBy: '1',
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
+              customLabel: 'Total',
             },
+            schema: 'metric',
           },
         ],
+        params: {
+          addLegend: false,
+          addTooltip: true,
+          metric: {
+            colorSchema: 'Green to Red',
+            colorsRange: [
+              {
+                from: 0,
+                to: 10000,
+              },
+            ],
+            invertColors: false,
+            labels: {
+              show: true,
+            },
+            metricColorMode: 'None',
+            percentageMode: false,
+            style: {
+              bgColor: false,
+              bgFill: '#000',
+              fontSize: 30,
+              labelColor: false,
+              subText: '',
+            },
+            useRanges: false,
+          },
+          type: 'metric',
+        },
       }),
-      uiStateJSON: JSON.stringify({ vis: { legendOpen: true } }),
+      uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -615,98 +721,70 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-General-Top-5-agents-Evolution',
+    _id: 'Wazuh-App-Overview-General-Level-12-Or-Above-Alerts',
     _source: {
-      title: 'Top 5 rule groups',
+      title: 'Level 12 or above alerts',
       visState: JSON.stringify({
-        type: 'histogram',
+        title: 'Level 12 or above alerts',
+        type: 'metric',
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {
+              customLabel: '',
+            },
+            schema: 'metric',
+          },
           {
             id: '2',
             enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
+            type: 'filters',
             params: {
-              field: 'timestamp',
-              timeRange: { from: '2020-07-19T16:18:13.637Z', to: '2020-07-28T13:58:33.357Z' },
-              useNormalizedEsInterval: true,
-              scaleMetricValues: false,
-              interval: 'auto',
-              drop_partials: false,
-              min_doc_count: 1,
-              extended_bounds: {},
+              filters: [
+                {
+                  input: {
+                    query: 'rule.level>=12',
+                    language: 'kuery',
+                  },
+                  label: 'Level 12 or above alerts',
+                },
+              ],
             },
-          },
-          {
-            id: '3',
-            enabled: true,
-            type: 'terms',
             schema: 'group',
-            params: {
-              field: 'agent.name',
-              orderBy: '1',
-              order: 'desc',
-              size: 5,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
           },
         ],
         params: {
-          type: 'area',
-          grid: { categoryLines: false },
-          categoryAxes: [
-            {
-              id: 'CategoryAxis-1',
-              type: 'category',
-              position: 'bottom',
-              show: true,
-              style: {},
-              scale: { type: 'linear' },
-              labels: { show: true, filter: true, truncate: 100 },
-              title: {},
-            },
-          ],
-          valueAxes: [
-            {
-              id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
-              type: 'value',
-              position: 'left',
-              show: true,
-              style: {},
-              scale: { type: 'linear', mode: 'normal' },
-              labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-              title: { text: 'Count' },
-            },
-          ],
-          seriesParams: [
-            {
-              show: true,
-              type: 'histogram',
-              mode: 'stacked',
-              data: { label: 'Count', id: '1' },
-              drawLinesBetweenPoints: true,
-              lineWidth: 2,
-              showCircles: true,
-              interpolate: 'linear',
-              valueAxis: 'ValueAxis-1',
-            },
-          ],
           addTooltip: true,
-          addLegend: true,
-          legendPosition: 'right',
-          times: [],
-          addTimeMarker: false,
-          thresholdLine: { show: false, value: 10, width: 1, style: 'full', color: '#E7664C' },
-          labels: {},
+          addLegend: false,
+          type: 'metric',
+          metric: {
+            percentageMode: false,
+            useRanges: false,
+            colorSchema: 'Green to Red',
+            metricColorMode: 'None',
+            colorsRange: [
+              {
+                from: 0,
+                to: 10000,
+              },
+            ],
+            labels: {
+              show: true,
+            },
+            invertColors: false,
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 30,
+            },
+          },
         },
-        title: 'top 5 agents evolution',
       }),
-      uiStateJSON: JSON.stringify({ vis: { legendOpen: true } }),
+      uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -719,6 +797,484 @@ export default [
     },
     _type: 'visualization',
   },
+  {
+    _id: 'Wazuh-App-Overview-General-Authentication-Failure',
+    _source: {
+      title: 'Authentication failure',
+      visState: JSON.stringify({
+        title: 'Authentication failure',
+        type: 'metric',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
+                {
+                  input: {
+                    query:
+                      'rule.groups : authentication_failed or win_authentication_failed or authentication_failures',
+                    language: 'kuery',
+                  },
+                  label: 'Authentication failure',
+                },
+              ],
+            },
+            schema: 'group',
+          },
+        ],
+        params: {
+          addTooltip: true,
+          addLegend: false,
+          type: 'metric',
+          metric: {
+            percentageMode: false,
+            useRanges: false,
+            colorSchema: 'Reds',
+            metricColorMode: 'None',
+            colorsRange: [
+              {
+                from: 0,
+                to: 10000,
+              },
+            ],
+            labels: {
+              show: true,
+            },
+            invertColors: true,
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 30,
+            },
+          },
+        },
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+    _type: 'visualization',
+  },
+  {
+    _id: 'Wazuh-App-Overview-General-Authentication-Success',
+    _source: {
+      title: 'Authentication success',
+      visState: JSON.stringify({
+        title: 'Authentication success',
+        type: 'metric',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
+                {
+                  input: {
+                    query: 'rule.groups: authentication_success',
+                    language: 'kuery',
+                  },
+                  label: 'Authentication success',
+                },
+              ],
+            },
+            schema: 'group',
+          },
+        ],
+        params: {
+          addTooltip: true,
+          addLegend: false,
+          type: 'metric',
+          metric: {
+            percentageMode: false,
+            useRanges: false,
+            colorSchema: 'Green to Red',
+            metricColorMode: 'None',
+            colorsRange: [
+              {
+                from: 0,
+                to: 10000,
+              },
+            ],
+            labels: {
+              show: true,
+            },
+            invertColors: false,
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 30,
+            },
+          },
+        },
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+    _type: 'visualization',
+  },
+  {
+    _id: 'Wazuh-App-Overview-General-Security-alerts',
+    _type: 'visualization',
+    _source: {
+      title: 'Security alerts',
+      visState: JSON.stringify({
+        title: 'Security alerts',
+        type: 'table',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {
+              customLabel: 'count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-1M',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+              customLabel: 'Time',
+            },
+            schema: 'bucket',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'agent.name',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'agent.name',
+            },
+            schema: 'bucket',
+          },
+          {
+            id: '4',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.mitre.technique',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'rule.mitre.technique',
+            },
+            schema: 'bucket',
+          },
+          {
+            id: '5',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.level',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'rule.level',
+            },
+            schema: 'bucket',
+          },
+          {
+            id: '6',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.id',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'rule.id',
+            },
+            schema: 'bucket',
+          },
+          {
+            id: '7',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.description',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'rule.description',
+            },
+            schema: 'bucket',
+          },
+        ],
+        params: {
+          perPage: 10,
+          showPartialRows: false,
+          showMetricsAtAllLevels: false,
+          showTotal: false,
+          totalFunc: 'sum',
+          percentageCol: '',
+          row: false,
+        },
+      }),
+      uiStateJSON: JSON.stringify({
+        vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
+      }),
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          filter: [],
+          query: { query: '', language: 'lucene' },
+        }),
+      },
+    },
+  },
+  // {
+  //   _id: 'Wazuh-App-Overview-General-Top-5-agents',
+  //   _source: {
+  //     title: 'Top 5 agents',
+  //     visState: JSON.stringify({
+  //       title: 'Top 5 agents',
+  //       type: 'pie',
+  //       params: {
+  //         type: 'pie',
+  //         addTooltip: true,
+  //         addLegend: true,
+  //         legendPosition: 'right',
+  //         isDonut: true,
+  //         labels: {
+  //           show: false,
+  //           values: true,
+  //           last_level: true,
+  //           truncate: 100,
+  //         },
+  //       },
+  //       aggs: [
+  //         {
+  //           id: '1',
+  //           enabled: true,
+  //           type: 'count',
+  //           schema: 'metric',
+  //           params: {},
+  //         },
+  //         {
+  //           id: '2',
+  //           enabled: true,
+  //           type: 'terms',
+  //           schema: 'segment',
+  //           params: {
+  //             field: 'agent.name',
+  //             size: 5,
+  //             order: 'desc',
+  //             orderBy: '1',
+  //             otherBucket: false,
+  //             otherBucketLabel: 'Other',
+  //             missingBucket: false,
+  //             missingBucketLabel: 'Missing',
+  //           },
+  //         },
+  //       ],
+  //     }),
+  //     uiStateJSON: JSON.stringify({ vis: { legendOpen: true } }),
+  //     description: '',
+  //     version: 1,
+  //     kibanaSavedObjectMeta: {
+  //       searchSourceJSON: JSON.stringify({
+  //         index: 'wazuh-alerts',
+  //         filter: [],
+  //         query: { query: '', language: 'lucene' },
+  //       }),
+  //     },
+  //   },
+  //   _type: 'visualization',
+  // },
+  // {
+  //   _id: 'Wazuh-App-Overview-General-Top-5-agents-Evolution',
+  //   _source: {
+  //     title: 'Top 5 rule groups',
+  //     visState: JSON.stringify({
+  //       type: 'histogram',
+  //       aggs: [
+  //         {
+  //           id: '1',
+  //           enabled: true,
+  //           type: 'count',
+  //           schema: 'metric',
+  //           params: {},
+  //         },
+  //         {
+  //           id: '2',
+  //           enabled: true,
+  //           type: 'date_histogram',
+  //           schema: 'segment',
+  //           params: {
+  //             field: 'timestamp',
+  //             timeRange: {
+  //               from: '2020-07-19T16:18:13.637Z',
+  //               to: '2020-07-28T13:58:33.357Z',
+  //             },
+  //             useNormalizedEsInterval: true,
+  //             scaleMetricValues: false,
+  //             interval: 'auto',
+  //             drop_partials: false,
+  //             min_doc_count: 1,
+  //             extended_bounds: {},
+  //           },
+  //         },
+  //         {
+  //           id: '3',
+  //           enabled: true,
+  //           type: 'terms',
+  //           schema: 'group',
+  //           params: {
+  //             field: 'agent.name',
+  //             orderBy: '1',
+  //             order: 'desc',
+  //             size: 5,
+  //             otherBucket: false,
+  //             otherBucketLabel: 'Other',
+  //             missingBucket: false,
+  //             missingBucketLabel: 'Missing',
+  //           },
+  //         },
+  //       ],
+  //       params: {
+  //         type: 'area',
+  //         grid: { categoryLines: false },
+  //         categoryAxes: [
+  //           {
+  //             id: 'CategoryAxis-1',
+  //             type: 'category',
+  //             position: 'bottom',
+  //             show: true,
+  //             style: {},
+  //             scale: { type: 'linear' },
+  //             labels: { show: true, filter: true, truncate: 100 },
+  //             title: {},
+  //           },
+  //         ],
+  //         valueAxes: [
+  //           {
+  //             id: 'ValueAxis-1',
+  //             name: 'LeftAxis-1',
+  //             type: 'value',
+  //             position: 'left',
+  //             show: true,
+  //             style: {},
+  //             scale: { type: 'linear', mode: 'normal' },
+  //             labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+  //             title: { text: 'Count' },
+  //           },
+  //         ],
+  //         seriesParams: [
+  //           {
+  //             show: true,
+  //             type: 'histogram',
+  //             mode: 'stacked',
+  //             data: { label: 'Count', id: '1' },
+  //             drawLinesBetweenPoints: true,
+  //             lineWidth: 2,
+  //             showCircles: true,
+  //             interpolate: 'linear',
+  //             valueAxis: 'ValueAxis-1',
+  //           },
+  //         ],
+  //         addTooltip: true,
+  //         addLegend: true,
+  //         legendPosition: 'right',
+  //         times: [],
+  //         addTimeMarker: false,
+  //         thresholdLine: {
+  //           show: false,
+  //           value: 10,
+  //           width: 1,
+  //           style: 'full',
+  //           color: '#E7664C',
+  //         },
+  //         labels: {},
+  //       },
+  //       title: 'top 5 agents evolution',
+  //     }),
+  //     uiStateJSON: JSON.stringify({ vis: { legendOpen: true } }),
+  //     description: '',
+  //     version: 1,
+  //     kibanaSavedObjectMeta: {
+  //       searchSourceJSON: JSON.stringify({
+  //         index: 'wazuh-alerts',
+  //         filter: [],
+  //         query: { query: '', language: 'lucene' },
+  //       }),
+  //     },
+  //   },
+  //   _type: 'visualization',
+  // },
   {
     _id: 'Wazuh-App-Overview-General-Alerts-summary',
     _type: 'visualization',
@@ -737,7 +1293,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -859,13 +1421,24 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '3',
             enabled: true,
             type: 'terms',
             schema: 'group',
-            params: { field: 'agent.name', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'agent.name',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
           {
             id: '2',
