@@ -136,8 +136,6 @@ export const ScaScan = compose(
       window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}`;
       store.dispatch(updateCurrentAgentData(this.props.agent));
       this.router.reload();
-
-      localStorage.removeItem('scaPolicies');
     };
 
     renderScanDetails() {

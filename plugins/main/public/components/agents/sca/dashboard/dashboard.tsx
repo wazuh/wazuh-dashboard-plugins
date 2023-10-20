@@ -72,7 +72,10 @@ class Dashboard extends Component {
           `/sca/${this.props.currentAgentData.id}`,
           { q: 'policy_id=' + id },
         );
-        await this.loadScaPolicy((policy?.data?.data?.items || [])[0]);
+        await this.loadScaPolicy(
+          policy?.data?.data?.affected_items[0]?.policy_id || [],
+          false,
+        );
         await this.initialize();
         window.location.href = window.location.href.replace(
           new RegExp('redirectPolicy=' + '[^&]*'),
@@ -89,7 +92,7 @@ class Dashboard extends Component {
           // If there is no data in localstorage , I load the data normally
           await this.initialize();
           if (this.state.policies.length > 0) {
-            await this.loadScaPolicy(this.state.policies[0].policy_id);
+            await this.loadScaPolicy(this.state.policies[0].policy_id, false);
           }
         }
       }
@@ -118,7 +121,7 @@ class Dashboard extends Component {
         await this.initialize();
         const firstPolicy = this.state.policies[0];
         if (firstPolicy) {
-          await this.loadScaPolicy(firstPolicy.policy_id);
+          await this.loadScaPolicy(firstPolicy.policy_id, false);
         }
       });
     }
@@ -228,7 +231,6 @@ class Dashboard extends Component {
     } else {
       this._isMount &&
         this.setState({
-          lookingPolicy: policy,
           loadingPolicy: false,
           items: [],
           checksIsLoading: false,
