@@ -18,7 +18,6 @@ export default function SCAPoliciesTable(props: Props) {
       onClick: rowProps ? () => rowProps(item) : null,
     };
   };
-  console.log(agent.id, 'estoy en la tabla');
 
   return (
     <>

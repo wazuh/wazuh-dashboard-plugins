@@ -39,7 +39,7 @@ import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constant
 
 type Props = {
   agent: { [key in string]: any };
-  router: any; // its angular router
+  router: any;
 };
 
 export const ScaScan = compose(
@@ -132,11 +132,12 @@ export const ScaScan = compose(
     }
 
     onClickRow = policy => {
-      // Stores state in localStorage before redirection
       localStorage.setItem('scaPolicies', JSON.stringify(this.state.policies));
       window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}`;
       store.dispatch(updateCurrentAgentData(this.props.agent));
       this.router.reload();
+
+      localStorage.removeItem('scaPolicies');
     };
 
     renderScanDetails() {
