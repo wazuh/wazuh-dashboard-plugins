@@ -151,17 +151,19 @@ class Dashboard extends Component {
 
   async initialize() {
     try {
-      const {
-        data: {
-          data: { affected_items: policies },
-        },
-      } = await WzRequest.apiReq(
-        'GET',
-        `/sca/${this.props.currentAgentData.id}`,
-        {},
-      );
-      policies.sort((a, b) => a.policy_id.localeCompare(b.policy_id)),
-        this._isMount && this.setState({ loading: false, policies });
+      if (!!this.props.currentAgentData?.id) {
+        const {
+          data: {
+            data: { affected_items: policies },
+          },
+        } = await WzRequest.apiReq(
+          'GET',
+          `/sca/${this.props.currentAgentData.id}`,
+          {},
+        );
+        policies.sort((a, b) => a.policy_id.localeCompare(b.policy_id)),
+          this._isMount && this.setState({ loading: false, policies });
+      }
     } catch (error) {
       this.setState({ loading: false, policies: [], lookingPolicy: false });
 
