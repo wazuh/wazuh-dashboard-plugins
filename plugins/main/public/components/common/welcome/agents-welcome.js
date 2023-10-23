@@ -135,7 +135,7 @@ export const AgentsWelcome = compose(
         actionAgents: true, // Hide actions agents
         selectedRequirement: 'pci',
         menuAgent: [],
-        maxModules: 6,
+        maxModules: 5,
         widthWindow: window.innerWidth,
         isLocked: false,
       };
@@ -148,19 +148,23 @@ export const AgentsWelcome = compose(
       } else {
         menuSize = window.innerWidth - this.offset;
       }
-      let maxModules = 6;
-      if (menuSize > 1250) {
-        maxModules = 6;
+      let maxModules = 5;
+      if (menuSize > 1400) {
+        maxModules = 5;
       } else {
-        if (menuSize > 1100) {
-          maxModules = 5;
+        if (menuSize > 1250) {
+          maxModules = 4;
         } else {
-          if (menuSize > 900) {
-            maxModules = 4;
-          } else {
+          if (menuSize > 1100) {
             maxModules = 3;
-            if (menuSize < 750) {
-              maxModules = null;
+          } else {
+            if (menuSize > 900) {
+              maxModules = 2;
+            } else {
+              maxModules = 1;
+              if (menuSize < 750) {
+                maxModules = null;
+              }
             }
           }
         }
@@ -338,9 +342,13 @@ export const AgentsWelcome = compose(
       const notNeedStatus = true;
       const thereAreAgentSelected = Boolean(this.props.agent?.id);
       return (
-        <EuiFlexGroup justifyContent='spaceBetween'>
+        <EuiFlexGroup
+          justifyContent='spaceBetween'
+          responsive={false}
+          gutterSize='xs'
+        >
           <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
-            <EuiFlexGroup>
+            <EuiFlexGroup responsive={false} gutterSize='xs'>
               {(this.state.maxModules !== null && this.renderModules()) || (
                 <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                   <EuiPopover
@@ -385,7 +393,7 @@ export const AgentsWelcome = compose(
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
-            <EuiFlexGroup>
+            <EuiFlexGroup responsive={false} gutterSize='none'>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 {/* Explore agent button. TODO: See the comment on removeAgentsFilter method. */}
                 <div style={{ display: 'inline-flex' }}>
@@ -419,32 +427,50 @@ export const AgentsWelcome = compose(
                 </div>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                <EuiButtonEmpty
+                <WzButton
+                  buttonType='empty'
                   iconType='inspect'
                   onClick={() =>
                     this.props.switchTab('syscollector', notNeedStatus)
                   }
+                  tooltip={
+                    this.state.maxModules === null
+                      ? { position: 'bottom', content: 'Inventory data' }
+                      : undefined
+                  }
                 >
-                  Inventory data
-                </EuiButtonEmpty>
+                  {this.state.maxModules !== null ? 'Inventory data' : ''}
+                </WzButton>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                <EuiButtonEmpty
+                <WzButton
+                  buttonType='empty'
                   iconType='stats'
                   onClick={() => this.props.switchTab('stats', notNeedStatus)}
+                  tooltip={
+                    this.state.maxModules === null
+                      ? { position: 'bottom', content: 'Stats' }
+                      : undefined
+                  }
                 >
-                  Stats
-                </EuiButtonEmpty>
+                  {this.state.maxModules !== null ? 'Stats' : ''}
+                </WzButton>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                <EuiButtonEmpty
+                <WzButton
+                  buttonType='empty'
                   iconType='gear'
                   onClick={() =>
                     this.props.switchTab('configuration', notNeedStatus)
                   }
+                  tooltip={
+                    this.state.maxModules === null
+                      ? { position: 'bottom', content: 'Configuration' }
+                      : undefined
+                  }
                 >
-                  Configuration
-                </EuiButtonEmpty>
+                  {this.state.maxModules !== null ? 'Configuration' : ''}
+                </WzButton>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
@@ -561,7 +587,7 @@ export const AgentsWelcome = compose(
 
       return (
         <div className='wz-module wz-module-welcome'>
-          <div className='wz-module-header-agent wz-module-header-agent-wrapper'>
+          <div className='wz-module-header-agent-wrapper'>
             <div className='wz-module-header-agent-main'>{title}</div>
           </div>
           <div className='wz-module-agents-padding-responsive'>
