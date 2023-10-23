@@ -7,25 +7,25 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.7.0
-- Added `status detail` column in the agents table. [#5680](https://github.com/wazuh/wazuh-kibana-app/pull/5680)
-- Added agent register wizard handle properly special characters in password [5738](https://github.com/wazuh/wazuh-kibana-app/pull/5738)
+- Added `status detail` column in the agents table. [#5680](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5680)
+- Added agent register wizard handle properly special characters in password [5738](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5738)
 
 ### Changed
 
-- Changed Network ports table columns for Linux agents. [#5636](https://github.com/wazuh/wazuh-kibana-app/pull/5636)
-- Updated development dependencies (`@typescript-eslint/eslint-plugin, @typescript-eslint/parser, eslint, swagger-client`)[#5748](https://github.com/wazuh/wazuh-kibana-app/pull/5748)
-- Changed timelion type displays in the management > statistics section to line type displays. [5707](https://github.com/wazuh/wazuh-kibana-app/pull/5707)
+- Changed Network ports table columns for Linux agents. [#5636](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5636)
+- Updated development dependencies (`@typescript-eslint/eslint-plugin, @typescript-eslint/parser, eslint, swagger-client`)[#5748](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5748)
+- Changed timelion type displays in the management > statistics section to line type displays. [5707](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5707)
 
 ### Fixed
 
-- Fixed problem with new or missing columns in agent table. [#5591](https://github.com/wazuh/wazuh-kibana-app/pull/5591)
-- Fixed the color of the agent name in the groups section in dark mode. [#5676](https://github.com/wazuh/wazuh-kibana-app/pull/5676) [#6018](https://github.com/wazuh/wazuh-kibana-app/pull/6018)
-- Fixed the propagation event so that the flyout data, in the decoders, does not change when the button is pressed. [#5597](https://github.com/wazuh/wazuh-kibana-app/pull/5597)
-- Fixed the tooltips of the tables in the security section, and unnecessary requests are removed. [#5631](https://github.com/wazuh/wazuh-kibana-app/pull/5631)
+- Fixed problem with new or missing columns in agent table. [#5591](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5591)
+- Fixed the color of the agent name in the groups section in dark mode. [#5676](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5676) [#6018](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6018)
+- Fixed the propagation event so that the flyout data, in the decoders, does not change when the button is pressed. [#5597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5597)
+- Fixed the tooltips of the tables in the security section, and unnecessary requests are removed. [#5631](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5631)
 
 ### Removed
 
-- Removed views in JSON and XML formats from management settings. [#5747](https://github.com/wazuh/wazuh-kibana-app/pull/5747)
+- Removed views in JSON and XML formats from management settings. [#5747](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5747)
 
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.8.0 - Revision 02
 
