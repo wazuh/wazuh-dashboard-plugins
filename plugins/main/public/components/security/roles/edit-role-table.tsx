@@ -87,7 +87,7 @@ export const EditRolesTable = ({
               iconType='trash'
               color='danger'
               isDisabled={isDisabled && !isLoading}
-              onClick={async item => {
+              onClick={async ev => {
                 try {
                   setIsLoading(true);
                   const response = await WzRequest.apiReq(

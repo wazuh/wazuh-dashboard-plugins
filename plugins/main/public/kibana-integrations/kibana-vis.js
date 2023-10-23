@@ -116,7 +116,7 @@ class KibanaVis extends Component {
       // is changed, which affects the entire application.
       // 
       // Related issue:
-      // https://github.com/wazuh/wazuh-kibana-app/issues/4158
+      // https://github.com/wazuh/wazuh-dashboard-plugins/issues/4158
       if (this.deadField) {
         return this.renderComplete();
       }
