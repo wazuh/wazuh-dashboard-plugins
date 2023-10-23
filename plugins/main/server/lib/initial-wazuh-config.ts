@@ -36,7 +36,7 @@ ${printSection('Wazuh app configuration file', { prefix: '# ', fill: '=' })}
 # ${webDocumentationLink('user-manual/wazuh-dashboard/config-file.html')}
 #
 # Also, you can check our repository:
-# https://github.com/wazuh/wazuh-kibana-app`;
+# https://github.com/wazuh/wazuh-dashboard-plugins`;
 
 const pluginSettingsConfigurationFile = getSettingsDefaultList().filter(({ isConfigurableFromFile }) => isConfigurableFromFile);
 
