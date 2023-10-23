@@ -27,6 +27,8 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getSettingDefaultValue } from '../../../common/services/settings';
+import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
+import store from '../../redux/store';
 
 export class AgentsController {
   /**
@@ -93,6 +95,11 @@ export class AgentsController {
       false,
       false,
     ];
+
+    this.loadWelcomeCardsProps();
+    this.$scope.getWelcomeCardsProps = resultState => {
+      return { ...this.$scope.welcomeCardsProps, resultState };
+    };
   }
 
   /**
@@ -604,6 +611,24 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
+      this.loadWelcomeCardsProps();
+      this.$scope.getWelcomeCardsProps = resultState => {
+        return { ...this.$scope.welcomeCardsProps, resultState };
+      };
+
+      if (!id) {
+        this.$scope.load = false;
+        // We set some properties used by the rendered component to work and allowing
+        // to manage when there is not selected agent.
+        await this.$scope.switchTab(this.$scope.tab, true);
+        this.loadWelcomeCardsProps();
+        this.$scope.getWelcomeCardsProps = resultState => {
+          return { ...this.$scope.welcomeCardsProps, resultState };
+        };
+        this.$scope.$applyAsync();
+        return;
+      }
+
       const data = await WzRequest.apiReq('GET', `/agents`, {
         params: {
           agents_list: id,
@@ -615,6 +640,15 @@ export class AgentsController {
       this.$scope.agent = agentInfo;
 
       if (!this.$scope.agent) return;
+
+      // Sync the selected agent on Redux store
+      if (
+        store.getState().appStateReducers.currentAgentData.id !==
+        this.$scope.agent.id
+      ) {
+        store.dispatch(updateCurrentAgentData(this.$scope.agent));
+      }
+
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
@@ -660,6 +694,9 @@ export class AgentsController {
     return hasAgentSupportModule(this.$scope.agent, component);
   }
 
+  setAgent(agent) {
+    this.$scope.agent = agent;
+  }
   /**
    * Get available welcome cards after getting the agent
    */
@@ -668,6 +705,7 @@ export class AgentsController {
       switchTab: (tab, force) => this.switchTab(tab, force),
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
+      setAgent: agent => this.setAgent(agent),
       goGroups: (agent, group) => this.goGroups(agent, group),
     };
   }

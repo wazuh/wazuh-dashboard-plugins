@@ -399,8 +399,9 @@ export class CommonData {
         return this.$location.search().agent;
       } else {
         this.shareAgent.deleteAgent();
-        this.$location.search('agent', globalAgent.id);
-        return globalAgent.id;
+        const agentId = globalAgent?.id || null;
+        agentId && this.$location.search('agent', agentId);
+        return agentId;
       }
     }
   }
