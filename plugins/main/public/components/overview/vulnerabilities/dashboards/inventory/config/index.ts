@@ -3,19 +3,38 @@ import { EuiDataGridColumn } from "@elastic/eui";
 export const inventoryTableDefaultColumns: EuiDataGridColumn[] = [
     {
       id: '@timestamp',
-      displayAsText: 'timestamp',
-      defaultSortDirection: 'desc',
+      displayAsText: 'Timestamp',
     },
     {
-      id: 'agent.id',
-      displayAsText: 'agent.id',
+      id: 'package.name',
+      displayAsText: 'Name',
     },
     {
-      id: 'agent.name',
-      displayAsText: 'agent.name',
+      id: 'package.version',
+      displayAsText: 'Version',
     },
     {
-      id: 'event.severity',
-      displayAsText: 'event.severity',
+      id: 'package.architecture',
+      displayAsText: 'Architecture',
+    },
+    {
+      id: 'vulnerability.severity',
+      displayAsText: 'Severity',
+    },
+    {
+      id: 'vulnerability.id',
+      displayAsText: 'Id',
+    },
+    {
+      id: 'vulnerability.score.version',
+      displayAsText: 'Score version',
+    },
+    {
+      id: 'vulnerability.score.base',
+      displayAsText: 'Score',
+    },
+    {
+      id: 'event.created',
+      displayAsText: 'Detected time',
     }
   ]
