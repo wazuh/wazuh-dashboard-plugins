@@ -15,9 +15,7 @@
           "message": "Error validating configuration: (1226): Error reading XML file 'etc/ossec.conf':  (line 0).",
           "remediation": "Please, fix the corrupted files"
         },
-        "id": [
-          "worker-node"
-        ]
+        "id": ["worker-node"]
       }
     ]
   },

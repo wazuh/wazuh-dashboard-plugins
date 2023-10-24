@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 elastic_versions=(
+	"7.10.2"
 	"7.16.0"
 	"7.16.1"
 	"7.16.2"
@@ -41,6 +42,7 @@ wazuh_api_version=(
 	"4.5.1"
   "4.5.2"
   "4.5.3"
+  "4.6.0"
 )
 
 usage() {

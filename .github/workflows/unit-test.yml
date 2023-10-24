@@ -5,7 +5,6 @@
 #
 # Jest is a third-party software https://jestjs.io/
 
-
 name: Run unit test
 
 on:
@@ -22,7 +21,7 @@ on:
         default: 'yarn test:jest'
         description: Select the type of test to run.
         options:
-        - 'yarn test:jest'
+          - 'yarn test:jest'
   pull_request:
 
 jobs:
