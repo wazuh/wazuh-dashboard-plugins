@@ -55,7 +55,6 @@ export const NodeList = withErrorBoundary(
         loading: false,
       };
     }
-
     render() {
       return (
         <EuiPanel>

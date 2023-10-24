@@ -16,12 +16,13 @@ import PropTypes from 'prop-types';
 import { EuiBasicTable } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString, hasSize } from '../utils/utils';
 
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const columns = [
@@ -68,17 +69,15 @@ class WzConfigurationAlertsLabels extends Component {
         {currentConfig['agent-labels'] &&
         !isString(currentConfig['agent-labels']) &&
         hasSize(currentConfig['agent-labels'].labels) ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title='Defined labels'
-            currentConfig={currentConfig}
-            minusHeight={agent.id === '000' ? 320 : 355}
             helpLinks={helpLinks}
           >
             <EuiBasicTable
               columns={columns}
               items={currentConfig['agent-labels'].labels}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );
@@ -99,11 +98,9 @@ export const WzConfigurationAlertsLabelsAgent = compose(
 )(WzConfigurationAlertsLabels);
 
 WzConfigurationAlertsLabels.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 WzConfigurationAlertsLabelsAgent.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };

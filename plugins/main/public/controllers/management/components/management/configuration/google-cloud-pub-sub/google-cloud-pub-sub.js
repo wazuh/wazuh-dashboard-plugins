@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 
@@ -77,18 +77,16 @@ class WzConfigurationGoogleCloudPubSub extends Component {
             <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig['gcp-pubsub'] && (
-          <WzConfigurationSettingsTabSelector
-            title='Main settings'
-            description='Configuration for the Google Cloud Pub/Sub module'
-            currentConfig={this.wodleConfig}
-            minusHeight={320}
-            helpLinks={helpLinks}
+          <WzConfigurationSettingsHeader
+            title="Main settings"
+            description="Configuration for the Google Cloud Pub/Sub module"
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={this.wodleConfig['gcp-pubsub']}
               items={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );

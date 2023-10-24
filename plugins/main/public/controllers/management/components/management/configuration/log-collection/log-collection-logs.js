@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
@@ -21,12 +21,12 @@ import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
 import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_LOGS_PROP } from './types';
 
-const renderTargetField = (item) => (item ? item.join(', ') : 'agent');
+const renderTargetField = item => (item ? item.join(', ') : 'agent');
 const renderArrayObjectField = arrayObjectField => {
   const stringToRender = arrayObjectField
     ? arrayObjectField
-      .map(({ value, type }) => value?.concat(type ? ` (${type})` : ''))
-      .join(', ')
+        .map(({ value, type }) => value?.concat(type ? ` (${type})` : ''))
+        .join(', ')
     : '-';
   return stringToRender;
 };
@@ -41,7 +41,8 @@ const mainSettings = [
   },
   {
     field: 'reconnect_time',
-    label: 'Time in seconds to try to reconnect with Windows Event Channel when it has fallen',
+    label:
+      'Time in seconds to try to reconnect with Windows Event Channel when it has fallen',
     when: 'agent',
   },
   {
@@ -73,11 +74,13 @@ const mainSettings = [
   },
 ];
 
-const getMainSettingsAgentOrManager = (agent) =>
+const getMainSettingsAgentOrManager = agent =>
   agent && agent.id === '000'
-    ? mainSettings.filter((setting) => setting.when !== 'agent')
-    : mainSettings.filter((setting) =>
-        setting.when === 'agent' ? agent && agent.os && agent.os.platform === 'windows' : true
+    ? mainSettings.filter(setting => setting.when !== 'agent')
+    : mainSettings.filter(setting =>
+        setting.when === 'agent'
+          ? agent && agent.os && agent.os.platform === 'windows'
+          : true,
       );
 class WzConfigurationLogCollectionLogs extends Component {
   constructor(props) {
@@ -85,37 +88,48 @@ class WzConfigurationLogCollectionLogs extends Component {
   }
   render() {
     const { currentConfig, agent } = this.props;
-    const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]
-      ? settingsListBuilder(currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP], [
-          'file',
-          'alias',
-          'commnad',
-          (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`,
-        ])
+    const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
+      LOCALFILE_LOGS_PROP
+    ]
+      ? settingsListBuilder(
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP],
+          [
+            'file',
+            'alias',
+            'commnad',
+            item =>
+              `${item.logformat}${
+                item.target ? ` - ${item.target.join(', ')}` : ''
+              }`,
+          ],
+        )
       : [];
     return (
       <Fragment>
         {isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) && (
-          <WzNoConfig error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]} help={helpLinks} />
+          <WzNoConfig
+            error={currentConfig[LOGCOLLECTOR_LOCALFILE_PROP]}
+            help={helpLinks}
+          />
         )}
         {!isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) &&
-        !currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]?.length ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
+        !currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]
+          ?.length ? (
+          <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {!isString(currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]) &&
-        currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]?.length ? (
-          <WzConfigurationSettingsTabSelector
-            title="Logs files"
-            description="List of log files that will be analyzed"
-            currentConfig={currentConfig}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+        currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_LOGS_PROP]
+          ?.length ? (
+          <WzConfigurationSettingsHeader
+            title='Logs files'
+            description='List of log files that will be analyzed'
+            help={helpLinks}
           >
             <WzConfigurationListSelector
               items={items}
               settings={getMainSettingsAgentOrManager(agent)}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );

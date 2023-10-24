@@ -107,8 +107,4 @@ class WzConfigurationIntegrityMonitoring extends Component {
 
 const sections = [{ component: 'syscheck', configuration: 'syscheck' }];
 
-WzConfigurationIntegrityMonitoring.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default withWzConfig(sections)(WzConfigurationIntegrityMonitoring);

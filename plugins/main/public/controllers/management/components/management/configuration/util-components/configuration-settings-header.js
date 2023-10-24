@@ -17,7 +17,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiHorizontalRule,
-  EuiLink,
   EuiSpacer,
   EuiText,
   EuiTitle
@@ -33,11 +32,8 @@ class WzConfigurationSettingsHeader extends Component {
     const {
       title,
       description,
-      json,
       help,
-      settings,
-      xml,
-      viewSelected
+      children
     } = this.props;
     return (
       <Fragment>
@@ -54,38 +50,6 @@ class WzConfigurationSettingsHeader extends Component {
               gutterSize="none"
               justifyContent="flexEnd"
             >
-              {settings && (
-                <Fragment>
-                  <span style={{ marginRight: '6px' }}>
-                    <ButtonLink
-                      viewSelected={viewSelected}
-                      view=""
-                      text="SETTINGS"
-                      onClick={settings}
-                    />
-                  </span>
-                </Fragment>
-              )}
-              {json && xml && (
-                <Fragment>
-                  <span style={{ marginRight: '6px' }}>
-                    <ButtonLink
-                      viewSelected={viewSelected}
-                      view="json"
-                      text="JSON"
-                      onClick={json}
-                    />
-                  </span>
-                  <span>
-                    <ButtonLink
-                      viewSelected={viewSelected}
-                      view="xml"
-                      text="XML"
-                      onClick={xml}
-                    />
-                  </span>
-                </Fragment>
-              )}
               {help && (
                 <span>
                   <WzHelpButtonPopover links={help} />
@@ -98,6 +62,7 @@ class WzConfigurationSettingsHeader extends Component {
         {title && (
           <EuiHorizontalRule margin="none" style={{ marginBottom: 16 }} />
         )}
+        {children}
       </Fragment>
     );
   }
@@ -108,29 +73,11 @@ WzConfigurationSettingsHeader.propTypes = {
   description: PropTypes.string
 };
 
-const ButtonLink = ({ onClick, text, view, viewSelected }) => {
-  return (
-    <EuiFlexItem>
-      <EuiLink
-        style={viewSelected === view ? { textDecoration: 'underline' } : {}}
-        onClick={onClick}
-      >
-        {text}
-      </EuiLink>
-    </EuiFlexItem>
-  );
-};
-
 export default WzConfigurationSettingsHeader;
 
 export class WzConfigurationSettingsHeaderViewer extends Component {
   constructor(props) {
     super(props);
-    this.title = this.props.mode === 'json' ? 'JSON viewer' : 'XML viewer';
-    this.description =
-      this.props.mode === 'json'
-        ? 'View this configuration in raw JSON format'
-        : 'View this configuration in raw XML format';
   }
   render() {
     return (
