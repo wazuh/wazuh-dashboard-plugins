@@ -75,7 +75,12 @@ export const InventoryVuls = () => {
   useEffect(() => {
     if (!isLoading) {
       setIndexPattern(indexPatterns?.[0] as IndexPattern);
-      search();
+      try {
+        search();
+      }catch(error){
+        console.error(error);
+        // check when filters are wrong and the search fails
+      }
     }
   }, [JSON.stringify(searchBarProps), JSON.stringify(pagination), JSON.stringify(sorting)]);
 
@@ -123,8 +128,8 @@ export const InventoryVuls = () => {
 
   return (
     <IntlProvider locale="en">
-      <div className="vulsInventoryContainer">
       <EuiPageTemplate
+        className="vulsInventoryContainer"
         restrictWidth="100%"
         fullHeight={true}
         grow
@@ -158,7 +163,6 @@ export const InventoryVuls = () => {
           )}
         </>
       </EuiPageTemplate>
-      </div>
     </IntlProvider>
   );
 }
