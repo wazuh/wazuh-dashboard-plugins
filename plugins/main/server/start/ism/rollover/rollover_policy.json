@@ -1,0 +1,24 @@
+{
+  "policy": {
+    "description": "Wazuh rollover and alias policy",
+    "default_state": "active",
+    "states": [
+      {
+        "name": "active",
+        "actions": [
+          {
+            "rollover": {
+              "min_primary_shard_size": "${SHARD_SIZE}gb",
+              "min_index_age": "${MIN_INDEX_AGE}",
+              "min_doc_count": "${rollover_min_docs}"
+            }
+          }
+        ]
+      }
+    ],
+    "ism_template": {
+      "index_patterns": ${ISM_INDEX_PATTERNS},
+      "priority": "${ISM_PRIORITY}"
+    }
+  }
+}

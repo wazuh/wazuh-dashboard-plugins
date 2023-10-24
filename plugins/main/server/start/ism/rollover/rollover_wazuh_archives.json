@@ -1,0 +1,7 @@
+{
+  "order": 3,
+  "index_patterns": ["wazuh-archives-*"],
+  "settings": {
+    "index.plugins.index_state_management.rollover_alias": "wazuh-archives"
+  }
+}

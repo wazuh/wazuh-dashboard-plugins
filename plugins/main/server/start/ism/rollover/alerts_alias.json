@@ -1,0 +1,7 @@
+{
+  "aliases": {
+    "wazuh-alerts": {
+      "is_write_index": true
+    }
+  }
+}
