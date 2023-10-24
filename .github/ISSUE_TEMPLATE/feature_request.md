@@ -7,11 +7,15 @@ assignees: ''
 
 ---
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+## Description
+A clear and concise description of what you want to happen: the reason why the issue is created.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Tasks
+The steps that have to be completed in order to close the issue.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+- [ ] Task 1
+- [ ] Task 2
+- [ ] ...
+
+## Additional information
+Add here any additional information relevant to the issue or that will help to close it: chunks of code, logs, additional error messages, related issues and so on.

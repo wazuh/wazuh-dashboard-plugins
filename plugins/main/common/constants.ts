@@ -105,7 +105,10 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
-export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
+export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [
+  1,
+  2
+];
 
 // Wazuh data path
 const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';

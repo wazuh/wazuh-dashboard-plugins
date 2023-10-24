@@ -66,6 +66,7 @@ class WzGroupAgentsTable extends Component {
         align: 'left',
         searchable: true,
         sortable: true,
+        show: true,
       },
       {
         field: 'os.name,os.version',

@@ -2,6 +2,13 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.8.0
+- Added remember server address check [#5680](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5680)
+
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 00
 
 ### Added
