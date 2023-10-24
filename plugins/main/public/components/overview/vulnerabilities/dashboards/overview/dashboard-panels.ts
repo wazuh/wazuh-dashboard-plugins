@@ -352,7 +352,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
 const getVisStateTopVulnerabilities = (indexPatternId: string) => {
   return {
     id: 'most_detected_vulnerabilities',
-    title: 'Most detected vulnerabilities horizontal',
+    title: 'Most detected vulnerabilities',
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
@@ -417,7 +417,7 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
         },
       ],
       addTooltip: true,
-      addLegend: true,
+      addLegend: false,
       legendPosition: 'right',
       times: [],
       addTimeMarker: false,
@@ -495,7 +495,7 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
 const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
-    title: 'The most vulnerable endpoints horizontal',
+    title: 'The most vulnerable endpoints',
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
@@ -560,7 +560,7 @@ const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
         },
       ],
       addTooltip: true,
-      addLegend: true,
+      addLegend: false,
       legendPosition: 'right',
       times: [],
       addTimeMarker: false,
@@ -643,13 +643,123 @@ const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
   };
 };
 
+const getVisStateAccumulationMostDetectedVulnerabilities = (
+  indexPatternId: string,
+) => {
+  return {
+    id: 'accumulation_most_vulnerable_vulnerabilities',
+    title: 'Accumulation of the most detected vulnerabilities',
+    type: 'heatmap',
+    params: {
+      addLegend: true,
+      addTooltip: true,
+      colorSchema: 'Greens',
+      colorsNumber: 5,
+      colorsRange: [
+        {
+          from: 0,
+          to: 100,
+        },
+      ],
+      enableHover: false,
+      invertColors: false,
+      legendPosition: 'right',
+      percentageMode: false,
+      setColorRange: false,
+      times: [],
+      type: 'heatmap',
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          labels: {
+            color: 'black',
+            overwriteColor: false,
+            rotate: 0,
+            show: false,
+          },
+          scale: {
+            defaultYExtents: false,
+            type: 'linear',
+          },
+          show: false,
+          type: 'value',
+        },
+      ],
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {},
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'vulnerability.id',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+          schema: 'group',
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'date_histogram',
+          params: {
+            field: '@timestamp',
+            timeRange: {
+              from: 'now-90d',
+              to: 'now',
+            },
+            useNormalizedOpenSearchInterval: true,
+            scaleMetricValues: false,
+            interval: 'w',
+            // eslint-disable-next-line camelcase
+            drop_partials: false,
+            // eslint-disable-next-line camelcase
+            min_doc_count: 1,
+            // eslint-disable-next-line camelcase
+            extended_bounds: {},
+          },
+          schema: 'segment',
+        },
+      ],
+    },
+  };
+};
+
 const getVisStateInventoryTable = (indexPatternId: string) => {
   return {
     id: 'inventory_table_vulnerabilities',
     title: 'Inventory table',
     type: 'table',
     params: {
-      perPage: 10,
+      perPage: 5,
       showPartialRows: false,
       showMetricsAtAllLevels: false,
       showTotal: false,
@@ -957,8 +1067,7 @@ const getVisStateOpenVsCloseVulnerabilities = (indexPatternId: string) => {
   };
 };
 
-
-export const getDashboardPanels = (): {
+export const getKPIsPanel = (): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }
   >;
@@ -1020,12 +1129,21 @@ export const getDashboardPanels = (): {
         savedVis: getVisStateSeverityLow(VULNERABILITIES_INDEX_PATTERN_ID),
       },
     },
+  };
+};
+
+export const getOpenVsClosePanel = (): {
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
+} => {
+  return {
     '5': {
       gridData: {
         w: 48,
         h: 12,
         x: 0,
-        y: 12,
+        y: 0,
         i: '5',
       },
       type: 'visualization',
@@ -1034,12 +1152,21 @@ export const getDashboardPanels = (): {
         savedVis: getVisStateOpenVsCloseVulnerabilities('wazuh-alerts-*'),
       },
     },
+  };
+};
+
+export const getDashboardPanels = (): {
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
+} => {
+  return {
     '6': {
       gridData: {
-        w: 24,
-        h: 10,
+        w: 16,
+        h: 12,
         x: 0,
-        y: 24,
+        y: 0,
         i: '6',
       },
       type: 'visualization',
@@ -1052,10 +1179,10 @@ export const getDashboardPanels = (): {
     },
     '7': {
       gridData: {
-        w: 24,
-        h: 10,
-        x: 24,
-        y: 24,
+        w: 16,
+        h: 12,
+        x: 16,
+        y: 0,
         i: '7',
       },
       type: 'visualization',
@@ -1068,15 +1195,31 @@ export const getDashboardPanels = (): {
     },
     '8': {
       gridData: {
-        w: 48,
+        w: 16,
         h: 12,
-        x: 0,
-        y: 34,
+        x: 32,
+        y: 0,
         i: '8',
       },
       type: 'visualization',
       explicitInput: {
         id: '8',
+        savedVis: getVisStateAccumulationMostDetectedVulnerabilities(
+          VULNERABILITIES_INDEX_PATTERN_ID,
+        ),
+      },
+    },
+    '9': {
+      gridData: {
+        w: 48,
+        h: 12,
+        x: 0,
+        y: 14,
+        i: '9',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '9',
         savedVis: getVisStateInventoryTable(VULNERABILITIES_INDEX_PATTERN_ID),
       },
     },
