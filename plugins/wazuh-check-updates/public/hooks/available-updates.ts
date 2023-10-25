@@ -17,11 +17,8 @@ export const useAvailableUpdates = () => {
       const checkUpdates = sessionStorage.getItem('checkUpdates');
       const alreadyCheckUpdates = checkUpdates === 'executed';
 
-      const response = (await getCore().http.get(routes.checkUpdates, {
-        query: {
-          checkAvailableUpdates: forceUpdate || !alreadyCheckUpdates,
-        },
-      })) as AvailableUpdates;
+      const response = await getAvailableUpdates(forceUpdate || !alreadyCheckUpdates);
+
       setApisAvailableUpdates(response?.apis_available_updates || []);
       setLastCheck(response?.last_check_date);
       setError(undefined);
@@ -49,4 +46,12 @@ export const useAvailableUpdates = () => {
   }, []);
 
   return { isLoading, apisAvailableUpdates, refreshAvailableUpdates, error, lastCheck };
+};
+
+export const getAvailableUpdates = async (forceUpdate = false): Promise<AvailableUpdates> => {
+  return await getCore().http.get(routes.checkUpdates, {
+    query: {
+      checkAvailableUpdates: forceUpdate,
+    },
+  });
 };

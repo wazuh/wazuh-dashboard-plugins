@@ -25,7 +25,9 @@ export const SettingsAboutAppInfo = ({ appInfo }: SettingsAboutAppInfoProps) => 
   const { ApisUpdateStatus } = getWazuhCheckUpdatesPlugin();
 
   const showVersionWarning = !!apisAvailableUpdates?.find(
-    (apiAvailableUpdates) => apiAvailableUpdates.version !== appInfo['app-version']
+    (apiAvailableUpdates) =>
+      apiAvailableUpdates.current_version &&
+      apiAvailableUpdates.current_version.replace('v', '') !== appInfo['app-version']
   );
 
   return (

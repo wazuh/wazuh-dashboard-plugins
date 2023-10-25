@@ -84,7 +84,7 @@ describe('UpdatesNotification component', () => {
     const dismissCheck = getByText('Disable updates notifications');
     expect(dismissCheck).toBeInTheDocument();
 
-    const checkUpdatesButton = getByRole('button', { name: 'Close' });
+    const checkUpdatesButton = getByRole('button', { name: 'Dismiss' });
     expect(checkUpdatesButton).toBeInTheDocument();
   });
 
@@ -128,7 +128,7 @@ describe('UpdatesNotification component', () => {
 
     const { container, getByRole } = render(<UpdatesNotification />);
 
-    const closeButton = getByRole('button', { name: 'Close' });
+    const closeButton = getByRole('button', { name: 'Dismiss' });
     expect(closeButton).toBeInTheDocument();
     await userEvent.click(closeButton);
 

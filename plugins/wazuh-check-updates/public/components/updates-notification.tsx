@@ -94,6 +94,7 @@ export const UpdatesNotification = () => {
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
                 <EuiButtonEmpty
+                  color="ghost"
                   href={getCore().http.basePath.prepend('/app/wazuh#/settings?tab=about')}
                 >
                   <FormattedMessage
@@ -120,10 +121,10 @@ export const UpdatesNotification = () => {
                 />
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <EuiButton size="s" iconType="cross" onClick={() => handleOnClose()}>
+                <EuiButton fill size="s" iconType="cross" onClick={() => handleOnClose()}>
                   <FormattedMessage
                     id="wazuhCheckUpdates.updatesNotification.closeButtonText"
-                    defaultMessage="Close"
+                    defaultMessage="Dismiss"
                   />
                 </EuiButton>
               </EuiFlexItem>
