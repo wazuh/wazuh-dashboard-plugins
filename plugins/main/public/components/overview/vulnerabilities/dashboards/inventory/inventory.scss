@@ -1,0 +1,8 @@
+.vulsInventoryContainer {
+    height: calc(100vh - 104px);
+}
+
+
+.headerIsExpanded .vulsInventoryContainer {
+    height: calc(100vh - 153px);
+}
