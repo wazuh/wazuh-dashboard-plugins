@@ -318,7 +318,7 @@ export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING =
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION =
   'user-manual/wazuh-dashboard/config-file.html';
 export const PLUGIN_PLATFORM_URL_GUIDE =
-  'https://opensearch.org/docs/1.2/opensearch/index/';
+  'https://opensearch.org/docs/2.10/about';
 export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'OpenSearch guide';
 
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {

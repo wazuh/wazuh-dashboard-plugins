@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from 'enzyme';
 import { SyscollectorInventory } from './inventory';
 
+// TODO: Fix this test
 describe('Inventory component', () => {
   it('A Linux agent should be well rendered.', () => {
     const agent = {

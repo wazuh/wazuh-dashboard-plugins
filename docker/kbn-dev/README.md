@@ -11,11 +11,11 @@ environment. For example:
 
 The script will ask for all the required parameters to bring up the
 environment, including the version of the Elastic Stack you want to
-develop for, and the source code folder where the _wazuh-kibana-app_ is
+develop for, and the source code folder where the _wazuh-dashboard-plugins_ is
 located.
 
 **The script will not select the appropriate version of the
-_wazuh-kibana-app_ to use, so be sure to check out the appropriate version
+_wazuh-dashboard-plugins_ to use, so be sure to check out the appropriate version
 before bringing up the environment!**
 
 ## Notes
