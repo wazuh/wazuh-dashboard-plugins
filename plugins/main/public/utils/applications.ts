@@ -505,7 +505,7 @@ const cdbLists = {
   redirectTo: () => '/manager/?tab=lists',
 };
 
-const endpointGroups = {
+export const endpointGroups = {
   category: 'wz-category-server-management',
   id: 'endpoint-groups',
   title: i18n.translate('wz-app-endpoint-groups', {
