@@ -78,7 +78,9 @@ describe('UpdatesNotification component', () => {
     const message = getByText('New release is available!');
     expect(message).toBeInTheDocument();
 
-    const releaseNotesLink = getByRole('link', { name: 'Go to the about page for details' });
+    const releaseNotesLink = getByRole('link', {
+      name: 'Go to the API configuration page for details',
+    });
     expect(releaseNotesLink).toBeInTheDocument();
 
     const dismissCheck = getByText('Disable updates notifications');

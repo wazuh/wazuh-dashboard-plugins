@@ -99,7 +99,7 @@ export const UpdatesNotification = () => {
                 >
                   <FormattedMessage
                     id="wazuhCheckUpdates.updatesNotification.linkText"
-                    defaultMessage="Go to the about page for details"
+                    defaultMessage="Go to the API configuration page for details"
                   />
                 </EuiButtonEmpty>
               </EuiFlexItem>
