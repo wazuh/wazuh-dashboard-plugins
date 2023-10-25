@@ -1,6 +1,11 @@
 {
   "name": "wazuh-core",
   "version": "4.8.0",
+  "revision": "01",
+  "pluginPlatform": {
+    "version": "2.10.0"
+  },
+  "description": "Wazuh Core",
   "private": true,
   "scripts": {
     "build": "yarn plugin-helpers build",

@@ -77,9 +77,9 @@
   },
   "messages": {
     "wazuhCheckUpdates.updatesNotification.message": "New release is available!",
-    "wazuhCheckUpdates.updatesNotification.linkText": "Go to the about page for details",
+    "wazuhCheckUpdates.updatesNotification.linkText": "Go to the API configuration page for details",
     "wazuhCheckUpdates.updatesNotification.dismissCheckText": "Disable updates notifications",
-    "wazuhCheckUpdates.updatesNotification.closeButtonText": "Close",
+    "wazuhCheckUpdates.updatesNotification.closeButtonText": "Dismiss",
     "wazuhCheckUpdates.apisUpdateStatus.upToDate": "Up to date",
     "wazuhCheckUpdates.apisUpdateStatus.availableUpdates": "Available updates",
     "wazuhCheckUpdates.apisUpdateStatus.error": "Error checking updates",

@@ -1,6 +1,11 @@
 {
   "name": "wazuh-check-updates",
-  "version": "0.0.0",
+  "version": "4.8.0",
+  "revision": "01",
+  "pluginPlatform": {
+    "version": "2.10.0"
+  },
+  "description": "Wazuh Check Updates",
   "private": true,
   "scripts": {
     "build": "yarn plugin-helpers build",
