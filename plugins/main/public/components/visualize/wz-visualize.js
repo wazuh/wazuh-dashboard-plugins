@@ -39,6 +39,7 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { webDocumentationLink } from '../../../common/services/web_documentation';
+import Dashboard from '../../components/agents/sca/dashboard/dashboard';
 
 const visHandler = new VisHandlers();
 
@@ -307,6 +308,16 @@ export const WzVisualize = compose(
                 );
               })}
           </EuiFlexItem>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              {this.props.selectedTab === 'sca' &&
+                this.props.resultState !== 'none' && (
+                  <EuiPanel paddingSize='none'>
+                    <Dashboard />
+                  </EuiPanel>
+                )}
+            </EuiFlexItem>
+          </EuiFlexGroup>
           <EuiFlexGroup style={{ margin: 0 }}>
             {/* <EuiFlexItem>
               {this.props.selectedTab === 'general' && this.props.resultState !== 'none' && (

@@ -87,11 +87,17 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   sca: {
-    init: 'inventory',
+    init: 'dashboard',
     tabs: [
       {
         id: 'inventory',
         name: 'Inventory',
+        buttons: [ButtonModuleExploreAgent],
+        component: MainSca,
+      },
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
@@ -121,8 +127,17 @@ export const ModulesDefaults = {
   },
   github: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: GitHubPanel }, DashboardTab, EventsTab],
-    availableFor: ['manager', 'agent']
+    tabs: [
+      {
+        id: 'inventory',
+        name: 'Panel',
+        buttons: [ButtonModuleExploreAgent],
+        component: GitHubPanel,
+      },
+      DashboardTab,
+      EventsTab,
+    ],
+    availableFor: ['manager', 'agent'],
   },
   ciscat: {
     init: 'dashboard',
@@ -146,7 +161,11 @@ export const ModulesDefaults = {
   mitre: {
     init: 'dashboard',
     tabs: [
-      { id: 'intelligence', name: 'Intelligence', component: ModuleMitreAttackIntelligence },
+      {
+        id: 'intelligence',
+        name: 'Intelligence',
+        component: ModuleMitreAttackIntelligence,
+      },
       {
         id: 'inventory',
         name: 'Framework',
