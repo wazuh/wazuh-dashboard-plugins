@@ -68,7 +68,6 @@ export class AppState {
       if (cluster_info) {
         getCookies().set('clusterInfo', encodedClusterInfo, {
           expires: exp,
-          path: window.location.pathname,
         });
       }
     } catch (error) {
@@ -98,7 +97,6 @@ export class AppState {
       exp.setDate(exp.getDate() + 365);
       getCookies().set('createdAt', createdAt, {
         expires: exp,
-        path: window.location.pathname,
       });
     } catch (error) {
       const options = {
@@ -159,9 +157,7 @@ export class AppState {
   static removeCurrentAPI() {
     const updateApiMenu = updateCurrentApi(false);
     store.dispatch(updateApiMenu);
-    return getCookies().remove('currentApi', {
-      path: window.location.pathname,
-    });
+    return getCookies().remove('currentApi');
   }
 
   /**
@@ -176,7 +172,6 @@ export class AppState {
       if (API) {
         getCookies().set('currentApi', encodedApi, {
           expires: exp,
-          path: window.location.pathname,
         });
         try {
           const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
@@ -227,7 +222,6 @@ export class AppState {
   static setPatternSelector(value) {
     const encodedPattern = encodeURI(value);
     getCookies().set('patternSelector', encodedPattern, {
-      path: window.location.pathname,
     });
   }
 
@@ -242,7 +236,6 @@ export class AppState {
     if (newPattern) {
       getCookies().set('currentPattern', encodedPattern, {
         expires: exp,
-        path: window.location.pathname,
       });
     }
   }
@@ -272,9 +265,7 @@ export class AppState {
    * Remove 'currentPattern' value
    */
   static removeCurrentPattern() {
-    return getCookies().remove('currentPattern', {
-      path: window.location.pathname,
-    });
+    return getCookies().remove('currentPattern');
   }
 
   /**
@@ -327,9 +318,7 @@ export class AppState {
     }
     if (navigate) {
       const encodedURI = encodeURI(JSON.stringify(navigate));
-      getCookies().set('navigate', encodedURI, {
-        path: window.location.pathname,
-      });
+      getCookies().set('navigate', encodedURI);
     }
   }
 
@@ -342,7 +331,7 @@ export class AppState {
   }
 
   static removeNavigation() {
-    return getCookies().remove('navigate', { path: window.location.pathname });
+    return getCookies().remove('navigate');
   }
 
   static setWzMenu(isVisible = true) {
@@ -380,7 +369,7 @@ export class AppState {
   }
 
   static checkCookies() {
-    getCookies().set('appName', 'wazuh', { path: window.location.pathname });
+    getCookies().set('appName', 'wazuh');
     return !!getCookies().get('appName');
   }
 }

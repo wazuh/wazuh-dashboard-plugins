@@ -82,8 +82,7 @@ export const WzMenu = withWindowSize(
       const $injector = getAngularModule().$injector;
       this.router = $injector.get('$route');
       try {
-        const result = await this.genericReq.request('GET', '/hosts/apis', {});
-        const APIlist = result?.data || [];
+        const APIlist = await this.loadApiList();
         if (APIlist.length) {
           const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
           const filteredApi = APIlist.filter(api => api.id === apiId);
@@ -138,11 +137,14 @@ export const WzMenu = withWindowSize(
     loadApiList = async () => {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const APIlist = (result || {}).data || [];
-      if (APIlist.length) this.setState({ APIlist });
+      if (APIlist.length) {
+        return APIlist;
+      }
     };
 
     loadIndexPatternsList = async () => {
       try {
+        let newState = {};
         let list = await PatternHandler.getPatternList('api');
         if (!list) return;
         this.props?.appConfig?.data?.['ip.ignore']?.length &&
@@ -171,30 +173,38 @@ export const WzMenu = withWindowSize(
         const data = filtered
           ? filtered
           : await this.indexPatterns.get(AppState.getCurrentPattern());
-        this.setState({ theresPattern: true, currentPattern: data.title });
+        newState = {
+          ...newState,
+          theresPattern: true,
+          currentPattern: data.title,
+        };
 
         // Getting the list of index patterns
         if (list) {
-          this.setState({
+          newState = {
+            ...newState,
             patternList: list,
             currentSelectedPattern: AppState.getCurrentPattern(),
-          });
+          };
         }
+        return newState;
       } catch (error) {
         throw error;
       }
     };
 
     async componentDidUpdate(prevProps) {
+      let newState = {};
       if (this.state.APIlist && !this.state.APIlist.length) {
-        this.loadApiList();
+        const APIlist = await this.loadApiList();
+        newState = { ...newState, APIlist };
       }
       const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
       const { currentAPI } = this.state;
       const currentTab = this.getCurrentTab();
 
       if (currentTab !== this.state.currentMenuTab) {
-        this.setState({ currentMenuTab: currentTab });
+        newState = { ...newState, currentMenuTab: currentTab };
       }
 
       if (this.props.windowSize) {
@@ -205,17 +215,17 @@ export const WzMenu = withWindowSize(
         prevProps.state.showMenu !== this.props.state.showMenu ||
         (this.props.state.showMenu === true && this.state.showMenu === false)
       ) {
-        this.load();
+        newState = { ...newState, ...(await this.load()) };
       }
       if ((!currentAPI && apiId) || apiId !== currentAPI) {
-        this.setState({ currentAPI: apiId });
+        newState = { ...newState, currentAPI: apiId };
       } else {
         if (
           currentAPI &&
           this.props.state.currentAPI &&
           currentAPI !== this.props.state.currentAPI
         ) {
-          this.setState({ currentAPI: this.props.state.currentAPI });
+          newState = { ...newState, currentAPI: this.props.state.currentAPI };
         }
       }
       if (
@@ -224,22 +234,32 @@ export const WzMenu = withWindowSize(
           this.props?.appConfig?.data?.['ip.ignore'],
         )
       ) {
-        this.loadIndexPatternsList();
+        newState = { ...newState, ...(await this.loadIndexPatternsList()) };
+      }
+      newState = { ...prevProps.state, ...newState };
+      if (!_.isEqual(newState, prevProps.state)) {
+        // and the state is different from the previous one
+        this.setState(newState);
       }
     }
 
     async load() {
       try {
-        this.setState({
+        let newState = {};
+        newState = {
           showMenu: true,
           isOverviewPopoverOpen: false,
           isManagementPopoverOpen: false,
           isSelectorsPopoverOpen: false,
-        });
+        };
 
         const currentTab = this.getCurrentTab();
         if (currentTab !== this.state.currentMenuTab) {
-          this.setState({ currentMenuTab: currentTab, hover: currentTab });
+          newState = {
+            ...newState,
+            currentMenuTab: currentTab,
+            hover: currentTab,
+          };
         }
         let list = await PatternHandler.getPatternList('api');
         if (!list || (list && !list.length)) return;
@@ -269,15 +289,21 @@ export const WzMenu = withWindowSize(
         const data = filtered
           ? filtered
           : await this.indexPatterns.get(AppState.getCurrentPattern());
-        this.setState({ theresPattern: true, currentPattern: data.title });
+        newState = {
+          ...newState,
+          theresPattern: true,
+          currentPattern: data.title,
+        };
 
         // Getting the list of index patterns
         if (list) {
-          this.setState({
+          newState = {
+            ...newState,
             patternList: list,
             currentSelectedPattern: AppState.getCurrentPattern(),
-          });
+          };
         }
+        return newState;
       } catch (error) {
         const options = {
           context: `${WzMenu.name}.load`,
@@ -326,14 +352,13 @@ export const WzMenu = withWindowSize(
       }
     };
 
-    updatePatternAndApi = () => {
-      this.setState(
-        { menuOpened: false, hover: this.state.currentMenuTab },
-        async () => {
-          await this.loadApiList();
-          await this.loadIndexPatternsList();
-        },
-      );
+    updatePatternAndApi = async () => {
+      this.setState({
+        menuOpened: false,
+        hover: this.state.currentMenuTab,
+        ...(await this.loadApiList()),
+        ...(await this.loadIndexPatternsList()),
+      });
     };
 
     /**
