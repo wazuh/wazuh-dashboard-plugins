@@ -39,12 +39,13 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { webDocumentationLink } from '../../../common/services/web_documentation';
+import Dashboard from '../../components/agents/sca/dashboard/dashboard';
 
 const visHandler = new VisHandlers();
 
 export const WzVisualize = compose(
   withErrorBoundary,
-  withReduxProvider
+  withReduxProvider,
 )(
   class WzVisualize extends Component {
     _isMount = false;
@@ -64,7 +65,9 @@ export const WzVisualize = compose(
       const wazuhConfig = new WazuhConfig();
       this.commonData = new CommonData();
       const configuration = wazuhConfig.getConfig();
-      this.monitoringEnabled = !!(configuration || {})['wazuh.monitoring.enabled'];
+      this.monitoringEnabled = !!(configuration || {})[
+        'wazuh.monitoring.enabled'
+      ];
       this.newFields = {};
     }
 
@@ -96,7 +99,9 @@ export const WzVisualize = compose(
       ) {
         this._isMount &&
           this.setState({
-            visualizations: !!this.props.isAgent ? agentVisualizations : visualizations,
+            visualizations: !!this.props.isAgent
+              ? agentVisualizations
+              : visualizations,
           });
         visHandler.removeAll();
       }
@@ -106,8 +111,10 @@ export const WzVisualize = compose(
       this._isMount = false;
     }
 
-    expand = (id) => {
-      this.setState({ expandedVis: this.state.expandedVis === id ? false : id });
+    expand = id => {
+      this.setState({
+        expandedVis: this.state.expandedVis === id ? false : id,
+      });
     };
 
     refreshKnownFields = async (newField = null) => {
@@ -131,49 +138,56 @@ export const WzVisualize = compose(
             severity: UI_ERROR_SEVERITIES.BUSINESS,
             error: {
               error: error,
-              message: 'The index pattern could not be refreshed' || error.message || error,
+              message:
+                'The index pattern could not be refreshed' ||
+                error.message ||
+                error,
               title: error.name || error,
             },
           };
           getErrorOrchestrator().handleError(options);
         }
       } else if (this.isRefreshing) {
-        await new Promise((r) => setTimeout(r, 150));
+        await new Promise(r => setTimeout(r, 150));
         await this.refreshKnownFields();
       }
     };
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
       const urlTroubleShootingDocs = webDocumentationLink(
-        'user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up'
+        'user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up',
       );
       getToasts().add({
         color: 'success',
         title: 'The index pattern was refreshed successfully.',
-        text: toMountPoint(<EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
-          <EuiFlexItem grow={false}>
-            There were some unknown fields for the current index pattern.
-            You need to refresh the page to apply the changes.
-            <EuiLink
-              title="More information in Wazuh documentation"
-              href={urlTroubleShootingDocs}
-              target="_blank"
-              external
-            >
-              Troubleshooting
-            </EuiLink>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
-          </EuiFlexItem>
-        </EuiFlexGroup>),
-        toastLifeTimeMs
+        text: toMountPoint(
+          <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
+            <EuiFlexItem grow={false}>
+              There were some unknown fields for the current index pattern. You
+              need to refresh the page to apply the changes.
+              <EuiLink
+                title='More information in Wazuh documentation'
+                href={urlTroubleShootingDocs}
+                target='_blank'
+                external
+              >
+                Troubleshooting
+              </EuiLink>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton onClick={() => window.location.reload()} size='s'>
+                Reload page
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>,
+        ),
+        toastLifeTimeMs,
       });
     };
     render() {
       const { visualizations } = this.state;
       const { selectedTab } = this.props;
-      const renderVisualizations = (vis) => {
+      const renderVisualizations = vis => {
         return (
           <EuiFlexItem
             grow={parseInt((vis.width || 10) / 10)}
@@ -181,18 +195,25 @@ export const WzVisualize = compose(
             style={{ maxWidth: vis.width + '%', margin: 0, padding: 12 }}
           >
             <EuiPanel
-              paddingSize="none"
-              className={this.state.expandedVis === vis.id ? 'fullscreen h-100' : 'h-100'}
+              paddingSize='none'
+              className={
+                this.state.expandedVis === vis.id ? 'fullscreen h-100' : 'h-100'
+              }
             >
-              <EuiFlexItem className="h-100">
-                <EuiFlexGroup style={{ padding: '12px 12px 0px' }} className="embPanel__header">
-                  <h2 className="embPanel__title wz-headline-title">{vis.title}</h2>
+              <EuiFlexItem className='h-100'>
+                <EuiFlexGroup
+                  style={{ padding: '12px 12px 0px' }}
+                  className='embPanel__header'
+                >
+                  <h2 className='embPanel__title wz-headline-title'>
+                    {vis.title}
+                  </h2>
                   <EuiButtonIcon
-                    color="text"
+                    color='text'
                     style={{ padding: '0px 6px', height: 30 }}
                     onClick={() => this.expand(vis.id)}
-                    iconType="expand"
-                    aria-label="Expand"
+                    iconType='expand'
+                    aria-label='Expand'
                   />
                 </EuiFlexGroup>
                 <div style={{ height: '100%' }}>
@@ -227,7 +248,7 @@ export const WzVisualize = compose(
                     marginBottom: visRow.noMargin ? '' : '4px',
                   }}
                 >
-                  {visRow.vis.map((visualizeRow) => {
+                  {visRow.vis.map(visualizeRow => {
                     return renderVisualizations(visualizeRow);
                   })}
                 </EuiFlexGroup>
@@ -243,18 +264,25 @@ export const WzVisualize = compose(
           {this.props.resultState === 'ready' && <SampleDataWarning />}
 
           {this.props.resultState === 'none' && (
-            <div className="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8">
+            <div className='wz-margin-top-10 wz-margin-right-8 wz-margin-left-8'>
               <EuiCallOut
-                title="There are no results for selected time range. Try another
-                    one."
-                color="warning"
-                iconType="help"
+                title='There are no results for selected time range. Try another
+                    one.'
+                color='warning'
+                iconType='help'
               ></EuiCallOut>
             </div>
           )}
-          <EuiFlexItem className={(this.props.resultState === 'none' && 'no-opacity') || ''}>
+          <EuiFlexItem
+            className={
+              (this.props.resultState === 'none' && 'no-opacity') || ''
+            }
+          >
             {this.props.resultState === 'ready' && (
-              <Metrics section={selectedTab} resultState={this.props.resultState} />
+              <Metrics
+                section={selectedTab}
+                resultState={this.props.resultState}
+              />
             )}
 
             {selectedTab &&
@@ -280,8 +308,18 @@ export const WzVisualize = compose(
                 );
               })}
           </EuiFlexItem>
-          <EuiFlexGroup style={{ margin: 0 }}>
+          <EuiFlexGroup>
             <EuiFlexItem>
+              {this.props.selectedTab === 'sca' &&
+                this.props.resultState !== 'none' && (
+                  <EuiPanel paddingSize='none'>
+                    <Dashboard />
+                  </EuiPanel>
+                )}
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiFlexGroup style={{ margin: 0 }}>
+            {/* <EuiFlexItem>
               {this.props.selectedTab === 'general' && this.props.resultState !== 'none' && (
                 <EuiPanel
                   paddingSize="none"
@@ -306,10 +344,10 @@ export const WzVisualize = compose(
                   </EuiFlexItem>
                 </EuiPanel>
               )}
-            </EuiFlexItem>
+            </EuiFlexItem> */}
           </EuiFlexGroup>
         </Fragment>
       );
     }
-  }
+  },
 );

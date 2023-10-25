@@ -132,7 +132,8 @@ export const ScaScan = compose(
     }
 
     onClickRow = policy => {
-      window.location.href = `#/overview?tab=sca&redirectPolicyTable=${policy.policy_id}`;
+      localStorage.setItem('scaPolicies', JSON.stringify(this.state.policies));
+      window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}`;
       store.dispatch(updateCurrentAgentData(this.props.agent));
       this.router.reload();
     };
@@ -191,7 +192,7 @@ export const ScaScan = compose(
               <EuiTitle size='xs'>
                 <EuiLink
                   onClick={() => {
-                    window.location.href = `#/overview?tab=sca&redirectPolicyTable=${lastScan.policy_id}`;
+                    window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
                     store.dispatch(updateCurrentAgentData(this.props.agent));
                     this.router.reload();
                   }}
