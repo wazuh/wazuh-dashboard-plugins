@@ -846,5 +846,10 @@ export const Categories = [
     order: 600,
     euiIconType: 'indexRollupApp',
   },
-  DEFAULT_APP_CATEGORIES.management,
+  {
+    id: 'management',
+    label: 'Indexer/dashboard Management',
+    order: 5e3,
+    euiIconType: 'managementApp',
+  },
 ];
