@@ -1,7 +1,11 @@
 import React from 'react';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getDashboardPanels, getKPIsPanel, getOpenVsClosePanel } from './dashboard-panels';
+import {
+  getDashboardPanels,
+  getKPIsPanel,
+  getOpenVsClosePanel,
+} from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBarConfiguration from '../../searchbar/use-search-bar-configuration';
 import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
@@ -26,7 +30,10 @@ export const DashboardVuls: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <SearchBar appName="vulnerability-detector-searchbar" {...searchBarProps} />
+        <SearchBar
+          appName='vulnerability-detector-searchbar'
+          {...searchBarProps}
+        />
       </I18nProvider>
       <DashboardFilters searchBarProps={searchBarProps} />
       <DashboardByRenderer
@@ -64,7 +71,8 @@ export const DashboardVuls: React.FC = () => {
             to: searchBarProps.dateRangeTo,
           },
           title: 'Open vs Close Vulnerabilities',
-          description: 'Open vs Close Vulnerabilities of the Vulnerability detector',
+          description:
+            'Open vs Close Vulnerabilities of the Vulnerability detector',
           query: searchBarProps.query,
           refreshConfig: {
             pause: false,
