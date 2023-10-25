@@ -12,10 +12,7 @@ type tDataGridProps = {
 };
 
 export const parseColumns = (fields: IFieldType[]): EuiDataGridColumn[] => {
-    console.log(fields);
-    // filter the fields that are not esStype keyword
-    const notKeywordFields = fields.filter((field) => field.esTypes && !field.esTypes.includes('keyword'));
-    return notKeywordFields.map((field) => {
+    return fields.map((field) => {
         return {
             id: field.name,
             display: field.name,
