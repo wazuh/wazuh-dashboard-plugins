@@ -148,7 +148,7 @@ export const ModulesDefaults = {
       EventsTab,
     ],
     buttons: ['settings'],
-    availableFor: ['manager', 'agent'],
+    availableFor: ['manager'],
   },
   mitre: {
     init: 'dashboard',
