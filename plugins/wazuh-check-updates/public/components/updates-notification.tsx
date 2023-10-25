@@ -95,7 +95,7 @@ export const UpdatesNotification = () => {
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
                 <EuiButtonEmpty
                   color="ghost"
-                  href={getCore().http.basePath.prepend('/app/wazuh#/settings?tab=api')}
+                  href={getCore().http.basePath.prepend('/app/server-api#/settings?tab=api')}
                 >
                   <FormattedMessage
                     id="wazuhCheckUpdates.updatesNotification.linkText"
