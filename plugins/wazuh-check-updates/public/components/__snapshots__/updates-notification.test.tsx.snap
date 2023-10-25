@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UpdatesNotification component should return null when is loading 1`] = `<div />`;
+
+exports[`UpdatesNotification component should return null when there are no available updates 1`] = `<div />`;
+
+exports[`UpdatesNotification component should return null when user already dismissed the notifications for available updates 1`] = `<div />`;
+
+exports[`UpdatesNotification component should return null when user close notification 1`] = `<div />`;
+
+exports[`UpdatesNotification component should return null when user dismissed notifications for future 1`] = `<div />`;
+
+exports[`UpdatesNotification component should return the nofication component 1`] = `<div />`;

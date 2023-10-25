@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.8.0
+- Added the ability to check if there are available updates from the UI.
 
 - Added remember server address check [#5680](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5680)
 

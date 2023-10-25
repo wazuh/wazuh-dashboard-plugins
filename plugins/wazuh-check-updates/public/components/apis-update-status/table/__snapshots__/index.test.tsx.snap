@@ -1,0 +1,150 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ApisUpdateTable component should return the ApisUpdateTable component 1`] = `
+<div>
+  <div
+    class="euiBasicTable"
+  >
+    <div>
+      <div
+        class="euiTableHeaderMobile"
+      >
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
+        >
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero"
+          />
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero"
+          />
+        </div>
+      </div>
+      <table
+        class="euiTable euiTable--responsive euiTable--auto"
+        id="htmlId"
+        tabindex="-1"
+      >
+        <caption
+          class="euiScreenReaderOnly euiTableCaption"
+        />
+        <thead>
+          <tr>
+            <th
+              class="euiTableHeaderCell"
+              data-test-subj="tableHeaderCell_api_id_0"
+              role="columnheader"
+              scope="col"
+            >
+              <span
+                class="euiTableCellContent"
+              >
+                <span
+                  class="euiTableCellContent__text"
+                  title="ID"
+                >
+                  ID
+                </span>
+              </span>
+            </th>
+            <th
+              class="euiTableHeaderCell"
+              data-test-subj="tableHeaderCell_current_version_1"
+              role="columnheader"
+              scope="col"
+            >
+              <span
+                class="euiTableCellContent"
+              >
+                <span
+                  class="euiTableCellContent__text"
+                  title="Version"
+                >
+                  Version
+                </span>
+              </span>
+            </th>
+            <th
+              class="euiTableHeaderCell"
+              data-test-subj="tableHeaderCell_status_2"
+              role="columnheader"
+              scope="col"
+            >
+              <span
+                class="euiTableCellContent"
+              >
+                <span
+                  class="euiTableCellContent__text"
+                  title="Update status"
+                >
+                  Update status
+                </span>
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            class="euiTableRow"
+          >
+            <td
+              class="euiTableRowCell"
+            >
+              <div
+                class="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
+              >
+                ID
+              </div>
+              <div
+                class="euiTableCellContent"
+              >
+                <span
+                  class="euiTableCellContent__text"
+                >
+                  api id
+                </span>
+              </div>
+            </td>
+            <td
+              class="euiTableRowCell"
+            >
+              <div
+                class="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
+              >
+                Version
+              </div>
+              <div
+                class="euiTableCellContent"
+              >
+                <span
+                  class="euiTableCellContent__text"
+                >
+                  4.3.1
+                </span>
+              </div>
+            </td>
+            <td
+              class="euiTableRowCell"
+            >
+              <div
+                class="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
+              >
+                Update status
+              </div>
+              <div
+                class="euiTableCellContent"
+              >
+                <span
+                  class="euiTableCellContent__text"
+                >
+                  availableUpdates
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+`;

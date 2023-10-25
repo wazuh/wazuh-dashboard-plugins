@@ -35,6 +35,8 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
+import { AvailableUpdatesFlyout } from './available-updates-flyout';
 
 export const ApiTable = compose(
   withErrorBoundary,
@@ -44,16 +46,34 @@ export const ApiTable = compose(
     constructor(props) {
       super(props);
 
+      const { getAvailableUpdates } = getWazuhCheckUpdatesPlugin();
+
       this.state = {
         apiEntries: [],
         refreshingEntries: false,
+        availableUpdates: {},
+        getAvailableUpdates,
+        refreshingAvailableUpdates: true,
+        apiAvailableUpdateDetails: undefined,
       };
+    }
+
+    async getApisAvailableUpdates(forceUpdate = false) {
+      try {
+        this.setState({ refreshingAvailableUpdates: true });
+        const availableUpdates = await this.state.getAvailableUpdates(forceUpdate);
+        this.setState({ availableUpdates });
+      } catch (e) {
+      } finally {
+        this.setState({ refreshingAvailableUpdates: false });
+      }
     }
 
     componentDidMount() {
       this.setState({
         apiEntries: this.props.apiEntries,
       });
+      this.getApisAvailableUpdates();
     }
 
     /**
@@ -164,7 +184,44 @@ export const ApiTable = compose(
     }
 
     render() {
-      const items = [...this.state.apiEntries];
+      const { DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
+
+      const API_UPDATES_STATUS_COLUMN = {
+        success: {
+          text: 'Up to date',
+          color: 'success',
+        },
+        availableUpdates: {
+          text: 'Available updates',
+          color: 'warning',
+        },
+        disabled: {
+          text: 'Checking updates disabled',
+          color: 'subdued',
+        },
+        error: {
+          text: 'Error checking updates',
+          color: 'danger',
+        },
+      };
+
+      const isLoading = this.state.refreshingEntries || this.state.refreshingAvailableUpdates;
+
+      const items = [
+        ...this.state.apiEntries?.map((apiEntry) => {
+          const versionData =
+            this.state.availableUpdates?.apis_available_updates?.find(
+              (apiAvailableUpdates) => apiAvailableUpdates.api_id === apiEntry.id
+            ) || {};
+
+          return {
+            ...versionData,
+            ...apiEntry,
+            version_status: versionData.status,
+          };
+        }),
+      ];
+
       const columns = [
         {
           field: 'id',
@@ -253,6 +310,44 @@ export const ApiTable = compose(
           },
         },
         {
+          field: 'current_version',
+          name: 'Version',
+          align: 'left',
+        },
+        {
+          field: 'version_status',
+          name: 'Updates status',
+          width: '200px',
+          render: (item, api) => {
+            const getColor = () => {
+              return API_UPDATES_STATUS_COLUMN[item]?.color || 'danger';
+            };
+
+            const getContent = () => {
+              return API_UPDATES_STATUS_COLUMN[item]?.text || 'Error checking updates';
+            };
+
+            return (
+              <EuiFlexGroup alignItems="center" gutterSize="s">
+                <EuiFlexItem grow={false}>
+                  <EuiHealth color={getColor()}>{getContent()}</EuiHealth>
+                </EuiFlexItem>
+                {item === 'availableUpdates' ? (
+                  <EuiFlexItem grow={false}>
+                    <EuiToolTip position="top" content={<p>View available updates</p>}>
+                      <EuiButtonIcon
+                        aria-label="Availabe updates"
+                        iconType="eye"
+                        onClick={() => this.setState({ apiAvailableUpdateDetails: api })}
+                      />
+                    </EuiToolTip>
+                  </EuiFlexItem>
+                ) : null}
+              </EuiFlexGroup>
+            );
+          },
+        },
+        {
           name: 'Run as',
           field: 'allow_run_as',
           align: 'center',
@@ -326,7 +421,7 @@ export const ApiTable = compose(
       return (
         <EuiPage>
           <EuiPanel paddingSize='l'>
-            <EuiFlexGroup>
+            <EuiFlexGroup alignItems="center">
               <EuiFlexItem>
                 <EuiFlexGroup>
                   <EuiFlexItem>
@@ -354,6 +449,17 @@ export const ApiTable = compose(
                   Refresh
                 </EuiButtonEmpty>
               </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  iconType="refresh"
+                  onClick={async () => await this.getApisAvailableUpdates(true)}
+                >
+                  Check updates
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <DismissNotificationCheck />
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -373,6 +479,11 @@ export const ApiTable = compose(
               loading={this.state.refreshingEntries}
             />
           </EuiPanel>
+          <AvailableUpdatesFlyout
+            api={this.state.apiAvailableUpdateDetails}
+            isVisible={!!this.state.apiAvailableUpdateDetails}
+            onClose={() => this.setState({ apiAvailableUpdateDetails: undefined })}
+          />
         </EuiPage>
       );
     }
