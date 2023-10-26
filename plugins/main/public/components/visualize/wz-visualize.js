@@ -88,7 +88,7 @@ export const WzVisualize = compose(
      * from a type to another, but aren't when the pinned agent changes.
      *
      * More info:
-     * https://github.com/wazuh/wazuh-kibana-app/issues/4230#issuecomment-1152161434
+     * https://github.com/wazuh/wazuh-dashboard-plugins/issues/4230#issuecomment-1152161434
      *
      * @param {Object} prevProps
      */
