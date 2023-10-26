@@ -39,6 +39,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
+import { formatUIDate } from '../../../react-services/time-service';
 
 export const ApiTable = compose(
   withErrorBoundary,
@@ -65,7 +66,20 @@ export const ApiTable = compose(
         this.setState({ refreshingAvailableUpdates: true });
         const availableUpdates = await this.state.getAvailableUpdates(forceUpdate);
         this.setState({ availableUpdates });
-      } catch (e) {
+      } catch (error) {
+        const options = {
+          context: `${ApiTable.name}.checkAvailableUpdates`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error checking available updates: ${error.message || error}`,
+          },
+        };
+
+        getErrorOrchestrator().handleError(options);
       } finally {
         this.setState({ refreshingAvailableUpdates: false });
       }
@@ -440,7 +454,19 @@ export const ApiTable = compose(
                   iconType="refresh"
                   onClick={async () => await this.getApisAvailableUpdates(true)}
                 >
-                  Check updates
+                  <span>
+                    Check updatess{' '}
+                    <EuiToolTip
+                      title="Last check"
+                      content={
+                        this.state.availableUpdates?.last_check_date
+                          ? formatUIDate(new Date(this.state.availableUpdates.last_check_date))
+                          : '-'
+                      }
+                    >
+                      <EuiIcon type="iInCircle" color="primary" />
+                    </EuiToolTip>
+                  </span>
                 </EuiButtonEmpty>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
