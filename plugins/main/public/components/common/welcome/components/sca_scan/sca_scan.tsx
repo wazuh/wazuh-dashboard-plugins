@@ -28,10 +28,7 @@ import {
 } from '@elastic/eui';
 import moment from 'moment-timezone';
 import store from '../../../../../redux/store';
-import {
-  updateCurrentAgentData,
-  updateAgentPoliciesData,
-} from '../../../../../redux/actions/appStateActions';
+import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { WzRequest } from '../../../../../react-services';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { getAngularModule } from '../../../../../kibana-services';
@@ -283,7 +280,6 @@ export const ScaScan = compose(
                         window.location.href = `#/overview?tab=sca`;
                         store.dispatch(
                           updateCurrentAgentData(this.props.agent),
-                          updateAgentPoliciesData(this.state.policies),
                         );
                         this.router.reload();
                       }}
