@@ -49,7 +49,7 @@ In general, the environment consist of:
 
     ```bash
     # ./bashrc
-    export WZ_HOME=~/your/path/to/wazuh_kibana_app/plugins/main
+    export WZ_HOME=~/your/path/to/wazuh_kibana_app/plugins
     ```
     Save and re-login or restart your terminal to apply the changes. Test that the variable has been set with:
 
