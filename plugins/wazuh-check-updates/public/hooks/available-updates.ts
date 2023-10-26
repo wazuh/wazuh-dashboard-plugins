@@ -20,7 +20,7 @@ export const useAvailableUpdates = () => {
       const response = await getAvailableUpdates(forceUpdate || !alreadyCheckUpdates);
 
       setApisAvailableUpdates(response?.apis_available_updates || []);
-      setLastCheck(response?.last_check_date);
+      setLastCheck(response?.last_check_date?.toString());
       setError(undefined);
 
       if (!alreadyCheckUpdates) {
