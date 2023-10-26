@@ -48,7 +48,6 @@ import WzViewSelector, {
 } from './util-components/view-selector';
 import WzLoading from './util-components/loading';
 import { withRenderIfOrWrapped } from './util-hocs/render-if';
-import { WzAgentNeverConnectedPrompt } from './configuration-no-agent';
 import WzConfigurationPath from './util-components/configuration-path';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
@@ -83,6 +82,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { WzConfigurationOffice365 } from './office365/office365';
 import { getCore } from '../../../../../kibana-services';
+import { PromptAgentNeverConnected } from '../../../../../components/agents/prompts';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -499,7 +499,7 @@ export default compose(
   ]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
   withRenderIfOrWrapped(
     props => props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
-    WzAgentNeverConnectedPrompt,
+    PromptAgentNeverConnected,
   ),
   connect(mapStateToProps, mapDispatchToProps),
 )(WzConfigurationSwitch);

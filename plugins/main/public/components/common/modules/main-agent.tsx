@@ -59,18 +59,6 @@ export class MainModuleAgent extends Component {
     this.router = $injector.get('$route');
   }
 
-  showAgentInfo() {
-    const elem = document.getElementsByClassName('wz-module-body-main')[0];
-    if (elem) {
-      if (!this.state.showAgentInfo) {
-        elem.classList.add('wz-module-body-main-double');
-      } else {
-        elem.classList.remove('wz-module-body-main-double');
-      }
-    }
-    this.setState({ showAgentInfo: !this.state.showAgentInfo });
-  }
-
   async startReport() {
     this.setState({ loadingReport: true });
     const syscollectorFilters: any[] = [];
@@ -158,7 +146,7 @@ export class MainModuleAgent extends Component {
         </div>
         {agent && agent.os && (
           <Fragment>
-            <div className='wz-module-header-nav-wrapper'>
+            <div>
               <div
                 className={
                   this.props.tabs &&

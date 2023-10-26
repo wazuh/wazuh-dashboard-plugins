@@ -13,20 +13,20 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { EuiEmptyPrompt, EuiButton } from '@elastic/eui';
-import { showExploreAgentModal } from '../../redux/actions/appStateActions';
+import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 
 export const PromptAgentNoSupportModule = () => {
   const dispatch = useDispatch();
-  const openAgentSelector = () => dispatch(showExploreAgentModal(true));
+  const openAgentSelector = () => dispatch(showExploreAgentModalGlobal(true));
   return (
     <EuiEmptyPrompt
-      iconType="watchesApp"
+      iconType='watchesApp'
       title={<h2>Module not supported by the agent</h2>}
       actions={
-        <EuiButton color="primary" fill onClick={openAgentSelector}>
+        <EuiButton color='primary' fill onClick={openAgentSelector}>
           Select agent
         </EuiButton>
       }
     />
-  )
-}
+  );
+};

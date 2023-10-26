@@ -18,27 +18,6 @@ export const configEquivalences = {
   'checks.metaFields': `Change the default value of the ${PLUGIN_PLATFORM_NAME} metaField configuration`,
   'checks.timeFilter': `Change the default value of the ${PLUGIN_PLATFORM_NAME} timeFilter configuration`,
   'checks.maxBuckets': `Change the default value of the ${PLUGIN_PLATFORM_NAME} max buckets configuration`,
-  'extensions.pci': 'Enable or disable the PCI DSS tab on Overview and Agents.',
-  'extensions.gdpr': 'Enable or disable the GDPR tab on Overview and Agents.',
-  'extensions.hipaa': 'Enable or disable the HIPAA tab on Overview and Agents.',
-  'extensions.nist':
-    'Enable or disable the NIST 800-53 tab on Overview and Agents.',
-  'extensions.tsc': 'Enable or disable the TSC tab on Overview and Agents.',
-  'extensions.audit': 'Enable or disable the Audit tab on Overview and Agents.',
-  'extensions.oscap':
-    'Enable or disable the Open SCAP tab on Overview and Agents.',
-  'extensions.ciscat':
-    'Enable or disable the CIS-CAT tab on Overview and Agents.',
-  'extensions.aws': 'Enable or disable the Amazon (AWS) tab on Overview.',
-  'extensions.gcp':
-    'Enable or disable the Google Cloud Platform tab on Overview.',
-  'extensions.virustotal':
-    'Enable or disable the VirusTotal tab on Overview and Agents.',
-  'extensions.osquery':
-    'Enable or disable the Osquery tab on Overview and Agents.',
-  'extensions.mitre': 'Enable or disable the MITRE tab on Overview and Agents.',
-  'extensions.docker':
-    'Enable or disable the Docker listener tab on Overview and Agents.',
   timeout:
     'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
   'ip.selector':

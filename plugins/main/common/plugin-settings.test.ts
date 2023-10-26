@@ -122,40 +122,12 @@ describe('[settings] Input validation', () => {
     ${'customization.reports.header'}   | ${'Test\nTest\nTest\nTest\nTest'}                                      | ${'The string should have less or equal to 3 line/s.'}
     ${'customization.reports.header'}   | ${'Line with 20 charact\nTest'}                                        | ${undefined}
     ${'customization.reports.header'}   | ${'Testing maximum length of a line of 40 characters\nTest'}           | ${'The maximum length of a line is 40 characters.'}
-    ${'disabled_roles'}                 | ${['test']}                                                            | ${undefined}
-    ${'disabled_roles'}                 | ${['']}                                                                | ${'Value can not be empty.'}
-    ${'disabled_roles'}                 | ${['test space']}                                                      | ${'No whitespaces allowed.'}
-    ${'disabled_roles'}                 | ${['test', 4]}                                                         | ${'Value is not a string.'}
     ${'enrollment.dns'}                 | ${'test'}                                                              | ${undefined}
     ${'enrollment.dns'}                 | ${''}                                                                  | ${undefined}
     ${'enrollment.dns'}                 | ${'test space'}                                                        | ${'No whitespaces allowed.'}
     ${'enrollment.password'}            | ${'test'}                                                              | ${undefined}
     ${'enrollment.password'}            | ${''}                                                                  | ${'Value can not be empty.'}
     ${'enrollment.password'}            | ${'test space'}                                                        | ${undefined}
-    ${'extensions.audit'}               | ${true}                                                                | ${undefined}
-    ${'extensions.audit'}               | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.aws'}                 | ${true}                                                                | ${undefined}
-    ${'extensions.aws'}                 | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.ciscat'}              | ${true}                                                                | ${undefined}
-    ${'extensions.ciscat'}              | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.gcp'}                 | ${true}                                                                | ${undefined}
-    ${'extensions.gcp'}                 | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.gdpr'}                | ${true}                                                                | ${undefined}
-    ${'extensions.gdpr'}                | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.hipaa'}               | ${true}                                                                | ${undefined}
-    ${'extensions.hipaa'}               | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.nist'}                | ${true}                                                                | ${undefined}
-    ${'extensions.nist'}                | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.oscap'}               | ${true}                                                                | ${undefined}
-    ${'extensions.oscap'}               | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.osquery'}             | ${true}                                                                | ${undefined}
-    ${'extensions.osquery'}             | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.pci'}                 | ${true}                                                                | ${undefined}
-    ${'extensions.pci'}                 | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.tsc'}                 | ${true}                                                                | ${undefined}
-    ${'extensions.tsc'}                 | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'extensions.virustotal'}          | ${true}                                                                | ${undefined}
-    ${'extensions.virustotal'}          | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'ip.ignore'}                      | ${['test']}                                                            | ${undefined}
     ${'ip.ignore'}                      | ${['test*']}                                                           | ${undefined}
     ${'ip.ignore'}                      | ${['']}                                                                | ${'Value can not be empty.'}

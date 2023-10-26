@@ -20,7 +20,7 @@
 
 # Scope
 
-This solution try to simplify the error management in the wazuh-kibana-app plugin.
+This solution try to simplify the error management in the main plugin.
 The main goal is to create a standard way to manage the errors in the plugin.
 By this way, the developer must be abstracted to the error management.
 
@@ -97,7 +97,7 @@ The error orchestrator have the responsability to receive and error and showing 
 
 The current error handler tells the error orchestrator how the error will be shown to the user/developer. It sends the error and the showing options to the error orchestrator.
 
-For more details about the error orchestrator see the [Error Orchestrator documentation](https://github.com/wazuh/wazuh-kibana-app/blob/ef071e55fd310bdb4cecb7d490ea83372bb07b01/public/react-services/error-orchestrator/README.md)
+For more details about the error orchestrator see the [Error Orchestrator documentation](https://github.com/wazuh/wazuh-dashboard-plugins/blob/ef071e55fd310bdb4cecb7d490ea83372bb07b01/public/react-services/error-orchestrator/README.md)
 
 ## React patterns
 

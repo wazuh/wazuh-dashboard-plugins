@@ -14,104 +14,23 @@ import store from '../redux/store';
 import {
   updateCurrentApi,
   updateShowMenu,
-  updateExtensions
 } from '../redux/actions/appStateActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { WazuhConfig } from './wazuh-config';
 import { CSVRequest } from '../services/csv-request';
-import { getToasts, getCookies, getAngularModule }  from '../kibana-services';
+import { getToasts, getCookies, getAngularModule } from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
-import { UI_ERROR_SEVERITIES, UIErrorLog, UIErrorSeverity, UILogLevel } from './error-orchestrator/types';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from './error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { getErrorOrchestrator } from './common-services';
 
 export class AppState {
-
-  static getCachedExtensions = (id) => {
-    const extensions = ((store.getState() || {}).appStateReducers || {}).extensions;
-    if(Object.keys(extensions).length && extensions[id]){
-      return extensions[id];
-    }
-    return false;
-  }
-
-
-  /**
-   * Returns if the extension 'id' is enabled
-   * @param {id} id
-   */
-  static getExtensions = async id => {
-    try {
-      const cachedExtensions = this.getCachedExtensions(id);
-      if(cachedExtensions){
-        return cachedExtensions;
-      }else{
-        const data = await GenericRequest.request('GET', `/api/extensions/${id}`);
-
-        const extensions = data.data.extensions;
-        if (Object.keys(extensions).length) {
-          AppState.setExtensions(id, extensions);
-          return extensions;
-        } else {
-          const wazuhConfig = new WazuhConfig();
-          const config = wazuhConfig.getConfig();
-          if(!Object.keys(config).length) return;
-          const extensions = Object.keys(config)
-          .filter(key => key.split('.')[0] == 'extensions')
-          .reduce((extensions, key) => {
-            extensions[key.split('.')[1]] = config[key];
-            return extensions;
-          }, {});
-          AppState.setExtensions(id, extensions);
-          return extensions;
-        }
-      }
-    } catch (error) {
-      const options = {
-        context: `${AppState.name}.getExtensions`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      throw error;
-    }
-  };
-
-  /**
-   *  Sets a new value for the cookie 'currentExtensions' object
-   * @param {*} id
-   * @param {*} extensions
-   */
-  static setExtensions = async (id, extensions) => {
-    try {
-      await GenericRequest.request('POST', '/api/extensions', {
-        id,
-        extensions
-      });
-      const updateExtension = updateExtensions(id,extensions);
-      store.dispatch(updateExtension);
-    } catch (error) {
-      const options = {
-        context: `${AppState.name}.setExtensions`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `${error.name}: Error set extensions`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      throw error;
-    }
-  };
-
   /**
    * Cluster setters and getters
    **/
@@ -149,7 +68,6 @@ export class AppState {
       if (cluster_info) {
         getCookies().set('clusterInfo', encodedClusterInfo, {
           expires: exp,
-          path: window.location.pathname
         });
       }
     } catch (error) {
@@ -179,7 +97,6 @@ export class AppState {
       exp.setDate(exp.getDate() + 365);
       getCookies().set('createdAt', createdAt, {
         expires: exp,
-        path: window.location.pathname
       });
     } catch (error) {
       const options = {
@@ -240,7 +157,7 @@ export class AppState {
   static removeCurrentAPI() {
     const updateApiMenu = updateCurrentApi(false);
     store.dispatch(updateApiMenu);
-    return getCookies().remove('currentApi', { path: window.location.pathname });
+    return getCookies().remove('currentApi');
   }
 
   /**
@@ -255,7 +172,6 @@ export class AppState {
       if (API) {
         getCookies().set('currentApi', encodedApi, {
           expires: exp,
-          path: window.location.pathname
         });
         try {
           const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
@@ -306,7 +222,6 @@ export class AppState {
   static setPatternSelector(value) {
     const encodedPattern = encodeURI(value);
     getCookies().set('patternSelector', encodedPattern, {
-      path: window.location.pathname
     });
   }
 
@@ -321,7 +236,6 @@ export class AppState {
     if (newPattern) {
       getCookies().set('currentPattern', encodedPattern, {
         expires: exp,
-        path: window.location.pathname
       });
     }
   }
@@ -351,7 +265,7 @@ export class AppState {
    * Remove 'currentPattern' value
    */
   static removeCurrentPattern() {
-    return getCookies().remove('currentPattern', { path: window.location.pathname });
+    return getCookies().remove('currentPattern');
   }
 
   /**
@@ -404,9 +318,7 @@ export class AppState {
     }
     if (navigate) {
       const encodedURI = encodeURI(JSON.stringify(navigate));
-      getCookies().set('navigate', encodedURI, {
-        path: window.location.pathname
-      });
+      getCookies().set('navigate', encodedURI);
     }
   }
 
@@ -419,14 +331,13 @@ export class AppState {
   }
 
   static removeNavigation() {
-    return getCookies().remove('navigate', { path: window.location.pathname });
+    return getCookies().remove('navigate');
   }
 
   static setWzMenu(isVisible = true) {
     const showMenu = updateShowMenu(isVisible);
     store.dispatch(showMenu);
   }
-
 
   static async downloadCsv(path, fileName, filters = []) {
     try {
@@ -458,7 +369,7 @@ export class AppState {
   }
 
   static checkCookies() {
-    getCookies().set('appName', 'wazuh', { path: window.location.pathname });
-    return !!getCookies().get('appName')
+    getCookies().set('appName', 'wazuh');
+    return !!getCookies().get('appName');
   }
 }

@@ -27,6 +27,8 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getSettingDefaultValue } from '../../../common/services/settings';
+import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
+import store from '../../redux/store';
 
 export class AgentsController {
   /**
@@ -93,6 +95,11 @@ export class AgentsController {
       false,
       false,
     ];
+
+    this.loadWelcomeCardsProps();
+    this.$scope.getWelcomeCardsProps = resultState => {
+      return { ...this.$scope.welcomeCardsProps, resultState };
+    };
   }
 
   /**
@@ -110,10 +117,6 @@ export class AgentsController {
     this.$location.search('_a', null);
     this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
     this.visFactoryService.clearAll();
-
-    const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-    const extensions = await AppState.getExtensions(currentApi);
-    this.$scope.extensions = extensions;
 
     // Getting possible target location
     this.targetLocation = this.shareAgent.getTargetLocation();
@@ -522,7 +525,6 @@ export class AgentsController {
 
       const tabs = this.commonData.getTabsFromCurrentPanel(
         this.currentPanel,
-        this.$scope.extensions,
         this.$scope.tabNames,
       );
 
@@ -609,6 +611,24 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
+      this.loadWelcomeCardsProps();
+      this.$scope.getWelcomeCardsProps = resultState => {
+        return { ...this.$scope.welcomeCardsProps, resultState };
+      };
+
+      if (!id) {
+        this.$scope.load = false;
+        // We set some properties used by the rendered component to work and allowing
+        // to manage when there is not selected agent.
+        await this.$scope.switchTab(this.$scope.tab, true);
+        this.loadWelcomeCardsProps();
+        this.$scope.getWelcomeCardsProps = resultState => {
+          return { ...this.$scope.welcomeCardsProps, resultState };
+        };
+        this.$scope.$applyAsync();
+        return;
+      }
+
       const data = await WzRequest.apiReq('GET', `/agents`, {
         params: {
           agents_list: id,
@@ -620,6 +640,15 @@ export class AgentsController {
       this.$scope.agent = agentInfo;
 
       if (!this.$scope.agent) return;
+
+      // Sync the selected agent on Redux store
+      if (
+        store.getState().appStateReducers.currentAgentData.id !==
+        this.$scope.agent.id
+      ) {
+        store.dispatch(updateCurrentAgentData(this.$scope.agent));
+      }
+
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
@@ -665,30 +694,19 @@ export class AgentsController {
     return hasAgentSupportModule(this.$scope.agent, component);
   }
 
-  cleanExtensions(extensions) {
-    const result = {};
-    for (const extension in extensions) {
-      if (hasAgentSupportModule(this.$scope.agent, extension)) {
-        result[extension] = extensions[extension];
-      }
-    }
-    return result;
+  setAgent(agent) {
+    this.$scope.agent = agent;
   }
-
   /**
    * Get available welcome cards after getting the agent
    */
   loadWelcomeCardsProps() {
     this.$scope.welcomeCardsProps = {
       switchTab: (tab, force) => this.switchTab(tab, force),
-      extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
+      setAgent: agent => this.setAgent(agent),
       goGroups: (agent, group) => this.goGroups(agent, group),
-      setExtensions: (api, extensions) => {
-        AppState.setExtensions(api, extensions);
-        this.$scope.extensions = extensions;
-      },
     };
   }
 
