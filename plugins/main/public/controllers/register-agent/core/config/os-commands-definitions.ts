@@ -1,11 +1,13 @@
 import {
-  getDEBInstallCommand,
-  getRPMInstallCommand,
   getLinuxStartCommand,
   getMacOsInstallCommand,
   getMacosStartCommand,
   getWindowsInstallCommand,
   getWindowsStartCommand,
+  getDEBAMD64InstallCommand,
+  getRPMAMD64InstallCommand,
+  getRPMARM64InstallCommand,
+  getDEBARM64InstallCommand,
 } from '../../services/register-agent-os-commands-services';
 import {
   scapeSpecialCharsForLinux,
@@ -82,28 +84,28 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       architecture: 'DEB amd64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64.deb`,
-      installCommand: props => getDEBInstallCommand(props),
-      startCommand: props => getLinuxStartCommand(props),
-    },
-    {
-      architecture: 'DEB aarch64',
-      urlPackage: props =>
-        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64.deb`,
-      installCommand: props => getDEBInstallCommand(props),
+      installCommand: props => getDEBAMD64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM amd64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.rpm`,
-      installCommand: props => getRPMInstallCommand(props),
+      installCommand: props => getRPMAMD64InstallCommand(props),
+      startCommand: props => getLinuxStartCommand(props),
+    },
+    {
+      architecture: 'DEB aarch64',
+      urlPackage: props =>
+        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_arm64.deb`,
+      installCommand: props => getDEBARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM aarch64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.rpm`,
-      installCommand: props => getRPMInstallCommand(props),
+        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.aarch64.rpm`,
+      installCommand: props => getRPMARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
   ],
