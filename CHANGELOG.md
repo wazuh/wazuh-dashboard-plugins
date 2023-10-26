@@ -16,6 +16,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Update regulatory compliance dashboard. [#5942](https://github.com/wazuh/wazuh-kibana-app/pull/5942)
 - Update cloud security dashboard. [#5943](https://github.com/wazuh/wazuh-kibana-app/pull/5943)
 
+### Changed
+
+- Refactoring of the security configuration assessment [#6061](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6061)
+
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.9.0 - Revision 00
 
 ### Added
