@@ -476,7 +476,7 @@ export const ApiTable = compose(
               columns={columns}
               pagination={true}
               sorting={true}
-              loading={this.state.refreshingEntries}
+              loading={isLoading}
             />
           </EuiPanel>
           <AvailableUpdatesFlyout
