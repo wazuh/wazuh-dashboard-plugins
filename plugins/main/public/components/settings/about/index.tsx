@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiLoadingContent, EuiPage, EuiPageBody, EuiPanel, EuiSpacer } from '@elastic/eui';
+import { EuiPage, EuiPageBody, EuiSpacer } from '@elastic/eui';
 import { SettingsAboutAppInfo } from './appInfo';
 import { SettingsAboutGeneralInfo } from './generalInfo';
 
@@ -15,16 +15,12 @@ interface SettingsAboutProps {
 export const SettingsAbout = (props: SettingsAboutProps) => {
   const { appInfo, pluginAppName } = props;
 
-  const isLoading = !appInfo;
-
   return (
     <EuiPage paddingSize="m">
       <EuiPageBody>
-        <SettingsAboutGeneralInfo pluginAppName={pluginAppName} />
+        <SettingsAboutAppInfo appInfo={appInfo} />
         <EuiSpacer size="l" />
-        <EuiPanel paddingSize="l">
-          {isLoading ? <EuiLoadingContent lines={3} /> : <SettingsAboutAppInfo appInfo={appInfo} />}
-        </EuiPanel>
+        <SettingsAboutGeneralInfo pluginAppName={pluginAppName} />
       </EuiPageBody>
     </EuiPage>
   );
