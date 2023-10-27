@@ -7,7 +7,6 @@ import {
 import { UpdatesNotification } from './components/updates-notification';
 import { DismissNotificationCheck } from './components/dismiss-notification-check';
 import { setCore, setWazuhCore } from './plugin-services';
-import { ApisUpdateStatus } from './components/apis-update-status';
 import { getAvailableUpdates } from './hooks/available-updates';
 
 export class WazuhCheckUpdatesPlugin
@@ -22,7 +21,6 @@ export class WazuhCheckUpdatesPlugin
 
     return {
       UpdatesNotification,
-      ApisUpdateStatus,
       getAvailableUpdates,
       DismissNotificationCheck,
     };
