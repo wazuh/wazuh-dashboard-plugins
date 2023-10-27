@@ -88,10 +88,10 @@ export const MainSca = compose(
 
   return (
     <>
-      {selectView === 'inventory' ? (
-        <Inventory {...rest} agent={agentData} />
-      ) : (
+      {selectView === 'dashboard' ? (
         <Dashboard {...rest} agent={agentData} />
+      ) : (
+        <Inventory {...rest} agent={agentData} />
       )}
     </>
   );
