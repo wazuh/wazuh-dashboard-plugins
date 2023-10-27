@@ -12,7 +12,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Changed dashboards. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035)
-- Refactoring of the security configuration assessment [#6061](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6061)
 
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 00
 
