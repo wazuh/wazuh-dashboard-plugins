@@ -65,23 +65,6 @@ export class OverviewController {
     this.visFactoryService = VisFactoryHandler;
     this.rawVisualizations = new RawVisualizations();
     this.wzReq = (...args) => WzRequest.apiReq(...args);
-  }
-
-  /**
-   * On controller loads
-   */
-  async $onInit() {
-    this.rawVisualizations.setType('');
-    this.wodlesConfiguration = false;
-    this.TabDescription = WAZUH_MODULES;
-    this.$rootScope.reportStatus = false;
-
-    this.$location.search('_a', null);
-    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
-    this.visFactoryService.clearAll();
-
-    this.wzMonitoringEnabled = false;
-
     // Tab names
     this.tabNames = TabNames;
 
@@ -91,7 +74,27 @@ export class OverviewController {
     // This object represents the number of visualizations per tab; used to show a progress bar
     this.tabVisualizations.assign('overview');
 
-    this.wodlesConfiguration = null;
+    this.currentOverviewSectionProps = {
+      switchTab: (tab, force) => this.switchTab(tab, force),
+      currentTab: this.tab
+    };
+  }
+
+  /**
+   * On controller loads
+   */
+  async $onInit() {
+    this.rawVisualizations.setType('');
+
+    this.TabDescription = WAZUH_MODULES;
+    this.$rootScope.reportStatus = false;
+
+    this.$location.search('_a', null);
+    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
+    this.visFactoryService.clearAll();
+
+    this.wzMonitoringEnabled = false;
+
 
     this.init();
 
@@ -107,11 +110,6 @@ export class OverviewController {
     this.welcomeCardsProps = {
       api: AppState.getCurrentAPI(),
       switchTab: tab => this.switchTab(tab),
-    };
-
-    this.currentOverviewSectionProps = {
-      switchTab: (tab, force) => this.switchTab(tab, force),
-      currentTab: this.tab,
     };
 
     this.agentsSelectionProps = {
