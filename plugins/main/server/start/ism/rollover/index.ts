@@ -8,38 +8,31 @@ export async function jobISMRolloverRun(context) {
   // Check the indexManagementDashboards plugin is installed
   if (!context.plugins.indexManagementDashboards) {
     context.wazuh.logger.warn(
-      'The plugin indexManagementDashboards is not installed. Skip task.',
+      'The indexManagementDashboards plugin is not installed. Skip task.',
     );
     // Skip task if indexManagementDashboards  application is not installed
     return;
   }
 
   try {
-    // Create custom OpenSearch client to manage the ISM
-    const opensearchClient: ILegacyCustomClusterClient = createOpenSearchClient(
-      context.core.opensearch,
-    );
-
-    context.wazuh.logger.debug(
-      `Configuration of [ism.rollover.enabled]: ${JSON.stringify(
-        context.wazuh.config.getConfiguration(),
-      )}`,
-    );
     // Get if the task is enabled
     let config = {
-      enabled: context.wazuh.config.get('ism.rollover.enabled'),
+      'ism.rollover.enabled': context.wazuh.config.get('ism.rollover.enabled'),
     };
     context.wazuh.logger.debug(
-      `Configuration of [ism.rollover.enabled]: ${config.enabled}`,
+      `Configuration of [ism.rollover.enabled]: ${config['ism.rollover.enabled']}`,
     );
-
-    if (!config.enabled) {
-      context.wazuh.logger.info(
+    if (!config['ism.rollover.enabled']) {
+      context.wazuh.logger.warn(
         'Roll over ISM policy task is disabled. Skip task.',
       );
       return;
     }
 
+    // Create custom OpenSearch client to manage the ISM
+    const opensearchClient: ILegacyCustomClusterClient = createOpenSearchClient(
+      context.core.opensearch,
+    );
     // Get the configuration
     config = {
       ...config,
