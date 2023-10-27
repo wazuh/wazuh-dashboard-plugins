@@ -17,7 +17,7 @@
       }
     ],
     "ism_template": {
-      "index_patterns": ${ISM_INDEX_PATTERNS},
+      "index_patterns": "${ISM_INDEX_PATTERNS}",
       "priority": "${ISM_PRIORITY}"
     }
   }

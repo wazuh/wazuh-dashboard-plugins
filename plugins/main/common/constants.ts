@@ -105,10 +105,7 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
-export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [
-  1,
-  2
-];
+export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
 // Wazuh data path
 const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
@@ -180,6 +177,37 @@ export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
 
 // Wazuh errors
 export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099';
+
+// ISM Roll over
+export const ISM_ROLLOVER_POLICY_NAME = 'rollover_policy';
+export const ISM_ROLLOVER_POLICY_FILE = path.join(
+  __dirname,
+  '../server/start/ism/rollover/policies/rollover_policy.json',
+);
+export const ISM_ROLLOVER_TEMPLATE_ROLLOVER_ALIAS_ALERTS_NAME =
+  'rollover-alerts';
+export const ISM_ROLLOVER_TEMPLATE_ROLLOVER_ALIAS_ALERTS_FILE = path.join(
+  __dirname,
+  '../server/start/ism/rollover/templates/rollover_wazuh_alerts.json',
+);
+export const ISM_ROLLOVER_TEMPLATE_ROLLOVER_ALIAS_ARCHIVES_NAME =
+  'rollover-archives';
+export const ISM_ROLLOVER_TEMPLATE_ROLLOVER_ALIAS_ARCHIVES_FILE = path.join(
+  __dirname,
+  '../server/start/ism/rollover/templates/rollover_wazuh_archives.json',
+);
+export const ISM_ROLLOVER_START_ALERTS_INDEX_NAME =
+  '<wazuh-alerts-4.x-{now/d}-000001>';
+export const ISM_ROLLOVER_START_ALERTS_INDEX_FILE = path.join(
+  __dirname,
+  '../server/start/ism/rollover/indices/alerts_alias.json',
+);
+export const ISM_ROLLOVER_START_ARCHIVES_INDEX_NAME =
+  '<wazuh-archives-4.x-{now/d}-000001>';
+export const ISM_ROLLOVER_START_ARCHIVES_INDEX_FILE = path.join(
+  __dirname,
+  '../server/start/ism/rollover/indices/archives_alias.json',
+);
 
 // Agents
 export enum WAZUH_AGENTS_OS_TYPE {
@@ -415,6 +443,7 @@ export enum SettingCategory {
   EXTENSIONS,
   MONITORING,
   STATISTICS,
+  ISM_ROLLOVER,
   SECURITY,
   CUSTOMIZATION,
 }
@@ -570,6 +599,12 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
     description:
       'Options related to the daemons manager monitoring job and their storage in indexes.',
     renderOrder: SettingCategory.STATISTICS,
+  },
+  [SettingCategory.ISM_ROLLOVER]: {
+    title: 'Task:Roll over Index State Management',
+    description: `Create a roll over ISM policy [${ISM_ROLLOVER_POLICY_NAME}] to manage the indices, create templates to define the roll over alias for wazuh-alerts-* [${ISM_ROLLOVER_TEMPLATE_ROLLOVER_ALIAS_ALERTS_NAME}] and wazuh-archives-* [${ISM_ROLLOVER_TEMPLATE_ROLLOVER_ALIAS_ARCHIVES_NAME}] index patterns.`,
+    documentationLink: 'user-manual/wazuh-indexer/index-life-management.html',
+    renderOrder: SettingCategory.ISM_ROLLOVER,
   },
   [SettingCategory.CUSTOMIZATION]: {
     title: 'Custom branding',
@@ -1908,6 +1943,256 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: true,
     isConfigurableFromFile: true,
     isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'ism.rollover.enabled': {
+    title: 'Status',
+    description:
+      'Enable or disable the task to adding a roll over ISM policy, alias templates and create the rollover indices.',
+    category: SettingCategory.ISM_ROLLOVER,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    requiresRestartingPluginPlatform: true,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'ism.rollover.index_patterns': {
+    title: 'Index patterns',
+    description: 'Index patterns to apply the roll over ISM policy.',
+    category: SettingCategory.ISM_ROLLOVER,
+    type: EpluginSettingType.editor,
+    defaultValue: [
+      'wazuh-alerts-*',
+      'wazuh-archives-*',
+      '-wazuh-alerts-4.x-sample*',
+    ],
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    requiresRestartingPluginPlatform: true,
+    options: {
+      editor: {
+        language: 'json',
+      },
+    },
+    uiFormTransformConfigurationValueToInputValue: function (value: any): any {
+      return JSON.stringify(value);
+    },
+    uiFormTransformInputValueToConfigurationValue: function (
+      value: string,
+    ): any {
+      try {
+        return JSON.parse(value);
+      } catch (error) {
+        return value;
+      }
+    },
+    validate: SettingsValidator.json(
+      SettingsValidator.compose(
+        SettingsValidator.array(
+          SettingsValidator.compose(
+            SettingsValidator.isString,
+            SettingsValidator.isNotEmptyString,
+            SettingsValidator.hasNoSpaces,
+            SettingsValidator.noLiteralString('.', '..'),
+            SettingsValidator.noStartsWithString('_', '+', '.'),
+            SettingsValidator.hasNotInvalidCharacters(
+              '\\',
+              '/',
+              '?',
+              '"',
+              '<',
+              '>',
+              '|',
+              ',',
+              '#',
+            ),
+          ),
+        ),
+      ),
+    ),
+    validateBackend: function (schema) {
+      return schema.arrayOf(
+        schema.string({
+          validate: SettingsValidator.compose(
+            SettingsValidator.isNotEmptyString,
+            SettingsValidator.hasNoSpaces,
+            SettingsValidator.noLiteralString('.', '..'),
+            SettingsValidator.noStartsWithString('_', '+', '.'),
+            SettingsValidator.hasNotInvalidCharacters(
+              '\\',
+              '/',
+              '?',
+              '"',
+              '<',
+              '>',
+              '|',
+              ',',
+              '#',
+            ),
+          ),
+        }),
+      );
+    },
+  },
+  'ism.rollover.min_doc_count': {
+    title: 'Minimum documents count',
+    description:
+      'Define the minimum documents count required to roll over the index. This value is the results of docs_by_shard * number_of_shards.', // TODO: enhance documentation
+    category: SettingCategory.ISM_ROLLOVER,
+    type: EpluginSettingType.number,
+    defaultValue: 200000000,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: {
+      number: {
+        min: 1,
+        max: 2e31,
+        integer: true,
+      },
+    },
+    uiFormTransformConfigurationValueToInputValue: function (
+      value: number,
+    ): string {
+      return String(value);
+    },
+    uiFormTransformInputValueToConfigurationValue: function (
+      value: string,
+    ): number {
+      return Number(value);
+    },
+    validate: function (value) {
+      return SettingsValidator.number(this.options.number)(value);
+    },
+    validateBackend: function (schema) {
+      return schema.number({ validate: this.validate.bind(this) });
+    },
+  },
+  'ism.rollover.min_index_age': {
+    title: 'Minimum age',
+    description: 'Define the minimum age required to roll over the index.',
+    category: SettingCategory.ISM_ROLLOVER,
+    type: EpluginSettingType.text,
+    defaultValue: '7d',
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    requiresRestartingPluginPlatform: true,
+    validate: SettingsValidator.compose(
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      value =>
+        /^\d+[dhms]{1}$/.test(value)
+          ? undefined
+          : 'Invalid value. It should be composed of a number followed by a time unit: d (day), h (hour), m (minutes) or s (seconds). Example: 30d or 10h.',
+    ),
+    validateBackend: function (schema) {
+      return schema.string({ validate: this.validate });
+    },
+  },
+  'ism.rollover.min_primary_shard_size': {
+    title: 'Minimum storage size',
+    description:
+      'Define the minimum storage size in (GiB) of a single primary shard required to roll over the index. Recommended size should be greater than 10.',
+    category: SettingCategory.ISM_ROLLOVER,
+    type: EpluginSettingType.number,
+    defaultValue: 25,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: {
+      number: {
+        min: 10,
+        integer: true,
+      },
+    },
+    uiFormTransformConfigurationValueToInputValue: function (
+      value: number,
+    ): string {
+      return String(value);
+    },
+    uiFormTransformInputValueToConfigurationValue: function (
+      value: string,
+    ): number {
+      return Number(value);
+    },
+    validate: function (value) {
+      return SettingsValidator.number(this.options.number)(value);
+    },
+    validateBackend: function (schema) {
+      return schema.number({ validate: this.validate.bind(this) });
+    },
+  },
+  'ism.rollover.priority': {
+    title: 'Priority',
+    description: 'Define the priority of the ISM policy template.',
+    category: SettingCategory.ISM_ROLLOVER,
+    type: EpluginSettingType.number,
+    defaultValue: 50,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: {
+      number: {
+        min: 0,
+        integer: true,
+      },
+    },
+    uiFormTransformConfigurationValueToInputValue: function (
+      value: number,
+    ): string {
+      return String(value);
+    },
+    uiFormTransformInputValueToConfigurationValue: function (
+      value: string,
+    ): number {
+      return Number(value);
+    },
+    validate: function (value) {
+      return SettingsValidator.number(this.options.number)(value);
+    },
+    validateBackend: function (schema) {
+      return schema.number({ validate: this.validate.bind(this) });
+    },
+  },
+  'ism.rollover.overwrite': {
+    title: 'Overwrite',
+    description: `Overwrite the ${ISM_ROLLOVER_POLICY_NAME} ISM policy with the current configuration. This requires to restart ${PLUGIN_PLATFORM_NAME}.`,
+    category: SettingCategory.ISM_ROLLOVER,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    requiresRestartingPluginPlatform: true,
     options: {
       switch: {
         values: {
