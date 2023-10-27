@@ -31,7 +31,7 @@ import store from '../../../../../redux/store';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { WzRequest } from '../../../../../react-services';
 import { formatUIDate } from '../../../../../react-services/time-service';
-import { getAngularModule } from '../../../../../kibana-services';
+import { getAngularModule, getCore } from '../../../../../kibana-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
 import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
@@ -78,6 +78,10 @@ export const ScaScan = compose(
     }
 
     async componentDidMount() {
+      const storedPolicies = localStorage.getItem('scaPolicies');
+      if (storedPolicies) {
+        this.setState({ policies: JSON.parse(storedPolicies) });
+      }
       this._isMount = true;
       const $injector = getAngularModule().$injector;
       this.router = $injector.get('$route');
@@ -132,10 +136,14 @@ export const ScaScan = compose(
     }
 
     onClickRow = policy => {
-      localStorage.setItem('scaPolicies', JSON.stringify(this.state.policies));
-      window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}`;
-      store.dispatch(updateCurrentAgentData(this.props.agent));
-      this.router.reload();
+      const updatedPolicies = [...this.state.policies, policy];
+      this.setState({ policies: updatedPolicies }, () => {
+        localStorage.setItem(
+          'scaPolicies',
+          JSON.stringify(this.state.policies),
+        );
+        window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}`;
+      });
     };
 
     renderScanDetails() {
@@ -251,7 +259,12 @@ export const ScaScan = compose(
                     <EuiLink
                       className='agents-link-item'
                       onClick={() => {
-                        window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                        getCore().application.navigateToApp(
+                          'configuration-assessment',
+                          {
+                            path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                          },
+                        );
                         store.dispatch(
                           updateCurrentAgentData(this.props.agent),
                         );
@@ -269,7 +282,12 @@ export const ScaScan = compose(
                       color='primary'
                       className='EuiButtonIcon'
                       onClick={() => {
-                        window.location.href = `#/overview?tab=sca`;
+                        getCore().application.navigateToApp(
+                          'configuration-assessment',
+                          {
+                            path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                          },
+                        );
                         store.dispatch(
                           updateCurrentAgentData(this.props.agent),
                         );
