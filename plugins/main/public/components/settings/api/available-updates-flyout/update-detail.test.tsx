@@ -3,6 +3,13 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { UpdateDetail } from './update-detail';
 
+jest.mock(
+  '../../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  })
+);
+
 jest.mock('../../../../react-services/time-service', () => ({
   formatUIDate: jest.fn().mockReturnValue('Sep 25, 2023 @ 14:03:40.816'),
 }));

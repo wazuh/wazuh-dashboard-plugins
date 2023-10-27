@@ -12,7 +12,7 @@ exports[`UpdateDetail component should return the UpdateDetail component 1`] = `
         aria-controls="v4.8.0"
         aria-expanded="false"
         class="euiAccordion__button euiAccordionForm__button"
-        id="i56bfa3f1-74fa-11ee-abae-c7f6545806a4"
+        id="htmlId"
         type="button"
       >
         <span
@@ -67,7 +67,7 @@ exports[`UpdateDetail component should return the UpdateDetail component 1`] = `
       </button>
     </div>
     <div
-      aria-labelledby="i56bfa3f1-74fa-11ee-abae-c7f6545806a4"
+      aria-labelledby="htmlId"
       class="euiAccordion__childWrapper"
       id="v4.8.0"
       role="region"
