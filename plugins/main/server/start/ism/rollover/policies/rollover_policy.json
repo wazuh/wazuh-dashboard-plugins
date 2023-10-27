@@ -1,6 +1,6 @@
 {
   "policy": {
-    "description": "Wazuh rollover and alias policy",
+    "description": "Rollover and alias policy",
     "default_state": "active",
     "states": [
       {
