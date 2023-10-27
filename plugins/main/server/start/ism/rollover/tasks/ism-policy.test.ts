@@ -237,7 +237,7 @@ describe('Task:Roll over Index State Management:check roll over create ISM polic
             _id: 'rollover_policy',
             policy: {
               policy: {
-                description: 'Wazuh rollover and alias policy',
+                description: 'Rollover and alias policy',
                 default_state: 'active',
                 states: [
                   {
@@ -284,7 +284,7 @@ describe('Task:Roll over Index State Management:check roll over create ISM polic
             _id: 'rollover_policy',
             policy: {
               policy: {
-                description: 'Wazuh rollover and alias policy',
+                description: 'Rollover and alias policy',
                 default_state: 'active',
                 states: [
                   {
@@ -330,7 +330,7 @@ describe('Task:Roll over Index State Management:check roll over create ISM polic
             _id: 'rollover_policy',
             policy: {
               policy: {
-                description: 'Wazuh rollover and alias policy',
+                description: 'Rollover and alias policy',
                 default_state: 'active',
                 states: [
                   {
@@ -376,7 +376,7 @@ describe('Task:Roll over Index State Management:check roll over create ISM polic
             _id: 'rollover_policy',
             policy: {
               policy: {
-                description: 'Wazuh rollover and alias policy',
+                description: 'Rollover and alias policy',
                 default_state: 'active',
                 states: [
                   {
@@ -434,7 +434,7 @@ describe('Task:Roll over Index State Management:check roll over create ISM polic
             _id: 'rollover_policy',
             policy: {
               policy: {
-                description: 'Wazuh rollover and alias policy',
+                description: 'Rollover and alias policy',
                 default_state: 'active',
                 states: [
                   {
@@ -480,7 +480,7 @@ describe('Task:Roll over Index State Management:check roll over create ISM polic
             _id: 'rollover_policy',
             policy: {
               policy: {
-                description: 'Wazuh rollover and alias policy',
+                description: 'Rollover and alias policy',
                 default_state: 'active',
                 states: [
                   {
@@ -526,7 +526,7 @@ describe('Task:Roll over Index State Management:check roll over create ISM polic
             _id: 'rollover_policy',
             policy: {
               policy: {
-                description: 'Wazuh rollover and alias policy',
+                description: 'Rollover and alias policy',
                 default_state: 'active',
                 states: [
                   {
