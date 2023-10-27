@@ -1,0 +1,171 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UpdateDetail component should return the UpdateDetail component 1`] = `
+<div>
+  <div
+    class="euiAccordion euiAccordionForm"
+  >
+    <div
+      class="euiAccordion__triggerWrapper"
+    >
+      <button
+        aria-controls="v4.8.0"
+        aria-expanded="false"
+        class="euiAccordion__button euiAccordionForm__button"
+        id="i56bfa3f1-74fa-11ee-abae-c7f6545806a4"
+        type="button"
+      >
+        <span
+          class="euiAccordion__iconWrapper"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon-isLoading euiAccordion__icon"
+            focusable="false"
+            height="16"
+            role="img"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          />
+        </span>
+        <span
+          class="euiIEFlexWrapFix"
+        >
+          <div
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+          >
+            <div
+              class="euiFlexItem"
+            >
+              <h3
+                class="euiTitle euiTitle--small euiAccordionForm__title"
+              >
+                Wazuh v4.8.0
+              </h3>
+            </div>
+            <div
+              class="euiFlexItem"
+            >
+              <span
+                class="euiBadge euiBadge--hollow euiBadge--iconLeft"
+                title="Last available minor"
+              >
+                <span
+                  class="euiBadge__content"
+                >
+                  <span
+                    class="euiBadge__text"
+                  >
+                    Last available minor
+                  </span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </span>
+      </button>
+    </div>
+    <div
+      aria-labelledby="i56bfa3f1-74fa-11ee-abae-c7f6545806a4"
+      class="euiAccordion__childWrapper"
+      id="v4.8.0"
+      role="region"
+      tabindex="-1"
+    >
+      <div>
+        <div
+          class="euiAccordion__padding--l"
+        >
+          <dl
+            class="euiDescriptionList euiDescriptionList--row"
+          >
+            <dt
+              class="euiDescriptionList__title"
+            >
+              Published
+            </dt>
+            <dd
+              class="euiDescriptionList__description"
+            >
+              Sep 25, 2023 @ 14:03:40.816
+            </dd>
+          </dl>
+          <div
+            class="euiSpacer euiSpacer--l"
+          />
+          <div
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--wrap"
+          >
+            <div
+              class="euiFlexItem euiFlexItem--flexGrowZero"
+              style="max-width: max-content;"
+            >
+              <a
+                class="euiLink euiLink--primary"
+                href="https://documentation.wazuh.com/current/release-notes/release-4-8-0.html"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Release notes
+                <svg
+                  aria-hidden="true"
+                  aria-label="External link"
+                  class="euiIcon euiIcon--small euiIcon-isLoading euiLink__externalIcon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+                <span
+                  class="euiScreenReaderOnly"
+                >
+                  (opens in a new tab or window)
+                </span>
+              </a>
+            </div>
+            <div
+              class="euiFlexItem euiFlexItem--flexGrowZero"
+              style="max-width: max-content;"
+            >
+              <a
+                class="euiLink euiLink--primary"
+                href="https://documentation.wazuh.com/4.8/upgrade-guide/index.html"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Upgrade guide
+                <svg
+                  aria-hidden="true"
+                  aria-label="External link"
+                  class="euiIcon euiIcon--small euiIcon-isLoading euiLink__externalIcon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+                <span
+                  class="euiScreenReaderOnly"
+                >
+                  (opens in a new tab or window)
+                </span>
+              </a>
+            </div>
+          </div>
+          <div
+            class="euiSpacer euiSpacer--l"
+          />
+           
+          <div>
+            Description
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
