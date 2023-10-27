@@ -320,18 +320,20 @@ export const ApiTable = compose(
           field: 'current_version',
           name: 'Version',
           align: 'left',
+          sortable: true,
         },
         {
           field: 'version_status',
           name: 'Updates status',
           width: '200px',
+          sortable: true,
           render: (item, api) => {
             const getColor = () => {
-              return API_UPDATES_STATUS_COLUMN[item]?.color || 'danger';
+              return API_UPDATES_STATUS_COLUMN[item]?.color;
             };
 
             const getContent = () => {
-              return API_UPDATES_STATUS_COLUMN[item]?.text || 'Error checking updates';
+              return API_UPDATES_STATUS_COLUMN[item]?.text;
             };
 
             return (

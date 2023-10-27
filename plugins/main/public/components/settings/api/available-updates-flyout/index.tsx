@@ -27,7 +27,7 @@ export const AvailableUpdatesFlyout = ({
     <WzFlyout onClose={onClose}>
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size="m">
-          <h2>Details of available updates</h2>
+          <h2>Available updates</h2>
         </EuiTitle>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
