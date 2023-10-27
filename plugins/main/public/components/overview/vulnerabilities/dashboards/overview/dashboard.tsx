@@ -1,16 +1,14 @@
 import React from 'react';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import {
-  getDashboardPanels,
-  getKPIsPanel,
-  getOpenVsClosePanel,
-} from './dashboard-panels';
+import { getDashboardPanels } from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBarConfiguration from '../../searchbar/use-search-bar-configuration';
 import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
-import { DashboardFilters } from './dashboard-filters/dashboard-filters';
-
+import { getDashboardFilters } from './dashboard-panels-filters';
+import './vulnerability-detector-filters.scss';
+import { getKPIsPanel } from './dashboard-panels-kpis';
+import { getOpenVsClosePanel } from './dashboard-panel-open-vs-close';
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -35,7 +33,30 @@ export const DashboardVuls: React.FC = () => {
           {...searchBarProps}
         />
       </I18nProvider>
-      <DashboardFilters searchBarProps={searchBarProps} />
+      <div className='vulnerability-dashboard-filters-wrapper'>
+        <DashboardByRenderer
+          input={{
+            viewMode: ViewMode.VIEW,
+            panels: getDashboardFilters(),
+            isFullScreenMode: false,
+            filters: searchBarProps.filters ?? [],
+            useMargins: false,
+            id: 'vulnerability-detector-dashboard-tab-filters',
+            timeRange: {
+              from: searchBarProps.dateRangeFrom,
+              to: searchBarProps.dateRangeTo,
+            },
+            title: 'Vulnerability detector dashboard filters',
+            description: 'Dashboard of the Vulnerability detector filters',
+            query: searchBarProps.query,
+            refreshConfig: {
+              pause: false,
+              value: 15,
+            },
+            hidePanelTitles: true,
+          }}
+        />
+      </div>
       <DashboardByRenderer
         input={{
           viewMode: ViewMode.VIEW,
@@ -79,7 +100,6 @@ export const DashboardVuls: React.FC = () => {
             value: 15,
           },
           hidePanelTitles: false,
-          disableTriggers: true,
         }}
       />
       <DashboardByRenderer
@@ -102,7 +122,6 @@ export const DashboardVuls: React.FC = () => {
             value: 15,
           },
           hidePanelTitles: false,
-          disableTriggers: true,
         }}
       />
     </>
