@@ -457,7 +457,7 @@ export const ApiTable = compose(
                   onClick={async () => await this.getApisAvailableUpdates(true)}
                 >
                   <span>
-                    Check updatess{' '}
+                    Check updates{' '}
                     <EuiToolTip
                       title="Last check"
                       content={
