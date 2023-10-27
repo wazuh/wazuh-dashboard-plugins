@@ -3,10 +3,8 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SettingsAboutAppInfo } from './appInfo';
 
-jest.mock('../../../kibana-services', () => ({
-  getWazuhCheckUpdatesPlugin: jest.fn().mockReturnValue({
-    ApisUpdateStatus: () => <div>APIs Updates Status component</div>,
-  }),
+jest.mock('../../../react-services/time-service', () => ({
+  formatUIDate: jest.fn().mockReturnValue('Sep 25, 2023 @ 14:03:40.816'),
 }));
 
 describe('SettingsAboutAppInfo component', () => {
@@ -23,12 +21,11 @@ describe('SettingsAboutAppInfo component', () => {
 
     expect(container).toMatchSnapshot();
 
-    expect(getByText('Version')).toBeInTheDocument();
+    expect(getByText('App version:')).toBeInTheDocument();
     expect(getByText('4.8.0')).toBeInTheDocument();
-    expect(getByText('Revision')).toBeInTheDocument();
+    expect(getByText('App revision:')).toBeInTheDocument();
     expect(getByText('01')).toBeInTheDocument();
-    expect(getByText('Install date')).toBeInTheDocument();
+    expect(getByText('Install date:')).toBeInTheDocument();
     expect(getByText('Sep 25, 2023 @ 14:03:40.816')).toBeInTheDocument();
-    expect(getByText('APIs Updates Status component')).toBeInTheDocument();
   });
 });

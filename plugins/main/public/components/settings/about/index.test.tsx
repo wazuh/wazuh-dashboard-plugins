@@ -12,16 +12,7 @@ jest.mock('./generalInfo', () => ({
 }));
 
 describe('SettingsAbout component', () => {
-  test('should render a component with a loader', () => {
-    const { container } = render(<SettingsAbout pluginAppName="Wazuh dashboard" />);
-
-    expect(container).toMatchSnapshot();
-
-    const loaders = container.getElementsByClassName('euiLoadingContent');
-    expect(loaders.length).toBe(1);
-  });
-
-  test('should render a component without a loader', () => {
+  test('should render about page', () => {
     const { container, getByText } = render(
       <SettingsAbout
         appInfo={{
@@ -35,10 +26,10 @@ describe('SettingsAbout component', () => {
 
     expect(container).toMatchSnapshot();
 
-    const loaders = container.getElementsByClassName('euiLoadingContent');
-    expect(loaders.length).toBe(0);
-
     const appInfo = getByText('App info');
     expect(appInfo).toBeInTheDocument();
+
+    const generalInfo = getByText('General info');
+    expect(generalInfo).toBeInTheDocument();
   });
 });
