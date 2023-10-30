@@ -258,11 +258,6 @@ export const visualizations = {
             id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
             width: 50,
           },
-          // {
-          //   title: 'Top 10 agents by alerts number',
-          //   id: 'Wazuh-App-Overview-PCI-DSS-Agents',
-          //   width: 50,
-          // },
         ],
       },
       {
@@ -275,24 +270,6 @@ export const visualizations = {
           },
         ],
       },
-      // {
-      //   height: 300,
-      //   vis: [
-      //     {
-      //       title: 'Top requirements over time',
-      //       id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 530,
-      //   vis: [
-      //     {
-      //       title: 'Last alerts',
-      //       id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
-      //     },
-      //   ],
-      // },
     ],
   },
   gdpr: {
@@ -702,35 +679,6 @@ export const visualizations = {
           },
         ],
       },
-      // {
-      //   height: 300,
-      //   vis: [
-      //     {
-      //       title: 'Top 5 images',
-      //       id: 'Wazuh-App-Overview-Docker-top-5-images',
-      //       width: 25,
-      //     },
-      //     {
-      //       title: 'Top 5 events',
-      //       id: 'Wazuh-App-Overview-Docker-top-5-actions',
-      //       width: 25,
-      //     },
-      //     {
-      //       title: 'Resources usage over time',
-      //       id: 'Wazuh-App-Overview-Docker-Types-over-time',
-      //       width: 50,
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 300,
-      //   vis: [
-      //     {
-      //       title: 'Events occurred evolution',
-      //       id: 'Wazuh-App-Overview-Docker-Actions-over-time',
-      //     },
-      //   ],
-      // },
     ],
   },
   oscap: {
@@ -833,36 +781,6 @@ export const visualizations = {
           },
         ],
       },
-
-      // {
-      //   height: 290,
-      //   vis: [
-      //     {
-      //       title: 'Events over time',
-      //       id: 'Wazuh-App-Overview-PM-Events-over-time',
-      //       width: 50,
-      //     },
-      //     {
-      //       title: 'Rule distribution',
-      //       id: 'Wazuh-App-Overview-PM-Top-5-rules',
-      //       width: 25,
-      //     },
-      //     {
-      //       title: 'Top 5 agents',
-      //       id: 'Wazuh-App-Overview-PM-Top-5-agents-pie',
-      //       width: 25,
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 240,
-      //   vis: [
-      //     {
-      //       title: 'Events per control type evolution',
-      //       id: 'Wazuh-App-Overview-PM-Events-per-agent-evolution',
-      //     },
-      //   ],
-      // },
     ],
   },
   audit: {
