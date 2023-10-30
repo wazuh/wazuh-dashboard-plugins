@@ -198,7 +198,7 @@ export const ApiTable = compose(
       const { DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
 
       const API_UPDATES_STATUS_COLUMN = {
-        success: {
+        upToDate: {
           text: 'Up to date',
           color: 'success',
         },

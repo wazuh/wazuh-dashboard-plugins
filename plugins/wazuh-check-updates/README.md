@@ -44,7 +44,7 @@ The plugin provides a function for fetching the available updates for each API. 
 - **Updates status column:** Indicates the server's status regarding available updates, which can be in one of four states:
   - **Up to date:** The server is up to date with the latest available version.
   - **Available updates:** There are updates available. In this case, you can view the details of the available updates by clicking an icon, and a Flyout will open with the details.
-  - **Disabled:** The server has the service for checking updates disabled.
+  - **Checking updates disabled:** The server has the service for checking updates disabled.
   - **Error checking updates:** An error occurred when trying to query the Wazuh Server API. In this case, a tooltip will display the error message.
 
 3. The user has the option to force a direct request for available updates to the Wazuh Server API instead of querying them in the saved object. To do this, they can click the "Check updates" button. If there are any changes when retrieving the information, the results will be reflected in the table.
