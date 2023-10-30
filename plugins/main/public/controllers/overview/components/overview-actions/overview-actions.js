@@ -32,7 +32,6 @@ class OverviewActions extends Component {
   }
 
   async removeAgentsFilter(shouldUpdate = true) {
-    await this.props.setAgent(false);
     const currentAppliedFilters = this.state.filterManager.filters;
     const agentFilters = currentAppliedFilters.filter(x => {
       return x.meta.key !== 'agent.id';
@@ -50,7 +49,7 @@ class OverviewActions extends Component {
     });
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (this.state.isAgent && !this.props.agent.id) {
       this.setState({ isAgent: false });
     } else if (
@@ -58,6 +57,13 @@ class OverviewActions extends Component {
       this.state.isAgent !== this.props.agent.id
     ) {
       this.setState({ isAgent: this.props.agent.id });
+    }
+
+    // This is added to change the selected agent that is in the overview.js controller,
+    // relying on the agent that is in redux.
+
+    if (this.props.agent.id !== prevProps.agent.id) {
+      this.props.setAgent(this.props.agent.id ? [this.props.agent.id] : false);
     }
   }
 
@@ -77,16 +83,6 @@ class OverviewActions extends Component {
   closeAgentModal() {
     this.setState({ isAgentModalVisible: false });
     this.props.showExploreAgentModalGlobal(false);
-  }
-
-  showAgentModal() {
-    this.setState({ isAgentModalVisible: true });
-  }
-
-  updateAgentSearch(agentsIdList) {
-    if (agentsIdList) {
-      this.setState({ isAgent: agentsIdList });
-    }
   }
 
   agentTableSearch(agentIdList) {
@@ -124,19 +120,6 @@ class OverviewActions extends Component {
     }
 
     this.setState({ isAgent: agentIdList }, () => this.closeAgentModal());
-  }
-
-  getSelectedAgents() {
-    let selectedAgentsObject = {};
-    for (
-      var i = 0;
-      this.state.isAgent &&
-      this.state.isAgent.length &&
-      i < this.state.isAgent.length;
-      ++i
-    )
-      selectedAgentsObject[this.state.isAgent[i]] = true;
-    return selectedAgentsObject;
   }
 
   render() {
