@@ -29,6 +29,23 @@ export default [
             schema: 'metric',
           },
           {
+            id: '3',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
+                {
+                  input: {
+                    query: 'rule.groups : "rootcheck"',
+                    language: 'kuery',
+                  },
+                  label: '',
+                },
+              ],
+            },
+            schema: 'group',
+          },
+          {
             id: '2',
             enabled: true,
             type: 'date_histogram',
@@ -46,23 +63,6 @@ export default [
               extended_bounds: {},
             },
             schema: 'segment',
-          },
-          {
-            id: '3',
-            enabled: true,
-            type: 'filters',
-            params: {
-              filters: [
-                {
-                  input: {
-                    query: 'rule.groups : "rootcheck"',
-                    language: 'kuery',
-                  },
-                  label: '',
-                },
-              ],
-            },
-            schema: 'group',
           },
         ],
         params: {
@@ -279,6 +279,22 @@ export default [
             schema: 'metric',
           },
           {
+            id: '4',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'data.title',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+            },
+            schema: 'group',
+          },
+          {
             id: '2',
             enabled: true,
             type: 'date_histogram',
@@ -296,22 +312,6 @@ export default [
               extended_bounds: {},
             },
             schema: 'segment',
-          },
-          {
-            id: '4',
-            enabled: true,
-            type: 'terms',
-            params: {
-              field: 'data.title',
-              orderBy: '1',
-              order: 'desc',
-              size: 5,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
-            schema: 'group',
           },
         ],
         params: {
