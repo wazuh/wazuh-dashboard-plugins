@@ -1,5 +1,5 @@
 import { EuiDataGridCellValueElementProps, EuiDataGridColumn, EuiDataGridProps, EuiDataGridSorting } from "@elastic/eui"
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Fragment } from "react";
 import { SearchResponse } from "@opensearch-project/opensearch/api/types";
 import { IFieldType, IndexPattern } from "../../../../../../../src/plugins/data/common";
 
@@ -14,6 +14,7 @@ type tDataGridProps = {
 export const parseColumns = (fields: IFieldType[]): EuiDataGridColumn[] => {
     return fields.map((field) => {
         return {
+            ...field,
             id: field.name,
             display: field.name,
             schema: field.type,
