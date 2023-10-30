@@ -278,11 +278,15 @@ export const ApiTable = compose(
           render: (item) => {
             if (item) {
               return item === 'online' ? (
-                <EuiHealth color="success">Online</EuiHealth>
+                <EuiHealth color="success" style={{ wordBreak: 'normal' }}>
+                  Online
+                </EuiHealth>
               ) : item.status === 'down' ? (
                 <EuiFlexGroup alignItems="center" gutterSize="xs" responsive={false}>
                   <EuiFlexItem grow={false}>
-                    <EuiHealth color="warning">Warning</EuiHealth>
+                    <EuiHealth color="warning" style={{ wordBreak: 'normal' }}>
+                      Warning
+                    </EuiHealth>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiToolTip position="top" content={item.downReason}>
@@ -298,7 +302,9 @@ export const ApiTable = compose(
               ) : (
                 <EuiFlexGroup alignItems="center" gutterSize="xs" responsive={false}>
                   <EuiFlexItem grow={false}>
-                    <EuiHealth color="danger">Offline</EuiHealth>
+                    <EuiHealth color="danger" style={{ wordBreak: 'normal' }}>
+                      Offline
+                    </EuiHealth>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiToolTip position="top" content={item.downReason}>
@@ -331,7 +337,6 @@ export const ApiTable = compose(
         {
           field: 'version_status',
           name: 'Updates status',
-          width: '200px',
           sortable: true,
           render: (item, api) => {
             const getColor = () => {
@@ -346,7 +351,9 @@ export const ApiTable = compose(
               return (
                 <EuiFlexGroup alignItems="center" gutterSize="xs" responsive={false}>
                   <EuiFlexItem grow={false}>
-                    <EuiHealth color={getColor()}>{getContent()}</EuiHealth>
+                    <EuiHealth color={getColor()} style={{ wordBreak: 'normal' }}>
+                      {getContent()}
+                    </EuiHealth>
                   </EuiFlexItem>
                   {item === 'availableUpdates' ? (
                     <EuiFlexItem grow={false}>
@@ -518,6 +525,7 @@ export const ApiTable = compose(
               pagination={true}
               sorting={true}
               loading={isLoading}
+              tableLayout="auto"
             />
           </EuiPanel>
           <AvailableUpdatesFlyout
