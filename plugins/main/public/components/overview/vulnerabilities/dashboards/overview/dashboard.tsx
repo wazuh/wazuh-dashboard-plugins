@@ -8,7 +8,6 @@ import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 import { getDashboardFilters } from './dashboard-panels-filters';
 import './vulnerability-detector-filters.scss';
 import { getKPIsPanel } from './dashboard-panels-kpis';
-import { getOpenVsClosePanel } from './dashboard-panel-open-vs-close';
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -29,11 +28,14 @@ export const DashboardVuls: React.FC = () => {
     <>
       <I18nProvider>
         <SearchBar
-          appName='vulnerability-detector-searchbar'
+          appName="vulnerability-detector-searchbar"
           {...searchBarProps}
+          showDatePicker={false}
+          showQueryInput={true}
+          showQueryBar={true}
         />
       </I18nProvider>
-      <div className='vulnerability-dashboard-filters-wrapper'>
+      <div className="vulnerability-dashboard-filters-wrapper">
         <DashboardByRenderer
           input={{
             viewMode: ViewMode.VIEW,
@@ -77,29 +79,6 @@ export const DashboardVuls: React.FC = () => {
             value: 15,
           },
           hidePanelTitles: true,
-        }}
-      />
-      <DashboardByRenderer
-        input={{
-          viewMode: ViewMode.VIEW,
-          panels: getOpenVsClosePanel(),
-          isFullScreenMode: false,
-          filters: [],
-          useMargins: true,
-          id: 'open-vs-close-vulnerability-detector-dashboard-tab',
-          timeRange: {
-            from: searchBarProps.dateRangeFrom,
-            to: searchBarProps.dateRangeTo,
-          },
-          title: 'Open vs Close Vulnerabilities',
-          description:
-            'Open vs Close Vulnerabilities of the Vulnerability detector',
-          query: searchBarProps.query,
-          refreshConfig: {
-            pause: false,
-            value: 15,
-          },
-          hidePanelTitles: false,
         }}
       />
       <DashboardByRenderer
