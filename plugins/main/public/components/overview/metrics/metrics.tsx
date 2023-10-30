@@ -72,35 +72,35 @@ export const Metrics = withAllowedAgents(
       this.stats = <></>;
 
       this.metricsList = {
-        // general: [
-        //   { name: 'Total', type: 'total' },
-        //   {
-        //     name: 'Level 12 or above alerts',
-        //     type: 'range',
-        //     gte: '12',
-        //     lt: null,
-        //     field: 'rule.level',
-        //     color: 'danger',
-        //   }, //null = infinite
-        //   {
-        //     name: 'Authentication failure',
-        //     type: 'phrases',
-        //     values: [
-        //       'win_authentication_failed',
-        //       'authentication_failed',
-        //       'authentication_failures',
-        //     ],
-        //     field: 'rule.groups',
-        //     color: 'danger',
-        //   },
-        //   {
-        //     name: 'Authentication success',
-        //     type: 'phrase',
-        //     value: 'authentication_success',
-        //     field: 'rule.groups',
-        //     color: 'secondary',
-        //   },
-        // ],
+        general: [
+          { name: 'Total', type: 'total' },
+          {
+            name: 'Level 12 or above alerts',
+            type: 'range',
+            gte: '12',
+            lt: null,
+            field: 'rule.level',
+            color: 'danger',
+          }, //null = infinite
+          {
+            name: 'Authentication failure',
+            type: 'phrases',
+            values: [
+              'win_authentication_failed',
+              'authentication_failed',
+              'authentication_failures',
+            ],
+            field: 'rule.groups',
+            color: 'danger',
+          },
+          {
+            name: 'Authentication success',
+            type: 'phrase',
+            value: 'authentication_success',
+            field: 'rule.groups',
+            color: 'secondary',
+          },
+        ],
         vuls: [
           {
             name: 'Critical Severity Alerts',
