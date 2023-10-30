@@ -33,6 +33,7 @@ const defaultConfiguration = {
   ignoreConfirmation: false,
   manifestPackage: '',
   manifestPlugin: '',
+  manifestChangelog: '',
   tagSuffix: '',
   exportTagsToFile: '',
 };
@@ -212,6 +213,19 @@ function parse(input) {
         }
         break;
       }
+      case '--manifest-changelog': {
+        // Set the manifest changelog
+        const manifestChangelog = typeof input[0] === 'string' && input[0];
+
+        if (manifestChangelog) {
+          configuration.manifestChangelog = manifestChangelog;
+          input.splice(0, 1);
+        } else {
+          logger.error('manifest-changelog parameter is not defined.');
+          process.exit(1);
+        }
+        break;
+      }
       default: {
       }
     }
@@ -226,6 +240,7 @@ const usageOptionsMessage = `Options:
   --export-tags <path/to/file>                        Export tags to file.
   --help                                              Display the help.
   --ignore-confirmation                               Ignore the confirmation.
+  --manifest-changelog <manifest-changelog>           Set the changelog manifest file location.
   --manifest-package <manifest-package>               Set the package manifest file location.
   --manifest-plugin <manifest-plugin>                 Set the plugin platform manifest file location.
   --platform-version <platform-version>               Set the platform version.
@@ -294,13 +309,13 @@ async function question(question) {
 async function requireConfirmation({ ignoreConfirmation }) {
   logger.warn(
     'Ensure the base branches are created in the remote and they have updated the files: ' +
-    'README.md, CHANGELOG.md, unit tests files, API data files. ' +
-    'It does not modify these files.',
+      'README.md, CHANGELOG.md, unit tests files, API data files. ' +
+      'It does not modify these files.',
   );
 
   logger.warn(
     'This script will commit and push the tags to the remote repository, ' +
-    'deleting any unpushed changes.',
+      'deleting any unpushed changes.',
   );
 
   if (!ignoreConfirmation) {
