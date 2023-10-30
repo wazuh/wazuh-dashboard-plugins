@@ -5,15 +5,6 @@ import taskTemplate from './tasks/template';
 import taskCreateRolloverIndices from './tasks/rollover-indices';
 
 export async function jobISMRolloverRun(context) {
-  // Check the indexManagementDashboards plugin is installed
-  if (!context.plugins.indexManagementDashboards) {
-    context.wazuh.logger.warn(
-      'The indexManagementDashboards plugin is not installed. Skip task.',
-    );
-    // Skip task if indexManagementDashboards  application is not installed
-    return;
-  }
-
   try {
     // Get if the task is enabled
     let config = {
@@ -23,8 +14,17 @@ export async function jobISMRolloverRun(context) {
       `Configuration of [ism.rollover.enabled]: ${config['ism.rollover.enabled']}`,
     );
     if (!config['ism.rollover.enabled']) {
-      context.wazuh.logger.warn(
+      context.wazuh.logger.debug(
         'Roll over ISM policy task is disabled. Skip task.',
+      );
+      return;
+    } else if (
+      !context.plugins.indexManagementDashboards &&
+      config['ism.rollover.enabled']
+    ) {
+      // Check the indexManagementDashboards plugin is installed and task is enabled.
+      context.wazuh.logger.warn(
+        'Roll over ISM task is enabled but the indexManagementDashboards plugin is not installed. Skip task.',
       );
       return;
     }

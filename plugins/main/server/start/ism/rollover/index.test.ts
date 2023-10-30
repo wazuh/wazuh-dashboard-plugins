@@ -66,16 +66,14 @@ describe('Task:Roll over Index State Management', () => {
     };
 
     await jobISMRolloverRun(context);
-    if (!plugins.indexManagementDashboards) {
+    if (!plugins.indexManagementDashboards && config['ism.rollover.enabled']) {
       expect(context.wazuh.logger.warn).toHaveBeenCalledWith(
-        'The indexManagementDashboards plugin is not installed. Skip task.',
+        'Roll over ISM task is enabled but the indexManagementDashboards plugin is not installed. Skip task.',
       );
-    } else {
-      if (!config['ism.rollover.enabled']) {
-        expect(context.wazuh.logger.warn).toHaveBeenCalledWith(
-          'Roll over ISM policy task is disabled. Skip task.',
-        );
-      }
+    } else if (!config['ism.rollover.enabled']) {
+      expect(context.wazuh.logger.debug).toHaveBeenCalledWith(
+        'Roll over ISM policy task is disabled. Skip task.',
+      );
     }
   });
 });
