@@ -33,10 +33,10 @@ exports[`UpdateDetail component should return the UpdateDetail component 1`] = `
           class="euiIEFlexWrapFix"
         >
           <div
-            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
           >
             <div
-              class="euiFlexItem"
+              class="euiFlexItem euiFlexItem--flexGrowZero"
             >
               <h3
                 class="euiTitle euiTitle--small euiAccordionForm__title"
@@ -45,7 +45,7 @@ exports[`UpdateDetail component should return the UpdateDetail component 1`] = `
               </h3>
             </div>
             <div
-              class="euiFlexItem"
+              class="euiFlexItem euiFlexItem--flexGrowZero"
             >
               <span
                 class="euiBadge euiBadge--hollow euiBadge--iconLeft"
@@ -159,7 +159,6 @@ exports[`UpdateDetail component should return the UpdateDetail component 1`] = `
           <div
             class="euiSpacer euiSpacer--l"
           />
-           
           <div>
             Description
           </div>

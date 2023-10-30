@@ -57,9 +57,13 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             status,
           };
         } catch (error) {
+          const message =
+            error instanceof Error ? error.message : typeof error === 'string' ? error : undefined;
+
           return {
             api_id: api.id,
             status: API_UPDATES_STATUS.ERROR,
+            error: message,
           };
         }
       })

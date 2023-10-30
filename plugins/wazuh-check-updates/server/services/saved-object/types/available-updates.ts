@@ -62,6 +62,9 @@ export const availableUpdatesObject: SavedObjectsType = {
           last_available_major: updateObjectType,
           last_available_minor: updateObjectType,
           last_available_patch: updateObjectType,
+          error: {
+            type: 'text',
+          },
         },
       },
     },
