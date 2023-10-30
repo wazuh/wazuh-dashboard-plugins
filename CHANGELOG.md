@@ -7,9 +7,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.8.0
-- Added the ability to check if there are available updates from the UI.
+- Added remember server address check [#5791](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5791)
 
-- Added remember server address check [#5680](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5680)
+### Changed
+
+- Changed dashboards. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035)
+- Change the display order of tabs in all modules. [#6067](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6067)
 
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 00
 

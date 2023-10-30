@@ -14,61 +14,6 @@ export const visualizations = {
   general: {
     rows: [
       {
-        height: 180,
-        vis: [
-          {
-            title: 'Total',
-            id: 'Wazuh-App-Overview-General-Total',
-            width: 25,
-          },
-          {
-            title: 'Level 12 or above alerts',
-            id: 'Wazuh-App-Overview-General-Level-12-Or-Above-Alerts',
-            width: 25,
-          },
-          {
-            title: 'Authentication failure',
-            id: 'Wazuh-App-Overview-General-Authentication-Failure',
-            width: 25,
-          },
-          {
-            title: 'Authentication success',
-            id: 'Wazuh-App-Overview-General-Authentication-Success',
-            width: 25,
-          },
-        ],
-      },
-      // {
-      //   height: 200,
-      //   vis: [
-      //     {
-      //       title: 'Level 12 or above alerts',
-      //       id: 'Wazuh-App-Overview-General-Level-12-Or-Above-Alerts',
-      //       width: 25,
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 200,
-      //   vis: [
-      //     {
-      //       title: 'Authentication failure',
-      //       id: 'Wazuh-App-Overview-General-Authentication-Failure',
-      //       width: 25,
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 200,
-      //   vis: [
-      //     {
-      //       title: 'Authentication success',
-      //       id: 'Wazuh-App-Overview-General-Authentication-Success',
-      //       width: 25,
-      //     },
-      //   ],
-      // },
-      {
         height: 360,
         vis: [
           {
@@ -87,27 +32,17 @@ export const visualizations = {
         height: 360,
         vis: [
           {
-            title: 'Security alerts',
-            id: 'Wazuh-App-Overview-General-Security-alerts',
-            width: 100,
+            title: 'Top 5 agents',
+            id: 'Wazuh-App-Overview-General-Top-5-agents',
+            width: 30,
+          },
+          {
+            title: 'Alerts evolution - Top 5 agents',
+            id: 'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents',
+            width: 70,
           },
         ],
       },
-      // {
-      //   height: 360,
-      //   vis: [
-      //     {
-      //       title: 'Top 5 agents',
-      //       id: 'Wazuh-App-Overview-General-Top-5-agents',
-      //       width: 30
-      //     },
-      //     {
-      //       title: 'Alerts evolution - Top 5 agents',
-      //       id: 'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents',
-      //       width: 70
-      //     },
-      //   ]
-      // },
     ],
   },
   fim: {
@@ -118,55 +53,44 @@ export const visualizations = {
           {
             title: 'Alerts by action over time',
             id: 'Wazuh-App-Agents-FIM-Alerts-by-action-over-time',
-            width: 100,
           },
         ],
       },
       {
-        height: 400,
+        height: 300,
         vis: [
           {
-            title: 'Recent events',
-            id: 'Wazuh-App-Overview-FIM-Recent-Events',
-            width: 100,
+            title: 'Top 5 agents',
+            id: 'Wazuh-App-Overview-FIM-Top-5-agents-pie',
+            width: 30,
+          },
+          {
+            title: 'Events summary',
+            id: 'Wazuh-App-Overview-FIM-Events-summary',
+            width: 70,
           },
         ],
       },
-      // {
-      //   height: 300,
-      //   vis: [
-      //     {
-      //       title: 'Top 5 agents',
-      //       id: 'Wazuh-App-Overview-FIM-Top-5-agents-pie',
-      //       width: 30,
-      //     },
-      //     {
-      //       title: 'Events summary',
-      //       id: 'Wazuh-App-Overview-FIM-Events-summary',
-      //       width: 70,
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 350,
-      //   vis: [
-      //     {
-      //       title: 'Rule distribution',
-      //       id: 'Wazuh-App-Overview-FIM-Top-5-rules',
-      //       width: 33,
-      //     },
-      //     {
-      //       title: 'Actions',
-      //       id: 'Wazuh-App-Overview-FIM-Common-actions',
-      //       width: 33,
-      //     },
-      //     {
-      //       title: 'Top 5 users',
-      //       id: 'Wazuh-App-Overview-FIM-top-agents-user',
-      //       width: 34,
-      //     },
-      //   ],
-      // },
+      {
+        height: 350,
+        vis: [
+          {
+            title: 'Rule distribution',
+            id: 'Wazuh-App-Overview-FIM-Top-5-rules',
+            width: 33,
+          },
+          {
+            title: 'Actions',
+            id: 'Wazuh-App-Overview-FIM-Common-actions',
+            width: 33,
+          },
+          {
+            title: 'Top 5 users',
+            id: 'Wazuh-App-Overview-FIM-top-agents-user',
+            width: 34,
+          },
+        ],
+      },
     ],
   },
   office: {
@@ -225,95 +149,54 @@ export const visualizations = {
   aws: {
     rows: [
       {
+        height: 250,
+        vis: [
+          {
+            title: 'Sources',
+            id: 'Wazuh-App-Overview-AWS-Top-sources',
+            width: 25,
+          },
+          {
+            title: 'Accounts',
+            id: 'Wazuh-App-Overview-AWS-Top-accounts',
+            width: 25,
+          },
+          {
+            title: 'S3 buckets',
+            id: 'Wazuh-App-Overview-AWS-Top-buckets',
+            width: 25,
+          },
+          {
+            title: 'Regions',
+            id: 'Wazuh-App-Overview-AWS-Top-regions',
+            width: 25,
+          },
+        ],
+      },
+      {
         height: 300,
         vis: [
           {
             title: 'Events by source over time',
-            id: 'Wazuh-App-Overview-AWS-Events-By-Source-Over-time',
-            width: 70,
+            id: 'Wazuh-App-Overview-AWS-Events-by-source',
+            width: 50,
           },
           {
-            title: 'Sources',
-            id: 'Wazuh-App-Overview-AWS-Sources',
-            width: 30,
+            title: 'Events by S3 bucket over time',
+            id: 'Wazuh-App-Overview-AWS-Events-by-s3-bucket',
+            width: 50,
           },
-          // {
-          //   title: 'Events',
-          //   id: 'Wazuh-App-Overview-AWS-Events',
-          //   width: 25,
-          // },
-          // {
-          //   title: 'Regions',
-          //   id: 'Wazuh-App-Overview-AWS-Top-regions',
-          //   width: 25,
-          // },
         ],
-        // height: 250,
-        // vis: [
-        //   {
-        //     title: 'Sources',
-        //     id: 'Wazuh-App-Overview-AWS-Top-sources',
-        //     width: 25,
-        //   },
-        // height: 250,
-        // vis: [
-        //   {
-        //     title: 'Sources',
-        //     id: 'Wazuh-App-Overview-AWS-Top-sources',
-        //     width: 25,
-        //   },
-        //   {
-        //     title: 'Accounts',
-        //     id: 'Wazuh-App-Overview-AWS-Top-accounts',
-        //     width: 25,
-        //   },
-        //   {
-        //     title: 'S3 buckets',
-        //     id: 'Wazuh-App-Overview-AWS-Top-buckets',
-        //     width: 25,
-        //   },
-        //   {
-        //     title: 'Regions',
-        //     id: 'Wazuh-App-Overview-AWS-Top-regions',
-        //     width: 25,
-        //   },
-        // ],
       },
       {
-        height: 400,
+        height: 570,
         vis: [
           {
-            title: 'Events',
-            id: 'Wazuh-App-Overview-AWS-Events',
-            width: 100,
+            title: 'Geolocation map',
+            id: 'Wazuh-App-Overview-AWS-geo',
           },
         ],
       },
-
-      // {
-      //   height: 300,
-      //   vis: [
-      //     {
-      //       title: 'Events by source over time',
-      //       id: 'Wazuh-App-Overview-AWS-Events-by-source',
-      //       width: 50,
-      //     },
-      //     {
-      //       title: 'Events by S3 bucket over time',
-      //       id: 'Wazuh-App-Overview-AWS-Events-by-s3-bucket',
-      //       width: 50,
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 570,
-      //   vis: [
-      //     {
-      //       title: 'Geolocation map',
-      //       id: 'Wazuh-App-Overview-AWS-geo',
-      //     },
-      //   ],
-      // },
     ],
   },
   gcp: {
@@ -375,11 +258,6 @@ export const visualizations = {
             id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
             width: 50,
           },
-          // {
-          //   title: 'Top 10 agents by alerts number',
-          //   id: 'Wazuh-App-Overview-PCI-DSS-Agents',
-          //   width: 50,
-          // },
         ],
       },
       {
@@ -392,24 +270,6 @@ export const visualizations = {
           },
         ],
       },
-      // {
-      //   height: 300,
-      //   vis: [
-      //     {
-      //       title: 'Top requirements over time',
-      //       id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 530,
-      //   vis: [
-      //     {
-      //       title: 'Last alerts',
-      //       id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
-      //     },
-      //   ],
-      // },
     ],
   },
   gdpr: {
@@ -798,14 +658,19 @@ export const visualizations = {
         height: 300,
         vis: [
           {
+            title: 'Top 5 images',
+            id: 'Wazuh-App-Overview-Docker-top-5-images',
+            width: 33,
+          },
+          {
             title: 'Top 5 events',
             id: 'Wazuh-App-Overview-Docker-top-5-events',
-            width: 30,
+            width: 33,
           },
           {
             title: 'Events by source over time',
             id: 'Wazuh-App-Overview-Docker-Events-By-Source-Over-Time',
-            width: 70,
+            width: 34,
           },
         ],
       },
@@ -819,35 +684,6 @@ export const visualizations = {
           },
         ],
       },
-      // {
-      //   height: 300,
-      //   vis: [
-      //     {
-      //       title: 'Top 5 images',
-      //       id: 'Wazuh-App-Overview-Docker-top-5-images',
-      //       width: 25,
-      //     },
-      //     {
-      //       title: 'Top 5 events',
-      //       id: 'Wazuh-App-Overview-Docker-top-5-actions',
-      //       width: 25,
-      //     },
-      //     {
-      //       title: 'Resources usage over time',
-      //       id: 'Wazuh-App-Overview-Docker-Types-over-time',
-      //       width: 50,
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 300,
-      //   vis: [
-      //     {
-      //       title: 'Events occurred evolution',
-      //       id: 'Wazuh-App-Overview-Docker-Actions-over-time',
-      //     },
-      //   ],
-      // },
     ],
   },
   oscap: {
@@ -950,36 +786,6 @@ export const visualizations = {
           },
         ],
       },
-
-      // {
-      //   height: 290,
-      //   vis: [
-      //     {
-      //       title: 'Events over time',
-      //       id: 'Wazuh-App-Overview-PM-Events-over-time',
-      //       width: 50,
-      //     },
-      //     {
-      //       title: 'Rule distribution',
-      //       id: 'Wazuh-App-Overview-PM-Top-5-rules',
-      //       width: 25,
-      //     },
-      //     {
-      //       title: 'Top 5 agents',
-      //       id: 'Wazuh-App-Overview-PM-Top-5-agents-pie',
-      //       width: 25,
-      //     },
-      //   ],
-      // },
-      // {
-      //   height: 240,
-      //   vis: [
-      //     {
-      //       title: 'Events per control type evolution',
-      //       id: 'Wazuh-App-Overview-PM-Events-per-agent-evolution',
-      //     },
-      //   ],
-      // },
     ],
   },
   audit: {
