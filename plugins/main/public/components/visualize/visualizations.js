@@ -798,14 +798,19 @@ export const visualizations = {
         height: 300,
         vis: [
           {
+            title: 'Top 5 images',
+            id: 'Wazuh-App-Overview-Docker-top-5-images',
+            width: 33,
+          },
+          {
             title: 'Top 5 events',
             id: 'Wazuh-App-Overview-Docker-top-5-events',
-            width: 30,
+            width: 33,
           },
           {
             title: 'Events by source over time',
             id: 'Wazuh-App-Overview-Docker-Events-By-Source-Over-Time',
-            width: 70,
+            width: 34,
           },
         ],
       },

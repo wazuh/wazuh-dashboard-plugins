@@ -211,54 +211,65 @@ export default [
       },
     },
   },
-  // {
-  //   _id: 'Wazuh-App-Overview-Docker-top-5-images',
-  //   _type: 'visualization',
-  //   _source: {
-  //     title: 'Top 5 images',
-  //     visState: JSON.stringify({
-  //       title: 'Top 5 images',
-  //       type: 'pie',
-  //       params: {
-  //         type: 'pie',
-  //         addTooltip: true,
-  //         addLegend: true,
-  //         legendPosition: 'right',
-  //         isDonut: true,
-  //         labels: { show: false, values: true, last_level: true, truncate: 100 },
-  //       },
-  //       aggs: [
-  //         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
-  //         {
-  //           id: '2',
-  //           enabled: true,
-  //           type: 'terms',
-  //           schema: 'segment',
-  //           params: {
-  //             field: 'data.docker.Actor.Attributes.image',
-  //             size: 5,
-  //             order: 'desc',
-  //             orderBy: '1',
-  //             otherBucket: false,
-  //             otherBucketLabel: 'Other',
-  //             missingBucket: false,
-  //             missingBucketLabel: 'Missing',
-  //           },
-  //         },
-  //       ],
-  //     }),
-  //     uiStateJSON: '{}',
-  //     description: '',
-  //     version: 1,
-  //     kibanaSavedObjectMeta: {
-  //       searchSourceJSON: JSON.stringify({
-  //         index: 'wazuh-alerts',
-  //         query: { query: '', language: 'lucene' },
-  //         filter: [],
-  //       }),
-  //     },
-  //   },
-  // },
+  {
+    _id: 'Wazuh-App-Overview-Docker-top-5-images',
+    _type: 'visualization',
+    _source: {
+      title: 'Top 5 images',
+      visState: JSON.stringify({
+        title: 'Top 5 images',
+        type: 'pie',
+        params: {
+          type: 'pie',
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          isDonut: true,
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
+        },
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'terms',
+            schema: 'segment',
+            params: {
+              field: 'data.docker.Actor.Attributes.image',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+            },
+          },
+        ],
+      }),
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-alerts',
+          query: { query: '', language: 'lucene' },
+          filter: [],
+        }),
+      },
+    },
+  },
   {
     _id: 'Wazuh-App-Overview-Docker-top-5-events',
     _type: 'visualization',
