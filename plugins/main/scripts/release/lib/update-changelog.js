@@ -14,8 +14,14 @@ function updateChangelog(
   logger.debug(`Reading file ${changelogPath}`);
   const content = fs.readFileSync(changelogPath, 'utf8');
   logger.debug(`Read file ${changelogPath}`);
-  const reChangelogEntry = `(Wazuh v${version} - [\\w\\s]+) ([\\d.]+) - Revision (\\d+)`;
+  const reChangelogEntry = `(Wazuh v${version.replace(
+    /\./g,
+    '\\.',
+  )} - [\\w\\s]+) ([\\d.]+) - Revision (\\d+)`;
   if (version && (revision || platformVersion)) {
+    logger.debug(
+      'Regular expression to find in changelog: ' + reChangelogEntry,
+    );
     if (content.search(reChangelogEntry) > -1) {
       const textReplaceEntry =
         '$1' +
