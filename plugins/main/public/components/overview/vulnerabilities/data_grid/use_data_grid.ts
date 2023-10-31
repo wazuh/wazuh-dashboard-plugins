@@ -2,6 +2,7 @@ import { EuiDataGridCellValueElementProps, EuiDataGridColumn, EuiDataGridProps, 
 import { useEffect, useMemo, useState, Fragment } from "react";
 import { SearchResponse } from "@opensearch-project/opensearch/api/types";
 import { IFieldType, IndexPattern } from "../../../../../../../src/plugins/data/common";
+import { parseData, getFieldFormatted } from '../dashboards/inventory/inventory_service';
 
 type tDataGridProps = {
     indexPattern: IndexPattern;
@@ -63,49 +64,14 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         setPagination((pagination) => ({ ...pagination, pageIndex: 0 }));
     }, [rowCount])
 
-    const parseData = (resultsHits: SearchResponse['hits']['hits']): any[] => {
-        const data = resultsHits.map((hit) => {
-            if (!hit) {
-                return {}
-            }
-            const source = hit._source as object;
-            const data = {
-                ...source,
-                _id: hit._id,
-                _index: hit._index,
-                _type: hit._type,
-                _score: hit._score,
-            };
-            return data;
-        });
-        return data;
-    }
 
     const renderCellValue = ({ rowIndex, columnId, setCellProps }) => {
         const rowsParsed = parseData(rows);
-        function getFormatted(rowIndex, columnId) {
-            if (columnId.includes('.')) {
-                // when the column is a nested field. The column could have 2 to n levels
-                // get dinamically the value of the nested field
-                const nestedFields = columnId.split('.');
-                let value = rowsParsed[rowIndex];
-                nestedFields.forEach((field) => {
-                    if (value) {
-                        value = value[field];
-                    }
-                });
-                return value;
-            } else {
-                return rowsParsed[rowIndex][columnId].formatted
-                    ? rowsParsed[rowIndex][columnId].formatted
-                    : rowsParsed[rowIndex][columnId];
-            }
-        }
         // On the context data always is stored the current page data (pagination)
         // then the rowIndex is relative to the current page
         const relativeRowIndex = rowIndex % pagination.pageSize;        
         return rowsParsed.hasOwnProperty(relativeRowIndex)
-            ? getFormatted(relativeRowIndex, columnId)
+            ? getFieldFormatted(relativeRowIndex, columnId, indexPattern, rowsParsed)
             : null;
     };
 

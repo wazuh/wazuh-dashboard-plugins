@@ -16,7 +16,7 @@ import {
   EuiTitle,
   EuiButtonEmpty,
 } from '@elastic/eui';
-import { Filter, IndexPattern, OpenSearchQuerySortValue } from '../../../../../../../../src/plugins/data/common';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import DocViewer from '../../doc_viewer/doc_viewer';
 import { DiscoverNoResults } from '../../common/components/no_results';
@@ -26,7 +26,7 @@ import { inventoryTableDefaultColumns } from './config';
 import { useDocViewer } from '../../doc_viewer/use_doc_viewer';
 import './inventory.scss';
 import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
-import * as FileSaver from '../../../../../services/file-saver';
+import { search, exportSearchToCSV } from './inventory_service';
 
 export const InventoryVuls = () => {
   const { searchBarProps } = useSearchBarConfiguration({
@@ -95,59 +95,14 @@ export const InventoryVuls = () => {
     }
   }, [JSON.stringify(searchBarProps), JSON.stringify(pagination), JSON.stringify(sorting)]);
 
-  /**
-   * Search in index pattern
-   */
-  interface SearchParams {
-    indexPattern: IndexPattern;
-    filters?: Filter[];
-    query?: any;
-    pagination?: {
-      pageIndex?: number;
-      pageSize?: number;
-    };
-    fields?: string[],
-    sorting?: {
-      columns: {
-        id: string;
-        direction: 'asc' | 'desc';
-      }[];
-    };
-  }
 
-  const search = async (params: SearchParams): Promise<SearchResponse> => {
-    const { indexPattern, filters = [], query, pagination, sorting, fields } = params;
-    const data = getPlugins().data;
-    const searchSource = await data.search.searchSource.create();
-    const fromField = (pagination?.pageIndex || 0) * (pagination?.pageSize || 100);
-    const sortOrder: OpenSearchQuerySortValue[] = sorting?.columns.map((column) => {
-      const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
-      return { [column?.id || '']: sortDirection } as OpenSearchQuerySortValue;
-    }) || [];
-
-    const searchParams = searchSource
-      .setParent(undefined)
-      .setField('filter', filters)
-      .setField('query', query)
-      .setField('sort', sortOrder)
-      .setField('size', pagination?.pageSize)
-      .setField('from', fromField)
-      .setField('index', indexPattern)
-
-    // add fields
-    if(fields && Array.isArray(fields) && fields.length > 0)
-      searchParams.setField('fields',fields);
-      
-
-    return await searchParams.fetch();
-  };
 
   const timeField = indexPattern?.timeFieldName ? indexPattern.timeFieldName : undefined;
 
-  const onClickExport = async () => {
+  const onClickExportResults = async () => {
     // use the search method to get the data and pass the results.hits.total to make
 
-    const result = await search({
+    const params = {
       indexPattern: indexPatterns?.[0] as IndexPattern,
       filters,
       query,
@@ -157,16 +112,9 @@ export const InventoryVuls = () => {
         pageSize: results.hits.total
       },
       sorting
-    })
+    }
 
-    const allResults = result.hits.hits.map((hit: any) => {
-      return indexPattern?.flattenHit(hit);
-    });
-
-    const blob = new Blob(allResults, { type: 'text/csv' });
-    FileSaver.saveAs(blob, `algo.csv`);
-    // use indexPattern to transform hits to object similar to flatenned method
-
+    await exportSearchToCSV(params);
   }
 
 
@@ -198,15 +146,15 @@ export const InventoryVuls = () => {
               toolbarVisibility={{
                 additionalControls: (
                   <EuiButtonEmpty
+                    disabled={results?.hits?.total === 0}
                     size="xs"
                     iconType="exportAction"
                     color="primary"
                     className="euiDataGrid__controlBtn"
-                    onClick={onClickExport}>
+                    onClick={onClickExportResults}>
                     Export Formated
                   </EuiButtonEmpty>
                 ),
-                showFullScreenSelector: false
               }}
               /> : null}
           {inspectedHit && (

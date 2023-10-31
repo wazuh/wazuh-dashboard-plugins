@@ -6,3 +6,9 @@
 .headerIsExpanded .vulsInventoryContainer {
     height: calc(100vh - 153px);
 }
+
+.vulsInventoryContainer .euiDataGrid--fullScreen {
+    height: calc(100vh - 49px);
+    bottom: 0;
+    top: auto;
+}
