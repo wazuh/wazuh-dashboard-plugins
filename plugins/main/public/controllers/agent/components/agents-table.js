@@ -33,7 +33,7 @@ import {
   AGENT_SYNCED_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
 } from '../../../../common/constants';
-import { AgentStatus } from '../../../components/agents/agent_status';
+import { AgentStatus } from '../../../components/agents/agent-status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
 import { TableWzAPI } from '../../../components/common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -254,13 +254,9 @@ export const AgentsTable = withErrorBoundary(
         truncateText: true,
         sortable: true,
         show: true,
-        render: status => (
-          <AgentStatus
-            status={status}
-            labelProps={{ className: 'hide-agent-status' }}
-          />
+        render: (status, agent) => (
+          <AgentStatus status={status} agent={agent} />
         ),
-        searchable: true,
       },
       {
         field: 'group_config_status',

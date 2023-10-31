@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzSettingsGroup from '../util-components/configuration-settings-group';
 
 import {
@@ -97,25 +97,22 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component {
     const { currentConfig, agent } = this.props;
     return (
       <Fragment>
-        <WzConfigurationSettingsTabSelector
+        <WzConfigurationSettingsHeader
           title="General"
           description="The settings shown below are applied globally"
-          currentConfig={currentConfig['syscheck-syscheck']}
-          minusHeight={this.props.agent.id === '000' ? 320 : 415}
-          helpLinks={helpLinks}
+          help={helpLinks}
         >
           <WzSettingsGroup
             config={currentConfig['syscheck-syscheck'].syscheck}
             items={mainSettingsOfAgentOrManager(agent)}
           />
-        </WzConfigurationSettingsTabSelector>
+        </WzConfigurationSettingsHeader>
       </Fragment>
     );
   }
 }
 
 WzConfigurationIntegrityMonitoringGeneral.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   agent: PropTypes.object
 };
 

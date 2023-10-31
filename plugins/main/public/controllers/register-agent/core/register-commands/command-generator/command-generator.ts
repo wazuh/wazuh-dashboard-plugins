@@ -14,10 +14,18 @@ import {
   validateOSDefinitionsDuplicated,
 } from '../services/search-os-definitions.service';
 import { OptionalParametersManager } from '../optional-parameters-manager/optional-parameters-manager';
-import { NoArchitectureSelectedException, NoOSSelectedException, WazuhVersionUndefinedException } from '../exceptions';
+import {
+  NoArchitectureSelectedException,
+  NoOSSelectedException,
+  WazuhVersionUndefinedException,
+} from '../exceptions';
 import { version } from '../../../../../../package.json';
 
-export class CommandGenerator<OS extends IOperationSystem, Params extends string> implements ICommandGenerator<OS, Params> {
+export class CommandGenerator<
+  OS extends IOperationSystem,
+  Params extends string,
+> implements ICommandGenerator<OS, Params>
+{
   os: OS['name'] | null = null;
   osDefinitionSelected: IOSCommandsDefinition<OS, Params> | null = null;
   optionalsManager: IOptionalParametersManager<Params>;
@@ -30,7 +38,7 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
     // validate os definitions received
     validateOSDefinitionsDuplicated(this.osDefinitions);
     validateOSDefinitionHasDuplicatedOptions(this.osDefinitions);
-    if(wazuhVersion == ''){
+    if (wazuhVersion == '') {
       throw new WazuhVersionUndefinedException();
     }
     this.optionalsManager = new OptionalParametersManager(optionalParams);
@@ -59,9 +67,12 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
    * @param props - The optional parameters to select
    * @returns The selected optional parameters
    */
-  addOptionalParams(props: IOptionalParameters<Params>): void {
+  addOptionalParams(props: IOptionalParameters<Params>, selectedOS?: OS): void {
     // Get all the optional parameters based on the given parameters
-    this.optionals = this.optionalsManager.getAllOptionalParams(props);
+    this.optionals = this.optionalsManager.getAllOptionalParams(
+      props,
+      selectedOS,
+    );
   }
 
   /**
@@ -97,7 +108,8 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
     }
     return this.osDefinitionSelected.urlPackage({
       wazuhVersion: this.wazuhVersion,
-      architecture: this.osDefinitionSelected.architecture as OS['architecture'],
+      architecture: this.osDefinitionSelected
+        .architecture as OS['architecture'],
       name: this.os as OS['name'],
     });
   }
@@ -114,7 +126,8 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
 
     return this.osDefinitionSelected.installCommand({
       name: this.os as OS['name'],
-      architecture: this.osDefinitionSelected.architecture as OS['architecture'],
+      architecture: this.osDefinitionSelected
+        .architecture as OS['architecture'],
       urlPackage: this.getUrlPackage(),
       wazuhVersion: this.wazuhVersion,
       optionals: this.optionals as IOptionalParameters<Params>,
@@ -133,7 +146,8 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
 
     return this.osDefinitionSelected.startCommand({
       name: this.os as OS['name'],
-      architecture: this.osDefinitionSelected.architecture as OS['architecture'],
+      architecture: this.osDefinitionSelected
+        .architecture as OS['architecture'],
       wazuhVersion: this.wazuhVersion,
       optionals: this.optionals as IOptionalParameters<Params>,
     });
@@ -152,7 +166,8 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
     return {
       wazuhVersion: this.wazuhVersion,
       os: this.os as OS['name'],
-      architecture: this.osDefinitionSelected.architecture as OS['architecture'],
+      architecture: this.osDefinitionSelected
+        .architecture as OS['architecture'],
       url_package: this.getUrlPackage(),
       install_command: this.getInstallCommand(),
       start_command: this.getStartCommand(),
@@ -167,5 +182,4 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
   getOptionalParamsCommands(): IOptionalParameters<Params> | object {
     return this.optionals;
   }
-
 }

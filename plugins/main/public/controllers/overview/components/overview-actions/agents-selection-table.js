@@ -18,7 +18,7 @@ import {
 } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { AgentStatus } from '../../../../components/agents/agent_status';
+import { AgentStatus } from '../../../../components/agents/agent-status';
 import { TableWzAPI } from '../../../../components/common/tables';
 
 const searchBarWQLOptions = {
@@ -77,8 +77,12 @@ export class AgentSelectionTable extends Component {
         searchable: true,
         sortable: true,
         width: 'auto',
-        render: status => (
-          <AgentStatus status={status} style={{ whiteSpace: 'no-wrap' }} />
+        render: (status, agent) => (
+          <AgentStatus
+            status={status}
+            agent={agent}
+            style={{ whiteSpace: 'no-wrap' }}
+          />
         ),
       },
     ];
@@ -182,9 +186,10 @@ export class AgentSelectionTable extends Component {
           <Fragment>
             <EuiFlexGroup responsive={false} justifyContent='flexEnd'>
               {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
-              <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+              <EuiFlexItem grow={false} style={{marginRight: 0}}>
                 <AgentStatus
                   status={selectedAgent.status}
+                  agent={selectedAgent}
                   style={{ whiteSpace: 'no-wrap' }}
                 >
                   {selectedAgent.name} ({selectedAgent.id})

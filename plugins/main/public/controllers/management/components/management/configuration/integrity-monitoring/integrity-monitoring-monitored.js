@@ -15,7 +15,6 @@ import PropTypes from 'prop-types';
 
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import WzNoConfig from '../util-components/no-config';
@@ -142,12 +141,10 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component {
         currentConfig['syscheck-syscheck'].syscheck &&
         currentConfig['syscheck-syscheck'].syscheck.directories &&
         currentConfig['syscheck-syscheck'].syscheck.directories.length > 0 ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Monitored directories"
             description="These directories are included on the integrity scan"
-            currentConfig={currentConfig['syscheck-syscheck']}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationListSelector
               items={items}
@@ -170,7 +167,7 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component {
                   />
                 </Fragment>
             )}
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
         {((agent || {}).os || {}).platform === 'windows' &&
           currentConfig &&
@@ -187,18 +184,16 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component {
           currentConfig['syscheck-syscheck'].syscheck.registry.length > 0 &&
           ((currentConfig['syscheck-syscheck'].syscheck.directories && !currentConfig['syscheck-syscheck'].syscheck.directories.length)
             || !currentConfig['syscheck-syscheck'].syscheck.directories) && (
-              <WzConfigurationSettingsTabSelector
+              <WzConfigurationSettingsHeader
                 title="Monitored registry entries"
                 description="A list of registry entries that will be monitored"
-                currentConfig={currentConfig}
-                minusHeight={this.props.agent.id === '000' ? 320 : 415}
-                helpLinks={helpLinks}
+                help={helpLinks}
               >
                 <EuiBasicTable
                   items={currentConfig['syscheck-syscheck'].syscheck.registry}
                   columns={columnsAgentWin}
                 />
-              </WzConfigurationSettingsTabSelector>
+              </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
@@ -206,7 +201,6 @@ class WzConfigurationIntegrityMonitoringMonitored extends Component {
 }
 
 WzConfigurationIntegrityMonitoringMonitored.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   agent: PropTypes.object
 };
 

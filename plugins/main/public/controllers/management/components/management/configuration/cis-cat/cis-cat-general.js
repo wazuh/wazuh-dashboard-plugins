@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
@@ -58,12 +58,10 @@ class WzConfigurationCisCatGeneral extends Component {
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {wodleConfig['cis-cat'] && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Main settings"
             description="General settings applied to all benchmarks"
-            currentConfig={wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={wodleConfig['cis-cat']}
@@ -75,15 +73,11 @@ class WzConfigurationCisCatGeneral extends Component {
               config={wodleConfig['cis-cat']}
               items={schedulingSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );
   }
 }
-
-WzConfigurationCisCatGeneral.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
-};
 
 export default WzConfigurationCisCatGeneral;

@@ -16,11 +16,12 @@ import PropTypes from 'prop-types';
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import { isString } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
@@ -72,18 +73,16 @@ class WzConfigurationAgentless extends Component {
           )}
         {currentConfig['agentless-agentless'] &&
           !isString(currentConfig['agentless-agentless']) && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Devices list"
               description="List of monitored devices that don't use the agent"
-              currentConfig={currentConfig}
-              minusHeight={260}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationListSelector
                 items={items}
                 settings={mainSettings}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
@@ -97,7 +96,6 @@ const mapStateToProps = state => ({
 });
 
 WzConfigurationAgentless.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

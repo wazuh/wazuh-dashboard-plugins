@@ -25,7 +25,8 @@
         "ip": "111.111.1.111",
         "mergedSum": "e669d89eba52f6897060fc65a45300ac",
         "configSum": "97fccbb67e250b7c80aadc8d0dc59abe",
-        "group_config_status": "synced"
+        "group_config_status": "synced",
+        "status_code": 2
       }
     ],
     "total_affected_items": 1,
