@@ -47,19 +47,6 @@ const readline = require('readline');
 // Supported versions
 function getSupportedVersions(pluginVersion) {
   return {
-    Kibana: {
-      branch: `${pluginVersion}-7.16`,
-      versions: [
-        ...[...Array(4).keys()].map(idx => `7.16.${idx}`),
-        ...[...Array(14).keys()].map(idx => `7.17.${idx}`),
-      ],
-      manifestPluginPath: 'kibana.json',
-    },
-    OpenDistro: {
-      branch: `${pluginVersion}-7.10`,
-      versions: ['7.10.2'],
-      manifestPluginPath: 'kibana.json',
-    },
     OpenSearch: {
       branch: pluginVersion,
       versions: ['2.8.0'],
