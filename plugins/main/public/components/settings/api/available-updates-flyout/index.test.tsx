@@ -2,7 +2,6 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AvailableUpdatesFlyout } from './';
-import { API_UPDATES_STATUS } from '../../../../../../wazuh-check-updates/common/types';
 
 jest.mock('./update-detail', () => ({
   UpdateDetail: jest.fn().mockReturnValue(<div>Update detail</div>),
@@ -17,7 +16,7 @@ describe('AvailableUpdatesFlyout component', () => {
         api={{
           api_id: 'api id',
           current_version: '4.3.1',
-          status: API_UPDATES_STATUS.AVAILABLE_UPDATES,
+          status: 'availableUpdates' as any,
           last_available_patch: {
             description:
               '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
