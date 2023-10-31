@@ -2,10 +2,6 @@ import { EuiDataGridColumn } from "@elastic/eui";
 
 export const inventoryTableDefaultColumns: EuiDataGridColumn[] = [
     {
-      id: '@timestamp',
-      displayAsText: 'Timestamp',
-    },
-    {
       id: 'package.name',
       displayAsText: 'Name',
     },
