@@ -254,19 +254,36 @@ export const visualizations = {
             width: 50,
           },
           {
-            title: 'Requirements by agent',
-            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
+            title: 'Top 10 agents by alerts number',
+            id: 'Wazuh-App-Overview-PCI-DSS-Agents',
             width: 50,
           },
         ],
       },
       {
-        height: 400,
+        height: 300,
         vis: [
           {
-            title: 'Recent events',
-            id: 'Wazuh-App-Agents-PCI-DSS-Recent-Events',
-            width: 100,
+            title: 'Top requirements over time',
+            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
+          },
+        ],
+      },
+      {
+        height: 530,
+        vis: [
+          {
+            title: 'Last alerts',
+            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
+          },
+        ],
+      },
+      {
+        height: 255,
+        vis: [
+          {
+            title: 'Requirements by agent',
+            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
           },
         ],
       },
