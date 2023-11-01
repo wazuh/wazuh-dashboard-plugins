@@ -45,6 +45,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { getCore } from '../../../../../kibana-services';
+import { statistics } from '../../../../../utils/applications';
 const wzConfig = new WazuhConfig();
 
 export class WzStatisticsOverview extends Component {
@@ -264,7 +265,7 @@ export class WzStatisticsOverview extends Component {
 }
 
 export default compose(
-  withGlobalBreadcrumb([{ text: '' }, { text: 'Statistics' }]),
+  withGlobalBreadcrumb([{ text: '' }, { text: statistics.title }]),
   withGuard(props => {
     return !(wzConfig.getConfig() || {})['cron.statistics.status']; // if 'cron.statistics.status' is false, then it renders PromptStatisticsDisabled component
   }, PromptStatisticsDisabled),

@@ -15,7 +15,11 @@ import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzReportingOverview from './reporting-overview';
 import { compose } from 'redux';
-import { withGlobalBreadcrumb, withReduxProvider } from '../../../../../components/common/hocs';
+import {
+  withGlobalBreadcrumb,
+  withReduxProvider,
+} from '../../../../../components/common/hocs';
+import { reporting } from '../../../../../utils/applications';
 
 class WzReporting extends Component {
   constructor(props) {
@@ -34,9 +38,7 @@ class WzReporting extends Component {
 
 export default compose(
   withReduxProvider,
-  withGlobalBreadcrumb( props => {
-    return [
-      { text: '' },
-      { text: 'Reporting' }
-    ];
-}))(WzReporting);
+  withGlobalBreadcrumb(props => {
+    return [{ text: '' }, { text: reporting.title }];
+  }),
+)(WzReporting);

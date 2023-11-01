@@ -73,6 +73,7 @@ import {
   Applications,
   configurationAssessment,
   fileIntegrityMonitoring,
+  itHygiene,
   mitreAttack,
   threatHunting,
   vulnerabilityDetection,
@@ -96,7 +97,7 @@ export const AgentsWelcome = compose(
     return [
       { text: '' },
       {
-        text: 'IT Hygiene',
+        text: itHygiene.title,
       },
       ...(agent?.name
         ? [

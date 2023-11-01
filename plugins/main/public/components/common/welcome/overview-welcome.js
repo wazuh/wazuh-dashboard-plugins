@@ -24,17 +24,18 @@ import {
   EuiPage,
   EuiButtonEmpty,
 } from '@elastic/eui';
-import { updateCurrentTab } from '../../../redux/actions/appStateActions';
-import store from '../../../redux/store';
 import './welcome.scss';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import {
   withErrorBoundary,
   withGlobalBreadcrumb,
   withReduxProvider,
 } from '../hocs';
 import { compose } from 'redux';
-import { Applications, Categories } from '../../../utils/applications';
+import {
+  Applications,
+  Categories,
+  overview,
+} from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 
 const appCategories = Applications.reduce((categories, app) => {
@@ -63,30 +64,13 @@ export const OverviewWelcome = compose(
   withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(props => {
-    return [{ text: '' }, { text: 'Overview' }];
+    return [{ text: '' }, { text: overview.title }];
   }),
 )(
   class OverviewWelcome extends Component {
     constructor(props) {
       super(props);
       this.strtools = new StringsTools();
-    }
-
-    buildTabCard(tab, icon) {
-      return (
-        <EuiFlexItem>
-          <EuiCard
-            size='xs'
-            layout='horizontal'
-            icon={<EuiIcon size='xl' type={icon} color='primary' />}
-            className='homSynopsis__card'
-            title={WAZUH_MODULES[tab].title}
-            onClick={() => store.dispatch(updateCurrentTab(tab))}
-            data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
-            description={WAZUH_MODULES[tab].description}
-          />
-        </EuiFlexItem>
-      );
     }
 
     addAgent() {
