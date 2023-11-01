@@ -29,7 +29,7 @@ Server management: 600
 Dashboard/indexer management (added to Wazuh dashboard default categories): 9000
 */
 
-const overview = {
+export const overview = {
   category: 'wz-category-home',
   id: 'wz-home',
   title: i18n.translate('wz-app-home', {
@@ -50,7 +50,7 @@ export const fileIntegrityMonitoring = {
   category: 'wz-category-endpoint-security',
   id: 'file-integrity-monitoring',
   title: i18n.translate('wz-app-file-integrity-monitoring', {
-    defaultMessage: 'File integrity monitoring',
+    defaultMessage: 'File Integrity Monitoring',
   }),
   description: i18n.translate('file-integrity-monitoring-description', {
     defaultMessage:
@@ -68,11 +68,11 @@ export const fileIntegrityMonitoring = {
     }`,
 };
 
-const endpointSumary = {
+export const endpointSumary = {
   category: 'wz-category-server-management',
   id: 'endpoints-summary',
   title: i18n.translate('wz-app-endpoints-summary', {
-    defaultMessage: 'Endpoints summary',
+    defaultMessage: 'Endpoints Summary',
   }),
   description: i18n.translate('endpoints-summary-description', {
     defaultMessage: 'Summary of agents and their status.',
@@ -88,7 +88,7 @@ const malwareDetection = {
   category: 'wz-category-endpoint-security',
   id: 'malware-detection',
   title: i18n.translate('wz-app-malware-detection', {
-    defaultMessage: 'Malware detection',
+    defaultMessage: 'Malware Detection',
   }),
   description: i18n.translate('malware-detection-description', {
     defaultMessage:
@@ -110,7 +110,7 @@ export const configurationAssessment = {
   category: 'wz-category-endpoint-security',
   id: 'configuration-assessment',
   title: i18n.translate('wz-app-configuration-assessment', {
-    defaultMessage: 'Configuration assessment',
+    defaultMessage: 'Configuration Assessment',
   }),
   description: i18n.translate('configuration-assessment-description', {
     defaultMessage:
@@ -132,7 +132,7 @@ export const threatHunting = {
   category: 'wz-category-threat-intelligence',
   id: 'threat-hunting',
   title: i18n.translate('wz-app-threat-hunting', {
-    defaultMessage: 'Threat hunting',
+    defaultMessage: 'Threat Hunting',
   }),
   description: i18n.translate('threat-hunting-description', {
     defaultMessage:
@@ -154,7 +154,7 @@ export const vulnerabilityDetection = {
   category: 'wz-category-threat-intelligence',
   id: 'vulnerability-detection',
   title: i18n.translate('wz-app-vulnerability-detection', {
-    defaultMessage: 'Vulnerability detection',
+    defaultMessage: 'Vulnerability Detection',
   }),
   description: i18n.translate('vulnerability-detection-description', {
     defaultMessage:
@@ -326,7 +326,7 @@ const tsc = {
     }`,
 };
 
-const itHygiene = {
+export const itHygiene = {
   category: 'wz-category-security-operations',
   id: 'it-hygiene',
   title: i18n.translate('wz-app-it-hygiene', {
@@ -457,7 +457,7 @@ const docker = {
     }`,
 };
 
-const rules = {
+export const rules = {
   category: 'wz-category-server-management',
   id: 'rules',
   title: i18n.translate('wz-app-rules', {
@@ -473,7 +473,7 @@ const rules = {
   redirectTo: () => '/manager/?tab=ruleset',
 };
 
-const decoders = {
+export const decoders = {
   category: 'wz-category-server-management',
   id: 'decoders',
   title: i18n.translate('wz-app-decoders', {
@@ -489,7 +489,7 @@ const decoders = {
   redirectTo: () => '/manager/?tab=decoders',
 };
 
-const cdbLists = {
+export const cdbLists = {
   category: 'wz-category-server-management',
   id: 'cdb-lists',
   title: i18n.translate('wz-app-lists', {
@@ -509,7 +509,7 @@ export const endpointGroups = {
   category: 'wz-category-server-management',
   id: 'endpoint-groups',
   title: i18n.translate('wz-app-endpoint-groups', {
-    defaultMessage: 'Endpoint groups',
+    defaultMessage: 'Endpoint Groups',
   }),
   description: i18n.translate('endpoint-groups-description', {
     defaultMessage: 'Manage your agent groups.',
@@ -521,7 +521,7 @@ export const endpointGroups = {
   redirectTo: () => '/manager/?tab=groups',
 };
 
-const serverStatus = {
+export const serverStatus = {
   category: 'wz-category-server-management',
   id: 'server-status',
   title: i18n.translate('wz-app-status', {
@@ -553,7 +553,7 @@ const cluster = {
   redirectTo: () => '/manager/?tab=monitoring',
 };
 
-const statistics = {
+export const statistics = {
   category: 'wz-category-server-management',
   id: 'statistics',
   title: i18n.translate('wz-app-statistics', {
@@ -569,7 +569,7 @@ const statistics = {
   redirectTo: () => '/manager/?tab=statistics',
 };
 
-const logs = {
+export const logs = {
   category: 'wz-category-server-management',
   id: 'logs',
   title: i18n.translate('wz-app-logs', {
@@ -585,7 +585,7 @@ const logs = {
   redirectTo: () => '/manager/?tab=logs',
 };
 
-const reporting = {
+export const reporting = {
   category: 'management',
   id: 'reporting',
   title: i18n.translate('wz-app-reporting', {
@@ -601,7 +601,7 @@ const reporting = {
   redirectTo: () => '/manager/?tab=reporting',
 };
 
-const settings = {
+export const settings = {
   category: 'wz-category-server-management',
   id: 'settings',
   title: i18n.translate('wz-app-settings', {
@@ -637,7 +637,7 @@ const rulesetTest = {
   category: 'wz-category-server-management',
   id: 'ruleset-test',
   title: i18n.translate('wz-app-ruleset-test', {
-    defaultMessage: 'Ruleset test',
+    defaultMessage: 'Ruleset Test',
   }),
   description: i18n.translate('ruleset-test-description', {
     defaultMessage: 'Check your ruleset testing logs.',
@@ -670,7 +670,7 @@ export const serverApi = {
   category: 'management',
   id: 'server-api',
   title: i18n.translate('wz-app-server-api', {
-    defaultMessage: 'Server API',
+    defaultMessage: 'Server APIs',
   }),
   description: i18n.translate('server-api-description', {
     defaultMessage: 'Manage and configure the API entries.',
@@ -686,7 +686,7 @@ const serverData = {
   category: 'management',
   id: 'server-data',
   title: i18n.translate('wz-app-server-data', {
-    defaultMessage: 'Server data',
+    defaultMessage: 'Sample Data',
   }),
   description: i18n.translate('server-data-description', {
     defaultMessage: 'Add sample data with events to the modules.',
@@ -702,7 +702,7 @@ export const wazuhPluginSettings = {
   category: 'management',
   id: 'wazuh-plugin-settings',
   title: i18n.translate('wz-app-wazuh-plugin-settings', {
-    defaultMessage: 'Wazuh plugin settings',
+    defaultMessage: 'App Settings',
   }),
   description: i18n.translate('wazuh-plugin-settings-description', {
     defaultMessage: 'Manage your Wazuh cluster configuration.',
@@ -718,7 +718,7 @@ const wazuhPluginLogs = {
   category: 'management',
   id: 'wazuh-plugin-logs',
   title: i18n.translate('wz-app-wazuh-plugin-logs', {
-    defaultMessage: 'Wazuh plugin logs',
+    defaultMessage: 'App Logs',
   }),
   description: i18n.translate('wazuh-plugin-logs-description', {
     defaultMessage: 'Explore the logs related to the applications.',
@@ -734,7 +734,7 @@ const wazuhPluginAbout = {
   category: 'management',
   id: 'wazuh-plugin-about',
   title: i18n.translate('wz-app-wazuh-plugin-about', {
-    defaultMessage: 'Wazuh plugin about',
+    defaultMessage: 'About',
   }),
   description: i18n.translate('wazuh-plugin-about-description', {
     defaultMessage: 'Show information about App Versions and community links.',
@@ -848,7 +848,7 @@ export const Categories = [
   },
   {
     id: 'management',
-    label: 'Indexer/dashboard Management',
+    label: 'Indexer/dashboard management',
     order: 5e3,
     euiIconType: 'managementApp',
   },
