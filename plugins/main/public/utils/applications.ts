@@ -20,10 +20,10 @@ Application order: one of 100-199 range: 100, 101, 102, etc...
 /* Categories ID
 Wazuh:
 Home: 0
-Endpoint security: 100
-Threat intelligence: 200
-Security operations: 300
-Cloud security: 400
+Endpoint security: 200
+Threat intelligence: 300
+Security operations: 400
+Cloud security: 500
 Explore (added to Wazuh dashboard default categories): 500
 Server management: 600
 Dashboard/indexer management (added to Wazuh dashboard default categories): 9000
@@ -59,7 +59,7 @@ export const fileIntegrityMonitoring = {
   euiIconType: 'indexRollupApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
-  order: 102,
+  order: 202,
   redirectTo: () =>
     `/overview/?tab=fim&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -95,7 +95,7 @@ const malwareDetection = {
       'Verify that your systems are configured according to your security policies baseline.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 101,
+  order: 201,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -116,7 +116,7 @@ export const configurationAssessment = {
     defaultMessage:
       'Scan your assets as part of a configuration assessment audit.',
   }),
-  order: 100,
+  order: 200,
   euiIconType: 'managementApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
@@ -139,7 +139,7 @@ export const threatHunting = {
       'Browse through your security alerts, identifying issues and threats in your environment.',
   }),
   euiIconType: 'securityAnalyticsApp',
-  order: 200,
+  order: 300,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -161,7 +161,7 @@ export const vulnerabilityDetection = {
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
   }),
   euiIconType: 'heartbeatApp',
-  order: 201,
+  order: 301,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -183,7 +183,7 @@ export const mitreAttack = {
       'Security events from the knowledge base of adversary tactics and techniques based on real-world observations.',
   }),
   euiIconType: 'grokApp',
-  order: 202,
+  order: 302,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -205,7 +205,7 @@ const virustotal = {
       'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.',
   }),
   euiIconType: 'monitoringApp',
-  order: 203,
+  order: 303,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -227,7 +227,7 @@ const pciDss = {
       'Global security standard for entities that process, store, or transmit payment cardholder data.',
   }),
   euiIconType: 'sqlApp',
-  order: 300,
+  order: 400,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -249,7 +249,7 @@ const hipaa = {
       'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.',
   }),
   euiIconType: 'monitoringApp',
-  order: 302,
+  order: 402,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -271,7 +271,7 @@ const gdpr = {
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
   }),
   euiIconType: 'sqlApp',
-  order: 301,
+  order: 401,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -295,7 +295,7 @@ const nist80053 = {
   euiIconType: 'notebookApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
-  order: 303,
+  order: 403,
   redirectTo: () =>
     `/overview/?tab=nist&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -315,7 +315,7 @@ const tsc = {
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.',
   }),
   euiIconType: 'packetbeatApp',
-  order: 304,
+  order: 404,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -337,7 +337,7 @@ export const itHygiene = {
       'Applications, network configuration, open ports, and processes running on your monitored systems.',
   }),
   euiIconType: 'visualizeApp',
-  order: 305,
+  order: 405,
   showInOverviewApp: true,
   showInAgentMenu: false,
   redirectTo: () =>
@@ -359,7 +359,7 @@ const amazonWebServices = {
       'Security events related to your Amazon AWS services, collected directly via AWS API.',
   }),
   euiIconType: 'logoAWSMono',
-  order: 400,
+  order: 500,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -381,7 +381,7 @@ const googleCloud = {
       'Security events related to your Google Cloud Platform services, collected directly via GCP API.',
   }),
   euiIconType: LogoGoogleCloud,
-  order: 401,
+  order: 501,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -403,7 +403,7 @@ const github = {
       'Monitoring events from audit logs of your GitHub organizations.',
   }),
   euiIconType: LogoGitHub,
-  order: 402,
+  order: 502,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -424,7 +424,7 @@ const office365 = {
     defaultMessage: 'Security events related to your Office 365 services.',
   }),
   euiIconType: LogoOffice365,
-  order: 403,
+  order: 503,
   showInOverviewApp: true,
   showInAgentMenu: false,
   redirectTo: () =>
@@ -811,7 +811,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-endpoint-security', {
       defaultMessage: 'Endpoint security',
     }),
-    order: 100,
+    order: 200,
     euiIconType: 'monitoringApp',
   },
   {
@@ -819,7 +819,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-threat-intelligence', {
       defaultMessage: 'Threat intelligence',
     }),
-    order: 200,
+    order: 300,
     euiIconType: 'lensApp',
   },
   {
@@ -827,7 +827,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-security-operations', {
       defaultMessage: 'Security operations',
     }),
-    order: 300,
+    order: 400,
     euiIconType: 'securityApp',
   },
   {
@@ -835,7 +835,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-cloud-security', {
       defaultMessage: 'Cloud security',
     }),
-    order: 400,
+    order: 500,
     euiIconType: 'watchesApp',
   },
   {
