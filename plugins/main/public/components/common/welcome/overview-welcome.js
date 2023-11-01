@@ -105,7 +105,7 @@ export const OverviewWelcome = compose(
     render() {
       return (
         <Fragment>
-          <EuiPage className='wz-welcome-page'>
+          <EuiPage>
             <EuiFlexGroup gutterSize='l'>
               <EuiFlexItem>
                 {this.props.agentsCountTotal === 0 && this.addAgent()}
@@ -129,11 +129,7 @@ export const OverviewWelcome = compose(
                                   size='xs'
                                   layout='horizontal'
                                   icon={
-                                    <EuiIcon
-                                      size='xl'
-                                      type={app.euiIconType}
-                                      color='primary'
-                                    />
+                                    <EuiIcon size='xl' type={app.euiIconType} />
                                   }
                                   className='homSynopsis__card'
                                   title={app.title}
