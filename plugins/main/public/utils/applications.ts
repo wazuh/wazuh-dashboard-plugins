@@ -20,11 +20,11 @@ Application order: one of 100-199 range: 100, 101, 102, etc...
 /* Categories ID
 Wazuh:
 Home: 0
+Explore (added to Wazuh dashboard default categories): 100
 Endpoint security: 200
 Threat intelligence: 300
 Security operations: 400
 Cloud security: 500
-Explore (added to Wazuh dashboard default categories): 500
 Server management: 600
 Dashboard/indexer management (added to Wazuh dashboard default categories): 9000
 */
