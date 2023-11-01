@@ -6,13 +6,9 @@ labels: bug
 assignees: ''
 ---
 
-| Wazuh | Elastic | Rev  | Security |
-| ----- | ------- | ---- | -------- |
-| 4.x   | 7.x     | 4xxx | Basic, ODFE, Xpack |
-
-| Browser |
-| ------- |
-| Chrome, Firefox, Safari, etc|
+| Wazuh | Rev  | Browser                      |
+|-------|------|------------------------------|
+| X.Y.Z | xyzw | Chrome, Firefox, Safari, etc |
 
 **Description**
 Short description of your issue.

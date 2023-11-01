@@ -33,6 +33,7 @@ const defaultConfiguration = {
   ignoreConfirmation: false,
   manifestPackage: '',
   manifestPlugin: '',
+  manifestChangelog: '',
   tagSuffix: '',
   exportTagsToFile: '',
 };
@@ -46,19 +47,6 @@ const readline = require('readline');
 // Supported versions
 function getSupportedVersions(pluginVersion) {
   return {
-    Kibana: {
-      branch: `${pluginVersion}-7.16`,
-      versions: [
-        ...[...Array(4).keys()].map(idx => `7.16.${idx}`),
-        ...[...Array(11).keys()].map(idx => `7.17.${idx}`),
-      ],
-      manifestPluginPath: 'kibana.json',
-    },
-    OpenDistro: {
-      branch: `${pluginVersion}-7.10`,
-      versions: ['7.10.2'],
-      manifestPluginPath: 'kibana.json',
-    },
     OpenSearch: {
       branch: pluginVersion,
       versions: ['2.9.0'],
@@ -212,6 +200,19 @@ function parse(input) {
         }
         break;
       }
+      case '--manifest-changelog': {
+        // Set the manifest changelog
+        const manifestChangelog = typeof input[0] === 'string' && input[0];
+
+        if (manifestChangelog) {
+          configuration.manifestChangelog = manifestChangelog;
+          input.splice(0, 1);
+        } else {
+          logger.error('manifest-changelog parameter is not defined.');
+          process.exit(1);
+        }
+        break;
+      }
       default: {
       }
     }
@@ -226,6 +227,7 @@ const usageOptionsMessage = `Options:
   --export-tags <path/to/file>                        Export tags to file.
   --help                                              Display the help.
   --ignore-confirmation                               Ignore the confirmation.
+  --manifest-changelog <manifest-changelog>           Set the changelog manifest file location.
   --manifest-package <manifest-package>               Set the package manifest file location.
   --manifest-plugin <manifest-plugin>                 Set the plugin platform manifest file location.
   --platform-version <platform-version>               Set the platform version.

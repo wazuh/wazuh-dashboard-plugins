@@ -121,5 +121,5 @@ version 2 of the License, or (at your option) any later version.
 [docs]: https://documentation.wazuh.com
 [install]: https://documentation.wazuh.com/current/installation-guide/index.html
 [slack]: https://join.slack.com/t/wazuh/shared_invite/zt-1lgu531ur-7M_k_ZQbpdo4QCn_pHee3w
-[branches]: https://github.com/wazuh/wazuh-kibana-app/wiki/About-our-branches-and-tags
-[wiki]: https://github.com/wazuh/wazuh-kibana-app/wiki
+[branches]: https://github.com/wazuh/wazuh-dashboard-plugins/wiki/About-our-branches-and-tags
+[wiki]: https://github.com/wazuh/wazuh-dashboard-plugins/wiki

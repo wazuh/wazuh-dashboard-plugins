@@ -1,5 +1,5 @@
 export const API_CONFIGURATION_PAGE = {
-  checkConnectionButton: 'div:nth-child(2) > span > button',
+  checkConnectionButton: 'tbody tr:nth-child(1) div:nth-child(2) > span > button',
   connectionSuccessToast: '.euiToast--success',
   addNewConnectionButton: 'react-component > div > div > div:nth-child(1) > div:nth-child(2) > button > span',
   addNewConnectionModal: 'react-component > div > div.euiFlexItem.min-guide-width > div',

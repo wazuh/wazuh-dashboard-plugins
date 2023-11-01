@@ -251,5 +251,3 @@ function HealthCheckComponent() {
 export const HealthCheck = compose(withErrorBoundary, withReduxProvider)(HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;
-
-

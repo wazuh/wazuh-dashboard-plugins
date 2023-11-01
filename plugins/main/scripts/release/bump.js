@@ -23,6 +23,7 @@ const defaultConfiguration = {
   platformVersion: '',
   manifestPackage: '',
   manifestPlugin: '',
+  manifestChangelog: '',
 };
 
 const logger = require('./lib/logger');
@@ -30,6 +31,7 @@ const logger = require('./lib/logger');
 const { readPackageManifest } = require('./lib/read-manifest-package');
 const { updatePackageManifest } = require('./lib/update-manifest-package');
 const { updatePluginManifest } = require('./lib/update-manifest-plugin');
+const { updateChangelog } = require('./lib/update-changelog');
 
 /**
  *
@@ -147,6 +149,19 @@ function parse(input) {
         }
         break;
       }
+      case '--manifest-changelog': {
+        // Set the manifest changelog
+        const manifestChangelog = typeof input[0] === 'string' && input[0];
+
+        if (manifestChangelog) {
+          configuration.manifestChangelog = manifestChangelog;
+          input.splice(0, 1);
+        } else {
+          logger.error('manifest-changelog parameter is not defined.');
+          process.exit(1);
+        }
+        break;
+      }
       default: {
       }
     }
@@ -159,6 +174,7 @@ const usageOptionsMessage = `Options:
   --display-configuration                             Display the configuration. Log to sterr.
   --examples                                          Display examples of usage.
   --help                                              Display the help.
+  --manifest-changelog <manifest-changelog>           Set the changelog manifest file location.
   --manifest-package <manifest-package>               Set the package manifest file location.
   --manifest-plugin <manifest-plugin>                 Set the plugin platform manifest file location.
   --platform-version <platform-version>               Set the platform version.
@@ -211,12 +227,14 @@ function run(configuration) {
     platformVersion,
     manifestPackage,
     manifestPlugin,
+    manifestChangelog,
   } = configuration;
   version && logger.info(`Version: ${version}`);
   revision && logger.info(`Revision: ${revision}`);
   platformVersion && logger.info(`Platform version: ${platformVersion}`);
   manifestPackage && logger.info(`Package manifest: ${manifestPackage}`);
   manifestPlugin && logger.info(`Plugin manifest: ${manifestPlugin}`);
+  manifestChangelog && logger.info(`Changelog: ${manifestChangelog}`);
 
   logger.info(
     'This will update the manifest files: package and platform plugin.',
@@ -231,6 +249,12 @@ function run(configuration) {
   updatePluginManifest(manifestPlugin, {
     version,
     revision,
+  });
+
+  updateChangelog(manifestChangelog, {
+    version,
+    revision,
+    platformVersion,
   });
 
   displayMessageManualChanges();

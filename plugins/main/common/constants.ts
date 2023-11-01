@@ -105,7 +105,10 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
-export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
+export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [
+  1,
+  2
+];
 
 // Wazuh data path
 const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
@@ -318,7 +321,7 @@ export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING =
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION =
   'user-manual/wazuh-dashboard/config-file.html';
 export const PLUGIN_PLATFORM_URL_GUIDE =
-  'https://opensearch.org/docs/1.2/opensearch/index/';
+  'https://opensearch.org/docs/2.8/about';
 export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'OpenSearch guide';
 
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
