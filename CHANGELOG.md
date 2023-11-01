@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.7.1
 
+### Fixed
+
+- Fixed problem when using non latin characters in the username [#6076](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6076)
+
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 01
 
 ### Added
@@ -34,7 +38,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed views in JSON and XML formats from management settings. [#5747](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5747)
 
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.8.0 - Revision 03
-
 
 ### Added
 
