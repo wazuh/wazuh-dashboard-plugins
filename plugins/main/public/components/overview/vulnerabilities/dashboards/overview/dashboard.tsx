@@ -1,13 +1,13 @@
 import React from 'react';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getDashboardPanels } from './dashboard-panels';
+import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
-import useSearchBarConfiguration from '../../searchbar/use-search-bar-configuration';
+import useSearchBarConfiguration from '../../search_bar/use_search_bar_configuration';
 import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
-import { getDashboardFilters } from './dashboard-panels-filters';
-import './vulnerability-detector-filters.scss';
-import { getKPIsPanel } from './dashboard-panels-kpis';
+import { getDashboardFilters } from './dashboard_panels_filters';
+import './vulnerability_detector_filters.scss';
+import { getKPIsPanel } from './dashboard_panels_kpis';
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;

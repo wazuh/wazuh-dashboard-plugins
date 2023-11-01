@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { getPlugins } from '../../../../../kibana-services';
-import useSearchBarConfiguration from '../../searchbar/use-search-bar-configuration'
+import useSearchBarConfiguration from '../../search_bar/use_search_bar_configuration'
 import { IntlProvider } from 'react-intl';
 import {
   EuiDataGrid,
@@ -27,8 +27,10 @@ import { useDocViewer } from '../../doc_viewer/use_doc_viewer';
 import './inventory.scss';
 import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 import { search, exportSearchToCSV } from './inventory_service';
+import { ErrorHandler, ErrorFactory, HttpError } from '../../../../../react-services/error-management';
+import { withErrorBoundary } from '../../../../common/hocs';
 
-export const InventoryVuls = () => {
+const InventoryVulsComponent = () => {
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
   })
@@ -39,7 +41,6 @@ export const InventoryVuls = () => {
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(undefined);
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
-
   const onClickInspectDoc = useMemo(() => (index: number) => {
     const rowClicked = results.hits.hits[index];
     setInspectedHit(rowClicked);
@@ -47,7 +48,6 @@ export const InventoryVuls = () => {
 
   const DocViewInspectButton = ({ rowIndex }: EuiDataGridCellValueElementProps) => {
     const inspectHintMsg = 'Inspect document details';
-
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -89,19 +89,16 @@ export const InventoryVuls = () => {
           setIsSearching(false);
         });
       }catch(error){
-        console.error(error);
-        // check when filters are wrong and the search fails
+        const searchError = ErrorFactory.create(HttpError, { error, message: 'Error searching vulnerabilities' })
+        ErrorHandler.handleError(searchError);
+        setIsSearching(false);
       }
     }
   }, [JSON.stringify(searchBarProps), JSON.stringify(pagination), JSON.stringify(sorting)]);
 
-
-
   const timeField = indexPattern?.timeFieldName ? indexPattern.timeFieldName : undefined;
 
   const onClickExportResults = async () => {
-    // use the search method to get the data and pass the results.hits.total to make
-
     const params = {
       indexPattern: indexPatterns?.[0] as IndexPattern,
       filters,
@@ -113,10 +110,13 @@ export const InventoryVuls = () => {
       },
       sorting
     }
-
-    await exportSearchToCSV(params);
+    try {
+      await exportSearchToCSV(params);
+    }catch(error){
+      const searchError = ErrorFactory.create(HttpError, { error, message: 'Error downloading csv report' })
+      ErrorHandler.handleError(searchError);
+    }
   }
-
 
   return (
     <IntlProvider locale="en">
@@ -179,3 +179,5 @@ export const InventoryVuls = () => {
     </IntlProvider>
   );
 }
+
+export const InventoryVuls = withErrorBoundary(InventoryVulsComponent);

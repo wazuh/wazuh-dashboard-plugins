@@ -13,6 +13,8 @@ type tDataGridProps = {
 };
 
 export const parseColumns = (fields: IFieldType[]): EuiDataGridColumn[] => {
+    // remove _source field becuase is a object field and is not supported
+    fields = fields.filter((field) => field.name !== '_source');
     return fields.map((field) => {
         return {
             ...field,
@@ -59,11 +61,9 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         setRows(results?.hits?.hits || [])
     }, [results, results?.hits, results?.hits?.total])
 
-
     useEffect(() => {
         setPagination((pagination) => ({ ...pagination, pageIndex: 0 }));
     }, [rowCount])
-
 
     const renderCellValue = ({ rowIndex, columnId, setCellProps }) => {
         const rowsParsed = parseData(rows);

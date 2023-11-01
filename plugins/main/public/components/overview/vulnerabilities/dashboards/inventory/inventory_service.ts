@@ -99,8 +99,40 @@ export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) 
 }
 
 export const exportSearchToCSV = async (params: SearchParams): Promise<void> => {
-    const { indexPattern, filters = [], query, sorting, fields } = params;
-    const searchResults = await search(params);
+    const DEFAULT_MAX_SIZE_PER_CALL = 10000;
+    const { indexPattern, filters = [], query, sorting, fields, pagination } = params;
+    // when the pageSize is greater than the default max size per call (10000)
+    // then we need to paginate the search
+    const mustPaginateSearch = pagination?.pageSize && pagination?.pageSize > DEFAULT_MAX_SIZE_PER_CALL;
+    const pageSize = mustPaginateSearch ? DEFAULT_MAX_SIZE_PER_CALL : pagination?.pageSize;
+    const totalHits = pagination?.pageSize || DEFAULT_MAX_SIZE_PER_CALL; 
+    let pageIndex = params.pagination?.pageIndex || 0;
+    let hitsCount = 0;
+    let allHits = [];
+    let searchResults;
+    if (mustPaginateSearch) {
+        // paginate the search
+        while (hitsCount < totalHits) {
+            const searchParams = {
+                indexPattern,
+                filters,
+                query,
+                pagination: {
+                    pageIndex,
+                    pageSize,
+                },
+                sorting,
+                fields,
+            };
+            searchResults = await search(searchParams);
+            allHits = allHits.concat(searchResults.hits.hits);
+            hitsCount = allHits.length;
+            pageIndex++;
+        }
+    } else {
+        searchResults = await search(params);
+    }
+    
     const resultsFields = fields;
     const data = searchResults.hits.hits.map((hit) => { 
         // check if the field type is a date
@@ -136,8 +168,6 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
         });
         return parsedRow?.join(',');
     }).join('\n');
-
-
 
     // create a csv file using blob
     const blobData = new Blob(

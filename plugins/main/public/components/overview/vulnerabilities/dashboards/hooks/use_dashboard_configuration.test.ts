@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { DashboardContainerInput } from '../../../../../../../../src/plugins/dashboard/public';
-import { useDashboardConfiguration } from './use-dashboard-configuration';
+import { useDashboardConfiguration } from './use_dashboard_configuration';
 
 describe('useDashboardConfiguration', () => {
   test('initial configuration is set correctly', () => {
