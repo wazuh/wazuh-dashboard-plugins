@@ -97,7 +97,8 @@ const keyRequestSettings = [
 ];
 
 const sslSettings = [
-  { field: 'ssl_verify_host', label: 'Verify agents using a CA certificate' },
+  { field: 'ssl_verify_host', label: 'Verify host when a CA certificate is specified' },
+  { field: 'ssl_agent_ca', label: 'Path to the CA certificate used to verify clients' },
   {
     field: 'ssl_auto_negotiate',
     label: 'Auto-select the SSL negotiation method',
