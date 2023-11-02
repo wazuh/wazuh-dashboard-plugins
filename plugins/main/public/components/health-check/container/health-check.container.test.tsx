@@ -47,7 +47,7 @@ jest.mock('../services', () => ({
 }));
 
 jest.mock('../components/check-result', () => ({
-  CheckResult: () => () => <></>,
+  CheckResult: () => <></>,
 }));
 
 jest.mock('../../../react-services', () => ({
@@ -59,10 +59,13 @@ jest.mock('../../../react-services', () => ({
   },
 }));
 
+jest.mock('react-use/lib/useObservable', () => () => {});
+
 jest.mock('../../../kibana-services', () => ({
   getCore: () => ({
     application: {
       getUrlForApp: (appId: string) => appId,
+      navigateToUrl: (appId: string) => appId,
     },
   }),
   getHttp: () => ({

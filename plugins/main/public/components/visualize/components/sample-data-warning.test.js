@@ -29,9 +29,12 @@ jest.mock('../../../react-services');
 jest.mock('../../../react-services/common-services');
 jest.mock('../../../kibana-services');
 
+jest.mock('react-use/lib/useObservable', () => () => {});
+
 getCore.mockImplementation(() => ({
   application: {
     getUrlForApp: (appId, options) => `/app/${appId}`,
+    navigateToUrl: appId => appId,
   },
 }));
 
