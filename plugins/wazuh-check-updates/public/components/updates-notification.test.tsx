@@ -1,7 +1,8 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { useAvailableUpdates, useUserPreferences } from '../hooks';
+import { useUserPreferences } from '../hooks';
+import { getAvailableUpdates } from '../services';
 import { areThereNewUpdates } from '../utils';
 import { UpdatesNotification } from './updates-notification';
 import userEvent from '@testing-library/user-event';
@@ -16,6 +17,9 @@ jest.mock(
 
 jest.mock('../plugin-services', () => ({
   getCore: jest.fn().mockReturnValue({
+    application: {
+      navigateToApp: () => 'http://url',
+    },
     http: {
       basePath: {
         prepend: () => 'http://url',
@@ -24,8 +28,8 @@ jest.mock('../plugin-services', () => ({
   }),
 }));
 
-const mockedUseAvailabeUpdates = useAvailableUpdates as jest.Mock;
-jest.mock('../hooks/available-updates');
+const mockedGetAvailableUpdates = getAvailableUpdates as jest.Mock;
+jest.mock('../services/available-updates');
 
 const mockedUseUserPreferences = useUserPreferences as jest.Mock;
 jest.mock('../hooks/user-preferences');
@@ -34,8 +38,8 @@ const mockedAreThereNewUpdates = areThereNewUpdates as jest.Mock;
 jest.mock('../utils/are-there-new-updates');
 
 describe('UpdatesNotification component', () => {
-  test('should return the nofication component', () => {
-    mockedUseAvailabeUpdates.mockImplementation(() => ({
+  test('should return the nofication component', async () => {
+    mockedGetAvailableUpdates.mockImplementation(() => ({
       isLoading: false,
       apisAvailableUpdates: [
         {
@@ -75,12 +79,10 @@ describe('UpdatesNotification component', () => {
 
     expect(container).toMatchSnapshot();
 
-    const message = getByText('New release is available!');
+    const message = await waitFor(() => getByText('New release is available!'));
     expect(message).toBeInTheDocument();
 
-    const releaseNotesLink = getByRole('link', {
-      name: 'Go to the API configuration page for details',
-    });
+    const releaseNotesLink = getByText('Go to the API configuration page for details');
     expect(releaseNotesLink).toBeInTheDocument();
 
     const dismissCheck = getByText('Disable updates notifications');
@@ -91,8 +93,7 @@ describe('UpdatesNotification component', () => {
   });
 
   test('should return null when user close notification', async () => {
-    mockedUseAvailabeUpdates.mockImplementation(() => ({
-      isLoading: false,
+    mockedGetAvailableUpdates.mockImplementation(() => ({
       apisAvailableUpdates: [
         {
           api_id: 'api id',
@@ -112,6 +113,7 @@ describe('UpdatesNotification component', () => {
           },
         },
       ],
+      last_check_date: '20231027 14:39',
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
@@ -130,7 +132,7 @@ describe('UpdatesNotification component', () => {
 
     const { container, getByRole } = render(<UpdatesNotification />);
 
-    const closeButton = getByRole('button', { name: 'Dismiss' });
+    const closeButton = await waitFor(() => getByRole('button', { name: 'Dismiss' }));
     expect(closeButton).toBeInTheDocument();
     await userEvent.click(closeButton);
 
@@ -141,11 +143,9 @@ describe('UpdatesNotification component', () => {
   });
 
   test('should return null when is loading', () => {
-    mockedUseAvailabeUpdates.mockImplementation(() => ({ isLoading: true }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: true,
     }));
-    mockedAreThereNewUpdates.mockImplementation(() => undefined);
 
     const { container } = render(<UpdatesNotification />);
 
@@ -155,8 +155,11 @@ describe('UpdatesNotification component', () => {
     expect(firstChild).toBeNull();
   });
 
-  test('should return null when there are no available updates', () => {
-    mockedUseAvailabeUpdates.mockImplementation(() => ({ isLoading: false }));
+  test('should return null when there are no available updates', async () => {
+    mockedGetAvailableUpdates.mockImplementation(() => ({
+      apisAvailableUpdates: [],
+      last_check_date: '20231027 14:39',
+    }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
       userPreferences: { hide_update_notifications: false },
@@ -167,33 +170,11 @@ describe('UpdatesNotification component', () => {
 
     expect(container).toMatchSnapshot();
 
-    const firstChild = container.firstChild;
+    const firstChild = await waitFor(() => container.firstChild);
     expect(firstChild).toBeNull();
   });
 
-  test('should return null when user dismissed notifications for future', () => {
-    mockedUseAvailabeUpdates.mockImplementation(() => ({
-      isLoading: false,
-      apisAvailableUpdates: [
-        {
-          api_id: 'api id',
-          current_version: '4.3.1',
-          status: 'availableUpdates' as API_UPDATES_STATUS,
-          last_available_patch: {
-            description:
-              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
-            published_date: '2022-05-18T10:12:43Z',
-            semver: {
-              major: 4,
-              minor: 3,
-              patch: 8,
-            },
-            tag: 'v4.3.8',
-            title: 'Wazuh v4.3.8',
-          },
-        },
-      ],
-    }));
+  test('should return null when user dismissed notifications for future', async () => {
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
       userPreferences: {
@@ -206,19 +187,17 @@ describe('UpdatesNotification component', () => {
         hide_update_notifications: true,
       },
     }));
-    mockedAreThereNewUpdates.mockImplementation(() => true);
 
     const { container } = render(<UpdatesNotification />);
 
     expect(container).toMatchSnapshot();
 
-    const firstChild = container.firstChild;
+    const firstChild = await waitFor(() => container.firstChild);
     expect(firstChild).toBeNull();
   });
 
-  test('should return null when user already dismissed the notifications for available updates', () => {
-    mockedUseAvailabeUpdates.mockImplementation(() => ({
-      isLoading: false,
+  test('should return null when user already dismissed the notifications for available updates', async () => {
+    mockedGetAvailableUpdates.mockImplementation(() => ({
       apisAvailableUpdates: [
         {
           api_id: 'api id',
@@ -238,6 +217,7 @@ describe('UpdatesNotification component', () => {
           },
         },
       ],
+      last_check_date: '20231027 14:39',
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
@@ -257,7 +237,7 @@ describe('UpdatesNotification component', () => {
 
     expect(container).toMatchSnapshot();
 
-    const firstChild = container.firstChild;
+    const firstChild = await waitFor(() => container.firstChild);
     expect(firstChild).toBeNull();
   });
 });

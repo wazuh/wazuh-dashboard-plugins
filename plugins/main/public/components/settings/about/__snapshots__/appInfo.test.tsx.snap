@@ -2,77 +2,58 @@
 
 exports[`SettingsAboutAppInfo component should render version, revision, install date and ApisUpdateStatus component 1`] = `
 <div>
-  <h2
-    class="euiTitle euiTitle--medium"
-  >
-    Dashboard version
-  </h2>
   <div
-    class="euiSpacer euiSpacer--l"
-  />
-  <div
-    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
+    class="euiCallOut euiCallOut--primary"
   >
     <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
+      class="euiText euiText--small"
     >
-      <dl
-        class="euiDescriptionList euiDescriptionList--row"
+      <div
+        class="euiTextColor euiTextColor--default"
       >
-        <dt
-          class="euiDescriptionList__title"
+        <div
+          class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
         >
-          Version
-        </dt>
-        <dd
-          class="euiDescriptionList__description"
-        >
-          4.8.0
-        </dd>
-      </dl>
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              App version: 
+              <b>
+                4.8.0
+              </b>
+            </div>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              App revision: 
+              <b>
+                01
+              </b>
+            </div>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Install date:
+               
+              <b>
+                Sep 25, 2023 @ 14:03:40.816
+              </b>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
-    >
-      <dl
-        class="euiDescriptionList euiDescriptionList--row"
-      >
-        <dt
-          class="euiDescriptionList__title"
-        >
-          Revision
-        </dt>
-        <dd
-          class="euiDescriptionList__description"
-        >
-          01
-        </dd>
-      </dl>
-    </div>
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
-    >
-      <dl
-        class="euiDescriptionList euiDescriptionList--row"
-      >
-        <dt
-          class="euiDescriptionList__title"
-        >
-          Install date
-        </dt>
-        <dd
-          class="euiDescriptionList__description"
-        >
-          Sep 25, 2023 @ 14:03:40.816
-        </dd>
-      </dl>
-    </div>
-  </div>
-  <hr
-    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginLarge"
-  />
-  <div>
-    APIs Updates Status component
   </div>
 </div>
 `;

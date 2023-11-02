@@ -39,13 +39,13 @@ export const UpdateDetail = ({ update, type }: UpdateDetailProps) => {
       className="euiAccordionForm"
       buttonClassName="euiAccordionForm__button"
       buttonContent={
-        <EuiFlexGroup alignItems="center">
-          <EuiFlexItem>
+        <EuiFlexGroup alignItems="center" responsive={false}>
+          <EuiFlexItem grow={false}>
             <EuiTitle size="s" className="euiAccordionForm__title">
               <h3>{title}</h3>
             </EuiTitle>
           </EuiFlexItem>
-          <EuiFlexItem>
+          <EuiFlexItem grow={false}>
             <EuiBadge color="hollow">{type}</EuiBadge>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -79,7 +79,7 @@ export const UpdateDetail = ({ update, type }: UpdateDetailProps) => {
               </EuiLink>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer />{' '}
+          <EuiSpacer />
         </>
       ) : null}
       {description ? <Markdown markdown={description} openLinksInNewTab /> : null}

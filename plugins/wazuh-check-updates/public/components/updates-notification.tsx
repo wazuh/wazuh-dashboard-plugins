@@ -7,13 +7,16 @@ import {
   EuiFlexItem,
   EuiText,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
-import { useAvailableUpdates, useUserPreferences } from '../hooks';
+import { useUserPreferences } from '../hooks';
 import { areThereNewUpdates } from '../utils';
 import { getCore } from '../plugin-services';
+import { AvailableUpdates } from '../../../wazuh-check-updates/common/types';
+import { getAvailableUpdates } from '../services';
 
 export const UpdatesNotification = () => {
+  const [availableUpdates, setAvailableUpdates] = useState<AvailableUpdates>();
   const [isDismissed, setIsDismissed] = useState(false);
   const [dismissFutureUpdates, setDismissFutureUpdates] = useState(false);
 
@@ -24,21 +27,19 @@ export const UpdatesNotification = () => {
     updateUserPreferences,
   } = useUserPreferences();
 
-  const {
-    apisAvailableUpdates,
-    error: getAvailableUpdatesError,
-    isLoading: isLoadingAvailableUpdates,
-  } = useAvailableUpdates();
+  const updateAvailableUpdates = async () => {
+    try {
+      const availableUpdates = await getAvailableUpdates();
+      setAvailableUpdates(availableUpdates);
+    } catch (e) {}
+  };
 
-  if (userPreferencesError) {
-    return null;
-  }
+  useEffect(() => {
+    if (isLoadingUserPreferences || userPreferences.hide_update_notifications) return;
+    updateAvailableUpdates();
+  }, [userPreferences?.hide_update_notifications, isLoadingUserPreferences]);
 
-  if (getAvailableUpdatesError) {
-    return null;
-  }
-
-  if (isLoadingAvailableUpdates || isLoadingUserPreferences) {
+  if (isLoadingUserPreferences || userPreferencesError) {
     return null;
   }
 
@@ -49,7 +50,7 @@ export const UpdatesNotification = () => {
   if (isDismissed) return null;
 
   const mustNotifyUser = areThereNewUpdates(
-    apisAvailableUpdates,
+    availableUpdates?.apis_available_updates,
     userPreferences.last_dismissed_updates
   );
 
@@ -59,20 +60,22 @@ export const UpdatesNotification = () => {
 
   const handleOnClose = () => {
     updateUserPreferences({
-      last_dismissed_updates: apisAvailableUpdates.map((apiAvailableUpdates) => {
-        const {
-          api_id,
-          last_available_major,
-          last_available_minor,
-          last_available_patch,
-        } = apiAvailableUpdates;
-        return {
-          api_id,
-          last_major: last_available_major?.tag,
-          last_minor: last_available_minor?.tag,
-          last_patch: last_available_patch?.tag,
-        };
-      }),
+      last_dismissed_updates: availableUpdates?.apis_available_updates?.map(
+        (apiAvailableUpdates) => {
+          const {
+            api_id,
+            last_available_major,
+            last_available_minor,
+            last_available_patch,
+          } = apiAvailableUpdates;
+          return {
+            api_id,
+            last_major: last_available_major?.tag,
+            last_minor: last_available_minor?.tag,
+            last_patch: last_available_patch?.tag,
+          };
+        }
+      ),
       ...(dismissFutureUpdates ? { hide_update_notifications: true } : {}),
     });
     setIsDismissed(true);
@@ -95,7 +98,9 @@ export const UpdatesNotification = () => {
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
                 <EuiButtonEmpty
                   color="ghost"
-                  href={getCore().http.basePath.prepend('/app/wazuh#/settings?tab=api')}
+                  onClick={() =>
+                    getCore().application.navigateToApp('wazuh', { path: '#/settings?tab=api' })
+                  }
                 >
                   <FormattedMessage
                     id="wazuhCheckUpdates.updatesNotification.linkText"

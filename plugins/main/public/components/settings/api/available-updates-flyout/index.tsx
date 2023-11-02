@@ -9,7 +9,6 @@ import {
   EuiFlexItem,
 } from '@elastic/eui';
 import { ApiAvailableUpdates } from '../../../../../../wazuh-check-updates/common/types';
-import { formatUIDate } from '../../../../react-services/time-service';
 import { UpdateDetail } from './update-detail';
 import { WzFlyout } from '../../../../components/common/flyouts';
 
@@ -28,7 +27,7 @@ export const AvailableUpdatesFlyout = ({
     <WzFlyout onClose={onClose}>
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size="m">
-          <h2>Details of available updates</h2>
+          <h2>Available updates</h2>
         </EuiTitle>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
