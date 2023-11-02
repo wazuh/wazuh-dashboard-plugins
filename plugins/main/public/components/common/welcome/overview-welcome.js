@@ -34,9 +34,11 @@ import { compose } from 'redux';
 import {
   Applications,
   Categories,
+  endpointSumary,
   overview,
 } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const appCategories = Applications.reduce((categories, app) => {
   const existingCategory = categories.find(
@@ -78,23 +80,25 @@ export const OverviewWelcome = compose(
         <>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiCallOut
-                title={
-                  <>
-                    No agents were added to this manager.{' '}
-                    <EuiButtonEmpty
-                      href={getCore().application.getUrlForApp(
-                        'endpoints-summary',
-                        { path: '#/agents-preview' },
-                      )}
-                    >
-                      Add agent
-                    </EuiButtonEmpty>
-                  </>
-                }
-                color='warning'
-                iconType='alert'
-              ></EuiCallOut>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiCallOut
+                  title={
+                    <>
+                      No agents were added to this manager.{' '}
+                      <EuiButtonEmpty
+                        href={getCore().application.getUrlForApp(
+                          endpointSumary.id,
+                          { path: '#/agents-preview' },
+                        )}
+                      >
+                        Add agent
+                      </EuiButtonEmpty>
+                    </>
+                  }
+                  color='warning'
+                  iconType='alert'
+                ></EuiCallOut>
+              </RedirectAppLinks>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size='xl' />
@@ -125,22 +129,29 @@ export const OverviewWelcome = compose(
                           <EuiFlexGrid columns={2}>
                             {apps.map(app => (
                               <EuiFlexItem key={app.id}>
-                                <EuiCard
-                                  size='xs'
-                                  layout='horizontal'
-                                  icon={
-                                    <EuiIcon size='xl' type={app.euiIconType} />
-                                  }
-                                  className='homSynopsis__card'
-                                  title={app.title}
-                                  onClick={() =>
-                                    getCore().application.navigateToApp(app.id)
-                                  }
-                                  data-test-subj={`overviewWelcome${this.strtools.capitalize(
-                                    app.id,
-                                  )}`}
-                                  description={app.description}
-                                />
+                                <RedirectAppLinks
+                                  application={getCore().application}
+                                >
+                                  <EuiCard
+                                    size='xs'
+                                    layout='horizontal'
+                                    icon={
+                                      <EuiIcon
+                                        size='xl'
+                                        type={app.euiIconType}
+                                      />
+                                    }
+                                    className='homSynopsis__card'
+                                    title={app.title}
+                                    href={getCore().application.getUrlForApp(
+                                      app.id,
+                                    )}
+                                    data-test-subj={`overviewWelcome${this.strtools.capitalize(
+                                      app.id,
+                                    )}`}
+                                    description={app.description}
+                                  />
+                                </RedirectAppLinks>
                               </EuiFlexItem>
                             ))}
                           </EuiFlexGrid>

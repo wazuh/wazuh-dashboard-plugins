@@ -39,6 +39,8 @@ import { TableWzAPI } from '../../../components/common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
 import { getCore } from '../../../kibana-services';
+import { itHygiene } from '../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -93,41 +95,38 @@ export const AgentsTable = withErrorBoundary(
     actionButtonsRender(agent) {
       return (
         <div className={'icon-box-action'}>
-          <EuiToolTip
-            content='Open summary panel for this agent'
-            position='left'
-          >
-            <EuiButtonIcon
-              onClick={ev => {
-                ev.stopPropagation();
-                getCore().application.navigateToApp('it-hygiene', {
-                  path: `#/agents?tab=welcome&agent=${agent.id}`,
-                });
-              }}
-              iconType='eye'
-              color={'primary'}
-              aria-label='Open summary panel for this agent'
-            />
-          </EuiToolTip>
-          &nbsp;
-          {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
+          <RedirectAppLinks application={getCore().application}>
             <EuiToolTip
-              content='Open configuration for this agent'
+              content='Open summary panel for this agent'
               position='left'
             >
               <EuiButtonIcon
-                onClick={ev => {
-                  ev.stopPropagation();
-                  AppNavigate.navigateToModule(ev, 'agents', {
-                    tab: 'configuration',
-                    agent: agent.id,
-                  });
-                }}
+                href={getCore().application.getUrlForApp(itHygiene.id, {
+                  path: `#/agents?tab=welcome&agent=${agent.id}`,
+                })}
+                iconType='eye'
                 color={'primary'}
-                iconType='wrench'
-                aria-label='Open configuration for this agent'
+                aria-label='Open summary panel for this agent'
               />
             </EuiToolTip>
+          </RedirectAppLinks>
+          &nbsp;
+          {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
+            <RedirectAppLinks application={getCore().application}>
+              <EuiToolTip
+                content='Open configuration for this agent'
+                position='left'
+              >
+                <EuiButtonIcon
+                  href={getCore().application.getUrlForApp(itHygiene.id, {
+                    path: `#/agents?tab=configuration&agent=${agent.id}`,
+                  })}
+                  color={'primary'}
+                  iconType='wrench'
+                  aria-label='Open configuration for this agent'
+                />
+              </EuiToolTip>
+            </RedirectAppLinks>
           )}
         </div>
       );
@@ -293,7 +292,7 @@ export const AgentsTable = withErrorBoundary(
         }
         return {
           onClick: ev => {
-            getCore().application.navigateToApp('it-hygiene', {
+            getCore().application.navigateToApp(itHygiene.id, {
               path: `#/agents?tab=welcome&agent=${item.id}`,
             });
           },

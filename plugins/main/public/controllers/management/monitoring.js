@@ -20,6 +20,7 @@ import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActi
 import { ModulesHelper } from '../../components/common/modules/modules-helper';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { getCore, getDataPlugin } from '../../kibana-services';
+import { endpointSumary } from '../../utils/applications';
 
 export function ClusterController(
   $scope,
@@ -80,7 +81,7 @@ export function ClusterController(
    * This navigates to agents preview
    */
   $scope.goAgents = () => {
-    getCore().application.navigateToApp('endpoints-summary', {
+    getCore().application.navigateToApp(endpointSumary.id, {
       path: '#/agents-preview',
     });
   };

@@ -83,6 +83,8 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
 import { WzConfigurationOffice365 } from './office365/office365';
 import { getCore } from '../../../../../kibana-services';
 import { PromptAgentNeverConnected } from '../../../../../components/agents/prompts';
+import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { endpointGroups } from '../../../../../utils/applications';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -206,19 +208,20 @@ class WzConfigurationSwitch extends Component {
           {agent.id !== '000' && agent.group && agent.group.length ? (
             <Fragment>
               <span>Groups:</span>
-              {agent.group.map((group, key) => (
-                <EuiButtonEmpty
-                  key={`agent-group-${key}`}
-                  onClick={() => {
-                    getCore().application.navigateToApp('endpoint-groups', {
-                      path: `#/manager/?tab=groups&group=${group}`,
-                    });
-                  }}
-                >
-                  {group}
-                </EuiButtonEmpty>
-              ))}
-              <EuiSpacer size='s' />
+              <RedirectAppLinks application={getCore().application}>
+                {agent.group.map((group, key) => (
+                  <EuiButtonEmpty
+                    key={`agent-group-${key}`}
+                    href={getCore().application.getUrlForApp(
+                      endpointGroups.id,
+                      { path: `#/manager/?tab=groups&group=${group}` },
+                    )}
+                  >
+                    {group}
+                  </EuiButtonEmpty>
+                ))}
+                <EuiSpacer size='s' />
+              </RedirectAppLinks>
             </Fragment>
           ) : null}
           {view !== '' && view !== 'edit-configuration' && (

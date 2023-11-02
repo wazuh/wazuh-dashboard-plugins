@@ -21,6 +21,7 @@ import {
   EuiPopover,
 } from '@elastic/eui';
 import { getCore } from '../../../../kibana-services';
+import { endpointGroups } from '../../../../utils/applications';
 
 export class GroupTruncate extends React.Component {
   _isMount = false;
@@ -51,7 +52,7 @@ export class GroupTruncate extends React.Component {
   action(index, group) {
     switch (this.props.action) {
       case 'redirect':
-        return getCore().application.navigateToApp('endpoint-groups', {
+        return getCore().application.navigateToApp(endpointGroups.id, {
           path: `#/manager/?tab=groups&group=${group}`,
         });
       case 'filter':

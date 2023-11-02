@@ -16,6 +16,7 @@ import {
   EuiFlexItem,
   EuiIcon,
   EuiSideNav,
+  EuiLink,
 } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
@@ -26,6 +27,7 @@ import {
 } from '../../../../kibana-services';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import { Applications, Categories } from '../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -71,7 +73,6 @@ class WzMenuAgent extends Component {
   clickMenuItem = appId => {
     this.props.closePopover();
     // do not redirect if we already are in that tab
-    getCore().application.navigateToApp(appId);
     this.props.updateCurrentAgentData(this.props.isAgent);
     this.router.reload();
   };
@@ -107,7 +108,14 @@ class WzMenuAgent extends Component {
             onClick={() => (!item.isTitle ? this.clickMenuItem(item.id) : null)}
             style={{ cursor: !item.isTitle ? 'pointer' : 'normal' }}
           >
-            {item.title}
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                href={getCore().application.getUrlForApp(item.id)}
+                style={{ cursor: 'pointer' }}
+              >
+                {item.title}
+              </EuiLink>
+            </RedirectAppLinks>
           </EuiFlexItem>
           {this.state.hoverAddFilter === item.id &&
             !item.isTitle &&

@@ -681,7 +681,7 @@ export const serverApis = {
   redirectTo: () => '/settings?tab=api',
 };
 
-const sampleData = {
+export const sampleData = {
   category: 'management',
   id: 'sample-data',
   title: i18n.translate('wz-app-sample-data-title', {

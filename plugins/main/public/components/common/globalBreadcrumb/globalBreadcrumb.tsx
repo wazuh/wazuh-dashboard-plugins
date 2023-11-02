@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { EuiBreadcrumbs } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { getAngularModule, getCore } from '../../../kibana-services';
+import { itHygiene } from '../../../utils/applications';
 
 class WzGlobalBreadcrumb extends Component {
   props: { state: { breadcrumb: [{ agent; text }] } };
@@ -23,7 +24,7 @@ class WzGlobalBreadcrumb extends Component {
               'euiLink euiLink--subdued osdBreadcrumbs wz-vertical-align-middle',
             onClick: ev => {
               ev.stopPropagation();
-              getCore().application.navigateToApp('it-hygiene', {
+              getCore().application.navigateToApp(itHygiene.id, {
                 path: `#/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
               });
               this.router.reload();
