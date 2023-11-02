@@ -136,13 +136,11 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent],
         component: withModuleNotForAgent(DashboardVuls),
       },
       {
         id: 'inventory',
         name: 'Inventory',
-        buttons: [ButtonModuleExploreAgent],
         component: withModuleNotForAgent(InventoryVuls),
       },
       EventsTab,
