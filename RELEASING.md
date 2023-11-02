@@ -10,23 +10,22 @@
 
 The following files must be updated:
 
-- `package.json`: Defines the package manifest. It contains the following properties:
+- `plugins/*/package.json`: Defines the package manifest. It contains the following properties:
   - `version`: Plugin version. Schema: `{major}.{minor}.{patch}`. Example: 4.4.5
   - `revision`: Plugin revision. Schema: number with 2 digits. This value is reset for each version to `01` and increament for following revisions.
   - `pluginPlatform.version`: version of the plugin platform.
-- `opensearch_dashboards.json` or `kibana.json`: Defines the plugin manifest. It contains the following properties:
+- `plugins/*/opensearch_dashboards.json` or `kibana.json`: Defines the plugin manifest. It contains the following properties:
   - `version`: Combination of version and revision of the plugin: `{version}-{revision}`.
-- `README.md`: References to the version of server, indexer and dashboard applications.
 - `CHANGELOG.md`: Changelog of the new release.
-- `common/api-info/endpoints.json`: Data related to endpoints and extracted from server's API
-- `common/api-info/security-actions.json`: Data related to security actions of extracted from server's API
+- `plugins/main/common/api-info/endpoints.json`: Data related to endpoints and extracted from server's API
+- `plugins/maincommon/api-info/security-actions.json`: Data related to security actions of extracted from server's API
 - Unit tests
 
 To bump the version, see [# Bump](#Bump)
 
 #### Update the API info static files
 
-We have a script to update the files that have information about the Wazuh API. This script uses the API specification
+We have a script to update the files of the `plugins/main` that have information about the Wazuh API. This script uses the API specification
 file that is stored in the GitHub repository of [wazuh/wazuh](https://github.com/wazuh/wazuh) repository. This must run for each version.
 
 ```console
@@ -74,7 +73,7 @@ git pull
 3. Create the tag
 
 ```
-git tag {tag} -a -m "Wazuh {version} for {platform} {platform version}"
+git tag {tag} -a -m "Wazuh {version} for OpenSearch Dashboards {platform version}"
 ```
 
 > replace the placeholders:
@@ -83,8 +82,7 @@ git tag {tag} -a -m "Wazuh {version} for {platform} {platform version}"
 >   - pre-alpha: `-pre-alpha{number}`. Example: `-pre-alpha1`.
 >   - release candidates: `-rc{number}`. Example: `-rc1`.
 > - `{version}`: plugin version
-> - `{platform}`: platform name. One of `OpenSearch` or `Kibana`
-> - `{platform}`: platform version.
+> - `{platform version}`: platform version.
 
 4. Push the tag
 
@@ -98,38 +96,43 @@ git push origin {tag}
 
 #### Create tags - Script
 
-The process to create all the required tags can be run through a script ( `scripts/release/tag` ).
+The process to create the required tag can be run through a script ( `scripts/release/tag.js` ).
 
-For each supported version defined in `scripts/release/tag`
-
-- edit `revision` package manifest file: `package.json`
-- edit the `version` property in plugin manifest file: `opensearch_dashboards.json` or `kibana.json`
-- commit
-- create tag
-- push tag
-
-The script can be run through the package script `yarn release:tag` too. This is the prefered method because defines some required parameters.
+- for each plugin in `plugins-directory`:
+  - edit `version`, `revision`, `pluginPlatfrom.version` in the package manifest file: `package.json`
+  - edit the `version` property in plugin manifest file: `opensearch_dashboards.json`
+- edit the entry in the `CHANGELOG.md` file
+- commit (if required)
+- create local tag
+- push local tag to remote
 
 Steps:
 
-1. Ensure the target versions are defined as the supported versions in `scripts/release/tag` and the others files are updated.
-   Currently there are 3 platforms: OpenDistro (Kibana 7.10.2), Kibana 7.16-7.17 and OpenSearch (Wazuh stack).
+1. Ensure the others files are updated.
 
-2. Bump version/revision/platform version and create the local and remote tag using the package script
+2. Bump version/revision/platform version and create the local and remote tags using the script
+
+- Define the `version`, `revision` and `pluginPlatformVersion`:
 
 ```console
-yarn release:tag --revision <bump_revision>
+node scripts/release/tag.js --plugins-directory ./plugins --version 4.6.0 --revision 03 --platform-version 2.8.0
+```
+
+- Use a package manifest as base to take the `version`, `revision` and `pluginPlatformVersion` values:
+
+```console
+node scripts/release/tag.js --plugins-directory ./plugins --manifest-plugin ./plugins/main/package.json
 ```
 
 > If the version or the revision is not specified, then it will use the current values from the package manifest file (package.json).
-> You can bump the `version` or `platform-version` too or combine them.
-> :warning: if the `version` is set, the base branches must exist in the remote repository.
+> You can bump the `version`, `revision` or `platform-version` too or combine them in this step. It is not recommended because these
+> values should be bumped previously.
 
 ```console
-yarn release:tag --version <bump_version>
-yarn release:tag --revision <bump_revision>
-yarn release:tag --platform-version <bump_platform_version>
-yarn release:tag --version <version> --revision <revision> --platform-version <bump_platform_version>
+node scripts/release/tag.js --plugins-directory ./plugins --version <bump_version>
+node scripts/release/tag.js --plugins-directory ./plugins --revision <bump_revision>
+node scripts/release/tag.js --plugins-directory ./plugins --platform-version <bump_platform_version>
+node scripts/release/tag.js --plugins-directory ./plugins --version <bump_version> --revision <bump_revision> --platform-version <bump_platform_version>
 ```
 
 Examples:
@@ -137,49 +140,37 @@ Examples:
 - Change the plugin version
 
 ```console
-yarn release:tag --version 4.5.0
+node scripts/release/tag.js --plugins-directory ./plugins --version 4.5.0
 ```
 
 - Change the plugin revision
 
 ```console
-yarn release:tag --revision 02
+node scripts/release/tag.js --plugins-directory ./plugins --revision 02
 ```
 
 - Change the platform version
 
 ```console
-yarn release:tag --platform-version 2.8.0
+node scripts/release/tag.js --plugins-directory ./plugins --platform-version 2.8.0
 ```
 
 - Change the plugin version, revision and platform version
 
 ```console
-yarn release:tag --version 4.5.0 --revision 02 --platform-version 2.8.0
+node scripts/release/tag.js --plugins-directory ./plugins --version 4.5.0 --revision 02 --platform-version 2.8.0
 ```
 
 For tags that needs a suffix, use the `--tag-suffix <tag-suffix>` flag.
 
 ```console
-yarn release:tag --tag-suffix <tag-suffix> <options>
+node scripts/release/tag.js --plugins-directory ./plugins --tag-suffix <tag-suffix> <options>
 ```
 
 Example:
 
 ```console
-yarn release:tag --tag-suffix -rc2 --revision 02
-```
-
-If you want to get a report of the tags generated and stored locally, use the `--export-tags <file>`.
-
-```console
-yarn release:tag --revision <bump_revision> --export-tags <file>
-```
-
-Example:
-
-```console
-yarn release:tag --version 4.5.0 --export-tags tags.log
+node scripts/release/tag.js --plugins-directory ./plugins --tag-suffix -rc2 --revision 02
 ```
 
 3. Review the new tags were pushed to the remote repository.
@@ -194,18 +185,14 @@ yarn release:tag --version 4.5.0 --export-tags tags.log
 
 ### Bump
 
-It means to increment the version number to a new, unique value.
+It means to increment the version number to a new and unique value.
 
-Bumping the version requires to do some changes in the source code of the application. See [# Files](#files).
+Bumping the version requires to do some changes in the source code of the plugins. See [# Files](#files).
 
-We have a script (`scripts/release/bump`) to update some of these files:
+We have a script (`scripts/release/bump`) to update some of these files for each plugin:
 
 - package.json
-- opensearch_dashboards.json or kibana.json
-
-This can be run through the `yarn release:bump` package script too. This is the prefered method because defines some required parameters. **The rest of the files should be changed manually.**
-
-> The package script sets some required parameters related to manifest files.
+- opensearch_dashboards.json
 
 Steps:
 
@@ -219,17 +206,16 @@ git checkout -b <bump_branch>
 
 2. Bump the version/revision/platform version using the package script
 
+- Define the values for `version`, `revision` and `platform-version`:
+
 ```console
-yarn release:bump --version <bump_version>
+node scripts/release/bump.js --plugins-directory ./plugins --version <version> --revision <revision> --platform-version <bump_platform_version>
 ```
 
-> You can bump the `revision` or `platform-version` too or combine them.
+- Take the values from a package manifest file and replace some value
 
 ```console
-yarn release:bump --version <bump_version>
-yarn release:bump --revision <bump_revision>
-yarn release:bump --platform-version <bump_platform_version>
-yarn release:bump --version <version> --revision <revision> --platform-version <bump_platform_version>
+node scripts/release/bump.js --plugins-directory ./plugins --manifest-package ./plugins/main/package.json --revision <revision>
 ```
 
 Examples:
@@ -237,25 +223,25 @@ Examples:
 - Change the plugin version
 
 ```console
-yarn release:bump --version 4.5.0
+node scripts/release/bump.js --plugins-directory ./plugins --manifest-package ./plugins/main/package.json --version 4.5.0
 ```
 
 - Change the plugin revision
 
 ```console
-yarn release:bump --revision 02
+node scripts/release/bump.js --plugins-directory ./plugins --manifest-package ./plugins/main/package.json --revision 02
 ```
 
 - Change the platform version
 
 ```console
-yarn release:bump --platform-version 2.8.0
+node scripts/release/bump.js --plugins-directory ./plugins --manifest-package ./plugins/main/package.json --platform-version 2.8.0
 ```
 
 - Change the plugin version, revision and platform version
 
 ```console
-yarn release:bump --version 4.5.0 --revision 02 --platform-version 2.8.0
+node scripts/release/bump.js --plugins-directory ./plugins --version 4.5.0 --revision 02 --platform-version 2.8.0
 ```
 
 3. Apply manually the changes to the rest of files if needed it. See [# Files](#Files).
