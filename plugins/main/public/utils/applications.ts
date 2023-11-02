@@ -6,7 +6,6 @@ import {
   LogoGoogleCloud,
   LogoOffice365,
 } from '../components/common/logos';
-import { DEFAULT_APP_CATEGORIES } from '../../../../src/core/public';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -32,10 +31,10 @@ Dashboard/indexer management (added to Wazuh dashboard default categories): 9000
 export const overview = {
   category: 'wz-category-home',
   id: 'wz-home',
-  title: i18n.translate('wz-app-home', {
+  title: i18n.translate('wz-app-home-title', {
     defaultMessage: 'Overview',
   }),
-  description: i18n.translate('overview-description', {
+  description: i18n.translate('wz-app-overview-description', {
     defaultMessage:
       'This application provides you with an overview of Wazuh applications.',
   }),
@@ -49,10 +48,10 @@ export const overview = {
 export const fileIntegrityMonitoring = {
   category: 'wz-category-endpoint-security',
   id: 'file-integrity-monitoring',
-  title: i18n.translate('wz-app-file-integrity-monitoring', {
+  title: i18n.translate('wz-app-file-integrity-monitoring-title', {
     defaultMessage: 'File Integrity Monitoring',
   }),
-  description: i18n.translate('file-integrity-monitoring-description', {
+  description: i18n.translate('wz-app-file-integrity-monitoring-description', {
     defaultMessage:
       'Alerts related to file changes, including permissions, content, ownership, and attributes.',
   }),
@@ -71,10 +70,10 @@ export const fileIntegrityMonitoring = {
 export const endpointSumary = {
   category: 'wz-category-server-management',
   id: 'endpoints-summary',
-  title: i18n.translate('wz-app-endpoints-summary', {
+  title: i18n.translate('wz-app-endpoints-summary-title', {
     defaultMessage: 'Endpoints Summary',
   }),
-  description: i18n.translate('endpoints-summary-description', {
+  description: i18n.translate('wz-app-endpoints-summary-description', {
     defaultMessage: 'Summary of agents and their status.',
   }),
   euiIconType: 'usersRolesApp',
@@ -87,10 +86,10 @@ export const endpointSumary = {
 const malwareDetection = {
   category: 'wz-category-endpoint-security',
   id: 'malware-detection',
-  title: i18n.translate('wz-app-malware-detection', {
+  title: i18n.translate('wz-app-malware-detection-title', {
     defaultMessage: 'Malware Detection',
   }),
-  description: i18n.translate('malware-detection-description', {
+  description: i18n.translate('wz-app-malware-detection-description', {
     defaultMessage:
       'Verify that your systems are configured according to your security policies baseline.',
   }),
@@ -109,10 +108,10 @@ const malwareDetection = {
 export const configurationAssessment = {
   category: 'wz-category-endpoint-security',
   id: 'configuration-assessment',
-  title: i18n.translate('wz-app-configuration-assessment', {
+  title: i18n.translate('wz-app-configuration-assessment-title', {
     defaultMessage: 'Configuration Assessment',
   }),
-  description: i18n.translate('configuration-assessment-description', {
+  description: i18n.translate('wz-app-configuration-assessment-description', {
     defaultMessage:
       'Scan your assets as part of a configuration assessment audit.',
   }),
@@ -131,10 +130,10 @@ export const configurationAssessment = {
 export const threatHunting = {
   category: 'wz-category-threat-intelligence',
   id: 'threat-hunting',
-  title: i18n.translate('wz-app-threat-hunting', {
+  title: i18n.translate('wz-app-threat-hunting-title', {
     defaultMessage: 'Threat Hunting',
   }),
-  description: i18n.translate('threat-hunting-description', {
+  description: i18n.translate('wz-app-threat-hunting-description', {
     defaultMessage:
       'Browse through your security alerts, identifying issues and threats in your environment.',
   }),
@@ -153,10 +152,10 @@ export const threatHunting = {
 export const vulnerabilityDetection = {
   category: 'wz-category-threat-intelligence',
   id: 'vulnerability-detection',
-  title: i18n.translate('wz-app-vulnerability-detection', {
+  title: i18n.translate('wz-app-vulnerability-detection-title', {
     defaultMessage: 'Vulnerability Detection',
   }),
-  description: i18n.translate('vulnerability-detection-description', {
+  description: i18n.translate('wz-app-vulnerability-detection-description', {
     defaultMessage:
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
   }),
@@ -175,10 +174,10 @@ export const vulnerabilityDetection = {
 export const mitreAttack = {
   category: 'wz-category-threat-intelligence',
   id: 'mitre-attack',
-  title: i18n.translate('wz-app-mitre-attack', {
+  title: i18n.translate('wz-app-mitre-attack-title', {
     defaultMessage: 'MITRE ATT&CK',
   }),
-  description: i18n.translate('mitre-attack-description', {
+  description: i18n.translate('wz-app-mitre-attack-description', {
     defaultMessage:
       'Security events from the knowledge base of adversary tactics and techniques based on real-world observations.',
   }),
@@ -197,10 +196,10 @@ export const mitreAttack = {
 const virustotal = {
   category: 'wz-category-threat-intelligence',
   id: 'virustotal',
-  title: i18n.translate('wz-app-virustotal', {
+  title: i18n.translate('wz-app-virustotal-title', {
     defaultMessage: 'Virustotal',
   }),
-  description: i18n.translate('virustotal-description', {
+  description: i18n.translate('wz-app-virustotal-description', {
     defaultMessage:
       'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.',
   }),
@@ -219,10 +218,10 @@ const virustotal = {
 const pciDss = {
   category: 'wz-category-security-operations',
   id: 'pci-dss',
-  title: i18n.translate('wz-app-pci-dss', {
+  title: i18n.translate('wz-app-pci-dss-title', {
     defaultMessage: 'PCI DSS',
   }),
-  description: i18n.translate('pci-dss-description', {
+  description: i18n.translate('wz-app-pci-dss-description', {
     defaultMessage:
       'Global security standard for entities that process, store, or transmit payment cardholder data.',
   }),
@@ -241,10 +240,10 @@ const pciDss = {
 const hipaa = {
   category: 'wz-category-security-operations',
   id: 'hipaa',
-  title: i18n.translate('wz-app-hipaa', {
+  title: i18n.translate('wz-app-hipaa-title', {
     defaultMessage: 'HIPAA',
   }),
-  description: i18n.translate('hipaa-description', {
+  description: i18n.translate('wz-app-hipaa-description', {
     defaultMessage:
       'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.',
   }),
@@ -263,10 +262,10 @@ const hipaa = {
 const gdpr = {
   category: 'wz-category-security-operations',
   id: 'gdpr',
-  title: i18n.translate('wz-app-gdpr', {
+  title: i18n.translate('wz-app-gdpr-title', {
     defaultMessage: 'GDPR',
   }),
-  description: i18n.translate('gdpr-description', {
+  description: i18n.translate('wz-app-gdpr-description', {
     defaultMessage:
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
   }),
@@ -285,10 +284,10 @@ const gdpr = {
 const nist80053 = {
   category: 'wz-category-security-operations',
   id: 'nist-800-53',
-  title: i18n.translate('wz-app-nist-800-53', {
+  title: i18n.translate('wz-app-nist-800-53-title', {
     defaultMessage: 'NIST 800-53',
   }),
-  description: i18n.translate('nist-800-53-description', {
+  description: i18n.translate('wz-app-nist-800-53-description', {
     defaultMessage:
       'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.',
   }),
@@ -307,10 +306,10 @@ const nist80053 = {
 const tsc = {
   category: 'wz-category-security-operations',
   id: 'tsc',
-  title: i18n.translate('wz-app-tsc', {
+  title: i18n.translate('wz-app-tsc-title', {
     defaultMessage: 'TSC',
   }),
-  description: i18n.translate('tsc-description', {
+  description: i18n.translate('wz-app-tsc-description', {
     defaultMessage:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.',
   }),
@@ -329,10 +328,10 @@ const tsc = {
 export const itHygiene = {
   category: 'wz-category-security-operations',
   id: 'it-hygiene',
-  title: i18n.translate('wz-app-it-hygiene', {
+  title: i18n.translate('wz-app-it-hygiene-title', {
     defaultMessage: 'IT Hygiene',
   }),
-  description: i18n.translate('it-hygiene-description', {
+  description: i18n.translate('wz-app-it-hygiene-description', {
     defaultMessage:
       'Applications, network configuration, open ports, and processes running on your monitored systems.',
   }),
@@ -351,10 +350,10 @@ export const itHygiene = {
 const amazonWebServices = {
   category: 'wz-category-cloud-security',
   id: 'amazon-web-services',
-  title: i18n.translate('wz-app-amazon-web-services', {
+  title: i18n.translate('wz-app-amazon-web-services-title', {
     defaultMessage: 'Amazon Web Services',
   }),
-  description: i18n.translate('amazon-web-services-description', {
+  description: i18n.translate('wz-app-amazon-web-services-description', {
     defaultMessage:
       'Security events related to your Amazon AWS services, collected directly via AWS API.',
   }),
@@ -373,10 +372,10 @@ const amazonWebServices = {
 const googleCloud = {
   category: 'wz-category-cloud-security',
   id: 'google-cloud',
-  title: i18n.translate('wz-app-google-cloud', {
+  title: i18n.translate('wz-app-google-cloud-title', {
     defaultMessage: 'Google Cloud',
   }),
-  description: i18n.translate('google-cloud-description', {
+  description: i18n.translate('wz-app-google-cloud-description', {
     defaultMessage:
       'Security events related to your Google Cloud Platform services, collected directly via GCP API.',
   }),
@@ -395,10 +394,10 @@ const googleCloud = {
 const github = {
   category: 'wz-category-cloud-security',
   id: 'github',
-  title: i18n.translate('wz-app-github', {
+  title: i18n.translate('wz-app-github-title', {
     defaultMessage: 'GitHub',
   }),
-  description: i18n.translate('github-description', {
+  description: i18n.translate('wz-app-github-description', {
     defaultMessage:
       'Monitoring events from audit logs of your GitHub organizations.',
   }),
@@ -417,10 +416,10 @@ const github = {
 const office365 = {
   category: 'wz-category-cloud-security',
   id: 'office365',
-  title: i18n.translate('wz-app-office365', {
+  title: i18n.translate('wz-app-office365-title', {
     defaultMessage: 'Office 365',
   }),
-  description: i18n.translate('office365-description', {
+  description: i18n.translate('wz-app-office365-description', {
     defaultMessage: 'Security events related to your Office 365 services.',
   }),
   euiIconType: LogoOffice365,
@@ -438,10 +437,10 @@ const office365 = {
 const docker = {
   category: 'wz-category-cloud-security',
   id: 'docker',
-  title: i18n.translate('wz-app-docker', {
+  title: i18n.translate('wz-app-docker-title', {
     defaultMessage: 'Docker',
   }),
-  description: i18n.translate('docker-description', {
+  description: i18n.translate('wz-app-docker-description', {
     defaultMessage:
       'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.',
   }),
@@ -460,10 +459,10 @@ const docker = {
 export const rules = {
   category: 'wz-category-server-management',
   id: 'rules',
-  title: i18n.translate('wz-app-rules', {
+  title: i18n.translate('wz-app-rules-title', {
     defaultMessage: 'Rules',
   }),
-  description: i18n.translate('rules-description', {
+  description: i18n.translate('wz-app-rules-description', {
     defaultMessage: 'Manage your Wazuh cluster rules.',
   }),
   euiIconType: 'indexRollupApp',
@@ -476,10 +475,10 @@ export const rules = {
 export const decoders = {
   category: 'wz-category-server-management',
   id: 'decoders',
-  title: i18n.translate('wz-app-decoders', {
+  title: i18n.translate('wz-app-decoders-title', {
     defaultMessage: 'Decoders',
   }),
-  description: i18n.translate('decoders-description', {
+  description: i18n.translate('wz-app-decoders-description', {
     defaultMessage: 'Manage your Wazuh cluster decoders.',
   }),
   euiIconType: 'indexRollupApp',
@@ -492,10 +491,10 @@ export const decoders = {
 export const cdbLists = {
   category: 'wz-category-server-management',
   id: 'cdb-lists',
-  title: i18n.translate('wz-app-lists', {
+  title: i18n.translate('wz-app-lists-title', {
     defaultMessage: 'CDB Lists',
   }),
-  description: i18n.translate('cdb-lists-description', {
+  description: i18n.translate('wz-app-cdb-lists-description', {
     defaultMessage: 'Manage your Wazuh cluster CDB list.',
   }),
   euiIconType: 'indexRollupApp',
@@ -508,10 +507,10 @@ export const cdbLists = {
 export const endpointGroups = {
   category: 'wz-category-server-management',
   id: 'endpoint-groups',
-  title: i18n.translate('wz-app-endpoint-groups', {
+  title: i18n.translate('wz-app-endpoint-groups-title', {
     defaultMessage: 'Endpoint Groups',
   }),
-  description: i18n.translate('endpoint-groups-description', {
+  description: i18n.translate('wz-app-endpoint-groups-description', {
     defaultMessage: 'Manage your agent groups.',
   }),
   euiIconType: 'usersRolesApp',
@@ -524,10 +523,10 @@ export const endpointGroups = {
 export const serverStatus = {
   category: 'wz-category-server-management',
   id: 'server-status',
-  title: i18n.translate('wz-app-status', {
+  title: i18n.translate('wz-app-status-title', {
     defaultMessage: 'Status',
   }),
-  description: i18n.translate('server-status-description', {
+  description: i18n.translate('wz-app-server-status-description', {
     defaultMessage: 'Manage your Wazuh cluster status.',
   }),
   euiIconType: 'indexRollupApp',
@@ -540,10 +539,10 @@ export const serverStatus = {
 const cluster = {
   category: 'wz-category-server-management',
   id: 'cluster',
-  title: i18n.translate('wz-app-cluster', {
+  title: i18n.translate('wz-app-cluster-title', {
     defaultMessage: 'Cluster',
   }),
-  description: i18n.translate('cluster-description', {
+  description: i18n.translate('wz-app-cluster-description', {
     defaultMessage: 'Manage your Wazuh cluster.',
   }),
   euiIconType: 'indexRollupApp',
@@ -556,10 +555,10 @@ const cluster = {
 export const statistics = {
   category: 'wz-category-server-management',
   id: 'statistics',
-  title: i18n.translate('wz-app-statistics', {
+  title: i18n.translate('wz-app-statistics-title', {
     defaultMessage: 'Statistics',
   }),
-  description: i18n.translate('statistics-description', {
+  description: i18n.translate('wz-app-statistics-description', {
     defaultMessage: 'Information about the Wazuh enviroment.',
   }),
   euiIconType: 'indexRollupApp',
@@ -572,10 +571,10 @@ export const statistics = {
 export const logs = {
   category: 'wz-category-server-management',
   id: 'logs',
-  title: i18n.translate('wz-app-logs', {
+  title: i18n.translate('wz-app-logs-title', {
     defaultMessage: 'Logs',
   }),
-  description: i18n.translate('logs-description', {
+  description: i18n.translate('wz-app-logs-description', {
     defaultMessage: 'Logs from your Wazuh cluster.',
   }),
   euiIconType: 'indexRollupApp',
@@ -588,10 +587,10 @@ export const logs = {
 export const reporting = {
   category: 'management',
   id: 'reporting',
-  title: i18n.translate('wz-app-reporting', {
+  title: i18n.translate('wz-app-reporting-title', {
     defaultMessage: 'Reporting',
   }),
-  description: i18n.translate('reporting-description', {
+  description: i18n.translate('wz-app-reporting-description', {
     defaultMessage: 'Check your stored Wazuh reports.',
   }),
   euiIconType: 'indexRollupApp',
@@ -604,10 +603,10 @@ export const reporting = {
 export const settings = {
   category: 'wz-category-server-management',
   id: 'settings',
-  title: i18n.translate('wz-app-settings', {
+  title: i18n.translate('wz-app-settings-title', {
     defaultMessage: 'Settings',
   }),
-  description: i18n.translate('settings-description', {
+  description: i18n.translate('wz-app-settings-description', {
     defaultMessage: 'Manage your Wazuh cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
@@ -620,10 +619,10 @@ export const settings = {
 const devTools = {
   category: 'wz-category-server-management',
   id: 'dev-tools',
-  title: i18n.translate('wz-app-dev-tools', {
+  title: i18n.translate('wz-app-dev-tools-title', {
     defaultMessage: 'Dev Tools',
   }),
-  description: i18n.translate('dev-tools-description', {
+  description: i18n.translate('wz-app-dev-tools-description', {
     defaultMessage: 'Test the Wazuh API endpoints.',
   }),
   euiIconType: 'devToolsApp',
@@ -636,10 +635,10 @@ const devTools = {
 const rulesetTest = {
   category: 'wz-category-server-management',
   id: 'ruleset-test',
-  title: i18n.translate('wz-app-ruleset-test', {
+  title: i18n.translate('wz-app-ruleset-test-title', {
     defaultMessage: 'Ruleset Test',
   }),
-  description: i18n.translate('ruleset-test-description', {
+  description: i18n.translate('wz-app-ruleset-test-description', {
     defaultMessage: 'Check your ruleset testing logs.',
   }),
   euiIconType: 'visualizeApp',
@@ -652,10 +651,10 @@ const rulesetTest = {
 export const security = {
   category: 'wz-category-server-management',
   id: 'security',
-  title: i18n.translate('wz-app-security', {
+  title: i18n.translate('wz-app-security-title', {
     defaultMessage: 'Security',
   }),
-  description: i18n.translate('security-description', {
+  description: i18n.translate('wz-app-security-description', {
     defaultMessage:
       'Manage permissions to system resources based on the roles and policies.',
   }),
@@ -666,13 +665,13 @@ export const security = {
   redirectTo: () => '/security?tab=users',
 };
 
-export const serverApi = {
+export const serverApis = {
   category: 'management',
-  id: 'server-api',
-  title: i18n.translate('wz-app-server-api', {
+  id: 'server-apis',
+  title: i18n.translate('wz-app-server-apis-title', {
     defaultMessage: 'Server APIs',
   }),
-  description: i18n.translate('server-api-description', {
+  description: i18n.translate('wz-app-server-apis-description', {
     defaultMessage: 'Manage and configure the API entries.',
   }),
   euiIconType: 'indexRollupApp',
@@ -682,13 +681,13 @@ export const serverApi = {
   redirectTo: () => '/settings?tab=api',
 };
 
-const serverData = {
+const sampleData = {
   category: 'management',
-  id: 'server-data',
-  title: i18n.translate('wz-app-server-data', {
+  id: 'sample-data',
+  title: i18n.translate('wz-app-sample-data-title', {
     defaultMessage: 'Sample Data',
   }),
-  description: i18n.translate('server-data-description', {
+  description: i18n.translate('wz-app-sample-data-description', {
     defaultMessage: 'Add sample data with events to the modules.',
   }),
   euiIconType: 'indexRollupApp',
@@ -698,13 +697,13 @@ const serverData = {
   redirectTo: () => '/settings?tab=sample_data',
 };
 
-export const wazuhPluginSettings = {
+export const appSettings = {
   category: 'management',
-  id: 'wazuh-plugin-settings',
-  title: i18n.translate('wz-app-wazuh-plugin-settings', {
+  id: 'app-settings',
+  title: i18n.translate('wz-app-settings-title', {
     defaultMessage: 'App Settings',
   }),
-  description: i18n.translate('wazuh-plugin-settings-description', {
+  description: i18n.translate('wz-app-settings-description', {
     defaultMessage: 'Manage your Wazuh cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
@@ -714,13 +713,13 @@ export const wazuhPluginSettings = {
   redirectTo: () => '/settings?tab=configuration',
 };
 
-const wazuhPluginLogs = {
+const appLogs = {
   category: 'management',
-  id: 'wazuh-plugin-logs',
-  title: i18n.translate('wz-app-wazuh-plugin-logs', {
+  id: 'app-logs',
+  title: i18n.translate('wz-app-app-logs-title', {
     defaultMessage: 'App Logs',
   }),
-  description: i18n.translate('wazuh-plugin-logs-description', {
+  description: i18n.translate('wz-app-app-logs-description', {
     defaultMessage: 'Explore the logs related to the applications.',
   }),
   euiIconType: 'indexRollupApp',
@@ -730,13 +729,13 @@ const wazuhPluginLogs = {
   redirectTo: () => '/settings?tab=logs',
 };
 
-const wazuhPluginAbout = {
+const about = {
   category: 'management',
-  id: 'wazuh-plugin-about',
-  title: i18n.translate('wz-app-wazuh-plugin-about', {
+  id: 'about',
+  title: i18n.translate('wz-app-about-title', {
     defaultMessage: 'About',
   }),
-  description: i18n.translate('wazuh-plugin-about-description', {
+  description: i18n.translate('wz-app-about-description', {
     defaultMessage: 'Show information about App Versions and community links.',
   }),
   euiIconType: 'indexRollupApp',
@@ -780,11 +779,11 @@ export const Applications = [
   logs,
   settings,
   reporting,
-  serverApi,
-  serverData,
-  wazuhPluginSettings,
-  wazuhPluginLogs,
-  wazuhPluginAbout,
+  serverApis,
+  sampleData,
+  appSettings,
+  appLogs,
+  about,
 ].sort((a, b) => {
   // Sort applications by order
   if (a.order < b.order) {
