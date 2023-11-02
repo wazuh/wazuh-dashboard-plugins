@@ -1,7 +1,7 @@
 {
   "name": "wazuh",
   "version": "4.8.0",
-  "revision": "01",
+  "revision": "00",
   "pluginPlatform": {
     "version": "2.10.0"
   },
@@ -16,10 +16,10 @@
   "license": "GPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wazuh/wazuh-kibana-app.git"
+    "url": "https://github.com/wazuh/wazuh-dashboard-plugins.git"
   },
   "bugs": {
-    "url": "https://github.com/wazuh/wazuh-kibana-app/issues"
+    "url": "https://github.com/wazuh/wazuh-dashboard-plugins/issues"
   },
   "homepage": "https://www.wazuh.com/",
   "scripts": {
@@ -41,8 +41,8 @@
     "test:jest": "node scripts/jest",
     "test:jest:runner": "node scripts/runner test",
     "generate:api-data": "node scripts/generate-api-data.js --spec https://raw.githubusercontent.com/wazuh/wazuh/$(node -e \"console.log(require('./package.json').version.split('.').splice(0,2).join('.'))\")/api/api/spec/spec.yaml --output file --output-directory common/api-info --display-configuration",
-    "release:bump": "node scripts/release/bump --manifest-package package.json --manifest-plugin opensearch_dashboards.json",
-    "release:tag": "node scripts/release/tag --manifest-package package.json",
+    "release:bump": "node scripts/release/bump --manifest-package package.json --manifest-plugin opensearch_dashboards.json --manifest-changelog ../../CHANGELOG.md",
+    "release:tag": "node scripts/release/tag --manifest-package package.json --manifest-changelog ../../CHANGELOG.md",
     "prebuild": "node scripts/generate-build-version"
   },
   "dependencies": {

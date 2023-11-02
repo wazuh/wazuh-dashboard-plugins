@@ -46,33 +46,25 @@ const getAllOptionalsMacos = (
     ['serverAddress', 'agentGroups', 'agentName', 'protocol'];
 
   if (!optionals) return '';
-  return Object.entries(paramNameOrderList).reduce((acc, [key, value]) => {
-    if (optionals[value]) {
-      acc += `${optionals[value]}\\n`;
+
+  const paramsValueList = [];
+
+  paramNameOrderList.forEach(paramName => {
+    if (optionals[paramName] && optionals[paramName] !== '') {
+      paramsValueList.push(optionals[paramName]);
     }
-    return acc;
-  }, '');
-};
+  });
 
-/******* RPM *******/
+  if (paramsValueList.length) {
+    return paramsValueList.join(' && ');
+  }
 
-// curl -o wazuh-agent-4.4.5-1.x86_64.rpm https://packages.wazuh.com/4.x/yum/wazuh-agent-4.4.5-1.x86_64.rpm && sudo WAZUH_MANAGER='172.30.30.20' rpm -ihv wazuh-agent-4.4.5-1.x86_64.rpm
-
-export const getRPMInstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage, wazuhVersion } = props;
-  const packageName = `wazuh-agent-${wazuhVersion}-1.x86_64.rpm`;
-  return `curl -o ${packageName} ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }rpm -ihv ${packageName}`;
+  return '';
 };
 
 /******* DEB *******/
 
-// wget https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.4.5-1_amd64.deb && sudo WAZUH_MANAGER='172.30.30.20' dpkg -i ./wazuh-agent_4.4.5-1_amd64.deb
-
-export const getDEBInstallCommand = (
+export const getDEBAMD64InstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, wazuhVersion } = props;
@@ -80,6 +72,38 @@ export const getDEBInstallCommand = (
   return `wget ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }dpkg -i ./${packageName}`;
+};
+
+export const getDEBARM64InstallCommand = (
+  props: tOSEntryInstallCommand<tOptionalParameters>,
+) => {
+  const { optionals, urlPackage, wazuhVersion } = props;
+  const packageName = `wazuh-agent_${wazuhVersion}-1_arm64.deb`;
+  return `wget ${urlPackage} && sudo ${
+    optionals && getAllOptionals(optionals)
+  }dpkg -i ./${packageName}`;
+};
+
+/******* RPM *******/
+
+export const getRPMAMD64InstallCommand = (
+  props: tOSEntryInstallCommand<tOptionalParameters>,
+) => {
+  const { optionals, urlPackage, wazuhVersion, architecture } = props;
+  const packageName = `wazuh-agent-${wazuhVersion}-1.x86_64.rpm`;
+  return `curl -o ${packageName} ${urlPackage} && sudo ${
+    optionals && getAllOptionals(optionals)
+  }rpm -ihv ${packageName}`;
+};
+
+export const getRPMARM64InstallCommand = (
+  props: tOSEntryInstallCommand<tOptionalParameters>,
+) => {
+  const { optionals, urlPackage, wazuhVersion, architecture } = props;
+  const packageName = `wazuh-agent-${wazuhVersion}-1.aarch64.rpm`;
+  return `curl -o ${packageName} ${urlPackage} && sudo ${
+    optionals && getAllOptionals(optionals)
+  }rpm -ihv ${packageName}`;
 };
 
 /******* Linux *******/
@@ -143,7 +167,7 @@ export const getMacOsInstallCommand = (
   }
   // If no variables are set, the echo will be empty
   const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions
-    ? `echo -e "${macOSInstallationOptions}${wazuhPasswordParamWithValue}" > /tmp/wazuh_envs && `
+    ? `echo "${macOSInstallationOptions}${wazuhPasswordParamWithValue}" > /tmp/wazuh_envs && `
     : ``;
 
   // Merge environment variables with installation script

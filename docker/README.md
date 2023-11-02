@@ -1,6 +1,6 @@
 # Frontend development environments
 
-Install [Docker Desktop][0] as per its instructions, available for Windows, Mac 
+Install [Docker Desktop][0] as per its instructions (make sure that the docker compose version is 2.20.2 or higher), available for Windows, Mac 
 and Linux (Ubuntu, Debian & Fedora).
 This ensures that the development experience between Linux, Mac and Windows is as
 similar as possible.
@@ -99,7 +99,7 @@ Before starting the environment, check that the plugin is in the desired branch
 Example:
 
 This brings up a Dev environment for OpenSearch `1.2.4` and opensearch-dashboards 
-`1.2.0`, with the `wazuh-kibana-app` development branch set up at 
+`1.2.0`, with the `wazuh-dashboard-plugins` development branch set up at 
 `$WZ_HOME`:
 
 ```bash
@@ -289,4 +289,4 @@ error getting credentials - err: exit status 1, out: `error getting credentials 
 [2]: <https://grafana.com/oss/loki/> "Loki"
 [3]: <https://prometheus.io/docs/visualization/grafana/> "Prometheus"
 [4]: <https://quay.io/organization/wazuh> "quay.io/wazuh"
-[5]: <https://github.com/wazuh/wazuh-kibana-app/issues/3872#issuecomment-1305507626> "App permissions"
+[5]: <https://github.com/wazuh/wazuh-dashboard-plugins/issues/3872#issuecomment-1305507626> "App permissions"

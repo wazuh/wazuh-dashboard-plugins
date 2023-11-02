@@ -671,5 +671,23 @@
       "GET /vulnerability/{agent_id}/last_scan",
       "GET /vulnerability/{agent_id}/summary/{field}"
     ]
+  },
+  "event:ingest": {
+    "description": "Ingest events",
+    "resources": [
+      "*:*"
+    ],
+    "example": {
+      "actions": [
+        "event:ingest"
+      ],
+      "resources": [
+        "*:*:*"
+      ],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "POST /events"
+    ]
   }
 }

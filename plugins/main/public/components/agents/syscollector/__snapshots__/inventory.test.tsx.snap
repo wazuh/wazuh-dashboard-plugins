@@ -24,7 +24,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Cores:
+              Cores: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -36,7 +36,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Memory:
+              Memory: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -48,7 +48,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Arch:
+              Arch: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -60,7 +60,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Operating system:
+              Operating system: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -72,7 +72,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              CPU:
+              CPU: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -84,7 +84,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Last scan:
+              Last scan: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -114,7 +114,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network interfaces
+              Network interfaces 
               <span>
                 (0)
               </span>
@@ -147,7 +147,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -180,7 +180,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -293,7 +293,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -352,7 +352,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                           />
                         </svg>
                       </span>
@@ -498,7 +498,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network ports
+              Network ports 
               <span>
                 (0)
               </span>
@@ -531,7 +531,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -564,7 +564,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -677,7 +677,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -832,7 +832,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network settings
+              Network settings 
               <span>
                 (0)
               </span>
@@ -865,7 +865,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -898,7 +898,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -1011,7 +1011,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -1070,7 +1070,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                           />
                         </svg>
                       </span>
@@ -1219,7 +1219,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Packages
+              Packages 
               <span>
                 (0)
               </span>
@@ -1252,7 +1252,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -1285,7 +1285,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -1398,7 +1398,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -1457,7 +1457,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                           />
                         </svg>
                       </span>
@@ -1608,7 +1608,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Processes
+              Processes 
               <span>
                 (0)
               </span>
@@ -1641,7 +1641,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -1674,7 +1674,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -1787,7 +1787,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -1847,7 +1847,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                           />
                         </svg>
                       </span>
@@ -2053,7 +2053,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Cores:
+              Cores: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2065,7 +2065,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Memory:
+              Memory: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2077,7 +2077,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Arch:
+              Arch: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2089,7 +2089,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Operating system:
+              Operating system: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2101,7 +2101,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              CPU:
+              CPU: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2113,7 +2113,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Last scan:
+              Last scan: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2143,7 +2143,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network interfaces
+              Network interfaces 
               <span>
                 (0)
               </span>
@@ -2510,7 +2510,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network ports
+              Network ports 
               <span>
                 (0)
               </span>
@@ -2863,7 +2863,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network settings
+              Network settings 
               <span>
                 (0)
               </span>
@@ -3233,7 +3233,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Packages
+              Packages 
               <span>
                 (0)
               </span>
@@ -3606,7 +3606,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Processes
+              Processes 
               <span>
                 (0)
               </span>
@@ -4156,7 +4156,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Cores:
+              Cores: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4168,7 +4168,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Memory:
+              Memory: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4180,7 +4180,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Arch:
+              Arch: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4192,7 +4192,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Operating system:
+              Operating system: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4204,7 +4204,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              CPU:
+              CPU: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4216,7 +4216,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Last scan:
+              Last scan: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4246,7 +4246,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network interfaces
+              Network interfaces 
               <span>
                 (0)
               </span>
@@ -4279,7 +4279,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -4312,7 +4312,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -4425,7 +4425,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -4484,7 +4484,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                           />
                         </svg>
                       </span>
@@ -4630,7 +4630,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network ports
+              Network ports 
               <span>
                 (0)
               </span>
@@ -4663,7 +4663,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -4696,7 +4696,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -4809,7 +4809,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -4988,7 +4988,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Network settings
+              Network settings 
               <span>
                 (0)
               </span>
@@ -5021,7 +5021,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -5054,7 +5054,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -5167,7 +5167,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -5226,7 +5226,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                           />
                         </svg>
                       </span>
@@ -5372,7 +5372,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Windows updates
+              Windows updates 
               <span>
                 (0)
               </span>
@@ -5405,7 +5405,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -5438,7 +5438,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -5551,7 +5551,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -5610,7 +5610,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                           />
                         </svg>
                       </span>
@@ -5663,7 +5663,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Packages
+              Packages 
               <span>
                 (0)
               </span>
@@ -5696,7 +5696,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -5729,7 +5729,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -5842,7 +5842,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -5901,7 +5901,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                           />
                         </svg>
                       </span>
@@ -6028,7 +6028,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <h1
               class="euiTitle euiTitle--small"
             >
-              Processes
+              Processes 
               <span>
                 (0)
               </span>
@@ -6061,7 +6061,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M11.228 2.942a.5.5 0 11-.538.842A5 5 0 1013 8a.5.5 0 111 0 6 6 0 11-2.772-5.058zM14 1.5v3A1.5 1.5 0 0112.5 6h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 111 0z"
+                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                       />
                     </svg>
                     <span
@@ -6094,7 +6094,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M9 10.114l1.85-1.943a.52.52 0 01.77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 01-2.31 0L5.41 9a.617.617 0 010-.829.52.52 0 01.77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 00-.972.804l-1.189 6A.995.995 0 002.991 14h11.018a1 1 0 00.972-1.196l-1.19-6a.993.993 0 00-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0114.016 15H2.984a1.992 1.992 0 01-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z"
+                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                       />
                     </svg>
                     <span
@@ -6207,7 +6207,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
                                 fill-rule="non-zero"
                               />
                             </svg>
@@ -6267,7 +6267,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 01-.707-.707l4.242-4.242a1.5 1.5 0 012.122 0l4.242 4.242a.5.5 0 11-.707.707L8 4.207z"
+                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                           />
                         </svg>
                       </span>

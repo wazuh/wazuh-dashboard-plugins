@@ -126,6 +126,7 @@ services:
     depends_on:
       idpsetup:
         condition: service_completed_successfully
+        required: false
     image: opensearchproject/opensearch:${OS_VERSION}
     <<: *logging
     profiles:
