@@ -32,7 +32,7 @@ import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';
 import { ApiCheck } from '../react-services/wz-api-check';
 import { AppState } from '../react-services/app-state';
-import { getAngularModule } from '../kibana-services';
+import { getAngularModule, getWzMainParams } from '../kibana-services';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -101,6 +101,7 @@ function enableWzMenu($rootScope, $location) {
 //Routes
 const app = getAngularModule();
 
+const redirectTo = () => getWzMainParams();
 app.config($routeProvider => {
   $routeProvider
     .when('/health-check', {
@@ -159,15 +160,17 @@ app.config($routeProvider => {
       outerAngularWrapperRoute: true,
     })
     .when('/', {
-      redirectTo: '/overview/',
+      redirectTo,
       outerAngularWrapperRoute: true,
     })
     .when('', {
-      redirectTo: '/overview/',
+      redirectTo,
       outerAngularWrapperRoute: true,
     })
     .otherwise({
-      redirectTo: '/overview',
+      redirectTo: () => {
+        return getWzMainParams();
+      },
       outerAngularWrapperRoute: true,
     });
 });

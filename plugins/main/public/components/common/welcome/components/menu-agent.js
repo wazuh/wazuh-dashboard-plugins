@@ -10,91 +10,83 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexGrid, EuiFlexGroup, EuiFlexItem, EuiIcon, EuiSideNav } from '@elastic/eui';
+import {
+  EuiFlexGrid,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiIcon,
+  EuiSideNav,
+  EuiLink,
+} from '@elastic/eui';
 import { connect } from 'react-redux';
-import { AppState } from '../../../../react-services/app-state';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
-import { getAngularModule, getToasts } from '../../../../kibana-services';
+import {
+  getAngularModule,
+  getCore,
+  getToasts,
+} from '../../../../kibana-services';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
-import { getAgentSections } from './agent-sections';
+import { Applications, Categories } from '../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 class WzMenuAgent extends Component {
   constructor(props) {
     super(props);
-    this.currentApi = JSON.parse(AppState.getCurrentAPI()).id;
     this.state = {
-      extensions: [],
       hoverAddFilter: '',
     };
 
-    this.menuAgent = window.localStorage.getItem('menuAgent')
-      ? JSON.parse(window.localStorage.getItem('menuAgent'))
-      : {};
-
-    this.agentSections = getAgentSections(this.menuAgent)
-
-    this.securityInformationItems = [
-      this.agentSections.general,
-      this.agentSections.fim,
-      this.agentSections.aws,
-      this.agentSections.gcp,
-      this.agentSections.github
-    ];
-    this.auditingItems = [
-      this.agentSections.pm,
-      this.agentSections.audit,
-      this.agentSections.oscap,
-      this.agentSections.ciscat,
-      this.agentSections.sca,
-    ];
-    this.threatDetectionItems = [
-      this.agentSections.vuls,
-      this.agentSections.docker,
-      this.agentSections.virustotal,
-      this.agentSections.osquery,
-      this.agentSections.mitre,
-    ];
-    this.regulatoryComplianceItems = [
-      this.agentSections.pci,
-      this.agentSections.gdpr,
-      this.agentSections.hipaa,
-      this.agentSections.nist,
-      this.agentSections.tsc,
-    ];
+    this.appCategories = Applications.reduce((categories, app) => {
+      const existingCategory = categories.find(
+        category => category.id === app.category,
+      );
+      if (app.showInAgentMenu) {
+        if (existingCategory) {
+          existingCategory.apps.push(app);
+        } else {
+          const category = Categories.find(
+            category => app.category === category.id,
+          );
+          categories.push({
+            id: category.id,
+            label: Categories.find(category => app.category === category.id)
+              .label,
+            icon: category.euiIconType,
+            apps: [app],
+          });
+        }
+      }
+      return categories;
+    }, []).sort((a, b) => {
+      return (
+        Categories.find(category => a.id === category.id).order -
+        Categories.find(category => b.id === category.id).order
+      );
+    });
   }
 
-  async componentDidMount() {
-    const extensions = await AppState.getExtensions(this.currentApi);
-    this.setState({ extensions });
+  componentDidMount() {
     const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
   }
 
-  clickMenuItem = (section) => {
+  clickMenuItem = appId => {
     this.props.closePopover();
-    if (this.props.currentTab !== section) {
-      // do not redirect if we already are in that tab
-      window.location.href = `#/overview/?tab=${section}`;
-      this.props.updateCurrentAgentData(this.props.isAgent);
-      this.router.reload();
-    }
+    // do not redirect if we already are in that tab
+    this.props.updateCurrentAgentData(this.props.isAgent);
+    this.router.reload();
   };
 
   addToast({ color, title, text, time = 3000 }) {
     getToasts().add({ title, text, toastLifeTimeMs: time, color });
   }
 
-  createItems = (items) => {
-    const keyExists = (key) => Object.keys(this.state.extensions).includes(key);
-    const keyIsTrue = (key) => (this.state.extensions || [])[key];
+  createItems = items => {
     return items
-      .filter(
-        (item) =>
-          hasAgentSupportModule(this.props.currentAgentData, item.id) &&
-          Object.keys(this.state.extensions).length &&
-          (!keyExists(item.id) || keyIsTrue(item.id))
+      .filter(item =>
+        hasAgentSupportModule(this.props.currentAgentData, item.id),
       )
-      .map((item) => this.createItem(item));
+      .map(item => this.createItem(item));
   };
 
   createItem = (item, data = {}) => {
@@ -104,6 +96,7 @@ class WzMenuAgent extends Component {
       id: item.id,
       name: (
         <EuiFlexGroup
+          responsive={false}
           onMouseEnter={() => {
             this.setState({ hoverAddFilter: item.id });
           }}
@@ -115,36 +108,53 @@ class WzMenuAgent extends Component {
             onClick={() => (!item.isTitle ? this.clickMenuItem(item.id) : null)}
             style={{ cursor: !item.isTitle ? 'pointer' : 'normal' }}
           >
-            {item.text}
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                href={getCore().application.getUrlForApp(item.id)}
+                style={{ cursor: 'pointer' }}
+              >
+                {item.title}
+              </EuiLink>
+            </RedirectAppLinks>
           </EuiFlexItem>
           {this.state.hoverAddFilter === item.id &&
             !item.isTitle &&
-            (Object.keys(this.menuAgent).length < 6 || item.isPin) &&
-            (Object.keys(this.menuAgent).length > 1 || !item.isPin) && (
+            (this.props.pinnedApplications.length < 6 || item.isPin) &&
+            (this.props.pinnedApplications.length > 1 || !item.isPin) && (
               <EuiFlexItem grow={false}>
                 <EuiIcon
                   onClick={() => {
-                    this.menuAgent = window.localStorage.getItem('menuAgent')
-                      ? JSON.parse(window.localStorage.getItem('menuAgent'))
-                      : {};
-                    if (!item.isPin && Object.keys(this.menuAgent).length < 6) {
-                      this.menuAgent[item.id] = item;
-                      item.isPin = true;
-                    } else if (this.menuAgent[item.id]) {
-                      delete this.menuAgent[item.id];
-                      item.isPin = false;
+                    if (
+                      !item.isPin &&
+                      this.props.pinnedApplications.length < 6
+                    ) {
+                      this.props.updatePinnedApplications([
+                        ...this.props.pinnedApplications,
+                        item.id,
+                      ]);
+                    } else if (
+                      this.props.pinnedApplications.includes(item.id)
+                    ) {
+                      this.props.updatePinnedApplications([
+                        ...this.props.pinnedApplications.filter(
+                          id => id !== item.id,
+                        ),
+                      ]);
                     } else {
                       this.addToast({
-                        title: 'The limit of pinned modules has been reached',
+                        title:
+                          'The limit of pinned applications has been reached',
                         color: 'danger',
                       });
                     }
-                    window.localStorage.setItem('menuAgent', JSON.stringify(this.menuAgent));
-                    this.props.updateMenuAgents();
                   }}
-                  color="primary"
-                  type={this.menuAgent[item.id] ? 'pinFilled' : 'pin'}
-                  aria-label="Next"
+                  color='primary'
+                  type={
+                    this.props.pinnedApplications.includes(item.id)
+                      ? 'pinFilled'
+                      : 'pin'
+                  }
+                  aria-label='Next'
                   style={{ cursor: 'pointer' }}
                 />
               </EuiFlexItem>
@@ -156,68 +166,53 @@ class WzMenuAgent extends Component {
   };
 
   render() {
-    const securityInformation = [
-      this.createItem(this.agentSections.securityInformation, {
-        icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems(this.securityInformationItems),
-      }),
-    ];
-
-    const auditing = [
-      this.createItem(this.agentSections.auditing, {
-        icon: <EuiIcon type="managementApp" color="primary" />,
-        items: this.createItems(this.auditingItems),
-      }),
-    ];
-
-    const threatDetection = [
-      this.createItem(this.agentSections.threatDetection, {
-        icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems(this.threatDetectionItems),
-      }),
-    ];
-
-    const regulatoryCompliance = [
-      this.createItem(this.agentSections.regulatoryCompliance, {
-        icon: <EuiIcon type="reportingApp" color="primary" />,
-        items: this.createItems(this.regulatoryComplianceItems),
-      }),
-    ];
+    const items = this.appCategories.map(({ apps, ...rest }) => ({
+      ...rest,
+      items: this.createItems(
+        apps.map(app => ({
+          id: app.id,
+          title: app.title,
+          isPin: this.props.pinnedApplications.includes(app.id),
+        })),
+      ),
+    }));
 
     return (
-      <div className="WzManagementSideMenu">
-        {(Object.keys(this.state.extensions).length && (
-          <div>
-            <EuiFlexGrid columns={2}>
-              <EuiFlexItem>
-                <EuiSideNav items={securityInformation} style={{ padding: '4px 12px' }} />
+      <div className='WzManagementSideMenu'>
+        <div>
+          <EuiFlexGrid columns={2}>
+            {items.map(item => (
+              <EuiFlexItem key={item.label}>
+                <EuiSideNav
+                  items={[
+                    {
+                      id: item.label,
+                      name: item.label,
+                      icon: <EuiIcon type={item.icon}></EuiIcon>,
+                      items: item.items,
+                    },
+                  ]}
+                  style={{ padding: '4px 12px' }}
+                />
               </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiSideNav items={auditing} style={{ padding: '4px 12px' }} />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiSideNav items={threatDetection} style={{ padding: '4px 12px' }} />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiSideNav items={regulatoryCompliance} style={{ padding: '4px 12px' }} />
-              </EuiFlexItem>
-            </EuiFlexGrid>
-          </div>
-        )) || <div style={{ width: 300 }}></div>}
+            ))}
+          </EuiFlexGrid>
+        </div>
       </div>
     );
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     currentAgentData: state.appStateReducers.currentAgentData,
     currentTab: state.appStateReducers.currentTab,
   };
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  updateCurrentAgentData: (agentData) => dispatch(updateCurrentAgentData(agentData)),
+const mapDispatchToProps = dispatch => ({
+  updateCurrentAgentData: agentData =>
+    dispatch(updateCurrentAgentData(agentData)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WzMenuAgent);

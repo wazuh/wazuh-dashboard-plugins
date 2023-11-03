@@ -1,0 +1,128 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <div
+        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      >
+        <h2
+          class="euiTitle euiTitle--medium"
+        >
+          Welcome to the Wazuh dashboard
+        </h2>
+        <div
+          class="euiSpacer euiSpacer--l"
+        />
+        <div
+          class="euiText euiText--medium"
+        >
+          <p>
+            Wazuh dashboard
+             provides management and monitoring capabilities, giving users control over the Wazuh infrastructure. You can monitor your agents status and configuration, query and visualize your alert data and monitor manager rules and configuration.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div
+      class="euiFlexItem"
+    >
+      <div
+        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      >
+        <h2
+          class="euiTitle euiTitle--medium"
+        >
+          Community
+        </h2>
+        <div
+          class="euiSpacer euiSpacer--l"
+        />
+        <div>
+          <div
+            class="euiText euiText--medium"
+          >
+            <p>
+              Enjoy your Wazuh experience and please don't hesitate to give us your feedback.
+            </p>
+          </div>
+          <div
+            class="euiSpacer euiSpacer--l"
+          />
+          <div
+            class="euiFlexGroup euiFlexGroup--gutterExtraLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentCenter euiFlexGroup--directionRow"
+          >
+            <div
+              class="euiFlexItem euiFlexItem--flexGrowZero"
+            >
+              <a
+                aria-label="Slack"
+                class="euiButtonIcon euiButtonIcon--primary euiButtonIcon--empty euiButtonIcon--xSmall"
+                href="https://wazuh.com/community/join-us-on-slack/"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--xxLarge euiIcon--inherit euiIcon-isLoading euiButtonIcon__icon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </a>
+            </div>
+            <div
+              class="euiFlexItem euiFlexItem--flexGrowZero"
+            >
+              <a
+                aria-label="Google Groups"
+                class="euiButtonIcon euiButtonIcon--primary euiButtonIcon--empty euiButtonIcon--xSmall"
+                href="https://groups.google.com/forum/#!forum/wazuh"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <img
+                  alt=""
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--xxLarge euiIcon--inherit euiButtonIcon__icon"
+                  src="<svg></svg>"
+                />
+              </a>
+            </div>
+            <div
+              class="euiFlexItem euiFlexItem--flexGrowZero"
+            >
+              <a
+                aria-label="Github"
+                class="euiButtonIcon euiButtonIcon--primary euiButtonIcon--empty euiButtonIcon--xSmall"
+                href="https://github.com/wazuh/wazuh-kibana-app"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--xxLarge euiIcon--inherit euiIcon-isLoading euiButtonIcon__icon"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

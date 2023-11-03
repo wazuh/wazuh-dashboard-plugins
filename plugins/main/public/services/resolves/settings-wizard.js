@@ -25,16 +25,18 @@ export function settingsWizard(
   genericReq,
   errorHandler,
   wzMisc,
-  disableErrors = false
+  disableErrors = false,
 ) {
   try {
     const wazuhConfig = new WazuhConfig();
     const deferred = $q.defer();
-    const checkResponse = (data) => {
+    const checkResponse = data => {
       let fromWazuhHosts = false;
       if (parseInt(data.data.error) === 2) {
         !disableErrors &&
-          ErrorHandler.handle('Please set up Wazuh API credentials.', '', { warning: true });
+          ErrorHandler.handle('Please set up Wazuh API credentials.', '', {
+            warning: true,
+          });
       } else if (
         JSON.stringify(data).includes('socket hang up') ||
         ((data || {}).data || {}).apiIsDown ||
@@ -62,7 +64,7 @@ export function settingsWizard(
         ) {
           !disableErrors &&
             ErrorHandler.handle(
-              'Wrong Wazuh API credentials, please add a new API and/or modify the existing one'
+              'Wrong Wazuh API credentials, please add a new API and/or modify the existing one',
             );
           if (!$location.path().includes('/settings')) {
             $location.search('_a', null);
@@ -84,18 +86,7 @@ export function settingsWizard(
       try {
         currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
-        throw Error('Error parsing JSON (settingsWizards.callCheckStored 1)')
-      }
-      const extensions = await AppState.getExtensions(currentApi);
-      if (currentApi && !extensions) {
-        const extensions = Object.keys(config)
-          .filter(key => key.split('.')[0] == 'extensions')
-          .reduce((extensions, key) => {
-            extensions[key.split('.')[1]] = config[key];
-            return extensions;
-          }, {});
-
-        AppState.setExtensions(currentApi, extensions);
+        throw Error('Error parsing JSON (settingsWizards.callCheckStored 1)');
       }
       deferred.resolve();
     };
@@ -106,8 +97,10 @@ export function settingsWizard(
       wzMisc.setWizard(true);
       if (redirect) {
         AppState.setCurrentAPI(redirect);
-      } else if (!$location.path().includes('/settings') &&
-        !$location.path().includes('/blank-screen')) {
+      } else if (
+        !$location.path().includes('/settings') &&
+        !$location.path().includes('/blank-screen')
+      ) {
         $location.search('_a', null);
         $location.search('tab', 'api');
         $location.path('/settings');
@@ -116,7 +109,7 @@ export function settingsWizard(
     };
 
     // Iterates them in order to set one as default
-    const tryToSetDefault = async (apis) => {
+    const tryToSetDefault = async apis => {
       try {
         let errors = 0;
         for (let idx in apis) {
@@ -154,9 +147,16 @@ export function settingsWizard(
     };
 
     const currentParams = $location.search();
-    const targetedAgent = currentParams && (currentParams.agent || currentParams.agent === '000');
-    const targetedRule = currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
-    if (!targetedAgent && !targetedRule && !disableErrors && healthCheck($window)) {
+    const targetedAgent =
+      currentParams && (currentParams.agent || currentParams.agent === '000');
+    const targetedRule =
+      currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
+    if (
+      !targetedAgent &&
+      !targetedRule &&
+      !disableErrors &&
+      healthCheck($window)
+    ) {
       $location.path('/health-check');
       deferred.resolve();
     } else {
@@ -165,18 +165,21 @@ export function settingsWizard(
       if (!currentApi) {
         genericReq
           .request('GET', '/hosts/apis')
-          .then(async (data) => {
+          .then(async data => {
             if (data.data.length > 0) {
               // Try to set some API entry as default
               const defaultApi = await tryToSetDefault(data.data);
-              setUpCredentials('Default Wazuh API has been updated.', defaultApi);
+              setUpCredentials(
+                'Default Wazuh API has been updated.',
+                defaultApi,
+              );
               $location.path('health-check');
             } else {
               setUpCredentials('Please set up Wazuh API credentials.');
             }
             deferred.resolve();
           })
-          .catch((error) => {
+          .catch(error => {
             !disableErrors && ErrorHandler.handle(error);
             wzMisc.setWizard(true);
             if (!$location.path().includes('/settings')) {
@@ -190,22 +193,28 @@ export function settingsWizard(
         const apiId = (JSON.parse(currentApi) || {}).id;
         genericReq
           .request('GET', '/hosts/apis')
-          .then(async (data) => {
-            if (data.data.length > 0 && data.data.find((api) => api.id == apiId)) {
+          .then(async data => {
+            if (
+              data.data.length > 0 &&
+              data.data.find(api => api.id == apiId)
+            ) {
               callCheckStored();
             } else {
               AppState.removeCurrentAPI();
               if (data.data.length > 0) {
                 // Try to set some as default
                 const defaultApi = await tryToSetDefault(data.data);
-                setUpCredentials('Default Wazuh API has been updated.', defaultApi);
+                setUpCredentials(
+                  'Default Wazuh API has been updated.',
+                  defaultApi,
+                );
                 $location.path('health-check');
               } else {
                 setUpCredentials('Please set up Wazuh API credentials.', false);
               }
             }
           })
-          .catch((error) => {
+          .catch(error => {
             setUpCredentials('Please set up Wazuh API credentials.');
           });
       }

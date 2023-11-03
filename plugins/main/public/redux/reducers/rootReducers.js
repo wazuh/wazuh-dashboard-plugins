@@ -14,25 +14,19 @@ import { combineReducers } from 'redux';
 import groupsReducers from './groupsReducers';
 import statusReducers from './statusReducers';
 import reportingReducers from './reportingReducers';
-import managementReducers from './managementReducers';
 import configurationReducers from './configurationReducers';
 import appStateReducers from './appStateReducers';
 import visualizationsReducers from './visualizationsReducers';
 import globalBreadcrumbReducers from './globalBreadcrumbReducers';
-import securityReducers from './securityReducers';
-import toolsReducers from './toolsReducers';
 import appConfig from './appConfigReducers';
 
 export default combineReducers({
   groupsReducers,
   statusReducers,
   reportingReducers,
-  managementReducers,
   configurationReducers,
   appStateReducers,
   visualizationsReducers,
   globalBreadcrumbReducers,
-  securityReducers,
-  toolsReducers,
-  appConfig
+  appConfig,
 });

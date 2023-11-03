@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SettingsAbout component should render about page 1`] = `
+<div>
+  <div
+    class="euiPage euiPage--paddingMedium euiPage--grow"
+  >
+    <div
+      class="euiPageBody euiPageBody--borderRadiusNone"
+    >
+      <div>
+        App info
+      </div>
+      <div
+        class="euiSpacer euiSpacer--l"
+      />
+      <div>
+        General info
+      </div>
+    </div>
+  </div>
+</div>
+`;
