@@ -14,6 +14,7 @@ import { areThereNewUpdates } from '../utils';
 import { getCore } from '../plugin-services';
 import { AvailableUpdates } from '../../../wazuh-check-updates/common/types';
 import { getAvailableUpdates } from '../services';
+import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
 
 export const UpdatesNotification = () => {
   const [availableUpdates, setAvailableUpdates] = useState<AvailableUpdates>();
@@ -35,7 +36,9 @@ export const UpdatesNotification = () => {
   };
 
   useEffect(() => {
-    if (isLoadingUserPreferences || userPreferences.hide_update_notifications) return;
+    if (isLoadingUserPreferences || userPreferences.hide_update_notifications) {
+      return;
+    }
     updateAvailableUpdates();
   }, [userPreferences?.hide_update_notifications, isLoadingUserPreferences]);
 
@@ -47,11 +50,13 @@ export const UpdatesNotification = () => {
     return null;
   }
 
-  if (isDismissed) return null;
+  if (isDismissed) {
+    return null;
+  }
 
   const mustNotifyUser = areThereNewUpdates(
     availableUpdates?.apis_available_updates,
-    userPreferences.last_dismissed_updates
+    userPreferences.last_dismissed_updates,
   );
 
   const handleOnChangeDismiss = (checked: boolean) => {
@@ -61,7 +66,7 @@ export const UpdatesNotification = () => {
   const handleOnClose = () => {
     updateUserPreferences({
       last_dismissed_updates: availableUpdates?.apis_available_updates?.map(
-        (apiAvailableUpdates) => {
+        apiAvailableUpdates => {
           const {
             api_id,
             last_available_major,
@@ -74,7 +79,7 @@ export const UpdatesNotification = () => {
             last_minor: last_available_minor?.tag,
             last_patch: last_available_patch?.tag,
           };
-        }
+        },
       ),
       ...(dismissFutureUpdates ? { hide_update_notifications: true } : {}),
     });
@@ -84,52 +89,63 @@ export const UpdatesNotification = () => {
   return mustNotifyUser ? (
     <I18nProvider>
       <EuiBottomBar>
-        <EuiFlexGroup justifyContent="spaceBetween" alignItems="center" gutterSize="m">
+        <EuiFlexGroup
+          justifyContent='spaceBetween'
+          alignItems='center'
+          gutterSize='m'
+        >
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize="m" alignItems="center">
+            <EuiFlexGroup gutterSize='m' alignItems='center'>
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
                 <EuiText>
                   <FormattedMessage
-                    id="wazuhCheckUpdates.updatesNotification.message"
-                    defaultMessage="New release is available!"
+                    id='wazuhCheckUpdates.updatesNotification.message'
+                    defaultMessage='New release is available!'
                   />
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <EuiButtonEmpty
-                  color="ghost"
-                  onClick={() =>
-                    getCore().application.navigateToApp('wazuh', { path: '#/settings?tab=api' })
-                  }
-                >
-                  <FormattedMessage
-                    id="wazuhCheckUpdates.updatesNotification.linkText"
-                    defaultMessage="Go to the API configuration page for details"
-                  />
-                </EuiButtonEmpty>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiButtonEmpty
+                    color='ghost'
+                    href={getCore().application.getUrlForApp('server-apis', {
+                      path: '#/settings?tab=api',
+                    })}
+                  >
+                    <FormattedMessage
+                      id='wazuhCheckUpdates.updatesNotification.linkText'
+                      defaultMessage='Go to the API configuration page for details'
+                    />
+                  </EuiButtonEmpty>
+                </RedirectAppLinks>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize="m" alignItems="center">
+            <EuiFlexGroup gutterSize='m' alignItems='center'>
               <EuiFlexItem grow={false}>
                 <EuiCheckbox
-                  id="check-dismiss-in-notification"
+                  id='check-dismiss-in-notification'
                   label={
                     <FormattedMessage
-                      id="wazuhCheckUpdates.updatesNotification.dismissCheckText"
-                      defaultMessage="Disable updates notifications"
+                      id='wazuhCheckUpdates.updatesNotification.dismissCheckText'
+                      defaultMessage='Disable updates notifications'
                     />
                   }
                   checked={dismissFutureUpdates}
-                  onChange={(e) => handleOnChangeDismiss(e.target.checked)}
+                  onChange={e => handleOnChangeDismiss(e.target.checked)}
                 />
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <EuiButton fill size="s" iconType="cross" onClick={() => handleOnClose()}>
+                <EuiButton
+                  fill
+                  size='s'
+                  iconType='cross'
+                  onClick={() => handleOnClose()}
+                >
                   <FormattedMessage
-                    id="wazuhCheckUpdates.updatesNotification.closeButtonText"
-                    defaultMessage="Dismiss"
+                    id='wazuhCheckUpdates.updatesNotification.closeButtonText'
+                    defaultMessage='Dismiss'
                   />
                 </EuiButton>
               </EuiFlexItem>

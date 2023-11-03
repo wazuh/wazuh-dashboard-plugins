@@ -1368,7 +1368,14 @@
             "description": "Filter by log level",
             "schema": {
               "type": "string",
-              "enum": ["critical", "debug", "debug2", "error", "info", "warning"]
+              "enum": [
+                "critical",
+                "debug",
+                "debug2",
+                "error",
+                "info",
+                "warning"
+              ]
             }
           },
           {
@@ -4885,7 +4892,14 @@
             "description": "Filter by log level",
             "schema": {
               "type": "string",
-              "enum": ["critical", "debug", "debug2", "error", "info", "warning"]
+              "enum": [
+                "critical",
+                "debug",
+                "debug2",
+                "error",
+                "info",
+                "warning"
+              ]
             }
           },
           {
@@ -6418,7 +6432,15 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["pci_dss", "gdpr", "hipaa", "nist-800-53", "gpg13", "tsc", "mitre"]
+              "enum": [
+                "pci_dss",
+                "gdpr",
+                "hipaa",
+                "nist-800-53",
+                "gpg13",
+                "tsc",
+                "mitre"
+              ]
             }
           }
         ],
@@ -10823,9 +10845,7 @@
         "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api.controllers.event_controller.forward_event",
         "description": "Send security events to analysisd.\n\nThe endpoint is limited to receiving a max of 30 requests per minute and a max bulk size of 100 events per request.",
         "summary": "Ingest events",
-        "tags": [
-          "Events"
-        ],
+        "tags": ["Events"],
         "query": [
           {
             "name": "pretty",
@@ -10856,9 +10876,7 @@
                 }
               }
             },
-            "required": [
-              "events"
-            ]
+            "required": ["events"]
           }
         ]
       },
@@ -11431,7 +11449,13 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["all", "active", "pending", "never_connected", "disconnected"]
+                "enum": [
+                  "all",
+                  "active",
+                  "pending",
+                  "never_connected",
+                  "disconnected"
+                ]
               },
               "minItems": 1
             }

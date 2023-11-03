@@ -20,27 +20,20 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 
-export function getIp(
-  $q,
-  $window,
-  $location,
-  wzMisc
-) {
+export function getIp($q, $window, $location, wzMisc) {
   const deferred = $q.defer();
 
-  const checkWazuhPatterns = async (indexPatterns) => {
+  const checkWazuhPatterns = async indexPatterns => {
     const wazuhConfig = new WazuhConfig();
     const configuration = await getWzConfig($q, GenericRequest, wazuhConfig);
     const wazuhPatterns = [
       `${configuration['wazuh.monitoring.pattern']}`,
-      `${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`
+      `${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`,
     ];
     return wazuhPatterns.every(pattern => {
-      return indexPatterns.find(
-        element => element.id === pattern
-      );
+      return indexPatterns.find(element => element.id === pattern);
     });
-  }
+  };
 
   const buildSavedObjectsClient = async () => {
     try {
@@ -49,7 +42,7 @@ export function getIp(
       const savedObjectsData = await savedObjectsClient.find({
         type: 'index-pattern',
         fields: ['title'],
-        perPage: 10000
+        perPage: 10000,
       });
 
       const { savedObjects } = savedObjectsData;
@@ -58,19 +51,16 @@ export function getIp(
 
       if (
         !currentPattern ||
-        !savedObjects.find(
-          element => element.id === currentPattern
-        ) ||
+        !savedObjects.find(element => element.id === currentPattern) ||
         !(await checkWazuhPatterns(savedObjects))
       ) {
         if (!$location.path().includes('/health-check')) {
-          $location.search('tab', null);
           $location.path('/health-check');
         }
       }
 
       const onlyWazuhAlerts = savedObjects.filter(
-        element => element.id === currentPattern
+        element => element.id === currentPattern,
       );
 
       if (!onlyWazuhAlerts || !onlyWazuhAlerts.length) {
@@ -80,13 +70,15 @@ export function getIp(
         return;
       }
 
-      const courierData = await getDataPlugin().indexPatterns.get(currentPattern);
+      const courierData = await getDataPlugin().indexPatterns.get(
+        currentPattern,
+      );
 
       deferred.resolve({
         list: onlyWazuhAlerts,
         loaded: courierData,
         stateVal: null,
-        stateValFound: false
+        stateValFound: false,
       });
     } catch (error) {
       deferred.reject(error);
@@ -97,7 +89,11 @@ export function getIp(
         store: true,
         error: {
           error: error,
-          message: (error?.body?.message?.includes('no permissions for') && `You have no permissions. Contact to an administrator:\n${error?.body?.message}`) || error.message || error,
+          message:
+            (error?.body?.message?.includes('no permissions for') &&
+              `You have no permissions. Contact to an administrator:\n${error?.body?.message}`) ||
+            error.message ||
+            error,
           title: error.name || error,
         },
       };

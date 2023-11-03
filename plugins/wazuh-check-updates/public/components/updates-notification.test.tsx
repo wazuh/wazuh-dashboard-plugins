@@ -12,13 +12,14 @@ jest.mock(
   '../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 jest.mock('../plugin-services', () => ({
   getCore: jest.fn().mockReturnValue({
     application: {
       navigateToApp: () => 'http://url',
+      getUrlForApp: (appId: string) => appId,
     },
     http: {
       basePath: {
@@ -27,6 +28,8 @@ jest.mock('../plugin-services', () => ({
     },
   }),
 }));
+
+jest.mock('react-use/lib/useObservable', () => () => {});
 
 const mockedGetAvailableUpdates = getAvailableUpdates as jest.Mock;
 jest.mock('../services/available-updates');
@@ -82,7 +85,9 @@ describe('UpdatesNotification component', () => {
     const message = await waitFor(() => getByText('New release is available!'));
     expect(message).toBeInTheDocument();
 
-    const releaseNotesLink = getByText('Go to the API configuration page for details');
+    const releaseNotesLink = getByText(
+      'Go to the API configuration page for details',
+    );
     expect(releaseNotesLink).toBeInTheDocument();
 
     const dismissCheck = getByText('Disable updates notifications');
@@ -132,7 +137,9 @@ describe('UpdatesNotification component', () => {
 
     const { container, getByRole } = render(<UpdatesNotification />);
 
-    const closeButton = await waitFor(() => getByRole('button', { name: 'Dismiss' }));
+    const closeButton = await waitFor(() =>
+      getByRole('button', { name: 'Dismiss' }),
+    );
     expect(closeButton).toBeInTheDocument();
     await userEvent.click(closeButton);
 

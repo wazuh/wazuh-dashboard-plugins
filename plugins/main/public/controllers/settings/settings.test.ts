@@ -29,6 +29,7 @@ jest.mock('../../kibana-services', () => ({
       return true;
     },
   }),
+  getWzCurrentAppID: jest.fn().mockReturnValue('app'),
   formatUIDate: jest.fn(),
 }));
 
@@ -89,9 +90,14 @@ describe('Settings Controller', () => {
   describe('$onInit', () => {
     it('Should return ERROR instance on ErrorOrchestrator options when checkApiStatus throw error and fails', async () => {
       const checkApisStatusErrorMocked = ErrorHandler.createError(
-        '3099 - ERROR3099 - Wazuh not ready yet'
+        '3099 - ERROR3099 - Wazuh not ready yet',
       );
-      const controller = new SettingsController($scope, window, window.location, ErrorHandler);
+      const controller = new SettingsController(
+        $scope,
+        window,
+        window.location,
+        ErrorHandler,
+      );
       const expectedErrorOrchestratorOptions = {
         context: `${SettingsController.name}.$onInit`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -99,7 +105,8 @@ describe('Settings Controller', () => {
         store: true,
         error: {
           error: checkApisStatusErrorMocked,
-          message: checkApisStatusErrorMocked.message || checkApisStatusErrorMocked,
+          message:
+            checkApisStatusErrorMocked.message || checkApisStatusErrorMocked,
           title: `${checkApisStatusErrorMocked.name}: Cannot initialize Settings`,
         },
       };
@@ -110,13 +117,13 @@ describe('Settings Controller', () => {
       await controller.$onInit();
       expect(mockedGetErrorOrchestrator.handleError).toBeCalledTimes(1);
       expect(mockedGetErrorOrchestrator.handleError).toBeCalledWith(
-        expectedErrorOrchestratorOptions
+        expectedErrorOrchestratorOptions,
       );
     });
 
     it('Should return ERROR instance on ErrorOrchestrator options when apiIsDown = true because checkManager fails', async () => {
       const checkApiErrorMocked = ErrorHandler.createError(
-        '3099 - ERROR3099 - Wazuh not ready yet'
+        '3099 - ERROR3099 - Wazuh not ready yet',
       );
       const expectedErrorOrchestratorOptions = {
         context: `${SettingsController.name}.getAppInfo`,
@@ -129,14 +136,23 @@ describe('Settings Controller', () => {
         },
       };
       // checkApi must return error - Wazuh not ready yet
-      ApiCheck.checkApi = jest.fn().mockResolvedValue(Promise.reject(checkApiErrorMocked));
+      ApiCheck.checkApi = jest
+        .fn()
+        .mockResolvedValue(Promise.reject(checkApiErrorMocked));
       // mock getAppInfo
       (axios as jest.MockedFunction<typeof axios>).mockResolvedValueOnce(
-        Promise.resolve(getAppInfoResponse)
+        Promise.resolve(getAppInfoResponse),
       );
       // mock formatUIDate
-      (formatUIDate as jest.MockedFunction<typeof Date>).mockReturnValue('mocked-date');
-      const controller = new SettingsController($scope, window, window.location, ErrorHandler);
+      (formatUIDate as jest.MockedFunction<typeof Date>).mockReturnValue(
+        'mocked-date',
+      );
+      const controller = new SettingsController(
+        $scope,
+        window,
+        window.location,
+        ErrorHandler,
+      );
       controller.getSettings = jest.fn().mockResolvedValue([]);
       // mocking manager hosts - apiEntries from wazuh.yml
       const manageHosts = new ManageHosts();
@@ -144,7 +160,7 @@ describe('Settings Controller', () => {
       await controller.$onInit();
       expect(mockedGetErrorOrchestrator.handleError).toBeCalledTimes(1);
       expect(mockedGetErrorOrchestrator.handleError).toBeCalledWith(
-        expectedErrorOrchestratorOptions
+        expectedErrorOrchestratorOptions,
       );
     });
   });

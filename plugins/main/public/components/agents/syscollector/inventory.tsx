@@ -11,15 +11,7 @@
  */
 
 import React from 'react';
-import {
-  EuiEmptyPrompt,
-  EuiButton,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiCallOut,
-  EuiLink,
-  EuiPanel,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiCallOut, EuiPanel } from '@elastic/eui';
 import { InventoryMetrics } from './components/syscollector-metrics';
 import {
   netaddrColumns,
@@ -33,47 +25,23 @@ import {
   API_NAME_AGENT_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
 } from '../../../../common/constants';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services';
 import { get as getLodash } from 'lodash';
+import { compose } from 'redux';
+import { withGuard } from '../../common/hocs';
+import { PromptAgentNeverConnected } from '../prompts';
 
 const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
-export function SyscollectorInventory({ agent }) {
-  if (agent && agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
-    return (
-      <EuiEmptyPrompt
-        iconType='securitySignalDetected'
-        style={{ marginTop: 20 }}
-        title={<h2>Agent has never connected.</h2>}
-        body={
-          <>
-            <p>
-              The agent has been registered but has not yet connected to the
-              manager.
-            </p>
-            <EuiLink
-              href={webDocumentationLink(
-                'user-manual/agents/agent-connection.html',
-              )}
-              target='_blank'
-              rel='noopener noreferrer'
-              external
-            >
-              Checking connection with the Wazuh server
-            </EuiLink>
-          </>
-        }
-        actions={
-          <EuiButton href='#/agents-preview?' color='primary' fill>
-            Back
-          </EuiButton>
-        }
-      />
-    );
-  }
-
+export const SyscollectorInventory = compose(
+  withGuard(
+    props =>
+      props.agent &&
+      props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    PromptAgentNeverConnected,
+  ),
+)(function SyscollectorInventory({ agent }) {
   let soPlatform;
   if (agent?.os?.uname?.includes('Linux')) {
     soPlatform = 'linux';
@@ -461,4 +429,4 @@ export function SyscollectorInventory({ agent }) {
       </EuiFlexGroup>
     </div>
   );
-}
+});

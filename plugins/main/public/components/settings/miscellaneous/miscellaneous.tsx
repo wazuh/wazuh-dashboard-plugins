@@ -26,64 +26,60 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
-import { getHttp } from '../../../kibana-services';
+import { getHttp, getWzCurrentAppID } from '../../../kibana-services';
 
 export const SettingsMiscellaneous = () => {
-
   const redirectHealthCheckDebugMode = useCallback(() => {
-    window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check?debug');
+    window.location.href = getHttp().basePath.prepend(
+      `/app/${getWzCurrentAppID()}#/health-check?debug`,
+    );
   }, []);
 
   return (
     <EuiPage>
-      <EuiPanel paddingSize="l">
+      <EuiPanel paddingSize='l'>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle>
               <h2>Miscellaneous</h2>
             </EuiTitle>
-            <EuiText color="subdued">
-              App utils
-            </EuiText>
+            <EuiText color='subdued'>App utils</EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer />
-        <SettingsMiscellaneousCategory 
+        <SettingsMiscellaneousCategory
           title='Health check'
           actions={[
             {
               title: 'Execute in debug mode',
-              description: 'Run health check and no redirect when all checks are ready',
+              description:
+                'Run health check and no redirect when all checks are ready',
               render: (
                 <EuiFormRow>
-                  <EuiButton
-                      fill
-                      onClick={redirectHealthCheckDebugMode}
-                    >
-                      Run
+                  <EuiButton fill onClick={redirectHealthCheckDebugMode}>
+                    Run
                   </EuiButton>
                 </EuiFormRow>
-              )
-            }
+              ),
+            },
           ]}
         />
       </EuiPanel>
     </EuiPage>
-  )
+  );
 };
 
-
-const SettingsMiscellaneousCategory = ({title, description = '', actions}) => (
+const SettingsMiscellaneousCategory = ({
+  title,
+  description = '',
+  actions,
+}) => (
   <EuiPanel>
     <>
       <EuiTitle>
         <h2>{title}</h2>
       </EuiTitle>
-      {description && (
-        <EuiText color='subdued'>
-          {description}
-        </EuiText>
-      )}
+      {description && <EuiText color='subdued'>{description}</EuiText>}
       <EuiSpacer size='xs' />
       {actions.map(action => (
         <Fragment key={`settins-miscellaneous-category-action-${action.title}`}>
@@ -98,4 +94,4 @@ const SettingsMiscellaneousCategory = ({title, description = '', actions}) => (
       ))}
     </>
   </EuiPanel>
-)
+);

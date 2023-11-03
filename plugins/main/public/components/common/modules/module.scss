@@ -2,13 +2,6 @@
     display: contents;
 }
 
-.wz-module-header-agent-wrapper, .wz-module-header-nav-wrapper{
-    width: 100%;
-    position: fixed;
-    z-index: 3000;
-    left: 0;
-}
-
 .wz-module-header-agent, .wz-module-header-nav{
     background:#fafbfd;
 }
@@ -61,10 +54,6 @@
     font-weight: 500;
 }
 
-.wz-module-header-nav-wrapper{
-    margin-top: 49px;
-}
-
 .wz-module-header-nav .euiTabs{
     padding-top: 6px;
 }
@@ -79,9 +68,6 @@
 }
 
 .wz-module.wz-module-welcome{
-    .wz-module-agent-body{
-        padding-top: 50px !important;
-    }
     .wz-module-body{
         padding-top: 109px !important;
     }
@@ -93,14 +79,6 @@
 
 .flyout-body .globalQueryBar{
     padding: 2px 0px 8px 0px!important;
-}
-
-.wz-module-body-main {
-    padding-top: 50px!important;
-}
-
-.wz-module-body-main-double {
-    padding-top: 102px!important;
 }
 
 .sidebar-list{
@@ -116,9 +94,6 @@ discover-app-w .sidebar-container {
         padding-top: 189px !important;
     }
     @media only screen and (max-width: 767px){
-        .wz-module.wz-module-welcome .wz-module-agent-body{
-            padding-top: 0px !important;
-        }
         .wz-module-header-agent{
             height: auto;
             h1{
@@ -129,14 +104,6 @@ discover-app-w .sidebar-container {
         }
         .wz-module-body {
             margin-top: -160px;
-        }
-
-        .wz-module-header-agent-wrapper, .wz-module-header-nav-wrapper{
-            position: relative;
-        }
-
-        .wz-module-header-nav-wrapper{
-            margin-top: 15px;
         }
 
         .wz-module-header-nav {

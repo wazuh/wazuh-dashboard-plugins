@@ -13,7 +13,6 @@ import { SettingsController } from './settings';
 import { ApiTable } from '../../components/settings/api/api-table';
 import { AddApi } from '../../components/settings/api/add-api';
 import { ApiIsDown } from '../../components/settings/api/api-is-down';
-import { EnableModules } from '../../components/settings/modules/modules';
 import { WzConfigurationSettings } from '../../components/settings/configuration/configuration';
 import SettingsLogs from '../../components/settings/settings-logs/logs';
 import { SettingsMiscellaneous } from '../../components/settings/miscellaneous/miscellaneous';
@@ -23,7 +22,6 @@ import { SettingsAbout } from '../../components/settings/about';
 
 const app = getAngularModule();
 
-EnableModules.displayName = 'EnableModules';
 WzSampleDataWrapper.displayName = 'WzSampleDataWrapper';
 WzConfigurationSettings.displayName = 'WzConfigurationSettings';
 SettingsLogs.displayName = 'SettingsLogs';
@@ -35,7 +33,6 @@ SettingsAbout.displayName = 'SettingsAbout';
 
 app
   .controller('settingsController', SettingsController)
-  .value('EnableModules', EnableModules)
   .value('WzSampleDataWrapper', WzSampleDataWrapper)
   .value('WzConfigurationSettings', WzConfigurationSettings)
   .value('SettingsLogs', SettingsLogs)

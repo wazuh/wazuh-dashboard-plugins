@@ -1,15 +1,15 @@
 # Frontend development environments
 
-Install [Docker Desktop][0] as per its instructions (make sure that the docker compose version is 2.20.2 or higher), available for Windows, Mac 
+Install [Docker Desktop][0] as per its instructions (make sure that the docker compose version is 2.20.2 or higher), available for Windows, Mac
 and Linux (Ubuntu, Debian & Fedora).
 This ensures that the development experience between Linux, Mac and Windows is as
 similar as possible.
 
 > IMPORTANT: be methodic during the installation of Docker Desktop, and proceed
-step by step as described in their documentation. Make sure that your system
-meets the system requirements before installing Docker Desktop, and read any 
-post-installation note, specially on Linux: [Differences between 
-Docker Desktop for Linux and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#differences-between-docker-desktop-for-linux-and-docker-engine)
+> step by step as described in their documentation. Make sure that your system
+> meets the system requirements before installing Docker Desktop, and read any
+> post-installation note, specially on Linux: [Differences between
+> Docker Desktop for Linux and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#differences-between-docker-desktop-for-linux-and-docker-engine)
 
 In general, the environment consist of:
 
@@ -19,48 +19,51 @@ In general, the environment consist of:
 
 ## Pre-requisites
 
- 1. Create the `devel` network:
+1.  Create the `devel` network:
 
     ```bash
     docker network create devel
     ```
 
- 2. Create the `mon` network:
+2.  Create the `mon` network:
 
     ```bash
     docker network create mon
     ```
 
- 3. Install the Docker driver Loki, from [Grafana][1], used to read logs from 
- the containers:
+3.  Install the Docker driver Loki, from [Grafana][1], used to read logs from
+    the containers:
 
     ```bash
     docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
     ```
- 4. Assign resources to [Docker Desktop][0]. The requirements for the 
- environments are:
+
+4.  Assign resources to [Docker Desktop][0]. The requirements for the
+    environments are:
+
     - 8 GB of RAM (minimum)
     - 4 cores
 
     The more resources the better ☺
- 
- 5. Save the path to the Wazuh App code as an environment variable, by exporting
- this path on your `.bashrc`, `.zhsrc` or similar.
+
+5.  Save the path to the Wazuh App code as an environment variable, by exporting
+    this path on your `.bashrc`, `.zhsrc` or similar.
 
     ```bash
     # ./bashrc
     export WZ_HOME=~/your/path/to/wazuh_kibana_app/plugins
     ```
+
     Save and re-login or restart your terminal to apply the changes. Test that the variable has been set with:
 
     ```bash
     echo $WZ_HOME
     ```
 
- 6. Set up user permissions
+6.  Set up user permissions
 
     The Docker volumes will be created by the internal Docker user, making them
-    read-only. To prevent this, a new group named `docker-desktop` and GUID 100999 
+    read-only. To prevent this, a new group named `docker-desktop` and GUID 100999
     needs to be created, then added to your user and the source code folder:
 
     ```bash
@@ -72,8 +75,8 @@ In general, the environment consist of:
 
 ## Understanding Docker contexts
 
-Before we begin starting Docker containers, we need to understand the 
-differences between Docker Engine and Docker Desktop, more precisely, that the 
+Before we begin starting Docker containers, we need to understand the
+differences between Docker Engine and Docker Desktop, more precisely, that the
 use different contexts.
 
 Carefully read these two sections of the Docker documentation:
@@ -81,14 +84,14 @@ Carefully read these two sections of the Docker documentation:
 - [Differences between Docker Desktop for Linux and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#differences-between-docker-desktop-for-linux-and-docker-engine)
 - [Switch between Docker Desktop and Docker Engine](https://docs.docker.com/desktop/install/linux-install/#context)
 
-Docker Desktop will change to its context automatically at start, so be sure 
-that any existing Docker container using the default context is **stopped** 
+Docker Desktop will change to its context automatically at start, so be sure
+that any existing Docker container using the default context is **stopped**
 before starting Docker Desktop and any of the environments in this folder.
 
 ## Starting up the environments
 
 Choose any of the [environments](#environments) available and use the `sh` script
-to up the environment. Each script will guide you on how to use it, reporting 
+to up the environment. Each script will guide you on how to use it, reporting
 which parameters it needs, and the accepted values for each of them.
 
 To see the usage of each script, just run it with no parameters.
@@ -98,21 +101,21 @@ Before starting the environment, check that the plugin is in the desired branch
 
 Example:
 
-This brings up a Dev environment for OpenSearch `1.2.4` and opensearch-dashboards 
-`1.2.0`, with the `wazuh-dashboard-plugins` development branch set up at 
+This brings up a Dev environment for OpenSearch `1.2.4` and opensearch-dashboards
+`1.2.0`, with the `wazuh-dashboard-plugins` development branch set up at
 `$WZ_HOME`:
 
 ```bash
 ./dev.sh 1.2.4 1.2.0 $WZ_HOME up
 ```
 
-Once the containers are up, **attach a shell to the development container**, 
-move to the `kbn\plugins\wazuh` and run `yarn` to install the dependencies of 
-the project. After that, move back to the root folder of the platform and run 
+Once the containers are up, **attach a shell to the development container**,
+move to the `kbn\plugins\wazuh` and run `yarn` to install the dependencies of
+the project. After that, move back to the root folder of the platform and run
 `yarn start` to start the App.
 
-The dependencies of the platform (Kibana \ OSD) are already installed, but it 
-might take a while to optimize all the bundles. We might include the cache in the 
+The dependencies of the platform (Kibana \ OSD) are already installed, but it
+might take a while to optimize all the bundles. We might include the cache in the
 image in the future.
 
 ## Logging
@@ -135,7 +138,6 @@ If you want to build an image, we recommend using a NPM cache server,
 so the download of node modules from the network only happens once
 while developing the image.
 
-
 To start the NPM cache server:
 
 ```bash
@@ -150,12 +152,11 @@ To setup the crendentials (**this only has to be done once**):
 2. Click on `CLI Password: Generate Encrypted Password`
 3. In the new window that opens, click on `Docker Configuration` and follow the steps.
 
-
 To build an image, use the docker build command like:
 
 Use the `--build-arg` flag to specify the version of Node and the version of
-the platform. The version of Node to use is defined in the `.nvmrc` file. Use 
-the Node version defined in that file for the target platform version, as the 
+the platform. The version of Node to use is defined in the `.nvmrc` file. Use
+the Node version defined in that file for the target platform version, as the
 version of Node might be increased between platfform's versions.
 
 For example, to build the image for OpenSearch Dashboards `2.6.0`:
@@ -184,6 +185,7 @@ You must have a [JVM](https://github.com/gatehill/imposter-cli/blob/main/docs/jv
 ### Install
 
 If you have Homebrew installed:
+
 ```
 brew tap gatehill/imposter
 brew install imposter
@@ -214,7 +216,6 @@ network, which will be needed by the other environments.
 If you don't want to bring up this environment, be sure to create the
 `mon` network as it is required by other docker compose and scripts.
 
-
 ### **osd-dev** - OpenSearch Dashboards development environment
 
 Folder: [osd-dev](./osd-dev/)
@@ -235,8 +236,8 @@ Folder: [wazuh-4.3-es](./wazuh-4.3-es)
 
 Within this folder, there are two scripts:
 
- - `rel.sh` brings up released versions
- - `pre.sh` brings up unreleased versions
+- `rel.sh` brings up released versions
+- `pre.sh` brings up unreleased versions
 
 ### Wazuh 4.3.X testing environment with wazuh-dashboard and wazuh-indexer
 
@@ -244,8 +245,8 @@ Folder: [wazuh-4.3-wz](./wazuh-4.3-wz)
 
 Within this folder, there are two scripts:
 
- - `rel.sh` brings up released versions
- - `pre.sh` brings up unreleased versions
+- `rel.sh` brings up released versions
+- `pre.sh` brings up unreleased versions
 
 ### Wazuh 4.2.X testing environment with Elastic Stack
 
@@ -263,10 +264,10 @@ Folder: [wazuh-3.13.X-es](./wazuh-3.13.X-es)
 
 Folder: [wazuh-3.13.X-od](./wazuh-3.13.X-od)
 
-
 ## Troubleshooting
 
 1. Error pulling Docker image from Quay.io
+
 ```
 error getting credentials - err: exit status 1, out: `error getting credentials - err: exit status 1, out: `no usernames for quay.io``
 ```
@@ -277,16 +278,9 @@ error getting credentials - err: exit status 1, out: `error getting credentials 
 
 **Solution:** setup the permissions for the app as described [here][5].
 
-
-
-
-
-
-
-
-[0]: <https://docs.docker.com/get-docker/> "Docker Desktop"
-[1]: <https://grafana.com/> "Grafana"
-[2]: <https://grafana.com/oss/loki/> "Loki"
-[3]: <https://prometheus.io/docs/visualization/grafana/> "Prometheus"
-[4]: <https://quay.io/organization/wazuh> "quay.io/wazuh"
-[5]: <https://github.com/wazuh/wazuh-dashboard-plugins/issues/3872#issuecomment-1305507626> "App permissions"
+[0]: https://docs.docker.com/get-docker/ 'Docker Desktop'
+[1]: https://grafana.com/ 'Grafana'
+[2]: https://grafana.com/oss/loki/ 'Loki'
+[3]: https://prometheus.io/docs/visualization/grafana/ 'Prometheus'
+[4]: https://quay.io/organization/wazuh 'quay.io/wazuh'
+[5]: https://github.com/wazuh/wazuh-dashboard-plugins/issues/3872#issuecomment-1305507626 'App permissions'
