@@ -24,11 +24,35 @@ The following files must be updated:
 
 To bump the version, see [# Bump](#Bump)
 
+#### Update the API info static files
+
+We have a script to update the files that have information about the Wazuh API. This script uses the API specification
+file that is stored in the GitHub repository of [wazuh/wazuh](https://github.com/wazuh/wazuh) repository. This must run for each version.
+
+```console
+yarn generate:api-data --spec <api_spec_file_URL>
+```
+
+Examples:
+
+- Update the files with a final tag
+
+```
+yarn generate:api-data --spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml
+```
+
+- Update the files with a pre-release tag
+
+```
+yarn generate:api-data --spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0-rc1/api/api/spec/spec.yaml
+```
+
 #### Create tags
 
 After the base branches have set the expected [# Files](#files), we must create the tags.
 
 The tag name follows the pattern:
+
 - final release tag: `v{version}-{platform version}`. Example: `v4.4.5-2.6.0`.
 - non-final release tag: `v{version}-{platform version}{suffix}`. Example: `v4.4.5-2.6.0-pre-alpha1`, `v4.4.5-2.6.0-alpha1`, `v4.4.5-2.6.0-rc1`.
 
@@ -112,45 +136,49 @@ Examples:
 
 - Change the plugin version
 
-```
+```console
 yarn release:tag --version 4.5.0
 ```
+
 - Change the plugin revision
 
-```
+```console
 yarn release:tag --revision 02
 ```
+
 - Change the platform version
 
-```
+```console
 yarn release:tag --platform-version 2.8.0
 ```
+
 - Change the plugin version, revision and platform version
 
-```
+```console
 yarn release:tag --version 4.5.0 --revision 02 --platform-version 2.8.0
 ```
+
 For tags that needs a suffix, use the `--tag-suffix <tag-suffix>` flag.
 
-```
+```console
 yarn release:tag --tag-suffix <tag-suffix> <options>
 ```
 
 Example:
 
-```
+```console
 yarn release:tag --tag-suffix -rc2 --revision 02
 ```
 
 If you want to get a report of the tags generated and stored locally, use the `--export-tags <file>`.
 
-```
+```console
 yarn release:tag --revision <bump_revision> --export-tags <file>
 ```
 
 Example:
 
-```
+```console
 yarn release:tag --version 4.5.0 --export-tags tags.log
 ```
 
@@ -208,36 +236,44 @@ Examples:
 
 - Change the plugin version
 
-```
+```console
 yarn release:bump --version 4.5.0
 ```
 
 - Change the plugin revision
 
-```
+```console
 yarn release:bump --revision 02
 ```
 
 - Change the platform version
 
-```
+```console
 yarn release:bump --platform-version 2.8.0
 ```
 
 - Change the plugin version, revision and platform version
 
-```
+```console
 yarn release:bump --version 4.5.0 --revision 02 --platform-version 2.8.0
 ```
 
 3. Apply manually the changes to the rest of files if needed it. See [# Files](#Files).
 
-4. Optional. Commit and push the new branch to the remote repository.
+4. Commit and push the new branch to the remote repository.
 
-```
+```console
 git add .
 git commit -m "bump: Bump version/revision/platform version to <version/revision/platform version>"
 git push origin <branch_name>
 ```
 
 A new branch will be created in the remote and will be ready to receive pull requests or use as source to create the tags.
+
+5. Create a pull request
+
+If you have installed the [GitHub CLI](https://cli.github.com/):
+
+```console
+gh pr create -a @me -B <base_branch> -t "Bump Wazuh version <version>"
+```

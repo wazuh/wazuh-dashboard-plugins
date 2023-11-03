@@ -8,16 +8,18 @@ import { UiActionsSetup } from '../../../src/plugins/ui_actions/public';
 import { SecurityOssPluginStart } from '../../../src/plugins/security_oss/public/';
 import { SavedObjectsStart } from '../../../src/plugins/saved_objects/public';
 import { TelemetryPluginStart, TelemetryPluginSetup } from '../../../src/plugins/telemetry/public';
+import { DashboardStart } from '../../../src/plugins/dashboard/public'
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
   data: DataPublicPluginStart;
   visualizations: VisualizationsStart;
   discover: DiscoverStart;
-  charts: ChartsPluginStart
-  securityOss: SecurityOssPluginStart,
-  savedObjects: SavedObjectsStart,
-  telemetry: TelemetryPluginStart
+  charts: ChartsPluginStart;
+  securityOss: SecurityOssPluginStart;
+  savedObjects: SavedObjectsStart;
+  telemetry: TelemetryPluginStart;
+  dashboard: DashboardStart;
 }
 export interface AppDependencies {
   core: CoreStart;
