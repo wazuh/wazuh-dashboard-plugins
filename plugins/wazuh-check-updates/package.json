@@ -6,6 +6,11 @@
     "version": "4.7.0"
   },
   "description": "Wazuh Check Updates",
+  "keywords": [
+    "opensearch_dashboards",
+    "wazuh-check-updates",
+    "ossec"
+  ],
   "private": true,
   "scripts": {
     "build": "yarn plugin-helpers build",
