@@ -162,6 +162,25 @@ const cli = require('../lib/cli/cli')(
       },
     },
     {
+      long: 'manifest-package',
+      description:
+        'Set the package manifest file location to take the default values.',
+      help: '<file-path>',
+      parse: (parameter, input, { logger, option }) => {
+        const [nextParameter] = input;
+
+        if (nextParameter) {
+          input.splice(0, 1);
+          return {
+            [option.long]: nextParameter,
+          };
+        } else {
+          logger.error(`${parameter} parameter is not defined.`);
+          process.exit(1);
+        }
+      },
+    },
+    {
       long: 'plugins-directory',
       description: 'Set the plugins directory where they are located.',
       help: '<directory>',
@@ -344,7 +363,7 @@ function main() {
     // Check version is set
     if (!configuration.version || !configuration.revision) {
       const { version: manifestVersion, revision: manifestRevision } =
-        readPackageManifest(configuration['manifest-package']);
+        readPackageManifest(configuration['manifest-package'], logger);
       if (!configuration.version) {
         logger.warn(
           `version is not defined. Using from the current package manifest ${configuration['manifest-package']}: ${manifestVersion}`,
