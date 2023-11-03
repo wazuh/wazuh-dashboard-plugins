@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SettingsAboutAppInfo component should render version, revision, install date and ApisUpdateStatus component 1`] = `
+<div>
+  <div
+    class="euiCallOut euiCallOut--primary"
+  >
+    <div
+      class="euiText euiText--small"
+    >
+      <div
+        class="euiTextColor euiTextColor--default"
+      >
+        <div
+          class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              App version: 
+              <b>
+                4.8.0
+              </b>
+            </div>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              App revision: 
+              <b>
+                01
+              </b>
+            </div>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Install date:
+               
+              <b>
+                Sep 25, 2023 @ 14:03:40.816
+              </b>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

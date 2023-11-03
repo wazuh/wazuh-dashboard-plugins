@@ -5167,6 +5167,31 @@
         ]
       },
       {
+        "name": "/manager/version/check",
+        "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api_controllers_manager_controller_get_available_updates",
+        "description": "Return the version of the API and the available updates",
+        "summary": "Get available updates",
+        "tags": ["Manager"],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/mitre/groups",
         "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api.controllers.mitre_controller.get_groups",
         "description": "Return the groups from MITRE database",

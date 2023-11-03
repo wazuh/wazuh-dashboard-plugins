@@ -22,6 +22,7 @@ import {
   setCookies,
   setWzMainParams,
   setWzCurrentAppID,
+  setWazuhCheckUpdatesPlugin,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -165,6 +166,7 @@ export class WazuhPlugin
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
     setErrorOrchestrator(ErrorOrchestratorService);
+    setWazuhCheckUpdatesPlugin(plugins.wazuhCheckUpdates);
     return {};
   }
 }
