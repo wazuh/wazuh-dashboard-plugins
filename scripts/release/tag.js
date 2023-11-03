@@ -1,4 +1,4 @@
-// NodeJS script which creates the tags in local and remote for the supported versions.
+// NodeJS script which bumps the plugins and create the tag in the remote repository.
 // It receives a version, revision and/or platform version and for each
 // supported version: updates the package and plugin manifest files and create the tag.
 // Usage: node tag.js <options>
@@ -12,14 +12,15 @@
 //   2.2. Prune local branches and tags
 //   2.3. Edit the package manifest file
 //   2.4. Edit the plugin manifest file
-//   2.5. Commit
-//   2.6. Create tag
-//   2.7. Push tag
-//   2.8. Reset local branch to remote branch
+//   2.5. Run the specific bump task.
+// 3. Commit (optional)
+// 4. Create tag
+// 5. Push tag
+// 6. Reset local branch to remote branch
 // 3. Optional. Export tags to file
 
 const cliName = 'tag';
-const cliDescription = `Create the tags in remote repository for the supported versions.
+const cliDescription = `Bump the plugins and create the tag in the remote repository.
 Some warning messages are sent to stderr.`;
 
 const logger = require('./lib/logger').create(['tag']);
