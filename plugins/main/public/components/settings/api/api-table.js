@@ -331,7 +331,7 @@ export const ApiTable = compose(
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle>
-                      <h2>Wazuh API configuration</h2>
+                      <h2>API Configuration</h2>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>

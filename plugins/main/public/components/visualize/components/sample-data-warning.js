@@ -16,6 +16,8 @@ import React, { useState, useEffect } from 'react';
 import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getCore } from '../../../kibana-services';
+import { sampleData } from '../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export const SampleDataWarning = ({ ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
@@ -59,16 +61,18 @@ export const SampleDataWarning = ({ ...props }) => {
         data-test-subject='sample-data-callout'
         {...props}
       >
-        <p>
-          {'The data displayed may contain sample alerts. Go '}
-          <EuiLink
-            href={getCore().application.getUrlForApp('server-data')}
-            aria-label='go to configure sample data'
-          >
-            {'here '}
-          </EuiLink>
-          {'to configure the sample data.'}
-        </p>
+        <RedirectAppLinks application={getCore().application}>
+          <p>
+            {'The data displayed may contain sample alerts. Go '}
+            <EuiLink
+              href={getCore().application.getUrlForApp(sampleData.id)}
+              aria-label='go to configure sample data'
+            >
+              {'here '}
+            </EuiLink>
+            {'to configure the sample data.'}
+          </p>
+        </RedirectAppLinks>
       </EuiCallOut>
     );
   } else {

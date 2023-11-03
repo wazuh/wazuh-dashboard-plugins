@@ -39,6 +39,8 @@ import {
 
 import { compose } from 'redux';
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
+import { serverApis } from '../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const checks = {
   api: {
@@ -272,14 +274,14 @@ function HealthCheckComponent() {
           <EuiFlexGroup justifyContent='center'>
             {thereAreErrors && (
               <EuiFlexItem grow={false}>
-                <EuiButton
-                  fill
-                  href={getCore().application.getUrlForApp(
-                    'server-api',
-                  )}
-                >
-                  Go to Settings
-                </EuiButton>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiButton
+                    fill
+                    href={getCore().application.getUrlForApp(serverApis.id)}
+                  >
+                    Go to Settings
+                  </EuiButton>
+                </RedirectAppLinks>
               </EuiFlexItem>
             )}
             {isDebugMode &&

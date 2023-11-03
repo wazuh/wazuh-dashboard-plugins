@@ -17,6 +17,7 @@ import {
   withReduxProvider,
 } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
+import { itHygiene, settings } from '../../../../../utils/applications';
 
 export default compose(
   withErrorBoundary,
@@ -24,12 +25,12 @@ export default compose(
   withGlobalBreadcrumb(props => {
     let breadcrumb = false;
     if (props.agent.id === '000') {
-      breadcrumb = [{ text: '' }, { text: 'Settings' }];
+      breadcrumb = [{ text: '' }, { text: settings.title }];
     } else {
       breadcrumb = [
         { text: '' },
         {
-          text: 'IT Hygiene',
+          text: itHygiene.title,
         },
         { agent: props.agent },
         { text: 'Configuration' },

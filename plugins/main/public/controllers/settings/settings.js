@@ -28,8 +28,8 @@ import { getAssetURL } from '../../utils/assets';
 import { getHttp, getWzCurrentAppID } from '../../kibana-services';
 import {
   Applications,
-  serverApi,
-  wazuhPluginSettings,
+  serverApis,
+  appSettings,
 } from '../../utils/applications';
 
 export class SettingsController {
@@ -87,7 +87,7 @@ export class SettingsController {
         const breadcrumb = [{ text: '' }, { text: tabActiveName }];
         store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       } else {
-        const breadcrumb = [{ text: '' }, { text: serverApi.title }];
+        const breadcrumb = [{ text: '' }, { text: serverApis.title }];
         store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       }
 
@@ -163,9 +163,7 @@ export class SettingsController {
       selectedTab: this.tab || 'api',
       // Define tabs for Wazuh plugin settings application
       tabs:
-        getWzCurrentAppID() === wazuhPluginSettings.id
-          ? this.tabsConfiguration
-          : null,
+        getWzCurrentAppID() === appSettings.id ? this.tabsConfiguration : null,
       wazuhConfig: this.wazuhConfig,
     };
 

@@ -15,7 +15,8 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import { connect } from 'react-redux';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+import { getWzCurrentAppID } from '../../../kibana-services';
+import { Applications } from '../../../utils/applications';
 
 class WzCurrentOverviewSection extends Component {
   constructor(props) {
@@ -26,16 +27,20 @@ class WzCurrentOverviewSection extends Component {
   setGlobalBreadcrumb() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
 
-    if (WAZUH_MODULES[this.props.currentTab]) {
+    const section = Applications.find(
+      ({ id }) => getWzCurrentAppID() === id,
+    )?.title;
+
+    if (section) {
       const breadcrumb = currentAgent.id
         ? [
             { text: '' },
             {
-              text: WAZUH_MODULES[this.props.currentTab].title,
+              text: section,
             },
             { agent: currentAgent },
           ]
-        : [{ text: '' }, { text: WAZUH_MODULES[this.props.currentTab].title }];
+        : [{ text: '' }, { text: section }];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       $('#breadcrumbNoTitle').attr('title', '');
     }
@@ -60,16 +65,7 @@ class WzCurrentOverviewSection extends Component {
   }
 
   render() {
-    return (
-      <span>
-        {/*this.props.currentTab && WAZUH_MODULES[this.props.currentTab] && WAZUH_MODULES[this.props.currentTab].title && (
-      <EuiTitle size='s'>
-        <h2>
-          {WAZUH_MODULES[this.props.currentTab].title}
-       </h2>
-      </EuiTitle>)*/}
-      </span>
-    );
+    return <span></span>;
   }
 }
 

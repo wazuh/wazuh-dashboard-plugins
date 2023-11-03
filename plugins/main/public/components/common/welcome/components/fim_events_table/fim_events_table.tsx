@@ -33,8 +33,10 @@ import { formatUIDate } from '../../../../../react-services/time-service';
 import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout';
 import { EuiLink } from '@elastic/eui';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { fileIntegrityMonitoring } from '../../../../../utils/applications';
 
-export function FimEventsTable({ agent, router }) {
+export function FimEventsTable({ agent }) {
   return (
     <EuiFlexItem>
       <EuiPanel paddingSize='m'>
@@ -47,12 +49,17 @@ export function FimEventsTable({ agent, router }) {
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiToolTip position='top' content='Open FIM'>
-                <EuiButtonIcon
-                  iconType='popout'
-                  color='primary'
-                  onClick={() => navigateToFim(agent, router)}
-                  aria-label='Open FIM'
-                />
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiButtonIcon
+                    iconType='popout'
+                    color='primary'
+                    onClick={() => navigateToFim(agent)}
+                    href={getCore().application.getUrlForApp(
+                      fileIntegrityMonitoring.id,
+                    )}
+                    aria-label='Open FIM'
+                  />
+                </RedirectAppLinks>
               </EuiToolTip>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -114,9 +121,8 @@ function FimTable({ agent }) {
   );
 }
 
-function navigateToFim(agent, router) {
+function navigateToFim(agent) {
   store.dispatch(updateCurrentAgentData(agent));
-  getCore().application.navigateToApp('file-integrity-monitoring');
 }
 
 const columns = (setFile, setIsOpen) => [

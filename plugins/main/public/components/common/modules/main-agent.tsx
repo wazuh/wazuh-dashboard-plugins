@@ -28,6 +28,7 @@ import { AgentInfo } from '../../common/welcome/agents-info';
 import { getAngularModule } from '../../../kibana-services';
 import { compose } from 'redux';
 import { withGlobalBreadcrumb } from '../hocs';
+import { itHygiene } from '../../../utils/applications';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -222,22 +223,17 @@ export class MainModuleAgent extends Component {
   }
 }
 
-
 export default compose(
-  withGlobalBreadcrumb(({agent, section}) => {
+  withGlobalBreadcrumb(({ agent, section }) => {
     if (section === 'welcome') {
-      return [
-        { text: '' },
-        { text: 'IT Hygiene' },
-        { text: agent.id },
-      ];
+      return [{ text: '' }, { text: itHygiene.title }, { text: agent.id }];
     } else {
       return [
         {
           text: '',
         },
         {
-          text: 'IT Hygiene',
+          text: itHygiene.title,
         },
         { agent: agent },
         {

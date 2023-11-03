@@ -45,6 +45,9 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { getCore } from '../../../../../kibana-services';
+import { appSettings, statistics } from '../../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+
 const wzConfig = new WazuhConfig();
 
 export class WzStatisticsOverview extends Component {
@@ -197,17 +200,17 @@ export class WzStatisticsOverview extends Component {
               <WzDatePicker condensed={true} onTimeChange={() => {}} />
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty
-                onMouseDown={e =>
-                  getCore().application.navigateToApp('wazuh-plugin-settings', {
+              <RedirectAppLinks application={getCore().application}>
+                <EuiButtonEmpty
+                  href={getCore().application.getUrlForApp(appSettings.id, {
                     path: '#/settings?tab=configuration&category=task:statistics',
-                  })
-                }
-                iconType='gear'
-                iconSide='left'
-              >
-                Settings
-              </EuiButtonEmpty>
+                  })}
+                  iconType='gear'
+                  iconSide='left'
+                >
+                  Settings
+                </EuiButtonEmpty>
+              </RedirectAppLinks>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup>
@@ -264,7 +267,7 @@ export class WzStatisticsOverview extends Component {
 }
 
 export default compose(
-  withGlobalBreadcrumb([{ text: '' }, { text: 'Statistics' }]),
+  withGlobalBreadcrumb([{ text: '' }, { text: statistics.title }]),
   withGuard(props => {
     return !(wzConfig.getConfig() || {})['cron.statistics.status']; // if 'cron.statistics.status' is false, then it renders PromptStatisticsDisabled component
   }, PromptStatisticsDisabled),

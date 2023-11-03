@@ -73,10 +73,12 @@ import {
   Applications,
   configurationAssessment,
   fileIntegrityMonitoring,
+  itHygiene,
   mitreAttack,
   threatHunting,
   vulnerabilityDetection,
 } from '../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,
@@ -96,7 +98,7 @@ export const AgentsWelcome = compose(
     return [
       { text: '' },
       {
-        text: 'IT Hygiene',
+        text: itHygiene.title,
       },
       ...(agent?.name
         ? [
@@ -278,21 +280,20 @@ export const AgentsWelcome = compose(
                   grow={false}
                   style={{ marginLeft: 0, marginTop: 7 }}
                 >
-                  <EuiButtonEmpty
-                    onClick={() => {
-                      getCore().application.navigateToApp(applicationId);
-                      this.router.reload();
-                    }}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <span>
-                      {
-                        Applications.find(({ id }) => id === applicationId)
-                          .title
-                      }
-                      &nbsp;
-                    </span>
-                  </EuiButtonEmpty>
+                  <RedirectAppLinks application={getCore().application}>
+                    <EuiButtonEmpty
+                      href={getCore().application.getUrlForApp(applicationId)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <span>
+                        {
+                          Applications.find(({ id }) => id === applicationId)
+                            .title
+                        }
+                        &nbsp;
+                      </span>
+                    </EuiButtonEmpty>
+                  </RedirectAppLinks>
                 </EuiFlexItem>
               );
             }
@@ -498,14 +499,16 @@ export const AgentsWelcome = compose(
                 </EuiFlexItem>
                 <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
                   <EuiToolTip position='top' content='Open MITRE ATT&CK'>
-                    <EuiButtonIcon
-                      iconType='popout'
-                      color='primary'
-                      onClick={() => {
-                        getCore().application.navigateToApp('mitre-attack');
-                      }}
-                      aria-label='Open MITRE ATT&CK'
-                    />
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiButtonIcon
+                        iconType='popout'
+                        color='primary'
+                        href={getCore().application.getUrlForApp(
+                          mitreAttack.id,
+                        )}
+                        aria-label='Open MITRE ATT&CK'
+                      />
+                    </RedirectAppLinks>
                   </EuiToolTip>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -635,10 +638,7 @@ export const AgentsWelcome = compose(
                     </EuiFlexGrid>
                     <EuiSpacer size='m' />
                     <EuiFlexGroup>
-                      <FimEventsTable
-                        agent={this.props.agent}
-                        router={this.router}
-                      />
+                      <FimEventsTable agent={this.props.agent} />
                     </EuiFlexGroup>
                     <EuiSpacer size='m' />
                     <EuiFlexGroup>
@@ -668,10 +668,7 @@ export const AgentsWelcome = compose(
                           {this.renderCompliancePanel()}
                         </EuiFlexGroup>
                       </EuiFlexItem>
-                      <FimEventsTable
-                        agent={this.props.agent}
-                        router={this.router}
-                      />
+                      <FimEventsTable agent={this.props.agent} />
                     </EuiFlexGrid>
                     <EuiSpacer size='l' />
                     <EuiFlexGroup>

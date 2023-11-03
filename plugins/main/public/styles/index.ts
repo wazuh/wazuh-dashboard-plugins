@@ -27,7 +27,5 @@ const IS_DARK_THEME = getUiSettings().get('theme:darkMode');
 /* tslint-disable no-undef */
 if (IS_DARK_THEME) {
   import('./theme/dark/index.dark.scss').then();
-}else{
-  import('./theme/light/index.light.scss').then();
 }
 /* tslint-enable no-undef */
