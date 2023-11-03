@@ -11,23 +11,36 @@
  */
 import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect, useMemo } from 'react';
-import { Filter } from 'src/plugins/data/public';
+import { Filter } from '../../../../../../src/plugins/data/public';
 import _ from 'lodash';
+import { FilterManager } from '../../../../../../src/plugins/data/public';
+import { Subscription } from 'rxjs';
 
-export const useFilterManager = () => {
-  const filterManager = useMemo(() => getDataPlugin().query.filterManager, []);
+type tUseFilterManagerReturn = {
+  filterManager: FilterManager;
+  filters: Filter[];
+};
+
+export const useFilterManager = (): tUseFilterManagerReturn => {
+  const filterManager = getDataPlugin().query.filterManager;
   const [filters, setFilters] = useState<Filter[]>(filterManager.getFilters());
 
   useEffect(() => {
-    const subscription = filterManager.getUpdates$().subscribe(() => {
-      const newFilters = filterManager.getFilters();
-      if (!_.isEqual(filters, newFilters)) {
-        setFilters(newFilters);
-      }
-    });
+    const subscriptions = new Subscription();
+
+    subscriptions.add(
+      filterManager.getUpdates$().subscribe({
+        next: () => {
+          const newFilters = filterManager.getFilters();
+          setFilters(newFilters);
+        },
+      })
+    );
+
     return () => {
-      subscription.unsubscribe();
+      subscriptions.unsubscribe();
     };
-  }, []);
+  }, [filterManager]);
+
   return { filterManager, filters };
 };

@@ -8,6 +8,8 @@
   "requiredPlugins": [
     "navigation",
     "data",
+    "dashboard",
+    "embeddable",
     "discover",
     "inspector",
     "visualizations",
