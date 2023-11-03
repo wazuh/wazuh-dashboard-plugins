@@ -154,7 +154,6 @@ async function run(configuration) {
   } else {
     logger.info('There are not changes to commit.');
   }
-  return;
 
   logger.debug(`Creating tag: ${tag}`);
   execSystem(`git tag -a ${tag} -m "Wazuh plugins for Wazuh dashboard ${tag}"`);
@@ -162,6 +161,13 @@ async function run(configuration) {
   logger.debug(`Pushing tag ${tag} to remote`);
   execSystem(`git push origin ${tag}`);
   logger.info(`Pushed tag ${tag} to remote`);
+  logger.debug('Undoing changes');
+  execSystem(`git reset --hard origin/${branch}`);
+  logger.info('Undone changes.');
+  thereChangesToCommit &&
+    logger.warn(
+      `A commit was added to the tag, but this was removed in the ${branch}.`,
+    );
 }
 
 const cli = require('../lib/cli/cli')(
