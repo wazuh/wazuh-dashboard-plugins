@@ -20,7 +20,7 @@ import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActi
 import { ModulesHelper } from '../../components/common/modules/modules-helper';
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { getCore, getDataPlugin } from '../../kibana-services';
-import { endpointSumary } from '../../utils/applications';
+import { cluster, endpointSumary } from '../../utils/applications';
 
 export function ClusterController(
   $scope,
@@ -323,7 +323,7 @@ export function ClusterController(
 
   $scope.expandArray = [false, false];
 
-  const breadcrumb = [{ text: '' }, { text: 'Cluster' }];
+  const breadcrumb = [{ text: cluster.title }];
   store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   if (clusterEnabled) load();
 

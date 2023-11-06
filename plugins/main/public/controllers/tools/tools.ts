@@ -57,7 +57,6 @@ export class ToolsController {
 
       this.switchTab(this.tab);
       const breadcrumb = [
-        { text: '' },
         { text: this.tab === 'devTools' ? 'API Console' : 'Ruleset Test' },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
@@ -85,7 +84,7 @@ export class ToolsController {
       { id: 'logtest', name: 'Ruleset Test' },
     ];
     this.toolsTabsProps = {
-      clickAction: (tab) => {
+      clickAction: tab => {
         this.switchTab(tab, true);
       },
       selectedTab: this.tab || 'devTools',

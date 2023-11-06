@@ -46,6 +46,7 @@ import {
   UI_LOGGER_LEVELS,
 } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { itHygiene } from '../../../utils/applications';
 
 const tableColumns = [
   {
@@ -105,10 +106,7 @@ export const MainAgentStats = compose(
   withReduxProvider,
   withGlobalBreadcrumb(({ agent }) => [
     {
-      text: '',
-    },
-    {
-      text: 'IT Hygiene',
+      text: itHygiene.title,
     },
     { agent },
     {

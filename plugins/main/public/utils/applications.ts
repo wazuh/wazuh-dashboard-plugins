@@ -536,7 +536,7 @@ export const serverStatus = {
   redirectTo: () => '/manager/?tab=status',
 };
 
-const cluster = {
+export const cluster = {
   category: 'wz-category-server-management',
   id: 'cluster',
   title: i18n.translate('wz-app-cluster-title', {

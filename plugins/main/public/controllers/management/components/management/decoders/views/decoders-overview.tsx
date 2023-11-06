@@ -61,7 +61,7 @@ function WzDecodersOverview(props) {
 
 export default compose(
   withGlobalBreadcrumb(props => {
-    return [{ text: '' }, { text: decoders.title }];
+    return [{ text: decoders.title }];
   }),
   withUserAuthorizationPrompt(props => [
     {
