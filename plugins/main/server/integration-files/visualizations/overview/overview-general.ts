@@ -461,7 +461,7 @@ export default [
     _source: {
       title: 'Alert level evolution',
       visState: JSON.stringify({
-        title: 'Alerts evolution',
+        title: 'Alerts level evolution',
         type: 'area',
         aggs: [
           {
