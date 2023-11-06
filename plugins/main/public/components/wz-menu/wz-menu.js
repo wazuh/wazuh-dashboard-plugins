@@ -33,6 +33,7 @@ import {
   getAngularModule,
   getToasts,
   getDataPlugin,
+  getHeaderActionMenuMounter,
 } from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
@@ -41,6 +42,8 @@ import { withWindowSize } from '../../components/common/hocs/withWindowSize';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { crumbs } from '../common/globalBreadcrumb/plataformBreadcrumb';
 
 const sections = {
   overview: 'overview',
@@ -96,6 +99,7 @@ export const WzMenu = withWindowSize(
             }
           }
         }
+        crumbs(this.props.globalBreadcrumbReducers.breadcrumb, this.router);
       } catch (error) {
         const options = {
           context: `${WzMenu.name}.componentDidMount`,
@@ -236,6 +240,14 @@ export const WzMenu = withWindowSize(
       ) {
         newState = { ...newState, ...(await this.loadIndexPatternsList()) };
       }
+
+      if (
+        this.props.globalBreadcrumbReducers.breadcrumb !==
+        prevProps.globalBreadcrumbReducers.breadcrumb
+      ) {
+        crumbs(this.props.globalBreadcrumbReducers.breadcrumb, this.router);
+      }
+
       newState = { ...prevProps.state, ...newState };
       if (!_.isEqual(newState, prevProps.state)) {
         // and the state is different from the previous one
@@ -596,19 +608,14 @@ export const WzMenu = withWindowSize(
         </EuiToolTip>
       );
 
-      const container = document.getElementsByClassName('euiBreadcrumbs');
-      return ReactDOM.createPortal(
-        <WzReduxProvider>
-          {this.state.showMenu && (
-            <EuiFlexGroup alignItems='center' responsive={false}>
-              <EuiFlexItem grow={false}>
-                <WzGlobalBreadcrumbWrapper></WzGlobalBreadcrumbWrapper>
-              </EuiFlexItem>
-
-              <EuiFlexItem>
-                <></>
-              </EuiFlexItem>
-
+      return (
+        <>
+          <MountPointPortal setMountPoint={getHeaderActionMenuMounter()}>
+            <EuiFlexGroup
+              alignItems='center'
+              responsive={false}
+              className='wz-margin-left-10 wz-margin-right-10'
+            >
               {!this.showSelectorsInPopover &&
                 this.state.patternList.length > 1 &&
                 this.getIndexPatternSelectorComponent()}
@@ -653,9 +660,8 @@ export const WzMenu = withWindowSize(
               {this.props.state.wazuhNotReadyYet &&
                 this.buildWazuhNotReadyYet()}
             </EuiFlexGroup>
-          )}
-        </WzReduxProvider>,
-        container[0],
+          </MountPointPortal>
+        </>
       );
     }
   },
@@ -665,6 +671,7 @@ const mapStateToProps = state => {
   return {
     state: state.appStateReducers,
     appConfig: state.appConfig,
+    globalBreadcrumbReducers: state.globalBreadcrumbReducers,
   };
 };
 
