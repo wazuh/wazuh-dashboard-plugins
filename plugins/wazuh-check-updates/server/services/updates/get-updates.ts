@@ -56,14 +56,16 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             api_id: api.id,
             status,
           };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : typeof error === 'string' ? error : undefined;
+        } catch (e) {
+          const error = {
+            title: e.response?.data?.title,
+            detail: e.response?.data?.detail ?? e.message,
+          };
 
           return {
             api_id: api.id,
             status: API_UPDATES_STATUS.ERROR,
-            error: message,
+            error,
           };
         }
       })
