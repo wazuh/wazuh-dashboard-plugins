@@ -17,11 +17,15 @@ export const agentVisualizations = {
         height: 400,
         vis: [
           {
-            title: 'Alert groups evolution',
+            title: 'Top 10 Alert groups evolution',
             id: 'Wazuh-App-Agents-General-Alert-groups-evolution',
             width: 50,
           },
-          { title: 'Alerts', id: 'Wazuh-App-Agents-General-Alerts', width: 50 },
+          {
+            title: 'Top 10 Alerts',
+            id: 'Wazuh-App-Agents-General-Alerts',
+            width: 50,
+          },
         ],
       },
       {
