@@ -722,7 +722,6 @@ function discoverController(
       // WAZUH query from search bar
       discoverPendingUpdates.removeAll();
       discoverPendingUpdates.addItem($scope.state.query, filterManager.filters);
-      $scope.fetch();
       /////
       $fetchObservable.next();
     }
@@ -1118,7 +1117,6 @@ function discoverController(
       evt.stopPropagation();
       if ($scope.tabView === 'discover') {
         $scope.rows = false;
-        $scope.fetch();
       }
       $scope.handleRefresh({
         query: $scope.state.query

@@ -36,10 +36,12 @@ import { withReduxProvider, withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
 import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
+import { configurationAssessment } from '../../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 type Props = {
   agent: { [key in string]: any };
-  router: any;
+  router: any; // its angular router
 };
 
 export const ScaScan = compose(
@@ -197,18 +199,25 @@ export const ScaScan = compose(
         <Fragment>
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <EuiTitle size='xs'>
-                <EuiLink
-                  onClick={() => {
-                    window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
-                    store.dispatch(updateCurrentAgentData(this.props.agent));
-                    this.router.reload();
-                  }}
-                >
-                  <h4>{lastScan.name}</h4>
-                  <EuiSpacer size='m' />
-                </EuiLink>
-              </EuiTitle>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiTitle size='xs'>
+                  <EuiLink
+                    onClick={() => {
+                      store.dispatch(updateCurrentAgentData(this.props.agent));
+                      this.router.reload();
+                    }}
+                    href={getCore().application.getUrlForApp(
+                      configurationAssessment.id,
+                      {
+                        path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                      },
+                    )}
+                  >
+                    <h4>{lastScan.name}</h4>
+                    <EuiSpacer size='m' />
+                  </EuiLink>
+                </EuiTitle>
+              </RedirectAppLinks>
             </EuiFlexItem>
             <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
               <EuiBadge color='secondary'>{lastScan.policy_id}</EuiBadge>
@@ -255,47 +264,48 @@ export const ScaScan = compose(
             <EuiText size='xs'>
               <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
                 <EuiFlexItem grow={false}>
-                  <EuiTitle size='xs'>
-                    <EuiLink
-                      className='agents-link-item'
-                      onClick={() => {
-                        getCore().application.navigateToApp(
-                          'configuration-assessment',
+                  <RedirectAppLinks application={getCore().application}>
+                    <EuiTitle size='xs'>
+                      <EuiLink
+                        className='agents-link-item'
+                        onClick={() => {
+                          store.dispatch(
+                            updateCurrentAgentData(this.props.agent),
+                          );
+                          this.router.reload();
+                        }}
+                        href={getCore().application.getUrlForApp(
+                          configurationAssessment.id,
                           {
                             path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
                           },
-                        );
-                        store.dispatch(
-                          updateCurrentAgentData(this.props.agent),
-                        );
-                        this.router.reload();
-                      }}
-                    >
-                      <h2>SCA: Lastest scans</h2>
-                    </EuiLink>
-                  </EuiTitle>
+                        )}
+                      >
+                        <h2>SCA: Lastest scans</h2>
+                      </EuiLink>
+                    </EuiTitle>
+                  </RedirectAppLinks>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                  <EuiToolTip position='top' content='Open SCA Scans'>
-                    <EuiButtonIcon
-                      iconType='popout'
-                      color='primary'
-                      className='EuiButtonIcon'
-                      onClick={() => {
-                        getCore().application.navigateToApp(
-                          'configuration-assessment',
-                          {
-                            path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
-                          },
-                        );
-                        store.dispatch(
-                          updateCurrentAgentData(this.props.agent),
-                        );
-                        this.router.reload();
-                      }}
-                      aria-label='Open SCA Scans'
-                    />
-                  </EuiToolTip>
+                  <RedirectAppLinks application={getCore().application}>
+                    <EuiToolTip position='top' content='Open SCA Scans'>
+                      <EuiButtonIcon
+                        iconType='popout'
+                        color='primary'
+                        className='EuiButtonIcon'
+                        onClick={() => {
+                          store.dispatch(
+                            updateCurrentAgentData(this.props.agent),
+                          );
+                          this.router.reload();
+                        }}
+                        href={getCore().application.getUrlForApp(
+                          configurationAssessment.id,
+                        )}
+                        aria-label='Open SCA Scans'
+                      />
+                    </EuiToolTip>
+                  </RedirectAppLinks>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiText>

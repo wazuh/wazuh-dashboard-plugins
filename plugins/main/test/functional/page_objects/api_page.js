@@ -61,7 +61,6 @@ export function ApiProvider({ getService, getPageObjects }) {
      * @memberof ApiPage
      */
     async checkIfAllTabsAreDisables() {
-      await this.checkTabDisabled('wzMenuOverview');
       await this.checkTabDisabled('wzMenuManagement');
       await this.checkTabDisabled('wzMenuAgents');
       await this.checkTabDisabled('wzMenuDiscover');

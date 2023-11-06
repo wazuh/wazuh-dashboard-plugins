@@ -26,7 +26,11 @@ export class UpdateRegistry {
    */
   async readContent() {
     try {
-      log('update-registry:readContent', 'Reading wazuh-registry.json content', 'debug');
+      log(
+        'update-registry:readContent',
+        'Reading wazuh-registry.json content',
+        'debug',
+      );
       const content = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       return JSON.parse(content);
     } catch (error) {
@@ -70,7 +74,11 @@ export class UpdateRegistry {
    */
   async writeContent(content) {
     try {
-      log('update-registry:writeContent', 'Writting wazuh-registry.json content', 'debug');
+      log(
+        'update-registry:writeContent',
+        'Writting wazuh-registry.json content',
+        'debug',
+      );
       if (this.busy) {
         throw new Error('Another process is updating the registry file');
       }
@@ -98,19 +106,24 @@ export class UpdateRegistry {
   }
 
   /**
-   * Migrates the cluster information and extensions associated to an API id
+   * Migrates the cluster information associated to an API id
    * @param {String} id
    * @param {Object} clusterInfo
-   * @param {Object} clusterExtensions
    */
-  async migrateToRegistry(id, clusterInfo, clusterExtensions) {
+  async migrateToRegistry(id, clusterInfo) {
     try {
       const content = await this.readContent();
-      if (!Object.keys(content).includes('hosts')) Object.assign(content, { hosts: {} });
-      const info = { cluster_info: clusterInfo, extensions: clusterExtensions };
+      if (!Object.keys(content).includes('hosts')) {
+        Object.assign(content, { hosts: {} });
+      }
+      const info = { cluster_info: clusterInfo };
       content.hosts[id] = info;
       await this.writeContent(content);
-      log('update-registry:migrateToRegistry', `API ${id} was properly migrated`, 'debug');
+      log(
+        'update-registry:migrateToRegistry',
+        `API ${id} was properly migrated`,
+        'debug',
+      );
       return info;
     } catch (error) {
       log('update-registry:migrateToRegistry', error.message || error);
@@ -133,33 +146,11 @@ export class UpdateRegistry {
       log(
         'update-registry:updateClusterInfo',
         `API ${id} information was properly updated`,
-        'debug'
+        'debug',
       );
       return id;
     } catch (error) {
       log('update-registry:updateClusterInfo', error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Updates the cluster-information or manager-information in the registry
-   * @param {String} id
-   * @param {Object} clusterInfo
-   */
-  async updateAPIExtensions(id, extensions) {
-    try {
-      const content = await this.readContent();
-      if(content.hosts[id]) content.hosts[id].extensions = extensions;
-      await this.writeContent(content);
-      log(
-        'update-registry:updateAPIExtensions',
-        `API ${id} extensions were properly updated`,
-        'debug'
-      );
-      return id;
-    } catch (error) {
-      log('update-registry:updateAPIHostname', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -186,7 +177,11 @@ export class UpdateRegistry {
    */
   async removeOrphanEntries(hosts) {
     try {
-      log('update-registry:removeOrphanEntries', 'Checking orphan registry entries', 'debug');
+      log(
+        'update-registry:removeOrphanEntries',
+        'Checking orphan registry entries',
+        'debug',
+      );
       const entries = await this.getHosts();
       const hostsKeys = hosts.map(h => {
         return h.id;
@@ -229,7 +224,11 @@ export class UpdateRegistry {
       if (!content.hosts[id]) content.hosts[id] = {};
       content.hosts[id].token = token;
       await this.writeContent(content);
-      log('update-registry:updateToken', `API ${id} information was properly updated`, 'debug');
+      log(
+        'update-registry:updateToken',
+        `API ${id} information was properly updated`,
+        'debug',
+      );
       return id;
     } catch (error) {
       log('update-registry:updateToken', error.message || error);

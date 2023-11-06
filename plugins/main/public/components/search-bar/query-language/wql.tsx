@@ -7,10 +7,7 @@ import {
   EuiCode,
 } from '@elastic/eui';
 import { tokenizer as tokenizerUQL } from './aql';
-import {
-  PLUGIN_VERSION,
-  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT,
-} from '../../../../common/constants';
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 /* UI Query language

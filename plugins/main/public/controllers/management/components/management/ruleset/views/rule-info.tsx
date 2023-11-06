@@ -27,6 +27,8 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orch
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { getCore } from '../../../../../../kibana-services';
+import { threatHunting } from '../../../../../../utils/applications';
 
 export default class WzRuleInfo extends Component {
   constructor(props) {
@@ -749,7 +751,9 @@ export default class WzRuleInfo extends Component {
               <EuiButtonEmpty
                 iconType='popout'
                 aria-label='popout'
-                href={`#/overview?tab=general&tabView=panels&addRuleFilter=${id}`}
+                href={getCore().application.getUrlForApp(threatHunting.id, {
+                  path: `#/overview?tab=general&tabView=panels&addRuleFilter=${id}`,
+                })}
                 target='blank'
               >
                 View alerts of this Rule

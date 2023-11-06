@@ -76,6 +76,13 @@ export default [
             params: {},
           },
           {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
+          {
             id: '3',
             enabled: true,
             type: 'terms',
@@ -331,22 +338,6 @@ export default [
             params: {},
           },
           {
-            id: '3',
-            enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: {
-              field: 'rule.pci_dss',
-              orderBy: '1',
-              order: 'desc',
-              size: 10,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
-          },
-          {
             id: '2',
             enabled: true,
             type: 'date_histogram',
@@ -360,6 +351,13 @@ export default [
               min_doc_count: 1,
               extended_bounds: {},
             },
+          },
+          {
+            id: '4',
+            enabled: true,
+            type: 'count',
+            schema: 'radius',
+            params: {},
           },
           {
             id: '4',

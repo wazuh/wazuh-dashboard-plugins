@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import {
   EuiPage,
   EuiFlexGroup,
@@ -26,10 +25,11 @@ import {
   PLUGIN_PLATFORM_NAME,
   UI_LOGGER_LEVELS,
 } from '../../../common/constants';
-import { updateSecuritySection } from '../../redux/actions/securityActions';
+
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getPluginDataPath } from '../../../common/plugin';
+import { security } from '../../utils/applications';
 
 const tabs = [
   {
@@ -57,10 +57,8 @@ const tabs = [
 export const WzSecurity = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
+  withGlobalBreadcrumb([{ text: '' }, { text: security.title }]),
 )(() => {
-  const dispatch = useDispatch();
-
   // Get the initial tab when the component is initiated
   const securityTabRegExp = new RegExp(
     `tab=(${tabs.map(tab => tab.id).join('|')})`,
@@ -104,10 +102,6 @@ export const WzSecurity = compose(
       };
       getErrorOrchestrator().handleError(options);
     }
-  }, []);
-
-  useEffect(() => {
-    dispatch(updateSecuritySection(selectedTabId));
   }, []);
 
   const onSelectedTabChanged = id => {

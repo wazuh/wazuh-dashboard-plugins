@@ -15,34 +15,34 @@ import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbA
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import { connect } from 'react-redux';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
+import { getWzCurrentAppID } from '../../../kibana-services';
+import { Applications } from '../../../utils/applications';
 
 class WzCurrentOverviewSection extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   setGlobalBreadcrumb() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
 
-    if(WAZUH_MODULES[this.props.currentTab]){
-      const breadcrumb = currentAgent.id ? [
-        { text: '' },
-        { text: 'Modules', href: '#/overview' },
-        { agent: currentAgent },
-        { text: WAZUH_MODULES[this.props.currentTab].title},
-      ] :
-      [
-        { text: '' },
-        { text: 'Modules', href: '#/overview' },
-        
-        
-        { text: WAZUH_MODULES[this.props.currentTab].title},
-      ];
+    const section = Applications.find(
+      ({ id }) => getWzCurrentAppID() === id,
+    )?.title;
+
+    if (section) {
+      const breadcrumb = currentAgent.id
+        ? [
+            { text: '' },
+            {
+              text: section,
+            },
+            { agent: currentAgent },
+          ]
+        : [{ text: '' }, { text: section }];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-      $('#breadcrumbNoTitle').attr("title","");
+      $('#breadcrumbNoTitle').attr('title', '');
     }
   }
 
@@ -51,34 +51,23 @@ class WzCurrentOverviewSection extends Component {
     store.dispatch(updateCurrentTab(this.props.currentTab));
   }
 
-
   async componentDidUpdate() {
-    if(this.props.state.currentTab !== this.props.currentTab){
+    if (this.props.state.currentTab !== this.props.currentTab) {
       const forceUpdate = this.props.tabView === 'discover';
-      if(this.props.state.currentTab) this.props.switchTab(this.props.state.currentTab,forceUpdate);
+      if (this.props.state.currentTab)
+        this.props.switchTab(this.props.state.currentTab, forceUpdate);
     }
     this.setGlobalBreadcrumb();
   }
-  
-  componentWillUnmount(){
-    store.dispatch(updateCurrentTab("")); 
+
+  componentWillUnmount() {
+    store.dispatch(updateCurrentTab(''));
   }
 
   render() {
-    return (
-      <span>
-      {/*this.props.currentTab && WAZUH_MODULES[this.props.currentTab] && WAZUH_MODULES[this.props.currentTab].title && (
-      <EuiTitle size='s'>
-        <h2>
-          {WAZUH_MODULES[this.props.currentTab].title}
-       </h2>
-      </EuiTitle>)*/}
-        </span>
-    );
+    return <span></span>;
   }
 }
-
-
 
 const mapStateToProps = state => {
   return {

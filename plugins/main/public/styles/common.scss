@@ -1628,10 +1628,6 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
   padding-left: 320px;
 }
 
-.chrHeaderWrapper--navIsLocked~.app-wrapper .wz-module-header-nav-wrapper {
-  padding-left: 320px;
-}
-
 .icon-box-action {
   display: flex;
 }
@@ -1832,4 +1828,8 @@ iframe.width-changed {
 
 .wz-overflow-auto{
   overflow: auto;
+}
+
+.wz-vertical-align-middle {
+  vertical-align: middle !important;
 }
