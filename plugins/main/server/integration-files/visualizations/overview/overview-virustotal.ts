@@ -24,7 +24,12 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
           {
@@ -39,7 +44,12 @@ export default [
             enabled: true,
             type: 'terms',
             schema: 'segment',
-            params: { field: 'data.virustotal.source.file', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'data.virustotal.source.file',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -139,7 +149,13 @@ export default [
             colorsRange: [{ from: 0, to: 10000 }],
             labels: { show: true },
             invertColors: false,
-            style: { bgFill: '#000', bgColor: false, labelColor: false, subText: '', fontSize: 20 },
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 20,
+            },
           },
         },
         aggs: [
@@ -211,7 +227,13 @@ export default [
             colorsRange: [{ from: 0, to: 10000 }],
             labels: { show: true },
             invertColors: false,
-            style: { bgFill: '#000', bgColor: false, labelColor: false, subText: '', fontSize: 20 },
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 20,
+            },
           },
         },
         aggs: [
@@ -432,7 +454,13 @@ export default [
             colorsRange: [{ from: 0, to: 10000 }],
             labels: { show: true },
             invertColors: false,
-            style: { bgFill: '#000', bgColor: false, labelColor: false, subText: '', fontSize: 20 },
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 20,
+            },
           },
         },
         aggs: [
@@ -573,7 +601,12 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
           {
@@ -588,7 +621,12 @@ export default [
             enabled: true,
             type: 'terms',
             schema: 'segment',
-            params: { field: 'agent.name', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'agent.name',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -685,7 +723,13 @@ export default [
           times: [],
           addTimeMarker: false,
           labels: { show: false },
-          thresholdLine: { show: false, value: 10, width: 1, style: 'full', color: '#E7664C' },
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
           dimensions: {
             x: {
               accessor: 0,
@@ -696,7 +740,10 @@ export default [
                 intervalOpenSearchValue: 3,
                 intervalOpenSearchUnit: 'h',
                 format: 'YYYY-MM-DD HH:mm',
-                bounds: { min: '2020-04-17T12:11:35.943Z', max: '2020-04-24T12:11:35.944Z' },
+                bounds: {
+                  min: '2020-04-17T12:11:35.943Z',
+                  max: '2020-04-24T12:11:35.944Z',
+                },
               },
               label: 'timestamp per 3 hours',
               aggType: 'date_histogram',
@@ -732,22 +779,12 @@ export default [
           radiusRatio: 50,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
           {
-            id: '2',
+            id: '1',
             enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              timeRange: { from: 'now-7d', to: 'now' },
-              useNormalizedEsInterval: true,
-              scaleMetricValues: false,
-              interval: 'auto',
-              drop_partials: false,
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
+            type: 'count',
+            schema: 'metric',
+            params: {},
           },
           {
             id: '3',
@@ -763,6 +800,22 @@ export default [
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
+            },
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            schema: 'segment',
+            params: {
+              field: 'timestamp',
+              timeRange: { from: 'now-7d', to: 'now' },
+              useNormalizedEsInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
             },
           },
         ],
@@ -854,7 +907,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,

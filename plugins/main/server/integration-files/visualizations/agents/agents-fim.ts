@@ -26,7 +26,13 @@ export default [
           labels: { show: true, values: true, last_level: true, truncate: 100 },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -74,7 +80,13 @@ export default [
           labels: { show: true, values: true, last_level: true, truncate: 100 },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -162,12 +174,23 @@ export default [
               accessor: 0,
               format: {
                 id: 'terms',
-                params: { id: 'string', otherBucketLabel: 'Other', missingBucketLabel: 'Missing' },
+                params: {
+                  id: 'string',
+                  otherBucketLabel: 'Other',
+                  missingBucketLabel: 'Missing',
+                },
               },
               params: {},
               aggType: 'terms',
             },
-            y: [{ accessor: 2, format: { id: 'number' }, params: {}, aggType: 'count' }],
+            y: [
+              {
+                accessor: 2,
+                format: { id: 'number' },
+                params: {},
+                aggType: 'count',
+              },
+            ],
             series: [
               {
                 accessor: 1,
@@ -186,20 +209,12 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
           {
-            id: '2',
+            id: '1',
             enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              useNormalizedEsInterval: true,
-              interval: 'auto',
-              drop_partials: false,
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
+            type: 'count',
+            schema: 'metric',
+            params: {},
           },
           {
             id: '3',
@@ -215,6 +230,20 @@ export default [
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
+            },
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            schema: 'segment',
+            params: {
+              field: 'timestamp',
+              useNormalizedEsInterval: true,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
             },
           },
         ],
@@ -247,13 +276,24 @@ export default [
           isDonut: true,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
             type: 'terms',
             schema: 'segment',
-            params: { field: 'syscheck.path', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'syscheck.path',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -318,13 +358,24 @@ export default [
           isDonut: true,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
             type: 'terms',
             schema: 'segment',
-            params: { field: 'syscheck.path', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'syscheck.path',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -383,13 +434,24 @@ export default [
           isDonut: true,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
             type: 'terms',
             schema: 'segment',
-            params: { field: 'syscheck.path', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'syscheck.path',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -451,7 +513,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '3',
             enabled: true,
