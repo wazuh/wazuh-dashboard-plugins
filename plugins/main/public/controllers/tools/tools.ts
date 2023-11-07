@@ -12,7 +12,6 @@
 import { TabNames } from '../../utils/tab-names';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { updateSelectedToolsSection } from '../../redux/actions/appStateActions';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -21,6 +20,7 @@ import {
 } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { devTools, rulesetTest } from '../../utils/applications';
 
 export class ToolsController {
   /**
@@ -50,14 +50,11 @@ export class ToolsController {
       if (location && location.tab) {
         this.tab = location.tab;
       }
-      // Set component props
-      this.setComponentProps();
 
       this.load = false;
 
-      this.switchTab(this.tab);
       const breadcrumb = [
-        { text: this.tab === 'devTools' ? 'API Console' : 'Ruleset Test' },
+        { text: this.tab === 'devTools' ? devTools.title : rulesetTest.title },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     } catch (error) {
@@ -73,31 +70,5 @@ export class ToolsController {
       };
       getErrorOrchestrator().handleError(options);
     }
-  }
-
-  /**
-   * Sets the component props
-   */
-  setComponentProps() {
-    let tabs = [
-      { id: 'devTools', name: 'API Console' },
-      { id: 'logtest', name: 'Ruleset Test' },
-    ];
-    this.toolsTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab, true);
-      },
-      selectedTab: this.tab || 'devTools',
-      tabs,
-    };
-  }
-
-  /**
-   * This switch to a selected tab
-   * @param {Object} tab
-   */
-  switchTab(tab) {
-    store.dispatch(updateSelectedToolsSection(tab));
-    this.$location.search('tab', tab);
   }
 }

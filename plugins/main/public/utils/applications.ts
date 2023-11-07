@@ -616,7 +616,7 @@ export const settings = {
   redirectTo: () => '/manager/?tab=configuration',
 };
 
-const devTools = {
+export const devTools = {
   category: 'wz-category-server-management',
   id: 'dev-tools',
   title: i18n.translate('wz-app-dev-tools-title', {
@@ -632,7 +632,7 @@ const devTools = {
   redirectTo: () => '/wazuh-dev/?tab=devTools',
 };
 
-const rulesetTest = {
+export const rulesetTest = {
   category: 'wz-category-server-management',
   id: 'ruleset-test',
   title: i18n.translate('wz-app-ruleset-test-title', {
