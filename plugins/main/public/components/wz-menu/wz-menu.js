@@ -42,7 +42,7 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboards_react/public';
-import { crumbs } from '../common/globalBreadcrumb/plataformBreadcrumb';
+import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
 
 const sections = {
   overview: 'overview',
@@ -83,6 +83,10 @@ export const WzMenu = withWindowSize(
     async componentDidMount() {
       const $injector = getAngularModule().$injector;
       this.router = $injector.get('$route');
+      setBreadcrumbs(
+        this.props.globalBreadcrumbReducers.breadcrumb,
+        this.router,
+      );
       try {
         const APIlist = await this.loadApiList();
         if (APIlist.length) {
@@ -98,7 +102,6 @@ export const WzMenu = withWindowSize(
             }
           }
         }
-        crumbs(this.props.globalBreadcrumbReducers.breadcrumb, this.router);
       } catch (error) {
         const options = {
           context: `${WzMenu.name}.componentDidMount`,
@@ -241,10 +244,15 @@ export const WzMenu = withWindowSize(
       }
 
       if (
-        this.props.globalBreadcrumbReducers.breadcrumb !==
-        prevProps.globalBreadcrumbReducers.breadcrumb
+        !_.isEqual(
+          this.props.globalBreadcrumbReducers.breadcrumb,
+          prevProps.globalBreadcrumbReducers.breadcrumb,
+        )
       ) {
-        crumbs(this.props.globalBreadcrumbReducers.breadcrumb, this.router);
+        setBreadcrumbs(
+          this.props.globalBreadcrumbReducers.breadcrumb,
+          this.router,
+        );
       }
 
       newState = { ...prevProps.state, ...newState };

@@ -1,7 +1,7 @@
 import { getCore } from '../../../kibana-services';
 import { itHygiene } from '../../../utils/applications';
 
-export const crumbs = (breadcrumbs, router) => {
+export const setBreadcrumbs = (breadcrumbs, router) => {
   if (breadcrumbs === '' || breadcrumbs === undefined) {
     return;
   }
