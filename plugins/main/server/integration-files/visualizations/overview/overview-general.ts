@@ -494,7 +494,7 @@ export default [
             params: {
               field: 'timestamp',
               timeRange: {
-                from: 'now-1M',
+                from: 'now-24h',
                 to: 'now',
               },
               useNormalizedOpenSearchInterval: true,
@@ -511,7 +511,9 @@ export default [
           type: 'area',
           grid: {
             categoryLines: true,
-            style: { color: '#eee' },
+            style: {
+              color: '#eee',
+            },
             valueAxis: 'ValueAxis-1',
           },
           categoryAxes: [
@@ -584,48 +586,6 @@ export default [
           },
           labels: {},
         },
-        aggs: [
-          {
-            id: '1',
-            enabled: true,
-            type: 'count',
-            schema: 'metric',
-            params: {},
-          },
-          {
-            id: '2',
-            enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              timeRange: { from: 'now-24h', to: 'now', mode: 'quick' },
-              useNormalizedEsInterval: true,
-              interval: 'auto',
-              time_zone: 'Europe/Berlin',
-              drop_partials: false,
-              customInterval: '2h',
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
-          },
-          {
-            id: '3',
-            enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: {
-              field: 'rule.level',
-              size: '15',
-              order: 'desc',
-              orderBy: '1',
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
-          },
-        ],
       }),
       uiStateJSON: '{}',
       description: '',
