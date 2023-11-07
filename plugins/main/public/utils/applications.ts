@@ -83,7 +83,7 @@ export const endpointSumary = {
   redirectTo: () => '/agents-preview/',
 };
 
-const malwareDetection = {
+export const malwareDetection = {
   category: 'wz-category-endpoint-security',
   id: 'malware-detection',
   title: i18n.translate('wz-app-malware-detection-title', {
@@ -193,7 +193,7 @@ export const mitreAttack = {
     }`,
 };
 
-const virustotal = {
+export const virustotal = {
   category: 'wz-category-threat-intelligence',
   id: 'virustotal',
   title: i18n.translate('wz-app-virustotal-title', {
@@ -347,7 +347,7 @@ export const itHygiene = {
     }`,
 };
 
-const amazonWebServices = {
+export const amazonWebServices = {
   category: 'wz-category-cloud-security',
   id: 'amazon-web-services',
   title: i18n.translate('wz-app-amazon-web-services-title', {
@@ -369,7 +369,7 @@ const amazonWebServices = {
     }`,
 };
 
-const googleCloud = {
+export const googleCloud = {
   category: 'wz-category-cloud-security',
   id: 'google-cloud',
   title: i18n.translate('wz-app-google-cloud-title', {
@@ -391,7 +391,7 @@ const googleCloud = {
     }`,
 };
 
-const github = {
+export const github = {
   category: 'wz-category-cloud-security',
   id: 'github',
   title: i18n.translate('wz-app-github-title', {
@@ -413,7 +413,7 @@ const github = {
     }`,
 };
 
-const office365 = {
+export const office365 = {
   category: 'wz-category-cloud-security',
   id: 'office365',
   title: i18n.translate('wz-app-office365-title', {
@@ -434,7 +434,7 @@ const office365 = {
     }`,
 };
 
-const docker = {
+export const docker = {
   category: 'wz-category-cloud-security',
   id: 'docker',
   title: i18n.translate('wz-app-docker-title', {

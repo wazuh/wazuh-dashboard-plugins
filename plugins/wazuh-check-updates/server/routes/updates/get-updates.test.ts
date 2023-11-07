@@ -9,7 +9,7 @@ import axios from 'axios';
 import { API_UPDATES_STATUS, AvailableUpdates } from '../../../common/types';
 
 const serverAddress = '127.0.0.1';
-const port = 10002; //assign a different port in each unit test
+const port = 11002; //assign a different port in each unit test
 axios.defaults.baseURL = `http://${serverAddress}:${port}`;
 
 const mockedGetUpdates = getUpdates as jest.Mock;
@@ -26,7 +26,8 @@ const context = {
     },
   },
 };
-const enhanceWithContext = (fn: (...args: any[]) => any) => fn.bind(null, context);
+const enhanceWithContext = (fn: (...args: any[]) => any) =>
+  fn.bind(null, context);
 let server: HttpServer, innerServer: any;
 
 beforeAll(async () => {
@@ -46,7 +47,9 @@ beforeAll(async () => {
 
   server = new HttpServer(loggingService, 'tests');
   const router = new Router('', logger, enhanceWithContext);
-  const { registerRouter, server: innerServerTest } = await server.setup(config);
+  const { registerRouter, server: innerServerTest } = await server.setup(
+    config,
+  );
   innerServer = innerServerTest;
 
   // Register routes
@@ -97,8 +100,13 @@ describe(`[endpoint] GET ${routes.checkUpdates}`, () => {
     };
 
     mockedGetUpdates.mockImplementation(() => mockResponse);
-    const response = await axios.get(`${routes.checkUpdates}?checkAvailableUpdates=true`);
+    const response = await axios.get(
+      `${routes.checkUpdates}?checkAvailableUpdates=true`,
+    );
 
-    expect(response.data).toEqual({ ...mockResponse, last_check_date: '2023-09-30T14:00:00.000Z' });
+    expect(response.data).toEqual({
+      ...mockResponse,
+      last_check_date: '2023-09-30T14:00:00.000Z',
+    });
   });
 });

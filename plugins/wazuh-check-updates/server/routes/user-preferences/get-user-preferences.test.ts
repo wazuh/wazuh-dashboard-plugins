@@ -9,7 +9,7 @@ import { getUserPreferencesRoutes } from './get-user-preferences';
 import { UserPreferences } from '../../../common/types';
 
 const serverAddress = '127.0.0.1';
-const port = 10003; //assign a different port in each unit test
+const port = 11003; //assign a different port in each unit test
 axios.defaults.baseURL = `http://${serverAddress}:${port}`;
 
 const mockedGetUserPreferences = getUserPreferences as jest.Mock;
@@ -26,7 +26,8 @@ const context = {
     },
   },
 };
-const enhanceWithContext = (fn: (...args: any[]) => any) => fn.bind(null, context);
+const enhanceWithContext = (fn: (...args: any[]) => any) =>
+  fn.bind(null, context);
 let server: HttpServer, innerServer: any;
 
 beforeAll(async () => {
@@ -46,7 +47,9 @@ beforeAll(async () => {
 
   server = new HttpServer(loggingService, 'tests');
   const router = new Router('', logger, enhanceWithContext);
-  const { registerRouter, server: innerServerTest } = await server.setup(config);
+  const { registerRouter, server: innerServerTest } = await server.setup(
+    config,
+  );
   innerServer = innerServerTest;
 
   // Register routes
