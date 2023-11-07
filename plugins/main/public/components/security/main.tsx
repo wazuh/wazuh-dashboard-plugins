@@ -57,7 +57,7 @@ const tabs = [
 export const WzSecurity = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: '' }, { text: security.title }]),
+  withGlobalBreadcrumb([{ text: security.title }]),
 )(() => {
   // Get the initial tab when the component is initiated
   const securityTabRegExp = new RegExp(

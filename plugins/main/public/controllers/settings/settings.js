@@ -84,10 +84,10 @@ export class SettingsController {
         const tabActiveName = Applications.find(
           ({ id }) => getWzCurrentAppID() === id,
         ).title;
-        const breadcrumb = [{ text: '' }, { text: tabActiveName }];
+        const breadcrumb = [{ text: tabActiveName }];
         store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       } else {
-        const breadcrumb = [{ text: '' }, { text: serverApis.title }];
+        const breadcrumb = [{ text: serverApis.title }];
         store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       }
 

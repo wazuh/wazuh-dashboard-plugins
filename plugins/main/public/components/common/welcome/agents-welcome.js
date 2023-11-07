@@ -96,7 +96,6 @@ export const AgentsWelcome = compose(
   connect(mapStateToProps, mapDispatchToProps),
   withGlobalBreadcrumb(({ agent }) => {
     return [
-      { text: '' },
       {
         text: itHygiene.title,
       },

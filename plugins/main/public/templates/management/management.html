@@ -3,7 +3,10 @@
   <!-- Navigation section -->
 
   <div flex="30" ng-if="mctrl.logtestOpened" class="md-padding logtest-side">
-    <react-component name="Logtest" props="mctrl.logtestProps"></react-component>
+    <react-component
+      name="Logtest"
+      props="mctrl.logtestProps"
+    ></react-component>
   </div>
 
   <div
@@ -17,7 +20,9 @@
       layout-padding
       ng-if="mctrl.tab === 'groups' && mctrl.currentGroup && mctrl.currentGroup.name"
     >
-      <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('groups', true)"
+      <span
+        class="wz-text-link cursor-pointer"
+        ng-click="mctrl.switchTab('groups', true)"
         >{{ mctrl.tabNames[mctrl.tab] }}</span
       >
       <span> / {{ mctrl.currentGroup.name }} </span>
@@ -25,20 +30,18 @@
     <!-- End breadcrumbs -->
   </div>
   <!-- end head -->
-  <!-- welcome -->
-  <div ng-if="mctrl.tab === 'welcome'" style="padding-top: 16px">
-    <react-component
-      flex
-      name="ManagementWelcomeWrapper"
-      props="mctrl.welcomeCardsProps"
-    ></react-component>
-  </div>
-  <!-- end welcome -->
   <!-- monitoring -->
-  <div ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'" style="padding: 16px">
+  <div
+    ng-controller="clusterController"
+    ng-if="mctrl.tab === 'monitoring'"
+    style="padding: 16px"
+  >
     <!-- Cluster disabled or not running -->
     <div ng-if="!authorized">
-      <react-component name="WzEmptyPromptNoPermissions" props="{permissions}"></react-component>
+      <react-component
+        name="WzEmptyPromptNoPermissions"
+        props="{permissions}"
+      ></react-component>
     </div>
 
     <!-- Cluster disabled or not running -->
@@ -50,7 +53,10 @@
     </div>
 
     <!-- Cluster enabled -->
-    <div ng-show="isClusterEnabled && isClusterRunning && authorized" class="monitoring-discover">
+    <div
+      ng-show="isClusterEnabled && isClusterRunning && authorized"
+      class="monitoring-discover"
+    >
       <div ng-show="loading" style="padding: 16px">
         <react-component
           name="EuiProgress"
@@ -129,10 +135,16 @@
       <!-- Info card -->
       <div class="euiFlexItem">
         <div class="euiPanel euiPanel--paddingMedium">
-          <span class="euiTitle euiTitle--small euiCard__title">Information</span>
+          <span class="euiTitle euiTitle--small euiCard__title"
+            >Information</span
+          >
           <div class="euiSpacer euiSpacer--m"></div>
           <!-- Nodes -->
-          <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goNodes()">
+          <div
+            layout="row"
+            class="wz-padding-top-10 cursor-pointer"
+            ng-click="goNodes()"
+          >
             <span
               flex="25"
               class="wz-text-link"
@@ -148,7 +160,11 @@
             >
           </div>
           <!-- Agents -->
-          <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goAgents()">
+          <div
+            layout="row"
+            class="wz-padding-top-10 cursor-pointer"
+            ng-click="goAgents()"
+          >
             <span
               flex="25"
               class="wz-text-link"
@@ -181,7 +197,8 @@
             props="{type:'help',className:'euiCallOutHeader__title'}"
           ></react-component>
           <span class="euiCallOutHeader__title"
-            >There are no results for selected time range. Try another one.</span
+            >There are no results for selected time range. Try another
+            one.</span
           >
         </div>
       </div>
@@ -202,7 +219,9 @@
     <!-- end configuration -->
     <!-- Cards for overview monitoring section -->
     <div ng-show="showConfig">
-      <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive"
+      >
         <div class="euiFlexItem euiFlexItem--flexGrowZero">
           <h2 class="euiTitle euiTitle--medium">
             <md-button
@@ -218,14 +237,27 @@
         </div>
       </div>
 
-      <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive"
+      >
         <!-- Overview visualization card -->
-        <div class="euiPanel euiFlexItem euiFlexItem--flexGrowZero" style="min-width: 500px; overflow: hidden;">
-           <span class="euiLoadingChart custom-charts-bar euiLoadingChart--large euiTextAlign--center "  style="top: 50%; transform: translate(0px, -25px); position: relative;" ng-if="!isReady || !rendered" >
-              <span class="euiLoadingChart__bar"></span>
-              <span class="euiLoadingChart__bar"></span>
-              <span class="euiLoadingChart__bar"></span>
-              <span class="euiLoadingChart__bar"></span>
+        <div
+          class="euiPanel euiFlexItem euiFlexItem--flexGrowZero"
+          style="min-width: 500px; overflow: hidden"
+        >
+          <span
+            class="euiLoadingChart custom-charts-bar euiLoadingChart--large euiTextAlign--center"
+            style="
+              top: 50%;
+              transform: translate(0px, -25px);
+              position: relative;
+            "
+            ng-if="!isReady || !rendered"
+          >
+            <span class="euiLoadingChart__bar"></span>
+            <span class="euiLoadingChart__bar"></span>
+            <span class="euiLoadingChart__bar"></span>
+            <span class="euiLoadingChart__bar"></span>
           </span>
           <md-card-content
             class="wazuh-column"
@@ -233,22 +265,25 @@
           >
             <span
               class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
-              >Top 5 nodes </span
-            >
+              >Top 5 nodes
+            </span>
             <react-component
               style="height: 100%"
               name="KibanaVisualization"
               props="{visId: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie', tab: 'monitoring'}"
             ></react-component>
             <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered"
-              >There are no results for selected time range. Try another one.</span
+              >There are no results for selected time range. Try another
+              one.</span
             >
           </md-card-content>
         </div>
         <!-- Cluster configuration card -->
         <div class="euiFlexItem">
           <div class="euiPanel euiPanel--paddingMedium">
-            <span class="euiTitle euiTitle--small euiCard__title">Configuration</span>
+            <span class="euiTitle euiTitle--small euiCard__title"
+              >Configuration</span
+            >
             <div class="euiSpacer euiSpacer--m"></div>
             <!-- Configuration options -->
             <div layout="row" class="wz-padding-top-10">
@@ -297,7 +332,9 @@
     <!-- nodes-detail -->
     <div ng-show="currentNode">
       <!-- Back button -->
-      <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive"
+      >
         <div class="euiFlexItem euiFlexItem--flexGrowZero">
           <h2 class="euiTitle euiTitle--medium">
             <md-button
@@ -313,7 +350,9 @@
         </div>
       </div>
       <!-- Node alerts summary card -->
-      <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive"
+      >
         <div
           class="height-250 euiPanel euiFlexItem"
           ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
@@ -345,27 +384,39 @@
           ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.info"
         >
           <div class="euiPanel euiPanel--paddingMedium">
-            <span class="euiTitle euiTitle--small euiCard__title">Node information</span>
+            <span class="euiTitle euiTitle--small euiCard__title"
+              >Node information</span
+            >
             <div class="euiSpacer euiSpacer--m"></div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30">IP</span>
-              <span class="color-grey">{{currentNode.healthCheck.info.ip}}</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.info.ip}}</span
+              >
             </div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30">Version</span>
-              <span class="color-grey">{{currentNode.healthCheck.info.version}}</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.info.version}}</span
+              >
             </div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30">Type</span>
-              <span class="color-grey">{{currentNode.healthCheck.info.type}}</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.info.type}}</span
+              >
             </div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30">Name</span>
-              <span class="color-grey">{{currentNode.healthCheck.info.name}}</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.info.name}}</span
+              >
             </div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30">Active agents</span>
-              <span class="color-grey">{{ currentNode.healthCheck.info.n_active_agents }}</span>
+              <span class="color-grey"
+                >{{ currentNode.healthCheck.info.n_active_agents }}</span
+              >
             </div>
           </div>
         </div>
@@ -494,8 +545,14 @@
   </div>
   <!-- end statiscts -->
   <!-- management -->
-  <div ng-if="!rctrl.loading && mctrl.managementProps && mctrl.tab !== 'welcome'" layout="column">
-    <react-component name="WzManagement" props="mctrl.managementProps"></react-component>
+  <div
+    ng-if="!rctrl.loading && mctrl.managementProps && mctrl.tab !== 'welcome'"
+    layout="column"
+  >
+    <react-component
+      name="WzManagement"
+      props="mctrl.managementProps"
+    ></react-component>
   </div>
   <!-- end management -->
   <!-- groups -->

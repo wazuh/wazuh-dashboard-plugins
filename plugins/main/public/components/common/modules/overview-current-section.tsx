@@ -34,13 +34,12 @@ class WzCurrentOverviewSection extends Component {
     if (section) {
       const breadcrumb = currentAgent.id
         ? [
-            { text: '' },
             {
               text: section,
             },
             { agent: currentAgent },
           ]
-        : [{ text: '' }, { text: section }];
+        : [{ text: section }];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       $('#breadcrumbNoTitle').attr('title', '');
     }
