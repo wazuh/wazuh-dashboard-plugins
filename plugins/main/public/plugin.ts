@@ -23,6 +23,7 @@ import {
   setWzMainParams,
   setWzCurrentAppID,
   setWazuhCheckUpdatesPlugin,
+  setHeaderActionMenuMounter,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -90,6 +91,8 @@ export class WazuhPlugin
             // Set the flag in the telemetry saved object as the notice was seen and dismissed
             this.hideTelemetryBanner && (await this.hideTelemetryBanner());
             setScopedHistory(params.history);
+            // This allows you to add the selectors to the navbar
+            setHeaderActionMenuMounter(params.setHeaderActionMenu);
             // Discover currently uses two history instances:
             // one from Kibana Platform and another from history package.
             // Below function is used every time Discover app is loaded to synchronize both instances

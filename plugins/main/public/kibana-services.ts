@@ -7,6 +7,7 @@ import {
   SavedObjectsStart,
   ScopedHistory,
   ToastsStart,
+  AppMountParameters,
 } from 'opensearch_dashboards/public';
 import { createGetterSetter } from '../../../src/plugins/opensearch_dashboards_utils/common';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
@@ -44,6 +45,10 @@ export const [getWzCurrentAppID, setWzCurrentAppID] =
   createGetterSetter<NavigationPublicPluginStart>('WzCurrentAppID');
 export const [getWazuhCheckUpdatesPlugin, setWazuhCheckUpdatesPlugin] =
   createGetterSetter<WazuhCheckUpdatesPluginStart>('WazuhCheckUpdatesPlugin');
+export const [getHeaderActionMenuMounter, setHeaderActionMenuMounter] =
+  createGetterSetter<AppMountParameters['setHeaderActionMenu']>(
+    'headerActionMenuMounter',
+  );
 
 /**
  * set bootstrapped inner angular module

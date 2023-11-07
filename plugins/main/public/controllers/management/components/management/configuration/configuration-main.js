@@ -25,10 +25,9 @@ export default compose(
   withGlobalBreadcrumb(props => {
     let breadcrumb = false;
     if (props.agent.id === '000') {
-      breadcrumb = [{ text: '' }, { text: settings.title }];
+      breadcrumb = [{ text: settings.title }];
     } else {
       breadcrumb = [
-        { text: '' },
         {
           text: itHygiene.title,
         },

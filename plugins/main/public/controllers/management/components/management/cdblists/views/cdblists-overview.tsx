@@ -60,7 +60,7 @@ function WzCDBListsOverview(props) {
 
 export default compose(
   withGlobalBreadcrumb(props => {
-    return [{ text: '' }, { text: cdbLists.title }];
+    return [{ text: cdbLists.title }];
   }),
   withUserAuthorizationPrompt(props => [
     {

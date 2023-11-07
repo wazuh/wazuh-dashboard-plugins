@@ -58,7 +58,7 @@ import { endpointSumary } from '../../../utils/applications';
 export const AgentsPreview = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: '' }, { text: endpointSumary.title }]),
+  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
