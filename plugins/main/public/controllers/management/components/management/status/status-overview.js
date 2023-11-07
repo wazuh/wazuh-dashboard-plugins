@@ -264,7 +264,7 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default compose(
-  withGlobalBreadcrumb([{ text: '' }, { text: serverStatus.title }]),
+  withGlobalBreadcrumb([{ text: serverStatus.title }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },

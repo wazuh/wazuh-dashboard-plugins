@@ -18,6 +18,7 @@ import {
 } from '../../common/hocs';
 import { SyscollectorInventory } from './inventory';
 import { compose } from 'redux';
+import { itHygiene } from '../../../utils/applications';
 
 export const MainSyscollector = compose(
   withReduxProvider,
@@ -25,10 +26,7 @@ export const MainSyscollector = compose(
   withGlobalBreadcrumb(({ agent }) => {
     return [
       {
-        text: '',
-      },
-      {
-        text: 'IT Hygiene',
+        text: itHygiene.title,
       },
       { agent },
       {
