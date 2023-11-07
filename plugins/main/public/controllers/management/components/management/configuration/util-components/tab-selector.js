@@ -19,7 +19,9 @@ class WzTabSelector extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedTab: this.props.children[0].props.label
+      selectedTab: this.props.children.find(
+        child => child.props?.label !== undefined,
+      )?.props?.label,
     };
   }
   changeSelectedTab(tab) {
@@ -28,24 +30,26 @@ class WzTabSelector extends Component {
   render() {
     const { selectedTab } = this.state;
     const { children, container, spacer } = this.props;
-    const activeTabContent = children.filter(child => child).find(
-      child => child.props.label === selectedTab
-    );
+    const activeTabContent = children
+      .filter(child => child)
+      .find(child => child.props.label === selectedTab);
     return (
       <Fragment>
         <EuiTabs>
-          {children.filter(child => child).map(child => {
-            const { label } = child.props;
-            return (
-              <EuiTab
-                onClick={() => this.changeSelectedTab(label)}
-                isSelected={label === selectedTab}
-                key={`tab-${label}`}
-              >
-                {label}
-              </EuiTab>
-            );
-          })}
+          {children
+            .filter(child => child)
+            .map(child => {
+              const { label } = child.props;
+              return (
+                <EuiTab
+                  onClick={() => this.changeSelectedTab(label)}
+                  isSelected={label === selectedTab}
+                  key={`tab-${label}`}
+                >
+                  {label}
+                </EuiTab>
+              );
+            })}
         </EuiTabs>
         {(container && container(activeTabContent)) || (
           <div>
@@ -60,7 +64,7 @@ class WzTabSelector extends Component {
 
 WzTabSelector.propTypes = {
   children: PropTypes.array.isRequired,
-  spacer: PropTypes.string
+  spacer: PropTypes.string,
 };
 
 export default WzTabSelector;
@@ -75,5 +79,5 @@ export class WzTabSelectorTab extends Component {
 }
 
 WzTabSelectorTab.propTypes = {
-  label: PropTypes.string
+  label: PropTypes.string,
 };
