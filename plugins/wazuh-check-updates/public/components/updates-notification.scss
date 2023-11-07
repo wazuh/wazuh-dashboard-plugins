@@ -1,0 +1,11 @@
+.euiBody--hasFlyout {
+    .wz-check-updates-bottom-bar {
+      margin-left: 320px;
+    }
+  
+    &.euiBody-hasOverlayMask {
+      .wz-check-updates-bottom-bar {
+        margin-left: 0px;
+      }
+    }
+  }
