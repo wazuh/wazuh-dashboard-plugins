@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed problem when using non latin characters in the username [#6076](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6076)
+- Fixed UI crash on retrieving log collection configuration for macos agent. [#6104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6104)
 
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 01
 
