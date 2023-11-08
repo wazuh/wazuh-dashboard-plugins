@@ -22,7 +22,6 @@ interface SearchParams {
     };
 }
 
-
 export const search = async (params: SearchParams): Promise<SearchResponse> => {
     const { indexPattern, filters = [], query, pagination, sorting, fields } = params;
     const data = getPlugins().data;
@@ -43,11 +42,18 @@ export const search = async (params: SearchParams): Promise<SearchResponse> => {
         .setField('index', indexPattern)
 
     // add fields
-    if (fields && Array.isArray(fields) && fields.length > 0)
+    if (fields && Array.isArray(fields) && fields.length > 0){
         searchParams.setField('fields', fields);
+    }
+    try{
+        return await searchParams.fetch();
+    }catch(error){
+        if(error.body){
+            throw error.body;
+        }
+        throw error;
+    }
 
-
-    return await searchParams.fetch();
 };
 
 
@@ -99,7 +105,7 @@ export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) 
 }
 
 export const exportSearchToCSV = async (params: SearchParams): Promise<void> => {
-    const DEFAULT_MAX_SIZE_PER_CALL = 10000;
+    const DEFAULT_MAX_SIZE_PER_CALL = 1000;
     const { indexPattern, filters = [], query, sorting, fields, pagination } = params;
     // when the pageSize is greater than the default max size per call (10000)
     // then we need to paginate the search
