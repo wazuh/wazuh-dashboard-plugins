@@ -56,7 +56,7 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             api_id: api.id,
             status,
           };
-        } catch (e) {
+        } catch (e: any) {
           const error = {
             title: e.response?.data?.title,
             detail: e.response?.data?.detail ?? e.message,
