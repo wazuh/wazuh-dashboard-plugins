@@ -226,12 +226,9 @@ export class MainModuleAgent extends Component {
 export default compose(
   withGlobalBreadcrumb(({ agent, section }) => {
     if (section === 'welcome') {
-      return [{ text: '' }, { text: itHygiene.title }, { text: agent.id }];
+      return [{ text: itHygiene.title }, { text: agent.id }];
     } else {
       return [
-        {
-          text: '',
-        },
         {
           text: itHygiene.title,
         },

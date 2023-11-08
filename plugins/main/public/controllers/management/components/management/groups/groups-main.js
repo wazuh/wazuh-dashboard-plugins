@@ -121,6 +121,6 @@ const mapDispatchToProps = dispatch => {
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withGlobalBreadcrumb(props => {
-    return [{ text: '' }, { text: endpointGroups.title }];
+    return [{ text: endpointGroups.title }];
   }),
 )(WzGroups);
