@@ -15,6 +15,8 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiButtonEmpty,
+  EuiCallOut,
+  EuiSpacer
 } from '@elastic/eui';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../../../src/core/server';
@@ -29,6 +31,7 @@ import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 import { search, exportSearchToCSV } from './inventory_service';
 import { ErrorHandler, ErrorFactory, HttpError } from '../../../../../react-services/error-management';
 import { withErrorBoundary } from '../../../../common/hocs';
+import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
 
 const InventoryVulsComponent = () => {
   const { searchBarProps } = useSearchBarConfiguration({
@@ -77,22 +80,20 @@ const InventoryVulsComponent = () => {
   useEffect(() => {
     if (!isLoading) {
       setIndexPattern(indexPatterns?.[0] as IndexPattern);
-      try {
-        search({
-          indexPattern: indexPatterns?.[0] as IndexPattern,
-          filters,
-          query,
-          pagination,
-          sorting
-        }).then((results) => {
-          setResults(results);
-          setIsSearching(false);
-        });
-      }catch(error){
-        const searchError = ErrorFactory.create(HttpError, { error, message: 'Error searching vulnerabilities' })
+      search({
+        indexPattern: indexPatterns?.[0] as IndexPattern,
+        filters,
+        query,
+        pagination,
+        sorting
+      }).then((results) => {
+        setResults(results);
+        setIsSearching(false);
+      }).catch((error) => {
+        const searchError = ErrorFactory.create(HttpError, { error, message: 'Error fetching vulnerabilities' })
         ErrorHandler.handleError(searchError);
         setIsSearching(false);
-      }
+      })
     }
   }, [JSON.stringify(searchBarProps), JSON.stringify(pagination), JSON.stringify(sorting)]);
 
@@ -112,7 +113,7 @@ const InventoryVulsComponent = () => {
     }
     try {
       await exportSearchToCSV(params);
-    }catch(error){
+    } catch (error) {
       const searchError = ErrorFactory.create(HttpError, { error, message: 'Error downloading csv report' })
       ErrorHandler.handleError(searchError);
     }
@@ -127,36 +128,56 @@ const InventoryVulsComponent = () => {
         grow
       >
         <>
-          {isLoading ? 
-            <LoadingSpinner /> : 
-            <SearchBar 
-              appName='inventory-vuls' 
-              {...searchBarProps} 
+          {isLoading ?
+            <LoadingSpinner /> :
+            <SearchBar
+              appName='inventory-vuls'
+              {...searchBarProps}
               showDatePicker={false}
               showQueryInput={true}
               showQueryBar={true}
-              />}
-          {isSearching ? 
+            />}
+          {isSearching ?
             <LoadingSpinner /> : null}
-          {!isLoading && !isSearching && results?.hits?.total === 0 ? 
+          {!isLoading && !isSearching && results?.hits?.total === 0 ?
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} /> : null}
-          {!isLoading && !isSearching && results?.hits?.total > 0 ?
-            <EuiDataGrid 
-              {...dataGridProps} 
-              toolbarVisibility={{
-                additionalControls: (
-                  <EuiButtonEmpty
-                    disabled={results?.hits?.total === 0}
-                    size="xs"
-                    iconType="exportAction"
-                    color="primary"
-                    className="euiDataGrid__controlBtn"
-                    onClick={onClickExportResults}>
-                    Export Formated
-                  </EuiButtonEmpty>
-                ),
-              }}
-              /> : null}
+          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+            <>
+              {results?.hits?.total > 10000 ?
+                (
+                  <>
+                    <EuiCallOut
+                      title="Search Limit Reached"
+                      color="danger"
+                      iconType="alert"
+                    >
+                      <p>To provide a better experience, the results in this table cannot exceed 10,000 hits. Please, refine your search criteria.</p>
+                    </EuiCallOut>
+                    <EuiSpacer size="m" />
+                  </>) : null}
+              <EuiDataGrid
+                {...dataGridProps}
+                toolbarVisibility={{
+                  additionalControls: (
+                    <>
+                      <HitsCounter
+                        hits={results?.hits?.total}
+                        showResetButton={false}
+                        onResetQuery={() => { }} />
+                      <EuiButtonEmpty
+                        disabled={results?.hits?.total === 0}
+                        size="xs"
+                        iconType="exportAction"
+                        color="primary"
+                        className="euiDataGrid__controlBtn"
+                        onClick={onClickExportResults}>
+                        Export Formated
+                      </EuiButtonEmpty>
+                    </>
+                  )
+                }}
+              />
+            </>) : null}
           {inspectedHit && (
             <EuiFlyout onClose={() => setInspectedHit(undefined)} size="m">
               <EuiFlyoutHeader>
