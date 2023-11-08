@@ -44,6 +44,7 @@ const InventoryVulsComponent = () => {
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(undefined);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
 
   const onClickInspectDoc = useMemo(() => (index: number) => {
     const rowClicked = results.hits.hits[index];
@@ -113,10 +114,13 @@ const InventoryVulsComponent = () => {
       sorting
     }
     try {
+      setIsExporting(true);
       await exportSearchToCSV(params);
     } catch (error) {
       const searchError = ErrorFactory.create(HttpError, { error, message: 'Error downloading csv report' })
       ErrorHandler.handleError(searchError);
+    }finally{
+      setIsExporting(false);
     }
   }
 
@@ -164,6 +168,7 @@ const InventoryVulsComponent = () => {
                       size="xs"
                       iconType="exportAction"
                       color="primary"
+                      isLoading={isExporting}
                       className="euiDataGrid__controlBtn"
                       onClick={onClickExportResults}>
                       Export Formated
