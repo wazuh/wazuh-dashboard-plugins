@@ -42,11 +42,8 @@ export const validateAgentName = (value: any) => {
   if (value.length === 0) {
     return undefined;
   }
-  const isLengthValid = value.length >= 2 && value.length <= 63;
-  if (!isLengthValid) {
-    return `The name must have between 2 and 63 characters. ${validateCharacters(
-      value,
-    )}`;
+  if (value.length < 2) {
+    return `The minimum length is 2 characters. ${validateCharacters(value)}`;
   }
   return `${validateCharacters(value)}`;
 };
