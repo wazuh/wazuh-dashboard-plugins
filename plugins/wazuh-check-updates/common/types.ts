@@ -17,7 +17,10 @@ export interface ResponseApiAvailableUpdates {
 export interface ApiAvailableUpdates extends ResponseApiAvailableUpdates {
   api_id: string;
   status: API_UPDATES_STATUS;
-  error?: string;
+  error?: {
+    title?: string;
+    detail?: string;
+  };
 }
 
 export interface Update {
