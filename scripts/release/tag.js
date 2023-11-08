@@ -40,7 +40,7 @@ async function run(configuration) {
     package manifest file from a plugin.
   */
   if (!version || !revision || !platformVersion) {
-    // Read the package manigest file from plugin
+    // Read the package manifest file from plugin
     const {
       version: manifestVersion,
       revision: manifestRevision,

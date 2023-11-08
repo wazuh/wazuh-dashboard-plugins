@@ -40,7 +40,7 @@
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest",
     "test:jest:runner": "node scripts/runner test",
-    "generate:api-data": "node scripts/generate-api-data.js --spec https://raw.githubusercontent.com/wazuh/wazuh/$(node -e \"console.log(require('./package.json').version.split('.').splice(0,2).join('.'))\")/api/api/spec/spec.yaml --output file --output-directory common/api-info --display-configuration",
+    "generate:api-data": "node scripts/generate-api-data.js --spec https://raw.githubusercontent.com/wazuh/wazuh/$(node -e \"console.log(require('./package.json').version)\")/api/api/spec/spec.yaml --output file --output-directory common/api-info --display-configuration",
     "prebuild": "node scripts/generate-build-version"
   },
   "dependencies": {
