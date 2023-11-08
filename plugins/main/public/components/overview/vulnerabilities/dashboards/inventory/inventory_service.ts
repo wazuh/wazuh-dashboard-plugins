@@ -141,10 +141,11 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
         }
     } else {
         searchResults = await search(params);
+        allHits = searchResults.hits.hits;
     }
     
     const resultsFields = fields;
-    const data = searchResults.hits.hits.map((hit) => { 
+    const data = allHits.map((hit) => { 
         // check if the field type is a date
         const dateFields = indexPattern.fields.getByType('date');
         const dateFieldsNames = dateFields.map((field) => field.name);
