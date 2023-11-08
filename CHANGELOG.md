@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added the ssl_agent_ca configuration to the SSL Settings form [#6083](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6083)
 - Added global vulnerabilities dashboards [#5896](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5896)
 - Added an agent selector to the IT Hygiene application [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
+- Added query results limit when the search exceed 10000 hits [#6106](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6106)
 
 ### Changed
 

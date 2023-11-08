@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, Fragment } from "react";
 import { SearchResponse } from "@opensearch-project/opensearch/api/types";
 import { IFieldType, IndexPattern } from "../../../../../../../src/plugins/data/common";
 import { parseData, getFieldFormatted } from '../dashboards/inventory/inventory_service';
+import { MAX_ENTRIES_PER_QUERY } from "../dashboards/inventory/config";
 
 type tDataGridProps = {
     indexPattern: IndexPattern;
@@ -92,7 +93,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         columnVisibility: { visibleColumns: columnVisibility, setVisibleColumns: setVisibility },
         renderCellValue: renderCellValue,
         leadingControlColumns: leadingControlColumns,
-        rowCount,
+        rowCount: rowCount < MAX_ENTRIES_PER_QUERY ? rowCount : MAX_ENTRIES_PER_QUERY,
         sorting: { columns: sortingColumns, onSort },
         pagination: {
             ...pagination,
