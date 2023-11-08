@@ -42,12 +42,13 @@ export const validateAgentName = (value: any) => {
   if (value.length === 0) {
     return undefined;
   }
+  let invalidCharacters = validateCharacters(value);
   if (value.length < 2) {
     return `The minimum length is 2 characters.${
-      validateCharacters(value) && ` ${validateCharacters(value)}`
+      invalidCharacters && ` ${invalidCharacters}`
     }`;
   }
-  return `${validateCharacters(value)}`;
+  return `${invalidCharacters}`;
 };
 
 const validateCharacters = (value: any) => {
