@@ -44,7 +44,7 @@ import { WzFieldSearchDelay } from '../../../../../components/common/search';
 import { logs } from '../../../../../utils/applications';
 
 export default compose(
-  withGlobalBreadcrumb([{ text: '' }, { text: logs.title }]),
+  withGlobalBreadcrumb([{ text: logs.title }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },

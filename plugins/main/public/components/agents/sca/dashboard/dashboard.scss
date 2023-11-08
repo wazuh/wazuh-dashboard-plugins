@@ -1,0 +1,27 @@
+@media (max-width: 767px) {
+  .sca-module-wrapper-donut {
+    width: 100%;
+    margin-right: 0;
+  }
+  .sca-module-card-visualization {
+    margin-right: 0;
+  }
+
+  .sca-module-panel-policies-table {
+    margin-right: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .sca-module-wrapper-donut {
+    width: 50%;
+  }
+  .sca-module-card-visualization {
+    margin-right: 16px;
+  }
+
+  .sca-module-panel-policies-table {
+    margin-right: 16px;
+    padding-bottom: 16px;
+  }
+}

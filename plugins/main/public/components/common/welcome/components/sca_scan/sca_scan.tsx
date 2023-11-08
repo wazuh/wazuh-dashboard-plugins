@@ -80,6 +80,10 @@ export const ScaScan = compose(
     }
 
     async componentDidMount() {
+      const storedPolicies = localStorage.getItem('scaPolicies');
+      if (storedPolicies) {
+        this.setState({ policies: JSON.parse(storedPolicies) });
+      }
       this._isMount = true;
       const $injector = getAngularModule().$injector;
       this.router = $injector.get('$route');
@@ -134,9 +138,14 @@ export const ScaScan = compose(
     }
 
     onClickRow = policy => {
-      window.location.href = `#/overview?tab=sca&redirectPolicyTable=${policy.policy_id}`;
-      store.dispatch(updateCurrentAgentData(this.props.agent));
-      this.router.reload();
+      const updatedPolicies = [...this.state.policies, policy];
+      this.setState({ policies: updatedPolicies }, () => {
+        localStorage.setItem(
+          'scaPolicies',
+          JSON.stringify(this.state.policies),
+        );
+        window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}`;
+      });
     };
 
     renderScanDetails() {

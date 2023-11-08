@@ -37,13 +37,13 @@ const EventsTab = {
   component: Events,
 };
 const RegulatoryComplianceTabs = [
+  DashboardTab,
   {
     id: 'inventory',
     name: 'Controls',
     buttons: [ButtonModuleExploreAgent],
     component: ComplianceTable,
   },
-  DashboardTab,
   EventsTab,
 ];
 
@@ -56,13 +56,13 @@ export const ModulesDefaults = {
   fim: {
     init: 'dashboard',
     tabs: [
+      DashboardTab,
       {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonModuleExploreAgent],
         component: MainFim,
       },
-      DashboardTab,
       EventsTab,
     ],
     availableFor: ['manager', 'agent'],
@@ -88,8 +88,14 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   sca: {
-    init: 'inventory',
+    init: 'dashboard',
     tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent],
+        component: MainSca,
+      },
       {
         id: 'inventory',
         name: 'Inventory',
@@ -105,16 +111,16 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       {
-        id: 'inventory',
-        name: 'Panel',
-        buttons: [ButtonModuleExploreAgent],
-        component: withModuleNotForAgent(OfficePanel),
-      },
-      {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
         component: withModuleNotForAgent(Dashboard),
+      },
+      {
+        id: 'inventory',
+        name: 'Panel',
+        buttons: [ButtonModuleExploreAgent],
+        component: withModuleNotForAgent(OfficePanel),
       },
       { ...EventsTab, component: withModuleNotForAgent(Events) },
     ],
@@ -122,8 +128,17 @@ export const ModulesDefaults = {
   },
   github: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: GitHubPanel }, DashboardTab, EventsTab],
-    availableFor: ['manager', 'agent']
+    tabs: [
+      DashboardTab,
+      {
+        id: 'inventory',
+        name: 'Panel',
+        buttons: [ButtonModuleExploreAgent],
+        component: GitHubPanel,
+      },
+      EventsTab,
+    ],
+    availableFor: ['manager', 'agent'],
   },
   ciscat: {
     init: 'dashboard',
@@ -151,14 +166,18 @@ export const ModulesDefaults = {
   mitre: {
     init: 'dashboard',
     tabs: [
-      { id: 'intelligence', name: 'Intelligence', component: ModuleMitreAttackIntelligence },
+      DashboardTab,
+      {
+        id: 'intelligence',
+        name: 'Intelligence',
+        component: ModuleMitreAttackIntelligence,
+      },
       {
         id: 'inventory',
         name: 'Framework',
         buttons: [ButtonModuleExploreAgent],
         component: MainMitre,
       },
-      DashboardTab,
       EventsTab,
     ],
     availableFor: ['manager', 'agent'],

@@ -66,7 +66,7 @@ export const OverviewWelcome = compose(
   withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(props => {
-    return [{ text: '' }, { text: overview.title }];
+    return [{ text: overview.title }];
   }),
 )(
   class OverviewWelcome extends Component {

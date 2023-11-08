@@ -20,11 +20,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed a problem with the agent menu header when the side menu is docked [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
+- Fixed how the query filters apply on the Security Alerts table [#6102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6102)
 
 ### Removed
 
 - Removed the `disabled_roles` and `customization.logo.sidebar` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Removed the ability to configure the visibility of modules and removed `extensions.*` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
+
+### Changed
+
+- Changed dashboards. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035)
+- Change the display order of tabs in all modules. [#6067](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6067)
 
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 00
 
