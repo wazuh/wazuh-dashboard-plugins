@@ -24,7 +24,7 @@ import DocViewer from '../../doc_viewer/doc_viewer';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
 import { useDataGrid } from '../../data_grid/use_data_grid';
-import { inventoryTableDefaultColumns } from './config';
+import { MAX_ENTRIES_PER_QUERY, inventoryTableDefaultColumns } from './config';
 import { useDocViewer } from '../../doc_viewer/use_doc_viewer';
 import './inventory.scss';
 import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
@@ -32,6 +32,7 @@ import { search, exportSearchToCSV } from './inventory_service';
 import { ErrorHandler, ErrorFactory, HttpError } from '../../../../../react-services/error-management';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
+import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
 
 const InventoryVulsComponent = () => {
   const { searchBarProps } = useSearchBarConfiguration({
@@ -142,62 +143,55 @@ const InventoryVulsComponent = () => {
           {!isLoading && !isSearching && results?.hits?.total === 0 ?
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} /> : null}
           {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-            <>
-              {results?.hits?.total > 10000 ?
-                (
+            <EuiDataGrid
+              {...dataGridProps}
+              toolbarVisibility={{
+                additionalControls: (
                   <>
-                    <EuiCallOut
-                      title="Search Limit Reached"
-                      color="danger"
-                      iconType="alert"
-                    >
-                      <p>To provide a better experience, the results in this table cannot exceed 10,000 hits. Please, refine your search criteria.</p>
-                    </EuiCallOut>
-                    <EuiSpacer size="m" />
-                  </>) : null}
-              <EuiDataGrid
-                {...dataGridProps}
-                toolbarVisibility={{
-                  additionalControls: (
-                    <>
-                      <HitsCounter
-                        hits={results?.hits?.total}
-                        showResetButton={false}
-                        onResetQuery={() => { }} />
-                      <EuiButtonEmpty
-                        disabled={results?.hits?.total === 0}
-                        size="xs"
-                        iconType="exportAction"
-                        color="primary"
-                        className="euiDataGrid__controlBtn"
-                        onClick={onClickExportResults}>
-                        Export Formated
-                      </EuiButtonEmpty>
-                    </>
-                  )
-                }}
-              />
-            </>) : null}
-          {inspectedHit && (
-            <EuiFlyout onClose={() => setInspectedHit(undefined)} size="m">
-              <EuiFlyoutHeader>
-                <EuiTitle>
-                  <h2>Document Details</h2>
-                </EuiTitle>
-              </EuiFlyoutHeader>
-              <EuiFlyoutBody>
-                <EuiFlexGroup direction="column">
-                  <EuiFlexItem>
-                    <DocViewer
-                      {...docViewerProps} />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlyoutBody>
-            </EuiFlyout>
-          )}
-        </>
-      </EuiPageTemplate>
-    </IntlProvider>
+                    <HitsCounter
+                      hits={results?.hits?.total}
+                      showResetButton={false}
+                      onResetQuery={() => { }}
+                      tooltip={results?.hits?.total && results?.hits?.total > MAX_ENTRIES_PER_QUERY ? {
+                        ariaLabel: 'Warning',
+                        content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(MAX_ENTRIES_PER_QUERY)} hits.`,
+                        iconType: 'alert',
+                        position: 'top'
+                      } : undefined}
+                    />
+                    <EuiButtonEmpty
+                      disabled={results?.hits?.total === 0}
+                      size="xs"
+                      iconType="exportAction"
+                      color="primary"
+                      className="euiDataGrid__controlBtn"
+                      onClick={onClickExportResults}>
+                      Export Formated
+                    </EuiButtonEmpty>
+                  </>
+                )
+              }}
+            />) : null}
+        {inspectedHit && (
+          <EuiFlyout onClose={() => setInspectedHit(undefined)} size="m">
+            <EuiFlyoutHeader>
+              <EuiTitle>
+                <h2>Document Details</h2>
+              </EuiTitle>
+            </EuiFlyoutHeader>
+            <EuiFlyoutBody>
+              <EuiFlexGroup direction="column">
+                <EuiFlexItem>
+                  <DocViewer
+                    {...docViewerProps} />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiFlyoutBody>
+          </EuiFlyout>
+        )}
+      </>
+    </EuiPageTemplate>
+    </IntlProvider >
   );
 }
 

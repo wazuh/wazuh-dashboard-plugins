@@ -3,6 +3,7 @@ import { getPlugins } from '../../../../../kibana-services';
 import { IndexPattern, Filter, OpenSearchQuerySortValue } from "../../../../../../../../src/plugins/data/public";
 import * as FileSaver from '../../../../../services/file-saver';
 import { beautifyDate } from "../../../../agents/vuls/inventory/lib";
+import { MAX_ENTRIES_PER_QUERY } from "./config";
 
 
 interface SearchParams {
@@ -118,7 +119,7 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
     let searchResults;
     if (mustPaginateSearch) {
         // paginate the search
-        while (hitsCount < totalHits) {
+        while (hitsCount < totalHits &&  hitsCount < MAX_ENTRIES_PER_QUERY) {
             const searchParams = {
                 indexPattern,
                 filters,
@@ -184,6 +185,6 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
     );
 
     if (blobData) {
-        FileSaver?.saveAs(blobData, 'vulnerabilities_inventory.csv');
+        FileSaver?.saveAs(blobData, `vulnerabilities_inventory-${new Date().toISOString()}.csv`);
     }
 }
