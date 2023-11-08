@@ -43,7 +43,9 @@ export const validateAgentName = (value: any) => {
     return undefined;
   }
   if (value.length < 2) {
-    return `The minimum length is 2 characters. ${validateCharacters(value)}`;
+    return `The minimum length is 2 characters.${
+      validateCharacters(value) && ` ${validateCharacters(value)}`
+    }`;
   }
   return `${validateCharacters(value)}`;
 };

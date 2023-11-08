@@ -65,7 +65,7 @@ describe('Validations', () => {
   test('should return an error message for invalid length', () => {
     const invalidAgentName = 'a';
     const result = validateAgentName(invalidAgentName);
-    expect(result).toBe('The minimum length is 2 characters. ');
+    expect(result).toBe('The minimum length is 2 characters.');
   });
 
   test('should return an empty string for a valid agent name', () => {
