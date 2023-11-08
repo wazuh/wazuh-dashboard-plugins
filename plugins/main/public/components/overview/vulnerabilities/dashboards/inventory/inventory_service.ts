@@ -23,8 +23,11 @@ interface SearchParams {
     };
 }
 
-export const search = async (params: SearchParams): Promise<SearchResponse> => {
+export const search = async (params: SearchParams): Promise<SearchResponse | void> => {
     const { indexPattern, filters = [], query, pagination, sorting, fields } = params;
+    if(!indexPattern){
+        return;
+    }
     const data = getPlugins().data;
     const searchSource = await data.search.searchSource.create();
     const fromField = (pagination?.pageIndex || 0) * (pagination?.pageSize || 100);
