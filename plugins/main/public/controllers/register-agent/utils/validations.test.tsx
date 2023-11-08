@@ -42,15 +42,23 @@ describe('Validations', () => {
     const invalidAgentName = '?';
     const result = validateAgentName(invalidAgentName);
     expect(result).toBe(
-      'The minimum length is 2 characters. The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"',
+      'The minimum length is 2 characters. The character "?" is not valid. Allowed characters are A-Z, a-z, 0-9, ".", "-", "_"',
     );
   });
 
-  test('should return an error message for invalid format', () => {
+  test('should return an error message for invalid format of 1 character', () => {
     const invalidAgentName = 'agent$name';
     const result = validateAgentName(invalidAgentName);
     expect(result).toBe(
-      'The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"',
+      'The character "$" is not valid. Allowed characters are A-Z, a-z, 0-9, ".", "-", "_"',
+    );
+  });
+
+  test('should return an error message for invalid format of more than 1 character', () => {
+    const invalidAgentName = 'agent$?name';
+    const result = validateAgentName(invalidAgentName);
+    expect(result).toBe(
+      'The characters "$,?" are not valid. Allowed characters are A-Z, a-z, 0-9, ".", "-", "_"',
     );
   });
 
