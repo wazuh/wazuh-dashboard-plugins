@@ -49,10 +49,6 @@ node scripts/release/bump.js --plugins-directory <plugins_directory> --manifest-
 
 Example:
 
-```console
-node scripts/release/bump.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/4.6.0/api/api/spec/spec.yaml --version 4.6.0 --revision 03 --platform-version 2.8.0
-```
-
 - Take the values from a package manifest file and replace some value (`version`, `revision` or `platform-plugin`)
 
 ```console

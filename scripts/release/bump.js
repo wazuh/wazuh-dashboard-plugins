@@ -202,12 +202,6 @@ const cli = require('../lib/cli/cli')(
 );
 
 // Display the message to do manual changes
-function displayMessageManualChanges() {
-  logger.warn(
-    'Some files could require to do changes manually. See RELEASING.md.',
-  );
-}
-
 function bumpPlugin(
   { version, revision, platformVersion, manifestPackage, manifestPlugin },
   logger,
@@ -338,8 +332,6 @@ function run(configuration) {
     },
     logger,
   );
-
-  displayMessageManualChanges();
 }
 
 function main() {
