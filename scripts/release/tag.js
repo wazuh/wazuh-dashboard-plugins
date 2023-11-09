@@ -150,14 +150,16 @@ async function run(configuration) {
     logger.info('There are changes to commit.');
     console.log(execSystem('git diff --name-only').toString());
     logger.debug('Commiting');
-    execSystem(`git commit -am "Bump ${tag}"`);
+    execSystem(`git commit -S -am "Bump ${tag}"`);
     logger.info('Commited');
   } else {
     logger.info('There are not changes to commit.');
   }
 
   logger.debug(`Creating tag: ${tag}`);
-  execSystem(`git tag -a ${tag} -m "Wazuh plugins for Wazuh dashboard ${tag}"`);
+  execSystem(
+    `git tag -s -a ${tag} -m "Wazuh plugins for Wazuh dashboard ${tag}"`,
+  );
   logger.info(`Created tag: ${tag}`);
   logger.debug(`Pushing tag ${tag} to remote`);
   execSystem(`git push origin ${tag}`);
