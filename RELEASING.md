@@ -196,6 +196,8 @@ The process to create the required tag can be run through a script ( `scripts/re
 - create local tag
 - push local tag to remote
 
+> THIS SCRIPT MUST RUN FROM THE SAME BRANCH (OR SIMILAR REGARDING THE SOURCE CODE) THAT MATCHES THE `--version` VALUE. IF NOT, IT WILL RUN UNWANTED CODE AND COULD FAIL.
+
 Steps:
 
 1. Bump version/revision/platform version, update the CHANGELOG.md and create the local and remote tags using the script.
