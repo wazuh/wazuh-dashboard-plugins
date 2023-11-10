@@ -172,7 +172,7 @@ async function run(configuration) {
   logger.info('Undone changes.');
   thereChangesToCommit &&
     logger.warn(
-      `A commit was added to the tag, but the branch ${branch} was reset to the state of the` +
+      `A commit was added to the tag, but the branch ${branch} was reset to the state of the ` +
         'remote.',
     );
 }
