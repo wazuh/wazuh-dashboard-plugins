@@ -74,14 +74,14 @@ async function run(configuration) {
   const branch = version;
 
   logger.warn(
-    'Ensure the base branch is created in the remote and it has updated the files: ' +
-      'CHANGELOG.md, unit tests files, API data files, etc... See RELEASING.md. ' +
-      'It does not modify these files.',
+    'Ensure the base branch is created in the remote and it has updated the files that are not ' +
+      'modified by the bump process. See RELEASING.md.',
   );
 
   logger.warn(
     'This script will prune the local branches and tags, bump the plugins, commit and push the ' +
-      'tags to the remote repository, deleting any unpushed changes.',
+      'tags to the remote repository, deleting any unpushed changes. It is required you have ' +
+      'configurated the repository to sign the commit and tag creation.',
   );
 
   if (!ignoreConfirmation) {
@@ -138,6 +138,9 @@ async function run(configuration) {
           break;
         }
         default: {
+          logger.warn(
+            'Some files could have been changed. You should undone this changes as necessary',
+          );
           logger.info('Aborting...');
           process.exit(0);
           break;
@@ -169,7 +172,8 @@ async function run(configuration) {
   logger.info('Undone changes.');
   thereChangesToCommit &&
     logger.warn(
-      `A commit was added to the tag, but this was removed in the ${branch}.`,
+      `A commit was added to the tag, but the branch ${branch} was reset to the state of the` +
+        'remote.',
     );
 }
 
@@ -190,15 +194,6 @@ const cli = require('../lib/cli/cli')(
     {
       long: 'display-configuration',
       description: 'Display the configuration.',
-      parse: (parameter, input, { logger, option }) => {
-        return {
-          [option.long]: true,
-        };
-      },
-    },
-    {
-      long: 'display-examples',
-      description: 'Display the examples.',
       parse: (parameter, input, { logger, option }) => {
         return {
           [option.long]: true,
@@ -290,12 +285,66 @@ const cli = require('../lib/cli/cli')(
       },
     },
     {
+      long: 'plugin-main-generate-api-data-spec',
+      description: 'Set the URL of API spec file to extract the data.',
+      help: '<url-spec-file>',
+      parse: (parameter, input, { logger, option }) => {
+        const [nextParameter] = input;
+
+        if (nextParameter) {
+          input.splice(0, 1);
+          return {
+            [option.long]: nextParameter,
+          };
+        } else {
+          logger.error(`${parameter} parameter is not defined.`);
+          process.exit(1);
+        }
+      },
+    },
+    {
+      long: 'plugins-directory',
+      description: 'Set the plugins directory where they are located.',
+      help: '<directory>',
+      parse: (parameter, input, { logger, option }) => {
+        const [nextParameter] = input;
+
+        if (nextParameter) {
+          input.splice(0, 1);
+          return {
+            [option.long]: nextParameter,
+          };
+        } else {
+          logger.error(`${parameter} parameter is not defined.`);
+          process.exit(1);
+        }
+      },
+    },
+    {
       long: 'ignore-confirmation',
       description: 'Ignore the confirmation.',
       parse: (parameter, input, { logger, option }) => {
         return {
           [option.long]: true,
         };
+      },
+    },
+    {
+      long: 'manifest-changelog',
+      description: 'Set the path to the changelog file.',
+      help: '<file-path>',
+      parse: (parameter, input, { logger, option }) => {
+        const [nextParameter] = input;
+
+        if (nextParameter) {
+          input.splice(0, 1);
+          return {
+            [option.long]: nextParameter,
+          };
+        } else {
+          logger.error(`${parameter} parameter is not defined.`);
+          process.exit(1);
+        }
       },
     },
     {

@@ -34,7 +34,8 @@ const cli = require('../../../../scripts/lib/cli/cli')(
     },
     {
       long: 'plugin-main-generate-api-data-spec',
-      description: 'Generate API data',
+      description: 'Set the URL of API spec file to extract the data.',
+      help: '<url-spec-file>',
       parse: (parameter, input, { logger, option }) => {
         const [nextParameter] = input;
 

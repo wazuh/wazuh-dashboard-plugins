@@ -14,7 +14,7 @@
 // 3. Display warning about manual changes
 
 const cliName = 'bump';
-const cliDescription = `Bump the plugin version, revision and/or platform version
+const cliDescription = `Bump the plugin version, revision or/and platform version for each plugin. Run specific bump task of each plugin. Bump changelog file.
 Some warning messages are sent to stderr.`;
 
 const logger = require('./lib/logger').create(['bump']);
@@ -60,93 +60,9 @@ const cli = require('../lib/cli/cli')(
       },
     },
     {
-      long: 'version',
-      description: 'Set the version.',
-      help: '<version>',
-      parse: (parameter, input, { logger, option }) => {
-        const [nextParameter] = input;
-
-        if (nextParameter) {
-          if (/\d+\.\d+\.\d+/.test(nextParameter)) {
-            input.splice(0, 1);
-            return {
-              [option.long]: nextParameter,
-            };
-          } else {
-            logger.error(
-              `${parameter} parameter is not valid. Expected format: X.Y.Z where X,Y, and Z are numbers.`,
-            );
-            process.exit(1);
-          }
-        } else {
-          logger.error(`${parameter} parameter is not defined.`);
-          process.exit(1);
-        }
-      },
-    },
-    {
-      long: 'revision',
-      description: 'Set the revision.',
-      help: '<revision>',
-      parse: (parameter, input, { logger, option }) => {
-        const [nextParameter] = input;
-
-        if (nextParameter) {
-          if (/\d{2}/.test(nextParameter)) {
-            input.splice(0, 1);
-            return {
-              [option.long]: nextParameter,
-            };
-          } else {
-            logger.error(
-              `${parameter} parameter is not valid. Expected format: Number`,
-            );
-            process.exit(1);
-          }
-        } else {
-          logger.error(`${parameter} parameter is not defined.`);
-          process.exit(1);
-        }
-      },
-    },
-    {
-      long: 'platform-version',
-      description: 'Set the platform version.',
-      help: '<platform-version>',
-      parse: (parameter, input, { logger, option }) => {
-        const [nextParameter] = input;
-
-        if (nextParameter) {
-          if (/\d+\.\d+\.\d+/.test(nextParameter)) {
-            input.splice(0, 1);
-            return {
-              [option.long]: nextParameter,
-            };
-          } else {
-            logger.error(
-              `${parameter} parameter is not valid. EExpected format: X.Y.Z where X,Y, and Z are numbers.`,
-            );
-            process.exit(1);
-          }
-        } else {
-          logger.error(`${parameter} parameter is not defined.`);
-          process.exit(1);
-        }
-      },
-    },
-    {
-      long: 'ignore-confirmation',
-      description: 'Ignore the confirmation.',
-      parse: (parameter, input, { logger, option }) => {
-        return {
-          [option.long]: true,
-        };
-      },
-    },
-    {
       long: 'manifest-changelog',
-      description: 'Set the tag suffix',
-      help: '<suffix>',
+      description: 'Set the path to the changelog file.',
+      help: '<file-path>',
       parse: (parameter, input, { logger, option }) => {
         const [nextParameter] = input;
 
@@ -181,6 +97,49 @@ const cli = require('../lib/cli/cli')(
       },
     },
     {
+      long: 'platform-version',
+      description: 'Set the platform version.',
+      help: '<platform-version>',
+      parse: (parameter, input, { logger, option }) => {
+        const [nextParameter] = input;
+
+        if (nextParameter) {
+          if (/\d+\.\d+\.\d+/.test(nextParameter)) {
+            input.splice(0, 1);
+            return {
+              [option.long]: nextParameter,
+            };
+          } else {
+            logger.error(
+              `${parameter} parameter is not valid. EExpected format: X.Y.Z where X,Y, and Z are numbers.`,
+            );
+            process.exit(1);
+          }
+        } else {
+          logger.error(`${parameter} parameter is not defined.`);
+          process.exit(1);
+        }
+      },
+    },
+    {
+      long: 'plugin-main-generate-api-data-spec',
+      description: 'Set the URL of API spec file to extract the data.',
+      help: '<url-spec-file>',
+      parse: (parameter, input, { logger, option }) => {
+        const [nextParameter] = input;
+
+        if (nextParameter) {
+          input.splice(0, 1);
+          return {
+            [option.long]: nextParameter,
+          };
+        } else {
+          logger.error(`${parameter} parameter is not defined.`);
+          process.exit(1);
+        }
+      },
+    },
+    {
       long: 'plugins-directory',
       description: 'Set the plugins directory where they are located.',
       help: '<directory>',
@@ -192,6 +151,56 @@ const cli = require('../lib/cli/cli')(
           return {
             [option.long]: nextParameter,
           };
+        } else {
+          logger.error(`${parameter} parameter is not defined.`);
+          process.exit(1);
+        }
+      },
+    },
+    {
+      long: 'revision',
+      description: 'Set the revision.',
+      help: '<revision>',
+      parse: (parameter, input, { logger, option }) => {
+        const [nextParameter] = input;
+
+        if (nextParameter) {
+          if (/\d{2}/.test(nextParameter)) {
+            input.splice(0, 1);
+            return {
+              [option.long]: nextParameter,
+            };
+          } else {
+            logger.error(
+              `${parameter} parameter is not valid. Expected format: Number`,
+            );
+            process.exit(1);
+          }
+        } else {
+          logger.error(`${parameter} parameter is not defined.`);
+          process.exit(1);
+        }
+      },
+    },
+    {
+      long: 'version',
+      description: 'Set the version.',
+      help: '<version>',
+      parse: (parameter, input, { logger, option }) => {
+        const [nextParameter] = input;
+
+        if (nextParameter) {
+          if (/\d+\.\d+\.\d+/.test(nextParameter)) {
+            input.splice(0, 1);
+            return {
+              [option.long]: nextParameter,
+            };
+          } else {
+            logger.error(
+              `${parameter} parameter is not valid. Expected format: X.Y.Z where X,Y, and Z are numbers.`,
+            );
+            process.exit(1);
+          }
         } else {
           logger.error(`${parameter} parameter is not defined.`);
           process.exit(1);
