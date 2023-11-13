@@ -3,14 +3,13 @@ import { HttpServer } from '../../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../../src/core/server/logging/logging_system.mock';
 import { ByteSizeValue } from '@osd/config-schema';
 import { routes } from '../../../common/constants';
-import axios from 'axios';
+import supertest from 'supertest';
 import { getUserPreferences } from '../../services/user-preferences';
 import { getUserPreferencesRoutes } from './get-user-preferences';
 import { UserPreferences } from '../../../common/types';
 
 const serverAddress = '127.0.0.1';
 const port = 11003; //assign a different port in each unit test
-axios.defaults.baseURL = `http://${serverAddress}:${port}`;
 
 const mockedGetUserPreferences = getUserPreferences as jest.Mock;
 jest.mock('../../services/user-preferences');
@@ -87,8 +86,11 @@ describe(`[endpoint] GET ${routes.userPreferences}`, () => {
     };
 
     mockedGetUserPreferences.mockImplementation(() => mockResponse);
-    const response = await axios.get(routes.userPreferences);
 
-    expect(response.data).toEqual(mockResponse);
+    const response = await supertest(innerServer.listener)
+      .get(routes.userPreferences)
+      .expect(200);
+
+    expect(response.body).toEqual(mockResponse);
   });
 });
