@@ -6,7 +6,9 @@ import angular from 'angular';
 export async function renderApp(moduleName: string, element: HTMLElement) {
   await import('./app');
   const $injector = mountWazuhApp(moduleName, element);
-  return () => $injector.get('$rootScope').$destroy();
+  return () => {
+    return $injector.get('$rootScope').$destroy();
+  };
 }
 
 function mountWazuhApp(moduleName: string, element: HTMLElement) {

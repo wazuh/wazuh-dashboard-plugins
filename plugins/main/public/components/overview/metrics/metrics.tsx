@@ -148,7 +148,9 @@ export const Metrics = withAllowedAgents(
           },
           { name: 'Total', type: 'total' },
         ],
-        osquery: [{ name: 'Agents reporting', type: 'unique-count', field: 'agent.id' }],
+        osquery: [
+          { name: 'Agents reporting', type: 'unique-count', field: 'agent.id' },
+        ],
         ciscat: [
           {
             name: 'Last scan not checked',
@@ -156,8 +158,14 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
-                aggs: { aggResult: { terms: { field: 'data.cis.notchecked' } } },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
+                aggs: {
+                  aggResult: { terms: { field: 'data.cis.notchecked' } },
+                },
               },
             },
             color: 'subdued',
@@ -168,7 +176,11 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.pass' } } },
               },
             },
@@ -180,7 +192,11 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.score' } } },
               },
             },
@@ -191,7 +207,11 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.timestamp' } } },
               },
             },
@@ -204,7 +224,11 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.error' } } },
               },
             },
@@ -216,7 +240,11 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.fail' } } },
               },
             },
@@ -228,7 +256,11 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.unknown' } } },
               },
             },
@@ -242,8 +274,14 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'oscap-report', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
-                aggs: { aggResult: { terms: { field: 'data.oscap.scan.score' } } },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
+                aggs: {
+                  aggResult: { terms: { field: 'data.oscap.scan.score' } },
+                },
               },
             },
           },
@@ -253,8 +291,14 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'oscap-report', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'data.oscap.scan.score', order: { _term: 'desc' }, size: 1 },
-                aggs: { aggResult: { terms: { field: 'data.oscap.scan.score' } } },
+                terms: {
+                  field: 'data.oscap.scan.score',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
+                aggs: {
+                  aggResult: { terms: { field: 'data.oscap.scan.score' } },
+                },
               },
             },
             color: 'secondary',
@@ -265,24 +309,75 @@ export const Metrics = withAllowedAgents(
             filter: { phrase: 'oscap-report', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'data.oscap.scan.score', order: { _term: 'asc' }, size: 1 },
-                aggs: { aggResult: { terms: { field: 'data.oscap.scan.score' } } },
+                terms: {
+                  field: 'data.oscap.scan.score',
+                  order: { _term: 'asc' },
+                  size: 1,
+                },
+                aggs: {
+                  aggResult: { terms: { field: 'data.oscap.scan.score' } },
+                },
               },
             },
             color: 'danger',
           },
         ],
         office: [
-          { name: "Max Rule Level", type: "custom", filter: { phrase: "office365", field: "rule.groups" }, agg: { "customAggResult": { "terms": { "field": "rule.level", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "rule.level" } } } } } },
-          { name: "Suspicious Downloads", type: "phrase", value: "91724", field: "rule.id", color: "danger" },
-          { name: "Full Access Permissions", type: "phrase", value: "91725", field: "rule.id" },
-          { name: "Phishing and Malware", type: "phrases", values: ["91556", "91575", "91700"], field: "rule.id", color: "danger" },
+          {
+            name: 'Max Rule Level',
+            type: 'custom',
+            filter: { phrase: 'office365', field: 'rule.groups' },
+            agg: {
+              customAggResult: {
+                terms: {
+                  field: 'rule.level',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
+                aggs: { aggResult: { terms: { field: 'rule.level' } } },
+              },
+            },
+          },
+          {
+            name: 'Suspicious Downloads',
+            type: 'phrase',
+            value: '91724',
+            field: 'rule.id',
+            color: 'danger',
+          },
+          {
+            name: 'Full Access Permissions',
+            type: 'phrase',
+            value: '91725',
+            field: 'rule.id',
+          },
+          {
+            name: 'Phishing and Malware',
+            type: 'phrases',
+            values: ['91556', '91575', '91700'],
+            field: 'rule.id',
+            color: 'danger',
+          },
         ],
         github: [
-          { name: "Organizations", type: "unique-count",  field: "data.github.org"},
-          { name: "Repositories", type: "unique-count",  field: "data.github.repo", color: "secondary"},
-          { name: "Actors", type: "unique-count",  field: "data.github.actor", color: "danger"},
-        ]
+          {
+            name: 'Organizations',
+            type: 'unique-count',
+            field: 'data.github.org',
+          },
+          {
+            name: 'Repositories',
+            type: 'unique-count',
+            field: 'data.github.repo',
+            color: 'secondary',
+          },
+          {
+            name: 'Actors',
+            type: 'unique-count',
+            field: 'data.github.actor',
+            color: 'danger',
+          },
+        ],
       };
     }
 
@@ -295,7 +390,12 @@ export const Metrics = withAllowedAgents(
 
     async getResults(filterParams, aggs = {}) {
       const params = { size: 0, track_total_hits: true };
-      const result = await getElasticAlerts(this.indexPattern, filterParams, aggs, params);
+      const result = await getElasticAlerts(
+        this.indexPattern,
+        filterParams,
+        aggs,
+        params,
+      );
       let totalHits = 0;
       if (Object.keys(aggs).length) {
         const agg = (result.data || {}).aggregations || {};
@@ -303,8 +403,10 @@ export const Metrics = withAllowedAgents(
           //CUSTOM AGG
           totalHits =
             (
-              (((((agg.customAggResult || {}).buckets || [])[0] || {}).aggResult || {}).buckets ||
-                [])[0] || {}
+              ((
+                (((agg.customAggResult || {}).buckets || [])[0] || {})
+                  .aggResult || {}
+              ).buckets || [])[0] || {}
             ).key || 0;
         } else {
           totalHits = (agg.aggResult || {}).value || 0;
@@ -327,7 +429,7 @@ export const Metrics = withAllowedAgents(
       this.setState({ filterParams, loading: true });
       const newOnClick = {};
 
-      const result = this.metricsList[this.props.section].map(async (item) => {
+      const result = this.metricsList[this.props.section].map(async item => {
         let filters = [];
         if (item.type === 'range') {
           const results = {};
@@ -337,7 +439,7 @@ export const Metrics = withAllowedAgents(
             ...buildRangeFilter(
               { name: item.field, type: 'integer' },
               valuesArray,
-              this.indexPattern
+              this.indexPattern,
             ),
             $state: { store: 'appState' },
           };
@@ -357,7 +459,7 @@ export const Metrics = withAllowedAgents(
             ...buildPhrasesFilter(
               { name: item.field, type: 'string' },
               item.values,
-              this.indexPattern
+              this.indexPattern,
             ),
             $state: { store: 'appState' },
           };
@@ -382,7 +484,7 @@ export const Metrics = withAllowedAgents(
               ...buildPhraseFilter(
                 { name: item.filter.field, type: 'string' },
                 item.filter.phrase,
-                this.indexPattern
+                this.indexPattern,
               ),
               $state: { store: 'appState' },
             };
@@ -394,7 +496,10 @@ export const Metrics = withAllowedAgents(
           const results = {};
           const existsFilters = {};
           const filters = {
-            ...buildExistsFilter({ name: item.field, type: 'nested' }, this.indexPattern),
+            ...buildExistsFilter(
+              { name: item.field, type: 'nested' },
+              this.indexPattern,
+            ),
             $state: { store: 'appState' },
           };
           existsFilters['filters'] = [...filterParams['filters']];
@@ -429,7 +534,7 @@ export const Metrics = withAllowedAgents(
             ...buildPhraseFilter(
               { name: item.field, type: 'string' },
               item.value,
-              this.indexPattern
+              this.indexPattern,
             ),
             $state: { store: 'appState' },
           };
@@ -455,7 +560,7 @@ export const Metrics = withAllowedAgents(
       try {
         const completed = await Promise.all(result);
         const newResults = {};
-        completed.forEach((item) => {
+        completed.forEach(item => {
           const key = Object.keys(item)[0];
           newResults[key] = item[key];
         });
@@ -489,21 +594,28 @@ export const Metrics = withAllowedAgents(
         this.props.resultState === 'ready' &&
         this.state.resultState === 'loading'
       ) {
-        this.setState({ buildingMetrics: true, resultState: this.props.resultState }, () => {
-          this.stats = this.buildMetric();
-        });
+        this.setState(
+          { buildingMetrics: true, resultState: this.props.resultState },
+          () => {
+            this.stats = this.buildMetric();
+          },
+        );
       } else if (this.props.resultState !== this.state.resultState) {
-        const isLoading = this.props.resultState === 'loading' ? { loading: true } : {};
+        const isLoading =
+          this.props.resultState === 'loading' ? { loading: true } : {};
         this.setState({ resultState: this.props.resultState, ...isLoading });
       }
     }
 
     buildTitleButton = (count, itemName) => {
       return (
-        <EuiToolTip position="top" content={`Filter by ${itemName}`}>
+        <EuiToolTip position='top' content={`Filter by ${itemName}`}>
           <span
             className={'statWithLink'}
-            style={{ cursor: 'pointer', fontSize: count > 20 ? '2rem' : '2.25rem' }}
+            style={{
+              cursor: 'pointer',
+              fontSize: count > 20 ? '2rem' : '2.25rem',
+            }}
             onClick={this.state.metricsOnClicks[itemName]}
           >
             {this.state.results[itemName]}
@@ -534,7 +646,7 @@ export const Metrics = withAllowedAgents(
                 description={item.name}
                 titleColor={this.metricsList[section][idx].color || 'primary'}
                 isLoading={this.state.loading}
-                textAlign="center"
+                textAlign='center'
               />
             </EuiFlexItem>
           );
@@ -552,5 +664,5 @@ export const Metrics = withAllowedAgents(
         </EuiFlexGroup>
       );
     }
-  }
+  },
 );

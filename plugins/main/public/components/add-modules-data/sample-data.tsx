@@ -13,7 +13,14 @@
 import React, { Component, Fragment } from 'react';
 import { WzButtonPermissions } from '../../components/common/permissions/button';
 
-import { EuiFlexItem, EuiCard, EuiFlexGrid, EuiFlexGroup, EuiCallOut, EuiSpacer } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiCard,
+  EuiFlexGrid,
+  EuiFlexGroup,
+  EuiCallOut,
+  EuiSpacer,
+} from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
@@ -23,6 +30,33 @@ import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import {
+  amazonWebServices,
+  docker,
+  fileIntegrityMonitoring,
+  github,
+  googleCloud,
+  malwareDetection,
+  mitreAttack,
+  office365,
+  virustotal,
+  vulnerabilityDetection,
+} from '../../utils/applications';
+
+const sampleSecurityInformationApplication = [
+  fileIntegrityMonitoring.title,
+  amazonWebServices.title,
+  office365.title,
+  googleCloud.title,
+  github.title,
+];
+
+const sampleThreatDetectionApplication = [
+  vulnerabilityDetection.title,
+  virustotal.title,
+  docker.title,
+  mitreAttack.title,
+];
 
 export default class WzSampleData extends Component {
   categories: {
@@ -45,32 +79,34 @@ export default class WzSampleData extends Component {
     this.categories = [
       {
         title: 'Sample security information',
-        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Office 365, Google Cloud Platform, GitHub, authorization, ssh, web).',
+        description: `Sample data, visualizations and dashboards for security information (${sampleSecurityInformationApplication.join(
+          ', ',
+        )}, authorization, ssh, web).`,
         image: '',
         categorySampleAlertsIndex: 'security',
       },
       {
-        title: 'Sample auditing and policy monitoring',
-        description:
-          'Sample data, visualizations and dashboards for events of auditing and policy monitoring (policy monitoring, system auditing, OpenSCAP, CIS-CAT).',
+        title: `Sample ${malwareDetection.title}`,
+        description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${malwareDetection.title}).`,
         image: '',
         categorySampleAlertsIndex: 'auditing-policy-monitoring',
       },
       {
         title: 'Sample threat detection and response',
-        description:
-          'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirusTotal, Osquery, Docker listener, MITRE).',
+        description: `Sample data, visualizations and dashboards for threat events of detection and response (${sampleThreatDetectionApplication.join(
+          ', ',
+        )}).`,
         image: '',
         categorySampleAlertsIndex: 'threat-detection',
       },
     ];
     this.state = {};
-    this.categories.forEach((category) => {
+    this.categories.forEach(category => {
       this.state[category.categorySampleAlertsIndex] = {
         exists: false,
         addDataLoading: false,
         removeDataLoading: false,
-        havePermissions: false
+        havePermissions: false,
       };
     });
   }
@@ -82,10 +118,10 @@ export default class WzSampleData extends Component {
           this.categories.reduce((accum, cur) => {
             accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq(
               'GET',
-              `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`
+              `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`,
             );
             return accum;
-          }, {})
+          }, {}),
         );
 
         this.setState(
@@ -97,8 +133,8 @@ export default class WzSampleData extends Component {
               };
               return accum;
             },
-            { ...this.state }
-          )
+            { ...this.state },
+          ),
         );
       } catch (error) {
         throw error;
@@ -134,7 +170,12 @@ export default class WzSampleData extends Component {
       getErrorOrchestrator().handleError(options);
     }
   }
-  showToast(color: string, title: string = '', text: string = '', time: number = 3000) {
+  showToast(
+    color: string,
+    title: string = '',
+    text: string = '',
+    time: number = 3000,
+  ) {
     getToasts().add({
       color: color,
       title: title,
@@ -153,13 +194,13 @@ export default class WzSampleData extends Component {
       await WzRequest.genericReq(
         'POST',
         `/elastic/samplealerts/${category.categorySampleAlertsIndex}`,
-        { params: this.generateAlertsParams }
+        { params: this.generateAlertsParams },
       );
       this.showToast(
         'success',
         `${category.title} alerts added`,
         'Date range for sample data is now-7 days ago',
-        5000
+        5000,
       );
       this.setState({
         [category.categorySampleAlertsIndex]: {
@@ -198,7 +239,7 @@ export default class WzSampleData extends Component {
       });
       await WzRequest.genericReq(
         'DELETE',
-        `/elastic/samplealerts/${category.categorySampleAlertsIndex}`
+        `/elastic/samplealerts/${category.categorySampleAlertsIndex}`,
       );
       this.setState({
         [category.categorySampleAlertsIndex]: {
@@ -234,17 +275,17 @@ export default class WzSampleData extends Component {
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
         <EuiCard
-          textAlign="left"
+          textAlign='left'
           title={category.title}
           description={category.description}
           image={category.image}
           betaBadgeLabel={exists ? 'Installed' : undefined}
           footer={
-            <EuiFlexGroup justifyContent="flexEnd">
+            <EuiFlexGroup justifyContent='flexEnd'>
               <EuiFlexItem grow={false}>
                 {(exists && (
                   <WzButtonPermissions
-                    color="danger"
+                    color='danger'
                     roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
                     onClick={() => this.removeSampleData(category)}
                   >
@@ -270,12 +311,12 @@ export default class WzSampleData extends Component {
     return (
       <>
         <EuiCallOut
-            title="These actions require permissions on the managed indices."
-            iconType="iInCircle"
+          title='These actions require permissions on the managed indices.'
+          iconType='iInCircle'
         />
         <EuiSpacer />
         <EuiFlexGrid columns={3}>
-          {this.categories.map((category) => this.renderCard(category))}
+          {this.categories.map(category => this.renderCard(category))}
         </EuiFlexGrid>
       </>
     );
@@ -292,13 +333,13 @@ const zipObject = (keys = [], values = []) => {
 const PromiseAllRecursiveObject = function (obj) {
   const keys = Object.keys(obj);
   return Promise.all(
-    keys.map((key) => {
+    keys.map(key => {
       const value = obj[key];
       // Promise.resolve(value) !== value should work, but !value.then always works
       if (typeof value === 'object' && !value.then) {
         return PromiseAllRecursiveObject(value);
       }
       return value;
-    })
-  ).then((result) => zipObject(keys, result))
+    }),
+  ).then(result => zipObject(keys, result));
 };

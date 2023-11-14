@@ -13,19 +13,20 @@
 import React, { Component, Fragment } from 'react';
 
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import WzConfigurationLogCollectionLogs from './log-collection-logs';
 import WzConfigurationLogCollectionCommands from './log-collection-commands';
-import WzConfigurationLogCollectionWindowsEvents from './log-collection-windowsevents'
+import WzConfigurationLogCollectionWindowsEvents from './log-collection-windowsevents';
 import WzConfigurationLogCollectionSockets from './log-collection-sockets';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString } from '../utils/utils';
-import { 
-  LOCALFILE_COMMANDS_PROP, 
-  LOCALFILE_LOGS_PROP, 
-  LOCALFILE_WINDOWSEVENT_PROP, 
-  LOGCOLLECTOR_LOCALFILE_PROP } from './types'
+import {
+  LOCALFILE_COMMANDS_PROP,
+  LOCALFILE_LOGS_PROP,
+  LOCALFILE_WINDOWSEVENT_PROP,
+  LOGCOLLECTOR_LOCALFILE_PROP,
+} from './types';
 
 class WzConfigurationLogCollection extends Component {
   constructor(props) {
@@ -40,45 +41,94 @@ class WzConfigurationLogCollection extends Component {
             ...currentConfig,
             [LOGCOLLECTOR_LOCALFILE_PROP]: {
               ...currentConfig[LOGCOLLECTOR_LOCALFILE_PROP],
-              [LOCALFILE_LOGS_PROP]: currentConfig[LOGCOLLECTOR_LOCALFILE_PROP].localfile.filter(item => typeof item.file !== 'undefined'), // TODO: it needs to be defined to support localfile as `eventchannel`. These doesn't have file property.
-              [LOCALFILE_WINDOWSEVENT_PROP]: currentConfig[LOGCOLLECTOR_LOCALFILE_PROP].localfile.filter(item => item.logformat === 'eventchannel' || item.logformat === 'eventlog'),
-              [LOCALFILE_COMMANDS_PROP]: currentConfig[LOGCOLLECTOR_LOCALFILE_PROP].localfile.filter(item => item.logformat === 'command' || item.logformat === 'full_command')
-            }
+              [LOCALFILE_LOGS_PROP]: currentConfig[
+                LOGCOLLECTOR_LOCALFILE_PROP
+              ].localfile.filter(item => typeof item.file !== 'undefined'), // TODO: it needs to be defined to support localfile as `eventchannel`. These doesn't have file property.
+              [LOCALFILE_WINDOWSEVENT_PROP]: currentConfig[
+                LOGCOLLECTOR_LOCALFILE_PROP
+              ].localfile.filter(
+                item =>
+                  item.logformat === 'eventchannel' ||
+                  item.logformat === 'eventlog',
+              ),
+              [LOCALFILE_COMMANDS_PROP]: currentConfig[
+                LOGCOLLECTOR_LOCALFILE_PROP
+              ].localfile.filter(
+                item =>
+                  item.logformat === 'command' ||
+                  item.logformat === 'full_command',
+              ),
+            },
           }
         : currentConfig;
-    return (
-      <Fragment>
-        <WzTabSelector>
-          { currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP].length > 0 && 
-            <WzTabSelectorTab label="Logs">
-              <WzConfigurationLogCollectionLogs
-                currentConfig={currentConfig}
-                agent={agent}
-              />
-            </WzTabSelectorTab>
-          }
-          { currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_WINDOWSEVENT_PROP].length > 0 && 
-            <WzTabSelectorTab label="Windows Events">
-              <WzConfigurationLogCollectionWindowsEvents
-                currentConfig={currentConfig}
-                agent={agent}
-              />
-            </WzTabSelectorTab>
-          }
-          { currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP].length > 0 && 
-            <WzTabSelectorTab label="Commands">
-              <WzConfigurationLogCollectionCommands
-                currentConfig={currentConfig}
-                agent={agent}
-              />
-            </WzTabSelectorTab>
-          }
-          <WzTabSelectorTab label="Sockets">
+
+    const tabsToRender = [
+      {
+        condition:
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP]
+            .length > 0,
+        component: (
+          <WzTabSelectorTab label='Logs'>
+            <WzConfigurationLogCollectionLogs
+              currentConfig={currentConfig}
+              agent={agent}
+            />
+          </WzTabSelectorTab>
+        ),
+      },
+      {
+        condition:
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][
+            LOCALFILE_WINDOWSEVENT_PROP
+          ].length > 0,
+        component: (
+          <WzTabSelectorTab label='Windows Events'>
+            <WzConfigurationLogCollectionWindowsEvents
+              currentConfig={currentConfig}
+              agent={agent}
+            />
+          </WzTabSelectorTab>
+        ),
+      },
+      {
+        condition:
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP]
+            .length > 0,
+        component: (
+          <WzTabSelectorTab label='Commands'>
+            <WzConfigurationLogCollectionCommands
+              currentConfig={currentConfig}
+              agent={agent}
+            />
+          </WzTabSelectorTab>
+        ),
+      },
+      {
+        condition: true, // Will always render
+        component: (
+          <WzTabSelectorTab label='Sockets'>
             <WzConfigurationLogCollectionSockets
               currentConfig={currentConfig}
               agent={agent}
             />
           </WzTabSelectorTab>
+        ),
+      },
+    ];
+
+    return (
+      <Fragment>
+        <WzTabSelector>
+          {tabsToRender
+            .filter(tab => tab.condition)
+            .map((tab, index) =>
+              React.cloneElement(tab.component, {
+                key: `WzTabSelectorTab_${index}`,
+              }),
+            )}
         </WzTabSelector>
       </Fragment>
     );
@@ -87,7 +137,7 @@ class WzConfigurationLogCollection extends Component {
 
 const sections = [
   { component: 'logcollector', configuration: 'localfile' },
-  { component: 'logcollector', configuration: 'socket' }
+  { component: 'logcollector', configuration: 'socket' },
 ];
 
 export default withWzConfig(sections)(WzConfigurationLogCollection);

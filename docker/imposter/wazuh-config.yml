@@ -511,6 +511,13 @@ resources:
       statusCode: 200
       scriptFile: manager/configuration.js
 
+  # Get available updates
+  - method: GET
+    path: /manager/version/check
+    response:
+      statusCode: 200
+      staticFile: manager/version/check.json
+
   # ===================================================== #
   #   MITRE
   # ===================================================== #
