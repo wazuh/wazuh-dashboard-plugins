@@ -11,7 +11,27 @@
  */
 
 import React from 'react';
-import { withErrorBoundary } from '../../common/hocs';
+import {
+  withErrorBoundary,
+  withGlobalBreadcrumb,
+  withReduxProvider,
+} from '../../common/hocs';
 import { SyscollectorInventory } from './inventory';
+import { compose } from 'redux';
+import { itHygiene } from '../../../utils/applications';
 
-export const MainSyscollector = withErrorBoundary(SyscollectorInventory);
+export const MainSyscollector = compose(
+  withReduxProvider,
+  withErrorBoundary,
+  withGlobalBreadcrumb(({ agent }) => {
+    return [
+      {
+        text: itHygiene.title,
+      },
+      { agent },
+      {
+        text: 'Inventory Data',
+      },
+    ];
+  }),
+)(SyscollectorInventory);

@@ -42,16 +42,26 @@ export const validateAgentName = (value: any) => {
   if (value.length === 0) {
     return undefined;
   }
-  const regex = /^[A-Za-z.\-_,]+$/;
+  let invalidCharacters = validateCharacters(value);
+  if (value.length < 2) {
+    return `The minimum length is 2 characters.${
+      invalidCharacters && ` ${invalidCharacters}`
+    }`;
+  }
+  return `${invalidCharacters}`;
+};
 
-  const isLengthValid = value.length >= 2 && value.length <= 63;
-  const isFormatValid = regex.test(value);
-  if (!isFormatValid && !isLengthValid) {
-    return 'The minimum length is 2 characters. The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
-  } else if (!isLengthValid) {
-    return 'The minimum length is 2 characters.';
-  } else if (!isFormatValid) {
-    return 'The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
+const validateCharacters = (value: any) => {
+  const regex = /^[a-z0-9.\-_,]+$/i;
+  const invalidCharacters = [
+    ...new Set(value.split('').filter(char => !regex.test(char))),
+  ];
+  if (invalidCharacters.length > 1) {
+    return `The characters "${invalidCharacters.join(
+      ',',
+    )}" are not valid. Allowed characters are A-Z, a-z, 0-9, ".", "-", "_"`;
+  } else if (invalidCharacters.length === 1) {
+    return `The character "${invalidCharacters[0]}" is not valid. Allowed characters are A-Z, a-z, 0-9, ".", "-", "_"`;
   }
   return '';
 };

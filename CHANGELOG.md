@@ -13,7 +13,29 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.8.0
+- Added the ability to check if there are available updates from the UI. [#6093](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6093)
 - Added remember server address check [#5791](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5791)
+- Added the ssl_agent_ca configuration to the SSL Settings form [#6083](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6083)
+- Added global vulnerabilities dashboards [#5896](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5896)
+- Added an agent selector to the IT Hygiene application [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
+- Added query results limit when the search exceed 10000 hits [#6106](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6106)
+
+### Changed
+
+- Moved the plugin menu to platform applications into the side menu [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
+- Changed dashboards. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035)
+- Change the display order of tabs in all modules. [#6067](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6067)
+- Upgraded the `axios` dependency to `1.6.1` [#5062](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5062)
+
+### Fixed
+
+- Fixed a problem with the agent menu header when the side menu is docked [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
+- Fixed how the query filters apply on the Security Alerts table [#6102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6102)
+
+### Removed
+
+- Removed the `disabled_roles` and `customization.logo.sidebar` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
+- Removed the ability to configure the visibility of modules and removed `extensions.*` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 00
 
@@ -21,7 +43,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.7.1
 
-## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 01
+### Fixed
+
+- Fixed problem when using non latin characters in the username [#6076](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6076)
+- Fixed UI crash on retrieving log collection configuration for macos agent. [#6104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6104)
+- Fixed incorrect validation of the agent name on the Deploy new agent window [#6105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6105)
+
+## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 03
 
 ### Added
 

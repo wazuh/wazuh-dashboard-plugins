@@ -54,6 +54,7 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { serverStatus } from '../../../../../utils/applications';
 
 export class WzStatusOverview extends Component {
   _isMounted = false;
@@ -92,15 +93,14 @@ export class WzStatusOverview extends Component {
     try {
       this.props.updateLoadingStatus(true);
 
-
-      const [
-        clusterStatus,
-        agentsCountByManagerNodes
-      ] = (await Promise.all([
-        this.statusHandler.clusterStatus(),
-        this.statusHandler.clusterAgentsCount()
-      ])).map(response => response?.data?.data);
-      const { connection: agentsCount, configuration } = agentsCountByManagerNodes?.agent_status;
+      const [clusterStatus, agentsCountByManagerNodes] = (
+        await Promise.all([
+          this.statusHandler.clusterStatus(),
+          this.statusHandler.clusterAgentsCount(),
+        ])
+      ).map(response => response?.data?.data);
+      const { connection: agentsCount, configuration } =
+        agentsCountByManagerNodes?.agent_status;
 
       const agentsActiveCoverage = (
         (agentsCount.active / agentsCount.total) *
@@ -118,32 +118,48 @@ export class WzStatusOverview extends Component {
         agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
       });
 
-      this.props.updateClusterEnabled(clusterStatus && clusterStatus.enabled === 'yes');
+      this.props.updateClusterEnabled(
+        clusterStatus && clusterStatus.enabled === 'yes',
+      );
 
-      if (clusterStatus && clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes') {
+      if (
+        clusterStatus &&
+        clusterStatus.enabled === 'yes' &&
+        clusterStatus.running === 'yes'
+      ) {
         const nodes = await this.statusHandler.clusterNodes();
         const listNodes = nodes.data.data.affected_items;
         this.props.updateListNodes(listNodes);
         const masterNode = nodes.data.data.affected_items.filter(
-          (item) => item.type === 'master'
+          item => item.type === 'master',
         )[0];
         this.props.updateSelectedNode(masterNode.name);
-        const daemons = await this.statusHandler.clusterNodeStatus(masterNode.name);
+        const daemons = await this.statusHandler.clusterNodeStatus(
+          masterNode.name,
+        );
         const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
         this.props.updateListDaemons(listDaemons);
-        const nodeInfo = await this.statusHandler.clusterNodeInfo(masterNode.name);
+        const nodeInfo = await this.statusHandler.clusterNodeInfo(
+          masterNode.name,
+        );
         this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
       } else {
-        if (clusterStatus && clusterStatus.enabled === 'yes' && clusterStatus.running === 'no') {
+        if (
+          clusterStatus &&
+          clusterStatus.enabled === 'yes' &&
+          clusterStatus.running === 'no'
+        ) {
           this.showToast(
             'danger',
             `Cluster is enabled but it's not running, please check your cluster health.`,
-            3000
+            3000,
           );
         } else {
           const managerInfo = await this.statusHandler.managerInfo();
           const daemons = await this.statusHandler.managerStatus();
-          const listDaemons = this.objToArr(daemons?.data?.data?.affected_items?.[0]);
+          const listDaemons = this.objToArr(
+            daemons?.data?.data?.affected_items?.[0],
+          );
           const managerInfoData = managerInfo?.data?.data?.affected_items?.[0];
           this.props.updateListDaemons(listDaemons);
           this.props.updateSelectedNode(false);
@@ -178,7 +194,8 @@ export class WzStatusOverview extends Component {
   };
 
   render() {
-    const { isLoading, listDaemons, stats, nodeInfo, agentInfo } = this.props.state;
+    const { isLoading, listDaemons, stats, nodeInfo, agentInfo } =
+      this.props.state;
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -197,11 +214,11 @@ export class WzStatusOverview extends Component {
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              {isLoading && <EuiProgress size="xs" color="primary" />}
+              {isLoading && <EuiProgress size='xs' color='primary' />}
               {!isLoading && listDaemons && <WzStatusDaemons />}
-              <EuiSpacer size="l" />
+              <EuiSpacer size='l' />
               {!isLoading && stats && <WzStatusStats />}
-              <EuiSpacer size="l" />
+              <EuiSpacer size='l' />
               {!isLoading && (
                 <EuiFlexGrid columns={2}>
                   {nodeInfo && (
@@ -224,32 +241,30 @@ export class WzStatusOverview extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.statusReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    updateListNodes: (listNodes) => dispatch(updateListNodes(listNodes)),
-    updateSelectedNode: (selectedNode) => dispatch(updateSelectedNode(selectedNode)),
-    updateListDaemons: (listDaemons) => dispatch(updateListDaemons(listDaemons)),
-    updateStats: (stats) => dispatch(updateStats(stats)),
-    updateNodeInfo: (nodeInfo) => dispatch(updateNodeInfo(nodeInfo)),
-    updateAgentInfo: (agentInfo) => dispatch(updateAgentInfo(agentInfo)),
-    updateClusterEnabled: (clusterEnabled) => dispatch(updateClusterEnabled(clusterEnabled)),
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updateListNodes: listNodes => dispatch(updateListNodes(listNodes)),
+    updateSelectedNode: selectedNode =>
+      dispatch(updateSelectedNode(selectedNode)),
+    updateListDaemons: listDaemons => dispatch(updateListDaemons(listDaemons)),
+    updateStats: stats => dispatch(updateStats(stats)),
+    updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
+    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
+    updateClusterEnabled: clusterEnabled =>
+      dispatch(updateClusterEnabled(clusterEnabled)),
     cleanInfo: () => dispatch(cleanInfo()),
   };
 };
 
 export default compose(
-  withGlobalBreadcrumb([
-    { text: '' },
-    { text: 'Management', href: '#/manager' },
-    { text: 'Status' },
-  ]),
+  withGlobalBreadcrumb([{ text: serverStatus.title }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
@@ -258,5 +273,5 @@ export default compose(
     { action: 'manager:read', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
-  connect(mapStateToProps, mapDispatchToProps)
+  connect(mapStateToProps, mapDispatchToProps),
 )(WzStatusOverview);

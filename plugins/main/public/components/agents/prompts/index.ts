@@ -15,3 +15,4 @@ export * from './prompt-no-selected-agent';
 export * from './prompt-select-agent';
 export * from './prompt-agent-feature-version';
 export * from './prompt_module_not_for_agent';
+export * from './prompt-agent-never-connected';

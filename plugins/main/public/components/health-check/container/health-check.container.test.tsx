@@ -36,18 +36,18 @@ jest.mock('../../../components/common/hooks', () => ({
 }));
 
 jest.mock('../services', () => ({
-  checkPatternService: (appInfo) => () => undefined,
-  checkTemplateService: (appInfo) => () => undefined,
-  checkApiService: (appInfo) => () => undefined,
-  checkSetupService: (appInfo) => () => undefined,
-  checkFieldsService: (appInfo) => () => undefined,
-  checkPluginPlatformSettings: (appInfo) => () => undefined,
-  checkPatternSupportService: (appInfo) => () => undefined,
-  checkIndexPatternService: (appInfo) => () => undefined,
+  checkPatternService: appInfo => () => undefined,
+  checkTemplateService: appInfo => () => undefined,
+  checkApiService: appInfo => () => undefined,
+  checkSetupService: appInfo => () => undefined,
+  checkFieldsService: appInfo => () => undefined,
+  checkPluginPlatformSettings: appInfo => () => undefined,
+  checkPatternSupportService: appInfo => () => undefined,
+  checkIndexPatternService: appInfo => () => undefined,
 }));
 
 jest.mock('../components/check-result', () => ({
-  CheckResult: () => () => <></>,
+  CheckResult: () => <></>,
 }));
 
 jest.mock('../../../react-services', () => ({
@@ -55,14 +55,22 @@ jest.mock('../../../react-services', () => ({
     setPatternSelector: () => {},
   },
   ErrorHandler: {
-    handle: (error) => error,
+    handle: error => error,
   },
 }));
 
+jest.mock('react-use/lib/useObservable', () => () => {});
+
 jest.mock('../../../kibana-services', () => ({
+  getCore: () => ({
+    application: {
+      getUrlForApp: (appId: string) => appId,
+      navigateToUrl: (appId: string) => appId,
+    },
+  }),
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
   getDataPlugin: () => ({
@@ -76,11 +84,11 @@ jest.mock('../../../kibana-services', () => ({
   }),
   getUiSettings: () => ({
     get: (setting: string): any => {
-      if(setting === 'theme:darkMode'){
-        return false
+      if (setting === 'theme:darkMode') {
+        return false;
       }
-    }
-  })
+    },
+  }),
 }));
 
 describe('Health Check container', () => {
@@ -93,7 +101,9 @@ describe('Health Check container', () => {
   it('should render a Health check screen with error', () => {
     const component = mount(<HealthCheckTest />);
 
-    component.find('CheckResult').at(1).invoke('handleErrors')('setup', ['Test error']); // invoke is wrapped with act to await for setState
+    component.find('CheckResult').at(1).invoke('handleErrors')('setup', [
+      'Test error',
+    ]); // invoke is wrapped with act to await for setState
 
     const callOutError = component.find('EuiCallOut');
     expect(callOutError.text()).toBe('[API version] Test error');

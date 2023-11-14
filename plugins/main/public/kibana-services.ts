@@ -7,25 +7,30 @@ import {
   SavedObjectsStart,
   ScopedHistory,
   ToastsStart,
+  AppMountParameters,
 } from 'opensearch_dashboards/public';
 import { createGetterSetter } from '../../../src/plugins/opensearch_dashboards_utils/common';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { VisualizationsStart } from '../../../src/plugins/visualizations/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AppPluginStartDependencies } from './types';
+import { WazuhCheckUpdatesPluginStart } from '../../wazuh-check-updates/public';
 
 let angularModule: any = null;
 let discoverModule: any = null;
 
 export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
-export const [getPlugins, setPlugins] = createGetterSetter<AppPluginStartDependencies>('Plugins');
+export const [getPlugins, setPlugins] =
+  createGetterSetter<AppPluginStartDependencies>('Plugins');
 export const [getToasts, setToasts] = createGetterSetter<ToastsStart>('Toasts');
 export const [getHttp, setHttp] = createGetterSetter<HttpStart>('Http');
-export const [getUiSettings, setUiSettings] = createGetterSetter<IUiSettingsClient>('UiSettings');
+export const [getUiSettings, setUiSettings] =
+  createGetterSetter<IUiSettingsClient>('UiSettings');
 export const [getChrome, setChrome] = createGetterSetter<ChromeStart>('Chrome');
 export const [getScopedHistory, setScopedHistory] =
   createGetterSetter<ScopedHistory>('ScopedHistory');
-export const [getOverlays, setOverlays] = createGetterSetter<OverlayStart>('Overlays');
+export const [getOverlays, setOverlays] =
+  createGetterSetter<OverlayStart>('Overlays');
 export const [getSavedObjects, setSavedObjects] =
   createGetterSetter<SavedObjectsStart>('SavedObjects');
 export const [getDataPlugin, setDataPlugin] =
@@ -34,6 +39,16 @@ export const [getVisualizationsPlugin, setVisualizationsPlugin] =
   createGetterSetter<VisualizationsStart>('VisualizationsPlugin');
 export const [getNavigationPlugin, setNavigationPlugin] =
   createGetterSetter<NavigationPublicPluginStart>('NavigationPlugin');
+export const [getWzMainParams, setWzMainParams] =
+  createGetterSetter<NavigationPublicPluginStart>('WzMainParams');
+export const [getWzCurrentAppID, setWzCurrentAppID] =
+  createGetterSetter<NavigationPublicPluginStart>('WzCurrentAppID');
+export const [getWazuhCheckUpdatesPlugin, setWazuhCheckUpdatesPlugin] =
+  createGetterSetter<WazuhCheckUpdatesPluginStart>('WazuhCheckUpdatesPlugin');
+export const [getHeaderActionMenuMounter, setHeaderActionMenuMounter] =
+  createGetterSetter<AppMountParameters['setHeaderActionMenu']>(
+    'headerActionMenuMounter',
+  );
 
 /**
  * set bootstrapped inner angular module

@@ -53,11 +53,12 @@ import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
+import { endpointSumary } from '../../../utils/applications';
 
 export const AgentsPreview = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
+  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },

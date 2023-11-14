@@ -15,6 +15,9 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import React, { useState, useEffect } from 'react';
 import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { getCore } from '../../../kibana-services';
+import { sampleData } from '../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export const SampleDataWarning = ({ ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
@@ -22,8 +25,9 @@ export const SampleDataWarning = ({ ...props }) => {
   useEffect(() => {
     (async () => {
       try {
-        const result = (await WzRequest.genericReq('GET', '/elastic/samplealerts')).data
-          .sampleAlertsInstalled;
+        const result = (
+          await WzRequest.genericReq('GET', '/elastic/samplealerts')
+        ).data.sampleAlertsInstalled;
         setIsSampleData(result);
       } catch (error) {
         const options = {
@@ -50,20 +54,25 @@ export const SampleDataWarning = ({ ...props }) => {
   if (isSampleData) {
     return (
       <EuiCallOut
-        title="This dashboard contains sample data"
-        color="warning"
-        iconType="alert"
+        title='This dashboard contains sample data'
+        color='warning'
+        iconType='alert'
         style={{ margin: '0 8px 16px 8px' }}
-        data-test-subject="sample-data-callout"
+        data-test-subject='sample-data-callout'
         {...props}
       >
-        <p>
-          {'The data displayed may contain sample alerts. Go '}
-          <EuiLink href="#/settings?tab=sample_data" aria-label="go to configure sample data">
-            {'here '}
-          </EuiLink>
-          {'to configure the sample data.'}
-        </p>
+        <RedirectAppLinks application={getCore().application}>
+          <p>
+            {'The data displayed may contain sample alerts. Go '}
+            <EuiLink
+              href={getCore().application.getUrlForApp(sampleData.id)}
+              aria-label='go to configure sample data'
+            >
+              {'here '}
+            </EuiLink>
+            {'to configure the sample data.'}
+          </p>
+        </RedirectAppLinks>
       </EuiCallOut>
     );
   } else {
