@@ -1,8 +1,6 @@
-const logger = require('./logger');
-
 function updatePackageManifest(
-  manifestPath,
-  { version, revision, platformVersion },
+  { path: manifestPath, version, revision, platformVersion },
+  logger,
 ) {
   if (!manifestPath) {
     logger.error(

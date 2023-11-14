@@ -1,6 +1,4 @@
-const logger = require('./logger');
-
-function readPackageManifest(manifestPath) {
+function readPackageManifest(manifestPath, logger) {
   if (!manifestPath) {
     logger.error(
       `package manifest file is not defined. Use --manifest-package <path/to/file>.`,

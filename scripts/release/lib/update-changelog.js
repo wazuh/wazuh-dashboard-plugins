@@ -1,19 +1,17 @@
-const logger = require('./logger');
-
 function updateChangelog(
-  changelogPath,
-  { version, revision, platformVersion },
+  { path: manifestPath, version, revision, platformVersion },
+  logger,
 ) {
-  if (!changelogPath) {
+  if (!manifestPath) {
     logger.error(
       `changelog file is not defined. Use --manifest-changelog <path/to/file>.`,
     );
     process.exit(1);
   }
   const fs = require('fs');
-  logger.debug(`Reading file ${changelogPath}`);
-  const content = fs.readFileSync(changelogPath, 'utf8');
-  logger.debug(`Read file ${changelogPath}`);
+  logger.debug(`Reading file ${manifestPath}`);
+  const content = fs.readFileSync(manifestPath, 'utf8');
+  logger.debug(`Read file ${manifestPath}`);
   const reChangelogEntry = `(Wazuh v${version.replace(
     /\./g,
     '\\.',
@@ -39,9 +37,9 @@ function updateChangelog(
         textReplaceEntry,
       );
       if (newContent !== content) {
-        logger.debug(`Updating ${changelogPath}`);
-        fs.writeFileSync(changelogPath, newContent);
-        logger.info(`Updated ${changelogPath}`);
+        logger.debug(`Updating ${manifestPath}`);
+        fs.writeFileSync(manifestPath, newContent);
+        logger.info(`Updated ${manifestPath}`);
       }
     } else {
       logger.warn(

@@ -1,6 +1,7 @@
-const logger = require('./logger');
-
-function updatePluginManifest(manifestPath, { version, revision }) {
+function updatePluginManifest(
+  { path: manifestPath, version, revision },
+  logger,
+) {
   if (!manifestPath) {
     logger.error(
       `plugin manifest file is not defined. Use --manifest-plugin <path/to/file>.`,
