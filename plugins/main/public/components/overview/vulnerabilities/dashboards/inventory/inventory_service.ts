@@ -3,6 +3,7 @@ import { getPlugins } from '../../../../../kibana-services';
 import { IndexPattern, Filter, OpenSearchQuerySortValue } from "../../../../../../../../src/plugins/data/public";
 import * as FileSaver from '../../../../../services/file-saver';
 import { beautifyDate } from "../../../../agents/vuls/inventory/lib";
+import { MAX_ENTRIES_PER_QUERY } from "./config";
 
 
 interface SearchParams {
@@ -22,9 +23,11 @@ interface SearchParams {
     };
 }
 
-
-export const search = async (params: SearchParams): Promise<SearchResponse> => {
+export const search = async (params: SearchParams): Promise<SearchResponse | void> => {
     const { indexPattern, filters = [], query, pagination, sorting, fields } = params;
+    if(!indexPattern){
+        return;
+    }
     const data = getPlugins().data;
     const searchSource = await data.search.searchSource.create();
     const fromField = (pagination?.pageIndex || 0) * (pagination?.pageSize || 100);
@@ -43,11 +46,18 @@ export const search = async (params: SearchParams): Promise<SearchResponse> => {
         .setField('index', indexPattern)
 
     // add fields
-    if (fields && Array.isArray(fields) && fields.length > 0)
+    if (fields && Array.isArray(fields) && fields.length > 0){
         searchParams.setField('fields', fields);
+    }
+    try{
+        return await searchParams.fetch();
+    }catch(error){
+        if(error.body){
+            throw error.body;
+        }
+        throw error;
+    }
 
-
-    return await searchParams.fetch();
 };
 
 
@@ -99,7 +109,7 @@ export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) 
 }
 
 export const exportSearchToCSV = async (params: SearchParams): Promise<void> => {
-    const DEFAULT_MAX_SIZE_PER_CALL = 10000;
+    const DEFAULT_MAX_SIZE_PER_CALL = 1000;
     const { indexPattern, filters = [], query, sorting, fields, pagination } = params;
     // when the pageSize is greater than the default max size per call (10000)
     // then we need to paginate the search
@@ -112,7 +122,7 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
     let searchResults;
     if (mustPaginateSearch) {
         // paginate the search
-        while (hitsCount < totalHits) {
+        while (hitsCount < totalHits &&  hitsCount < MAX_ENTRIES_PER_QUERY) {
             const searchParams = {
                 indexPattern,
                 filters,
@@ -131,10 +141,11 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
         }
     } else {
         searchResults = await search(params);
+        allHits = searchResults.hits.hits;
     }
     
     const resultsFields = fields;
-    const data = searchResults.hits.hits.map((hit) => { 
+    const data = allHits.map((hit) => { 
         // check if the field type is a date
         const dateFields = indexPattern.fields.getByType('date');
         const dateFieldsNames = dateFields.map((field) => field.name);
@@ -178,6 +189,6 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
     );
 
     if (blobData) {
-        FileSaver?.saveAs(blobData, 'vulnerabilities_inventory.csv');
+        FileSaver?.saveAs(blobData, `vulnerabilities_inventory-${new Date().toISOString()}.csv`);
     }
 }

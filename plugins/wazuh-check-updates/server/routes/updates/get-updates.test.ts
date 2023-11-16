@@ -5,12 +5,11 @@ import { ByteSizeValue } from '@osd/config-schema';
 import { getUpdates } from '../../services/updates';
 import { routes } from '../../../common/constants';
 import { getUpdatesRoute } from './get-updates';
-import axios from 'axios';
+import supertest from 'supertest';
 import { API_UPDATES_STATUS, AvailableUpdates } from '../../../common/types';
 
 const serverAddress = '127.0.0.1';
 const port = 11002; //assign a different port in each unit test
-axios.defaults.baseURL = `http://${serverAddress}:${port}`;
 
 const mockedGetUpdates = getUpdates as jest.Mock;
 jest.mock('../../services/updates');
@@ -100,11 +99,12 @@ describe(`[endpoint] GET ${routes.checkUpdates}`, () => {
     };
 
     mockedGetUpdates.mockImplementation(() => mockResponse);
-    const response = await axios.get(
-      `${routes.checkUpdates}?checkAvailableUpdates=true`,
-    );
+    const response = await supertest(innerServer.listener)
+      .get(`${routes.checkUpdates}?checkAvailableUpdates=true`)
+      .send(mockResponse)
+      .expect(200);
 
-    expect(response.data).toEqual({
+    expect(response.body).toEqual({
       ...mockResponse,
       last_check_date: '2023-09-30T14:00:00.000Z',
     });

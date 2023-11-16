@@ -8147,6 +8147,14 @@
             }
           },
           {
+            "name": "distinct",
+            "description": "Look for distinct values.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
             "name": "gateway",
             "description": "Filter by network gateway",
             "schema": {

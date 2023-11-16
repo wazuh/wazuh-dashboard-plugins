@@ -61,7 +61,10 @@ export class WazuhApiCtrl {
       if (
         !force &&
         request.headers.cookie &&
-        username === getCookieValueByName(request.headers.cookie, 'wz-user') &&
+        username ===
+          decodeURIComponent(
+            getCookieValueByName(request.headers.cookie, 'wz-user'),
+          ) &&
         idHost === getCookieValueByName(request.headers.cookie, 'wz-api')
       ) {
         const wzToken = getCookieValueByName(
@@ -101,12 +104,12 @@ export class WazuhApiCtrl {
       if (context.wazuh.server.info.protocol === 'https') {
         textSecure = ';Secure';
       }
-
+      const encodedUser = encodeURIComponent(username);
       return response.ok({
         headers: {
           'set-cookie': [
             `wz-token=${token};Path=/;HttpOnly${textSecure}`,
-            `wz-user=${username};Path=/;HttpOnly${textSecure}`,
+            `wz-user=${encodedUser};Path=/;HttpOnly${textSecure}`,
             `wz-api=${idHost};Path=/;HttpOnly`,
           ],
         },

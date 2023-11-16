@@ -59,6 +59,11 @@ jobs:
               path: 'wazuh/plugins/wazuh-check-updates',
               container_path: 'wazuh-check-updates',
             },
+            {
+              name: 'Wazuh Core',
+              path: 'wazuh/plugins/wazuh-core',
+              container_path: 'wazuh-core',
+            },
           ]
 
     steps:
