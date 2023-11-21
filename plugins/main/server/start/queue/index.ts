@@ -26,8 +26,7 @@ export interface IQueueJob {
  * Add a job to the queue.
  * @param job Job to add to queue
  */
-export function addJobToQueue(context: any, job: IQueueJob) {
-  context.wazuh.logger.info('New job added');
+export function addJobToQueue(job: IQueueJob) {
   queue.push(job);
 }
 
