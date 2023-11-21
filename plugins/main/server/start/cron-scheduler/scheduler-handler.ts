@@ -14,7 +14,7 @@ const schedulerJobs = [];
  */
 const checkPluginPlatformStatus = async function (context) {
   try {
-    context.wazuh.logger.debug('Waiting for servers to be ready...');
+    context.wazuh.logger.debug('Waiting for platform servers to be ready...');
 
     await checkElasticsearchServer(context);
     await checkTemplate(context);

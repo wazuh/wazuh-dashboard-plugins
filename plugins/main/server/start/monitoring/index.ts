@@ -332,9 +332,7 @@ async function createIndex(context, indexName: string) {
  */
 async function checkPluginPlatformStatus(context) {
   try {
-    context.wazuh.logger.debug(
-      `Waiting for ${PLUGIN_PLATFORM_NAME} and Elasticsearch servers to be ready...`, //TODO: rename Elasticsearch (use constant)
-    );
+    context.wazuh.logger.debug('Waiting for platform servers to be ready...');
 
     await checkElasticsearchServer(context);
     await init(context);
