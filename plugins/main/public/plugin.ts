@@ -65,7 +65,7 @@ export class WazuhPlugin
       console.error('plugin.ts: Error getting logos configuration', error);
     }
 
-    // Reset the visualizations mapped colors when the type of Dashboard is changed.
+    // Redefine the mapKeys method to change the properties sent to euiPaletteColorBlind.
     // This is a workaround until the issue reported in Opensearch Dashboards is fixed.
     // https://github.com/opensearch-project/OpenSearch-Dashboards/issues/5422
     // This should be reomved when the issue is fixed. Probably in OSD 2.12.0
