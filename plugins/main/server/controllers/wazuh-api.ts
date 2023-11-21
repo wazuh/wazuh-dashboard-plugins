@@ -723,7 +723,7 @@ export class WazuhApiCtrl {
       if (delay) {
         addJobToQueue({
           startAt: new Date(Date.now() + delay),
-          run: async () => {
+          run: async contextJob => {
             try {
               await context.wazuh.api.client.asCurrentUser.request(
                 method,
