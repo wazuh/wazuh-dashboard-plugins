@@ -48,6 +48,9 @@ export const WAZUH_STATISTICS_DEFAULT_STATUS = true;
 export const WAZUH_STATISTICS_DEFAULT_FREQUENCY = 900;
 export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 
+// Wazuh vulnerabilities
+export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities';
+
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
@@ -402,6 +405,10 @@ export const ELASTIC_NAME = 'elastic';
 // Default Wazuh indexer name
 export const WAZUH_INDEXER_NAME = 'Wazuh indexer';
 
+// Not timeFieldName on index pattern
+export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =
+  'not_time_field_name_index_pattern';
+
 // Customization
 export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
 
@@ -409,8 +416,10 @@ export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1
 export enum SettingCategory {
   GENERAL,
   HEALTH_CHECK,
+  EXTENSIONS,
   MONITORING,
   STATISTICS,
+  VULNERABILITIES,
   SECURITY,
   CUSTOMIZATION,
 }
@@ -546,6 +555,10 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
       'Basic app settings related to alerts index pattern, hide the manager alerts in the dashboards, logs level and more.',
     renderOrder: SettingCategory.GENERAL,
   },
+  [SettingCategory.EXTENSIONS]: {
+    title: 'Initial display state of the modules of the new API host entries.',
+    description: 'Extensions.',
+  },
   [SettingCategory.SECURITY]: {
     title: 'Security',
     description: 'Application security options such as unauthorized roles.',
@@ -562,6 +575,12 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
     description:
       'Options related to the daemons manager monitoring job and their storage in indexes.',
     renderOrder: SettingCategory.STATISTICS,
+  },
+  [SettingCategory.VULNERABILITIES]: {
+    title: 'Vulnerabilities',
+    description:
+      'Options related to the agent vulnerabilities monitoring job and its storage in indexes.',
+    renderOrder: SettingCategory.VULNERABILITIES,
   },
   [SettingCategory.CUSTOMIZATION]: {
     title: 'Custom branding',
@@ -797,6 +816,33 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Set time filter to 24h',
     description:
       'Change the default value of the plugin platform timeFilter configuration.',
+    category: SettingCategory.HEALTH_CHECK,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'checks.vulnerabilities.pattern': {
+    title: 'Vulnerabilities index pattern',
+    description:
+      'Enable or disable the vulnerabilities index pattern health check when opening the app.',
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -1108,7 +1154,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   },
   'customization.logo.app': {
     title: 'App main logo',
-    description: `This logo is used as loading indicator while the user is logging into Wazuh API`,
+    description: `This logo is used as loading indicator while the user is logging into Wazuh API.`,
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.filepicker,
     defaultValue: '',
@@ -1237,6 +1283,51 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       )(value);
     },
   },
+  'customization.logo.sidebar': {
+    title: 'Navigation drawer logo',
+    description: `This is the logo for the app to display in the platform's navigation drawer, this is, the main sidebar collapsible menu.`,
+    category: SettingCategory.CUSTOMIZATION,
+    type: EpluginSettingType.filepicker,
+    defaultValue: '',
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    requiresReloadingBrowserTab: true,
+    options: {
+      file: {
+        type: 'image',
+        extensions: ['.jpeg', '.jpg', '.png', '.svg'],
+        size: {
+          maxBytes:
+            CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+        },
+        recommended: {
+          dimensions: {
+            width: 80,
+            height: 80,
+            unit: 'px',
+          },
+        },
+        store: {
+          relativePathFileSystem: 'public/assets/custom/images',
+          filename: 'customization.logo.sidebar',
+          resolveStaticURL: (filename: string) =>
+            `custom/images/${filename}?v=${Date.now()}`,
+          // ?v=${Date.now()} is used to force the browser to reload the image when a new file is uploaded
+        },
+      },
+    },
+    validate: function (value) {
+      return SettingsValidator.compose(
+        SettingsValidator.filePickerFileSize({
+          ...this.options.file.size,
+          meaningfulUnit: true,
+        }),
+        SettingsValidator.filePickerSupportedExtensions(
+          this.options.file.extensions,
+        ),
+      )(value);
+    },
+  },
   'customization.reports.footer': {
     title: 'Reports footer',
     description: 'Set the footer of the reports.',
@@ -1277,6 +1368,53 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.string({ validate: this.validate.bind(this) });
     },
   },
+  disabled_roles: {
+    title: 'Disable roles',
+    description: 'Disabled the plugin visibility for users with the roles.',
+    category: SettingCategory.SECURITY,
+    type: EpluginSettingType.editor,
+    defaultValue: [],
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: {
+      editor: {
+        language: 'json',
+      },
+    },
+    uiFormTransformConfigurationValueToInputValue: function (value: any): any {
+      return JSON.stringify(value);
+    },
+    uiFormTransformInputValueToConfigurationValue: function (
+      value: string,
+    ): any {
+      try {
+        return JSON.parse(value);
+      } catch (error) {
+        return value;
+      }
+    },
+    validate: SettingsValidator.json(
+      SettingsValidator.compose(
+        SettingsValidator.array(
+          SettingsValidator.compose(
+            SettingsValidator.isString,
+            SettingsValidator.isNotEmptyString,
+            SettingsValidator.hasNoSpaces,
+          ),
+        ),
+      ),
+    ),
+    validateBackend: function (schema) {
+      return schema.arrayOf(
+        schema.string({
+          validate: SettingsValidator.compose(
+            SettingsValidator.isNotEmptyString,
+            SettingsValidator.hasNoSpaces,
+          ),
+        }),
+      );
+    },
+  },
   'enrollment.dns': {
     title: 'Enrollment DNS',
     description:
@@ -1303,6 +1441,398 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     validate: SettingsValidator.isNotEmptyString,
     validateBackend: function (schema) {
       return schema.string({ validate: this.validate });
+    },
+  },
+  'extensions.audit': {
+    title: 'System auditing',
+    description: 'Enable or disable the Audit tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.aws': {
+    title: 'Amazon AWS',
+    description: 'Enable or disable the Amazon (AWS) tab on Overview.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.ciscat': {
+    title: 'CIS-CAT',
+    description: 'Enable or disable the CIS-CAT tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.docker': {
+    title: 'Docker listener',
+    description:
+      'Enable or disable the Docker listener tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.gcp': {
+    title: 'Google Cloud platform',
+    description: 'Enable or disable the Google Cloud Platform tab on Overview.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.gdpr': {
+    title: 'GDPR',
+    description: 'Enable or disable the GDPR tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.github': {
+    title: 'GitHub',
+    description: 'Enable or disable the GitHub tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.hipaa': {
+    title: 'HIPAA',
+    description: 'Enable or disable the HIPAA tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.nist': {
+    title: 'NIST',
+    description:
+      'Enable or disable the NIST 800-53 tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.office': {
+    title: 'Office 365',
+    description: 'Enable or disable the Office 365 tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.oscap': {
+    title: 'OSCAP',
+    description: 'Enable or disable the Open SCAP tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.osquery': {
+    title: 'Osquery',
+    description: 'Enable or disable the Osquery tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.pci': {
+    title: 'PCI DSS',
+    description: 'Enable or disable the PCI DSS tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.tsc': {
+    title: 'TSC',
+    description: 'Enable or disable the TSC tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'extensions.virustotal': {
+    title: 'Virustotal',
+    description: 'Enable or disable the VirusTotal tab on Overview and Agents.',
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
     },
   },
   hideManagerAlerts: {
@@ -1718,6 +2248,36 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     },
     validateBackend: function (schema) {
       return schema.number({ validate: this.validate.bind(this) });
+    },
+  },
+  'vulnerabilities.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for vulnerabilities.',
+    category: SettingCategory.VULNERABILITIES,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_VULNERABILITIES_PATTERN,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    requiresRunningHealthCheck: false,
+    validate: SettingsValidator.compose(
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+    validateBackend: function (schema) {
+      return schema.string({ minLength: 1, validate: this.validate });
     },
   },
 };
