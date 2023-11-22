@@ -24,10 +24,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -72,10 +83,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -124,7 +146,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -202,7 +230,11 @@ export default [
         type: 'histogram',
         params: {
           type: 'histogram',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          grid: {
+            categoryLines: true,
+            style: { color: '#eee' },
+            valueAxis: 'ValueAxis-1',
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -246,23 +278,12 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
           {
-            id: '2',
+            id: '1',
             enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              timeRange: { from: 'now-1h', to: 'now', mode: 'quick' },
-              useNormalizedEsInterval: true,
-              interval: 'auto',
-              time_zone: 'Europe/Berlin',
-              drop_partials: false,
-              customInterval: '2h',
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
+            type: 'count',
+            schema: 'metric',
+            params: {},
           },
           {
             id: '3',
@@ -278,6 +299,23 @@ export default [
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
+            },
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            schema: 'segment',
+            params: {
+              field: 'timestamp',
+              timeRange: { from: 'now-1h', to: 'now', mode: 'quick' },
+              useNormalizedEsInterval: true,
+              interval: 'auto',
+              time_zone: 'Europe/Berlin',
+              drop_partials: false,
+              customInterval: '2h',
+              min_doc_count: 1,
+              extended_bounds: {},
             },
           },
         ],
@@ -304,7 +342,11 @@ export default [
         type: 'area',
         params: {
           type: 'area',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          grid: {
+            categoryLines: true,
+            style: { color: '#eee' },
+            valueAxis: 'ValueAxis-1',
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -357,6 +399,23 @@ export default [
             params: { customLabel: 'Events' },
           },
           {
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            schema: 'group',
+            params: {
+              field: 'data.docker.Action',
+              size: 10,
+              order: 'desc',
+              orderBy: '1',
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Action',
+            },
+          },
+          {
             id: '2',
             enabled: true,
             type: 'date_histogram',
@@ -372,23 +431,6 @@ export default [
               min_doc_count: 1,
               extended_bounds: {},
               customLabel: '',
-            },
-          },
-          {
-            id: '3',
-            enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: {
-              field: 'data.docker.Action',
-              size: 10,
-              order: 'desc',
-              orderBy: '1',
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-              customLabel: 'Action',
             },
           },
         ],

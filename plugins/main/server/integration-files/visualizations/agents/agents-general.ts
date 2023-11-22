@@ -23,10 +23,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -85,7 +96,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -98,7 +114,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -138,7 +156,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -151,7 +174,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -216,7 +241,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -229,7 +259,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -241,7 +273,8 @@ export default [
                 index: 'wazuh-alerts',
                 type: 'phrases',
                 key: 'rule.groups',
-                value: 'win_authentication_failed, authentication_failed, authentication_failures',
+                value:
+                  'win_authentication_failed, authentication_failed, authentication_failures',
                 params: [
                   'win_authentication_failed',
                   'authentication_failed',
@@ -311,7 +344,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -324,7 +362,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -377,10 +417,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: false,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -425,10 +476,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -465,11 +527,61 @@ export default [
     _source: {
       title: 'Alert groups evolution',
       visState: JSON.stringify({
-        title: 'Alerts by group over time',
+        title: 'Alert groups evolution',
         type: 'area',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.groups',
+              orderBy: '1',
+              order: 'desc',
+              size: 10,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+            },
+            schema: 'group',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-1M',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+        ],
         params: {
           type: 'area',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          grid: {
+            categoryLines: true,
+            style: {
+              color: '#eee',
+            },
+            valueAxis: 'ValueAxis-1',
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -477,8 +589,14 @@ export default [
               position: 'bottom',
               show: true,
               style: {},
-              scale: { type: 'linear' },
-              labels: { show: true, filter: true, truncate: 100 },
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
               title: {},
             },
           ],
@@ -490,9 +608,19 @@ export default [
               position: 'left',
               show: true,
               style: {},
-              scale: { type: 'linear', mode: 'normal' },
-              labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-              title: { text: 'Count' },
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Count',
+              },
             },
           ],
           seriesParams: [
@@ -500,7 +628,10 @@ export default [
               show: 'true',
               type: 'area',
               mode: 'stacked',
-              data: { label: 'Count', id: '1' },
+              data: {
+                label: 'Count',
+                id: '1',
+              },
               drawLinesBetweenPoints: true,
               showCircles: true,
               interpolate: 'cardinal',
@@ -512,43 +643,15 @@ export default [
           legendPosition: 'right',
           times: [],
           addTimeMarker: false,
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
+          labels: {},
         },
-        aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
-          {
-            id: '2',
-            enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              timeRange: { from: 'now-24h', to: 'now', mode: 'quick' },
-              useNormalizedEsInterval: true,
-              interval: 'auto',
-              time_zone: 'Europe/Berlin',
-              drop_partials: false,
-              customInterval: '2h',
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
-          },
-          {
-            id: '3',
-            enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: {
-              field: 'rule.groups',
-              size: 5,
-              order: 'desc',
-              orderBy: '1',
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
-          },
-        ],
       }),
       uiStateJSON: '{}',
       description: '',
@@ -568,11 +671,61 @@ export default [
     _source: {
       title: 'Alerts',
       visState: JSON.stringify({
-        title: 'Alerts by action over time',
+        title: 'Top 10 Alerts',
         type: 'area',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'metric',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'rule.level',
+              orderBy: '1',
+              order: 'desc',
+              size: 10,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+            },
+            schema: 'group',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-1M',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+        ],
         params: {
           type: 'area',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          grid: {
+            categoryLines: true,
+            style: {
+              color: '#eee',
+            },
+            valueAxis: 'ValueAxis-1',
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -580,8 +733,14 @@ export default [
               position: 'bottom',
               show: true,
               style: {},
-              scale: { type: 'linear' },
-              labels: { show: true, filter: true, truncate: 100 },
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
               title: {},
             },
           ],
@@ -593,9 +752,19 @@ export default [
               position: 'left',
               show: true,
               style: {},
-              scale: { type: 'linear', mode: 'normal' },
-              labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-              title: { text: 'Count' },
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Count',
+              },
             },
           ],
           seriesParams: [
@@ -603,7 +772,10 @@ export default [
               show: 'true',
               type: 'area',
               mode: 'stacked',
-              data: { label: 'Count', id: '1' },
+              data: {
+                label: 'Count',
+                id: '1',
+              },
               drawLinesBetweenPoints: true,
               showCircles: true,
               interpolate: 'cardinal',
@@ -615,43 +787,15 @@ export default [
           legendPosition: 'right',
           times: [],
           addTimeMarker: false,
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
+          labels: {},
         },
-        aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
-          {
-            id: '2',
-            enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              timeRange: { from: 'now-24h', to: 'now', mode: 'quick' },
-              useNormalizedEsInterval: true,
-              interval: 'auto',
-              time_zone: 'Europe/Berlin',
-              drop_partials: false,
-              customInterval: '2h',
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
-          },
-          {
-            id: '3',
-            enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: {
-              field: 'rule.level',
-              size: 5,
-              order: 'desc',
-              orderBy: '1',
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
-          },
-        ],
       }),
       uiStateJSON: '{}',
       description: '',
@@ -684,7 +828,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -770,7 +920,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
