@@ -12,7 +12,6 @@ import {
   WazuhEndpointsPluginStart,
   AppPluginStartDependencies,
 } from './types';
-import { ISecurityFactory } from '../../wazuh-core/server/services/security-factory';
 
 export class WazuhEndpointsPlugin
   implements Plugin<WazuhEndpointsPluginSetup, WazuhEndpointsPluginStart> {
