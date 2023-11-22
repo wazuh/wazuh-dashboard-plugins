@@ -17,9 +17,15 @@
     "opensearchDashboardsReact",
     "opensearchDashboardsUtils",
     "opensearchDashboardsLegacy",
-    "wazuhCheckUpdates"
+    "wazuhCheckUpdates",
+    "wazuhEndpoints"
   ],
-  "optionalPlugins": ["security", "securityDashboards", "searchguard", "telemetry"],
+  "optionalPlugins": [
+    "security",
+    "securityDashboards",
+    "searchguard",
+    "telemetry"
+  ],
   "server": true,
   "ui": true
 }
