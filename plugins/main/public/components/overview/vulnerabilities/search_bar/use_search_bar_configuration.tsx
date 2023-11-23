@@ -44,9 +44,6 @@ type tUserSearchBarResponse = {
 const useSearchBarConfiguration = (
   props?: tUseSearchBarProps,
 ): tUserSearchBarResponse => {
-  const appConfig = useAppConfig();
-  const VULNERABILITIES_INDEX_PATTERN_ID =
-    appConfig.data['vulnerabilities.pattern'];
   // dependencies
   const filterManager = useFilterManager().filterManager as FilterManager;
   const { filters } = useFilterManager();
@@ -64,8 +61,7 @@ const useSearchBarConfiguration = (
   }, []);
 
   useEffect(() => {
-    const defaultIndex =
-      props?.defaultIndexPatternID ?? VULNERABILITIES_INDEX_PATTERN_ID;
+    const defaultIndex = props?.defaultIndexPatternID;
     /* Filters that do not belong to the default index are filtered */
     const cleanedFilters = filters.filter(
       filter => filter.meta.index === defaultIndex,
