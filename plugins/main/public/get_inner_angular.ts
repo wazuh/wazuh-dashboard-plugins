@@ -23,8 +23,16 @@
 import angular from 'angular';
 // required for `ngSanitize` angular module
 import 'angular-sanitize';
-import { i18nDirective, i18nFilter, I18nProvider } from '@osd/i18n/angular';
-import { CoreStart, PluginInitializerContext } from 'opensearch_dashboards/public';
+import 'ngreact';
+import {
+  i18nDirective,
+  i18nFilter,
+  I18nProvider,
+} from './kibana-integrations/packages/osd-i18n/angular';
+import {
+  CoreStart,
+  PluginInitializerContext,
+} from 'opensearch_dashboards/public';
 import { Storage } from '../../../src/plugins/opensearch_dashboards_utils/public';
 import { NavigationPublicPluginStart as NavigationStart } from '../../../src/plugins/navigation/public';
 import {
@@ -36,7 +44,7 @@ import {
   watchMultiDecorator,
   createTopNavDirective,
   createTopNavHelper,
-} from '../../../src/plugins/opensearch_dashboards_legacy/public';
+} from './kibana-integrations/plugins/opensearch_dashboards_legacy/public';
 import { AppPluginStartDependencies } from './types';
 import { getScopedHistory, setDiscoverModule } from './kibana-services';
 import { createDiscoverLegacyDirective } from './kibana-integrations/discover/application/components/create_discover_legacy_directive';
@@ -51,17 +59,25 @@ export function getInnerAngularModule(
   name: string,
   core: CoreStart,
   deps: AppPluginStartDependencies,
-  context: PluginInitializerContext
+  context: PluginInitializerContext,
 ) {
   initAngularBootstrap();
   const module = initializeInnerAngularModule(name, deps.navigation);
-  configureAppAngularModule(module, { core, env: context.env }, true, getScopedHistory);
+  configureAppAngularModule(
+    module,
+    { core, env: context.env },
+    true,
+    getScopedHistory,
+  );
   return module;
 }
 
 let initialized = false;
 
-export function initializeInnerAngularModule(name = 'app/wazuh', navigation: NavigationStart) {
+export function initializeInnerAngularModule(
+  name = 'app/wazuh',
+  navigation: NavigationStart,
+) {
   if (!initialized) {
     createLocalI18nModule();
     createLocalPrivateModule();
@@ -93,12 +109,14 @@ export function initializeInnerAngularModule(name = 'app/wazuh', navigation: Nav
     .config(watchMultiDecorator)
     .run(registerListenEventListener)
     .directive('discoverLegacy', createDiscoverLegacyDirective)
-    .directive('icon', (reactDirective) => reactDirective(EuiIcon))
+    .directive('icon', reactDirective => reactDirective(EuiIcon))
     .directive('contextErrorMessage', createContextErrorMessageDirective);
 }
 
 function createLocalPromiseModule() {
-  angular.module('discoverPromise', []).service('Promise', PromiseServiceCreator);
+  angular
+    .module('discoverPromise', [])
+    .service('Promise', PromiseServiceCreator);
 }
 
 function createLocalPrivateModule() {
