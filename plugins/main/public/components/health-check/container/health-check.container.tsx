@@ -33,8 +33,10 @@ import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { getCore, getHttp, getWzCurrentAppID } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
+  NOT_TIME_FIELD_NAME_INDEX_PATTERN,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_INDEX_TYPE_VULNERABILITIES,
 } from '../../../../common/constants';
 
 import { compose } from 'redux';
@@ -88,9 +90,23 @@ const checks = {
     shouldCheck: true,
     canRetry: true,
   },
+  'vulnerabilities.pattern': {
+    title: 'Check vulnerabilities index pattern',
+    label: 'Vulnerabilities index pattern',
+    validator: appConfig =>
+      checkPatternSupportService(
+        appConfig.data['vulnerabilities.pattern'],
+        WAZUH_INDEX_TYPE_VULNERABILITIES,
+        NOT_TIME_FIELD_NAME_INDEX_PATTERN,
+      ),
+    awaitFor: [],
+    shouldCheck: false,
+    canRetry: true,
+  },
 };
 
 function HealthCheckComponent() {
+  const [checkWarnings, setCheckWarnings] = useState<{ [key: string]: [] }>({});
   const [checkErrors, setCheckErrors] = useState<{ [key: string]: [] }>({});
   const [checksReady, setChecksReady] = useState<{ [key: string]: boolean }>(
     {},
@@ -136,6 +152,18 @@ function HealthCheckComponent() {
     setIsDebugMode(window.location.href.includes('debug'));
   }, []);
 
+  const handleWarnings = (checkID, warnings, parsed) => {
+    const newWarnings = parsed
+      ? warnings.map(warning =>
+          ErrorHandler.handle(warning, 'Health Check', {
+            warning: true,
+            silent: true,
+          }),
+        )
+      : warnings;
+    setCheckWarnings(prev => ({ ...prev, [checkID]: newWarnings }));
+  };
+
   const handleErrors = (checkID, errors, parsed) => {
     const newErrors = parsed
       ? errors.map(error =>
@@ -146,6 +174,11 @@ function HealthCheckComponent() {
         )
       : errors;
     setCheckErrors(prev => ({ ...prev, [checkID]: newErrors }));
+  };
+
+  const cleanWarnings = (checkID: string) => {
+    delete checkWarnings[checkID];
+    setCheckWarnings({ ...checkWarnings });
   };
 
   const cleanErrors = (checkID: string) => {
@@ -164,9 +197,10 @@ function HealthCheckComponent() {
       : getThemeAssetURL('logo.svg'),
   );
   const thereAreErrors = Object.keys(checkErrors).length > 0;
+  const thereAreWarnings = Object.keys(checkWarnings).length > 0;
 
   const renderChecks = () => {
-    const showLogButton = thereAreErrors || isDebugMode;
+    const showLogButton = thereAreErrors || thereAreWarnings || isDebugMode;
     return Object.keys(checks).map((check, index) => {
       return (
         <CheckResult
@@ -179,7 +213,9 @@ function HealthCheckComponent() {
             checks[check].shouldCheck || appConfig.data[`checks.${check}`]
           }
           validationService={checks[check].validator(appConfig)}
+          handleWarnings={handleWarnings}
           handleErrors={handleErrors}
+          cleanWarnings={cleanWarnings}
           cleanErrors={cleanErrors}
           isLoading={appConfig.isLoading}
           handleCheckReady={handleCheckReady}
@@ -230,6 +266,30 @@ function HealthCheckComponent() {
     return words.join(' ');
   };
 
+  const renderWarnings = () => {
+    return Object.keys(checkWarnings).map(checkID =>
+      checkWarnings[checkID].map((warning, index) => (
+        <Fragment key={index}>
+          <EuiCallOut
+            title={
+              <>
+                {`[${checks[checkID].label}]`}{' '}
+                <span
+                  dangerouslySetInnerHTML={{ __html: addTagsToUrl(warning) }}
+                ></span>
+              </>
+            }
+            color='warning'
+            iconType='alert'
+            style={{ textAlign: 'left' }}
+            data-test-subj='callOutWarning'
+          ></EuiCallOut>
+          <EuiSpacer size='xs' />
+        </Fragment>
+      )),
+    );
+  };
+
   const renderErrors = () => {
     return Object.keys(checkErrors).map(checkID =>
       checkErrors[checkID].map((error, index) => (
@@ -268,7 +328,13 @@ function HealthCheckComponent() {
           {renderErrors()}
         </>
       )}
-      {(thereAreErrors || isDebugMode) && (
+      {thereAreWarnings && (
+        <>
+          <EuiSpacer size='xl' />
+          {renderWarnings()}
+        </>
+      )}
+      {(thereAreErrors || thereAreWarnings || isDebugMode) && (
         <>
           <EuiSpacer size='xl' />
           <EuiFlexGroup justifyContent='center'>

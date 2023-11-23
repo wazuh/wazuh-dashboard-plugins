@@ -1,6 +1,5 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 
 const getVisStateFilter = (
   id: string,
@@ -69,7 +68,9 @@ const getVisStateFilter = (
   };
 };
 
-export const getDashboardFilters = (): {
+export const getDashboardFilters = (
+  indexPatternId: string,
+): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }
   >;
@@ -88,7 +89,7 @@ export const getDashboardFilters = (): {
         id: 'topPackageSelector',
         savedVis: getVisStateFilter(
           'topPackageSelector',
-          VULNERABILITIES_INDEX_PATTERN_ID,
+          indexPatternId,
           'Top Packages vulnerabilities',
           'Package',
           'package.name',
@@ -108,7 +109,7 @@ export const getDashboardFilters = (): {
         id: 'topOSVulnerabilities',
         savedVis: getVisStateFilter(
           'topOSVulnerabilities',
-          VULNERABILITIES_INDEX_PATTERN_ID,
+          indexPatternId,
           'Top Operating system vulnerabilities',
           'Operating system',
           'host.os.name',
@@ -128,7 +129,7 @@ export const getDashboardFilters = (): {
         id: 'topAgentVulnerabilities',
         savedVis: getVisStateFilter(
           'topAgentVulnerabilities',
-          VULNERABILITIES_INDEX_PATTERN_ID,
+          indexPatternId,
           'Agent filter',
           'Agent',
           'agent.id',
@@ -148,7 +149,7 @@ export const getDashboardFilters = (): {
         id: 'topVulnerabilities',
         savedVis: getVisStateFilter(
           'topVulnerabilities',
-          VULNERABILITIES_INDEX_PATTERN_ID,
+          indexPatternId,
           'Top vulnerabilities',
           'Vulnerability',
           'vulnerability.id',
