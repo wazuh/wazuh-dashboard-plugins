@@ -64,11 +64,6 @@ jobs:
               path: 'wazuh/plugins/wazuh-core',
               container_path: 'wazuh-core',
             },
-            {
-              name: 'Wazuh Endpoints',
-              path: 'wazuh/plugins/wazuh-endpoints',
-              container_path: 'wazuh-endpoints',
-            },
           ]
 
     steps:
