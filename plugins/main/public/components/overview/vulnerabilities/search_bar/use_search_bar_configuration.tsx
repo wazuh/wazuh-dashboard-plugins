@@ -13,7 +13,6 @@ import {
 import { getDataPlugin } from '../../../../kibana-services';
 
 import {
-  useAppConfig,
   useFilterManager,
   useQueryManager,
   useTimeFilter,
@@ -22,7 +21,7 @@ import { AUTHORIZED_AGENTS } from '../../../../../common/constants';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
-  defaultIndexPatternID?: IIndexPattern['id'];
+  defaultIndexPatternID: IIndexPattern['id'];
   onFiltersUpdated?: (filters: Filter[]) => void;
   onQuerySubmitted?: (
     payload: { dateRange: TimeRange; query?: Query },
