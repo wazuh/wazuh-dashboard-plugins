@@ -18,7 +18,7 @@ The following files must be updated:
   - `version`: Combination of version and revision of the plugin: `{version}-{revision}`.
 - `CHANGELOG.md`: Changelog of the new release.
 - `plugins/main/common/api-info/endpoints.json`: Data related to endpoints and extracted from server's API specification file
-- `plugins/maincommon/api-info/security-actions.json`: Data related to security actions of extracted from server's API specification file
+- `plugins/main/common/api-info/security-actions.json`: Data related to security actions of extracted from server's API specification file
 - Unit tests (when bumping the minor version could fail some tests due to snapshots)
 
 To bump the version, see [# Bump](#Bump)
