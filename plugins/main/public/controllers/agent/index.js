@@ -21,6 +21,7 @@ import { MainModule } from '../../components/common/modules/main';
 import { MainSyscollector } from '../../components/agents/syscollector/main';
 import { MainAgentStats } from '../../components/agents/stats';
 import { getAngularModule } from '../../kibana-services';
+import { EndpointsPreview } from './endpoints-preview';
 
 const app = getAngularModule();
 
@@ -35,4 +36,5 @@ app
   .value('AgentsTable', AgentsTable)
   .value('MainSyscollector', MainSyscollector)
   .value('MainAgentStats', MainAgentStats)
-  .value('MainModule', MainModule);
+  .value('MainModule', MainModule)
+  .value('EndpointsPreview', EndpointsPreview);
