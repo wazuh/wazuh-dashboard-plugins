@@ -28,10 +28,10 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
       hosts?.map(async (api) => {
         const data = {};
         const method = 'GET';
-        const path = '/manager/version/check';
+        const path = '/manager/version/check?force_query=true';
         const options = {
           apiHostID: api.id,
-          force_query: true,
+          forceRefresh: true,
         };
         try {
           const response = await wazuhApiClient.client.asInternalUser.request(
