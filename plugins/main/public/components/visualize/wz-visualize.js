@@ -30,7 +30,7 @@ import { VisHandlers } from '../../factories/vis-handlers';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import { Metrics } from '../overview/metrics/metrics';
 import { PatternHandler } from '../../react-services/pattern-handler';
-import { getToasts } from '../../kibana-services';
+import { getToasts, getPlugins } from '../../kibana-services';
 import { SampleDataWarning, SecurityAlerts } from './components';
 import { toMountPoint } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { withReduxProvider, withErrorBoundary } from '../common/hocs';
@@ -57,6 +57,12 @@ export const WzVisualize = compose(
         refreshingKnownFields: [],
         refreshingIndex: true,
       };
+      // Reset the visualizations mapped colors when the type of Dashboard is changed.
+      // This is a workaround until the issue reported in Opensearch Dashboards is fixed.
+      // https://github.com/opensearch-project/OpenSearch-Dashboards/issues/5422
+      // This should be reomved when the issue is fixed. Probably in OSD 2.12.0
+      getPlugins().charts.colors.mappedColors.purge();
+
       this.hasRefreshedKnownFields = false;
       this.isRefreshing = false;
       this.metricValues = false;

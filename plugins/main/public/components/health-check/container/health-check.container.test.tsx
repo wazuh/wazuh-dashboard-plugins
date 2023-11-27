@@ -30,6 +30,7 @@ jest.mock('../../../components/common/hooks', () => ({
       'checks.pattern': true,
       'checks.template': true,
       'checks.fields': true,
+      'checks.vulnerabilities.pattern': true,
     },
   }),
   useRootScope: () => ({}),
@@ -107,5 +108,16 @@ describe('Health Check container', () => {
 
     const callOutError = component.find('EuiCallOut');
     expect(callOutError.text()).toBe('[API version] Test error');
+  });
+
+  it('should render a Health check screen with warning', () => {
+    const component = mount(<HealthCheckTest />);
+
+    component.find('CheckResult').at(1).invoke('handleWarnings')('setup', [
+      'Test warning',
+    ]);
+
+    const callOutWarning = component.find('EuiCallOut');
+    expect(callOutWarning.text()).toBe('[API version] Test warning');
   });
 });
