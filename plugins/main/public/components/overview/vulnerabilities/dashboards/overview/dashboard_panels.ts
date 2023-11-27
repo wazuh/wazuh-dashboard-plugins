@@ -1,6 +1,5 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 
 const getVisStateTopVulnerabilities = (indexPatternId: string) => {
   return {
@@ -296,7 +295,9 @@ const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAccumulationMostDetectedVulnerabilities = (indexPatternId: string) => {
+const getVisStateAccumulationMostDetectedVulnerabilities = (
+  indexPatternId: string,
+) => {
   return {
     id: 'accumulation_most_vulnerable_vulnerabilities',
     title: 'Accumulation of the most detected vulnerabilities',
@@ -615,8 +616,12 @@ const getVisStateInventoryTable = (indexPatternId: string) => {
   };
 };
 
-export const getDashboardPanels = (): {
-  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
+export const getDashboardPanels = (
+  indexPatternId: string,
+): {
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
 } => {
   return {
     '6': {
@@ -630,7 +635,7 @@ export const getDashboardPanels = (): {
       type: 'visualization',
       explicitInput: {
         id: '6',
-        savedVis: getVisStateTopVulnerabilities(VULNERABILITIES_INDEX_PATTERN_ID),
+        savedVis: getVisStateTopVulnerabilities(indexPatternId),
       },
     },
     '7': {
@@ -644,7 +649,7 @@ export const getDashboardPanels = (): {
       type: 'visualization',
       explicitInput: {
         id: '7',
-        savedVis: getVisStateTopVulnerabilitiesEndpoints(VULNERABILITIES_INDEX_PATTERN_ID),
+        savedVis: getVisStateTopVulnerabilitiesEndpoints(indexPatternId),
       },
     },
     '8': {
@@ -658,9 +663,8 @@ export const getDashboardPanels = (): {
       type: 'visualization',
       explicitInput: {
         id: '8',
-        savedVis: getVisStateAccumulationMostDetectedVulnerabilities(
-          VULNERABILITIES_INDEX_PATTERN_ID
-        ),
+        savedVis:
+          getVisStateAccumulationMostDetectedVulnerabilities(indexPatternId),
       },
     },
     '9': {
@@ -674,7 +678,7 @@ export const getDashboardPanels = (): {
       type: 'visualization',
       explicitInput: {
         id: '9',
-        savedVis: getVisStateInventoryTable(VULNERABILITIES_INDEX_PATTERN_ID),
+        savedVis: getVisStateInventoryTable(indexPatternId),
       },
     },
   };

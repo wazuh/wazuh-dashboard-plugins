@@ -16,7 +16,13 @@ export default [
       title: 'Mitre attack count',
       visState: JSON.stringify({
         aggs: [
-          { enabled: true, id: '1', params: {}, schema: 'metric', type: 'count' },
+          {
+            enabled: true,
+            id: '1',
+            params: {},
+            schema: 'metric',
+            type: 'count',
+          },
           {
             enabled: true,
             id: '2',
@@ -38,7 +44,14 @@ export default [
         params: {
           dimensions: {
             buckets: [],
-            metrics: [{ accessor: 0, aggType: 'count', format: { id: 'number' }, params: {} }],
+            metrics: [
+              {
+                accessor: 0,
+                aggType: 'count',
+                format: { id: 'number' },
+                params: {},
+              },
+            ],
           },
           perPage: 10,
           percentageCol: '',
@@ -118,7 +131,13 @@ export default [
           times: [],
           addTimeMarker: false,
           labels: {},
-          thresholdLine: { show: false, value: 10, width: 1, style: 'full', color: '#34130C' },
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#34130C',
+          },
           dimensions: {
             x: {
               accessor: 0,
@@ -127,11 +146,21 @@ export default [
                 date: true,
                 interval: 'PT3H',
                 format: 'YYYY-MM-DD HH:mm',
-                bounds: { min: '2019-11-07T15:45:45.770Z', max: '2019-11-14T15:45:45.770Z' },
+                bounds: {
+                  min: '2019-11-07T15:45:45.770Z',
+                  max: '2019-11-14T15:45:45.770Z',
+                },
               },
               aggType: 'date_histogram',
             },
-            y: [{ accessor: 2, format: { id: 'number' }, params: {}, aggType: 'count' }],
+            y: [
+              {
+                accessor: 2,
+                format: { id: 'number' },
+                params: {},
+                aggType: 'count',
+              },
+            ],
             series: [
               {
                 accessor: 1,
@@ -150,21 +179,12 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
           {
-            id: '2',
+            id: '1',
             enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              timeRange: { from: 'now-7d', to: 'now' },
-              useNormalizedEsInterval: true,
-              interval: 'auto',
-              drop_partials: false,
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
+            type: 'count',
+            schema: 'metric',
+            params: {},
           },
           {
             id: '3',
@@ -181,6 +201,21 @@ export default [
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
+            },
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            schema: 'segment',
+            params: {
+              field: 'timestamp',
+              timeRange: { from: 'now-7d', to: 'now' },
+              useNormalizedEsInterval: true,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
             },
           },
         ],
@@ -209,7 +244,12 @@ export default [
           addLegend: true,
           addTooltip: true,
           dimensions: {
-            metric: { accessor: 1, format: { id: 'number' }, params: {}, aggType: 'count' },
+            metric: {
+              accessor: 1,
+              format: { id: 'number' },
+              params: {},
+              aggType: 'count',
+            },
             buckets: [
               {
                 accessor: 0,
@@ -240,12 +280,23 @@ export default [
             ],
           },
           isDonut: true,
-          labels: { last_level: true, show: false, truncate: 100, values: true },
+          labels: {
+            last_level: true,
+            show: false,
+            truncate: 100,
+            values: true,
+          },
           legendPosition: 'right',
           type: 'pie',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -308,9 +359,19 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
-            metric: { accessor: 1, format: { id: 'number' }, params: {}, aggType: 'count' },
+            metric: {
+              accessor: 1,
+              format: { id: 'number' },
+              params: {},
+              aggType: 'count',
+            },
             buckets: [
               {
                 accessor: 0,
@@ -342,7 +403,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '3',
             enabled: true,
@@ -405,9 +472,19 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
-            metric: { accessor: 1, format: { id: 'number' }, params: {}, aggType: 'count' },
+            metric: {
+              accessor: 1,
+              format: { id: 'number' },
+              params: {},
+              aggType: 'count',
+            },
             buckets: [
               {
                 accessor: 0,
@@ -452,7 +529,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '3',
             enabled: true,
@@ -554,10 +637,23 @@ export default [
           times: [],
           addTimeMarker: false,
           labels: { show: false },
-          thresholdLine: { show: false, value: 10, width: 1, style: 'full', color: '#34130C' },
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#34130C',
+          },
           dimensions: {
             x: null,
-            y: [{ accessor: 1, format: { id: 'number' }, params: {}, aggType: 'count' }],
+            y: [
+              {
+                accessor: 1,
+                format: { id: 'number' },
+                params: {},
+                aggType: 'count',
+              },
+            ],
             series: [
               {
                 accessor: 0,
@@ -576,7 +672,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -637,9 +739,19 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: false,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
-            metric: { accessor: 1, format: { id: 'number' }, params: {}, aggType: 'count' },
+            metric: {
+              accessor: 1,
+              format: { id: 'number' },
+              params: {},
+              aggType: 'count',
+            },
             buckets: [
               {
                 accessor: 0,
@@ -658,7 +770,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -708,7 +826,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,

@@ -12,15 +12,21 @@ import {
 } from '../../../../../../../src/plugins/data/public';
 import { getDataPlugin } from '../../../../kibana-services';
 
-import { useFilterManager, useQueryManager, useTimeFilter } from '../../../common/hooks';
+import {
+  useFilterManager,
+  useQueryManager,
+  useTimeFilter,
+} from '../../../common/hooks';
 import { AUTHORIZED_AGENTS } from '../../../../../common/constants';
-import { VULNERABILITIES_INDEX_PATTERN_ID } from '../common/constants';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
-  defaultIndexPatternID?: IIndexPattern['id'];
+  defaultIndexPatternID: IIndexPattern['id'];
   onFiltersUpdated?: (filters: Filter[]) => void;
-  onQuerySubmitted?: (payload: { dateRange: TimeRange; query?: Query }, isUpdate?: boolean) => void;
+  onQuerySubmitted?: (
+    payload: { dateRange: TimeRange; query?: Query },
+    isUpdate?: boolean,
+  ) => void;
 };
 type tUseSearchBarProps = Partial<SearchBarProps> & tUseSearchBarCustomInputs;
 
@@ -34,24 +40,31 @@ type tUserSearchBarResponse = {
  * @param props
  * @returns
  */
-const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarResponse => {
+const useSearchBarConfiguration = (
+  props?: tUseSearchBarProps,
+): tUserSearchBarResponse => {
   // dependencies
   const filterManager = useFilterManager().filterManager as FilterManager;
   const { filters } = useFilterManager();
-  const [query, setQuery] = props?.query ? useState(props?.query) : useQueryManager();
+  const [query, setQuery] = props?.query
+    ? useState(props?.query)
+    : useQueryManager();
   const { timeFilter, timeHistory, setTimeFilter } = useTimeFilter();
   // states
   const [isLoading, setIsLoading] = useState(false);
-  const [indexPatternSelected, setIndexPatternSelected] = useState<IIndexPattern>();
+  const [indexPatternSelected, setIndexPatternSelected] =
+    useState<IIndexPattern>();
 
   useEffect(() => {
     initSearchBar();
   }, []);
 
   useEffect(() => {
-    const defaultIndex = props?.defaultIndexPatternID ?? VULNERABILITIES_INDEX_PATTERN_ID;
+    const defaultIndex = props?.defaultIndexPatternID;
     /* Filters that do not belong to the default index are filtered */
-    const cleanedFilters = filters.filter((filter) => filter.meta.index === defaultIndex);
+    const cleanedFilters = filters.filter(
+      filter => filter.meta.index === defaultIndex,
+    );
     if (cleanedFilters.length !== filters.length) {
       filterManager.setFilters(cleanedFilters);
     }
@@ -75,7 +88,8 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
    * @returns
    */
   const getIndexPattern = async (indexPatternID?: string) => {
-    const indexPatternService = getDataPlugin().indexPatterns as IndexPatternsContract;
+    const indexPatternService = getDataPlugin()
+      .indexPatterns as IndexPatternsContract;
     if (indexPatternID) {
       try {
         return await indexPatternService.get(indexPatternID);
@@ -96,7 +110,8 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
    * @returns
    */
   const getInitialFilters = async (indexPattern: IIndexPattern) => {
-    const indexPatternService = getDataPlugin().indexPatterns as IndexPatternsContract;
+    const indexPatternService = getDataPlugin()
+      .indexPatterns as IndexPatternsContract;
     let initialFilters: Filter[] = [];
     if (props?.filters) {
       return props?.filters;
@@ -105,8 +120,12 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
       // get filtermanager and filters
       // if the index is the same, get filters stored
       // else clear filters
-      const defaultIndexPattern = (await indexPatternService.getDefault()) as IIndexPattern;
-      initialFilters = defaultIndexPattern.id === indexPattern.id ? filterManager.getFilters() : [];
+      const defaultIndexPattern =
+        (await indexPatternService.getDefault()) as IIndexPattern;
+      initialFilters =
+        defaultIndexPattern.id === indexPattern.id
+          ? filterManager.getFilters()
+          : [];
     } else {
       initialFilters = [];
     }
@@ -120,7 +139,9 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
    */
   const getFilters = () => {
     const filters = filterManager ? filterManager.getFilters() : [];
-    return filters.filter((filter) => filter.meta.controlledBy !== AUTHORIZED_AGENTS); // remove auto loaded agent.id filters
+    return filters.filter(
+      filter => filter.meta.controlledBy !== AUTHORIZED_AGENTS,
+    ); // remove auto loaded agent.id filters
   };
 
   /**
@@ -141,7 +162,7 @@ const useSearchBarConfiguration = (props?: tUseSearchBarProps): tUserSearchBarRe
     },
     onQuerySubmit: (
       payload: { dateRange: TimeRange; query?: Query },
-      _isUpdate?: boolean
+      _isUpdate?: boolean,
     ): void => {
       const { dateRange, query } = payload;
       // its necessary execute setter to apply query filters
