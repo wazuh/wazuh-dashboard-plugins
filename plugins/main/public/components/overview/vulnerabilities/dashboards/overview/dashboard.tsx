@@ -4,10 +4,10 @@ import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public'
 import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBarConfiguration from '../../search_bar/use_search_bar_configuration';
-import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 import { getDashboardFilters } from './dashboard_panels_filters';
 import './vulnerability_detector_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
+import { useAppConfig } from '../../../../common/hooks';
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -19,6 +19,10 @@ a wrapper for visual adjustments, while the Kpi, the Open vs Close visualization
 the rest of the visualizations have different configurations at the dashboard level. */
 
 export const DashboardVuls: React.FC = () => {
+  const appConfig = useAppConfig();
+  const VULNERABILITIES_INDEX_PATTERN_ID =
+    appConfig.data['vulnerabilities.pattern'];
+
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
     filters: [],
@@ -28,18 +32,18 @@ export const DashboardVuls: React.FC = () => {
     <>
       <I18nProvider>
         <SearchBar
-          appName="vulnerability-detector-searchbar"
+          appName='vulnerability-detector-searchbar'
           {...searchBarProps}
           showDatePicker={false}
           showQueryInput={true}
           showQueryBar={true}
         />
       </I18nProvider>
-      <div className="vulnerability-dashboard-filters-wrapper">
+      <div className='vulnerability-dashboard-filters-wrapper'>
         <DashboardByRenderer
           input={{
             viewMode: ViewMode.VIEW,
-            panels: getDashboardFilters(),
+            panels: getDashboardFilters(VULNERABILITIES_INDEX_PATTERN_ID),
             isFullScreenMode: false,
             filters: searchBarProps.filters ?? [],
             useMargins: false,
@@ -62,7 +66,7 @@ export const DashboardVuls: React.FC = () => {
       <DashboardByRenderer
         input={{
           viewMode: ViewMode.VIEW,
-          panels: getKPIsPanel(),
+          panels: getKPIsPanel(VULNERABILITIES_INDEX_PATTERN_ID),
           isFullScreenMode: false,
           filters: searchBarProps.filters ?? [],
           useMargins: true,
@@ -84,7 +88,7 @@ export const DashboardVuls: React.FC = () => {
       <DashboardByRenderer
         input={{
           viewMode: ViewMode.VIEW,
-          panels: getDashboardPanels(),
+          panels: getDashboardPanels(VULNERABILITIES_INDEX_PATTERN_ID),
           isFullScreenMode: false,
           filters: searchBarProps.filters ?? [],
           useMargins: true,

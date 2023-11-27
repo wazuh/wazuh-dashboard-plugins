@@ -34,6 +34,8 @@ describe('[settings] Input validation', () => {
     ${'checks.template'}                | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'checks.timeFilter'}              | ${true}                                                                | ${undefined}
     ${'checks.timeFilter'}              | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
+    ${'checks.vulnerabilities.pattern'} | ${true}                                                                | ${undefined}
+    ${'checks.vulnerabilities.pattern'} | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'cron.prefix'}                    | ${'test'}                                                              | ${undefined}
     ${'cron.prefix'}                    | ${'test space'}                                                        | ${'No whitespaces allowed.'}
     ${'cron.prefix'}                    | ${''}                                                                  | ${'Value can not be empty.'}
@@ -208,6 +210,22 @@ describe('[settings] Input validation', () => {
     ${'wazuh.monitoring.shards'}        | ${-1}                                                                  | ${'Value should be greater or equal than 1.'}
     ${'wazuh.monitoring.shards'}        | ${'1.2'}                                                               | ${'Number should be an integer.'}
     ${'wazuh.monitoring.shards'}        | ${1.2}                                                                 | ${'Number should be an integer.'}
+    ${'vulnerabilities.pattern'}        | ${'test'}                                                              | ${undefined}
+    ${'vulnerabilities.pattern'}        | ${'test*'}                                                             | ${undefined}
+    ${'vulnerabilities.pattern'}        | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'vulnerabilities.pattern'}        | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'vulnerabilities.pattern'}        | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'vulnerabilities.pattern'}        | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'vulnerabilities.pattern'}        | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'vulnerabilities.pattern'}        | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'vulnerabilities.pattern'}        | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'vulnerabilities.pattern'}        | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'vulnerabilities.pattern'}        | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'vulnerabilities.pattern'}        | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'vulnerabilities.pattern'}        | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'vulnerabilities.pattern'}        | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'vulnerabilities.pattern'}        | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'vulnerabilities.pattern'}        | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
   `(
     '$setting | $value | $expectedValidation',
     ({ setting, value, expectedValidation }) => {
