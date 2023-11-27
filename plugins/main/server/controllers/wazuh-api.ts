@@ -146,7 +146,7 @@ export class WazuhApiCtrl {
       const api = await this.manageHosts.getHostById(id);
       // Check Manage Hosts
       if (!Object.keys(api).length) {
-        throw new Error('Could not find Wazuh API entry on wazuh.yml');
+        throw new Error('Could not find API entry on wazuh.yml');
       }
 
       log('wazuh-api:checkStoredAPI', `${id} exists`, 'debug');
@@ -477,7 +477,7 @@ export class WazuhApiCtrl {
           if (responseCluster.status === HTTP_STATUS_CODES.OK) {
             log(
               'wazuh-api:checkStoredAPI',
-              `Wazuh API response is valid`,
+              `API response is valid`,
               'debug',
             );
             if (responseCluster.data.data.enabled === 'yes') {
@@ -546,7 +546,7 @@ export class WazuhApiCtrl {
       }
       if (error.code === 'EPROTO') {
         return ErrorResponse(
-          'Wrong protocol being used to connect to the Wazuh API',
+          'Wrong protocol being used to connect to the API',
           3005,
           HTTP_STATUS_CODES.BAD_REQUEST,
           response,
@@ -571,7 +571,7 @@ export class WazuhApiCtrl {
       isDown &&
         log(
           'wazuh-api:makeRequest',
-          'Wazuh API is online but Wazuh is not ready yet',
+          'API is online but Wazuh is not ready yet',
         );
 
       return isDown;
@@ -755,7 +755,7 @@ export class WazuhApiCtrl {
           if (!isDown) {
             log(
               'wazuh-api:makeRequest',
-              'Wazuh API is online but Wazuh is not ready yet',
+              'API is online but Wazuh is not ready yet',
             );
             return ErrorResponse(
               `ERROR3099 - ${error.message || 'Wazuh not ready yet'}`,
@@ -826,7 +826,7 @@ export class WazuhApiCtrl {
       }
       throw responseError && responseBody.detail
         ? { message: responseBody.detail, code: responseError }
-        : new Error('Unexpected error fetching data from the Wazuh API');
+        : new Error('Unexpected error fetching data from the API');
     } catch (error) {
       if (
         error &&
@@ -835,7 +835,7 @@ export class WazuhApiCtrl {
       ) {
         return ErrorResponse(
           error.message || error,
-          error.code ? `Wazuh API error: ${error.code}` : 3013,
+          error.code ? `API error: ${error.code}` : 3013,
           HTTP_STATUS_CODES.UNAUTHORIZED,
           response,
         );
@@ -852,7 +852,7 @@ export class WazuhApiCtrl {
         }
         return ErrorResponse(
           errorMsg.detail || error,
-          error.code ? `Wazuh API error: ${error.code}` : 3013,
+          error.code ? `API error: ${error.code}` : 3013,
           HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response,
         );

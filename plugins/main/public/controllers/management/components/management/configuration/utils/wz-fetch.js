@@ -95,7 +95,7 @@ export const extractMessage = error => {
       origin.includes('/api/request') ||
       origin.includes('/api/csv');
     return isFromAPI ?
-      'Wazuh API is not reachable. Reason: timeout.' :
+      'API is not reachable. Reason: timeout.' :
       'Server did not respond';
   }
   if ((((error || {}).data || {}).errorData || {}).message)

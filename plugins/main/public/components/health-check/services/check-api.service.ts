@@ -54,7 +54,7 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
         for (var j = 0; j < errors.length; j++) {
           if (errors[j].includes('ERROR3099 - 405: Method Not Allowed')) {
             return Promise.reject(
-              `No API available to connect. This may be related to a version mismatch between Wazuh Server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${webDocumentationLink(
+              `No API available to connect. This may be related to a version mismatch between Server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${webDocumentationLink(
                 PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
               )}#wazuh-api-and-wazuh-app-version-mismatch-error-is-displayed.`,
             );
@@ -109,7 +109,7 @@ export const checkApiService =
         );
         getToasts().add({
           color: 'warning',
-          title: 'Selected Wazuh API has been updated',
+          title: 'Selected API has been updated',
           text: '',
           toastLifeTimeMs: 3000,
         });
@@ -124,7 +124,7 @@ export const checkApiService =
         checkLogger.error('Wazuh not ready yet');
       } else if (data.data.error || data.data.data.apiIsDown) {
         const errorMessage = data.data.data.apiIsDown
-          ? 'Wazuh API is down'
+          ? 'API is down'
           : `Error connecting to the API: ${
               data.data.error && data.data.error.message
                 ? ` ${data.data.error.message}`

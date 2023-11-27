@@ -14,8 +14,8 @@
   const OUTPUT_FILE_SECURITY_ACTIONS = 'security-actions.json';
 
   // Define the CLI information
-  const cliName = 'Wazuh API data extractor';
-  const cliDescription = `Extract the Wazuh API data
+  const cliName = 'API data extractor';
+  const cliDescription = `Extract the API data
 
 Some warning messages are sent to stderr.`;
   const cliFilePath = process.argv[1];

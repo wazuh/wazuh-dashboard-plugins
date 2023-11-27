@@ -3,7 +3,7 @@ import { ASSETS_PUBLIC_URL, PLUGIN_PLATFORM_NAME } from './constants';
 export const configEquivalences = {
   pattern:
     "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
-  'customization.logo.app': `Set the name of the app logo stored at ${ASSETS_PUBLIC_URL}.  It is used while the user is logging into Wazuh API.`,
+  'customization.logo.app': `Set the name of the app logo stored at ${ASSETS_PUBLIC_URL}.  It is used while the user is logging into the API.`,
   'customization.logo.healthcheck': `Set the name of the health-check logo stored at ${ASSETS_PUBLIC_URL}`,
   'customization.logo.reports': `Set the name of the reports logo (.png) stored at ${ASSETS_PUBLIC_URL}`,
   'checks.pattern':
@@ -23,7 +23,7 @@ export const configEquivalences = {
   'ip.selector':
     'Define if the user is allowed to change the selected index pattern directly from the top menu bar.',
   'ip.ignore':
-    'Disable certain index pattern names from being available in index pattern selector from the Wazuh app.',
+    'Disable certain index pattern names from being available in index pattern selector from the app.',
   'wazuh.monitoring.enabled':
     'Enable or disable the wazuh-monitoring index creation and/or visualization.',
   'wazuh.monitoring.frequency':

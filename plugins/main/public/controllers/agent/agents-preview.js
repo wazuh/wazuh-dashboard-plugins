@@ -298,7 +298,7 @@ export class AgentsPreviewController {
         error: {
           error: error,
           message: error.message || error,
-          title: `Could not get the Wazuh API address: ${
+          title: `Could not get the API address: ${
             error.message || error
           }`,
         },

@@ -561,7 +561,7 @@ export default [
     _source: {
       title: 'Top 10 alerts',
       visState: JSON.stringify({
-        title: 'Wazuh App OSCAP Top 10 alerts',
+        title: 'App OSCAP Top 10 alerts',
         type: 'pie',
         params: {
           type: 'pie',
@@ -626,7 +626,7 @@ export default [
     _source: {
       title: 'Top 10 high risk alerts',
       visState: JSON.stringify({
-        title: 'Wazuh App OSCAP Top 10 high risk alerts',
+        title: 'App OSCAP Top 10 high risk alerts',
         type: 'pie',
         params: {
           type: 'pie',

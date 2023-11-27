@@ -37,7 +37,7 @@ export class ErrorHandler {
       const isFromAPI =
         origin.includes('/api/request') ||
         origin.includes('/api/csv');
-      return isFromAPI ? 'Wazuh API is not reachable. Reason: timeout.' : 'Server did not respond';
+      return isFromAPI ? 'API is not reachable. Reason: timeout.' : 'Server did not respond';
     }
 
     if ((((error || {}).response || {}).data || {}).message) {

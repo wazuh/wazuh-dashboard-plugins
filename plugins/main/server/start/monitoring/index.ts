@@ -344,7 +344,7 @@ async function getHostsConfiguration() {
 
     log(
       'monitoring:getConfig',
-      'There are no Wazuh API entries yet',
+      'There are no API entries yet',
       'debug'
     );
     return Promise.reject({
@@ -354,7 +354,7 @@ async function getHostsConfiguration() {
   } catch (error) {
     log('monitoring:getHostsConfiguration', error.message || error);
     return Promise.reject({
-      error: 'no wazuh hosts',
+      error: 'no hosts',
       error_code: 2
     });
   }

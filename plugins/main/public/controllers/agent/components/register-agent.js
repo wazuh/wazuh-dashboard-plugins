@@ -980,7 +980,7 @@ export const RegisterAgent = withErrorBoundary(
       );
       const passwordInput = (
         <EuiFieldText
-          placeholder='Wazuh password'
+          placeholder='Password'
           value={this.state.wazuhPassword}
           onChange={event => this.setWazuhPassword(event)}
         />
@@ -1050,10 +1050,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
       const text = customTexts[field];
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
       const warningUpgrade =
-        'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.';
+        'If the installer finds another agent in the system, it will upgrade it preserving the configuration.';
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
-          To verify the connection with the Wazuh server, please follow this{' '}
+          To verify the connection with the server, please follow this{' '}
           <a
             href={urlCheckConnectionDocumentation}
             target='_blank'
@@ -1231,12 +1231,12 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       title={
                         <span>
                           After installing the agent, you need to enroll it in
-                          the Wazuh server. Check the Wazuh agent enrollment{' '}
+                          the server. Check the agent enrollment{' '}
                           <EuiLink
                             target='_blank'
                             href={urlWazuhAgentEnrollment}
                           >
-                            Wazuh agent enrollment
+                            Agent enrollment
                           </EuiLink>{' '}
                           section to learn more.
                         </span>
@@ -1297,12 +1297,12 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       title={
                         <span>
                           After installing the agent, you need to enroll it in
-                          the Wazuh server. Check the Wazuh agent enrollment{' '}
+                          the server. Check the agent enrollment{' '}
                           <EuiLink
                             target='_blank'
                             href={urlWazuhAgentEnrollment}
                           >
-                            Wazuh agent enrollment{' '}
+                            Agent enrollment{' '}
                           </EuiLink>
                           section to learn more.
                         </span>
@@ -1339,12 +1339,12 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       title={
                         <span>
                           After installing the agent, you need to enroll it in
-                          the Wazuh server. Check the Wazuh agent enrollment{' '}
+                          the server. Check the agent enrollment{' '}
                           <EuiLink
                             target='_blank'
                             href={urlWazuhAgentEnrollment}
                           >
-                            Wazuh agent enrollment{' '}
+                            Agent enrollment{' '}
                           </EuiLink>
                           section to learn more.
                         </span>
@@ -2035,7 +2035,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         )
           ? [
               {
-                title: 'Wazuh server address',
+                title: 'Server address',
                 children: (
                   <Fragment>
                     <WzManagerAddressInput
@@ -2056,7 +2056,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         )
           ? [
               {
-                title: 'Wazuh password',
+                title: 'Password',
                 children: <Fragment>{passwordInput}</Fragment>,
               },
             ]

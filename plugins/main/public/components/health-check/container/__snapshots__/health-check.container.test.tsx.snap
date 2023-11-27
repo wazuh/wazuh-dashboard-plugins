@@ -29,7 +29,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="api"
         shouldCheck={true}
         showLogButton={false}
-        title="Check Wazuh API connection"
+        title="Check API connection"
         validationService={[Function]}
       />
       <CheckResult
@@ -47,7 +47,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="setup"
         shouldCheck={true}
         showLogButton={false}
-        title="Check Wazuh API version"
+        title="Check API version"
         validationService={[Function]}
       />
       <CheckResult

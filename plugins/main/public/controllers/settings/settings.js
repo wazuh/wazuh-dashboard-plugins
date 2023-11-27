@@ -538,7 +538,7 @@ export class SettingsController {
           this.apiIsDown = true;
           throw {
             message:
-              'Wazuh API not recheable, please review your configuration',
+              'API not recheable, please review your configuration',
             type: 'danger',
             closedEnabled: true,
           };
