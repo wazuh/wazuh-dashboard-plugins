@@ -44,4 +44,4 @@ EXPOSE 55000
 # WAZUH_VERSION - Define the Wazuh branch/tag to install. [WAZUH_VERSION=4.1.0]
 # FILEBEAT_VERSION - Filebeat Version
 # FILEBEAT_WAZUH_TEMPLATE_URL - Link with the Wazuh template. [FILEBEAT_WAZUH_TEMPLATE_URL=https://raw.githubusercontent.com/wazuh/wazuh/4.0/extensions/elasticsearch/7.x/wazuh-template.json]
-# FILEBEAT_WAZUH_MODULE_URL - Link with the Wazuh Filebeat module. [FILEBEAT_WAZUH_MODULE_URL=https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.1.tar.gz]
+# FILEBEAT_WAZUH_MODULE_URL - Link with the Wazuh Filebeat module. [FILEBEAT_WAZUH_MODULE_URL=https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.3.tar.gz]
