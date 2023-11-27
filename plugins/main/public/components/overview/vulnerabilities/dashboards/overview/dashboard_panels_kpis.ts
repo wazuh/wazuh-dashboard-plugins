@@ -1,6 +1,5 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { VULNERABILITIES_INDEX_PATTERN_ID } from '../../common/constants';
 
 const getVisStateSeverityCritical = (indexPatternId: string) => {
   return {
@@ -349,7 +348,9 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
   };
 };
 
-export const getKPIsPanel = (): {
+export const getKPIsPanel = (
+  indexPatternId: string,
+): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }
   >;
@@ -366,7 +367,7 @@ export const getKPIsPanel = (): {
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getVisStateSeverityCritical(VULNERABILITIES_INDEX_PATTERN_ID),
+        savedVis: getVisStateSeverityCritical(indexPatternId),
       },
     },
     '2': {
@@ -380,7 +381,7 @@ export const getKPIsPanel = (): {
       type: 'visualization',
       explicitInput: {
         id: '2',
-        savedVis: getVisStateSeverityHigh(VULNERABILITIES_INDEX_PATTERN_ID),
+        savedVis: getVisStateSeverityHigh(indexPatternId),
       },
     },
     '3': {
@@ -394,7 +395,7 @@ export const getKPIsPanel = (): {
       type: 'visualization',
       explicitInput: {
         id: '3',
-        savedVis: getVisStateSeverityMedium(VULNERABILITIES_INDEX_PATTERN_ID),
+        savedVis: getVisStateSeverityMedium(indexPatternId),
       },
     },
     '4': {
@@ -408,7 +409,7 @@ export const getKPIsPanel = (): {
       type: 'visualization',
       explicitInput: {
         id: '4',
-        savedVis: getVisStateSeverityLow(VULNERABILITIES_INDEX_PATTERN_ID),
+        savedVis: getVisStateSeverityLow(indexPatternId),
       },
     },
   };

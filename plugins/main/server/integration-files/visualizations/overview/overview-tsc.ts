@@ -19,7 +19,11 @@ export default [
         type: 'area',
         params: {
           type: 'area',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          grid: {
+            categoryLines: true,
+            style: { color: '#eee' },
+            valueAxis: 'ValueAxis-1',
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -64,23 +68,12 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
           {
-            id: '2',
+            id: '1',
             enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              timeRange: { from: 'now-24h', to: 'now', mode: 'quick' },
-              useNormalizedEsInterval: true,
-              interval: 'auto',
-              time_zone: 'Europe/Berlin',
-              drop_partials: false,
-              customInterval: '2h',
-              min_doc_count: 1,
-              extended_bounds: {},
-            },
+            type: 'count',
+            schema: 'metric',
+            params: {},
           },
           {
             id: '3',
@@ -96,6 +89,23 @@ export default [
               otherBucketLabel: 'Other',
               missingBucket: false,
               missingBucketLabel: 'Missing',
+            },
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            schema: 'segment',
+            params: {
+              field: 'timestamp',
+              timeRange: { from: 'now-24h', to: 'now', mode: 'quick' },
+              useNormalizedEsInterval: true,
+              interval: 'auto',
+              time_zone: 'Europe/Berlin',
+              drop_partials: false,
+              customInterval: '2h',
+              min_doc_count: 1,
+              extended_bounds: {},
             },
           },
         ],
@@ -140,12 +150,23 @@ export default [
               id: 'ValueAxis-1',
               type: 'value',
               scale: { type: 'linear', defaultYExtents: false },
-              labels: { show: false, rotate: 0, overwriteColor: false, color: '#555' },
+              labels: {
+                show: false,
+                rotate: 0,
+                overwriteColor: false,
+                color: '#555',
+              },
             },
           ],
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -267,8 +288,22 @@ export default [
               params: { date: true, interval: 'P1D', format: 'YYYY-MM-DD' },
               aggType: 'date_histogram',
             },
-            y: [{ accessor: 2, format: { id: 'number' }, params: {}, aggType: 'count' }],
-            z: [{ accessor: 3, format: { id: 'number' }, params: {}, aggType: 'count' }],
+            y: [
+              {
+                accessor: 2,
+                format: { id: 'number' },
+                params: {},
+                aggType: 'count',
+              },
+            ],
+            z: [
+              {
+                accessor: 3,
+                format: { id: 'number' },
+                params: {},
+                aggType: 'count',
+              },
+            ],
             series: [
               {
                 accessor: 1,
@@ -288,7 +323,29 @@ export default [
           radiusRatio: 50,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            schema: 'group',
+            params: {
+              field: 'rule.tsc',
+              orderBy: '1',
+              order: 'desc',
+              size: 10,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+            },
+          },
           {
             id: '2',
             enabled: true,
@@ -305,22 +362,12 @@ export default [
             },
           },
           {
-            id: '3',
+            id: '4',
             enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: {
-              field: 'rule.tsc',
-              orderBy: '1',
-              order: 'desc',
-              size: 50,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-            },
+            type: 'count',
+            schema: 'radius',
+            params: {},
           },
-          { id: '4', enabled: true, type: 'count', schema: 'radius', params: {} },
         ],
       }),
       uiStateJSON: '{}',
@@ -351,13 +398,24 @@ export default [
           isDonut: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
             type: 'terms',
             schema: 'segment',
-            params: { field: 'agent.name', size: 10, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'agent.name',
+              size: 10,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -428,7 +486,13 @@ export default [
           radiusRatio: 51,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -447,7 +511,12 @@ export default [
             enabled: true,
             type: 'terms',
             schema: 'group',
-            params: { field: 'agent.name', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'agent.name',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -482,7 +551,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -568,7 +643,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,

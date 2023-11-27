@@ -17,12 +17,12 @@ export const visualizations = {
         height: 360,
         vis: [
           {
-            title: 'Alert level evolution',
+            title: 'Top 10 Alert level evolution',
             id: 'Wazuh-App-Overview-General-Alert-level-evolution',
             width: 60,
           },
           {
-            title: 'Top MITRE ATT&CKS',
+            title: 'Top 10 MITRE ATT&CKS',
             id: 'Wazuh-App-Overview-General-Alerts-Top-Mitre',
             width: 40,
           },
@@ -249,7 +249,7 @@ export const visualizations = {
         height: 400,
         vis: [
           {
-            title: 'PCI DSS requirements',
+            title: 'Top 10 PCI DSS requirements',
             id: 'Wazuh-App-Overview-PCI-DSS-requirements',
             width: 50,
           },
@@ -346,7 +346,7 @@ export const visualizations = {
             width: 20,
           },
           {
-            title: 'Top requirements over time',
+            title: 'Top 10 requirements over time',
             id: 'Wazuh-App-Overview-NIST-Requirements-over-time',
             width: 50,
           },
