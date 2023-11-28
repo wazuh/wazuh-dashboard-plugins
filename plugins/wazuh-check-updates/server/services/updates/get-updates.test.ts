@@ -76,7 +76,9 @@ describe('getUpdates function', () => {
     mockedGetWazuhCore.mockImplementation(() => ({
       controllers: {
         WazuhHostsCtrl: jest.fn().mockImplementation(() => ({
-          getHostsEntries: jest.fn().mockImplementation(() => [{ id: 'api id' }]),
+          getHostsEntries: jest
+            .fn()
+            .mockImplementation(() => [{ id: 'api id' }]),
         })),
       },
       services: {
@@ -86,6 +88,7 @@ describe('getUpdates function', () => {
               request: jest.fn().mockImplementation(() => ({
                 data: {
                   data: {
+                    uuid: '7f828fd6-ef68-4656-b363-247b5861b84c',
                     current_version: '4.3.1',
                     last_available_patch: {
                       description:

@@ -6,6 +6,7 @@ import {
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { getSavedObject, setSavedObject } from '../saved-object';
 import { getWazuhCore } from '../../plugin-services';
+import _ from 'lodash';
 
 export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<AvailableUpdates> => {
   try {
@@ -27,7 +28,7 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
       hosts?.map(async (api) => {
         const data = {};
         const method = 'GET';
-        const path = '/manager/version/check';
+        const path = '/manager/version/check?force_query=true';
         const options = {
           apiHostID: api.id,
           forceRefresh: true,
@@ -51,8 +52,10 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
               ? API_UPDATES_STATUS.AVAILABLE_UPDATES
               : API_UPDATES_STATUS.UP_TO_DATE;
 
+          const updateWithoutUUID = _.omit(update, 'uuid');
+
           return {
-            ...update,
+            ...updateWithoutUUID,
             api_id: api.id,
             status,
           };
