@@ -8,10 +8,14 @@ import { getSavedObject, setSavedObject } from '../saved-object';
 import { getWazuhCore } from '../../plugin-services';
 import _ from 'lodash';
 
-export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<AvailableUpdates> => {
+export const getUpdates = async (
+  checkAvailableUpdates?: boolean,
+): Promise<AvailableUpdates> => {
   try {
     if (!checkAvailableUpdates) {
-      const availableUpdates = (await getSavedObject(SAVED_OBJECT_UPDATES)) as AvailableUpdates;
+      const availableUpdates = (await getSavedObject(
+        SAVED_OBJECT_UPDATES,
+      )) as AvailableUpdates;
 
       return availableUpdates;
     }
@@ -22,10 +26,11 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
     } = getWazuhCore();
     const wazuhHostsController = new WazuhHostsCtrl();
 
-    const hosts: { id: string }[] = await wazuhHostsController.getHostsEntries();
+    const hosts: { id: string }[] =
+      await wazuhHostsController.getHostsEntries();
 
     const apisAvailableUpdates = await Promise.all(
-      hosts?.map(async (api) => {
+      hosts?.map(async api => {
         const data = {};
         const method = 'GET';
         const path = '/manager/version/check?force_query=true';
@@ -38,26 +43,33 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             method,
             path,
             data,
-            options
+            options,
           );
 
           const update = response.data.data as ResponseApiAvailableUpdates;
 
-          const status =
-            update?.update_check === false
-              ? API_UPDATES_STATUS.DISABLED
-              : update.last_available_patch ||
-                update.last_available_minor ||
-                update.last_available_patch
-              ? API_UPDATES_STATUS.AVAILABLE_UPDATES
-              : API_UPDATES_STATUS.UP_TO_DATE;
+          const getStatus = () => {
+            if (update?.update_check === false) {
+              return API_UPDATES_STATUS.DISABLED;
+            }
+
+            if (
+              update?.last_available_patch?.tag ||
+              update?.last_available_minor?.tag ||
+              update?.last_available_patch?.tag
+            ) {
+              return API_UPDATES_STATUS.AVAILABLE_UPDATES;
+            }
+
+            return API_UPDATES_STATUS.UP_TO_DATE;
+          };
 
           const updateWithoutUUID = _.omit(update, 'uuid');
 
           return {
             ...updateWithoutUUID,
             api_id: api.id,
-            status,
+            status: getStatus(),
           };
         } catch (e: any) {
           const error = {
@@ -71,7 +83,7 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             error,
           };
         }
-      })
+      }),
     );
 
     const savedObject = {
