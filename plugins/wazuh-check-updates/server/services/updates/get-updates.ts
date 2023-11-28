@@ -43,21 +43,28 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
 
           const update = response.data.data as ResponseApiAvailableUpdates;
 
-          const status =
-            update?.update_check === false
-              ? API_UPDATES_STATUS.DISABLED
-              : update.last_available_patch ||
-                update.last_available_minor ||
-                update.last_available_patch
-              ? API_UPDATES_STATUS.AVAILABLE_UPDATES
-              : API_UPDATES_STATUS.UP_TO_DATE;
+          const getStatus = () => {
+            if (update?.update_check === false) {
+              return API_UPDATES_STATUS.DISABLED;
+            }
+
+            if (
+              update?.last_available_patch?.tag ||
+              update?.last_available_minor?.tag ||
+              update?.last_available_patch?.tag
+            ) {
+              return API_UPDATES_STATUS.AVAILABLE_UPDATES;
+            }
+
+            return API_UPDATES_STATUS.UP_TO_DATE;
+          };
 
           const updateWithoutUUID = _.omit(update, 'uuid');
 
           return {
             ...updateWithoutUUID,
             api_id: api.id,
-            status,
+            status: getStatus(),
           };
         } catch (e: any) {
           const error = {
