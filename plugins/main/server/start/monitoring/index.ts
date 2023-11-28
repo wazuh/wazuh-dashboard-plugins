@@ -15,7 +15,6 @@ import { getConfiguration } from '../../lib/get-configuration';
 import { parseCron } from '../../lib/parse-cron';
 import { indexDate } from '../../lib/index-date';
 import { buildIndexSettings } from '../../lib/build-index-settings';
-import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import {
   WAZUH_MONITORING_DEFAULT_CRON_FREQ,
   WAZUH_MONITORING_TEMPLATE_NAME,
@@ -23,8 +22,6 @@ import {
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 import { delayAsPromise } from '../../../common/utils';
 import { getSettingDefaultValue } from '../../../common/services/settings';
-
-const wazuhHostController = new WazuhHostsCtrl();
 
 let MONITORING_ENABLED,
   MONITORING_FREQUENCY,
@@ -380,20 +377,13 @@ async function checkElasticsearchServer(context) {
   }
 }
 
-const fakeResponseEndpoint = {
-  ok: (body: any) => body,
-  custom: (body: any) => body,
-};
 /**
  * Get API configuration from elastic and callback to loadCredentials
  */
 async function getHostsConfiguration(context) {
   try {
-    const hosts = await wazuhHostController.getHostsEntries(
-      context, // TODO: research if this needs the context
-      false,
-      fakeResponseEndpoint,
-    );
+    const hosts =
+      await context.wazuh_core.serverAPIHostEntries.getHostsEntries();
     if (hosts.body.length) {
       return hosts.body;
     }
