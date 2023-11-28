@@ -14,7 +14,7 @@
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
     "test:browser": "plugin-helpers test:browser",
-    "test:jest": "node scripts/jest",
+    "test:jest": "node scripts/jest --runInBand",
     "test:jest:runner": "node scripts/runner test"
   },
   "dependencies": {
