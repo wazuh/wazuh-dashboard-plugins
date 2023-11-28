@@ -8,14 +8,10 @@ import { getSavedObject, setSavedObject } from '../saved-object';
 import { getWazuhCore } from '../../plugin-services';
 import _ from 'lodash';
 
-export const getUpdates = async (
-  checkAvailableUpdates?: boolean,
-): Promise<AvailableUpdates> => {
+export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<AvailableUpdates> => {
   try {
     if (!checkAvailableUpdates) {
-      const availableUpdates = (await getSavedObject(
-        SAVED_OBJECT_UPDATES,
-      )) as AvailableUpdates;
+      const availableUpdates = (await getSavedObject(SAVED_OBJECT_UPDATES)) as AvailableUpdates;
 
       return availableUpdates;
     }
@@ -26,11 +22,10 @@ export const getUpdates = async (
     } = getWazuhCore();
     const wazuhHostsController = new WazuhHostsCtrl();
 
-    const hosts: { id: string }[] =
-      await wazuhHostsController.getHostsEntries();
+    const hosts: { id: string }[] = await wazuhHostsController.getHostsEntries();
 
     const apisAvailableUpdates = await Promise.all(
-      hosts?.map(async api => {
+      hosts?.map(async (api) => {
         const data = {};
         const method = 'GET';
         const path = '/manager/version/check?force_query=true';
@@ -43,7 +38,7 @@ export const getUpdates = async (
             method,
             path,
             data,
-            options,
+            options
           );
 
           const update = response.data.data as ResponseApiAvailableUpdates;
@@ -83,7 +78,7 @@ export const getUpdates = async (
             error,
           };
         }
-      }),
+      })
     );
 
     const savedObject = {
