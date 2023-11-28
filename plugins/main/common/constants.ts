@@ -1446,38 +1446,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.boolean();
     },
   },
-  'logs.level': {
-    title: 'Log level',
-    description: 'Logging level of the App.',
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.select,
-    options: {
-      select: [
-        {
-          text: 'Info',
-          value: 'info',
-        },
-        {
-          text: 'Debug',
-          value: 'debug',
-        },
-      ],
-    },
-    defaultValue: 'info',
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
-    requiresRestartingPluginPlatform: true,
-    validate: function (value) {
-      return SettingsValidator.literal(
-        this.options.select.map(({ value }) => value),
-      )(value);
-    },
-    validateBackend: function (schema) {
-      return schema.oneOf(
-        this.options.select.map(({ value }) => schema.literal(value)),
-      );
-    },
-  },
   pattern: {
     title: 'Index pattern',
     description:

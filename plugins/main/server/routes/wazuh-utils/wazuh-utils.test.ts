@@ -157,9 +157,9 @@ hosts:
   });
 
   it.each`
-    settings                                                      | responseStatusCode
-    ${{ pattern: 'test-alerts-groupA-*' }}                        | ${200}
-    ${{ pattern: 'test-alerts-groupA-*', 'logs.level': 'debug' }} | ${200}
+    settings                                               | responseStatusCode
+    ${{ pattern: 'test-alerts-groupA-*' }}                 | ${200}
+    ${{ pattern: 'test-alerts-groupA-*', timeout: 15000 }} | ${200}
   `(
     `Update the plugin configuration: $settings. PUT /utils/configuration - $responseStatusCode`,
     async ({ responseStatusCode, settings }) => {
@@ -184,7 +184,7 @@ hosts:
     },
     {
       testTitle: 'Update the plugin configuration',
-      settings: { pattern: 'test-alerts-groupA-*', 'logs.level': 'debug' },
+      settings: { pattern: 'test-alerts-groupA-*', timeout: 15000 },
       responseStatusCode: 200,
       responseBodyMessage: null,
     },
@@ -206,7 +206,7 @@ hosts:
       testTitle: 'Bad request, unknown setting',
       settings: {
         'unknown.setting': 'test-alerts-groupA-*',
-        'logs.level': 'debug',
+        timeout: 15000,
       },
       responseStatusCode: 400,
       responseBodyMessage:
@@ -379,9 +379,6 @@ hosts:
     ${'ip.ignore'}                      | ${['test', 'test#']}                                             | ${400}             | ${'[request body.ip.ignore.1]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'ip.selector'}                    | ${true}                                                          | ${200}             | ${null}
     ${'ip.selector'}                    | ${''}                                                            | ${400}             | ${'[request body.ip.selector]: expected value of type [boolean] but got [string]'}
-    ${'logs.level'}                     | ${'info'}                                                        | ${200}             | ${null}
-    ${'logs.level'}                     | ${'debug'}                                                       | ${200}             | ${null}
-    ${'logs.level'}                     | ${''}                                                            | ${400}             | ${'[request body.logs.level]: types that failed validation:\n- [request body.logs.level.0]: expected value to equal [info]\n- [request body.logs.level.1]: expected value to equal [debug]'}
     ${'pattern'}                        | ${'test'}                                                        | ${200}             | ${null}
     ${'pattern'}                        | ${'test*'}                                                       | ${200}             | ${null}
     ${'pattern'}                        | ${''}                                                            | ${400}             | ${'[request body.pattern]: Value can not be empty.'}

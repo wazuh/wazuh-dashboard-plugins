@@ -37,7 +37,6 @@ export const configEquivalences = {
   'wazuh.monitoring.pattern':
     'Default index pattern to use for Wazuh monitoring.',
   hideManagerAlerts: 'Hide the alerts of the manager in every dashboard.',
-  'logs.level': 'Logging level of the App.',
   'enrollment.dns':
     'Specifies the Wazuh registration server, used for the agent enrollment.',
   'enrollment.password':
@@ -85,7 +84,6 @@ export const nameEquivalence = {
   'wazuh.monitoring.creation': 'Index creation',
   'wazuh.monitoring.pattern': 'Index pattern',
   hideManagerAlerts: 'Hide manager alerts',
-  'logs.level': 'Log level',
   'enrollment.dns': 'Enrollment DNS',
   'cron.prefix': 'Cron prefix',
   'cron.statistics.status': 'Status',
@@ -140,7 +138,6 @@ export const categoriesEquivalence = {
   'wazuh.monitoring.creation': MONITORING,
   'wazuh.monitoring.pattern': MONITORING,
   hideManagerAlerts: GENERAL,
-  'logs.level': GENERAL,
   'enrollment.dns': GENERAL,
   'cron.prefix': GENERAL,
   'cron.statistics.status': STATISTICS,
@@ -195,15 +192,6 @@ export const formEquivalence = {
   },
   'wazuh.monitoring.pattern': { type: TEXT },
   hideManagerAlerts: { type: BOOLEAN },
-  'logs.level': {
-    type: LIST,
-    params: {
-      options: [
-        { text: 'Info', value: 'info' },
-        { text: 'Debug', value: 'debug' },
-      ],
-    },
-  },
   'enrollment.dns': { type: TEXT },
   'cron.prefix': { type: TEXT },
   'cron.statistics.status': { type: BOOLEAN },
