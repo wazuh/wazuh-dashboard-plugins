@@ -15,7 +15,6 @@ import {
   WAZUH_DATA_ABSOLUTE_PATH,
   WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_DIRECTORY_PATH,
 } from '../../common/constants';
 import { execSync } from 'child_process';
 import fs from 'fs';
@@ -68,8 +67,6 @@ beforeAll(async () => {
   createDataDirectoryIfNotExists();
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
   createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
-  // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
-  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
 
   // Create server
   const config = {

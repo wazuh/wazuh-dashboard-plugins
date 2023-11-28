@@ -17,7 +17,6 @@ import { read } from 'read-last-lines';
 import jwtDecode from 'jwt-decode';
 import {
   WAZUH_ROLE_ADMINISTRATOR_ID,
-  WAZUH_DATA_LOGS_RAW_PATH,
   PLUGIN_SETTINGS,
 } from '../../../common/constants';
 import {
@@ -156,18 +155,13 @@ export class WazuhUtilsCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const lastLogs = await read(WAZUH_DATA_LOGS_RAW_PATH, 50);
-      const spliterLog = lastLogs.split('\n');
-      return spliterLog && Array.isArray(spliterLog)
-        ? response.ok({
-            body: {
-              error: 0,
-              lastLogs: spliterLog.filter(
-                item => typeof item === 'string' && item.length,
-              ),
-            },
-          })
-        : response.ok({ error: 0, lastLogs: [] });
+      const lastLogs = []; // TODO: get logs or remove endpoint
+      response.ok({
+        body: {
+          error: 0,
+          lastLogs,
+        },
+      });
     } catch (error) {
       return ErrorResponse(error.message || error, 3036, 500, response);
     }

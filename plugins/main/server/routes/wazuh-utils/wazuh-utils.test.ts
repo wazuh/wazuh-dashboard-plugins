@@ -16,8 +16,6 @@ import {
   WAZUH_DATA_ABSOLUTE_PATH,
   WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_RAW_PATH,
 } from '../../../common/constants';
 import { execSync } from 'child_process';
 import fs from 'fs';
@@ -42,9 +40,6 @@ beforeAll(async () => {
   createDataDirectoryIfNotExists();
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
   createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
-
-  // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
-  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
 
   // Create server
   const config = {
@@ -686,19 +681,14 @@ hosts:
   );
 });
 
-describe('[endpoint] GET /utils/logs', () => {
+describe.skip('[endpoint] GET /utils/logs', () => {
+  // TODO: adapt or remove
   beforeAll(() => {
     // Create the configuration file with custom content
     const fileContent = `---
 {"date":"2022-09-20T08:36:16.688Z","level":"info","location":"initialize","message":"Kibana index: .kibana"}
 {"date":"2022-09-20T08:36:16.689Z","level":"info","location":"initialize","message":"App revision: 4400"}
 `;
-    fs.writeFileSync(WAZUH_DATA_LOGS_RAW_PATH, fileContent, 'utf8');
-  });
-
-  afterAll(() => {
-    // Remove the configuration file
-    fs.unlinkSync(WAZUH_DATA_LOGS_RAW_PATH);
   });
 
   it(`Get plugin logs. GET /utils/logs`, async () => {
