@@ -10,6 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { log } from './logger';
-export { wazuhApiClient } from './api-client';
-export * as securityFactory from './security-factory';
+export * from './cache-api-user-has-run-as';
+export * from './cookie';
+export * from './filesystem';
+export * from './get-configuration';
+export * from './manage-hosts';
+export * from './security-factory';
+export * from './server-api-client';
+export * from './server-api-host-entries';
+export * from './update-registry';
+export * from './update-configuration-file';

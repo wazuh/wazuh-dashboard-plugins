@@ -17,7 +17,7 @@ import { indexDate } from '../../lib/index-date';
 import { buildIndexSettings } from '../../lib/build-index-settings';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import {
-  PLUGIN_PLATFORM_NAME,
+  WAZUH_MONITORING_DEFAULT_CRON_FREQ,
   WAZUH_MONITORING_TEMPLATE_NAME,
 } from '../../../common/constants';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
@@ -68,7 +68,16 @@ function initMonitoringConfiguration(context) {
       appConfig,
       getSettingDefaultValue('wazuh.monitoring.frequency'),
     );
-    MONITORING_CRON_FREQ = parseCron(MONITORING_FREQUENCY);
+    try {
+      MONITORING_CRON_FREQ = parseCron(MONITORING_FREQUENCY);
+    } catch (error) {
+      context.wazuh.logger.warn(
+        `Using default value ${WAZUH_MONITORING_DEFAULT_CRON_FREQ} due to: ${
+          error.message || error
+        }`,
+      );
+      MONITORING_CRON_FREQ = WAZUH_MONITORING_DEFAULT_CRON_FREQ;
+    }
     MONITORING_CREATION = getAppConfigurationSetting(
       'wazuh.monitoring.creation',
       appConfig,

@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 import fs from 'fs';
-import { log } from './logger';
 import { getConfiguration } from './get-configuration';
 import { WAZUH_DATA_CONFIG_APP_PATH } from '../../common/constants';
 import { formatSettingValueToFile } from '../../common/services/settings';
+import { Logger } from 'opensearch-dashboards/server';
 
 export class UpdateConfigurationFile {
-  constructor() {
+  constructor(private logger: Logger) {
     this.busy = false;
     this.file = WAZUH_DATA_CONFIG_APP_PATH;
   }
@@ -29,17 +29,18 @@ export class UpdateConfigurationFile {
    */
   updateLine(key, value, exists = false) {
     try {
+      this.logger.debug(`Updating setting: ${key} with value ${value}`);
       const data = fs.readFileSync(this.file, { encoding: 'utf-8' });
       const re = new RegExp(`^${key}\\s{0,}:\\s{1,}.*`, 'gm');
       const formatedValue = formatSettingValueToFile(value);
       const result = exists
         ? data.replace(re, `${key}: ${formatedValue}`)
         : `${data}\n${key}: ${formatedValue}`;
+      this.logger.info(`updateLine: ${result}`);
       fs.writeFileSync(this.file, result, 'utf8');
-      log('update-configuration:updateLine', 'Updating line', 'debug');
       return true;
     } catch (error) {
-      log('update-configuration:updateLine', error.message || error);
+      this.logger.error(error.message || error);
       throw error;
     }
   }
@@ -55,24 +56,28 @@ export class UpdateConfigurationFile {
       }
       this.busy = true;
 
-      const pluginConfiguration = getConfiguration({force: true}) || {};
+      const pluginConfiguration = getConfiguration({ force: true }) || {};
 
-      for(const pluginSettingKey in updatedConfiguration){
+      for (const pluginSettingKey in updatedConfiguration) {
         // Store the configuration in the configuration file.
         const value = updatedConfiguration[pluginSettingKey];
-        this.updateLine(pluginSettingKey, value, typeof pluginConfiguration[pluginSettingKey] !== 'undefined');
+        this.updateLine(
+          pluginSettingKey,
+          value,
+          /* WARNING: This is trusting the result of getConfiguration service only returns the
+          settings defined in the configuration file. The updateLine function could be enhanced to
+          identify if the setting is defined or not itself.
+          */
+          typeof pluginConfiguration[pluginSettingKey] !== 'undefined',
+        );
         // Update the app configuration server-cached setting in memory with the new value.
         pluginConfiguration[pluginSettingKey] = value;
-      };
+      }
 
       this.busy = false;
-      log(
-        'update-configuration:updateConfiguration',
-        'Updating configuration',
-        'debug'
-      );
+      this.logger.debug('Updating configuration');
     } catch (error) {
-      log('update-configuration:updateConfiguration', error.message || error);
+      this.logger.error(error.message || error);
       this.busy = false;
       throw error;
     }

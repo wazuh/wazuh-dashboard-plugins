@@ -20,30 +20,17 @@ import { HTTP_STATUS_CODES } from '../../common/constants';
 import { getCustomizationSetting } from '../../common/services/settings';
 import { addJobToQueue } from '../start/queue';
 import fs from 'fs';
-import { ManageHosts } from '../lib/manage-hosts';
-import { UpdateRegistry } from '../lib/update-registry';
 import jwtDecode from 'jwt-decode';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
-import {
-  APIUserAllowRunAs,
-  CacheInMemoryAPIUserAllowRunAs,
-  API_USER_STATUS_RUN_AS,
-} from '../lib/cache-api-user-has-run-as';
 import { getCookieValueByName } from '../lib/cookie';
 import { getConfiguration } from '../lib/get-configuration';
 
 export class WazuhApiCtrl {
-  manageHosts: ManageHosts;
-  updateRegistry: UpdateRegistry;
-
-  constructor() {
-    this.manageHosts = new ManageHosts();
-    this.updateRegistry = new UpdateRegistry();
-  }
+  constructor() {}
 
   async getToken(
     context: RequestHandlerContext,
@@ -88,8 +75,8 @@ export class WazuhApiCtrl {
       }
       let token;
       if (
-        (await APIUserAllowRunAs.canUse(idHost)) ==
-        API_USER_STATUS_RUN_AS.ENABLED
+        (await context.wazuh_core.cacheAPIUserAllowRunAs.canUse(idHost)) ===
+        context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS.ENABLED
       ) {
         token = await context.wazuh.api.client.asCurrentUser.authenticate(
           idHost,
@@ -145,7 +132,7 @@ export class WazuhApiCtrl {
       // Get config from wazuh.yml
       const id = request.body.id;
       context.wazuh.logger.debug(`Getting server API host by ID: ${id}`);
-      const api = await this.manageHosts.getHostById(id);
+      const api = await context.wazuh_core.manageHosts.getHostById(id);
       context.wazuh.logger.debug(
         `Server API host data: ${JSON.stringify(api)}`,
       );
@@ -245,7 +232,10 @@ export class WazuhApiCtrl {
 
           if (api.cluster_info) {
             // Update cluster information in the wazuh-registry.json
-            await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
+            await context.wazuh_core.updateRegistry.updateClusterInfo(
+              id,
+              api.cluster_info,
+            );
 
             // Hide Wazuh API secret, username, password
             const copied = { ...api };
@@ -285,7 +275,7 @@ export class WazuhApiCtrl {
         });
       } else {
         try {
-          const apis = await this.manageHosts.getHosts();
+          const apis = await context.wazuh_core.manageHosts.getHosts();
           for (const api of apis) {
             try {
               const id = Object.keys(api)[0];
@@ -381,7 +371,9 @@ export class WazuhApiCtrl {
       // if (notValid) return ErrorResponse(notValid, 3003, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, response);
       context.wazuh.logger.debug(`${request.body.id} is valid`);
       // Check if a Wazuh API id is given (already stored API)
-      const data = await this.manageHosts.getHostById(request.body.id);
+      const data = await context.wazuh_core.manageHosts.getHostById(
+        request.body.id,
+      );
       if (data) {
         apiAvailable = data;
       } else {
@@ -443,7 +435,9 @@ export class WazuhApiCtrl {
             );
 
           // Check the run_as for the API user and update it
-          let apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ALL_DISABLED;
+          let apiUserAllowRunAs =
+            context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
+              .ALL_DISABLED;
           const responseApiUserAllowRunAs =
             await context.wazuh.api.client.asInternalUser.request(
               'GET',
@@ -458,18 +452,26 @@ export class WazuhApiCtrl {
 
             if (allow_run_as && apiAvailable && apiAvailable.run_as)
               // HOST AND USER ENABLED
-              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ENABLED;
+              apiUserAllowRunAs =
+                context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
+                  .ENABLED;
             else if (!allow_run_as && apiAvailable && apiAvailable.run_as)
               // HOST ENABLED AND USER DISABLED
-              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED;
+              apiUserAllowRunAs =
+                context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
+                  .USER_NOT_ALLOWED;
             else if (allow_run_as && (!apiAvailable || !apiAvailable.run_as))
               // USER ENABLED AND HOST DISABLED
-              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.HOST_DISABLED;
+              apiUserAllowRunAs =
+                context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
+                  .HOST_DISABLED;
             else if (!allow_run_as && (!apiAvailable || !apiAvailable.run_as))
               // HOST AND USER DISABLED
-              apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ALL_DISABLED;
+              apiUserAllowRunAs =
+                context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
+                  .ALL_DISABLED;
           }
-          CacheInMemoryAPIUserAllowRunAs.set(
+          context.wazuh_core.cacheAPIUserAllowRunAs.set(
             request.body.id,
             apiAvailable.username,
             apiUserAllowRunAs,
@@ -663,7 +665,7 @@ export class WazuhApiCtrl {
   async makeRequest(context, method, path, data, id, response) {
     const devTools = !!(data || {}).devTools;
     try {
-      const api = await this.manageHosts.getHostById(id);
+      const api = await context.wazuh_core.manageHosts.getHostById(id);
       if (devTools) {
         delete data.devTools;
       }
@@ -1118,7 +1120,7 @@ export class WazuhApiCtrl {
   ) {
     try {
       const source = JSON.parse(
-        fs.readFileSync(this.updateRegistry.file, 'utf8'),
+        fs.readFileSync(context.wazuh_core.updateRegistry.file, 'utf8'),
       );
       if (source.installationDate && source.lastRestart) {
         context.wazuh.logger.debug(
@@ -1158,7 +1160,7 @@ export class WazuhApiCtrl {
   ) {
     try {
       const source = JSON.parse(
-        fs.readFileSync(this.updateRegistry.file, 'utf8'),
+        fs.readFileSync(context.wazuh_core.updateRegistry.file, 'utf8'),
       );
       return response.ok({
         body: {

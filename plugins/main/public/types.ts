@@ -5,13 +5,20 @@ import {
   VisualizationsSetup,
   VisualizationsStart,
 } from '../../../src/plugins/visualizations/public';
-import { DataPublicPluginSetup, DataPublicPluginStart } from '../../../src/plugins/data/public';
+import {
+  DataPublicPluginSetup,
+  DataPublicPluginStart,
+} from '../../../src/plugins/data/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { UiActionsSetup } from '../../../src/plugins/ui_actions/public';
 import { SecurityOssPluginStart } from '../../../src/plugins/security_oss/public/';
 import { SavedObjectsStart } from '../../../src/plugins/saved_objects/public';
-import { TelemetryPluginStart, TelemetryPluginSetup } from '../../../src/plugins/telemetry/public';
+import {
+  TelemetryPluginStart,
+  TelemetryPluginSetup,
+} from '../../../src/plugins/telemetry/public';
 import { WazuhCheckUpdatesPluginStart } from '../../wazuh-check-updates/public';
+import { WazuhCorePluginStart } from '../../wazuh-core/public';
 import { DashboardStart } from '../../../src/plugins/dashboard/public';
 
 export interface AppPluginStartDependencies {
@@ -24,6 +31,7 @@ export interface AppPluginStartDependencies {
   savedObjects: SavedObjectsStart;
   telemetry: TelemetryPluginStart;
   wazuhCheckUpdates: WazuhCheckUpdatesPluginStart;
+  wazuhCore: WazuhCorePluginStart;
   dashboard: DashboardStart;
 }
 export interface AppDependencies {

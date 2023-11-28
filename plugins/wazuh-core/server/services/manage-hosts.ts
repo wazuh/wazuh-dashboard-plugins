@@ -11,21 +11,19 @@
  */
 import fs from 'fs';
 import yml from 'js-yaml';
-import { log } from './logger';
 import { UpdateRegistry } from './update-registry';
 import { initialWazuhConfig } from './initial-wazuh-config';
 import { WAZUH_DATA_CONFIG_APP_PATH } from '../../common/constants';
 import { createDataDirectoryIfNotExists } from './filesystem';
+import { Logger } from 'opensearch-dashboards/server';
 
 export class ManageHosts {
   busy: boolean;
   file: string;
-  updateRegistry: UpdateRegistry;
   initialConfig: string;
-  constructor() {
+  constructor(private logger: Logger, private updateRegistry: UpdateRegistry) {
     this.busy = false;
     this.file = WAZUH_DATA_CONFIG_APP_PATH;
-    this.updateRegistry = new UpdateRegistry();
     this.initialConfig = initialWazuhConfig;
   }
 
@@ -36,14 +34,14 @@ export class ManageHosts {
    */
   composeHost(host, id) {
     try {
-      log('manage-hosts:composeHost', 'Composing host', 'debug');
+      this.logger.debug('Composing host');
       return `  - ${!id ? new Date().getTime() : id}:
       url: ${host.url}
       port: ${host.port}
       username: ${host.username || host.user}
       password: ${host.password}`;
     } catch (error) {
-      log('manage-hosts:composeHost', error.message || error);
+      this.logger.error(error.message || error);
       throw error;
     }
   }
@@ -56,10 +54,10 @@ export class ManageHosts {
     try {
       const hostId = Object.keys(host)[0];
       const reg = `\\s*-\\s*${hostId}\\s*:\\s*\\n*\\s*url\\s*:\\s*\\S*\\s*\\n*\\s*port\\s*:\\s*\\S*\\s*\\n*\\s*username\\s*:\\s*\\S*\\s*\\n*\\s*password\\s*:\\s*\\S*`;
-      log('manage-hosts:composeRegex', 'Composing regex', 'debug');
+      this.logger.debug('Composing regex');
       return new RegExp(`${reg}`, 'gm');
     } catch (error) {
-      log('manage-hosts:composeRegex', error.message || error);
+      this.logger.error(error.message || error);
       throw error;
     }
   }
@@ -82,12 +80,12 @@ export class ManageHosts {
       const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
       this.busy = false;
       const content = yml.load(raw);
-      log('manage-hosts:getHosts', 'Getting hosts', 'debug');
+      this.logger.debug('Getting hosts');
       const entries = (content || {})['hosts'] || [];
       return entries;
     } catch (error) {
       this.busy = false;
-      log('manage-hosts:getHosts', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -97,15 +95,15 @@ export class ManageHosts {
    */
   async checkIfHostsKeyExists() {
     try {
-      log('manage-hosts:checkIfHostsKeyExists', 'Checking hosts key', 'debug');
+      this.logger.debug('Checking hosts key');
       this.busy = true;
       const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
       this.busy = false;
       const content = yml.load(raw);
       return Object.keys(content || {}).includes('hosts');
     } catch (error) {
-      log('manage-hosts:checkIfHostsKeyExists', error.message || error);
       this.busy = false;
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -119,10 +117,10 @@ export class ManageHosts {
       const ids = hosts.map(h => {
         return Object.keys(h)[0];
       });
-      log('manage-hosts:getCurrentHostsIds', 'Getting hosts ids', 'debug');
+      this.logger.debug('Getting hosts ids');
       return ids;
     } catch (error) {
-      log('manage-hosts:getCurrentHostsIds', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -133,7 +131,7 @@ export class ManageHosts {
    */
   async getHostById(id) {
     try {
-      log('manage-hosts:getHostById', `Getting host ${id}`, 'debug');
+      this.logger.debug(`Getting host ${id}`);
       const hosts = await this.getHosts();
       const host = hosts.filter(h => {
         return Object.keys(h)[0] == id;
@@ -145,7 +143,7 @@ export class ManageHosts {
       const result = Object.assign(host[0][key], { id: key }) || {};
       return result;
     } catch (error) {
-      log('manage-hosts:getHostById', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -179,13 +177,9 @@ export class ManageHosts {
         };
         entries.push(api);
       });
-      log(
-        'manage-hosts:transformIndexedApis',
-        'Transforming index API schedule to wazuh.yml',
-        'debug',
-      );
+      this.logger.debug('Transforming index API schedule to wazuh.yml');
     } catch (error) {
-      log('manage-hosts:transformIndexedApis', error.message || error);
+      this.logger.error(error.message || error);
       throw error;
     }
     return entries;
@@ -200,7 +194,7 @@ export class ManageHosts {
       const apis = this.transformIndexedApis(apiEntries);
       return await this.addSeveralHosts(apis);
     } catch (error) {
-      log('manage-hosts:migrateFromIndex', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -215,14 +209,10 @@ export class ManageHosts {
       const cleanHosts = hosts.filter(h => {
         return !currentHosts.includes(h.id);
       });
-      log(
-        'manage-hosts:cleanExistingHosts',
-        'Preventing add existings hosts',
-        'debug',
-      );
+      this.logger.debug('Preventing add existings hosts');
       return cleanHosts;
     } catch (error) {
-      log('manage-hosts:cleanExistingHosts', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -241,7 +231,7 @@ export class ManageHosts {
    */
   async addSeveralHosts(hosts) {
     try {
-      log('manage-hosts:addSeveralHosts', 'Adding several', 'debug');
+      this.logger.debug('Adding several');
       const hostsToAdd = await this.cleanExistingHosts(hosts);
       if (!hostsToAdd.length) return 'There are not APIs entries to migrate';
       for (let idx in hostsToAdd) {
@@ -250,7 +240,7 @@ export class ManageHosts {
       }
       return 'All APIs entries were migrated to the wazuh.yml';
     } catch (error) {
-      log('manage-hosts:addSeveralHosts', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -294,11 +284,11 @@ export class ManageHosts {
         host.cluster_info,
         host.extensions,
       );
-      log('manage-hosts:addHost', `Host ${id} was properly added`, 'debug');
+      this.logger.debug(`Host ${id} was properly added`);
       return id;
     } catch (error) {
       this.busy = false;
-      log('manage-hosts:addHost', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -336,15 +326,11 @@ export class ManageHosts {
         }
       }
       this.busy = false;
-      log(
-        'manage-hosts:deleteHost',
-        `Host ${req.params.id} was properly deleted`,
-        'debug',
-      );
+      this.logger.debug(`Host ${req.params.id} was properly deleted`);
       return true;
     } catch (error) {
       this.busy = false;
-      log('manage-hosts:deleteHost', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -374,15 +360,11 @@ export class ManageHosts {
         await fs.writeFileSync(this.file, result, 'utf8');
       }
       this.busy = false;
-      log(
-        'manage-hosts:updateHost',
-        `Host ${id} was properly updated`,
-        'debug',
-      );
+      this.logger.debug(`Host ${id} was properly updated`);
       return true;
     } catch (error) {
       this.busy = false;
-      log('manage-hosts:updateHost', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }

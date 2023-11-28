@@ -6,13 +6,16 @@ import { loggingSystemMock } from '../../../../src/core/server/logging/logging_s
 import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
 import { WazuhApiRoutes } from './wazuh-api';
-import { createDataDirectoryIfNotExists, createDirectoryIfNotExists } from '../lib/filesystem';
+import {
+  createDataDirectoryIfNotExists,
+  createDirectoryIfNotExists,
+} from '../lib/filesystem';
 import {
   HTTP_STATUS_CODES,
   WAZUH_DATA_ABSOLUTE_PATH,
   WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_DIRECTORY_PATH
+  WAZUH_DATA_LOGS_DIRECTORY_PATH,
 } from '../../common/constants';
 import { execSync } from 'child_process';
 import fs from 'fs';
@@ -22,16 +25,45 @@ const logger = loggingService.get();
 const context = {
   wazuh: {
     security: {
-      getCurrentUser: () => 'wazuh'
-    }
-  }
+      getCurrentUser: () => 'wazuh',
+    },
+    logger: {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    },
+  },
+  wazuh_core: {
+    manageHosts: {
+      getHostById: jest.fn(id => {
+        return {
+          id,
+          url: 'https://localhost',
+          port: 55000,
+          username: 'wazuh-wui',
+          password: 'wazuh-wui',
+          run_as: false,
+        };
+      }),
+    },
+    cacheAPIUserAllowRunAs: {
+      set: jest.fn(),
+      API_USER_STATUS_RUN_AS: {
+        ALL_DISABLED: 0,
+        USER_NOT_ALLOWED: 1,
+        HOST_DISABLED: 2,
+        ENABLED: 3,
+      },
+    },
+  },
 };
 
-const enhanceWithContext = (fn: (...args: any[]) => any) => fn.bind(null, context);
+const enhanceWithContext = (fn: (...args: any[]) => any) =>
+  fn.bind(null, context);
 let server, innerServer;
 
 beforeAll(async () => {
-
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
   createDataDirectoryIfNotExists();
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
@@ -54,7 +86,11 @@ beforeAll(async () => {
   } as any;
   server = new HttpServer(loggingService, 'tests');
   const router = new Router('', logger, enhanceWithContext);
-  const { registerRouter, server: innerServerTest, ...rest } = await server.setup(config);
+  const {
+    registerRouter,
+    server: innerServerTest,
+    ...rest
+  } = await server.setup(config);
   innerServer = innerServerTest;
 
   // Register routes
@@ -101,13 +137,16 @@ hosts:
   });
 
   it.each`
-    apiId | statusCode
+    apiId        | statusCode
     ${'default'} | ${HTTP_STATUS_CODES.SERVICE_UNAVAILABLE}
-  `(`Get API configuration POST /api/check-api - apiID - $statusCode`, async ({ apiId, statusCode }) => {
-    const body = { id: apiId, forceRefresh: false };
-    const response = await supertest(innerServer.listener)
-      .post('/api/check-api')
-      .send(body)
-      .expect(statusCode);
-  });
+  `(
+    `Get API configuration POST /api/check-api - apiID - $statusCode`,
+    async ({ apiId, statusCode }) => {
+      const body = { id: apiId, forceRefresh: false };
+      const response = await supertest(innerServer.listener)
+        .post('/api/check-api')
+        .send(body)
+        .expect(statusCode);
+    },
+  );
 });

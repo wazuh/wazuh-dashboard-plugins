@@ -28,6 +28,9 @@ const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
 const context = {
   wazuh: {},
+  wazuh_core: {
+    updateConfigurationFile: { updateConfiguration: jest.fn() },
+  },
 };
 
 const enhanceWithContext = (fn: (...args: any[]) => any) =>

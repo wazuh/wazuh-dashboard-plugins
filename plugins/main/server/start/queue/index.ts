@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import cron from 'node-cron';
-import { log } from '../../lib/logger';
 import { WAZUH_QUEUE_CRON_FREQ } from '../../../common/constants';
 
 export let queue = [];

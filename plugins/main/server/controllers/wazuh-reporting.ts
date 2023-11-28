@@ -322,7 +322,9 @@ export class WazuhReportingCtrl {
         const { from, to } = time || {};
         let additionalTables = [];
         // Init
-        const printer = new ReportPrinter();
+        const printer = new ReportPrinter(
+          context.wazuh.logger.get('report-printer'),
+        );
 
         createDataDirectoryIfNotExists();
         createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
@@ -419,7 +421,9 @@ export class WazuhReportingCtrl {
         const { components, apiId } = request.body;
         const { groupID } = request.params;
         // Init
-        const printer = new ReportPrinter();
+        const printer = new ReportPrinter(
+          context.wazuh.logger.get('report-printer'),
+        );
 
         createDataDirectoryIfNotExists();
         createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
@@ -710,7 +714,9 @@ export class WazuhReportingCtrl {
           const { components, apiId } = request.body;
           const { agentID } = request.params;
 
-          const printer = new ReportPrinter();
+          const printer = new ReportPrinter(
+            context.wazuh.logger.get('report-printer'),
+          );
           createDataDirectoryIfNotExists();
           createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
           createDirectoryIfNotExists(
@@ -1054,7 +1060,9 @@ export class WazuhReportingCtrl {
           const { agentID } = request.params;
           const { from, to } = time || {};
           // Init
-          const printer = new ReportPrinter();
+          const printer = new ReportPrinter(
+            context.wazuh.logger.get('report-printer'),
+          );
 
           const { hashUsername } = await context.wazuh.security.getCurrentUser(
             request,

@@ -24,7 +24,6 @@ import {
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
 } from '../../common/constants';
 import jwtDecode from 'jwt-decode';
-import { ManageHosts } from '../lib/manage-hosts';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
@@ -40,10 +39,8 @@ import { WAZUH_INDEXER_NAME } from '../../common/constants';
 
 export class WazuhElasticCtrl {
   wzSampleAlertsIndexPrefix: string;
-  manageHosts: ManageHosts;
   constructor() {
     this.wzSampleAlertsIndexPrefix = this.getSampleAlertPrefix();
-    this.manageHosts = new ManageHosts();
   }
 
   /**

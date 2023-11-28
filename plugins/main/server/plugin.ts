@@ -27,7 +27,6 @@ import {
 } from 'opensearch_dashboards/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
-import { SecurityObj, ISecurityFactory } from './lib/security-factory';
 import { setupRoutes } from './routes';
 import {
   jobInitializeRun,
@@ -36,10 +35,6 @@ import {
   jobQueueRun,
   jobMigrationTasksRun,
 } from './start';
-import { getCookieValueByName } from './lib/cookie';
-import * as ApiInterceptor from './lib/api-interceptor';
-import { schema, TypeOf } from '@osd/config-schema';
-import type { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 
 declare module 'opensearch_dashboards/server' {
@@ -47,7 +42,7 @@ declare module 'opensearch_dashboards/server' {
     wazuh: {
       logger: Logger;
       plugins: PluginSetup;
-      security: ISecurityFactory;
+      security: any;
       api: {
         client: {
           asInternalUser: {
@@ -84,7 +79,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
-    const wazuhSecurity = await SecurityObj(plugins);
     const serverInfo = core.http.getServerInfo();
 
     core.http.registerRouteHandlerContext('wazuh', (context, request) => {
@@ -97,39 +91,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           info: serverInfo,
         },
         plugins,
-        security: wazuhSecurity,
-        api: {
-          client: {
-            asInternalUser: {
-              authenticate: async apiHostID =>
-                await ApiInterceptor.authenticate(apiHostID),
-              request: async (method, path, data, options) =>
-                await ApiInterceptor.requestAsInternalUser(
-                  method,
-                  path,
-                  data,
-                  options,
-                ),
-            },
-            asCurrentUser: {
-              authenticate: async apiHostID =>
-                await ApiInterceptor.authenticate(
-                  apiHostID,
-                  (
-                    await wazuhSecurity.getCurrentUser(request, context)
-                  ).authContext,
-                ),
-              request: async (method, path, data, options) =>
-                await ApiInterceptor.requestAsCurrentUser(method, path, data, {
-                  ...options,
-                  token: getCookieValueByName(
-                    request.headers.cookie,
-                    'wz-token',
-                  ),
-                }),
-            },
-          },
-        },
+        security: plugins.wazuhCore.dashboardSecurity,
+        api: context.wazuh_core.api,
       };
     });
 
@@ -148,26 +111,11 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public async start(core: CoreStart) {
+  public async start(core: CoreStart, plugins: any) {
     const globalConfiguration: SharedGlobalConfig =
       await this.initializerContext.config.legacy.globalConfig$
         .pipe(first())
         .toPromise();
-    const wazuhApiClient = {
-      client: {
-        asInternalUser: {
-          authenticate: async apiHostID =>
-            await ApiInterceptor.authenticate(apiHostID),
-          request: async (method, path, data, options) =>
-            await ApiInterceptor.requestAsInternalUser(
-              method,
-              path,
-              data,
-              options,
-            ),
-        },
-      },
-    };
 
     const contextServer = {
       config: globalConfiguration,
@@ -178,8 +126,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       core,
       wazuh: {
         logger: this.logger.get('initialize'),
-        api: wazuhApiClient,
+        api: plugins.wazuhCore.api,
       },
+      wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
 
@@ -188,8 +137,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       core,
       wazuh: {
         logger: this.logger.get('migration-task'),
-        api: wazuhApiClient,
+        api: plugins.wazuhCore.api,
       },
+      wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
 
@@ -198,8 +148,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       core,
       wazuh: {
         logger: this.logger.get('monitoring'),
-        api: wazuhApiClient,
+        api: plugins.wazuhCore.api,
       },
+      wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
 
@@ -208,8 +159,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       core,
       wazuh: {
         logger: this.logger.get('cron-scheduler'),
-        api: wazuhApiClient,
+        api: plugins.wazuhCore.api,
       },
+      wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
 
@@ -218,8 +170,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       core,
       wazuh: {
         logger: this.logger.get('queue'),
-        api: wazuhApiClient,
+        api: plugins.wazuhCore.api,
       },
+      wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
     return {};
