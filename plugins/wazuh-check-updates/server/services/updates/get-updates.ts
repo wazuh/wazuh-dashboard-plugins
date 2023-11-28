@@ -6,7 +6,6 @@ import {
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { getSavedObject, setSavedObject } from '../saved-object';
 import { getWazuhCore } from '../../plugin-services';
-import _ from 'lodash';
 
 export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<AvailableUpdates> => {
   try {
@@ -43,15 +42,24 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
 
           const update = response.data.data as ResponseApiAvailableUpdates;
 
+          const {
+            current_version,
+            update_check,
+            last_available_major,
+            last_available_minor,
+            last_available_patch,
+            last_check_date,
+          } = update;
+
           const getStatus = () => {
-            if (update?.update_check === false) {
+            if (update_check === false) {
               return API_UPDATES_STATUS.DISABLED;
             }
 
             if (
-              update?.last_available_patch?.tag ||
-              update?.last_available_minor?.tag ||
-              update?.last_available_patch?.tag
+              last_available_major?.tag ||
+              last_available_minor?.tag ||
+              last_available_patch?.tag
             ) {
               return API_UPDATES_STATUS.AVAILABLE_UPDATES;
             }
@@ -59,10 +67,13 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             return API_UPDATES_STATUS.UP_TO_DATE;
           };
 
-          const updateWithoutUUID = _.omit(update, 'uuid');
-
           return {
-            ...updateWithoutUUID,
+            current_version,
+            update_check,
+            last_available_major,
+            last_available_minor,
+            last_available_patch,
+            last_check_date: last_check_date || undefined,
             api_id: api.id,
             status: getStatus(),
           };
