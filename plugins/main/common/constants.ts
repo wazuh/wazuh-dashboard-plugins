@@ -48,6 +48,9 @@ export const WAZUH_STATISTICS_DEFAULT_STATUS = true;
 export const WAZUH_STATISTICS_DEFAULT_FREQUENCY = 900;
 export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 
+// Wazuh vulnerabilities
+export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities';
+
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
@@ -402,6 +405,10 @@ export const ELASTIC_NAME = 'elastic';
 // Default Wazuh indexer name
 export const WAZUH_INDEXER_NAME = 'Wazuh indexer';
 
+// Not timeFieldName on index pattern
+export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =
+  'not_time_field_name_index_pattern';
+
 // Customization
 export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
 
@@ -411,6 +418,7 @@ export enum SettingCategory {
   HEALTH_CHECK,
   MONITORING,
   STATISTICS,
+  VULNERABILITIES,
   SECURITY,
   CUSTOMIZATION,
 }
@@ -562,6 +570,12 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
     description:
       'Options related to the daemons manager monitoring job and their storage in indexes.',
     renderOrder: SettingCategory.STATISTICS,
+  },
+  [SettingCategory.VULNERABILITIES]: {
+    title: 'Vulnerabilities',
+    description:
+      'Options related to the agent vulnerabilities monitoring job and its storage in indexes.',
+    renderOrder: SettingCategory.VULNERABILITIES,
   },
   [SettingCategory.CUSTOMIZATION]: {
     title: 'Custom branding',
@@ -797,6 +811,33 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Set time filter to 24h',
     description:
       'Change the default value of the plugin platform timeFilter configuration.',
+    category: SettingCategory.HEALTH_CHECK,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'checks.vulnerabilities.pattern': {
+    title: 'Vulnerabilities index pattern',
+    description:
+      'Enable or disable the vulnerabilities index pattern health check when opening the app.',
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -1108,7 +1149,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   },
   'customization.logo.app': {
     title: 'App main logo',
-    description: `This logo is used as loading indicator while the user is logging into Wazuh API`,
+    description: `This logo is used as loading indicator while the user is logging into Wazuh API.`,
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.filepicker,
     defaultValue: '',
@@ -1718,6 +1759,36 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     },
     validateBackend: function (schema) {
       return schema.number({ validate: this.validate.bind(this) });
+    },
+  },
+  'vulnerabilities.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for vulnerabilities.',
+    category: SettingCategory.VULNERABILITIES,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_VULNERABILITIES_PATTERN,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    requiresRunningHealthCheck: false,
+    validate: SettingsValidator.compose(
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+    validateBackend: function (schema) {
+      return schema.string({ minLength: 1, validate: this.validate });
     },
   },
 };

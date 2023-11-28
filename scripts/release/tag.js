@@ -111,11 +111,6 @@ async function run(configuration) {
 
   bump(configuration);
 
-  logger.debug('Checking if there are changes to commit');
-  const thereChangesToCommit =
-    execSystem('git diff --exit-code --no-patch;echo -n $?').toString() === '1';
-  logger.debug(`Are there changes to commit?: ${thereChangesToCommit}`);
-
   if (!ignoreConfirmation) {
     let repeat = true;
     do {
@@ -148,6 +143,11 @@ async function run(configuration) {
       }
     } while (repeat);
   }
+
+  logger.debug('Checking if there are changes to commit');
+  const thereChangesToCommit =
+    execSystem('git diff --exit-code --no-patch;echo -n $?').toString() === '1';
+  logger.debug(`Are there changes to commit?: ${thereChangesToCommit}`);
 
   if (thereChangesToCommit) {
     logger.info('There are changes to commit.');

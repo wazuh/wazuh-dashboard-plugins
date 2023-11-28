@@ -45,6 +45,7 @@ import {
 } from './services/request-handler';
 import { Applications, Categories } from './utils/applications';
 import { syncHistoryLocations } from './kibana-integrations/discover/kibana_services';
+import { euiPaletteColorBlind } from '@elastic/eui';
 
 const innerAngularName = 'app/wazuh';
 
@@ -67,6 +68,56 @@ export class WazuhPlugin
     } catch (error) {
       console.error('plugin.ts: Error getting logos configuration', error);
     }
+
+    // Redefine the mapKeys method to change the properties sent to euiPaletteColorBlind.
+    // This is a workaround until the issue reported in Opensearch Dashboards is fixed.
+    // https://github.com/opensearch-project/OpenSearch-Dashboards/issues/5422
+    // This should be reomved when the issue is fixed. Probably in OSD 2.12.0
+    plugins.charts.colors.mappedColors.mapKeys = function (
+      keys: Array<string | number>,
+    ) {
+      const configMapping = this.getConfigColorMapping();
+      const configColors = _.values(configMapping);
+      const oldColors = _.values(this._oldMap);
+
+      let alreadyUsedColors: string[] = [];
+      const keysToMap: Array<string | number> = [];
+      _.each(keys, key => {
+        // If this key is mapped in the config, it's unnecessary to have it mapped here
+        if (configMapping[key as any]) {
+          delete this._mapping[key];
+          alreadyUsedColors.push(configMapping[key]);
+        }
+
+        // If this key is mapped to a color used by the config color mapping, we need to remap it
+        if (_.includes(configColors, this._mapping[key])) keysToMap.push(key);
+
+        // if key exist in oldMap, move it to mapping
+        if (this._oldMap[key]) {
+          this._mapping[key] = this._oldMap[key];
+          alreadyUsedColors.push(this._mapping[key]);
+        }
+
+        // If this key isn't mapped, we need to map it
+        if (this.get(key) == null) keysToMap.push(key);
+      });
+
+      alreadyUsedColors.push(...Object.values(this._mapping));
+      alreadyUsedColors = alreadyUsedColors.map(color =>
+        color.toLocaleLowerCase(),
+      );
+      // Choose colors from euiPaletteColorBlind and filter out any already assigned to keys
+      const colorPalette = euiPaletteColorBlind({
+        rotations: Math.ceil(
+          (keysToMap.length + alreadyUsedColors.length) / 10,
+        ),
+        direction: core.uiSettings.get('theme:darkMode') ? 'darker' : 'lighter',
+      })
+        .filter(color => !alreadyUsedColors.includes(color.toLowerCase()))
+        .slice(0, keysToMap.length);
+
+      _.merge(this._mapping, _.zipObject(keysToMap, colorPalette));
+    };
 
     // Register the applications
     Applications.forEach(app => {
