@@ -1,44 +1,84 @@
-.wz-welcome-page .euiCard .euiTitle, .wz-module-body .euiCard .euiTitle {
-    font-size: 16px;
-    font-weight: 400;
+.wz-welcome-page .euiCard .euiTitle,
+.wz-module-body .euiCard .euiTitle {
+  font-size: 16px;
+  font-weight: 400;
 }
 
-.wz-welcome-page .euiCard .euiText, .wz-module-body .euiCard .euiText {
-    font-size: 12px;
-    font-family: sans-serif;
+.wz-welcome-page .euiCard .euiText,
+.wz-module-body .euiCard .euiText {
+  font-size: 12px;
+  font-family: sans-serif;
 }
 
-.wz-module-header-agent:not(.wz-module-header-agent-main){
-   background: white;
-   border-bottom: 1px solid #D3DAE6;
+.wz-module-header-agent:not(.wz-module-header-agent-main) {
+  background: white;
+  border-bottom: 1px solid #d3dae6;
 }
 
-.wz-welcome-page-agent-info.wz-welcome-page-agent-info-gray{
-    border-top: 1px solid #d3dae6;
-    background: #fafbfd!important;
-    border-bottom: 1px solid #d3dae6;
+.wz-welcome-page-agent-info.wz-welcome-page-agent-info-gray {
+  border-top: 1px solid #d3dae6;
+  background: #fafbfd !important;
+  border-bottom: 1px solid #d3dae6;
 }
 
-.wz-welcome-page-agent-tabs{
-    padding: 12px 16px 1px 10px;
-    min-height: 54px;
-    border-bottom: 1px solid #D3DAE6;
-    background-color: white;
+.wz-welcome-page-agent-tabs {
+  padding: 12px 16px 1px 10px;
+  min-height: 54px;
+  border-bottom: 1px solid #d3dae6;
+  background-color: white;
 }
 
-.wz-welcome-page-agent-info-actions{
-    padding: 6px 0px 6px 0px;
+.wz-welcome-page-agent-info-actions {
+  padding: 6px 0px 6px 0px;
 }
 
-.wz-welcome-page-agent-info .euiStat .euiText{
-    font-size: 12px;
-    font-family: sans-serif;
+.wz-welcome-page-agent-info .euiStat .euiText {
+  font-size: 12px;
+  font-family: sans-serif;
 }
 
 .statWithLink:hover .euiTitle {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-span.statWithLink:hover  {
-    text-decoration: underline;
+span.statWithLink:hover {
+  text-decoration: underline;
 }
+
+// Header buttons of IT Hygiene application
+
+// Sidebar is open and locked
+body.euiBody--hasFlyout:not(.euiBody-hasOverlayMask) {
+  @media only screen and (max-width: 1345px) {
+    // Hide button text depending on the window size
+    .wz-it-hygiene-header-button .euiButtonEmpty__text {
+      display: none;
+    }
+  }
+
+  @media only screen and (min-width: 1346px) {
+    // Hide the tooltip of button depending on the window size
+    .wz-it-hygiene-header-button-tooltip {
+      display: none;
+    }
+  }
+}
+
+// Sidebar is closed
+body:not(.euiBody--hasFlyout) {
+  @media only screen and (max-width: 1025px) {
+    // Hide button text depending on the window size
+    .wz-it-hygiene-header-button .euiButtonEmpty__text {
+      display: none;
+    }
+  }
+
+  @media only screen and (min-width: 1026px) {
+    // Hide the tooltip of button depending on the window size
+    .wz-it-hygiene-header-button-tooltip {
+      display: none;
+    }
+  }
+}
+
+// Header buttons of IT Hygiene application
