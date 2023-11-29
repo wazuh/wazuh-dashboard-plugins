@@ -174,7 +174,7 @@ const InventoryVulsComponent = () => {
           )}
           {isSearching ? <LoadingSpinner /> : null}
           {!isLoading && !isSearching && results?.hits?.total === 0 ? (
-            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+            <DiscoverNoResults />
           ) : null}
           {!isLoading && !isSearching && results?.hits?.total > 0 ? (
             <EuiDataGrid

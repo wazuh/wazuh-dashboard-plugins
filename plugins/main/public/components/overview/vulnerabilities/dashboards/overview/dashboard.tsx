@@ -21,6 +21,7 @@ import { DiscoverNoResults } from '../../common/components/no_results';
 import { SavedObject } from '../../../../../react-services';
 import { WAZUH_INDEX_TYPE_VULNERABILITIES } from '../../../../../../common/constants';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
+import useCheckIndexFields from '../../common/hooks/useCheckIndexFields';
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -35,59 +36,34 @@ const DashboardVulsComponent: React.FC = () => {
   const appConfig = useAppConfig();
   const VULNERABILITIES_INDEX_PATTERN_ID =
     appConfig.data['vulnerabilities.pattern'];
-
-  const [isCheckingIndex, setIsCheckingIndex] = useState<boolean>(false);
-  const [vulnerabilityIndexChecked, setVulnerabilityIndexChecked] =
-    useState<boolean>(false);
-  const [resultVulnerabilityIndexData, setResultVulnerabilityIndexData] =
-    useState<SearchResponse>({} as SearchResponse);
-
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
     filters: [],
   });
-  const { isLoading, filters, query, indexPatterns } = searchBarProps;
+  const {
+    isLoading: isLoadingSearchbar,
+    filters,
+    query,
+    indexPatterns,
+  } = searchBarProps;
 
-  useEffect(() => {
-    const checkVulnerabilitiesIndexFields = async () => {
-      const fields = await SavedObject.getIndicesFields(
-        VULNERABILITIES_INDEX_PATTERN_ID,
-        WAZUH_INDEX_TYPE_VULNERABILITIES,
-      );
-      if (fields) {
-        setVulnerabilityIndexChecked(true);
-        search({
-          indexPattern: indexPatterns?.[0] as IndexPattern,
-          filters,
-          query,
-        })
-          .then(results => {
-            setResultVulnerabilityIndexData(results);
-            setIsCheckingIndex(true);
-          })
-          .catch(error => {
-            const searchError = ErrorFactory.create(HttpError, {
-              error,
-              message: 'Error fetching vulnerabilities',
-            });
-            ErrorHandler.handleError(searchError);
-            setIsCheckingIndex(true);
-          });
-      } else {
-        setVulnerabilityIndexChecked(false);
-      }
-    };
-    if (!isLoading) {
-      checkVulnerabilitiesIndexFields();
-    }
-  }, [isLoading]);
+  const { isError, error, isSuccess, resultIndexData, isLoading } =
+    useCheckIndexFields(
+      VULNERABILITIES_INDEX_PATTERN_ID,
+      indexPatterns?.[0],
+      WAZUH_INDEX_TYPE_VULNERABILITIES,
+      filters,
+      query,
+    );
+
+  if (isLoading || isLoadingSearchbar) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
       <I18nProvider>
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
+        {!isLoading && !isLoadingSearchbar ? (
           <SearchBar
             appName='vulnerability-detector-searchbar'
             {...searchBarProps}
@@ -95,12 +71,13 @@ const DashboardVulsComponent: React.FC = () => {
             showQueryInput={true}
             showQueryBar={true}
           />
-        )}
-
-        {(!isCheckingIndex && !vulnerabilityIndexChecked) ||
-        resultVulnerabilityIndexData?.hits?.total === 0 ? (
-          <DiscoverNoResults queryLanguage={''} />
-        ) : (
+        ) : null}
+        {!isLoadingSearchbar &&
+        !isLoading &&
+        (isError || resultIndexData?.hits?.total === 0) ? (
+          <DiscoverNoResults message={error?.message} />
+        ) : null}
+        {!isLoadingSearchbar && !isLoading && isSuccess ? (
           <>
             <div className='vulnerability-dashboard-filters-wrapper'>
               <DashboardByRenderer
@@ -172,7 +149,7 @@ const DashboardVulsComponent: React.FC = () => {
               }}
             />
           </>
-        )}
+        ) : null}
       </I18nProvider>
     </>
   );
