@@ -209,7 +209,7 @@ export const ScaScan = compose(
                     href={getCore().application.getUrlForApp(
                       configurationAssessment.id,
                       {
-                        path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}`,
                       },
                     )}
                   >
@@ -220,7 +220,7 @@ export const ScaScan = compose(
               </RedirectAppLinks>
             </EuiFlexItem>
             <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
-              <EuiBadge color='secondary'>{lastScan.policy_id}</EuiBadge>
+              <EuiBadge color='secondary'>{lastScan?.policy_id}</EuiBadge>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiPanel>
@@ -277,7 +277,7 @@ export const ScaScan = compose(
                         href={getCore().application.getUrlForApp(
                           configurationAssessment.id,
                           {
-                            path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                            path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}`,
                           },
                         )}
                       >
