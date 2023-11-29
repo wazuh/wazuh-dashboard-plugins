@@ -101,13 +101,13 @@ export function jobInitializeRun(context) {
         );
         log(
           'initialize:saveConfiguration',
-          'Wazuh configuration registry saved.',
+          'Configuration registry saved.',
           'debug',
         );
       } catch (error) {
         log('initialize:saveConfiguration', error.message || error);
         context.wazuh.logger.error(
-          'Could not create Wazuh configuration registry',
+          'Could not create configuration registry',
         );
       }
     } catch (error) {
@@ -173,7 +173,7 @@ export function jobInitializeRun(context) {
 
         log(
           'initialize:checkwazuhRegistry',
-          'Wazuh app revision or version changed, regenerating wazuh-registry.json.',
+          'App revision or version changed, regenerating wazuh-registry.json.',
           'info',
         );
 

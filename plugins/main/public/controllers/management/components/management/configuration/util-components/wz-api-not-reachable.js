@@ -58,7 +58,7 @@ class WzWazuhAPINotReachable extends Component {
           <EuiFlexItem>
             <div style={{ textAlign: 'center' }}>
               <EuiIcon type="alert" style={{ marginRight: '4px' }} />
-              <span>Wazuh API not reachable</span>
+              <span>API not reachable</span>
               <EuiHorizontalRule margin="s" />
               <EuiButton iconType="refresh" onClick={this.onClickRefresh}>
                 Refresh

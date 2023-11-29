@@ -44,14 +44,14 @@ import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashb
 
 const checks = {
   api: {
-    title: 'Check Wazuh API connection',
+    title: 'Check API connection',
     label: 'API connection',
     validator: checkApiService,
     awaitFor: [],
     canRetry: true,
   },
   setup: {
-    title: 'Check Wazuh API version',
+    title: 'Check API version',
     label: 'API version',
     validator: checkSetupService,
     awaitFor: ['api'],

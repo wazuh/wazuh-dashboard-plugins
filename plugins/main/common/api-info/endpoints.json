@@ -1542,7 +1542,7 @@
       {
         "name": "/cluster/:node_id/stats/analysisd",
         "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_analysisd_node",
-        "description": "Return Wazuh analysisd statistical information in node {node_id}",
+        "description": "Return analysisd statistical information in node {node_id}",
         "summary": "Get node stats analysisd",
         "tags": ["Cluster"],
         "args": [
@@ -5044,7 +5044,7 @@
       {
         "name": "/manager/stats/analysisd",
         "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_analysisd",
-        "description": "Return Wazuh analysisd statistical information",
+        "description": "Return analysisd statistical information",
         "summary": "Get stats analysisd",
         "tags": ["Manager"],
         "query": [

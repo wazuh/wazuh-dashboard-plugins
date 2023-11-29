@@ -148,13 +148,13 @@ export const Steps = ({
     ...(needsPassword && !wazuhPassword
       ? [
           {
-            title: 'Wazuh password',
+            title: 'Password',
             children: (
               <EuiCallOut
                 color='warning'
                 title={
                   <span>
-                    The Wazuh password is required but wasn't defined. Please
+                    The password is required but wasn't defined. Please
                     check our{' '}
                     <EuiLink
                       target='_blank'
@@ -184,8 +184,7 @@ export const Steps = ({
       ),
     },
     {
-      title:
-        'Run the following commands to download and install the Wazuh agent:',
+      title: 'Run the following commands to download and install the agent:',
       children: (
         <>
           {missingStepsName?.length ? (
@@ -221,7 +220,7 @@ export const Steps = ({
       status: installCommandStepStatus,
     },
     {
-      title: 'Start the Wazuh agent:',
+      title: 'Start the agent:',
       children: (
         <>
           {missingStepsName?.length ? (

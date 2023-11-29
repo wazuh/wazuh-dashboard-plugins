@@ -355,38 +355,6 @@ export const AgentsPreview = compose(
                   </EuiFlexItem>
                 </>
               }
-              <EuiFlexItem
-                grow={false}
-                className='agents-evolution-visualization'
-                style={{
-                  margin: !this.state.loading ? '12px' : 0,
-                }}
-              >
-                <EuiCard
-                  title
-                  description
-                  paddingSize='none'
-                  betaBadgeLabel='Evolution'
-                >
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <div style={{ height: evolutionIsReady ? '180px' : 0 }}>
-                        <WzReduxProvider>
-                          <KibanaVis
-                            visID={'Wazuh-App-Overview-General-Agents-status'}
-                            tab={'general'}
-                          />
-                        </WzReduxProvider>
-                      </div>
-                      {!evolutionIsReady && (
-                        <div className='loading-chart-xl'>
-                          <EuiLoadingChart size='xl' />
-                        </div>
-                      )}
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiCard>
-              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size='m' />
             <WzReduxProvider>

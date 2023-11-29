@@ -31,8 +31,8 @@ const WzManagerAddressInput = (props: Props) => {
   return (
     <EuiText>
       <p>
-        This is the address the agent uses to communicate with the Wazuh server.
-        It can be an IP address or a fully qualified domain name (FQDN).
+        This is the address the agent uses to communicate with the server. It
+        can be an IP address or a fully qualified domain name (FQDN).
       </p>
       <EuiFieldText
         placeholder='Server Address'

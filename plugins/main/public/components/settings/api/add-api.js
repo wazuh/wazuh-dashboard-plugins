@@ -57,7 +57,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         blockClose: true,
         message:
           (error.data || error).message ||
-          'Wazuh API not reachable, please review your configuration',
+          'API not reachable, please review your configuration',
         fetchingData: false
       });
     }
@@ -94,7 +94,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         enableClose: false,
         message:
           (error.data || error).message || error ||
-          'Wazuh API not reachable, please review your configuration',
+          'API not reachable, please review your configuration',
         fetchingData: false
       });
 
@@ -106,7 +106,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Wazuh API not reachable, please review your configuration: ${error.message || error}`,
+          title: `API not reachable, please review your configuration: ${error.message || error}`,
         },
       };
 
@@ -136,7 +136,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         {(this.state.status === 'warning' ||
           this.state.status === 'danger') && <EuiSpacer />}
         <EuiText>
-          Check that the {PLUGIN_PLATFORM_NAME} server can reach the configured Wazuh API(s).
+          Check that the {PLUGIN_PLATFORM_NAME} server can reach the configured API(s).
         </EuiText>
         <EuiSpacer />
         <EuiButton
@@ -166,7 +166,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         <EuiSpacer />
         <EuiText>
           Where <EuiCode>{'<id>'}</EuiCode> is an arbitrary ID,{' '}
-          <EuiCode>{'<api_url>'}</EuiCode> is the URL of the Wazuh API,{' '}
+          <EuiCode>{'<api_url>'}</EuiCode> is the URL of the API,{' '}
           <EuiCode>{'<api_port>'}</EuiCode> is the port,{' '}
           <EuiCode>{'<api_username>'}</EuiCode> and{' '}
           <EuiCode>{'<api_password>'}</EuiCode> are the credentials to

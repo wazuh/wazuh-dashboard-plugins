@@ -47,13 +47,13 @@ export class ApiRequest {
         throw {error: 404, message: error.data.detail};
       }
       if (error.response && error.response.status === 401){
-        throw {error: 401, message: 'Wrong Wazuh API credentials used'};
+        throw {error: 401, message: 'Wrong API credentials used'};
       }
       if (error && error.data && error.data.detail && error.data.detail === 'ECONNRESET') {
-        throw {error: 3005, message: 'Wrong protocol being used to connect to the Wazuh API'};
+        throw {error: 3005, message: 'Wrong protocol being used to connect to the API'};
       }
       if (error && error.data && error.data.detail && ['ENOTFOUND','EHOSTUNREACH','EINVAL','EAI_AGAIN','ECONNREFUSED'].includes(error.data.detail)) {
-        throw {error: 3005, message: 'Wazuh API is not reachable. Please check your url and port.'};
+        throw {error: 3005, message: 'API is not reachable. Please check your url and port.'};
       }
       throw error;
     }

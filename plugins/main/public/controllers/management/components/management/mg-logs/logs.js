@@ -458,7 +458,7 @@ export default compose(
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiTextColor color='subdued'>
-                <p>List and filter Wazuh logs.</p>
+                <p>List and filter logs.</p>
               </EuiTextColor>
             </EuiFlexItem>
           </EuiFlexGroup>

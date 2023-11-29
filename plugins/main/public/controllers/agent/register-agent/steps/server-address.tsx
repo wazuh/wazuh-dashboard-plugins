@@ -67,7 +67,9 @@ const ServerAddress = (props: Props) => {
    */
   const setDefaultValue = async () => {
     if (defaultValue) {
-      const defaultNode = [{ label: defaultValue, value: defaultValue, nodetype: 'custom' }];
+      const defaultNode = [
+        { label: defaultValue, value: defaultValue, nodetype: 'custom' },
+      ];
       handleOnChange(defaultNode);
       setIsDisabled(true);
     } else {
@@ -149,7 +151,8 @@ const ServerAddress = (props: Props) => {
   return (
     <EuiText>
       <p>
-        This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
+        This is the address the agent uses to communicate with the server. It
+        can be an IP address or a fully qualified domain name (FQDN).
       </p>
       <EuiComboBox
         placeholder='Server Address'

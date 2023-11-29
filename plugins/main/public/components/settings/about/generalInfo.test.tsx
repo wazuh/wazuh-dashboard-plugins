@@ -24,7 +24,7 @@ describe('SettingsAboutGeneralInfo component', () => {
     const panels = container.getElementsByClassName('euiPanel');
     expect(panels.length).toBe(2);
 
-    expect(getByText('Welcome to the Wazuh dashboard')).toBeInTheDocument();
+    expect(getByText('Welcome to the dashboard')).toBeInTheDocument();
     expect(getByText('Community')).toBeInTheDocument();
   });
 });

@@ -65,7 +65,7 @@ export const APIUserAllowRunAs = {
     const ApiUserCanUseStatus = await APIUserAllowRunAs.check(apiId);
     if(ApiUserCanUseStatus === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED){
       const api = await manageHosts.getHostById(apiId);
-      throw new Error(`API with host ID [${apiId}] misconfigured. The Wazuh API user [${api.username}] is not allowed to use [run_as]. Allow it in the user configuration or set [run_as] host setting with [false] value.`);
+      throw new Error(`API with host ID [${apiId}] misconfigured. The API user [${api.username}] is not allowed to use [run_as]. Allow it in the user configuration or set [run_as] host setting with [false] value.`);
     }
     return ApiUserCanUseStatus;
   }

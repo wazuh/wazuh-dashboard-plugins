@@ -40,7 +40,7 @@ export const PromptAgentNeverConnected = () => {
             rel='noopener noreferrer'
             external
           >
-            Checking connection with the Wazuh server
+            Checking connection with the server
           </EuiLink>
         </Fragment>
       }

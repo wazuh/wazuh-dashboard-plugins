@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { getToasts }  from '../kibana-services';
+import { getToasts } from '../kibana-services';
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzMisc } from '../factories/misc';
@@ -33,10 +33,9 @@ export class ErrorHandler {
     if ((error || {}).status === -1) {
       const origin = ((error || {}).config || {}).url || '';
       const isFromAPI =
-        origin.includes('/api/request') ||
-        origin.includes('/api/csv');
+        origin.includes('/api/request') || origin.includes('/api/csv');
       return isFromAPI
-        ? 'Wazuh API is not reachable. Reason: timeout.'
+        ? 'API is not reachable. Reason: timeout.'
         : 'Server did not respond';
     }
     if ((((error || {}).data || {}).errorData || {}).message)

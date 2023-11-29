@@ -135,16 +135,16 @@ export const WzSecurity = compose(
         break;
       case API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED:
         runAsWarningTxt =
-          'The role mapping has no effect because the current Wazuh API user has allow_run_as disabled.';
+          'The role mapping has no effect because the current API user has allow_run_as disabled.';
         break;
       case API_USER_STATUS_RUN_AS.ALL_DISABLED:
         runAsWarningTxt = `For the role mapping to take effect, enable run_as in ${getPluginDataPath(
           'config/wazuh.yml',
-        )} configuration file and set the current Wazuh API user allow_run_as to true. Restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
+        )} configuration file and set the current API user allow_run_as to true. Restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
         break;
       default:
         runAsWarningTxt =
-          'The role mapping has no effect because the current Wazuh API user has run_as disabled.';
+          'The role mapping has no effect because the current API user has run_as disabled.';
         break;
     }
 
