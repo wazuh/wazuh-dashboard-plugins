@@ -431,7 +431,7 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
           enabled: true,
           type: 'date_histogram',
           params: {
-            field: 'event.created',
+            field: '@timestamp',
             timeRange: {
               from: 'now-24h',
               to: 'now',
@@ -523,23 +523,6 @@ const getVisStateInventoryTable = (indexPatternId: string) => {
             missingBucket: false,
             missingBucketLabel: 'Missing',
             customLabel: 'version',
-          },
-          schema: 'bucket',
-        },
-        {
-          id: '4',
-          enabled: true,
-          type: 'terms',
-          params: {
-            field: 'package.architecture',
-            orderBy: '1',
-            order: 'desc',
-            size: 5,
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'architecture',
           },
           schema: 'bucket',
         },

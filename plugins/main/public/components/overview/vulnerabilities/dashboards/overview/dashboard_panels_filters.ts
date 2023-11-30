@@ -112,7 +112,7 @@ export const getDashboardFilters = (
           indexPatternId,
           'Top Operating system vulnerabilities',
           'Operating system',
-          'host.os.name',
+          'host.os.full',
         ),
       },
     },
