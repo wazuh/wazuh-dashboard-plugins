@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added the ability to check if there are available updates from the UI. [#6093](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6093)
 - Added remember server address check [#5791](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5791)
 - Added the ssl_agent_ca configuration to the SSL Settings form [#6083](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6083)
-- Added global vulnerabilities dashboards [#5896](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5896)
+- Added global vulnerabilities dashboards [#5896](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5896) [#6179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6179)
 - Added an agent selector to the IT Hygiene application [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Added query results limit when the search exceed 10000 hits [#6106](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6106)
 
@@ -25,7 +25,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed a problem with the agent menu header when the side menu is docked [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Fixed how the query filters apply on the Security Alerts table [#6102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6102)
-- Fixed error when a column with no value is selected to show in the vulnerabilities inventory table [#6179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6179)
 
 ### Removed
 
