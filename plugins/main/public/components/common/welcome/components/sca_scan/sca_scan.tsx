@@ -258,6 +258,12 @@ export const ScaScan = compose(
       const loading = this.renderLoadingStatus();
       const scaScan = this.renderScanDetails();
       const emptyPrompt = this.renderEmptyPrompt();
+      if (loading) {
+        return { loading };
+      }
+      if (!lastScan) {
+        return { emptyPrompt };
+      }
       return (
         <EuiFlexItem>
           <EuiPanel paddingSize='m'>
@@ -309,8 +315,6 @@ export const ScaScan = compose(
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiText>
-            {lastScan === undefined && emptyPrompt}
-            {loading}
             {scaScan}
           </EuiPanel>
         </EuiFlexItem>
