@@ -90,6 +90,12 @@ export const ScaScan = compose(
       this.getLastScan(this.props.agent.id);
     }
 
+    async componentDidUpdate(prevProps: Readonly<Props>) {
+      if (prevProps.agent.id !== this.props.agent.id) {
+        this.getLastScan(this.props.agent.id);
+      }
+    }
+
     async getLastScan(agentId: Number) {
       const scans = await WzRequest.apiReq(
         'GET',
@@ -259,10 +265,18 @@ export const ScaScan = compose(
       const scaScan = this.renderScanDetails();
       const emptyPrompt = this.renderEmptyPrompt();
       if (loading) {
-        return { loading };
+        return (
+          <EuiFlexItem>
+            <EuiPanel paddingSize='m'>{loading}</EuiPanel>
+          </EuiFlexItem>
+        );
       }
       if (!lastScan) {
-        return { emptyPrompt };
+        return (
+          <EuiFlexItem>
+            <EuiPanel paddingSize='m'>{emptyPrompt}</EuiPanel>
+          </EuiFlexItem>
+        );
       }
       return (
         <EuiFlexItem>
