@@ -5,7 +5,7 @@ import { DevToolsController } from './dev-tools';
 jest.mock('../../kibana-services', () => ({
   ...(jest.requireActual('../../kibana-services') as object),
   getUiSettings: jest.fn().mockReturnValue({
-    get: (name) => {
+    get: name => {
       return true;
     },
   }),
@@ -49,34 +49,39 @@ describe('Devtools Controller', () => {
 
   describe('Devtools.Send()', () => {
     it('Should return string type errors to print in the codemirror textarea output', async () => {
-
       // Create new instance of the devtools controller
-      const controller = new DevToolsController($scope, window, ErrorHandler, [window.document]);
+      const controller = new DevToolsController($scope, window, ErrorHandler, [
+        window.document,
+      ]);
 
       // Define possible error structures to parse
       const errorTypes = {
         dataObject: {
-          data: { message: 'Data Object Error' }
+          data: { message: 'Data Object Error' },
         },
         invalidObject: {
-          error: 'Invalid Object Error'
+          error: 'Invalid Object Error',
         },
         object: {
           data: 'Object Error',
-          status: -1
+          status: -1,
         },
-        string: "String Error",
+        string: 'String Error',
         null: null,
         undefined: undefined,
         number: 1,
-      }
+      };
 
-      expect(controller.parseError(errorTypes.object)).toEqual('Wazuh API is not reachable. Reason: timeout.');
+      expect(controller.parseError(errorTypes.object)).toEqual(
+        'API is not reachable. Reason: timeout.',
+      );
       expect(controller.parseError(errorTypes.string)).toEqual('String Error');
-      expect(controller.parseError(errorTypes.dataObject)).toEqual(errorTypes.dataObject.data.message);
-      expect(controller.parseError(errorTypes.invalidObject)).toEqual(JSON.stringify(errorTypes.invalidObject));
-      
-    })
-  })
-
+      expect(controller.parseError(errorTypes.dataObject)).toEqual(
+        errorTypes.dataObject.data.message,
+      );
+      expect(controller.parseError(errorTypes.invalidObject)).toEqual(
+        JSON.stringify(errorTypes.invalidObject),
+      );
+    });
+  });
 });

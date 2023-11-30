@@ -16,7 +16,7 @@ jest.mock('../../../utils/assets', () => ({
 describe('SettingsAboutGeneralInfo component', () => {
   test('should render a component', () => {
     const { container, getByText } = render(
-      <SettingsAboutGeneralInfo pluginAppName="Wazuh dashboard" />
+      <SettingsAboutGeneralInfo pluginAppName='Wazuh dashboard' />,
     );
 
     expect(container).toMatchSnapshot();

@@ -462,7 +462,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                     }
                   >
                     <EuiFieldText
-                      data-testid="collect-events-generated-since-wazuh-manager-is-initialized"
+                      data-testid="collect-events-generated-since-manager-is-initialized"
                       readOnly={true}
                       value="yes"
                     >
@@ -479,7 +479,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                             <EuiValidatableControl>
                               <input
                                 className="euiFieldText"
-                                data-testid="collect-events-generated-since-wazuh-manager-is-initialized"
+                                data-testid="collect-events-generated-since-manager-is-initialized"
                                 readOnly={true}
                                 type="text"
                                 value="yes"
