@@ -74,15 +74,9 @@ export const AgentsPreview = compose(
         loadingSummary: false,
         showAgentsEvolutionVisualization: true,
         agentTableFilters: [],
-        agentStatusSummary: {
-          active: '-',
-          disconnected: '-',
-          total: '-',
-          pending: '-',
-          never_connected: '-',
-        },
+        agentStatusSummary: props.tableProps.agentStatusSummary,
         agentConfiguration: {},
-        agentsActiveCoverage: 0,
+        agentsActiveCoverage: props.tableProps.agentsActiveCoverage,
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
@@ -126,36 +120,6 @@ export const AgentsPreview = compose(
         return prev;
       }, {});
     };
-    async fetchSummaryStatus() {
-      this.setState({ loadingSummary: true });
-      const {
-        data: {
-          data: {
-            connection: agentStatusSummary,
-            configuration: agentConfiguration,
-          },
-        },
-      } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-
-      this.props.tableProps.updateSummary(agentStatusSummary);
-
-      const agentsActiveCoverage = (
-        (agentStatusSummary.active / agentStatusSummary.total) *
-        100
-      ).toFixed(2);
-
-      this.setState({
-        loadingSummary: false,
-        agentStatusSummary,
-        agentConfiguration,
-        /* Calculate the agents active coverage.
-          Ensure the calculated value is not a NaN, otherwise set a 0.
-        */
-        agentsActiveCoverage: isNaN(agentsActiveCoverage)
-          ? 0
-          : agentsActiveCoverage,
-      });
-    }
 
     async fetchAgents() {
       this.setState({ loadingAgents: true });
@@ -177,7 +141,6 @@ export const AgentsPreview = compose(
     }
     async fetchAgentStatusDetailsData() {
       try {
-        this.fetchSummaryStatus();
         this.fetchAgents();
       } catch (error) {
         this.setState({ loadingAgents: false, loadingSummary: false });

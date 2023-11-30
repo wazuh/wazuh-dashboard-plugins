@@ -65,7 +65,7 @@
         props="ctrl.registerAgentsProps"
       ></react-component>
     </div>
-    <div ng-show="!ctrl.addingNewAgent">
+    <div ng-if="!ctrl.addingNewAgent">
       <kbn-dis class="hide-filter-control" ng-show="false"></kbn-dis>
       <react-component
         name="AgentsPreview"
