@@ -6,7 +6,6 @@ import {
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { getSavedObject, setSavedObject } from '../saved-object';
 import { getWazuhCore } from '../../plugin-services';
-import _ from 'lodash';
 
 export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<AvailableUpdates> => {
   try {
@@ -43,21 +42,40 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
 
           const update = response.data.data as ResponseApiAvailableUpdates;
 
-          const status =
-            update?.update_check === false
-              ? API_UPDATES_STATUS.DISABLED
-              : update.last_available_patch ||
-                update.last_available_minor ||
-                update.last_available_patch
-              ? API_UPDATES_STATUS.AVAILABLE_UPDATES
-              : API_UPDATES_STATUS.UP_TO_DATE;
+          const {
+            current_version,
+            update_check,
+            last_available_major,
+            last_available_minor,
+            last_available_patch,
+            last_check_date,
+          } = update;
 
-          const updateWithoutUUID = _.omit(update, 'uuid');
+          const getStatus = () => {
+            if (update_check === false) {
+              return API_UPDATES_STATUS.DISABLED;
+            }
+
+            if (
+              last_available_major?.tag ||
+              last_available_minor?.tag ||
+              last_available_patch?.tag
+            ) {
+              return API_UPDATES_STATUS.AVAILABLE_UPDATES;
+            }
+
+            return API_UPDATES_STATUS.UP_TO_DATE;
+          };
 
           return {
-            ...updateWithoutUUID,
+            current_version,
+            update_check,
+            last_available_major,
+            last_available_minor,
+            last_available_patch,
+            last_check_date: last_check_date || undefined,
             api_id: api.id,
-            status,
+            status: getStatus(),
           };
         } catch (e: any) {
           const error = {
