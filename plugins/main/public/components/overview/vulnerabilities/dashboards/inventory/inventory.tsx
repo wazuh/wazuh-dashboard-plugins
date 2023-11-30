@@ -15,8 +15,6 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiButtonEmpty,
-  EuiCallOut,
-  EuiSpacer,
 } from '@elastic/eui';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../../../src/core/server';
@@ -37,6 +35,8 @@ import { withErrorBoundary } from '../../../../common/hocs';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
 import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
 import { useAppConfig } from '../../../../common/hooks';
+import { WAZUH_INDEX_TYPE_VULNERABILITIES } from '../../../../../../common/constants';
+import useCheckIndexFields from '../../common/hooks/useCheckIndexFields';
 
 const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
@@ -93,8 +93,22 @@ const InventoryVulsComponent = () => {
     indexPattern: indexPattern as IndexPattern,
   });
 
+  const {
+    isError,
+    error,
+    isSuccess,
+    resultIndexData,
+    isLoading: isLoadingCheckIndex,
+  } = useCheckIndexFields(
+    VULNERABILITIES_INDEX_PATTERN_ID,
+    indexPatterns?.[0],
+    WAZUH_INDEX_TYPE_VULNERABILITIES,
+    filters,
+    query,
+  );
+
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && isSuccess) {
       setIndexPattern(indexPatterns?.[0] as IndexPattern);
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,
@@ -120,11 +134,8 @@ const InventoryVulsComponent = () => {
     JSON.stringify(searchBarProps),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
+    isLoadingCheckIndex,
   ]);
-
-  const timeField = indexPattern?.timeFieldName
-    ? indexPattern.timeFieldName
-    : undefined;
 
   const onClickExportResults = async () => {
     const params = {
@@ -161,7 +172,7 @@ const InventoryVulsComponent = () => {
         grow
       >
         <>
-          {isLoading ? (
+          {isLoading || isLoadingCheckIndex ? (
             <LoadingSpinner />
           ) : (
             <SearchBar
@@ -173,10 +184,17 @@ const InventoryVulsComponent = () => {
             />
           )}
           {isSearching ? <LoadingSpinner /> : null}
-          {!isLoading && !isSearching && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
+          {!isLoading &&
+          !isSearching &&
+          (isError ||
+            results?.hits?.total === 0 ||
+            resultIndexData?.hits?.total === 0) ? (
+            <DiscoverNoResults message={error?.message} />
           ) : null}
-          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+          {!isLoading &&
+          !isSearching &&
+          isSuccess &&
+          results?.hits?.total > 0 ? (
             <EuiDataGrid
               {...dataGridProps}
               toolbarVisibility={{

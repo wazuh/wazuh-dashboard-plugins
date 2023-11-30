@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { search } from '../../dashboards/inventory/inventory_service';
 import {
+  IIndexPattern,
   IndexPattern,
   Filter,
 } from '../../../../../../../../src/plugins/data/public';
@@ -20,7 +21,7 @@ interface UseCheckIndexFieldsResult {
 
 const useCheckIndexFields = (
   indexPatternId: string,
-  indexPattern: IndexPattern,
+  indexPattern: IIndexPattern | undefined,
   indexType: string,
   filters?: Filter[],
   query?: any,
@@ -29,7 +30,7 @@ const useCheckIndexFields = (
   const [error, setError] = useState<Error | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [resultIndexData, setResultIndexData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (indexPatternId) {
@@ -41,13 +42,13 @@ const useCheckIndexFields = (
 
           // Check that the index has data
           search({
-            indexPattern: indexPattern,
+            indexPattern: indexPattern as IndexPattern,
             filters,
             query,
           })
             .then((results: any) => {
               setResultIndexData(results);
-              setIsLoading(true);
+              setIsLoading(false);
             })
             .catch((error: any) => {
               const searchError = ErrorFactory.create(HttpError, {
@@ -56,12 +57,13 @@ const useCheckIndexFields = (
               });
               setError(searchError);
               setIsError(true);
-              setIsLoading(true);
+              setIsLoading(false);
             });
         } catch (error) {
           setError(error);
           setIsError(true);
           setIsSuccess(false);
+          setIsLoading(false);
         }
       };
 
