@@ -1,7 +1,7 @@
 {
   "name": "wazuh",
-  "version": "4.7.1",
-  "revision": "01",
+  "version": "4.7.2",
+  "revision": "00",
   "pluginPlatform": {
     "version": "2.8.0"
   },
