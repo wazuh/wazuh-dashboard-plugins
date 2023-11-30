@@ -23,13 +23,17 @@ import { getGroups } from '../../services/register-agent-services';
 import { useForm } from '../../../../components/common/form/hooks';
 import { FormConfiguration } from '../../../../components/common/form/types';
 import { useSelector } from 'react-redux';
-import { withReduxProvider } from '../../../../components/common/hocs';
+import {
+  withGlobalBreadcrumb,
+  withReduxProvider,
+} from '../../../../components/common/hocs';
 import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
 import {
   validateServerAddress,
   validateAgentName,
 } from '../../utils/validations';
+import { compose } from 'redux';
 
 interface IRegisterAgentProps {
   getWazuhVersion: () => Promise<string>;
@@ -38,7 +42,10 @@ interface IRegisterAgentProps {
   reload: () => void;
 }
 
-export const RegisterAgent = withReduxProvider(
+export const RegisterAgent = compose(
+  withReduxProvider,
+  withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
+)(
   ({
     getWazuhVersion,
     hasAgents,
