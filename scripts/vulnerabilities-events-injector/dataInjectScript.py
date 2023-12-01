@@ -61,12 +61,6 @@ def generateRandomHost():
     host = {}
     family=random.choice(['debian','ubuntu','macos','ios','android','RHEL'])
     version='{}.{}'.format(random.randint(0, 99),random.randint(0, 99))
-    #host['architecture'] = random.choice(['x86','x64','arm','arm64'])
-    #host['hostname'] = 'host{}'.format(random.randint(0, 99))
-    #host['id'] = 'h{}-abc'.format(random.randint(0, 99))
-    #host['ip'] = '192.168.0.{}'.format(random.randint(0, 255))
-    #host['mac'] = ":".join([('0'+hex(random.randint(0,256))[2:])[-2:].upper() for _ in range(6)])
-    #host['name'] = '{}host'.format(random.randint(0, 99))
     host['os'] = {
         'family': family,
         'full': family + ' ' + version,
@@ -139,7 +133,7 @@ def generateRandomData(number):
             'package':generateRandomPackage(),
             'tags':generateRandomTags(),
             'vulnerability':generateRandomVulnerability(),
-        }   
+        }
 
 def verifyIndex(index,instance):
     if not instance.indices.exists(index):
@@ -152,7 +146,7 @@ def verifyIndex(index,instance):
                 indexExist = True
                 print('Done!')
             except Exception as e:
-                print('Error: {}'.format(e))    
+                print('Error: {}'.format(e))
             return True
         else:
             notemplate=input('\nIndex {} does not exist. Template file not found. Continue without template? (y/n)'.format(index))
@@ -211,7 +205,7 @@ def injectEvents(generator):
             helpers.bulk(instance, generator, index=config['index'])
             print('\nDone!')
         except Exception as e:
-            print('\nError: {}'.format(e))   
+            print('\nError: {}'.format(e))
     return
 
 
@@ -225,7 +219,7 @@ def main():
     data = generateRandomData(number)
     if action == 's':
         print('\nGenerating {} events...\n'.format(number))
-        outfile = open('generatedData.json','a') 
+        outfile = open('generatedData.json','a')
         for i in data:
             json.dump(i, outfile)
             outfile.write('\n')
