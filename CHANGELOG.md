@@ -26,6 +26,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed a problem with the agent menu header when the side menu is docked [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Fixed how the query filters apply on the Security Alerts table [#6102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6102)
+- Fixed exception in IT-Hygiene when an agent doesn't have policies [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
+- Fixed exception in Inventory when agents don't have S.O. information [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
+- Fixed pinned agent state in URL [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
 
 ### Removed
 

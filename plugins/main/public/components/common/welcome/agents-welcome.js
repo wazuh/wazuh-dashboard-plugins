@@ -143,6 +143,10 @@ export const AgentsWelcome = compose(
       getDataPlugin().query.filterManager.setFilters(agentFilters);
     }
 
+    clearAgentInUrl() {
+      this.location.search('agent', null);
+    }
+
     async componentDidMount() {
       this._isMount = true;
       /* WORKAROUND: ensure the $scope.agent is synced with the agent stored in Redux (this.props.agent). See agents.js controller.
@@ -163,6 +167,7 @@ export const AgentsWelcome = compose(
           this.updateWidth();
         });
       this.router = $injector.get('$route');
+      this.location = $injector.get('$location');
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line
       await VisFactoryHandler.buildAgentsVisualizations(
         filterHandler,
@@ -249,6 +254,7 @@ export const AgentsWelcome = compose(
                       className='wz-unpin-agent'
                       iconType='pinFilled'
                       onClick={() => {
+                        this.clearAgentInUrl();
                         this.props.updateCurrentAgentData({});
                         this.removeAgentsFilter();
                       }}

@@ -48,12 +48,10 @@ class WzAgentSelector extends Component {
   agentTableSearch(agentIdList) {
     this.closeAgentModal();
     if (window.location.href.includes('/agents?')) {
-      this.location.search(
-        'agent',
-        store.getState().appStateReducers.currentAgentData.id
-          ? String(store.getState().appStateReducers.currentAgentData.id)
-          : null,
-      );
+      const seletedAgent =
+        agentIdList?.[0] ||
+        store.getState().appStateReducers.currentAgentData.id;
+      this.location.search('agent', seletedAgent ? String(seletedAgent) : null);
       this.route.reload();
       return;
     }
