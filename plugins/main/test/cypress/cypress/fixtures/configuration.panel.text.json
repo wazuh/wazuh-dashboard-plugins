@@ -94,6 +94,11 @@
           "title": "Set time filter to 24h",
           "subTitle": "Change the default value of the Kibana timeFilter configuration",
           "label": "checks.timeFilter"
+        },
+        {
+          "title": "Vulnerabilities index pattern",
+          "subTitle": "Enable or disable the vulnerabilities index pattern health check when opening the app.",
+          "label": "checks.vulnerabilities.pattern"
         }
       ]
     },
@@ -129,6 +134,11 @@
           "title": "Index pattern",
           "subTitle": "Default index pattern to use for Wazuh monitoring.",
           "label": "wazuh.monitoring.pattern"
+        },
+        {
+          "title": "Index pattern",
+          "subTitle": "Default index pattern to use for vulnerabilities.",
+          "label": "vulnerabilities.pattern"
         },
         {
           "title": "",
@@ -174,6 +184,21 @@
           "title": "Index replicas",
           "subTitle": "Define the number of replicas to use for the statistics indices.",
           "label": "cron.statistics.index.replicas"
+        }
+      ]
+    },
+    {
+      "name": "Vulnerabilities",
+      "items": [
+        {
+          "title": "Index pattern",
+          "subTitle": "Default index pattern to use for vulnerabilities.",
+          "label": "vulnerabilities.pattern"
+        },
+        {
+          "title": "",
+          "subTitle": "",
+          "label": ""
         }
       ]
     },

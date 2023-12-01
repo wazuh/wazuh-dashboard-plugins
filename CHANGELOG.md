@@ -7,6 +7,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.9.0
+- Added AngularJS dependencies [#6145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6145)
+
+## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.8.1
 
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 00
 
@@ -37,7 +44,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the `disabled_roles` and `customization.logo.sidebar` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Removed the ability to configure the visibility of modules and removed `extensions.*` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 
-## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 00
+## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 01
 
 ### Added
 
@@ -49,7 +56,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed UI crash on retrieving log collection configuration for macos agent. [#6104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6104)
 - Fixed incorrect validation of the agent name on the Deploy new agent window [#6105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6105)
 
-## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 03
+## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 04
 
 ### Added
 

@@ -58,6 +58,8 @@ export const configEquivalences = {
     'Define the number of replicas to use for the statistics indices.',
   'alerts.sample.prefix':
     'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  'vulnerabilities.pattern':
+    'Default index pattern to use for vulnerabilities.',
 };
 
 export const nameEquivalence = {
@@ -94,6 +96,8 @@ export const nameEquivalence = {
   'cron.statistics.index.shards': 'Index shards',
   'cron.statistics.index.replicas': 'Index replicas',
   'alerts.sample.prefix': 'Sample alerts prefix',
+  'vulnerabilities.pattern': 'Index pattern',
+  'checks.vulnerabilities.pattern': 'Vulnerabilities index pattern',
 };
 
 const HEALTH_CHECK = 'Health Check';
@@ -101,6 +105,7 @@ const GENERAL = 'General';
 const SECURITY = 'Security';
 const MONITORING = 'Monitoring';
 const STATISTICS = 'Statistics';
+const VULNERABILITIES = 'Vulnerabilities';
 const CUSTOMIZATION = 'Logo Customization';
 export const categoriesNames = [
   HEALTH_CHECK,
@@ -108,6 +113,7 @@ export const categoriesNames = [
   SECURITY,
   MONITORING,
   STATISTICS,
+  VULNERABILITIES,
   CUSTOMIZATION,
 ];
 
@@ -145,6 +151,8 @@ export const categoriesEquivalence = {
   'cron.statistics.index.shards': STATISTICS,
   'cron.statistics.index.replicas': STATISTICS,
   'alerts.sample.prefix': GENERAL,
+  'vulnerabilities.pattern': VULNERABILITIES,
+  'checks.vulnerabilities.pattern': HEALTH_CHECK,
 };
 
 const TEXT = 'text';
@@ -216,4 +224,6 @@ export const formEquivalence = {
   'cron.statistics.index.shards': { type: NUMBER },
   'cron.statistics.index.replicas': { type: NUMBER },
   'alerts.sample.prefix': { type: TEXT },
+  'vulnerabilities.pattern': { type: TEXT },
+  'checks.vulnerabilities.pattern': { type: BOOLEAN },
 };

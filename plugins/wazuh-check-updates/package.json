@@ -1,9 +1,9 @@
 {
   "name": "wazuh-check-updates",
-  "version": "4.8.0",
+  "version": "4.9.0",
   "revision": "00",
   "pluginPlatform": {
-    "version": "2.10.0"
+    "version": "2.11.0"
   },
   "description": "Wazuh Check Updates",
   "private": true,
@@ -14,7 +14,7 @@
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
     "test:browser": "plugin-helpers test:browser",
-    "test:jest": "node scripts/jest",
+    "test:jest": "node scripts/jest --runInBand",
     "test:jest:runner": "node scripts/runner test"
   },
   "dependencies": {
