@@ -88,7 +88,9 @@ export const OverviewWelcome = compose(
                       <EuiButtonEmpty
                         href={getCore().application.getUrlForApp(
                           endpointSumary.id,
-                          { path: '#/agents-preview' },
+                          {
+                            path: '#/agents/deploy',
+                          },
                         )}
                       >
                         Add agent

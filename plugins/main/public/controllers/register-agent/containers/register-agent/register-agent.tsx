@@ -33,18 +33,12 @@ import {
 
 interface IRegisterAgentProps {
   getWazuhVersion: () => Promise<string>;
-  hasAgents: () => Promise<boolean>;
   addNewAgent: (agent: any) => Promise<any>;
   reload: () => void;
 }
 
 export const RegisterAgent = withReduxProvider(
-  ({
-    getWazuhVersion,
-    hasAgents,
-    addNewAgent,
-    reload,
-  }: IRegisterAgentProps) => {
+  ({ getWazuhVersion, addNewAgent, reload }: IRegisterAgentProps) => {
     const configuration = useSelector(
       (state: { appConfig: { data: any } }) => state.appConfig.data,
     );
@@ -168,23 +162,13 @@ export const RegisterAgent = withReduxProvider(
               <EuiFlexItem>
                 <EuiPanel className='register-agent-wizard-container'>
                   <div className='register-agent-wizard-close'>
-                    {hasAgents() ? (
-                      <EuiButtonEmpty
-                        size='s'
-                        onClick={() => addNewAgent(false)}
-                        iconType='cross'
-                      >
-                        Close
-                      </EuiButtonEmpty>
-                    ) : (
-                      <EuiButtonEmpty
-                        size='s'
-                        onClick={() => reload()}
-                        iconType='refresh'
-                      >
-                        Refresh
-                      </EuiButtonEmpty>
-                    )}
+                    <EuiButtonEmpty
+                      size='s'
+                      onClick={() => addNewAgent(false)}
+                      iconType='cross'
+                    >
+                      Close
+                    </EuiButtonEmpty>
                   </div>
                   <EuiFlexGroup>
                     <EuiFlexItem>

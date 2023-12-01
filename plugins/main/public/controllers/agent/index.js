@@ -20,7 +20,7 @@ import { MainModule } from '../../components/common/modules/main';
 import { MainSyscollector } from '../../components/agents/syscollector/main';
 import { MainAgentStats } from '../../components/agents/stats';
 import { getAngularModule } from '../../kibana-services';
-import { EndpointsPreview } from './endpoints-preview';
+import { FleetPreview } from '../../components/fleet';
 
 const app = getAngularModule();
 
@@ -35,4 +35,4 @@ app
   .value('MainSyscollector', MainSyscollector)
   .value('MainAgentStats', MainAgentStats)
   .value('MainModule', MainModule)
-  .value('EndpointsPreview', EndpointsPreview);
+  .value('FleetPreview', FleetPreview);

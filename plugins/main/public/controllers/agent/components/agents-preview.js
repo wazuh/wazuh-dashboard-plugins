@@ -73,17 +73,9 @@ export const AgentsPreview = compose(
       this.state = {
         loadingAgents: false,
         loadingSummary: false,
-        showAgentsEvolutionVisualization: true,
         agentTableFilters: [],
-        agentStatusSummary: {
-          active: '-',
-          disconnected: '-',
-          total: '-',
-          pending: '-',
-          never_connected: '-',
-        },
-        agentConfiguration: {},
-        agentsActiveCoverage: 0,
+        agentStatusSummary: props.agentStatusSummary,
+        agentsActiveCoverage: props.agentsActiveCoverage,
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
@@ -97,10 +89,6 @@ export const AgentsPreview = compose(
       this._isMount = true;
       this.fetchAgentStatusDetailsData();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
-        this._isMount &&
-          this.setState({
-            showAgentsEvolutionVisualization: true,
-          });
         const tabVisualizations = new TabVisualizations();
         tabVisualizations.removeAll();
         tabVisualizations.setTab('general');
@@ -127,36 +115,6 @@ export const AgentsPreview = compose(
         return prev;
       }, {});
     };
-    async fetchSummaryStatus() {
-      this.setState({ loadingSummary: true });
-      const {
-        data: {
-          data: {
-            connection: agentStatusSummary,
-            configuration: agentConfiguration,
-          },
-        },
-      } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-
-      this.props.tableProps.updateSummary(agentStatusSummary);
-
-      const agentsActiveCoverage = (
-        (agentStatusSummary.active / agentStatusSummary.total) *
-        100
-      ).toFixed(2);
-
-      this.setState({
-        loadingSummary: false,
-        agentStatusSummary,
-        agentConfiguration,
-        /* Calculate the agents active coverage.
-          Ensure the calculated value is not a NaN, otherwise set a 0.
-        */
-        agentsActiveCoverage: isNaN(agentsActiveCoverage)
-          ? 0
-          : agentsActiveCoverage,
-      });
-    }
 
     async fetchAgents() {
       this.setState({ loadingAgents: true });
@@ -178,7 +136,6 @@ export const AgentsPreview = compose(
     }
     async fetchAgentStatusDetailsData() {
       try {
-        this.fetchSummaryStatus();
         this.fetchAgents();
       } catch (error) {
         this.setState({ loadingAgents: false, loadingSummary: false });
@@ -211,19 +168,12 @@ export const AgentsPreview = compose(
           agentTableFilters: { q: `id!=000;status=${status}` },
         });
     }
-    onRenderComplete() {
-      this.setState({
-        evolutionRenderComplete: true,
-      });
-    }
 
     render() {
-      const evolutionIsReady = this.props.resultState !== 'loading';
-
       return (
         <EuiPage className='flex-column'>
           <EuiFlexItem>
-            <EuiFlexGroup className='agents-evolution-visualization-group mt-0'>
+            <EuiFlexGroup className='agents-visualization-group mt-0'>
               {
                 <>
                   <EuiFlexItem className='agents-status-pie' grow={false}>
@@ -355,47 +305,15 @@ export const AgentsPreview = compose(
                   </EuiFlexItem>
                 </>
               }
-              <EuiFlexItem
-                grow={false}
-                className='agents-evolution-visualization'
-                style={{
-                  margin: !this.state.loading ? '12px' : 0,
-                }}
-              >
-                <EuiCard
-                  title
-                  description
-                  paddingSize='none'
-                  betaBadgeLabel='Evolution'
-                >
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <div style={{ height: evolutionIsReady ? '180px' : 0 }}>
-                        <WzReduxProvider>
-                          <KibanaVis
-                            visID={'Wazuh-App-Overview-General-Agents-status'}
-                            tab={'general'}
-                          />
-                        </WzReduxProvider>
-                      </div>
-                      {!evolutionIsReady && (
-                        <div className='loading-chart-xl'>
-                          <EuiLoadingChart size='xl' />
-                        </div>
-                      )}
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiCard>
-              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size='m' />
             <WzReduxProvider>
               <AgentsTable
                 filters={this.state.agentTableFilters}
                 removeFilters={() => this.removeFilters()}
-                wzReq={this.props.tableProps.wzReq}
-                addingNewAgent={this.props.tableProps.addingNewAgent}
-                downloadCsv={this.props.tableProps.downloadCsv}
+                // wzReq={this.props.tableProps.wzReq}
+                // addingNewAgent={this.props.tableProps.addingNewAgent}
+                // downloadCsv={this.props.tableProps.downloadCsv}
                 formatUIDate={date => formatUIDate(date)}
                 reload={() => this.fetchAgentStatusDetailsData()}
               />

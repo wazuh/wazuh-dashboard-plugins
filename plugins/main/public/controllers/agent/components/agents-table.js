@@ -22,7 +22,6 @@ import {
   EuiToolTip,
   EuiIconTip,
 } from '@elastic/eui';
-import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
@@ -312,7 +311,13 @@ export const AgentsTable = withErrorBoundary(
                   buttonType='empty'
                   permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
                   iconType='plusInCircle'
-                  onClick={() => this.props.addingNewAgent()}
+                  href={getCore().application.getUrlForApp(
+                    'endpoints-summary',
+                    {
+                      path: '#/agents/deploy',
+                    },
+                  )}
+                  // onClick={() => this.props.addingNewAgent()}
                 >
                   Deploy new agent
                 </WzButtonPermissions>,
@@ -346,7 +351,7 @@ export const AgentsTable = withErrorBoundary(
               }}
               rowProps={getRowProps}
               filters={this.state.filters}
-              downloadCsv
+              // downloadCsv
               showReload
               showFieldSelector
               searchTable
@@ -534,9 +539,9 @@ export const AgentsTable = withErrorBoundary(
 );
 
 AgentsTable.propTypes = {
-  wzReq: PropTypes.func,
-  addingNewAgent: PropTypes.func,
-  downloadCsv: PropTypes.func,
+  // wzReq: PropTypes.func,
+  // addingNewAgent: PropTypes.func,
+  // downloadCsv: PropTypes.func,
   timeService: PropTypes.func,
   reload: PropTypes.func,
 };

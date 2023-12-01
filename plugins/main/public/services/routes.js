@@ -20,6 +20,7 @@ import { settingsWizard, getSavedSearch, getIp, getWzConfig } from './resolves';
 // HTML templates
 import healthCheckTemplate from '../templates/health-check/health-check.html';
 import agentsTemplate from '../templates/agents/dashboards.html';
+import agentDeployTemplate from '../templates/agents/deploy/agent-deploy.html';
 import agentsPrevTemplate from '../templates/agents-prev/agents-prev.html';
 import managementTemplate from '../templates/management/management.html';
 import overviewTemplate from '../templates/visualize/dashboards.html';
@@ -67,8 +68,8 @@ function nestedResolve($q, errorHandler, $rootScope, $location, $window) {
       GenericRequest,
       errorHandler,
       wzMisc,
-      location && location.includes('/health-check'),
-    ),
+      location && location.includes('/health-check')
+    )
   );
 }
 
@@ -102,10 +103,15 @@ function enableWzMenu($rootScope, $location) {
 const app = getAngularModule();
 
 const redirectTo = () => getWzMainParams();
-app.config($routeProvider => {
+app.config(($routeProvider) => {
   $routeProvider
     .when('/health-check', {
       template: healthCheckTemplate,
+      resolve: { wzConfig, ip },
+      outerAngularWrapperRoute: true,
+    })
+    .when('/agents/deploy', {
+      template: agentDeployTemplate,
       resolve: { wzConfig, ip },
       outerAngularWrapperRoute: true,
     })
