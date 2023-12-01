@@ -47,7 +47,7 @@ export const SyscollectorInventory = compose(
   } else if (agent?.os?.uname?.toLowerCase().includes('sunos')) {
     soPlatform = 'solaris';
   }
-  soPlatform = undefined;
+
   return (
     <div style={{ overflow: 'hidden' }}>
       {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
