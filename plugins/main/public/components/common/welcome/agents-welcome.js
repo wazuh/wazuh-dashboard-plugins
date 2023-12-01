@@ -21,7 +21,6 @@ import {
   EuiFlexGrid,
   EuiButtonEmpty,
   EuiPage,
-  EuiPopover,
   EuiLoadingChart,
   EuiToolTip,
   EuiButtonIcon,
@@ -35,7 +34,6 @@ import {
 } from './components';
 import { AgentInfo } from './agents-info';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
-import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
@@ -53,7 +51,6 @@ import {
   getCore,
   getDataPlugin,
 } from '../../../kibana-services';
-import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import {
   withErrorBoundary,
   withGlobalBreadcrumb,
@@ -62,7 +59,6 @@ import {
 } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import {
   PromptAgentNeverConnected,
   PromptNoSelectedAgent,
@@ -71,12 +67,8 @@ import { connect } from 'react-redux';
 import { WzButton } from '../buttons';
 import {
   Applications,
-  configurationAssessment,
-  fileIntegrityMonitoring,
   itHygiene,
   mitreAttack,
-  threatHunting,
-  vulnerabilityDetection,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
@@ -120,13 +112,8 @@ export const AgentsWelcome = compose(
 )(
   class AgentsWelcome extends Component {
     _isMount = false;
-    sidebarSizeDefault;
     constructor(props) {
       super(props);
-
-      this.offset = 275;
-
-      this.sidebarSizeDefault = 320;
 
       this.state = {
         lastScans: [],
@@ -135,43 +122,12 @@ export const AgentsWelcome = compose(
         sortDirection: 'desc',
         actionAgents: true, // Hide actions agents
         selectedRequirement: 'pci',
-        menuAgent: [],
-        maxModules: 5,
         widthWindow: window.innerWidth,
-        isLocked: false,
       };
     }
 
     updateWidth = () => {
-      let menuSize;
-      if (this.state.isLocked) {
-        menuSize = window.innerWidth - this.offset - this.sidebarSizeDefault;
-      } else {
-        menuSize = window.innerWidth - this.offset;
-      }
-      let maxModules = 5;
-      if (menuSize > 1400) {
-        maxModules = 5;
-      } else {
-        if (menuSize > 1250) {
-          maxModules = 4;
-        } else {
-          if (menuSize > 1100) {
-            maxModules = 3;
-          } else {
-            if (menuSize > 900) {
-              maxModules = 2;
-            } else {
-              maxModules = 1;
-              if (menuSize < 750) {
-                maxModules = null;
-              }
-            }
-          }
-        }
-      }
-
-      this.setState({ maxModules: maxModules, widthWindow: window.innerWidth });
+      this.setState({ widthWindow: window.innerWidth });
     };
 
     /* TODO: we should to create a unique Explore agent button instead
@@ -198,7 +154,6 @@ export const AgentsWelcome = compose(
       /* WORKAROUND: ensure the $scope.agent is synced with the agent stored in Redux (this.props.agent). See agents.js controller.
        */
       this.props.setAgent(this.props.agent);
-      this.updatePinnedApplications();
       this.updateWidth();
       const tabVisualizations = new TabVisualizations();
       tabVisualizations.removeAll();
@@ -210,10 +165,8 @@ export const AgentsWelcome = compose(
       const $injector = getAngularModule().$injector;
       this.drawerLokedSubscribtion = getChrome()
         .getIsNavDrawerLocked$()
-        .subscribe(isLocked => {
-          this.setState({ isLocked }, () => {
-            this.updateWidth();
-          });
+        .subscribe(() => {
+          this.updateWidth();
         });
       this.router = $injector.get('$route');
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line
@@ -236,117 +189,34 @@ export const AgentsWelcome = compose(
       this.drawerLokedSubscribtion?.unsubscribe();
     }
 
-    updatePinnedApplications(applications) {
-      let pinnedApplications;
-
-      if (applications) {
-        pinnedApplications = applications;
-      } else {
-        pinnedApplications = window.localStorage.getItem(
-          'wz-menu-agent-apps-pinned',
-        )
-          ? JSON.parse(window.localStorage.getItem('wz-menu-agent-apps-pinned'))
-          : [
-              // Default pinned applications
-              threatHunting.id,
-              fileIntegrityMonitoring.id,
-              configurationAssessment.id,
-              vulnerabilityDetection.id,
-              mitreAttack.id,
-            ];
-      }
-
-      // Ensure the pinned applications are supported
-      pinnedApplications = pinnedApplications.filter(pinnedApplication =>
-        Applications.some(({ id }) => id === pinnedApplication),
+    renderEndpointsSummaryButton() {
+      const application = Applications.find(
+        ({ id }) => id === 'endpoints-summary',
       );
-
-      window.localStorage.setItem(
-        'wz-menu-agent-apps-pinned',
-        JSON.stringify(pinnedApplications),
-      );
-      this.setState({ menuAgent: pinnedApplications });
-    }
-
-    renderModules() {
       return (
-        <Fragment>
-          {this.state.menuAgent.map((applicationId, i) => {
-            const moduleID = Object.keys(WAZUH_MODULES).find(
-              key => WAZUH_MODULES[key]?.appId === applicationId,
-            ).appId;
-            if (
-              i < this.state.maxModules &&
-              hasAgentSupportModule(this.props.agent, moduleID)
-            ) {
-              return (
-                <EuiFlexItem
-                  key={i}
-                  grow={false}
-                  style={{ marginLeft: 0, marginTop: 7 }}
-                >
-                  <RedirectAppLinks application={getCore().application}>
-                    <EuiButtonEmpty
-                      href={getCore().application.getUrlForApp(applicationId)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <span>
-                        {
-                          Applications.find(({ id }) => id === applicationId)
-                            .title
-                        }
-                        &nbsp;
-                      </span>
-                    </EuiButtonEmpty>
-                  </RedirectAppLinks>
-                </EuiFlexItem>
-              );
-            }
-          })}
-          <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-            <EuiPopover
-              button={
-                <EuiButtonEmpty
-                  iconSide='right'
-                  iconType='arrowDown'
-                  onClick={() =>
-                    this.setState({ switchModule: !this.state.switchModule })
-                  }
-                >
-                  More...
-                </EuiButtonEmpty>
-              }
-              isOpen={this.state.switchModule}
-              closePopover={() => this.setState({ switchModule: false })}
-              repositionOnScroll={false}
-              anchorPosition='downCenter'
-            >
-              <div>
-                <WzReduxProvider>
-                  <div style={{ maxWidth: 730 }}>
-                    <MenuAgent
-                      isAgent={this.props.agent}
-                      pinnedApplications={this.state.menuAgent}
-                      updatePinnedApplications={applications =>
-                        this.updatePinnedApplications(applications)
-                      }
-                      closePopover={() => {
-                        this.setState({ switchModule: false });
-                      }}
-                      switchTab={module => this.props.switchTab(module)}
-                    ></MenuAgent>
-                  </div>
-                </WzReduxProvider>
-              </div>
-            </EuiPopover>
-          </EuiFlexItem>
-        </Fragment>
+        <RedirectAppLinks application={getCore().application}>
+          <WzButton
+            buttonType='empty'
+            iconType={application.euiIconType}
+            href={getCore().application.getUrlForApp('endpoints-summary')}
+            className='wz-it-hygiene-header-button'
+            tooltip={{
+              position: 'bottom',
+              content: application.title,
+              className: 'wz-it-hygiene-header-button-tooltip',
+            }}
+          >
+            {application.title}
+          </WzButton>
+        </RedirectAppLinks>
       );
     }
 
     renderTitle() {
       const notNeedStatus = true;
       const thereAreAgentSelected = Boolean(this.props.agent?.id);
+      // Calculate if the header buttons should display the name or only the icon to be responsive
+
       return (
         <EuiFlexGroup
           justifyContent='spaceBetween'
@@ -355,47 +225,9 @@ export const AgentsWelcome = compose(
         >
           <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
             <EuiFlexGroup responsive={false} gutterSize='xs'>
-              {(this.state.maxModules !== null && this.renderModules()) || (
-                <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                  <EuiPopover
-                    button={
-                      <EuiButtonEmpty
-                        iconSide='right'
-                        iconType='arrowDown'
-                        onClick={() =>
-                          this.setState({
-                            switchModule: !this.state.switchModule,
-                          })
-                        }
-                      >
-                        Applications
-                      </EuiButtonEmpty>
-                    }
-                    isOpen={this.state.switchModule}
-                    closePopover={() => this.setState({ switchModule: false })}
-                    repositionOnScroll={false}
-                    anchorPosition='downCenter'
-                  >
-                    <div>
-                      <WzReduxProvider>
-                        <div style={{ maxWidth: 730 }}>
-                          <MenuAgent
-                            isAgent={this.props.agent}
-                            pinnedApplications={this.state.menuAgent}
-                            updatePinnedApplications={applications =>
-                              this.updatePinnedApplications(applications)
-                            }
-                            closePopover={() => {
-                              this.setState({ switchModule: false });
-                            }}
-                            switchTab={module => this.props.switchTab(module)}
-                          ></MenuAgent>
-                        </div>
-                      </WzReduxProvider>
-                    </div>
-                  </EuiPopover>
-                </EuiFlexItem>
-              )}
+              <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+                {this.renderEndpointsSummaryButton()}
+              </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
@@ -440,13 +272,14 @@ export const AgentsWelcome = compose(
                   onClick={() =>
                     this.props.switchTab('syscollector', notNeedStatus)
                   }
-                  tooltip={
-                    this.state.maxModules === null
-                      ? { position: 'bottom', content: 'Inventory data' }
-                      : undefined
-                  }
+                  className='wz-it-hygiene-header-button'
+                  tooltip={{
+                    position: 'bottom',
+                    content: 'Inventory data',
+                    className: 'wz-it-hygiene-header-button-tooltip',
+                  }}
                 >
-                  {this.state.maxModules !== null ? 'Inventory data' : ''}
+                  Inventory data
                 </WzButton>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
@@ -454,13 +287,14 @@ export const AgentsWelcome = compose(
                   buttonType='empty'
                   iconType='stats'
                   onClick={() => this.props.switchTab('stats', notNeedStatus)}
-                  tooltip={
-                    this.state.maxModules === null
-                      ? { position: 'bottom', content: 'Stats' }
-                      : undefined
-                  }
+                  className='wz-it-hygiene-header-button'
+                  tooltip={{
+                    position: 'bottom',
+                    content: 'Stats',
+                    className: 'wz-it-hygiene-header-button-tooltip',
+                  }}
                 >
-                  {this.state.maxModules !== null ? 'Stats' : ''}
+                  Stats
                 </WzButton>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
@@ -470,13 +304,14 @@ export const AgentsWelcome = compose(
                   onClick={() =>
                     this.props.switchTab('configuration', notNeedStatus)
                   }
-                  tooltip={
-                    this.state.maxModules === null
-                      ? { position: 'bottom', content: 'Configuration' }
-                      : undefined
-                  }
+                  className='wz-it-hygiene-header-button'
+                  tooltip={{
+                    position: 'bottom',
+                    content: 'Configuration',
+                    className: 'wz-it-hygiene-header-button-tooltip',
+                  }}
                 >
-                  {this.state.maxModules !== null ? 'Configuration' : ''}
+                  Configuration
                 </WzButton>
               </EuiFlexItem>
             </EuiFlexGroup>
