@@ -2,7 +2,7 @@ import { EuiDataGridCellValueElementProps, EuiDataGridColumn, EuiDataGridProps, 
 import { useEffect, useMemo, useState, Fragment } from "react";
 import { SearchResponse } from "@opensearch-project/opensearch/api/types";
 import { IFieldType, IndexPattern } from "../../../../../../../src/plugins/data/common";
-import { parseData, getFieldFormatted } from '../dashboards/inventory/inventory_service';
+import { parseData, getFieldValueFormatted } from '../dashboards/inventory/inventory_service';
 import { MAX_ENTRIES_PER_QUERY } from "../dashboards/inventory/config";
 
 type tDataGridProps = {
@@ -72,7 +72,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         // then the rowIndex is relative to the current page
         const relativeRowIndex = rowIndex % pagination.pageSize;        
         return rowsParsed.hasOwnProperty(relativeRowIndex)
-            ? getFieldFormatted(relativeRowIndex, columnId, indexPattern, rowsParsed)
+            ? getFieldValueFormatted(relativeRowIndex, columnId, indexPattern, rowsParsed)
             : null;
     };
 

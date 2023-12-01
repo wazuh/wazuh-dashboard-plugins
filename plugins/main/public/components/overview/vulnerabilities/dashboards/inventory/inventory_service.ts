@@ -80,7 +80,7 @@ export const parseData = (resultsHits: SearchResponse['hits']['hits']): any[] =>
 }
 
 
-export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) => {
+export const getFieldValueFormatted = (rowIndex, columnId, indexPattern, rowsParsed) => {
     const field = indexPattern.fields.find((field) => field.name === columnId);
     let fieldValue = null;
     if (columnId.includes('.')) {
@@ -93,13 +93,19 @@ export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) 
                 fieldValue = fieldValue[field];
             }
         });
-
     } else {
-        fieldValue = rowsParsed[rowIndex][columnId].formatted
-            ? rowsParsed[rowIndex][columnId].formatted
-            : rowsParsed[rowIndex][columnId];
+        const rowValue = rowsParsed[rowIndex];
+        // when not exist the column in the row value then the value is null
+        if(!rowValue.hasOwnProperty(columnId)){
+            fieldValue = null;
+        }else{
+            fieldValue = rowValue[columnId]?.formatted || rowValue[columnId];
+        }
     }
-
+    // when fieldValue is null or undefined then return a empty string
+    if (fieldValue === null || fieldValue === undefined) {
+        return '';
+    }
     // if is date field
     if (field?.type === 'date') {
         // @ts-ignore
