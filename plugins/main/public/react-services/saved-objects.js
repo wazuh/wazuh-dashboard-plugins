@@ -24,6 +24,8 @@ import {
 } from '../../common/constants';
 import { getSavedObjects } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
+import { ErrorFactory } from './error-management';
+import { WarningError } from './error-management/error-factory/errors/WarningError';
 
 export class SavedObject {
   /**
@@ -322,7 +324,7 @@ export class SavedObject {
         {},
       );
       return response.data.fields;
-    } catch {
+    } catch (error) {
       switch (indexType) {
         case WAZUH_INDEX_TYPE_MONITORING:
           return FieldsMonitoring;
@@ -330,6 +332,12 @@ export class SavedObject {
           return FieldsStatistics;
         case WAZUH_INDEX_TYPE_ALERTS:
           return KnownFields;
+        default:
+          const warningError = ErrorFactory.create(WarningError, {
+            error,
+            message: error.message,
+          });
+          throw warningError;
       }
     }
   };
