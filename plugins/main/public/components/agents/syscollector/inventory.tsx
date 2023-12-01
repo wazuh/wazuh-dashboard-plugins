@@ -47,7 +47,6 @@ export const SyscollectorInventory = compose(
   } else if (agent?.os?.uname?.toLowerCase().includes('sunos')) {
     soPlatform = 'solaris';
   }
-  soPlatform = undefined;
 
   return (
     <div style={{ overflow: 'hidden' }}>
