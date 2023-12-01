@@ -32,12 +32,10 @@ import {
   getServices,
   setServices,
   setDocViewsRegistry,
-  subscribeWithScope,
   tabifyAggResponse,
-  getHeaderActionMenuMounter,
   setUiActions,
 } from './discover/kibana_services';
-
+import { subscribeWithScope } from './plugins/opensearch_dashboards_legacy/public';
 import indexTemplateLegacy from './discover/application/angular/discover_legacy.html';
 
 getAngularModule().directive('kbnDis', [
