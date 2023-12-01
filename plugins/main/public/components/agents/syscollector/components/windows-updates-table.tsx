@@ -8,9 +8,9 @@ import { windowsUpdatesColumns } from '../columns';
 
 const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
-export default function WindowsUpdatesTable({ agent }) {
+export const WindowsUpdatesTable = ({ agent }) => {
   return (
-    <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
+    <EuiPanel paddingSize='m' className='wz-agent-inventory-panel'>
       <TableWzAPI
         title='Windows updates'
         tableColumns={windowsUpdatesColumns}
@@ -66,4 +66,4 @@ export default function WindowsUpdatesTable({ agent }) {
       />
     </EuiPanel>
   );
-}
+};

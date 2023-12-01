@@ -1,20 +1,16 @@
 import React from 'react';
 import { EuiPanel } from '@elastic/eui';
-import {
-  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
-} from '../../../../../common/constants';
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../common/constants';
 import { TableWzAPI } from '../../../common/tables';
 import { WzRequest } from '../../../../react-services';
 import { get as getLodash } from 'lodash';
-import {
-  netaddrColumns,
-} from '../columns';
+import { netaddrColumns } from '../columns';
 
 const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
-export default function NetworkSettingsTable({ agent }) {
+export const NetworkSettingsTable = ({ agent }) => {
   return (
-    <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
+    <EuiPanel paddingSize='m' className='wz-agent-inventory-panel'>
       <TableWzAPI
         title='Network settings'
         tableColumns={netaddrColumns}
@@ -68,4 +64,4 @@ export default function NetworkSettingsTable({ agent }) {
       />
     </EuiPanel>
   );
-}
+};

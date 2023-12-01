@@ -17,12 +17,15 @@ import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { compose } from 'redux';
 import { withGuard } from '../../common/hocs';
 import { PromptAgentNeverConnected } from '../prompts';
-import NetworkInterfacesTable from './components/network-interfaces-table';
-import NetworkPortsTable from './components/network-ports-table';
-import NetworkSettingsTable from './components/network-settings-table';
-import WindowsUpdatesTable from './components/windows-updates-table';
-import ProcessesTable from './components/processes-table';
-import PackagesTable from './components/packages-table';
+import {
+  NetworkInterfacesTable,
+  NetworkPortsTable,
+  NetworkSettingsTable,
+  WindowsUpdatesTable,
+  ProcessesTable,
+  PackagesTable,
+} from './components';
+import 'inventory.scss';
 
 export const SyscollectorInventory = compose(
   withGuard(
@@ -44,7 +47,7 @@ export const SyscollectorInventory = compose(
   } else if (agent?.os?.uname?.toLowerCase().includes('sunos')) {
     soPlatform = 'solaris';
   }
-
+  soPlatform = undefined;
   return (
     <div style={{ overflow: 'hidden' }}>
       {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (

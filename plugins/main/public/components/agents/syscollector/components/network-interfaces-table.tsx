@@ -8,7 +8,7 @@ import { netifaceColumns } from '../columns';
 
 const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
-export default function NetworkInterfacesTable({ agent }) {
+export const NetworkInterfacesTable = ({ agent }) => {
   return (
     <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
       <TableWzAPI
@@ -64,4 +64,4 @@ export default function NetworkInterfacesTable({ agent }) {
       />
     </EuiPanel>
   );
-}
+};

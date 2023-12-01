@@ -5,20 +5,13 @@ import { TableWzAPI } from '../../../common/tables';
 import { WzRequest } from '../../../../react-services';
 import { get as getLodash } from 'lodash';
 import { packagesColumns } from '../columns';
+import { withSOPlatformGuard } from './with-so-platform-guard';
 
 const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
-export default function PackagesTable({ agent, soPlatform }) {
-  if (!soPlatform) {
-    return (
-      <EuiPanel paddingSize='s' style={{ margin: 16, textAlign: 'center' }}>
-        <EuiIcon type='iInCircle' /> Not enough hardware or operating system
-        information
-      </EuiPanel>
-    );
-  }
+export const PackagesTable = withSOPlatformGuard(({ agent, soPlatform }) => {
   return (
-    <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
+    <EuiPanel paddingSize='m' className='wz-agent-inventory-panel'>
       <TableWzAPI
         title='Packages'
         tableColumns={packagesColumns[soPlatform]}
@@ -74,4 +67,4 @@ export default function PackagesTable({ agent, soPlatform }) {
       />
     </EuiPanel>
   );
-}
+});
