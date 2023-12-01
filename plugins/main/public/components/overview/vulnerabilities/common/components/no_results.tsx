@@ -28,170 +28,32 @@
  * under the License.
  */
 
-import React, { Fragment } from 'react';
+import React from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 
-import {
-  EuiCallOut,
-  EuiCode,
-  EuiDescriptionList,
-  EuiLink,
-  EuiPanel,
-  EuiSpacer,
-  EuiText,
-} from '@elastic/eui';
+import { EuiCallOut, EuiPanel } from '@elastic/eui';
 
 interface Props {
-  timeFieldName?: string;
-  queryLanguage?: string;
+  message?: string;
 }
 
-export const DiscoverNoResults = ({ timeFieldName, queryLanguage }: Props) => {
-  let timeFieldMessage;
-
-  if (timeFieldName) {
-    timeFieldMessage = (
-      <Fragment>
-        <EuiSpacer size="xl" />
-
-        <EuiText>
-          <h2 data-test-subj="discoverNoResultsTimefilter">
-            <FormattedMessage
-              id="discover.noResults.expandYourTimeRangeTitle"
-              defaultMessage="Expand your time range"
-            />
-          </h2>
-
-          <p>
-            <FormattedMessage
-              id="discover.noResults.queryMayNotMatchTitle"
-              defaultMessage="One or more of the indices you&rsquo;re looking at contains a date field. Your query may
-                  not match anything in the current time range, or there may not be any data at all in
-                  the currently selected time range. You can try changing the time range to one which contains data."
-            />
-          </p>
-        </EuiText>
-      </Fragment>
-    );
-  }
-
-  let luceneQueryMessage;
-
-  if (queryLanguage === 'lucene') {
-    const searchExamples = [
-      {
-        description: <EuiCode>200</EuiCode>,
-        title: (
-          <EuiText>
-            <strong>
-              <FormattedMessage
-                id="discover.noResults.searchExamples.anyField200StatusCodeExampleTitle"
-                defaultMessage="Find requests that contain the number 200, in any field"
-              />
-            </strong>
-          </EuiText>
-        ),
-      },
-      {
-        description: <EuiCode>status:200</EuiCode>,
-        title: (
-          <EuiText>
-            <strong>
-              <FormattedMessage
-                id="discover.noResults.searchExamples.statusField200StatusCodeExampleTitle"
-                defaultMessage="Find 200 in the status field"
-              />
-            </strong>
-          </EuiText>
-        ),
-      },
-      {
-        description: <EuiCode>status:[400 TO 499]</EuiCode>,
-        title: (
-          <EuiText>
-            <strong>
-              <FormattedMessage
-                id="discover.noResults.searchExamples.400to499StatusCodeExampleTitle"
-                defaultMessage="Find all status codes between 400-499"
-              />
-            </strong>
-          </EuiText>
-        ),
-      },
-      {
-        description: <EuiCode>status:[400 TO 499] AND extension:PHP</EuiCode>,
-        title: (
-          <EuiText>
-            <strong>
-              <FormattedMessage
-                id="discover.noResults.searchExamples.400to499StatusCodeWithPhpExtensionExampleTitle"
-                defaultMessage="Find status codes 400-499 with the extension php"
-              />
-            </strong>
-          </EuiText>
-        ),
-      },
-      {
-        description: <EuiCode>status:[400 TO 499] AND (extension:php OR extension:html)</EuiCode>,
-        title: (
-          <EuiText>
-            <strong>
-              <FormattedMessage
-                id="discover.noResults.searchExamples.400to499StatusCodeWithPhpOrHtmlExtensionExampleTitle"
-                defaultMessage="Find status codes 400-499 with the extension php or html"
-              />
-            </strong>
-          </EuiText>
-        ),
-      },
-    ];
-
-    luceneQueryMessage = (
-      <Fragment>
-        <EuiSpacer size="xl" />
-
-        <EuiText>
-          <h3>
-            <FormattedMessage
-              id="discover.noResults.searchExamples.refineYourQueryTitle"
-              defaultMessage="Refine your query"
-            />
-          </h3>
-
-          <p>
-            <FormattedMessage
-              id="discover.noResults.searchExamples.howTosearchForWebServerLogsDescription"
-              defaultMessage="The search bar at the top uses OpenSearch&rsquo;s support for Lucene {queryStringSyntaxLink}.
-                Here are some examples of how you can search for web server logs that have been parsed into a few fields."
-            />
-          </p>
-        </EuiText>
-
-        <EuiSpacer size="m" />
-
-        <EuiDescriptionList type="column" listItems={searchExamples} />
-
-        <EuiSpacer size="xl" />
-      </Fragment>
-    );
-  }
-
+export const DiscoverNoResults = ({ message }: Props) => {
   return (
     <I18nProvider>
-      <EuiPanel hasBorder={false} hasShadow={false} color="transparent">
+      <EuiPanel hasBorder={false} hasShadow={false} color='transparent'>
         <EuiCallOut
           title={
-            <FormattedMessage
-              id="discover.noResults.searchExamples.noResultsMatchSearchCriteriaTitle"
-              defaultMessage="No results match your search criteria"
-            />
+            message ?? (
+              <FormattedMessage
+                id='discover.noResults.searchExamples.noResultsMatchSearchCriteriaTitle'
+                defaultMessage='No results match your search criteria'
+              />
+            )
           }
-          color="warning"
-          iconType="help"
-          data-test-subj="discoverNoResults"
+          color='warning'
+          iconType='help'
+          data-test-subj='discoverNoResults'
         />
-        {timeFieldMessage}
-        {luceneQueryMessage}
       </EuiPanel>
     </I18nProvider>
   );
