@@ -24,5 +24,5 @@ export const withSOPlatformGuard = WrappedComponent => props => {
       </EuiPanel>
     );
   }
-  return WrappedComponent;
+  return <WrappedComponent {...props} />;
 };

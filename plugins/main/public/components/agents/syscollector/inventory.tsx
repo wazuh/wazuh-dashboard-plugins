@@ -25,7 +25,7 @@ import {
   ProcessesTable,
   PackagesTable,
 } from './components';
-import 'inventory.scss';
+import './inventory.scss';
 
 export const SyscollectorInventory = compose(
   withGuard(
@@ -47,6 +47,7 @@ export const SyscollectorInventory = compose(
   } else if (agent?.os?.uname?.toLowerCase().includes('sunos')) {
     soPlatform = 'solaris';
   }
+  soPlatform = undefined;
 
   return (
     <div style={{ overflow: 'hidden' }}>
