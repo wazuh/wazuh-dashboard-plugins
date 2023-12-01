@@ -144,9 +144,7 @@ export const AgentsWelcome = compose(
     }
 
     clearAgentInUrl() {
-      const currentUrl = window.location.href;
-      const newUrl = currentUrl.replace(/&agent=[^&]*/, '');
-      window.history.pushState({}, '', newUrl);
+      this.location.search('agent', null);
     }
 
     async componentDidMount() {
@@ -169,6 +167,7 @@ export const AgentsWelcome = compose(
           this.updateWidth();
         });
       this.router = $injector.get('$route');
+      this.location = $injector.get('$location');
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line
       await VisFactoryHandler.buildAgentsVisualizations(
         filterHandler,
