@@ -29,7 +29,6 @@ const DashboardVulsComponent: React.FC = () => {
     appConfig.data['vulnerabilities.pattern'];
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
-    filters: [],
   });
   const {
     isLoading: isLoadingSearchbar,
