@@ -384,8 +384,8 @@ async function getHostsConfiguration(context) {
   try {
     const hosts =
       await context.wazuh_core.serverAPIHostEntries.getHostsEntries();
-    if (hosts.body.length) {
-      return hosts.body;
+    if (hosts.length) {
+      return hosts;
     }
 
     context.wazuh.logger.debug('There are no API host entries yet');
