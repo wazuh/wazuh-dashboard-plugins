@@ -22,7 +22,7 @@ import { UpdateRegistry } from './update-registry';
 import { Logger } from 'opensearch-dashboards/server';
 
 /**
- * This service gets the API host entries
+ * This service gets information about the API host entries
  */
 export class ServerAPIHostEntries {
   constructor(

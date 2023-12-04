@@ -18,7 +18,7 @@ import { createDataDirectoryIfNotExists } from './filesystem';
 import { Logger } from 'opensearch-dashboards/server';
 
 /**
- * This services manage the API host entries
+ * This services manages the API host entries
  */
 export class ManageHosts {
   busy: boolean;
