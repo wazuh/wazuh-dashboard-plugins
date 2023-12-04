@@ -59,13 +59,13 @@
     layout="column"
     layout-align="start space-around"
   >
-    <div class="registerAgent" ng-if="ctrl.addingNewAgent">
+    <div class="registerAgent" ng-show="ctrl.addingNewAgent">
       <react-component
         name="RegisterAgent"
         props="ctrl.registerAgentsProps"
       ></react-component>
     </div>
-    <div ng-if="!ctrl.addingNewAgent">
+    <div ng-show="!ctrl.addingNewAgent">
       <kbn-dis class="hide-filter-control" ng-show="false"></kbn-dis>
       <react-component
         name="AgentsPreview"

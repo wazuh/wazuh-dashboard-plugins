@@ -25,6 +25,7 @@ import store from '../../redux/store';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 export class AgentsPreviewController {
   /**
@@ -107,12 +108,17 @@ export class AgentsPreviewController {
     this.hasAgents = true;
     this.init = false;
     const instance = new DataFactory(WzRequest.apiReq, '/agents', false, false);
-
-    //Load
-    await this.load();
-
     //Props
     this.tableAgentsProps = {
+      updateSummary: summary => {
+        this.summary = summary;
+        if (this.summary.total === 0) {
+          this.addNewAgent(true);
+          this.hasAgents = false;
+        } else {
+          this.hasAgents = true;
+        }
+      },
       wzReq: (method, path, body) => WzRequest.apiReq(method, path, body),
       addingNewAgent: () => {
         this.addNewAgent(true);
@@ -141,9 +147,10 @@ export class AgentsPreviewController {
         this.$scope.$applyAsync();
       },
       formatUIDate: date => formatUIDate(date),
-      agentStatusSummary: this.agentStatusSummary,
-      agentsActiveCoverage: this.agentsActiveCoverage,
+      summary: this.summary,
     };
+    //Load
+    this.load();
   }
 
   /**
@@ -248,8 +255,6 @@ export class AgentsPreviewController {
       this.pattern = (
         await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
       ).title;
-
-      await this.fetchSummaryStatus();
     } catch (error) {
       const options = {
         context: `${AgentsPreviewController.name}.load`,
@@ -266,37 +271,6 @@ export class AgentsPreviewController {
     }
     this.loading = false;
     this.$scope.$applyAsync();
-  }
-
-  async fetchSummaryStatus() {
-    const {
-      data: {
-        data: {
-          connection: agentStatusSummary,
-          configuration: agentConfiguration,
-        },
-      },
-    } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-
-    this.agentStatusSummary = agentStatusSummary;
-    if (agentStatusSummary.total === 0) {
-      this.addNewAgent(true);
-      this.hasAgents = false;
-    } else {
-      this.hasAgents = true;
-    }
-
-    const agentsActiveCoverage = (
-      (agentStatusSummary.active / agentStatusSummary.total) *
-      100
-    ).toFixed(2);
-
-    /* Calculate the agents active coverage.
-          Ensure the calculated value is not a NaN, otherwise set a 0.
-        */
-    this.agentsActiveCoverage = isNaN(agentsActiveCoverage)
-      ? 0
-      : agentsActiveCoverage;
   }
 
   addNewAgent(flag) {

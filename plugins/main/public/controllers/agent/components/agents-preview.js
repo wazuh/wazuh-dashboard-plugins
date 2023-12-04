@@ -23,6 +23,7 @@ import {
   EuiToolTip,
   EuiCard,
   EuiLink,
+  EuiProgress,
 } from '@elastic/eui';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -71,12 +72,18 @@ export const AgentsPreview = compose(
       super(props);
       this.state = {
         loadingAgents: false,
-        loadingSummary: false,
+        loadingSummary: true,
         showAgentsEvolutionVisualization: true,
         agentTableFilters: [],
-        agentStatusSummary: props.tableProps.agentStatusSummary,
+        agentStatusSummary: {
+          active: '-',
+          disconnected: '-',
+          total: '-',
+          pending: '-',
+          never_connected: '-',
+        },
         agentConfiguration: {},
-        agentsActiveCoverage: props.tableProps.agentsActiveCoverage,
+        agentsActiveCoverage: 0,
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
@@ -88,7 +95,8 @@ export const AgentsPreview = compose(
 
     async componentDidMount() {
       this._isMount = true;
-      this.fetchAgentStatusDetailsData();
+      this.fetchSummaryStatus();
+      this.fetchAgentsStats();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
         this._isMount &&
           this.setState({
@@ -121,31 +129,40 @@ export const AgentsPreview = compose(
       }, {});
     };
 
-    async fetchAgents() {
-      this.setState({ loadingAgents: true });
-      const {
-        data: {
-          data: {
-            affected_items: [lastRegisteredAgent],
-          },
-        },
-      } = await WzRequest.apiReq('GET', '/agents', {
-        params: { limit: 1, sort: '-dateAdd', q: 'id!=000' },
-      });
-      const agentMostActive = await this.props.tableProps.getMostActive();
-      this.setState({
-        loadingAgents: false,
-        lastRegisteredAgent,
-        agentMostActive,
-      });
-    }
-    async fetchAgentStatusDetailsData() {
+    async fetchSummaryStatus() {
       try {
-        this.fetchAgents();
+        this.setState({ loadingSummary: true });
+        const {
+          data: {
+            data: {
+              connection: agentStatusSummary,
+              configuration: agentConfiguration,
+            },
+          },
+        } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+
+        this.props.tableProps.updateSummary(agentStatusSummary);
+
+        const agentsActiveCoverage = (
+          (agentStatusSummary.active / agentStatusSummary.total) *
+          100
+        ).toFixed(2);
+
+        this.setState({
+          loadingSummary: false,
+          agentStatusSummary,
+          agentConfiguration,
+          /* Calculate the agents active coverage.
+          Ensure the calculated value is not a NaN, otherwise set a 0.
+        */
+          agentsActiveCoverage: isNaN(agentsActiveCoverage)
+            ? 0
+            : agentsActiveCoverage,
+        });
       } catch (error) {
-        this.setState({ loadingAgents: false, loadingSummary: false });
+        this.setState({ loadingSummary: false });
         const options = {
-          context: `${AgentsPreview.name}.fetchAgentStatusDetailsData`,
+          context: `${AgentsPreview.name}.fetchSummaryStatus`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
@@ -153,6 +170,41 @@ export const AgentsPreview = compose(
             error: error,
             message: error.message || error,
             title: `Could not get the agents summary`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    }
+
+    async fetchAgentsStats() {
+      try {
+        this.setState({ loadingAgents: true });
+        const {
+          data: {
+            data: {
+              affected_items: [lastRegisteredAgent],
+            },
+          },
+        } = await WzRequest.apiReq('GET', '/agents', {
+          params: { limit: 1, sort: '-dateAdd', q: 'id!=000' },
+        });
+        const agentMostActive = await this.props.tableProps.getMostActive();
+        this.setState({
+          loadingAgents: false,
+          lastRegisteredAgent,
+          agentMostActive,
+        });
+      } catch (error) {
+        this.setState({ loadingAgents: false });
+        const options = {
+          context: `${AgentsPreview.name}.fetchAgentsStats`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Could not get the agents stats`,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -182,6 +234,20 @@ export const AgentsPreview = compose(
     render() {
       const evolutionIsReady = this.props.resultState !== 'loading';
 
+      if (this.state.loadingSummary) {
+        return (
+          <div class='md-padding md-padding-top-16'>
+            <EuiProgress size='xs' color='primary' />
+          </div>
+        );
+      }
+
+      //This condition is because the angular template and the controller have a small delay to show the register agent component when there are no agents
+      //This condition must be removed when the controller is removed
+      if (this.state.agentStatusSummary.total === 0) {
+        return <></>;
+      }
+
       return (
         <EuiPage className='flex-column'>
           <EuiFlexItem>
@@ -198,7 +264,6 @@ export const AgentsPreview = compose(
                       <EuiFlexGroup>
                         <EuiFlexItem className='align-items-center'>
                           <VisualizationBasic
-                            isLoading={this.state.loadingSummary}
                             type='donut'
                             size={{ width: '100%', height: '150px' }}
                             showLegend
@@ -224,7 +289,6 @@ export const AgentsPreview = compose(
                         {this.agentStatus.map(({ status, label, color }) => (
                           <EuiFlexItem key={`agent-details-status-${status}`}>
                             <EuiStat
-                              isLoading={this.state.loadingSummary}
                               title={
                                 <EuiToolTip
                                   position='top'
@@ -249,7 +313,6 @@ export const AgentsPreview = compose(
                         ))}
                         <EuiFlexItem>
                           <EuiStat
-                            isLoading={this.state.loadingSummary}
                             title={`${this.state.agentsActiveCoverage}%`}
                             titleSize='s'
                             description='Agents coverage'
@@ -359,7 +422,6 @@ export const AgentsPreview = compose(
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
                 formatUIDate={date => formatUIDate(date)}
-                reload={() => this.fetchAgentStatusDetailsData()}
               />
             </WzReduxProvider>
           </EuiFlexItem>
