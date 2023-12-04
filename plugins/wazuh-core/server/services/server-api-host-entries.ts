@@ -21,6 +21,9 @@ import { ManageHosts } from './manage-hosts';
 import { UpdateRegistry } from './update-registry';
 import { Logger } from 'opensearch-dashboards/server';
 
+/**
+ * This service gets the API host entries
+ */
 export class ServerAPIHostEntries {
   constructor(
     private logger: Logger,

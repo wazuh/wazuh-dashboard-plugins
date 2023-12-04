@@ -15,8 +15,12 @@ import { ServerAPIClient } from './server-api-client';
 import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
 
 // Object.freeze(API_USER_STATUS_RUN_AS);
-
+/**
+ * This service caches the status of API host internal user allows the run as option.
+ */
 export class CacheAPIUserAllowRunAs {
+  readonly API_USER_STATUS_RUN_AS;
+  private _cache: any;
   constructor(
     private logger: Logger,
     private manageHosts: ManageHosts,

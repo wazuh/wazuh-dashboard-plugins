@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import https from 'https';
 import { Logger } from 'opensearch-dashboards/server';
 import { getCookieValueByName } from './cookie';
@@ -64,10 +64,14 @@ export interface ServerAPIScopedUserClient {
   ) => Promise<AxiosResponse<any, any>>;
 }
 
+/**
+ * This service communicates with the Wazuh server APIs
+ */
 export class ServerAPIClient {
   private _CacheInternalUserAPIHostToken: Map<string, string>;
   private _axios: typeof axios;
   private asInternalUser: ServerAPIInternalUserClient;
+  private _axios: AxiosInstance;
   constructor(
     private logger: Logger, // TODO: add logger as needed
     private manageHosts: ManageHosts,

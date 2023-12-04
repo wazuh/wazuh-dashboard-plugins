@@ -13,6 +13,9 @@ import fs from 'fs';
 import { WAZUH_DATA_CONFIG_REGISTRY_PATH } from '../../common/constants';
 import { Logger } from 'opensearch-dashboards/server';
 
+/**
+ * This service updates the registry file
+ */
 export class UpdateRegistry {
   busy: boolean;
   file: string;

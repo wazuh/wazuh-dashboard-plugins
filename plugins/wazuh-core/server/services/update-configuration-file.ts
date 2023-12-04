@@ -15,6 +15,9 @@ import { WAZUH_DATA_CONFIG_APP_PATH } from '../../common/constants';
 import { formatSettingValueToFile } from '../../common/services/settings';
 import { Logger } from 'opensearch-dashboards/server';
 
+/**
+ * This service updates the configuration file
+ */
 export class UpdateConfigurationFile {
   constructor(private logger: Logger) {
     this.busy = false;

@@ -17,6 +17,9 @@ import { WAZUH_DATA_CONFIG_APP_PATH } from '../../common/constants';
 import { createDataDirectoryIfNotExists } from './filesystem';
 import { Logger } from 'opensearch-dashboards/server';
 
+/**
+ * This services manage the API host entries
+ */
 export class ManageHosts {
   busy: boolean;
   file: string;
