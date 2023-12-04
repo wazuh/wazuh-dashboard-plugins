@@ -77,7 +77,6 @@ export const AgentsTable = withErrorBoundary(
 
     async reloadAgents() {
       this.setState({ reloadTable: Date.now() });
-      await this.props.reload();
     }
 
     async componentDidUpdate(prevProps) {
@@ -541,5 +540,4 @@ AgentsTable.propTypes = {
   addingNewAgent: PropTypes.func,
   downloadCsv: PropTypes.func,
   timeService: PropTypes.func,
-  reload: PropTypes.func,
 };
