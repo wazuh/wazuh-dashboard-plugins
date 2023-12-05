@@ -78,7 +78,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
               />
             </div>
           </div>
-           <div
+            <div
             class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <div
@@ -90,7 +90,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
               />
             </div>
           </div>
-           <div
+            <div
             class="euiFlexItem"
           >
             <div
