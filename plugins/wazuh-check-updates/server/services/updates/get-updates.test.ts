@@ -93,42 +93,6 @@ describe('getUpdates function', () => {
   });
 
   test('should return available updates from api', async () => {
-    mockedGetWazuhCore.mockImplementation(() => ({
-      controllers: {
-        WazuhHostsCtrl: jest.fn().mockImplementation(() => ({
-          getHostsEntries: jest
-            .fn()
-            .mockImplementation(() => [{ id: 'api id' }]),
-        })),
-      },
-      services: {
-        wazuhApiClient: {
-          client: {
-            asInternalUser: {
-              request: jest.fn().mockImplementation(() => ({
-                data: {
-                  data: {
-                    current_version: '4.3.1',
-                    last_available_patch: {
-                      description:
-                        '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
-                      published_date: '2022-05-18T10:12:43Z',
-                      semver: {
-                        major: 4,
-                        minor: 3,
-                        patch: 8,
-                      },
-                      tag: 'v4.3.8',
-                      title: 'Wazuh v4.3.8',
-                    },
-                  },
-                },
-              })),
-            },
-          },
-        },
-      },
-    }));
     mockedSetSavedObject.mockImplementation(() => ({}));
     mockedGetWazuhCore.mockImplementation(() => ({
       api: {

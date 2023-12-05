@@ -61,10 +61,6 @@ describe('getUserPreferences function', () => {
   test('should return an error', async () => {
     mockedGetSavedObject.mockRejectedValue(new Error('getSavedObject error'));
 
-    mockedGetWazuhCore.mockImplementation(() => ({
-      services: { log: jest.fn().mockImplementation(() => {}) },
-    }));
-
     const promise = getUserPreferences('admin');
 
     expect(getSavedObject).toHaveBeenCalledTimes(1);

@@ -74,10 +74,6 @@ describe('updateUserPreferences function', () => {
   test('should return an error', async () => {
     mockedSetSavedObject.mockRejectedValue(new Error('getSavedObject error'));
 
-    mockedGetWazuhCore.mockImplementation(() => ({
-      services: { log: jest.fn().mockImplementation(() => {}) },
-    }));
-
     const promise = updateUserPreferences('admin', {
       last_dismissed_updates: [
         {
