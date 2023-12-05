@@ -1,6 +1,9 @@
 import { getSavedObject } from '../saved-object/get-saved-object';
 import { setSavedObject } from '../saved-object/set-saved-object';
-import { getWazuhCore } from '../../plugin-services';
+import {
+  getWazuhCheckUpdatesServices,
+  getWazuhCore,
+} from '../../plugin-services';
 import { API_UPDATES_STATUS } from '../../../common/types';
 import { getUpdates } from './get-updates';
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
@@ -12,6 +15,8 @@ const mockedSetSavedObject = setSavedObject as jest.Mock;
 jest.mock('../saved-object/set-saved-object');
 
 const mockedGetWazuhCore = getWazuhCore as jest.Mock;
+const mockedGetWazuhCheckUpdatesServices =
+  getWazuhCheckUpdatesServices as jest.Mock;
 jest.mock('../../plugin-services');
 
 describe('getUpdates function', () => {
@@ -41,6 +46,21 @@ describe('getUpdates function', () => {
           },
         },
       ],
+    }));
+
+    mockedGetWazuhCore.mockImplementation(() => ({
+      serverAPIHostEntries: {
+        getHostsEntries: jest.fn(() => []),
+      },
+    }));
+
+    mockedGetWazuhCheckUpdatesServices.mockImplementation(() => ({
+      logger: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
     }));
 
     const updates = await getUpdates();
@@ -76,7 +96,9 @@ describe('getUpdates function', () => {
     mockedGetWazuhCore.mockImplementation(() => ({
       controllers: {
         WazuhHostsCtrl: jest.fn().mockImplementation(() => ({
-          getHostsEntries: jest.fn().mockImplementation(() => [{ id: 'api id' }]),
+          getHostsEntries: jest
+            .fn()
+            .mockImplementation(() => [{ id: 'api id' }]),
         })),
       },
       services: {
@@ -108,6 +130,44 @@ describe('getUpdates function', () => {
       },
     }));
     mockedSetSavedObject.mockImplementation(() => ({}));
+    mockedGetWazuhCore.mockImplementation(() => ({
+      api: {
+        client: {
+          asInternalUser: {
+            request: jest.fn().mockImplementation(() => ({
+              data: {
+                data: {
+                  current_version: '4.3.1',
+                  last_available_patch: {
+                    description:
+                      '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+                    published_date: '2022-05-18T10:12:43Z',
+                    semver: {
+                      major: 4,
+                      minor: 3,
+                      patch: 8,
+                    },
+                    tag: 'v4.3.8',
+                    title: 'Wazuh v4.3.8',
+                  },
+                },
+              },
+            })),
+          },
+        },
+      },
+      serverAPIHostEntries: {
+        getHostsEntries: jest.fn(() => [{ id: 'api id' }]),
+      },
+    }));
+    mockedGetWazuhCheckUpdatesServices.mockImplementation(() => ({
+      logger: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
+    }));
 
     const updates = await getUpdates(true);
 
