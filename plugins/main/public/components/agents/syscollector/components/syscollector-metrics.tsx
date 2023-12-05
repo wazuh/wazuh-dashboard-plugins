@@ -93,7 +93,7 @@ export function InventoryMetrics({ agent }) {
             )}
           </EuiText>
         </EuiFlexItem>
-        <EuiFlexItem grow={true}>
+        <EuiFlexItem grow={false}>
           <EuiText>
             CPU:{' '}
             {syscollector.isLoading ? (
@@ -105,7 +105,7 @@ export function InventoryMetrics({ agent }) {
             )}
           </EuiText>
         </EuiFlexItem>
-        <EuiFlexItem grow={true}>
+        <EuiFlexItem grow={false}>
           <EuiText>
             Hostname:{' '}
             {syscollector.isLoading ? (
@@ -119,7 +119,7 @@ export function InventoryMetrics({ agent }) {
         </EuiFlexItem>
         <EuiFlexItem grow={true}>
           <EuiText>
-            Board Serial:{' '}
+            Board serial:{' '}
             {syscollector.isLoading ? (
               <EuiLoadingSpinner size='s' />
             ) : syscollector.data.hardware.board_serial ? (
