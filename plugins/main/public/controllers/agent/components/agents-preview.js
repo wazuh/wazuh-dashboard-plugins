@@ -422,6 +422,7 @@ export const AgentsPreview = compose(
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
                 formatUIDate={date => formatUIDate(date)}
+                reload={() => this.fetchAgentsStats()}
               />
             </WzReduxProvider>
           </EuiFlexItem>
