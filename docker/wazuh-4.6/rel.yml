@@ -1,11 +1,11 @@
 # Wazuh App Copyright (C) 2021 Wazuh Inc. (License GPLv2)
 version: '3.9'
 
-x-logging: &logging
-  logging:
-    driver: loki
-    options:
-      loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
+# x-logging: &logging
+#   logging:
+#     driver: loki
+#     options:
+#       loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
 
 services:
   generator:
@@ -13,7 +13,7 @@ services:
     profiles:
       - 'saml'
       - 'standard'
-    <<: *logging
+    #<<: *logging
     volumes:
       - wi_certs:/certs/wi
       - wd_certs:/certs/wd
@@ -134,7 +134,7 @@ services:
     networks:
       - wz-rel
       - mon
-    <<: *logging
+    #<<: *logging
     environment:
       - INDEXER_URL=https://wazuh.indexer:9200
       - INDEXER_USERNAME=admin
@@ -175,7 +175,7 @@ services:
     networks:
       - wz-rel
       - mon
-    <<: *logging
+    #<<: *logging
     environment:
       - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m'
       - 'OPENSEARCH_PATH_CONF=/usr/share/wazuh-indexer/config'
@@ -217,7 +217,7 @@ services:
     networks:
       - wz-rel
       - mon
-    <<: *logging
+    #<<: *logging
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -236,7 +236,7 @@ services:
     profiles:
       - 'saml'
       - 'standard'
-    <<: *logging
+    #<<: *logging
     hostname: 'exporter'
     networks:
       - wz-rel
@@ -254,7 +254,7 @@ services:
     profiles:
       - 'saml'
     hostname: idp
-    <<: *logging
+    #<<: *logging
     networks:
       - wz-rel
       - mon
@@ -283,7 +283,7 @@ services:
     profiles:
       - 'saml'
     hostname: idpsetup
-    <<: *logging
+    #<<: *logging
     networks:
       - wz-rel
       - mon
