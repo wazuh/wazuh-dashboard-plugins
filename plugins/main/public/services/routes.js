@@ -110,7 +110,7 @@ app.config(($routeProvider) => {
       resolve: { wzConfig, ip },
       outerAngularWrapperRoute: true,
     })
-    .when('/agents/deploy', {
+    .when('/agents-preview/deploy', {
       template: agentDeployTemplate,
       resolve: { wzConfig, ip },
       outerAngularWrapperRoute: true,

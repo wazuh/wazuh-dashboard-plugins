@@ -11,29 +11,29 @@ import {
   EuiProgress,
   EuiButton,
 } from '@elastic/eui';
-import { WzRequest } from '../../../../react-services/wz-request';
-import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
-import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
-import { ErrorHandler } from '../../../../react-services/error-management';
-import { getMasterRemoteConfiguration } from '../../../agent/components/register-agent-service';
+import { WzRequest } from '../../../../../react-services/wz-request';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { ErrorHandler } from '../../../../../react-services/error-management';
+import { getMasterRemoteConfiguration } from '../../../../../controllers/agent/components/register-agent-service';
 import './register-agent.scss';
 import { Steps } from '../steps/steps';
-import { InputForm } from '../../../../components/common/form';
+import { InputForm } from '../../../../common/form';
 import { getGroups } from '../../services/register-agent-services';
-import { useForm } from '../../../../components/common/form/hooks';
-import { FormConfiguration } from '../../../../components/common/form/types';
+import { useForm } from '../../../../common/form/hooks';
+import { FormConfiguration } from '../../../../common/form/types';
 import { useSelector } from 'react-redux';
 import {
   withReduxProvider,
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
-} from '../../../../components/common/hocs';
+} from '../../../../common/hocs';
 import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
 import { validateServerAddress, validateAgentName } from '../../utils/validations';
 import { compose } from 'redux';
-import { endpointSumary } from '../../../../utils/applications';
-import { getCore } from '../../../../kibana-services';
+import { endpointSumary } from '../../../../../utils/applications';
+import { getCore } from '../../../../../kibana-services';
 
 interface IRegisterAgentProps {
   getWazuhVersion: () => Promise<string>;

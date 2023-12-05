@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { EuiPage, EuiPageBody, EuiEmptyPrompt, EuiButton, EuiProgress } from '@elastic/eui';
+import { EuiPage, EuiPageBody, EuiEmptyPrompt, EuiProgress } from '@elastic/eui';
 import { RegisterAgent } from '../../controllers/register-agent/containers/register-agent/register-agent';
-import { AgentsPreview } from '../../controllers/agent/components/agents-preview';
+import { Fleet } from './fleet';
 import { WzRequest } from '../../react-services/wz-request';
+import { endpointSumary } from '../../utils/applications';
+import { withReduxProvider, withGlobalBreadcrumb } from '../common/hocs';
+import { compose } from 'redux';
+import { WzButtonPermissions } from '../common/permissions/button';
+import { getCore } from '../../kibana-services';
 
-export const FleetPreview = () => {
+export const MainFleet = compose(
+  withReduxProvider,
+  withGlobalBreadcrumb([{ text: endpointSumary.title }])
+)(() => {
   const [isSummaryLoading, setIsSummaryLoading] = useState(true);
   const [agentStatusSummary, setAgentStatusSummary] = useState();
   const [agentCount, setAgentCount] = useState<number>();
@@ -51,13 +59,17 @@ export const FleetPreview = () => {
         title={<h2>There are no agents</h2>}
         body={<p>Add agents to fleet to start monitoring</p>}
         actions={
-          <EuiButton
+          <WzButtonPermissions
             color="primary"
             fill
-            //  onClick={openAgentSelector}
+            permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
+            iconType="plusInCircle"
+            href={getCore().application.getUrlForApp('endpoints-summary', {
+              path: '#/agents-preview/deploy',
+            })}
           >
             Deploy new agent
-          </EuiButton>
+          </WzButtonPermissions>
         }
       />
     );
@@ -66,11 +78,11 @@ export const FleetPreview = () => {
   return (
     <EuiPage paddingSize="m">
       <EuiPageBody>
-        <AgentsPreview
+        <Fleet
           agentStatusSummary={agentStatusSummary}
           agentsActiveCoverage={agentsActiveCoverage}
         />
       </EuiPageBody>
     </EuiPage>
   );
-};
+});

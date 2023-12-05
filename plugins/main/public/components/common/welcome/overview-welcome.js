@@ -25,25 +25,14 @@ import {
   EuiButtonEmpty,
 } from '@elastic/eui';
 import './welcome.scss';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withReduxProvider,
-} from '../hocs';
+import { withErrorBoundary, withGlobalBreadcrumb, withReduxProvider } from '../hocs';
 import { compose } from 'redux';
-import {
-  Applications,
-  Categories,
-  endpointSumary,
-  overview,
-} from '../../../utils/applications';
+import { Applications, Categories, endpointSumary, overview } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const appCategories = Applications.reduce((categories, app) => {
-  const existingCategory = categories.find(
-    category => category.label === app.category,
-  );
+  const existingCategory = categories.find((category) => category.label === app.category);
   if (app.showInOverviewApp) {
     if (existingCategory) {
       existingCategory.apps.push(app);
@@ -57,17 +46,17 @@ const appCategories = Applications.reduce((categories, app) => {
   return categories;
 }, []).sort((a, b) => {
   return (
-    Categories.find(category => a.label === category.id).order -
-    Categories.find(category => b.label === category.id).order
+    Categories.find((category) => a.label === category.id).order -
+    Categories.find((category) => b.label === category.id).order
   );
 });
 
 export const OverviewWelcome = compose(
   withReduxProvider,
   withErrorBoundary,
-  withGlobalBreadcrumb(props => {
+  withGlobalBreadcrumb((props) => {
     return [{ text: overview.title }];
-  }),
+  })
 )(
   class OverviewWelcome extends Component {
     constructor(props) {
@@ -86,24 +75,21 @@ export const OverviewWelcome = compose(
                     <>
                       No agents were added to this manager.{' '}
                       <EuiButtonEmpty
-                        href={getCore().application.getUrlForApp(
-                          endpointSumary.id,
-                          {
-                            path: '#/agents/deploy',
-                          },
-                        )}
+                        href={getCore().application.getUrlForApp(endpointSumary.id, {
+                          path: '#/agents-preview/deploy',
+                        })}
                       >
                         Add agent
                       </EuiButtonEmpty>
                     </>
                   }
-                  color='warning'
-                  iconType='alert'
+                  color="warning"
+                  iconType="alert"
                 ></EuiCallOut>
               </RedirectAppLinks>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size='xl' />
+          <EuiSpacer size="xl" />
         </>
       );
     }
@@ -112,7 +98,7 @@ export const OverviewWelcome = compose(
       return (
         <Fragment>
           <EuiPage>
-            <EuiFlexGroup gutterSize='l'>
+            <EuiFlexGroup gutterSize="l">
               <EuiFlexItem>
                 {this.props.agentsCountTotal === 0 && this.addAgent()}
                 <EuiFlexGroup>
@@ -123,33 +109,23 @@ export const OverviewWelcome = compose(
                           title
                           description
                           betaBadgeLabel={
-                            Categories.find(category => category.id === label)
-                              ?.label
+                            Categories.find((category) => category.id === label)?.label
                           }
                         >
-                          <EuiSpacer size='s' />
+                          <EuiSpacer size="s" />
                           <EuiFlexGrid columns={2}>
-                            {apps.map(app => (
+                            {apps.map((app) => (
                               <EuiFlexItem key={app.id}>
-                                <RedirectAppLinks
-                                  application={getCore().application}
-                                >
+                                <RedirectAppLinks application={getCore().application}>
                                   <EuiCard
-                                    size='xs'
-                                    layout='horizontal'
-                                    icon={
-                                      <EuiIcon
-                                        size='xl'
-                                        type={app.euiIconType}
-                                      />
-                                    }
-                                    className='homSynopsis__card'
+                                    size="xs"
+                                    layout="horizontal"
+                                    icon={<EuiIcon size="xl" type={app.euiIconType} />}
+                                    className="homSynopsis__card"
                                     title={app.title}
-                                    href={getCore().application.getUrlForApp(
-                                      app.id,
-                                    )}
+                                    href={getCore().application.getUrlForApp(app.id)}
                                     data-test-subj={`overviewWelcome${this.strtools.capitalize(
-                                      app.id,
+                                      app.id
                                     )}`}
                                     description={app.description}
                                   />
@@ -168,5 +144,5 @@ export const OverviewWelcome = compose(
         </Fragment>
       );
     }
-  },
+  }
 );
