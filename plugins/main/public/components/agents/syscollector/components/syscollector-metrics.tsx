@@ -105,6 +105,30 @@ export function InventoryMetrics({ agent }) {
             )}
           </EuiText>
         </EuiFlexItem>
+        <EuiFlexItem grow={true}>
+          <EuiText>
+            Hostname:{' '}
+            {syscollector.isLoading ? (
+              <EuiLoadingSpinner size='s' />
+            ) : syscollector.data.os.hostname ? (
+              <strong>{syscollector.data.os.hostname}</strong>
+            ) : (
+              <strong>-</strong>
+            )}
+          </EuiText>
+        </EuiFlexItem>
+        <EuiFlexItem grow={true}>
+          <EuiText>
+            Board Serial:{' '}
+            {syscollector.isLoading ? (
+              <EuiLoadingSpinner size='s' />
+            ) : syscollector.data.hardware.board_serial ? (
+              <strong>{syscollector.data.hardware.board_serial}</strong>
+            ) : (
+              <strong>-</strong>
+            )}
+          </EuiText>
+        </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText>
             Last scan:{' '}
