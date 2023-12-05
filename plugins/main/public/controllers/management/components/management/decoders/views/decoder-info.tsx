@@ -25,6 +25,9 @@ import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
 export default class WzDecoderInfo extends Component {
+  columns: object[];
+  resourcesHandler;
+
   constructor(props) {
     super(props);
     this.onClickRow = this.onClickRow.bind(this);
@@ -34,7 +37,8 @@ export default class WzDecoderInfo extends Component {
 
     this.resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
 
-    const handleFileClick = async (value, item) => {
+    const handleFileClick = async (event, value, item) => {
+      event.stopPropagation();
       try {
         const result = await this.resourcesHandler.getFileContent(
           value,
@@ -88,7 +92,9 @@ export default class WzDecoderInfo extends Component {
         render: (value, item) => {
           return (
             <EuiToolTip position='top' content={`Show ${value} content`}>
-              <EuiLink onClick={async () => handleFileClick(value, item)}>
+              <EuiLink
+                onClick={async event => handleFileClick(event, value, item)}
+              >
                 {value}
               </EuiLink>
             </EuiToolTip>
@@ -245,7 +251,7 @@ export default class WzDecoderInfo extends Component {
   colorRegex(regex) {
     regex = regex.toString();
     const starts = (
-      <span key={`decoder-info-color-regex-start`} className='subdued-color'>
+      <span key={'decoder-info-color-regex-start'} className='subdued-color'>
         {regex.split('(')[0]}
       </span>
     );

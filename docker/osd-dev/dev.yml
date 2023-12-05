@@ -193,7 +193,7 @@ services:
         echo admin | filebeat keystore add username --stdin --force
         echo ${PASSWORD}| filebeat keystore add password --stdin --force
         curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
-        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.2.tar.gz | tar -xvz -C /usr/share/filebeat/module
+        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.3.tar.gz | tar -xvz -C /usr/share/filebeat/module
         # copy filebeat to preserve correct permissions without
         # affecting host filesystem
         cp /tmp/filebeat.yml /usr/share/filebeat/filebeat.yml

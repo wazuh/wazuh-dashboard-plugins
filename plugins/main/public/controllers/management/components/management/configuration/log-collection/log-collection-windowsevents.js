@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { renderValueOrNoValue, isString } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
@@ -98,15 +98,13 @@ class WzConfigurationLogCollectionWindowsEvents extends Component {
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : null}
         {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[LOCALFILE_WINDOWSEVENT_PROP]?.length ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Windows events logs"
             description="List of Windows logs that will be processed"
-            currentConfig={currentConfig}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationListSelector items={items} settings={mainSettings} />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );

@@ -11,9 +11,9 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
-import { EuiBasicTable } from '@elastic/eui';
 import { compose } from 'redux';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import WzTabSelector, {
@@ -124,19 +124,17 @@ const tabWrapper = compose(
   ),
 );
 
-const GeneralTab = tabWrapper(({ agent, wodleConfiguration }) => (
-  <WzConfigurationSettingsTabSelector
-    title='Main settings'
-    description='Configuration for the GitHub module'
-    currentConfig={wodleConfiguration}
-    minusHeight={agent.id === '000' ? 370 : 420} //TODO: Review the minusHeight for the agent case
-    helpLinks={helpLinks}
+const GeneralTab = tabWrapper(({agent, wodleConfiguration}) => (
+  <WzConfigurationSettingsHeader
+    title="Main settings"
+    description="Configuration for the GitHub module"
+    help={helpLinks}
   >
     <WzConfigurationSettingsGroup
       config={wodleConfiguration['github']}
       items={mainSettings}
     />
-  </WzConfigurationSettingsTabSelector>
+  </WzConfigurationSettingsHeader>
 ));
 
 const CredentialsTab = tabWrapper(({ agent, wodleConfiguration }) => {
@@ -146,16 +144,14 @@ const CredentialsTab = tabWrapper(({ agent, wodleConfiguration }) => {
     [wodleConfiguration],
   );
   return (
-    <WzConfigurationSettingsTabSelector
-      title='List of organizations to auditing'
-      currentConfig={wodleConfiguration}
-      minusHeight={agent.id === '000' ? 370 : 420} //TODO: Review the minusHeight for the agent case
-      helpLinks={helpLinks}
+    <WzConfigurationSettingsHeader
+      title="List of organizations to auditing"
+      help={helpLinks}
     >
       <WzConfigurationSettingsListSelector
         items={credentials}
         settings={columns}
       />
-    </WzConfigurationSettingsTabSelector>
-  );
+    </WzConfigurationSettingsHeader>
+  )
 });

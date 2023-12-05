@@ -56,8 +56,4 @@ class WzConfigurationCisCat extends Component {
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
-WzConfigurationCisCat.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default withWzConfig(sections)(WzConfigurationCisCat);

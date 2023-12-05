@@ -1,0 +1,39 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "id": 1,
+        "name": "wui_elastic_admin",
+        "rule": {
+          "FIND": {
+            "username": "elastic"
+          }
+        },
+        "roles": [1]
+      },
+      {
+        "id": 2,
+        "name": "wui_opendistro_admin",
+        "rule": {
+          "FIND": {
+            "username": "admin"
+          }
+        },
+        "roles": [1]
+      },
+      {
+        "id": 102,
+        "name": "custom_rule2",
+        "rule": {
+          "FIND": {
+            "username": "admin"
+          }
+        },
+        "roles": [2]
+      }
+    ],
+    "total_affected_items": 4,
+    "total_failed_items": 0,
+    "failed_items": []
+  }
+}

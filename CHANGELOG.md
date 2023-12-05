@@ -2,6 +2,49 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.7.2
+
+## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.7.1
+
+### Fixed
+
+- Fixed problem when using non latin characters in the username [#6076](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6076)
+- Fixed UI crash on retrieving log collection configuration for macos agent. [#6104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6104)
+- Fixed incorrect validation of the agent name on the Deploy new agent window [#6105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6105)
+
+## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 04
+
+### Added
+
+- Support for Wazuh 4.7.0
+- Added `status detail` column in the agents table. [#5680](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5680)
+- Added agent register wizard handle properly special characters in password [5738](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5738)
+
+### Changed
+
+- Changed Network ports table columns for Linux agents. [#5636](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5636)
+- Updated development dependencies (`@typescript-eslint/eslint-plugin, @typescript-eslint/parser, eslint, swagger-client`)[#5748](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5748)
+- Changed timelion type displays in the management > statistics section to line type displays. [5707](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5707)
+
+### Fixed
+
+- Fixed problem with new or missing columns in agent table. [#5591](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5591)
+- Fixed the color of the agent name in the groups section in dark mode. [#5676](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5676) [#6018](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6018)
+- Fixed the propagation event so that the flyout data, in the decoders, does not change when the button is pressed. [#5597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5597)
+- Fixed the tooltips of the tables in the security section, and unnecessary requests are removed. [#5631](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5631)
+
+### Removed
+
+- Removed views in JSON and XML formats from management settings. [#5747](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5747)
+
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.8.0 - Revision 03
 
 ### Added

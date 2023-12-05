@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiToolTip,
   EuiInMemoryTable,
@@ -12,7 +12,10 @@ import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzButtonPermissionsModalConfirm } from '../../../common/buttons';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import RulesServices from '../../rules/services';
-import { UI_LOGGER_LEVELS, WAZUH_API_RESERVED_WUI_SECURITY_RULES } from '../../../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  WAZUH_API_RESERVED_WUI_SECURITY_RULES,
+} from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
@@ -23,6 +26,12 @@ export const RolesMappingTable = ({
   editRule,
   updateRules,
 }) => {
+  const [rulesState, setRulesState] = useState([]);
+
+  useEffect(() => {
+    setRulesState(rules);
+  }, [rules]);
+
   const getRowProps = item => {
     const { id } = item;
     return {
@@ -37,6 +46,9 @@ export const RolesMappingTable = ({
         await RulesServices.DeleteRules([item.id]);
         ErrorHandler.info('Role mapping was successfully deleted');
         updateRules();
+        // Workaround for tooltip problem does not disappear
+        // when deleting a rule if the following rule is a reserved rule
+        setRulesState([]);
       } catch (error) {
         const options = {
           context: `${RolesMappingTable.name}.onDeleteRoleMapping`,
@@ -161,7 +173,7 @@ export const RolesMappingTable = ({
 
   return (
     <EuiInMemoryTable
-      items={rules || []}
+      items={rulesState || []}
       columns={columns}
       search={search}
       rowProps={getRowProps}

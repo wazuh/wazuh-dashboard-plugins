@@ -14,20 +14,27 @@ export type IOptionalParameters<Params extends string> = {
 /// Operating system commands definitions
 ///////////////////////////////////////////////////////////////////
 
-export interface IOSDefinition<OS extends IOperationSystem, Params extends string> {
+export interface IOSDefinition<
+  OS extends IOperationSystem,
+  Params extends string,
+> {
   name: OS['name'];
-  options: IOSCommandsDefinition<OS,Params>[];
+  options: IOSCommandsDefinition<OS, Params>[];
 }
 
 interface IOptionalParamsWithValues<Params extends string> {
-  optionals?: IOptionalParameters<Params> 
+  optionals?: IOptionalParameters<Params>;
 }
 
+export type tOSEntryProps<Param extends string> = IOSProps &
+  IOptionalParamsWithValues<Param>;
+export type tOSEntryInstallCommand<Param extends string> =
+  tOSEntryProps<Param> & { urlPackage: string };
 
-export type tOSEntryProps<Param extends string> = IOSProps & IOptionalParamsWithValues<Param>;
-export type tOSEntryInstallCommand<Param extends string> = tOSEntryProps<Param> & { urlPackage: string };
-
-export interface IOSCommandsDefinition<OS extends IOperationSystem,Param extends string> {
+export interface IOSCommandsDefinition<
+  OS extends IOperationSystem,
+  Param extends string,
+> {
   architecture: OS['architecture'];
   urlPackage: (props: tOSEntryProps<Param>) => string;
   installCommand: (props: tOSEntryInstallCommand<Param>) => string;
@@ -46,12 +53,16 @@ interface IOptionalParamProps {
   value: string;
 }
 
-export type tOptionalParamsCommandProps<T extends string> = IOptionalParamProps & {
-  name: T;
-};
+export type tOptionalParamsCommandProps<T extends string> =
+  IOptionalParamProps & {
+    name: T;
+  };
 export interface IOptionsParamConfig<T extends string> {
   property: string;
-  getParamCommand: (props: tOptionalParamsCommandProps<T>) => string;
+  getParamCommand: (
+    props: tOptionalParamsCommandProps<T>,
+    selectedOS?: IOperationSystem,
+  ) => string;
 }
 
 export type tOptionalParams<T extends string> = {
@@ -64,22 +75,32 @@ export interface IOptionalParamInput<T extends string> {
 }
 export interface IOptionalParametersManager<T extends string> {
   getOptionalParam(props: IOptionalParamInput<T>): string;
-  getAllOptionalParams(paramsValues: IOptionalParameters<T>): object;
+  getAllOptionalParams(
+    paramsValues: IOptionalParameters<T>,
+    selectedOs?: IOperationSystem,
+  ): object;
 }
 
 ///////////////////////////////////////////////////////////////////
 /// Command creator class
 ///////////////////////////////////////////////////////////////////
 
-export type IOSInputs<T extends string> = IOperationSystem & IOptionalParameters<T>;
-export interface ICommandGenerator<OS extends IOperationSystem, Params extends string> extends ICommandGeneratorMethods<Params> {
+export type IOSInputs<T extends string> = IOperationSystem &
+  IOptionalParameters<T>;
+export interface ICommandGenerator<
+  OS extends IOperationSystem,
+  Params extends string,
+> extends ICommandGeneratorMethods<Params> {
   osDefinitions: IOSDefinition<OS, Params>[];
   wazuhVersion: string;
 }
 
 export interface ICommandGeneratorMethods<T extends string> {
   selectOS(params: IOperationSystem): void;
-  addOptionalParams(props: IOptionalParameters<T>): void;
+  addOptionalParams(
+    props: IOptionalParameters<T>,
+    osSelected?: IOperationSystem,
+  ): void;
   getInstallCommand(): string;
   getStartCommand(): string;
   getUrlPackage(): string;

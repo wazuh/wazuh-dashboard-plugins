@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 
 import { EuiBasicTable } from '@elastic/eui';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
 
@@ -38,12 +38,10 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component {
           currentConfig['syscheck-syscheck'] &&
           currentConfig['syscheck-syscheck'].syscheck &&
           currentConfig['syscheck-syscheck'].syscheck.nodiff && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="No diff directories"
               description="These files won't have their diff calculated"
-              currentConfig={currentConfig['syscheck-syscheck']}
-              minusHeight={this.props.agent.id === '000' ? 320 : 415}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <EuiBasicTable
                 items={currentConfig['syscheck-syscheck'].syscheck.nodiff.map(
@@ -51,15 +49,11 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component {
                 )}
                 columns={columnsPath}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
   }
 }
-
-WzConfigurationIntegrityMonitoringNoDiff.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationIntegrityMonitoringNoDiff;

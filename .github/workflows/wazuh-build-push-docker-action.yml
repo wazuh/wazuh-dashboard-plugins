@@ -69,7 +69,7 @@ jobs:
         --build-arg WAZUH_VERSION=${{ github.event.inputs.wazuh-manager-version }} \
         --build-arg FILEBEAT_VERSION=${{ github.event.inputs.elastic-manager-version }} \
         --build-arg FILEBEAT_WAZUH_TEMPLATE_URL=https://raw.githubusercontent.com/wazuh/wazuh/4.0/extensions/elasticsearch/7.x/wazuh-template.json \
-        --build-arg FILEBEAT_WAZUH_MODULE_URL=https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.1.tar.gz .
+        --build-arg FILEBEAT_WAZUH_MODULE_URL=https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.3.tar.gz .
      - name: Step 04 - Push image to quay.io
        run: |
         docker push quay.io/wazuh/wazuh-manager-image:${{ github.event.inputs.wazuh-manager-version }}-${{ github.event.inputs.elastic-manager-version }}

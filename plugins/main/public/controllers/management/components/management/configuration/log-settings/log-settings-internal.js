@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
@@ -50,31 +50,29 @@ class WzConfigurationLogSettingsInternal extends Component {
           currentConfig['analysis-logging'].logging) ||
           (currentConfig['monitor-logging'] &&
             currentConfig['monitor-logging'].logging && (
-              <WzConfigurationSettingsTabSelector
+              <WzConfigurationSettingsHeader
                 title="Internal settings"
                 description="Basic internal log settings"
-                currentConfig={currentConfig['monitor-logging'].logging}
-                helpLinks={helpLinks}
+                help={helpLinks}
               >
                 <WzConfigurationSettingsGroup
                   config={currentConfig['monitor-logging'].logging}
                   items={mainSettings}
                 />
-              </WzConfigurationSettingsTabSelector>
+              </WzConfigurationSettingsHeader>
             ))}
         {currentConfig['agent-logging'] &&
           currentConfig['agent-logging'].logging && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Internal settings"
               description="Basic internal log settings"
-              currentConfig={currentConfig['agent-logging'].logging}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationSettingsGroup
                 config={currentConfig['agent-logging'].logging}
                 items={mainSettings}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
