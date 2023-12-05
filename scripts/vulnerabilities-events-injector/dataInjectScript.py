@@ -1,15 +1,13 @@
-import datetime
-from datetime import timedelta
+from datetime import timedelta, datetime
 from opensearchpy import OpenSearch, helpers
 import random
 import json
 import os.path
-import requests
 import warnings
 
 warnings.filterwarnings("ignore")
 def generateRandomDate():
-    start_date = datetime.datetime.now()
+    start_date = datetime.now()
     end_date = start_date - timedelta(days=10)
     random_date = start_date + (end_date - start_date) * random.random()
     return(random_date.strftime("%Y-%m-%dT%H:%M:%S.{}Z".format(random.randint(0, 999))))
@@ -147,20 +145,19 @@ def verifyIndex(index,instance):
                 print('Done!')
             except Exception as e:
                 print('Error: {}'.format(e))
-            return True
         else:
             notemplate=input('\nIndex {} does not exist. Template file not found. Continue without template? (y/n)'.format(index))
             while notemplate != 'y' and notemplate != 'n':
-                notemplate=input('\nInvalid option. Continue without template? (y/n)')
-            if notemplate == 'y':
-                print('\nTrying to create index {} without template'.format(index))
-                try:
-                    instance.indices.create(index=index)
-                    print('\nDone!')
-                except Exception as e:
-                    print('\nError: {}'.format(e))
-                return True
-            return False
+                notemplate=input('\nInvalid option. Continue without template? (y/n) \n')
+            if notemplate == 'n':
+                return False
+            print('\nTrying to create index {} without template'.format(index))
+            try:
+                instance.indices.create(index=index)
+                print('\nDone!')
+            except Exception as e:
+                print('\nError: {}'.format(e))
+    return True
 
 def verifySettings():
     verified = False
@@ -181,18 +178,17 @@ def verifySettings():
         url = 'https://{}:{}/{}/_doc'.format(ip, port, index)
         username = input("\nUsername: \n")
         password = input("\nPassword: \n")
-        config = json.dumps({'ip':ip,'port':port,'index':index,'username':username,'password':password})
+        config = {'ip':ip,'port':port,'index':index,'username':username,'password':password}
         store = input("\nDo you want to store these settings for future use? (y/n) \n")
         while store != 'y' and store != 'n':
             store = input("\nInvalid option.\n Do you want to store these settings for future use? (y/n) \n")
         if store == 'y':
-            with open('\nDIS_Settings.json', 'w') as configFile:
-                configFile.write(config)
+            with open('DIS_Settings.json', 'w') as configFile:
+                json.dump(config, configFile)
     return config
 
 def injectEvents(generator):
     config = verifySettings()
-
     instance = OpenSearch([{'host':config['ip'],'port':config['port']}], http_auth=(config['username'], config['password']), use_ssl=True, verify_certs=False)
 
     if not instance.ping():
