@@ -22,19 +22,19 @@ import {
   EuiToolTip,
   EuiIconTip,
 } from '@elastic/eui';
-import { GroupTruncate } from '../../../components/common/util';
-import { WzButtonPermissions } from '../../../components/common/permissions/button';
+import { GroupTruncate } from '../../common/util';
+import { WzButtonPermissions } from '../../common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
-import { withErrorBoundary } from '../../../components/common/hocs';
+import { withErrorBoundary } from '../../common/hocs';
 import {
   API_NAME_AGENT_STATUS,
   UI_ORDER_AGENT_STATUS,
   AGENT_SYNCED_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
 } from '../../../../common/constants';
-import { AgentStatus } from '../../../components/agents/agent-status';
-import { AgentSynced } from '../../../components/agents/agent-synced';
-import { TableWzAPI } from '../../../components/common/tables';
+import { AgentStatus } from '../../agents/agent-status';
+import { AgentSynced } from '../../agents/agent-synced';
+import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
 import { getCore } from '../../../kibana-services';
@@ -57,7 +57,9 @@ export const AgentsTable = withErrorBoundary(
         filters: {
           default: { q: 'id!=000' },
           ...(sessionStorage.getItem('wz-agents-overview-table-filter')
-            ? JSON.parse(sessionStorage.getItem('wz-agents-overview-table-filter'))
+            ? JSON.parse(
+                sessionStorage.getItem('wz-agents-overview-table-filter'),
+              )
             : {}),
         },
         reloadTable: 0,
@@ -88,28 +90,34 @@ export const AgentsTable = withErrorBoundary(
       return (
         <div className={'icon-box-action'}>
           <RedirectAppLinks application={getCore().application}>
-            <EuiToolTip content="Open summary panel for this agent" position="left">
+            <EuiToolTip
+              content='Open summary panel for this agent'
+              position='left'
+            >
               <EuiButtonIcon
                 href={getCore().application.getUrlForApp(itHygiene.id, {
                   path: `#/agents?tab=welcome&agent=${agent.id}`,
                 })}
-                iconType="eye"
+                iconType='eye'
                 color={'primary'}
-                aria-label="Open summary panel for this agent"
+                aria-label='Open summary panel for this agent'
               />
             </EuiToolTip>
           </RedirectAppLinks>
           &nbsp;
           {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
             <RedirectAppLinks application={getCore().application}>
-              <EuiToolTip content="Open configuration for this agent" position="left">
+              <EuiToolTip
+                content='Open configuration for this agent'
+                position='left'
+              >
                 <EuiButtonIcon
                   href={getCore().application.getUrlForApp(itHygiene.id, {
                     path: `#/agents?tab=configuration&agent=${agent.id}`,
                   })}
                   color={'primary'}
-                  iconType="wrench"
-                  aria-label="Open configuration for this agent"
+                  iconType='wrench'
+                  aria-label='Open configuration for this agent'
                 />
               </EuiToolTip>
             </RedirectAppLinks>
@@ -132,11 +140,11 @@ export const AgentsTable = withErrorBoundary(
       const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
       return (
-        <EuiFlexGroup gutterSize="xs">
+        <EuiFlexGroup gutterSize='xs'>
           <EuiFlexItem grow={false}>
             <i
               className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-              aria-hidden="true"
+              aria-hidden='true'
             ></i>
           </EuiFlexItem>{' '}
           <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
@@ -173,7 +181,7 @@ export const AgentsTable = withErrorBoundary(
         name: 'Group(s)',
         sortable: true,
         show: true,
-        render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
+        render: groups => (groups !== '-' ? this.renderGroups(groups) : '-'),
         searchable: true,
       },
       {
@@ -205,10 +213,10 @@ export const AgentsTable = withErrorBoundary(
           <span>
             Registration date{' '}
             <EuiIconTip
-              content="This is not searchable through a search term."
-              size="s"
-              color="subdued"
-              type="alert"
+              content='This is not searchable through a search term.'
+              size='s'
+              color='subdued'
+              type='alert'
             />
           </span>
         ),
@@ -222,10 +230,10 @@ export const AgentsTable = withErrorBoundary(
           <span>
             Last keep alive{' '}
             <EuiIconTip
-              content="This is not searchable through a search term."
-              size="s"
-              color="subdued"
-              type="alert"
+              content='This is not searchable through a search term.'
+              size='s'
+              color='subdued'
+              type='alert'
             />
           </span>
         ),
@@ -239,14 +247,16 @@ export const AgentsTable = withErrorBoundary(
         truncateText: true,
         sortable: true,
         show: true,
-        render: (status, agent) => <AgentStatus status={status} agent={agent} />,
+        render: (status, agent) => (
+          <AgentStatus status={status} agent={agent} />
+        ),
       },
       {
         field: 'group_config_status',
         name: 'Synced',
         sortable: true,
         show: false,
-        render: (synced) => <AgentSynced synced={synced} />,
+        render: synced => <AgentSynced synced={synced} />,
         searchable: true,
       },
       {
@@ -261,7 +271,7 @@ export const AgentsTable = withErrorBoundary(
     ];
 
     tableRender() {
-      const getRowProps = (item) => {
+      const getRowProps = item => {
         const { id } = item;
         return {
           'data-test-subj': `row-${id}`,
@@ -275,7 +285,7 @@ export const AgentsTable = withErrorBoundary(
           return;
         }
         return {
-          onClick: (ev) => {
+          onClick: ev => {
             getCore().application.navigateToApp(itHygiene.id, {
               path: `#/agents?tab=welcome&agent=${item.id}`,
             });
@@ -287,28 +297,31 @@ export const AgentsTable = withErrorBoundary(
       // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
       // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
       return (
-        <EuiFlexGroup className="wz-overflow-auto">
+        <EuiFlexGroup className='wz-overflow-auto'>
           <EuiFlexItem>
             <TableWzAPI
-              title="Agents"
+              title='Agents'
               actionButtons={[
                 <WzButtonPermissions
-                  buttonType="empty"
+                  buttonType='empty'
                   permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
-                  iconType="plusInCircle"
-                  href={getCore().application.getUrlForApp('endpoints-summary', {
-                    path: '#/agents-preview/deploy',
-                  })}
+                  iconType='plusInCircle'
+                  href={getCore().application.getUrlForApp(
+                    'endpoints-summary',
+                    {
+                      path: '#/agents-preview/deploy',
+                    },
+                  )}
                 >
                   Deploy new agent
                 </WzButtonPermissions>,
               ]}
-              endpoint="/agents"
+              endpoint='/agents'
               tableColumns={this.defaultColumns}
-              tableInitialSortingField="id"
+              tableInitialSortingField='id'
               tablePageSizeOptions={[10, 25, 50, 100]}
               reload={this.state.reloadTable}
-              mapResponseItem={(item) => {
+              mapResponseItem={item => {
                 return {
                   ...item,
                   ...(item.ip ? { ip: item.ip } : { ip: '-' }),
@@ -382,31 +395,36 @@ export const AgentsTable = withErrorBoundary(
                     try {
                       switch (field) {
                         case 'status':
-                          return UI_ORDER_AGENT_STATUS.map((status) => ({
+                          return UI_ORDER_AGENT_STATUS.map(status => ({
                             label: status,
                           }));
                         case 'group_config_status':
-                          return [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED].map(
-                            (label) => ({
-                              label,
-                            })
-                          );
+                          return [
+                            AGENT_SYNCED_STATUS.SYNCED,
+                            AGENT_SYNCED_STATUS.NOT_SYNCED,
+                          ].map(label => ({
+                            label,
+                          }));
                         default: {
-                          const response = await WzRequest.apiReq('GET', '/agents', {
-                            params: {
-                              distinct: true,
-                              limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
-                              select: field,
-                              sort: `+${field}`,
-                              ...(currentValue
-                                ? {
-                                    q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
-                                  }
-                                : {
-                                    q: `${searchBarWQLOptions.implicitQuery.query}`,
-                                  }),
+                          const response = await WzRequest.apiReq(
+                            'GET',
+                            '/agents',
+                            {
+                              params: {
+                                distinct: true,
+                                limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                                select: field,
+                                sort: `+${field}`,
+                                ...(currentValue
+                                  ? {
+                                      q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                    }
+                                  : {
+                                      q: `${searchBarWQLOptions.implicitQuery.query}`,
+                                    }),
+                              },
                             },
-                          });
+                          );
                           if (field === 'group') {
                             /* the group field is returned as an string[],
                             example: ['group1', 'group2']
@@ -420,15 +438,20 @@ export const AgentsTable = withErrorBoundary(
                             of groups.
                             */
                             return response?.data?.data.affected_items
-                              .map((item) => getLodash(item, field))
+                              .map(item => getLodash(item, field))
                               .flat()
-                              .filter((item, index, array) => array.indexOf(item) === index)
+                              .filter(
+                                (item, index, array) =>
+                                  array.indexOf(item) === index,
+                              )
                               .sort()
-                              .map((group) => ({ label: group }));
+                              .map(group => ({ label: group }));
                           }
-                          return response?.data?.data.affected_items.map((item) => ({
-                            label: getLodash(item, field),
-                          }));
+                          return response?.data?.data.affected_items.map(
+                            item => ({
+                              label: getLodash(item, field),
+                            }),
+                          );
                         }
                       }
                     } catch (error) {
@@ -442,7 +465,7 @@ export const AgentsTable = withErrorBoundary(
                     if (value) {
                       if (['dateAdd', 'lastKeepAlive'].includes(field)) {
                         return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}:\d{2}(.\d{1,6})?Z?)?$/.test(
-                          value
+                          value,
                         )
                           ? undefined
                           : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
@@ -465,7 +488,7 @@ export const AgentsTable = withErrorBoundary(
       );
     }
 
-    filterGroupBadge = (group) => {
+    filterGroupBadge = group => {
       this.setState({
         filters: {
           default: { q: 'id!=000' },
@@ -491,9 +514,9 @@ export const AgentsTable = withErrorBoundary(
 
       return (
         <div>
-          <EuiPanel paddingSize="m">{table}</EuiPanel>
+          <EuiPanel paddingSize='m'>{table}</EuiPanel>
         </div>
       );
     }
-  }
+  },
 );

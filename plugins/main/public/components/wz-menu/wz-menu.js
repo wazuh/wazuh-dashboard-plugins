@@ -83,12 +83,15 @@ export const WzMenu = withWindowSize(
     async componentDidMount() {
       const $injector = getAngularModule().$injector;
       this.router = $injector.get('$route');
-      setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb, this.router);
+      setBreadcrumbs(
+        this.props.globalBreadcrumbReducers.breadcrumb,
+        this.router,
+      );
       try {
         const APIlist = await this.loadApiList();
         if (APIlist.length) {
           const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
-          const filteredApi = APIlist.filter((api) => api.id === apiId);
+          const filteredApi = APIlist.filter(api => api.id === apiId);
           const selectedApi = filteredApi[0];
           if (selectedApi) {
             const apiData = await ApiCheck.checkStored(selectedApi.id);
@@ -128,7 +131,7 @@ export const WzMenu = withWindowSize(
     getCurrentTab() {
       const currentWindowLocation = window.location.hash;
       let currentTab = '';
-      Object.keys(sections).some((section) => {
+      Object.keys(sections).some(section => {
         if (currentWindowLocation.match(`#/${section}`)) {
           currentTab = sections[section];
           return true;
@@ -152,8 +155,10 @@ export const WzMenu = withWindowSize(
         if (!list) return;
         this.props?.appConfig?.data?.['ip.ignore']?.length &&
           (list = list.filter(
-            (indexPattern) =>
-              !this.props?.appConfig?.data?.['ip.ignore'].includes(indexPattern.title)
+            indexPattern =>
+              !this.props?.appConfig?.data?.['ip.ignore'].includes(
+                indexPattern.title,
+              ),
           ));
 
         // Abort if we have disabled the pattern selector
@@ -165,7 +170,9 @@ export const WzMenu = withWindowSize(
           AppState.setCurrentPattern(list[0].id);
         } else {
           // Check if the current pattern cookie is valid
-          filtered = list.find((item) => item.id.includes(AppState.getCurrentPattern()));
+          filtered = list.find(item =>
+            item.id.includes(AppState.getCurrentPattern()),
+          );
           if (!filtered) AppState.setCurrentPattern(list[0].id);
         }
 
@@ -230,7 +237,7 @@ export const WzMenu = withWindowSize(
       if (
         !_.isEqual(
           prevProps?.appConfig?.data?.['ip.ignore'],
-          this.props?.appConfig?.data?.['ip.ignore']
+          this.props?.appConfig?.data?.['ip.ignore'],
         )
       ) {
         newState = { ...newState, ...(await this.loadIndexPatternsList()) };
@@ -239,10 +246,13 @@ export const WzMenu = withWindowSize(
       if (
         !_.isEqual(
           this.props.globalBreadcrumbReducers.breadcrumb,
-          prevProps.globalBreadcrumbReducers.breadcrumb
+          prevProps.globalBreadcrumbReducers.breadcrumb,
         )
       ) {
-        setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb, this.router);
+        setBreadcrumbs(
+          this.props.globalBreadcrumbReducers.breadcrumb,
+          this.router,
+        );
       }
 
       newState = { ...prevProps.state, ...newState };
@@ -274,8 +284,10 @@ export const WzMenu = withWindowSize(
         if (!list || (list && !list.length)) return;
         this.props?.appConfig?.data?.['ip.ignore']?.length &&
           (list = list.filter(
-            (indexPattern) =>
-              !this.props?.appConfig?.data?.['ip.ignore'].includes(indexPattern.title)
+            indexPattern =>
+              !this.props?.appConfig?.data?.['ip.ignore'].includes(
+                indexPattern.title,
+              ),
           ));
 
         // Abort if we have disabled the pattern selector
@@ -287,7 +299,9 @@ export const WzMenu = withWindowSize(
           AppState.setCurrentPattern(list[0].id);
         } else {
           // Check if the current pattern cookie is valid
-          filtered = list.filter((item) => item.id.includes(AppState.getCurrentPattern()));
+          filtered = list.filter(item =>
+            item.id.includes(AppState.getCurrentPattern()),
+          );
           if (!filtered.length) AppState.setCurrentPattern(list[0].id);
         }
 
@@ -327,7 +341,7 @@ export const WzMenu = withWindowSize(
       this.isLoading = false;
     }
 
-    changePattern = async (event) => {
+    changePattern = async event => {
       try {
         const newPattern = event.target;
         if (!AppState.getPatternSelector()) return;
@@ -382,15 +396,15 @@ export const WzMenu = withWindowSize(
       }
     };
 
-    changeAPI = async (event) => {
+    changeAPI = async event => {
       try {
         const apiId = event.target[event.target.selectedIndex];
-        const apiEntry = this.state.APIlist.filter((item) => {
+        const apiEntry = this.state.APIlist.filter(item => {
           return item.id === apiId.value;
         });
         const response = await ApiCheck.checkApi(apiEntry[0]);
         const clusterInfo = response.data || {};
-        const apiData = this.state.APIlist.filter((item) => {
+        const apiData = this.state.APIlist.filter(item => {
           return item.id === apiId.value;
         });
 
@@ -398,7 +412,9 @@ export const WzMenu = withWindowSize(
         apiData[0].cluster_info = clusterInfo;
 
         AppState.setClusterInfo(apiData[0].cluster_info);
-        AppState.setCurrentAPI(JSON.stringify({ name: apiData[0].manager, id: apiId.value }));
+        AppState.setCurrentAPI(
+          JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
+        );
 
         if (this.state.currentMenuTab !== 'wazuh-dev') {
           this.router.reload();
@@ -420,15 +436,15 @@ export const WzMenu = withWindowSize(
 
     buildPatternSelector() {
       return (
-        <EuiFormRow label="Selected index pattern">
+        <EuiFormRow label='Selected index pattern'>
           <EuiSelect
-            id="selectIndexPattern"
-            options={this.state.patternList.map((item) => {
+            id='selectIndexPattern'
+            options={this.state.patternList.map(item => {
               return { value: item.id, text: item.title };
             })}
             value={this.state.currentSelectedPattern}
             onChange={this.changePattern}
-            aria-label="Index pattern selector"
+            aria-label='Index pattern selector'
           />
         </EuiFormRow>
       );
@@ -436,15 +452,15 @@ export const WzMenu = withWindowSize(
 
     buildApiSelector() {
       return (
-        <EuiFormRow label="Selected API">
+        <EuiFormRow label='Selected API'>
           <EuiSelect
-            id="selectAPI"
-            options={this.state.APIlist.map((item) => {
+            id='selectAPI'
+            options={this.state.APIlist.map(item => {
               return { value: item.id, text: item.id };
             })}
             value={this.state.currentAPI}
             onChange={this.changeAPI}
-            aria-label="API selector"
+            aria-label='API selector'
           />
         </EuiFormRow>
       );
@@ -453,10 +469,10 @@ export const WzMenu = withWindowSize(
     buildWazuhNotReadyYet() {
       const container = document.getElementsByClassName('wazuhNotReadyYet');
       return ReactDOM.createPortal(
-        <EuiCallOut title={this.props.state.wazuhNotReadyYet} color="warning">
+        <EuiCallOut title={this.props.state.wazuhNotReadyYet} color='warning'>
           <EuiFlexGroup
             responsive={false}
-            direction="row"
+            direction='row'
             style={{ maxHeight: '40px', marginTop: '-45px' }}
           >
             <EuiFlexItem>
@@ -467,16 +483,17 @@ export const WzMenu = withWindowSize(
                 <EuiFlexItem grow={false}>
                   <p>
                     {' '}
-                    <EuiLoadingSpinner size="l" /> &nbsp; &nbsp;{' '}
+                    <EuiLoadingSpinner size='l' /> &nbsp; &nbsp;{' '}
                   </p>
                 </EuiFlexItem>
               )}
-            {this.props.state.wazuhNotReadyYet === 'Wazuh could not be recovered.' && (
+            {this.props.state.wazuhNotReadyYet ===
+              'Wazuh could not be recovered.' && (
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
                   onClick={() => location.reload()}
-                  className="WzNotReadyButton"
+                  className='WzNotReadyButton'
                 >
                   <span> Reload </span>
                 </EuiButtonEmpty>
@@ -484,7 +501,7 @@ export const WzMenu = withWindowSize(
             )}
           </EuiFlexGroup>
         </EuiCallOut>,
-        container[0]
+        container[0],
       );
     }
 
@@ -497,10 +514,10 @@ export const WzMenu = withWindowSize(
       }
       const { filterManager } = getDataPlugin().query;
       const currentAppliedFilters = filterManager.getFilters();
-      const agentFilters = currentAppliedFilters.filter((x) => {
+      const agentFilters = currentAppliedFilters.filter(x => {
         return x.meta.key === 'agent.id';
       });
-      agentFilters.map((x) => {
+      agentFilters.map(x => {
         filterManager.removeFilter(x);
       });
     }
@@ -533,14 +550,14 @@ export const WzMenu = withWindowSize(
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
               <EuiSelect
-                id="selectAPIBar"
+                id='selectAPIBar'
                 fullWidth={true}
-                options={this.state.APIlist.map((item) => {
+                options={this.state.APIlist.map(item => {
                   return { value: item.id, text: item.id };
                 })}
                 value={this.state.currentAPI}
                 onChange={this.changeAPI}
-                aria-label="API selector"
+                aria-label='API selector'
               />
             </div>
           </EuiFlexItem>
@@ -563,14 +580,14 @@ export const WzMenu = withWindowSize(
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
               <EuiSelect
-                id="selectIndexPatternBar"
+                id='selectIndexPatternBar'
                 fullWidth={true}
-                options={this.state.patternList.map((item) => {
+                options={this.state.patternList.map(item => {
                   return { value: item.id, text: item.title };
                 })}
                 value={this.state.currentSelectedPattern}
                 onChange={this.changePattern}
-                aria-label="Index pattern selector"
+                aria-label='Index pattern selector'
               />
             </div>
           </EuiFlexItem>
@@ -586,14 +603,14 @@ export const WzMenu = withWindowSize(
 
     render() {
       const openSelectorsButton = (
-        <EuiToolTip position="bottom" content="Show selectors">
+        <EuiToolTip position='bottom' content='Show selectors'>
           <EuiButtonEmpty
-            iconType="boxesVertical"
-            iconSide="right"
+            iconType='boxesVertical'
+            iconSide='right'
             style={{ position: 'relative', right: 0 }}
             onClick={() => this.switchSelectorsPopOver()}
-            size="s"
-            aria-label="Open selectors"
+            size='s'
+            aria-label='Open selectors'
           ></EuiButtonEmpty>
         </EuiToolTip>
       );
@@ -602,9 +619,9 @@ export const WzMenu = withWindowSize(
         <>
           <MountPointPortal setMountPoint={getHeaderActionMenuMounter()}>
             <EuiFlexGroup
-              alignItems="center"
+              alignItems='center'
               responsive={false}
-              className="wz-margin-left-10 wz-margin-right-10"
+              className='wz-margin-left-10 wz-margin-right-10'
             >
               {!this.showSelectorsInPopover &&
                 this.state.patternList.length > 1 &&
@@ -615,26 +632,30 @@ export const WzMenu = withWindowSize(
                 this.getApiSelectorComponent()}
 
               {this.showSelectorsInPopover &&
-                (this.state.patternList.length > 1 || this.state.APIlist.length > 1) && (
+                (this.state.patternList.length > 1 ||
+                  this.state.APIlist.length > 1) && (
                   <>
                     <EuiFlexItem grow={false}>
                       <EuiPopover
                         ownFocus
-                        anchorPosition="downCenter"
+                        anchorPosition='downCenter'
                         button={openSelectorsButton}
                         isOpen={this.state.isSelectorsPopoverOpen}
                         closePopover={() => this.switchSelectorsPopOver()}
                       >
                         {this.state.patternList.length > 1 && (
-                          <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
+                          <EuiFlexGroup
+                            alignItems='center'
+                            style={{ paddingTop: 5 }}
+                          >
                             {this.getIndexPatternSelectorComponent()}
                           </EuiFlexGroup>
                         )}
                         {this.state.APIlist.length > 1 && (
                           <EuiFlexGroup
-                            alignItems="center"
+                            alignItems='center'
                             style={{ paddingTop: 5 }}
-                            direction="row"
+                            direction='row'
                           >
                             {this.getApiSelectorComponent()}
                           </EuiFlexGroup>
@@ -643,16 +664,17 @@ export const WzMenu = withWindowSize(
                     </EuiFlexItem>
                   </>
                 )}
-              {this.props.state.wazuhNotReadyYet && this.buildWazuhNotReadyYet()}
+              {this.props.state.wazuhNotReadyYet &&
+                this.buildWazuhNotReadyYet()}
             </EuiFlexGroup>
           </MountPointPortal>
         </>
       );
     }
-  }
+  },
 );
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.appStateReducers,
     appConfig: state.appConfig,

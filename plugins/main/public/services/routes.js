@@ -68,8 +68,8 @@ function nestedResolve($q, errorHandler, $rootScope, $location, $window) {
       GenericRequest,
       errorHandler,
       wzMisc,
-      location && location.includes('/health-check')
-    )
+      location && location.includes('/health-check'),
+    ),
   );
 }
 
@@ -103,7 +103,7 @@ function enableWzMenu($rootScope, $location) {
 const app = getAngularModule();
 
 const redirectTo = () => getWzMainParams();
-app.config(($routeProvider) => {
+app.config($routeProvider => {
   $routeProvider
     .when('/health-check', {
       template: healthCheckTemplate,

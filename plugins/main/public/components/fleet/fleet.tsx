@@ -24,9 +24,8 @@ import {
   EuiCard,
   EuiLink,
 } from '@elastic/eui';
-import { AgentsTable } from './table/agent-table';
+import { AgentsTable } from './table/agents-table';
 import { WzRequest } from '../../react-services/wz-request';
-import KibanaVis from '../../kibana-integrations/kibana-vis';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
 import { AppState } from '../../react-services/app-state';
