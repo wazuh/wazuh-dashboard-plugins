@@ -11,16 +11,16 @@
  */
 import { AgentsPreviewController } from './agents-preview';
 import { AgentsController } from './agents';
-import { RegisterAgent } from '../../components/fleet/register-agent/containers/register-agent/register-agent';
+import { RegisterAgent } from '../../components/endpoints-summary/register-agent/containers/register-agent/register-agent';
 import { ExportConfiguration } from './components/export-configuration';
 import { AgentsWelcome } from '../../components/common/welcome/agents-welcome';
 import { Mitre } from '../../components/overview';
-import { AgentsTable } from '../../components/fleet/table/agents-table';
+import { AgentsTable } from '../../components/endpoints-summary/table/agents-table';
 import { MainModule } from '../../components/common/modules/main';
 import { MainSyscollector } from '../../components/agents/syscollector/main';
 import { MainAgentStats } from '../../components/agents/stats';
 import { getAngularModule } from '../../kibana-services';
-import { MainFleet } from '../../components/fleet';
+import { MainEndpointsSummary } from '../../components/endpoints-summary';
 
 const app = getAngularModule();
 
@@ -35,4 +35,4 @@ app
   .value('MainSyscollector', MainSyscollector)
   .value('MainAgentStats', MainAgentStats)
   .value('MainModule', MainModule)
-  .value('FleetPreview', MainFleet);
+  .value('MainEndpointsSummary', MainEndpointsSummary);

@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { EuiPage, EuiPageBody, EuiEmptyPrompt, EuiProgress } from '@elastic/eui';
+import {
+  EuiPage,
+  EuiPageBody,
+  EuiEmptyPrompt,
+  EuiProgress,
+} from '@elastic/eui';
 import { RegisterAgent } from '../../controllers/register-agent/containers/register-agent/register-agent';
-import { Fleet } from './fleet';
+import { EndpointsSummary } from './endpoints-summary';
 import { WzRequest } from '../../react-services/wz-request';
 import { endpointSumary } from '../../utils/applications';
 import { withReduxProvider, withGlobalBreadcrumb } from '../common/hocs';
@@ -9,9 +14,9 @@ import { compose } from 'redux';
 import { WzButtonPermissions } from '../common/permissions/button';
 import { getCore } from '../../kibana-services';
 
-export const MainFleet = compose(
+export const MainEndpointsSummary = compose(
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: endpointSumary.title }])
+  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
 )(() => {
   const [isSummaryLoading, setIsSummaryLoading] = useState(true);
   const [agentStatusSummary, setAgentStatusSummary] = useState();
@@ -23,7 +28,10 @@ export const MainFleet = compose(
 
     const {
       data: {
-        data: { connection: agentStatusSummary, configuration: agentConfiguration },
+        data: {
+          connection: agentStatusSummary,
+          configuration: agentConfiguration,
+        },
       },
     } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
 
@@ -34,7 +42,9 @@ export const MainFleet = compose(
 
     setAgentStatusSummary(agentStatusSummary);
     setAgentCount(agentStatusSummary.total ?? 0);
-    setAgentsActiveCoverage(isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage);
+    setAgentsActiveCoverage(
+      isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
+    );
     setIsSummaryLoading(false);
   };
 
@@ -44,9 +54,9 @@ export const MainFleet = compose(
 
   if (isSummaryLoading) {
     return (
-      <EuiPage paddingSize="m">
+      <EuiPage paddingSize='m'>
         <EuiPageBody>
-          <EuiProgress size="xs" color="primary" />
+          <EuiProgress size='xs' color='primary' />
         </EuiPageBody>
       </EuiPage>
     );
@@ -55,15 +65,15 @@ export const MainFleet = compose(
   if (agentCount === 0) {
     return (
       <EuiEmptyPrompt
-        iconType="watchesApp"
+        iconType='watchesApp'
         title={<h2>There are no agents</h2>}
         body={<p>Add agents to fleet to start monitoring</p>}
         actions={
           <WzButtonPermissions
-            color="primary"
+            color='primary'
             fill
             permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
-            iconType="plusInCircle"
+            iconType='plusInCircle'
             href={getCore().application.getUrlForApp('endpoints-summary', {
               path: '#/agents-preview/deploy',
             })}
@@ -76,9 +86,9 @@ export const MainFleet = compose(
   }
 
   return (
-    <EuiPage paddingSize="m">
+    <EuiPage paddingSize='m'>
       <EuiPageBody>
-        <Fleet
+        <EndpointsSummary
           agentStatusSummary={agentStatusSummary}
           agentsActiveCoverage={agentsActiveCoverage}
         />

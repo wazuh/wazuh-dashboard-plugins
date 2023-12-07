@@ -30,7 +30,10 @@ import {
 } from '../../../../common/hocs';
 import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
-import { validateServerAddress, validateAgentName } from '../../utils/validations';
+import {
+  validateServerAddress,
+  validateAgentName,
+} from '../../utils/validations';
 import { compose } from 'redux';
 import { endpointSumary } from '../../../../../utils/applications';
 import { getCore } from '../../../../../kibana-services';
@@ -44,12 +47,14 @@ interface IRegisterAgentProps {
 export const RegisterAgent = compose(
   withReduxProvider,
   withGlobalBreadcrumb([
-    { text: endpointSumary.title, href: '#/agents-preview' },
+    { text: endpointSumary.title, href: `#${endpointSumary.redirectTo()}` },
     { text: 'Deploy new agent' },
   ]),
-  withUserAuthorizationPrompt([[{ action: 'agent:read', resource: 'agent:group:*' }]])
+  // withUserAuthorizationPrompt([[{ action: 'agent:read', resource: 'agent:group:*' }]])
 )(({ getWazuhVersion, addNewAgent, reload }: IRegisterAgentProps) => {
-  const configuration = useSelector((state: { appConfig: { data: any } }) => state.appConfig.data);
+  const configuration = useSelector(
+    (state: { appConfig: { data: any } }) => state.appConfig.data,
+  );
   const [wazuhVersion, setWazuhVersion] = useState('');
   const [haveUdpProtocol, setHaveUdpProtocol] = useState<boolean | null>(false);
   const [loading, setLoading] = useState(false);
@@ -61,7 +66,7 @@ export const RegisterAgent = compose(
     operatingSystemSelection: {
       type: 'custom',
       initialValue: '',
-      component: (props) => {
+      component: props => {
         return <OsCard {...props} />;
       },
       options: {
@@ -82,7 +87,7 @@ export const RegisterAgent = compose(
     agentGroups: {
       type: 'custom',
       initialValue: [],
-      component: (props) => {
+      component: props => {
         return <GroupInput {...props} />;
       },
       options: {
@@ -102,7 +107,11 @@ export const RegisterAgent = compose(
 
   const getAuthInfo = async () => {
     try {
-      const result = await WzRequest.apiReq('GET', '/agents/000/config/auth/auth', {});
+      const result = await WzRequest.apiReq(
+        'GET',
+        '/agents/000/config/auth/auth',
+        {},
+      );
       return (result.data || {}).data || {};
     } catch (error) {
       ErrorHandler.handleError(error);
@@ -119,7 +128,10 @@ export const RegisterAgent = compose(
         let wazuhPassword = '';
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
-          wazuhPassword = configuration['enrollment.password'] || authInfo['authd.pass'] || '';
+          wazuhPassword =
+            configuration['enrollment.password'] ||
+            authInfo['authd.pass'] ||
+            '';
         }
         const groups = await getGroups();
         setNeedsPassword(needsPassword);
@@ -149,22 +161,27 @@ export const RegisterAgent = compose(
     fetchData();
   }, []);
 
-  const osCard = <InputForm {...form.fields.operatingSystemSelection}></InputForm>;
+  const osCard = (
+    <InputForm {...form.fields.operatingSystemSelection}></InputForm>
+  );
 
   return (
     <div>
-      <EuiPage restrictWidth="1000px" style={{ background: 'transparent' }}>
+      <EuiPage restrictWidth='1000px' style={{ background: 'transparent' }}>
         <EuiPageBody>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiPanel className="register-agent-wizard-container">
-                <div className="register-agent-wizard-close">
+              <EuiPanel className='register-agent-wizard-container'>
+                <div className='register-agent-wizard-close'>
                   <EuiButtonEmpty
-                    size="s"
-                    href={getCore().application.getUrlForApp('endpoints-summary', {
-                      path: '#/agents-preview',
-                    })}
-                    iconType="cross"
+                    size='s'
+                    href={getCore().application.getUrlForApp(
+                      'endpoints-summary',
+                      {
+                        path: '#/agents-preview',
+                      },
+                    )}
+                    iconType='cross'
                   >
                     Close
                   </EuiButtonEmpty>
@@ -172,7 +189,9 @@ export const RegisterAgent = compose(
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle>
-                      <h2 className="register-agent-wizard-title">Deploy new agent</h2>
+                      <h2 className='register-agent-wizard-title'>
+                        Deploy new agent
+                      </h2>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -180,7 +199,7 @@ export const RegisterAgent = compose(
                 {loading ? (
                   <>
                     <EuiFlexItem>
-                      <EuiProgress size="xs" color="primary" />
+                      <EuiProgress size='xs' color='primary' />
                     </EuiFlexItem>
                     <EuiSpacer></EuiSpacer>
                   </>
@@ -197,15 +216,21 @@ export const RegisterAgent = compose(
                     />
                   </EuiFlexItem>
                 )}
-                <EuiFlexGroup justifyContent="flexEnd" style={{ marginRight: '0.3rem' }}>
+                <EuiFlexGroup
+                  justifyContent='flexEnd'
+                  style={{ marginRight: '0.3rem' }}
+                >
                   <EuiFlexItem grow={false}>
                     <EuiButton
-                      className="close-button"
+                      className='close-button'
                       fill
-                      color="primary"
-                      href={getCore().application.getUrlForApp('endpoints-summary', {
-                        path: '#/agents-preview',
-                      })}
+                      color='primary'
+                      href={getCore().application.getUrlForApp(
+                        'endpoints-summary',
+                        {
+                          path: '#/agents-preview',
+                        },
+                      )}
                     >
                       Close
                     </EuiButton>
