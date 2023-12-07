@@ -1,17 +1,18 @@
 version: '2.2'
 
-x-logging: &logging
-  logging:
-    driver: loki
-    options:
-      loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
+# x-logging: &logging
+#   logging:
+#     driver: loki
+#     options:
+#       loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
 
 services:
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
-    <<: *logging
+    #<<: *logging
     hostname: exporter-osd-${OS_VERSION}
     profiles:
+      - 'server'
       - 'saml'
       - 'standard'
     networks:
@@ -24,7 +25,7 @@ services:
 
   imposter:
     image: outofcoffee/imposter
-    <<: *logging
+    #<<: *logging
     hostname: imposter-osd-${OS_VERSION}
     networks:
       - os-dev
@@ -37,8 +38,9 @@ services:
 
   generator:
     image: cfssl/cfssl
-    <<: *logging
+    #<<: *logging
     profiles:
+      - 'server'
       - 'saml'
       - 'standard'
     volumes:
@@ -128,8 +130,9 @@ services:
         condition: service_completed_successfully
         required: false
     image: opensearchproject/opensearch:${OS_VERSION}
-    <<: *logging
+    #<<: *logging
     profiles:
+      - 'server'
       - 'saml'
       - 'standard'
     environment:
@@ -183,7 +186,7 @@ services:
     networks:
       - os-dev
       - mon
-    <<: *logging
+    #<<: *logging
     # restart: always
     entrypoint:
       - '/bin/bash'
@@ -212,6 +215,7 @@ services:
         condition: service_healthy
     image: quay.io/wazuh/osd-dev:${OSD_VERSION}
     profiles:
+      - 'server'
       - 'saml'
       - 'standard'
     hostname: osd
@@ -220,7 +224,7 @@ services:
       - devel
       - mon
     user: '1000:1000'
-    <<: *logging
+    #<<: *logging
     ports:
       - ${OSD_PORT}:5601
     environment:
@@ -272,7 +276,7 @@ services:
     profiles:
       - 'saml'
     hostname: idp
-    <<: *logging
+    #<<: *logging
     networks:
       - os-dev
       - mon
@@ -301,7 +305,7 @@ services:
     profiles:
       - 'saml'
     hostname: idpsetup
-    <<: *logging
+    #<<: *logging
     networks:
       - os-dev
       - mon
@@ -315,6 +319,38 @@ services:
        bash /enable_saml.sh
        exit 0
       '
+  wazuh.manager:
+    build:
+      context: ../images/wazuh-server-filebeat-sources-cmake
+      args:
+        WAZUH_VERSION: ${WAZUH_VERSION}
+        FILEBEAT_VERSION: 7.10.2
+        FILEBEAT_WAZUH_TEMPLATE_URL: https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_VERSION}/extensions/elasticsearch/7.x/wazuh-template.json
+        FILEBEAT_WAZUH_MODULE_URL: https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.3.tar.gz
+    image: wazuh-server-filebeat-sources-cmake:${WAZUH_VERSION}-7.10.2
+    profiles:
+      - 'server'
+    hostname: wazuh.manager
+    #<<: *logging
+    networks:
+      - os-dev
+      - mon
+    volumes:
+      - wm_certs:/etc/ssl/elastic
+      - ./config/${OSD_MAJOR}/filebeat/filebeat.server.yml:/etc/filebeat/filebeat.yml
+    ports:
+      - '514:514'
+      - '1514:1514'
+      - '1515:1515'
+      - '1516:1516'
+      - '55000:55000'
+    depends_on:
+      os1:
+        condition: service_healthy
+    environment:
+      NODE_IP: wazuh-manager-master
+      NODE_NAME: master-node
+      NODE_TYPE: master
 
 networks:
   os-dev:

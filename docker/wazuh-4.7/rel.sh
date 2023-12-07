@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 versions=(
-	"4.6.0"
+	"4.7.0"
+  "4.7.1"
+  "4.7.2"
 )
 
 usage() {

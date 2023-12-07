@@ -29,7 +29,7 @@ osd_versions=(
 
 usage() {
   echo
-  echo "./dev.sh os_version osd_version /wazuh_app_src action [saml]"
+  echo "./dev.sh os_version osd_version /wazuh_app_src action [saml/server]"
   echo
   echo "where"
   echo "  os_version is one of " ${os_versions[*]}
@@ -37,6 +37,7 @@ usage() {
   echo "  wazuh_app_src is the path to the wazuh application source code"
   echo "  action is one of up | down | stop"
   echo "  saml to deploy a saml enabled environment"
+  echo "  server to deploy a real server enabled environment"
   exit -1
 }
 
@@ -97,6 +98,10 @@ if [[ "$5" =~ "saml" ]]; then
   export SEC_CONFIG_FILE=./config/${OSD_MAJOR}/os/config-saml.yml
 fi
 
+if [[ "$5" =~ "server" ]]; then
+  profile="server"
+fi
+
 export SEC_CONFIG_PATH=/usr/share/opensearch/plugins/opensearch-security/securityconfig
 if [[ "$OSD_MAJOR" == "2.x" ]]; then
   export SEC_CONFIG_PATH=/usr/share/opensearch/config/opensearch-security
@@ -105,13 +110,31 @@ fi
 case "$4" in
 up)
   /bin/bash ../scripts/create_docker_networks.sh
-  docker compose --profile $profile -f dev.yml up -Vd
+  docker compose --profile $profile --env-file dev.env -f dev.yml up -Vd
+
+  # Display a command to deploy an agent when using the real server
+  if [[ "$5" =~ "server" ]]; then
+    WAZUH_AGENT_VERSION=$(grep "^WAZUH_VERSION=" dev.env | sed "s|WAZUH_VERSION=||")
+    echo
+    echo "1. (Optional) Enroll an agent (Ubuntu 20.04):"
+    echo "docker run --name ${COMPOSE_PROJECT_NAME}-agent --network ${COMPOSE_PROJECT_NAME} --label com.docker.compose.project=${COMPOSE_PROJECT_NAME} -d ubuntu:20.04 bash -c '"
+    echo "  apt update -y"
+    echo "  apt install -y curl lsb-release"
+    echo "  curl -so \wazuh-agent-${WAZUH_AGENT_VERSION}.deb \\"
+    echo "    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${WAZUH_AGENT_VERSION}-1_amd64.deb \\"
+    echo "    && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-${WAZUH_AGENT_VERSION}.deb"
+    echo
+    echo "  /etc/init.d/wazuh-agent start"
+    echo "  tail -f /var/ossec/logs/ossec.log"
+    echo "'"
+    echo
+  fi
   ;;
 down)
-  docker compose --profile $profile -f dev.yml down -v --remove-orphans
+  docker compose --profile $profile --env-file dev.env -f dev.yml down -v --remove-orphans
   ;;
 stop)
-  docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
+  docker compose --profile $profile --env-file dev.env -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
   ;;
 *)
   echo "Action must be up | down | stop: "
