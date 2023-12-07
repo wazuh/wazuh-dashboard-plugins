@@ -7,7 +7,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.7.2
-- Improved Agents preview page load when there are no registered agents [#6185](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6185)
+
+### Fixed
+
+- Fixed Agents preview page load when there are no registered agents [#6185](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6185)
 
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 01
 

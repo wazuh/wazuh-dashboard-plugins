@@ -227,7 +227,7 @@ export const AgentsPreview = compose(
         this.state.agentStatusSummary.total === '-'
       ) {
         return (
-          <div class='md-padding md-padding-top-16'>
+          <div className='md-padding md-padding-top-16'>
             <EuiProgress size='xs' color='primary' />
           </div>
         );
