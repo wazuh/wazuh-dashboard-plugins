@@ -36,10 +36,10 @@ import {
   withReduxProvider,
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
+  withErrorBoundary,
 } from '../common/hocs';
 import { formatUIDate } from '../../../public/react-services/time-service';
 import { compose } from 'redux';
-import { withErrorBoundary } from '../common/hocs';
 import {
   UI_LOGGER_LEVELS,
   UI_ORDER_AGENT_STATUS,

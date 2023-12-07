@@ -5,7 +5,6 @@ import {
   EuiEmptyPrompt,
   EuiProgress,
 } from '@elastic/eui';
-import { RegisterAgent } from '../../controllers/register-agent/containers/register-agent/register-agent';
 import { EndpointsSummary } from './endpoints-summary';
 import { WzRequest } from '../../react-services/wz-request';
 import { endpointSumary } from '../../utils/applications';

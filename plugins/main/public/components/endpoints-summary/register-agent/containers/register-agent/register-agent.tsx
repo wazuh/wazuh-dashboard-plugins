@@ -15,15 +15,18 @@ import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { ErrorHandler } from '../../../../../react-services/error-management';
-import { getMasterRemoteConfiguration } from '../../../../../controllers/agent/components/register-agent-service';
 import './register-agent.scss';
 import { Steps } from '../steps/steps';
 import { InputForm } from '../../../../common/form';
-import { getGroups } from '../../services/register-agent-services';
+import {
+  getGroups,
+  getMasterRemoteConfiguration,
+} from '../../services/register-agent-services';
 import { useForm } from '../../../../common/form/hooks';
 import { FormConfiguration } from '../../../../common/form/types';
 import { useSelector } from 'react-redux';
 import {
+  withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
@@ -37,21 +40,17 @@ import {
 import { compose } from 'redux';
 import { endpointSumary } from '../../../../../utils/applications';
 import { getCore } from '../../../../../kibana-services';
-
-interface IRegisterAgentProps {
-  getWazuhVersion: () => Promise<string>;
-  addNewAgent: (agent: any) => Promise<any>;
-  reload: () => void;
-}
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 export const RegisterAgent = compose(
+  withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([
     { text: endpointSumary.title, href: `#${endpointSumary.redirectTo()}` },
     { text: 'Deploy new agent' },
   ]),
   // withUserAuthorizationPrompt([[{ action: 'agent:read', resource: 'agent:group:*' }]])
-)(({ getWazuhVersion, addNewAgent, reload }: IRegisterAgentProps) => {
+)(() => {
   const configuration = useSelector(
     (state: { appConfig: { data: any } }) => state.appConfig.data,
   );
@@ -115,6 +114,27 @@ export const RegisterAgent = compose(
       return (result.data || {}).data || {};
     } catch (error) {
       ErrorHandler.handleError(error);
+    }
+  };
+
+  const getWazuhVersion = async () => {
+    try {
+      const data = await WzRequest.apiReq('GET', '/', {});
+      const result = ((data || {}).data || {}).data || {};
+      return result.api_version;
+    } catch (error) {
+      const options = {
+        context: `RegisterAgent.getWazuhVersion`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Could not get the Wazuh version: ${error.message || error}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      return version;
     }
   };
 
