@@ -1,65 +1,9 @@
 import { SearchResponse } from "../../../../../../src/core/server";
-import { getPlugins } from '../../../kibana-services';
-import { IndexPattern, Filter, OpenSearchQuerySortValue } from "../../../../../../src/plugins/data/public";
 import * as FileSaver from '../../../services/file-saver';
 import { beautifyDate } from "../../agents/vuls/inventory/lib";
+import { SearchParams, search } from "../search_bar/use_search_bar_service";
+import { IFieldType, IndexPattern } from "../../../../../../src/plugins/data/common";
 export const MAX_ENTRIES_PER_QUERY = 10000;
-
-
-interface SearchParams {
-    indexPattern: IndexPattern;
-    filters?: Filter[];
-    query?: any;
-    pagination?: {
-        pageIndex?: number;
-        pageSize?: number;
-    };
-    fields?: string[],
-    sorting?: {
-        columns: {
-            id: string;
-            direction: 'asc' | 'desc';
-        }[];
-    };
-}
-
-export const search = async (params: SearchParams): Promise<SearchResponse | void> => {
-    const { indexPattern, filters = [], query, pagination, sorting, fields } = params;
-    if(!indexPattern){
-        return;
-    }
-    const data = getPlugins().data;
-    const searchSource = await data.search.searchSource.create();
-    const fromField = (pagination?.pageIndex || 0) * (pagination?.pageSize || 100);
-    const sortOrder: OpenSearchQuerySortValue[] = sorting?.columns.map((column) => {
-        const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
-        return { [column?.id || '']: sortDirection } as OpenSearchQuerySortValue;
-    }) || [];
-
-    const searchParams = searchSource
-        .setParent(undefined)
-        .setField('filter', filters)
-        .setField('query', query)
-        .setField('sort', sortOrder)
-        .setField('size', pagination?.pageSize)
-        .setField('from', fromField)
-        .setField('index', indexPattern)
-
-    // add fields
-    if (fields && Array.isArray(fields) && fields.length > 0){
-        searchParams.setField('fields', fields);
-    }
-    try{
-        return await searchParams.fetch();
-    }catch(error){
-        if(error.body){
-            throw error.body;
-        }
-        throw error;
-    }
-
-};
-
 
 export const parseData = (resultsHits: SearchResponse['hits']['hits']): any[] => {
     const data = resultsHits.map((hit) => {
@@ -93,13 +37,19 @@ export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) 
                 fieldValue = fieldValue[field];
             }
         });
-
     } else {
-        fieldValue = rowsParsed[rowIndex][columnId].formatted
-            ? rowsParsed[rowIndex][columnId].formatted
-            : rowsParsed[rowIndex][columnId];
+        const rowValue = rowsParsed[rowIndex];
+        // when not exist the column in the row value then the value is null
+        if(!rowValue.hasOwnProperty(columnId)){
+            fieldValue = null;
+        }else{
+            fieldValue = rowValue[columnId]?.formatted || rowValue[columnId];
+        }
     }
-
+    // when fieldValue is null or undefined then return a empty string
+    if (fieldValue === null || fieldValue === undefined) {
+        return '';
+    }
     // if is date field
     if (field?.type === 'date') {
         // @ts-ignore
@@ -108,6 +58,7 @@ export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) 
     return fieldValue;
 }
 
+// receive search params
 export const exportSearchToCSV = async (params: SearchParams): Promise<void> => {
     const DEFAULT_MAX_SIZE_PER_CALL = 1000;
     const { indexPattern, filters = [], query, sorting, fields, pagination } = params;
@@ -191,4 +142,20 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
     if (blobData) {
         FileSaver?.saveAs(blobData, `vulnerabilities_inventory-${new Date().toISOString()}.csv`);
     }
+}
+
+export const parseColumns = (fields: IFieldType[]): EuiDataGridColumn[] => {
+    // remove _source field becuase is a object field and is not supported
+    fields = fields.filter((field) => field.name !== '_source');
+    return fields.map((field) => {
+        return {
+            ...field,
+            id: field.name,
+            display: field.name,
+            schema: field.type,
+            actions: {
+                showHide: true,
+            },
+        };
+    }) || [];
 }

@@ -23,7 +23,7 @@ import { SearchResponse } from '../../../../../../src/core/server';
 import DocViewer from '../doc_viewer/doc_viewer';
 import { DiscoverNoResults } from '../../overview/vulnerabilities/common/components/no_results';
 import { LoadingSpinner } from '../../overview/vulnerabilities/common/components/loading_spinner';
-import { useDataGrid } from '../data_grid/use_data_grid';
+import { useDataGrid, tDataGridColumn } from '../data_grid';
 import { useDocViewer } from '../doc_viewer/use_doc_viewer';
 //import './inventory.scss';
 import { search, exportSearchToCSV } from '../../overview/vulnerabilities/dashboards/inventory/inventory_service';
@@ -31,39 +31,32 @@ import { ErrorHandler, ErrorFactory, HttpError } from '../../../react-services/e
 import { withErrorBoundary } from '../hocs';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
-import useSearchBarConfiguration from '../search_bar/use_search_bar_configuration';
+import useSearchBar from '../search_bar/use_search_bar';
 import { getPlugins } from '../../../kibana-services';
 import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
 import { getDiscoverPanels } from './config/chart';
 const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
 
+/**
+ * ToDo:
+ * - add possibility to customize column render
+ * - add save query feature
+ */
+
+
+
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
-const defaultTableColumns: EuiDataGridColumn[] = [{
-  id: 'timestamp'
-},
-{
-  id: 'agent.name'
-},
-{
-  id: 'rule.description'
-},
-{
-  id: 'rule.level'
-},
-{
-  id: 'rule.id'
-}]
-
 type WazuhDiscoverProps = {
-  indexPattern: string;
-  tableColumns: EuiDataGridColumn[];
+  indexPatternName: string;
+  tableColumns: tDataGridColumn[];
 }
 
-const WazuhDiscover = () => {
-  const { searchBarProps } = useSearchBarConfiguration({
-    defaultIndexPatternID: 'wazuh-alerts-*',
+const WazuhDiscover = (props: WazuhDiscoverProps) => {
+  const { indexPatternName, tableColumns: defaultTableColumns } = props
+  const { searchBarProps } = useSearchBar({
+    defaultIndexPatternID: indexPatternName,
   })
   const { isLoading, filters, query, indexPatterns } = searchBarProps;
   const SearchBar = getPlugins().data.ui.SearchBar;

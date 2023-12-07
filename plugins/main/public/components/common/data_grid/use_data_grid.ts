@@ -1,35 +1,23 @@
 import { EuiDataGridCellValueElementProps, EuiDataGridColumn, EuiDataGridProps, EuiDataGridSorting } from "@elastic/eui"
 import React, { useEffect, useMemo, useState, Fragment } from "react";
 import { SearchResponse } from "@opensearch-project/opensearch/api/types";
-import { IFieldType, IndexPattern } from "../../../../../../src/plugins/data/common";
 // ToDo: check how create this methods
-import { parseData, getFieldFormatted } from './data_grid_service';
+import { parseData, getFieldFormatted, parseColumns } from './data_grid_service';
 
 const MAX_ENTRIES_PER_QUERY = 10000;
+
+export type tDataGridColumn = {
+    render?: (value: any) => string | React.ReactNode;
+} & EuiDataGridColumn;
 
 type tDataGridProps = {
     indexPattern: IndexPattern;
     results: SearchResponse;
-    defaultColumns: EuiDataGridColumn[];
+    defaultColumns: tDataGridColumn[];
     DocViewInspectButton: ({ rowIndex }: EuiDataGridCellValueElementProps) => React.JSX.Element
     ariaLabelledBy: string;
 };
 
-export const parseColumns = (fields: IFieldType[]): EuiDataGridColumn[] => {
-    // remove _source field becuase is a object field and is not supported
-    fields = fields.filter((field) => field.name !== '_source');
-    return fields.map((field) => {
-        return {
-            ...field,
-            id: field.name,
-            display: field.name,
-            schema: field.type,
-            actions: {
-                showHide: true,
-            },
-        };
-    }) || [];
-}
 
 export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     const { indexPattern, DocViewInspectButton, results, defaultColumns } = props;
@@ -49,15 +37,15 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     }
     const defaultSorting: EuiDataGridSorting['columns'] = getDefaultSorting();
     const [sortingColumns, setSortingColumns] = useState(defaultSorting);
-    const onSort = (sortingColumns) => {setSortingColumns(sortingColumns)};
+    const onSort = (sortingColumns) => { setSortingColumns(sortingColumns) };
     /** Pagination **/
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
     const onChangeItemsPerPage = useMemo(() => (pageSize) =>
-            setPagination((pagination) => ({
-                ...pagination,
-                pageSize,
-                pageIndex: 0,
-            })), [rows, rowCount]);
+        setPagination((pagination) => ({
+            ...pagination,
+            pageSize,
+            pageIndex: 0,
+        })), [rows, rowCount]);
     const onChangePage = (pageIndex) => setPagination((pagination) => ({ ...pagination, pageIndex }))
 
     useEffect(() => {
@@ -72,10 +60,17 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         const rowsParsed = parseData(rows);
         // On the context data always is stored the current page data (pagination)
         // then the rowIndex is relative to the current page
-        const relativeRowIndex = rowIndex % pagination.pageSize;        
-        return rowsParsed.hasOwnProperty(relativeRowIndex)
-            ? getFieldFormatted(relativeRowIndex, columnId, indexPattern, rowsParsed)
-            : null;
+        const relativeRowIndex = rowIndex % pagination.pageSize;
+        if(rowsParsed.hasOwnProperty(relativeRowIndex)){
+            const fieldFormatted = getFieldFormatted(relativeRowIndex, columnId, indexPattern, rowsParsed);
+            // check if column have render method initialized
+            const column = columns.find((column) => column.id === columnId);
+            if (column && column.render) {
+                return column.render(fieldFormatted);
+            }
+            return fieldFormatted;
+        }
+        return null
     };
 
     const leadingControlColumns = useMemo(() => {
