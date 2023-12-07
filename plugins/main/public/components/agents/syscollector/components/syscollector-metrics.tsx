@@ -107,7 +107,7 @@ export function InventoryMetrics({ agent }) {
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText>
-            Hostname:{' '}
+            Host name:{' '}
             {syscollector.isLoading ? (
               <EuiLoadingSpinner size='s' />
             ) : syscollector.data.os.hostname ? (

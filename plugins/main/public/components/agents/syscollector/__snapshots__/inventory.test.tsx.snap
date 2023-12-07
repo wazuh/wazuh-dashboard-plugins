@@ -84,7 +84,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Hostname: 
+              Host name: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2137,7 +2137,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Hostname: 
+              Host name: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4264,7 +4264,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             <div
               class="euiText euiText--medium"
             >
-              Hostname: 
+              Host name: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
