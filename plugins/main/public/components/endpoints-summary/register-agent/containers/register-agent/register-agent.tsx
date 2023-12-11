@@ -49,7 +49,6 @@ export const RegisterAgent = compose(
     { text: endpointSumary.title, href: `#${endpointSumary.redirectTo()}` },
     { text: 'Deploy new agent' },
   ]),
-  // withUserAuthorizationPrompt([[{ action: 'agent:read', resource: 'agent:group:*' }]])
 )(() => {
   const configuration = useSelector(
     (state: { appConfig: { data: any } }) => state.appConfig.data,
