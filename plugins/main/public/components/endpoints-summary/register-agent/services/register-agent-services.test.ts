@@ -1,9 +1,9 @@
-import * as RegisterAgentService from './register-agent-service';
-import { WzRequest } from '../../../react-services/wz-request';
-import { ServerAddressOptions } from '../register-agent/steps';
+import * as RegisterAgentService from './register-agent-services';
+import { WzRequest } from '../../../../react-services/wz-request';
+import { ServerAddressOptions } from './register-agent-services';
 
-jest.mock('../../../react-services', () => ({
-  ...(jest.requireActual('../../../react-services') as object),
+jest.mock('../../../../react-services', () => ({
+  ...(jest.requireActual('../../../../react-services') as object),
   WzRequest: () => ({
     apiReq: jest.fn(),
   }),

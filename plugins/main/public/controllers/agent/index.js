@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AgentsPreviewController } from './agents-preview';
 import { AgentsController } from './agents';
 import { RegisterAgent } from '../../components/endpoints-summary/register-agent/containers/register-agent/register-agent';
 import { ExportConfiguration } from './components/export-configuration';
@@ -26,8 +25,6 @@ const app = getAngularModule();
 
 app
   .controller('agentsController', AgentsController)
-  .controller('agentsPreviewController', AgentsPreviewController)
-  .value('RegisterAgent', RegisterAgent)
   .value('ExportConfiguration', ExportConfiguration)
   .value('AgentsWelcome', AgentsWelcome)
   .value('Mitre', Mitre)
@@ -36,3 +33,4 @@ app
   .value('MainAgentStats', MainAgentStats)
   .value('MainModule', MainModule)
   .value('MainEndpointsSummary', MainEndpointsSummary);
+  .value('RegisterAgent', RegisterAgent)
