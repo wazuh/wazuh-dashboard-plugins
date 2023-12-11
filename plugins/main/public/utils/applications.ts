@@ -713,22 +713,6 @@ export const appSettings = {
   redirectTo: () => '/settings?tab=configuration',
 };
 
-const appLogs = {
-  category: 'management',
-  id: 'app-logs',
-  title: i18n.translate('wz-app-app-logs-title', {
-    defaultMessage: 'App Logs',
-  }),
-  description: i18n.translate('wz-app-app-logs-description', {
-    defaultMessage: 'Explore the logs related to the applications.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 8904,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/settings?tab=logs',
-};
-
 const about = {
   category: 'management',
   id: 'about',
@@ -782,7 +766,6 @@ export const Applications = [
   serverApis,
   sampleData,
   appSettings,
-  appLogs,
   about,
 ].sort((a, b) => {
   // Sort applications by order

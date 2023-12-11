@@ -677,22 +677,3 @@ hosts:
     },
   );
 });
-
-describe.skip('[endpoint] GET /utils/logs', () => {
-  // TODO: adapt or remove
-  beforeAll(() => {
-    // Create the configuration file with custom content
-    const fileContent = `---
-{"date":"2022-09-20T08:36:16.688Z","level":"info","location":"initialize","message":"Kibana index: .kibana"}
-{"date":"2022-09-20T08:36:16.689Z","level":"info","location":"initialize","message":"App revision: 4400"}
-`;
-  });
-
-  it(`Get plugin logs. GET /utils/logs`, async () => {
-    const response = await supertest(innerServer.listener)
-      .get('/utils/logs')
-      .expect(200);
-
-    expect(response.body.lastLogs).toBeDefined();
-  });
-});

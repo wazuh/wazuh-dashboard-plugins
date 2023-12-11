@@ -143,31 +143,6 @@ export class WazuhUtilsCtrl {
     );
 
   /**
-   * Returns Wazuh app logs
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Array<String>} app logs or ErrorResponse
-   */
-  async getAppLogs(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const lastLogs = []; // TODO: get logs or remove endpoint
-      response.ok({
-        body: {
-          error: 0,
-          lastLogs,
-        },
-      });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3036, 500, response);
-    }
-  }
-
-  /**
    * Upload a file
    * @param {Object} context
    * @param {Object} request
