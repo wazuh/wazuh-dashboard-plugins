@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.7.2
+- Added host name and board serial information to Agents > Inventory data [#6191](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6191)
 
 ### Fixed
 
