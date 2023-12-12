@@ -87,7 +87,7 @@ export const PoliciesTable = ({
       name: 'Actions',
       sortable: true,
       render: actions => {
-        return (actions || []).join(', ');
+        return (actions || []).sort((a, b) => a.localeCompare(b)).join(', ');
       },
       truncateText: true,
     },
