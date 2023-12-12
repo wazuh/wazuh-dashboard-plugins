@@ -27,10 +27,10 @@ const popoverServerAddress = (
     <EuiLink
       href={webDocumentationLink(
         'user-manual/reference/ossec-conf/client.html#manager-address',
-        PLUGIN_VERSION_SHORT
+        PLUGIN_VERSION_SHORT,
       )}
-      target="_blank"
-      rel="noopener noreferrer"
+      target='_blank'
+      rel='noopener noreferrer'
     >
       Server address.
     </EuiLink>
@@ -41,14 +41,16 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
   const { formField } = props;
   const [isPopoverServerAddress, setIsPopoverServerAddress] = useState(false);
   const onButtonServerAddress = () =>
-    setIsPopoverServerAddress((isPopoverServerAddress) => !isPopoverServerAddress);
+    setIsPopoverServerAddress(
+      isPopoverServerAddress => !isPopoverServerAddress,
+    );
   const closeServerAddress = () => setIsPopoverServerAddress(false);
   const [rememberServerAddress, setRememberServerAddress] = useState(false);
   const [defaultServerAddress, setDefaultServerAddress] = useState(
-    formField?.initialValue ? formField?.initialValue : ''
+    formField?.initialValue ? formField?.initialValue : '',
   );
 
-  const handleToggleRememberAddress = async (event) => {
+  const handleToggleRememberAddress = async event => {
     setRememberServerAddress(event.target.checked);
     if (event.target.checked) {
       await saveServerAddress();
@@ -74,7 +76,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
     return !formField.value || !!formField.error;
   };
 
-  const handleInputChange = (value) => {
+  const handleInputChange = value => {
     if (value === defaultServerAddress) {
       setRememberServerAddress(true);
     } else {
@@ -88,10 +90,12 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
 
   return (
     <Fragment>
-      <EuiFlexGroup gutterSize="s" wrap>
+      <EuiFlexGroup gutterSize='s' wrap>
         {SERVER_ADDRESS_TEXTS.map((data, index) => (
           <EuiFlexItem key={index}>
-            <EuiText className="stepSubtitleServerAddress">{data.subtitle}</EuiText>
+            <EuiText className='stepSubtitleServerAddress'>
+              {data.subtitle}
+            </EuiText>
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
@@ -101,16 +105,23 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
             {...formField}
             label={
               <>
-                <EuiFlexGroup alignItems="center" direction="row" responsive={false} gutterSize="s">
+                <EuiFlexGroup
+                  alignItems='center'
+                  direction='row'
+                  responsive={false}
+                  gutterSize='s'
+                >
                   <EuiFlexItem grow={false}>
-                    <span className="registerAgentLabels">Assign a server address</span>
+                    <span className='registerAgentLabels'>
+                      Assign a server address
+                    </span>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiPopover
                       button={
                         <EuiButtonEmpty
-                          iconType="questionInCircle"
-                          iconSide="left"
+                          iconType='questionInCircle'
+                          iconSide='left'
                           onClick={onButtonServerAddress}
                           style={{
                             flexDirection: 'row',
@@ -121,7 +132,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                       }
                       isOpen={isPopoverServerAddress}
                       closePopover={closeServerAddress}
-                      anchorPosition="rightCenter"
+                      anchorPosition='rightCenter'
                     >
                       {popoverServerAddress}
                     </EuiPopover>
@@ -130,7 +141,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
               </>
             }
             fullWidth={false}
-            placeholder="Server address"
+            placeholder='Server address'
           />
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -138,9 +149,9 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
         <EuiFlexItem grow={false}>
           <EuiSwitch
             disabled={rememberToggleIsDisabled()}
-            label="Remember server address"
+            label='Remember server address'
             checked={rememberServerAddress}
-            onChange={(e) => handleToggleRememberAddress(e)}
+            onChange={e => handleToggleRememberAddress(e)}
           />
         </EuiFlexItem>
       </EuiFlexGroup>

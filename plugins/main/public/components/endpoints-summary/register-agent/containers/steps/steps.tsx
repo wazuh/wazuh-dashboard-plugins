@@ -44,7 +44,13 @@ interface IStepsProps {
   wazuhPassword: string;
 }
 
-export const Steps = ({ needsPassword, form, osCard, connection, wazuhPassword }: IStepsProps) => {
+export const Steps = ({
+  needsPassword,
+  form,
+  osCard,
+  connection,
+  wazuhPassword,
+}: IStepsProps) => {
   const initialParsedFormValues = {
     operatingSystem: {
       name: '',
@@ -58,8 +64,12 @@ export const Steps = ({ needsPassword, form, osCard, connection, wazuhPassword }
       protocol: connection.isUDP ? 'UDP' : '',
     },
   } as IParseRegisterFormValues;
-  const [missingStepsName, setMissingStepsName] = useState<tFormStepsLabel[]>([]);
-  const [invalidFieldsName, setInvalidFieldsName] = useState<tFormFieldsLabel[]>([]);
+  const [missingStepsName, setMissingStepsName] = useState<tFormStepsLabel[]>(
+    [],
+  );
+  const [invalidFieldsName, setInvalidFieldsName] = useState<
+    tFormFieldsLabel[]
+  >([]);
   const [registerAgentFormValues, setRegisterAgentFormValues] =
     useState<IParseRegisterFormValues>(initialParsedFormValues);
 
@@ -70,32 +80,32 @@ export const Steps = ({ needsPassword, form, osCard, connection, wazuhPassword }
     const registerAgentFormValuesParsed = parseRegisterAgentFormValues(
       getRegisterAgentFormValues(form),
       OPERATING_SYSTEMS_OPTIONS,
-      initialParsedFormValues
+      initialParsedFormValues,
     );
     setRegisterAgentFormValues(registerAgentFormValuesParsed);
-    setInstallCommandStepStatus(getAgentCommandsStepStatus(form.fields, installCommandWasCopied));
-    setStartCommandStepStatus(getAgentCommandsStepStatus(form.fields, startCommandWasCopied));
+    setInstallCommandStepStatus(
+      getAgentCommandsStepStatus(form.fields, installCommandWasCopied),
+    );
+    setStartCommandStepStatus(
+      getAgentCommandsStepStatus(form.fields, startCommandWasCopied),
+    );
     setMissingStepsName(getIncompleteSteps(form.fields) || []);
     setInvalidFieldsName(getInvalidFields(form.fields) || []);
   }, [form.fields]);
 
-  const { installCommand, startCommand, selectOS, setOptionalParams } = useRegisterAgentCommands<
-    tOperatingSystem,
-    tOptionalParameters
-  >({
-    osDefinitions: osCommandsDefinitions,
-    optionalParamsDefinitions: optionalParamsDefinitions,
-  });
+  const { installCommand, startCommand, selectOS, setOptionalParams } =
+    useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
+      osDefinitions: osCommandsDefinitions,
+      optionalParamsDefinitions: optionalParamsDefinitions,
+    });
 
   // install - start commands step state
   const [installCommandWasCopied, setInstallCommandWasCopied] = useState(false);
-  const [installCommandStepStatus, setInstallCommandStepStatus] = useState<tFormStepsStatus>(
-    getAgentCommandsStepStatus(form.fields, false)
-  );
+  const [installCommandStepStatus, setInstallCommandStepStatus] =
+    useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
   const [startCommandWasCopied, setStartCommandWasCopied] = useState(false);
-  const [startCommandStepStatus, setStartCommandStepStatus] = useState<tFormStepsStatus>(
-    getAgentCommandsStepStatus(form.fields, false)
-  );
+  const [startCommandStepStatus, setStartCommandStepStatus] =
+    useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
 
   useEffect(() => {
     if (
@@ -106,18 +116,22 @@ export const Steps = ({ needsPassword, form, osCard, connection, wazuhPassword }
     }
     setOptionalParams(
       { ...registerAgentFormValues.optionalParams },
-      registerAgentFormValues.operatingSystem as tOperatingSystem
+      registerAgentFormValues.operatingSystem as tOperatingSystem,
     );
     setInstallCommandWasCopied(false);
     setStartCommandWasCopied(false);
   }, [registerAgentFormValues]);
 
   useEffect(() => {
-    setInstallCommandStepStatus(getAgentCommandsStepStatus(form.fields, installCommandWasCopied));
+    setInstallCommandStepStatus(
+      getAgentCommandsStepStatus(form.fields, installCommandWasCopied),
+    );
   }, [installCommandWasCopied]);
 
   useEffect(() => {
-    setStartCommandStepStatus(getAgentCommandsStepStatus(form.fields, startCommandWasCopied));
+    setStartCommandStepStatus(
+      getAgentCommandsStepStatus(form.fields, startCommandWasCopied),
+    );
   }, [startCommandWasCopied]);
 
   const registerAgentFormSteps = [
@@ -137,23 +151,24 @@ export const Steps = ({ needsPassword, form, osCard, connection, wazuhPassword }
             title: 'Wazuh password',
             children: (
               <EuiCallOut
-                color="warning"
+                color='warning'
                 title={
                   <span>
-                    The Wazuh password is required but wasn't defined. Please check our{' '}
+                    The Wazuh password is required but wasn't defined. Please
+                    check our{' '}
                     <EuiLink
-                      target="_blank"
+                      target='_blank'
                       href={webDocumentationLink(
-                        'user-manual/agent-enrollment/security-options/using-password-authentication.html'
+                        'user-manual/agent-enrollment/security-options/using-password-authentication.html',
                       )}
-                      rel="noopener noreferrer"
+                      rel='noopener noreferrer'
                     >
                       documentation
                     </EuiLink>
                   </span>
                 }
-                iconType="iInCircle"
-                className="warningForAgentName"
+                iconType='iInCircle'
+                className='warningForAgentName'
               />
             ),
             status: getPasswordStepStatus(form.fields),
@@ -163,26 +178,32 @@ export const Steps = ({ needsPassword, form, osCard, connection, wazuhPassword }
     {
       title: 'Optional settings',
       children: <OptionalsInputs formFields={form.fields} />,
-      status: getOptionalParameterStepStatus(form.fields, installCommandWasCopied),
+      status: getOptionalParameterStepStatus(
+        form.fields,
+        installCommandWasCopied,
+      ),
     },
     {
-      title: 'Run the following commands to download and install the Wazuh agent:',
+      title:
+        'Run the following commands to download and install the Wazuh agent:',
       children: (
         <>
           {missingStepsName?.length ? (
             <EuiCallOut
-              color="warning"
-              title={`Please select the ${missingStepsName?.join(FORM_MESSAGE_CONJUNTION)}.`}
-              iconType="iInCircle"
+              color='warning'
+              title={`Please select the ${missingStepsName?.join(
+                FORM_MESSAGE_CONJUNTION,
+              )}.`}
+              iconType='iInCircle'
             />
           ) : null}
           {invalidFieldsName?.length ? (
             <EuiCallOut
-              color="danger"
+              color='danger'
               title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
-                FORM_MESSAGE_CONJUNTION
+                FORM_MESSAGE_CONJUNTION,
               )}.`}
-              iconType="iInCircle"
+              iconType='iInCircle'
               style={{ marginTop: '1rem' }}
             />
           ) : null}
@@ -205,18 +226,20 @@ export const Steps = ({ needsPassword, form, osCard, connection, wazuhPassword }
         <>
           {missingStepsName?.length ? (
             <EuiCallOut
-              color="warning"
-              title={`Please select the ${missingStepsName?.join(FORM_MESSAGE_CONJUNTION)}.`}
-              iconType="iInCircle"
+              color='warning'
+              title={`Please select the ${missingStepsName?.join(
+                FORM_MESSAGE_CONJUNTION,
+              )}.`}
+              iconType='iInCircle'
             />
           ) : null}
           {invalidFieldsName?.length ? (
             <EuiCallOut
-              color="danger"
+              color='danger'
               title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
-                FORM_MESSAGE_CONJUNTION
+                FORM_MESSAGE_CONJUNTION,
               )}.`}
-              iconType="iInCircle"
+              iconType='iInCircle'
               style={{ marginTop: '1rem' }}
             />
           ) : null}

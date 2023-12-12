@@ -1,5 +1,12 @@
 import React from 'react';
-import { EuiCard, EuiFlexGroup, EuiFlexItem, EuiCallOut, EuiLink, EuiCheckbox } from '@elastic/eui';
+import {
+  EuiCard,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiCallOut,
+  EuiLink,
+  EuiCheckbox,
+} from '@elastic/eui';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
@@ -13,22 +20,22 @@ interface Props {
 
 export const OsCard = ({ onChange, value }: Props) => {
   return (
-    <div data-testid="os-card">
-      <EuiFlexGroup gutterSize="l" wrap>
+    <div data-testid='os-card'>
+      <EuiFlexGroup gutterSize='l' wrap>
         {OPERATING_SYSTEMS_OPTIONS.map((data, index) => (
           <EuiFlexItem key={index}>
             <EuiCard
               title={
-                <div data-testid="card-title" className="cardTitle">
-                  <img className="cardIcon" src={data.icon} alt="Icon" />
-                  <span className="cardText">{data.title}</span>
+                <div data-testid='card-title' className='cardTitle'>
+                  <img className='cardIcon' src={data.icon} alt='Icon' />
+                  <span className='cardText'>{data.title}</span>
                 </div>
               }
-              display="plain"
+              display='plain'
               hasBorder
-              className="card"
+              className='card'
             >
-              {data.hr && <hr className="hr" />}
+              {data.hr && <hr className='hr' />}
               <CheckboxGroupComponent
                 component={EuiCheckbox}
                 data={data.architecture}
@@ -42,16 +49,18 @@ export const OsCard = ({ onChange, value }: Props) => {
         ))}
       </EuiFlexGroup>
       <EuiCallOut
-        color="primary"
-        className="cardsCallOut"
-        iconType="iInCircle"
+        color='primary'
+        className='cardsCallOut'
+        iconType='iInCircle'
         title={
           <span>
             For additional systems and architectures, please check our{' '}
             <EuiLink
-              target="_blank"
-              href={webDocumentationLink('installation-guide/wazuh-agent/index.html')}
-              rel="noopener noreferrer"
+              target='_blank'
+              href={webDocumentationLink(
+                'installation-guide/wazuh-agent/index.html',
+              )}
+              rel='noopener noreferrer'
             >
               documentation
             </EuiLink>
