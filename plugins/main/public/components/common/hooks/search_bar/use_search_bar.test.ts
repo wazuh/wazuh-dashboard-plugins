@@ -1,18 +1,18 @@
 import { renderHook } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom/extend-expect';
 // osd dependencies
-import { Start, dataPluginMock } from '../../../../../../src/plugins/data/public/mocks';
+import { Start, dataPluginMock } from '../../../../../../../src/plugins/data/public/mocks';
 import {
   Filter,
   IndexPattern,
   Query,
   TimeRange,
-} from '../../../../../../src/plugins/data/public';
+} from '../../../../../../../src/plugins/data/public';
 // wazuh plugin dependencies
 import useSearchBar from './use_search_bar';
-import { getDataPlugin } from '../../../kibana-services';
-import * as timeFilterHook from '../hooks/use-time-filter';
-import * as queryManagerHook from '../hooks/use-query';
+import { getDataPlugin } from '../../../../kibana-services';
+import * as timeFilterHook from '../../hooks/use-time-filter';
+import * as queryManagerHook from '../../hooks/use-query';
 
 /**
  * Mocking Data Plugin
@@ -80,7 +80,9 @@ describe('[hook] useSearchBarConfiguration', () => {
     jest
       .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
       .mockReturnValue([]);
-    const { result, waitForNextUpdate } = renderHook(() => useSearchBar({}));
+    const { result, waitForNextUpdate } = renderHook(() => useSearchBar({
+      defaultIndexPatternID: 'default-index-pattern',
+    }));
     await waitForNextUpdate();
     expect(mockDataPlugin.indexPatterns.getDefault).toBeCalled();
     expect(result.current.searchBarProps.indexPatterns).toMatchObject([
@@ -165,6 +167,7 @@ describe('[hook] useSearchBarConfiguration', () => {
     const { result, waitForNextUpdate } = renderHook(() =>
       useSearchBar({
         filters: defaultFilters,
+        defaultIndexPatternID: 'wazuh-index-pattern',
       }),
     );
 

@@ -1,6 +1,6 @@
-import { getPlugins } from '../../../kibana-services';
-import { IndexPattern, Filter, OpenSearchQuerySortValue } from "../../../../../../src/plugins/data/public";
-import { SearchResponse } from "../../../../../../src/core/server";
+import { getPlugins } from '../../../../kibana-services';
+import { IndexPattern, Filter, OpenSearchQuerySortValue } from "../../../../../../../src/plugins/data/public";
+import { SearchResponse } from "../../../../../../../src/core/server";
 
 export interface SearchParams {
     indexPattern: IndexPattern;

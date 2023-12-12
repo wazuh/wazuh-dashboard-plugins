@@ -1,9 +1,10 @@
-import { SearchResponse } from "../../../../../../src/core/server";
-import * as FileSaver from '../../../services/file-saver';
-import { beautifyDate } from "../../agents/vuls/inventory/lib";
+import { SearchResponse } from "../../../../../../../src/core/server";
+import * as FileSaver from '../../../../services/file-saver';
+import { beautifyDate } from "../../../agents/vuls/inventory/lib";
 import { SearchParams, search } from "../search_bar/use_search_bar_service";
-import { IFieldType, IndexPattern } from "../../../../../../src/plugins/data/common";
+import { IFieldType, IndexPattern } from "../../../../../../../src/plugins/data/common";
 export const MAX_ENTRIES_PER_QUERY = 10000;
+import { EuiDataGridColumn } from '@elastic/eui';
 
 export const parseData = (resultsHits: SearchResponse['hits']['hits']): any[] => {
     const data = resultsHits.map((hit) => {
@@ -140,6 +141,7 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
     );
 
     if (blobData) {
+        // @ts-ignore
         FileSaver?.saveAs(blobData, `vulnerabilities_inventory-${new Date().toISOString()}.csv`);
     }
 }

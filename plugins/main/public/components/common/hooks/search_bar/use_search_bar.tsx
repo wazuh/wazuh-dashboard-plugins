@@ -7,11 +7,11 @@ import {
   Filter,
   IIndexPattern,
   IndexPatternsContract,
-} from '../../../../../../src/plugins/data/public';
-import { getDataPlugin } from '../../../kibana-services';
+} from '../../../../../../../src/plugins/data/public';
+import { getDataPlugin } from '../../../../kibana-services';
 
-import { useFilterManager, useQueryManager, useTimeFilter } from '../hooks';
-import { AUTHORIZED_AGENTS } from '../../../../common/constants';
+import { useFilterManager, useQueryManager, useTimeFilter } from '../../hooks';
+import { AUTHORIZED_AGENTS } from '../../../../../common/constants';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
