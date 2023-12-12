@@ -21,7 +21,7 @@ export type tDocViewerProps = {
  */
 export const shortenDottedString = (input: string) => input.replace(DOT_PREFIX_RE, '$1.');
 
-export function getFieldTypeName(type: string) {
+export const getFieldTypeName = (type: string) => {
     switch (type) {
         case 'boolean':
             return i18n.translate('discover.fieldNameIcons.booleanAriaLabel', {
@@ -81,7 +81,7 @@ const DocViewer = (props: tDocViewerProps) => {
 
     return (<>
         {flattened && (
-            <table className="table table-condensed osdDocViewerTable">
+            <table>
                 <tbody>
                     {Object.keys(flattened)
                         .sort()

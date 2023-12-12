@@ -1,7 +1,7 @@
 import { SearchResponse } from "../../../../../../../src/core/server";
 import * as FileSaver from '../../../../services/file-saver';
 import { beautifyDate } from "../../../agents/vuls/inventory/lib";
-import { SearchParams, search } from "../search_bar/use_search_bar_service";
+import { SearchParams, search } from "../search_bar/search_bar_service";
 import { IFieldType, IndexPattern } from "../../../../../../../src/plugins/data/common";
 export const MAX_ENTRIES_PER_QUERY = 10000;
 import { EuiDataGridColumn } from '@elastic/eui';
