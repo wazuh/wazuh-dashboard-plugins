@@ -18,10 +18,10 @@ const popoverAgentGroup = (
     <EuiLink
       href={webDocumentationLink(
         'user-manual/reference/ossec-conf/client.html#groups',
-        PLUGIN_VERSION_SHORT
+        PLUGIN_VERSION_SHORT,
       )}
-      target="_blank"
-      rel="noopener noreferrer"
+      target='_blank'
+      rel='noopener noreferrer'
     >
       Select a group.
     </EuiLink>
@@ -32,26 +32,28 @@ const GroupInput = ({ value, options, onChange }) => {
   const [isPopoverAgentGroup, setIsPopoverAgentGroup] = useState(false);
 
   const onButtonAgentGroup = () =>
-    setIsPopoverAgentGroup((isPopoverAgentGroup) => !isPopoverAgentGroup);
+    setIsPopoverAgentGroup(isPopoverAgentGroup => !isPopoverAgentGroup);
   const closeAgentGroup = () => setIsPopoverAgentGroup(false);
   return (
     <>
       <EuiFlexGroup
         style={{ marginTop: '32px' }}
-        alignItems="center"
-        direction="row"
+        alignItems='center'
+        direction='row'
         responsive={false}
-        gutterSize="s"
+        gutterSize='s'
       >
         <EuiFlexItem grow={false}>
-          <p className="registerAgentLabels">Select one or more existing groups</p>
+          <p className='registerAgentLabels'>
+            Select one or more existing groups
+          </p>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiPopover
             button={
               <EuiButtonEmpty
-                iconType="questionInCircle"
-                iconSide="left"
+                iconType='questionInCircle'
+                iconSide='left'
                 onClick={onButtonAgentGroup}
                 style={{
                   flexDirection: 'row',
@@ -62,7 +64,7 @@ const GroupInput = ({ value, options, onChange }) => {
             }
             isOpen={isPopoverAgentGroup}
             closePopover={closeAgentGroup}
-            anchorPosition="rightCenter"
+            anchorPosition='rightCenter'
           >
             {popoverAgentGroup}
           </EuiPopover>
@@ -72,24 +74,24 @@ const GroupInput = ({ value, options, onChange }) => {
         placeholder={!value?.length ? 'Default' : 'Select group'}
         options={options?.groups}
         selectedOptions={value}
-        onChange={(group) => {
+        onChange={group => {
           onChange({
             target: { value: group },
           });
         }}
         isDisabled={!options?.groups.length}
         isClearable={true}
-        data-test-subj="demoComboBox"
-        data-testid="group-input-combobox"
+        data-test-subj='demoComboBox'
+        data-testid='group-input-combobox'
       />
       {!options?.groups.length && (
         <>
           <EuiCallOut
             style={{ marginTop: '1.5rem' }}
-            color="warning"
-            title="This section could not be configured because you do not have permission to read groups."
-            iconType="iInCircle"
-            data-testid="group-input-callout"
+            color='warning'
+            title='This section could not be configured because you do not have permission to read groups.'
+            iconType='iInCircle'
+            data-testid='group-input-callout'
           />
         </>
       )}

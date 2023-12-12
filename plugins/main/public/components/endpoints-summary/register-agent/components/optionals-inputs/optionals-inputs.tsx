@@ -22,16 +22,20 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
   const { formFields } = props;
   const [isPopoverAgentName, setIsPopoverAgentName] = useState(false);
   const onButtonAgentName = () =>
-    setIsPopoverAgentName((isPopoverAgentName) => !isPopoverAgentName);
+    setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
   const closeAgentName = () => setIsPopoverAgentName(false);
   const agentNameDocLink = webDocumentationLink(
     'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
-    PLUGIN_VERSION_SHORT
+    PLUGIN_VERSION_SHORT,
   );
   const popoverAgentName = (
     <span>
       Learn about{' '}
-      <EuiLink href={agentNameDocLink} target="_blank" rel="noopener noreferrer">
+      <EuiLink
+        href={agentNameDocLink}
+        target='_blank'
+        rel='noopener noreferrer'
+      >
         Assigning an agent name.
       </EuiLink>
     </span>
@@ -41,10 +45,10 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
     'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
   return (
     <Fragment>
-      <EuiFlexGroup gutterSize="s" wrap>
+      <EuiFlexGroup gutterSize='s' wrap>
         {OPTIONAL_PARAMETERS_TEXT.map((data, index) => (
           <EuiFlexItem key={index}>
-            <EuiText className="stepSubtitle">{data.subtitle}</EuiText>
+            <EuiText className='stepSubtitle'>{data.subtitle}</EuiText>
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
@@ -53,16 +57,21 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
         fullWidth={false}
         label={
           <>
-            <EuiFlexGroup alignItems="center" direction="row" responsive={false} gutterSize="s">
+            <EuiFlexGroup
+              alignItems='center'
+              direction='row'
+              responsive={false}
+              gutterSize='s'
+            >
               <EuiFlexItem grow={false}>
-                <p className="registerAgentLabels">Assign an agent name</p>
+                <p className='registerAgentLabels'>Assign an agent name</p>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiPopover
                   button={
                     <EuiButtonEmpty
-                      iconType="questionInCircle"
-                      iconSide="left"
+                      iconType='questionInCircle'
+                      iconSide='left'
                       onClick={onButtonAgentName}
                       style={{
                         flexDirection: 'row',
@@ -73,7 +82,7 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
                   }
                   isOpen={isPopoverAgentName}
                   closePopover={closeAgentName}
-                  anchorPosition="rightCenter"
+                  anchorPosition='rightCenter'
                 >
                   {popoverAgentName}
                 </EuiPopover>
@@ -81,18 +90,22 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
             </EuiFlexGroup>
           </>
         }
-        placeholder="Agent name"
+        placeholder='Agent name'
       />
       <EuiCallOut
-        color="warning"
+        color='warning'
         title={
           <span>
             {warningForAgentName}
-            <EuiLink target="_blank" href={agentNameDocLink} rel="noopener noreferrer" />
+            <EuiLink
+              target='_blank'
+              href={agentNameDocLink}
+              rel='noopener noreferrer'
+            />
           </span>
         }
-        iconType="iInCircle"
-        className="warningForAgentName"
+        iconType='iInCircle'
+        className='warningForAgentName'
       />
       <InputForm {...formFields.agentGroups}></InputForm>
     </Fragment>
