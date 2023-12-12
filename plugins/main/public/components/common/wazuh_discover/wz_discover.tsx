@@ -20,12 +20,11 @@ import {
 import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
+import { useDocViewer } from '../doc_viewer';
 import DocViewer from '../doc_viewer/doc_viewer';
 import { DiscoverNoResults } from '../../overview/vulnerabilities/common/components/no_results';
 import { LoadingSpinner } from '../../overview/vulnerabilities/common/components/loading_spinner';
 import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../hooks/data_grid';
-import { useDocViewer } from '../doc_viewer/use_doc_viewer';
-//import './inventory.scss';
 import { ErrorHandler, ErrorFactory, HttpError } from '../../../react-services/error-management';
 import { withErrorBoundary } from '../hocs';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
