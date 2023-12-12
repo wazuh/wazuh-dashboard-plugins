@@ -160,6 +160,9 @@ services:
 
       - os_logs:/var/log/os1
       - os_data:/var/lib/os1
+    ports:
+      - 9200:9200
+      - 9300:9300
     networks:
       - os-dev
       - mon
@@ -320,37 +323,60 @@ services:
        exit 0
       '
   wazuh.manager:
-    build:
-      context: ../images/wazuh-server-filebeat-sources-cmake
-      args:
-        WAZUH_VERSION: ${WAZUH_VERSION}
-        FILEBEAT_VERSION: 7.10.2
-        FILEBEAT_WAZUH_TEMPLATE_URL: https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_VERSION}/extensions/elasticsearch/7.x/wazuh-template.json
-        FILEBEAT_WAZUH_MODULE_URL: https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.3.tar.gz
-    image: wazuh-server-filebeat-sources-cmake:${WAZUH_VERSION}-7.10.2
+    depends_on:
+      os1:
+        condition: service_healthy
+    image: wazuh/wazuh-manager:${WAZUH_STACK}
     profiles:
       - 'server'
     hostname: wazuh.manager
-    #<<: *logging
+    # <<: *logging
     networks:
       - os-dev
       - mon
+    environment:
+      - INDEXER_URL=https://os1:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=admin
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
+      - SSL_KEY=/etc/ssl/wazuh/filebeat.key
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
     volumes:
-      - wm_certs:/etc/ssl/elastic
-      - ./config/${OSD_MAJOR}/filebeat/filebeat.server.yml:/etc/filebeat/filebeat.yml
+      - wm_certs:/etc/ssl/wazuh
+      - ./config/wazuh_cluster/wazuh_manager.conf:/wazuh-config-mount/etc/ossec.conf
     ports:
       - '514:514'
       - '1514:1514'
       - '1515:1515'
       - '1516:1516'
       - '55000:55000'
-    depends_on:
-      os1:
-        condition: service_healthy
-    environment:
-      NODE_IP: wazuh-manager-master
-      NODE_NAME: master-node
-      NODE_TYPE: master
+  # wazuh.manager:
+  #   profiles:
+  #     - 'server'
+  #   hostname: wazuh.manager
+  #   #<<: *logging
+  #   networks:
+  #     - os-dev
+  #     - mon
+  #   volumes:
+  #     - wm_certs:/etc/ssl/elastic
+  #     - ./config/${OSD_MAJOR}/filebeat/filebeat.server.yml:/etc/filebeat/filebeat.yml
+  #   ports:
+  #     - '514:514'
+  #     - '1514:1514'
+  #     - '1515:1515'
+  #     - '1516:1516'
+  #     - '55000:55000'
+  #   depends_on:
+  #     os1:
+  #       condition: service_healthy
+  #   environment:
+  #     NODE_IP: wazuh-manager-master
+  #     NODE_NAME: master-node
+  #     NODE_TYPE: master
 
 networks:
   os-dev:

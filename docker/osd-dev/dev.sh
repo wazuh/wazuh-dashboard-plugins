@@ -27,9 +27,15 @@ osd_versions=(
   '4.7.0'
 )
 
+wzs_version=(
+  '4.7.0'
+  '4.7.1'
+  '4.7.2'
+)
+
 usage() {
   echo
-  echo "./dev.sh os_version osd_version /wazuh_app_src action [saml/server]"
+  echo "./dev.sh os_version osd_version /wazuh_app_src action [saml/server] [server_version]"
   echo
   echo "where"
   echo "  os_version is one of " ${os_versions[*]}
@@ -100,6 +106,12 @@ fi
 
 if [[ "$5" =~ "server" ]]; then
   profile="server"
+  if [[ ! " ${wzs_version[*]} " =~ " ${6} " ]]; then
+    echo "Wazuh server version ${6} not found in ${wzs_version[*]}"
+    echo
+    exit -1
+  fi
+  export WAZUH_STACK="${6}"
 fi
 
 export SEC_CONFIG_PATH=/usr/share/opensearch/plugins/opensearch-security/securityconfig
@@ -110,7 +122,7 @@ fi
 case "$4" in
 up)
   /bin/bash ../scripts/create_docker_networks.sh
-  docker compose --profile $profile --env-file dev.env -f dev.yml up -Vd
+  docker compose --profile $profile -f dev.yml up -Vd
 
   # Display a command to deploy an agent when using the real server
   if [[ "$5" =~ "server" ]]; then
@@ -134,10 +146,10 @@ up)
   fi
   ;;
 down)
-  docker compose --profile $profile --env-file dev.env -f dev.yml down -v --remove-orphans
+  docker compose --profile $profile -f dev.yml down -v --remove-orphans
   ;;
 stop)
-  docker compose --profile $profile --env-file dev.env -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
+  docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
   ;;
 *)
   echo "Action must be up | down | stop: "
