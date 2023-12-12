@@ -132,7 +132,7 @@ up)
     echo "If you need to change de version, edit the command as you see fit."
     echo "***********************************"
     echo "1. (Optional) Enroll an agent (Ubuntu 20.04):"
-    echo "docker run --name ${COMPOSE_PROJECT_NAME}-agent-\$(date +%s) --network os-dev-${OS_VERSION} --label com.docker.compose.project=${COMPOSE_PROJECT_NAME} --env WAZUH_AGENT_VERSION=$(grep "^WAZUH_VERSION=" dev.env | sed "s|WAZUH_VERSION=||") -d ubuntu:20.04 bash -c '"
+    echo "docker run --name ${COMPOSE_PROJECT_NAME}-agent-\$(date +%s) --network os-dev-${OS_VERSION} --label com.docker.compose.project=${COMPOSE_PROJECT_NAME} --env WAZUH_AGENT_VERSION=${WAZUH_STACK} -d ubuntu:20.04 bash -c '"
     echo "  apt update -y"
     echo "  apt install -y curl lsb-release"
     echo "  curl -so \wazuh-agent-\${WAZUH_AGENT_VERSION}.deb \\"
