@@ -353,30 +353,6 @@ services:
       - '1515:1515'
       - '1516:1516'
       - '55000:55000'
-  # wazuh.manager:
-  #   profiles:
-  #     - 'server'
-  #   hostname: wazuh.manager
-  #   #<<: *logging
-  #   networks:
-  #     - os-dev
-  #     - mon
-  #   volumes:
-  #     - wm_certs:/etc/ssl/elastic
-  #     - ./config/${OSD_MAJOR}/filebeat/filebeat.server.yml:/etc/filebeat/filebeat.yml
-  #   ports:
-  #     - '514:514'
-  #     - '1514:1514'
-  #     - '1515:1515'
-  #     - '1516:1516'
-  #     - '55000:55000'
-  #   depends_on:
-  #     os1:
-  #       condition: service_healthy
-  #   environment:
-  #     NODE_IP: wazuh-manager-master
-  #     NODE_NAME: master-node
-  #     NODE_TYPE: master
 
 networks:
   os-dev:
