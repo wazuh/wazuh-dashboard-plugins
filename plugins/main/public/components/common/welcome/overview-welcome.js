@@ -22,7 +22,6 @@ import {
   EuiFlexGrid,
   EuiCallOut,
   EuiPage,
-  EuiButtonEmpty,
 } from '@elastic/eui';
 import './welcome.scss';
 import {
@@ -39,6 +38,7 @@ import {
 } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { WzButtonPermissions } from '../../common/permissions/button';
 
 const appCategories = Applications.reduce((categories, app) => {
   const existingCategory = categories.find(
@@ -85,16 +85,21 @@ export const OverviewWelcome = compose(
                   title={
                     <>
                       No agents were added to this manager.{' '}
-                      <EuiButtonEmpty
+                      <WzButtonPermissions
+                        buttonType='empty'
+                        permissions={[
+                          { action: 'agent:create', resource: '*:*:*' },
+                        ]}
+                        iconType='plusInCircle'
                         href={getCore().application.getUrlForApp(
                           endpointSumary.id,
                           {
-                            path: '#/agents-preview/deploy',
+                            path: `#${endpointSumary.redirectTo()}deploy`,
                           },
                         )}
                       >
-                        Add agent
-                      </EuiButtonEmpty>
+                        Deploy new agent
+                      </WzButtonPermissions>
                     </>
                   }
                   color='warning'

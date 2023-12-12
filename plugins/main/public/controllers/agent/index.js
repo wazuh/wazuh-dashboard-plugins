@@ -25,6 +25,7 @@ const app = getAngularModule();
 
 app
   .controller('agentsController', AgentsController)
+  .value('RegisterAgent', RegisterAgent)
   .value('ExportConfiguration', ExportConfiguration)
   .value('AgentsWelcome', AgentsWelcome)
   .value('Mitre', Mitre)
@@ -33,4 +34,3 @@ app
   .value('MainAgentStats', MainAgentStats)
   .value('MainModule', MainModule)
   .value('MainEndpointsSummary', MainEndpointsSummary);
-  .value('RegisterAgent', RegisterAgent)

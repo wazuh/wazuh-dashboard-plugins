@@ -38,7 +38,7 @@ import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
 import { getCore } from '../../../kibana-services';
-import { itHygiene } from '../../../utils/applications';
+import { itHygiene, endpointSumary } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const searchBarWQLOptions = {
@@ -306,12 +306,9 @@ export const AgentsTable = withErrorBoundary(
                   buttonType='empty'
                   permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
                   iconType='plusInCircle'
-                  href={getCore().application.getUrlForApp(
-                    'endpoints-summary',
-                    {
-                      path: '#/agents-preview/deploy',
-                    },
-                  )}
+                  href={getCore().application.getUrlForApp(endpointSumary.id, {
+                    path: `#${endpointSumary.redirectTo()}deploy`,
+                  })}
                 >
                   Deploy new agent
                 </WzButtonPermissions>,

@@ -65,7 +65,7 @@ export const MainEndpointsSummary = compose(
     return (
       <EuiEmptyPrompt
         iconType='watchesApp'
-        title={<h2>There are no agents</h2>}
+        title={<h2>No agents were added to this manager.</h2>}
         body={<p>Add agents to fleet to start monitoring</p>}
         actions={
           <WzButtonPermissions
@@ -73,8 +73,8 @@ export const MainEndpointsSummary = compose(
             fill
             permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
             iconType='plusInCircle'
-            href={getCore().application.getUrlForApp('endpoints-summary', {
-              path: '#/agents-preview/deploy',
+            href={getCore().application.getUrlForApp(endpointSumary.id, {
+              path: `#${endpointSumary.redirectTo()}deploy`,
             })}
           >
             Deploy new agent
