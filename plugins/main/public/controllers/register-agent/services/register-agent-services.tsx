@@ -42,7 +42,10 @@ export const clusterStatusResponse = async (): Promise<boolean> => {
 /**
  * Get the remote configuration from api
  */
-async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
+async function getRemoteConfiguration(
+  nodeName: string,
+  clusterStatus: boolean,
+): Promise<RemoteConfig> {
   let config: RemoteConfig = {
     name: nodeName,
     isUdp: false,
@@ -50,7 +53,6 @@ async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
   };
 
   try {
-    const clusterStatus = await clusterStatusResponse();
     let result;
     if (clusterStatus) {
       result = await WzRequest.apiReq(
@@ -97,8 +99,8 @@ async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
  * @param node
  * @returns
  */
-async function getAuthConfiguration(node?: string) {
-  const authConfigUrl = node
+async function getAuthConfiguration(node: string, clusterStatus: boolean) {
+  const authConfigUrl = clusterStatus
     ? `/cluster/${node}/configuration/auth/auth`
     : '/manager/configuration/auth/auth';
   const result = await WzRequest.apiReq('GET', authConfigUrl, {});
@@ -131,7 +133,11 @@ async function getConnectionConfig(
   const nodeIp = nodeSelected?.value;
   if (!defaultServerAddress) {
     if (nodeSelected.nodetype !== 'custom') {
-      const remoteConfig = await getRemoteConfiguration(nodeName);
+      const clusterStatus = await clusterStatusResponse();
+      const remoteConfig = await getRemoteConfiguration(
+        nodeName,
+        clusterStatus,
+      );
       return {
         serverAddress: nodeIp,
         udpProtocol: remoteConfig.isUdp,
@@ -232,8 +238,12 @@ export const getMasterNode = (nodeIps: any[]): any[] => {
 export const getMasterConfiguration = async () => {
   const nodes = await fetchClusterNodesOptions();
   const masterNode = getMasterNode(nodes);
-  const remote = await getRemoteConfiguration(masterNode[0].label);
-  const auth = await getAuthConfiguration(masterNode[0].label);
+  const clusterStatus = await clusterStatusResponse();
+  const remote = await getRemoteConfiguration(
+    masterNode[0].label,
+    clusterStatus,
+  );
+  const auth = await getAuthConfiguration(masterNode[0].label, clusterStatus);
   return {
     remote,
     auth,
