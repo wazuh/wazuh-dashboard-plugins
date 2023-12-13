@@ -8,12 +8,20 @@ import {
 import { EndpointsSummary } from './endpoints-summary';
 import { WzRequest } from '../../react-services/wz-request';
 import { endpointSumary } from '../../utils/applications';
-import { withReduxProvider, withGlobalBreadcrumb } from '../common/hocs';
+import {
+  withErrorBoundary,
+  withReduxProvider,
+  withGlobalBreadcrumb,
+} from '../common/hocs';
 import { compose } from 'redux';
 import { WzButtonPermissions } from '../common/permissions/button';
 import { getCore } from '../../kibana-services';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export const MainEndpointsSummary = compose(
+  withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([{ text: endpointSumary.title }]),
 )(() => {
@@ -23,28 +31,47 @@ export const MainEndpointsSummary = compose(
   const [agentsActiveCoverage, setAgentsActiveCoverage] = useState();
 
   const getSummary = async () => {
-    setIsSummaryLoading(true);
+    try {
+      setIsSummaryLoading(true);
 
-    const {
-      data: {
+      const {
         data: {
-          connection: agentStatusSummary,
-          configuration: agentConfiguration,
+          data: {
+            connection: agentStatusSummary,
+            configuration: agentConfiguration,
+          },
         },
-      },
-    } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+      } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
 
-    const agentsActiveCoverage = (
-      (agentStatusSummary.active / agentStatusSummary.total) *
-      100
-    ).toFixed(2);
+      const agentsActiveCoverage = (
+        (agentStatusSummary?.active / agentStatusSummary?.total) *
+        100
+      ).toFixed(2);
 
-    setAgentStatusSummary(agentStatusSummary);
-    setAgentCount(agentStatusSummary.total ?? 0);
-    setAgentsActiveCoverage(
-      isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
-    );
-    setIsSummaryLoading(false);
+      setAgentStatusSummary(agentStatusSummary);
+      setAgentCount(agentStatusSummary?.total ?? 0);
+      setAgentsActiveCoverage(
+        isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
+      );
+      setIsSummaryLoading(false);
+    } catch (error) {
+      setIsSummaryLoading(false);
+      setAgentStatusSummary([]);
+      setAgentCount(0);
+      setAgentsActiveCoverage(0);
+      const options = {
+        context: `MainEndpointsSummary.getSummary`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Could not get agents summary`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
   };
 
   useEffect(() => {

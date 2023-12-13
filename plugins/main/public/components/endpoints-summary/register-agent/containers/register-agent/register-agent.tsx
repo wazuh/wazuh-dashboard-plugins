@@ -113,7 +113,7 @@ export const RegisterAgent = compose(
         '/agents/000/config/auth/auth',
         {},
       );
-      return (result.data || {}).data || {};
+      return result?.data?.data || {};
     } catch (error) {
       ErrorHandler.handleError(error);
     }
@@ -121,9 +121,8 @@ export const RegisterAgent = compose(
 
   const getWazuhVersion = async () => {
     try {
-      const data = await WzRequest.apiReq('GET', '/', {});
-      const result = ((data || {}).data || {}).data || {};
-      return result.api_version;
+      const result = await WzRequest.apiReq('GET', '/', {});
+      return result?.data?.data?.api_version;
     } catch (error) {
       const options = {
         context: `RegisterAgent.getWazuhVersion`,

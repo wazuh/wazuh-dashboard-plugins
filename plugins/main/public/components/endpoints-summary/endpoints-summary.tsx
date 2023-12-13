@@ -23,6 +23,7 @@ import {
   EuiToolTip,
   EuiCard,
   EuiLink,
+  EuiText,
 } from '@elastic/eui';
 import { AgentsTable } from './table/agents-table';
 import { WzRequest } from '../../react-services/wz-request';
@@ -51,7 +52,9 @@ import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
 } from '../../../common/services/wz_agent_status';
-import { endpointSumary } from '../../utils/applications';
+import { endpointSumary, itHygiene } from '../../utils/applications';
+import { ShareAgent } from '../../factories/share-agent';
+import { getCore } from '../../kibana-services';
 import './endpoints-summary.scss';
 
 export const EndpointsSummary = compose(
@@ -70,8 +73,7 @@ export const EndpointsSummary = compose(
     constructor(props) {
       super(props);
       this.state = {
-        loadingAgents: false,
-        loadingSummary: false,
+        loadingLastRegisteredAgent: false,
         agentTableFilters: [],
         agentStatusSummary: props.agentStatusSummary,
         agentsActiveCoverage: props.agentsActiveCoverage,
@@ -82,11 +84,12 @@ export const EndpointsSummary = compose(
         label: agentStatusLabelByAgentStatus(agentStatus),
         color: agentStatusColorByAgentStatus(agentStatus),
       }));
+      this.shareAgent = new ShareAgent();
     }
 
     async componentDidMount() {
       this._isMount = true;
-      this.fetchAgentStatusDetailsData();
+      this.fetchLastRegisteredAgent();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
         const tabVisualizations = new TabVisualizations();
         tabVisualizations.removeAll();
@@ -115,38 +118,35 @@ export const EndpointsSummary = compose(
       }, {});
     };
 
-    async fetchAgents() {
-      this.setState({ loadingAgents: true });
-      const {
-        data: {
-          data: {
-            affected_items: [lastRegisteredAgent],
-          },
-        },
-      } = await WzRequest.apiReq('GET', '/agents', {
-        params: { limit: 1, sort: '-dateAdd', q: 'id!=000' },
-      });
-      const agentMostActive = await this.props.tableProps.getMostActive();
-      this.setState({
-        loadingAgents: false,
-        lastRegisteredAgent,
-        agentMostActive,
-      });
-    }
-    async fetchAgentStatusDetailsData() {
+    async fetchLastRegisteredAgent() {
       try {
-        this.fetchAgents();
+        this.setState({ loadingLastRegisteredAgent: true });
+        const {
+          data: {
+            data: {
+              affected_items: [lastRegisteredAgent],
+            },
+          },
+        } = await WzRequest.apiReq('GET', '/agents', {
+          params: { limit: 1, sort: '-dateAdd', q: 'id!=000' },
+        });
+        this.setState({
+          loadingLastRegisteredAgent: false,
+          lastRegisteredAgent,
+        });
       } catch (error) {
-        this.setState({ loadingAgents: false, loadingSummary: false });
+        this.setState({
+          loadingLastRegisteredAgent: false,
+        });
         const options = {
-          context: `${AgentsPreview.name}.fetchAgentStatusDetailsData`,
+          context: `EndpointsSummary.fetchLastRegisteredAgent`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
           error: {
             error: error,
             message: error.message || error,
-            title: `Could not get the agents summary`,
+            title: `Could not get the last registered agent`,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -173,137 +173,103 @@ export const EndpointsSummary = compose(
         <EuiPage className='flex-column'>
           <EuiFlexItem>
             <EuiFlexGroup className='agents-visualization-group mt-0'>
-              {
-                <>
-                  <EuiFlexItem className='agents-status-pie' grow={false}>
-                    <EuiCard
-                      title
-                      description
-                      betaBadgeLabel='Status'
-                      className='eui-panel'
-                    >
-                      <EuiFlexGroup>
-                        <EuiFlexItem className='align-items-center'>
-                          <VisualizationBasic
-                            isLoading={this.state.loadingSummary}
-                            type='donut'
-                            size={{ width: '100%', height: '150px' }}
-                            showLegend
-                            data={this.agentStatus.map(
-                              ({ status, label, color }) => ({
-                                label,
-                                value:
-                                  this.state.agentStatusSummary[status] || 0,
-                                color,
-                                onClick: () => this.filterAgentByStatus(status),
-                              }),
-                            )}
-                            noDataTitle='No results'
-                            noDataMessage='No results were found.'
-                          />
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </EuiCard>
-                  </EuiFlexItem>
-                  <EuiFlexItem className='agents-details-card'>
-                    <EuiCard title description betaBadgeLabel='Details'>
-                      <EuiFlexGroup wrap={true} className='group-details'>
-                        {this.agentStatus.map(({ status, label, color }) => (
-                          <EuiFlexItem key={`agent-details-status-${status}`}>
-                            <EuiStat
-                              isLoading={this.state.loadingSummary}
-                              title={
-                                <EuiToolTip
-                                  position='top'
-                                  content={`Filter by agent status: ${status}`}
-                                >
-                                  <span
-                                    onClick={() =>
-                                      this.filterAgentByStatus(status)
-                                    }
-                                    style={{ cursor: 'pointer' }}
-                                  >
-                                    {this.state.agentStatusSummary[status]}
-                                  </span>
-                                </EuiToolTip>
-                              }
-                              titleSize='s'
-                              description={label}
-                              titleColor={color}
-                              className='white-space-nowrap'
-                            />
-                          </EuiFlexItem>
-                        ))}
-                        <EuiFlexItem>
-                          <EuiStat
-                            isLoading={this.state.loadingSummary}
-                            title={`${this.state.agentsActiveCoverage}%`}
-                            titleSize='s'
-                            description='Agents coverage'
-                            className='white-space-nowrap'
-                          />
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                      <EuiFlexGroup className='mt-0'>
-                        <EuiFlexItem className='agents-link-item'>
-                          <EuiStat
-                            className='euiStatLink last-agents-link'
-                            isLoading={this.state.loadingAgents}
-                            title={
-                              <EuiToolTip
-                                position='top'
-                                content='View agent details'
+              <EuiFlexItem className='agents-status-pie' grow={false}>
+                <EuiCard
+                  title
+                  description
+                  betaBadgeLabel='Status'
+                  className='eui-panel'
+                >
+                  <EuiFlexGroup>
+                    <EuiFlexItem className='align-items-center'>
+                      <VisualizationBasic
+                        type='donut'
+                        size={{ width: '100%', height: '150px' }}
+                        showLegend
+                        data={this.agentStatus.map(
+                          ({ status, label, color }) => ({
+                            label,
+                            value: this.state.agentStatusSummary[status] || 0,
+                            color,
+                            onClick: () => this.filterAgentByStatus(status),
+                          }),
+                        )}
+                        noDataTitle='No results'
+                        noDataMessage='No results were found.'
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiCard>
+              </EuiFlexItem>
+              <EuiFlexItem className='agents-details-card'>
+                <EuiCard title description betaBadgeLabel='Details'>
+                  <EuiFlexGroup wrap={true} className='group-details'>
+                    {this.agentStatus.map(({ status, label, color }) => (
+                      <EuiFlexItem key={`agent-details-status-${status}`}>
+                        <EuiStat
+                          title={
+                            <EuiToolTip
+                              position='top'
+                              content={`Filter by agent status: ${status}`}
+                            >
+                              <span
+                                onClick={() => this.filterAgentByStatus(status)}
+                                style={{ cursor: 'pointer' }}
                               >
-                                <EuiLink
-                                  onClick={() =>
-                                    this.showAgent(
-                                      this.state.lastRegisteredAgent,
-                                    )
-                                  }
-                                >
-                                  {this.state.lastRegisteredAgent?.name || '-'}
-                                </EuiLink>
-                              </EuiToolTip>
-                            }
-                            titleSize='s'
-                            description='Last registered agent'
-                            titleColor='primary'
-                          />
-                        </EuiFlexItem>
-                        {
-                          <EuiFlexItem className='agents-link-item'>
-                            <EuiStat
-                              className={
-                                this.state.agentMostActive?.name
-                                  ? 'euiStatLink'
-                                  : ''
-                              }
-                              isLoading={this.state.loadingAgents}
-                              title={
-                                <EuiToolTip
-                                  position='top'
-                                  content='View agent details'
-                                >
-                                  <EuiLink
-                                    onClick={() =>
-                                      this.showAgent(this.state.agentMostActive)
-                                    }
-                                  >
-                                    {this.state.agentMostActive?.name || '-'}
-                                  </EuiLink>
-                                </EuiToolTip>
-                              }
-                              titleSize='s'
-                              description='Most active agent'
-                              titleColor='primary'
-                            />
-                          </EuiFlexItem>
+                                {this.state.agentStatusSummary[status]}
+                              </span>
+                            </EuiToolTip>
+                          }
+                          titleSize='s'
+                          description={label}
+                          titleColor={color}
+                          className='white-space-nowrap'
+                        />
+                      </EuiFlexItem>
+                    ))}
+                    <EuiFlexItem>
+                      <EuiStat
+                        title={`${this.state.agentsActiveCoverage}%`}
+                        titleSize='s'
+                        description='Agents coverage'
+                        className='white-space-nowrap'
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  <EuiFlexGroup className='mt-0'>
+                    <EuiFlexItem className='agents-link-item'>
+                      <EuiStat
+                        className='euiStatLink last-agents-link'
+                        isLoading={this.state.loadingLastRegisteredAgent}
+                        title={
+                          <EuiToolTip
+                            position='top'
+                            content='View agent details'
+                          >
+                            {this.state.lastRegisteredAgent?.id ? (
+                              <EuiLink
+                                href={getCore().application.getUrlForApp(
+                                  itHygiene.id,
+                                  {
+                                    path: `#/agents?tab=welcome&agent=${this.state.lastRegisteredAgent.id}`,
+                                  },
+                                )}
+                              >
+                                {this.state.lastRegisteredAgent.name || '-'}
+                              </EuiLink>
+                            ) : (
+                              <EuiText>-</EuiText>
+                            )}
+                          </EuiToolTip>
                         }
-                      </EuiFlexGroup>
-                    </EuiCard>
-                  </EuiFlexItem>
-                </>
-              }
+                        titleSize='s'
+                        description='Last registered agent'
+                        titleColor='primary'
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiCard>
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size='m' />
             <WzReduxProvider>
@@ -319,8 +285,3 @@ export const EndpointsSummary = compose(
     }
   },
 );
-
-AgentsTable.propTypes = {
-  tableProps: PropTypes.object,
-  showAgent: PropTypes.func,
-};
