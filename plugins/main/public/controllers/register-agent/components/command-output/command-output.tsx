@@ -63,6 +63,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
           <EuiCodeBlock
             style={{
               zIndex: '100',
+              wordWrap: 'break-word',
             }}
             language='tsx'
           >
