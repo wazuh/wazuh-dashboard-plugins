@@ -66,7 +66,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
             >
               <EuiFlexItem grow={false}>
                 <span className='registerAgentLabels'>
-                  Assign a server address
+                  Assign a server address:
                 </span>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
