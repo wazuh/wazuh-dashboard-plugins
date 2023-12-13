@@ -6,14 +6,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Added contextual information in the register agent commands [#6208](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6208)
 - Support for Wazuh 4.7.2
+- Added contextual information in the register agent commands [#6208](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6208)
 - Added host name and board serial information to Agents > Inventory data [#6191](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6191)
 
 ### Fixed
 
 - Fixed Agents preview page load when there are no registered agents [#6185](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6185)
-- Fixed the endpoint to get Wazuh server auth configuration [#6206](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6206)
+- Fixed the endpoint to get Wazuh server auth configuration [#6206](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6206) [#6213](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6213)
 
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 01
 
