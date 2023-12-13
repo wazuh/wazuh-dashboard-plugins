@@ -6,6 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Added contextual information in the register agent commands [#6208](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6208)
 - Support for Wazuh 4.7.2
 - Added host name and board serial information to Agents > Inventory data [#6191](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6191)
 
