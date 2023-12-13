@@ -11,15 +11,17 @@ import {
   EuiProgress,
   EuiButton,
 } from '@elastic/eui';
-import { WzRequest } from '../../../../react-services/wz-request';
+
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { ErrorHandler } from '../../../../react-services/error-management';
-import { getMasterRemoteConfiguration } from '../../../agent/components/register-agent-service';
 import './register-agent.scss';
 import { Steps } from '../steps/steps';
 import { InputForm } from '../../../../components/common/form';
-import { getGroups } from '../../services/register-agent-services';
+import {
+  getGroups,
+  getMasterConfiguration,
+} from '../../services/register-agent-services';
 import { useForm } from '../../../../components/common/form/hooks';
 import { FormConfiguration } from '../../../../components/common/form/types';
 import { useSelector } from 'react-redux';
@@ -93,39 +95,26 @@ export const RegisterAgent = withReduxProvider(
 
     const form = useForm(initialFields);
 
-    const getRemoteConfig = async () => {
-      const remoteConfig = await getMasterRemoteConfiguration();
-      if (remoteConfig) {
-        setHaveUdpProtocol(remoteConfig.isUdp);
+    const getMasterConfig = async () => {
+      const masterConfig = await getMasterConfiguration();
+      if (masterConfig?.remote) {
+        setHaveUdpProtocol(masterConfig.remote.isUdp);
       }
-    };
-
-    const getAuthInfo = async () => {
-      try {
-        const result = await WzRequest.apiReq(
-          'GET',
-          '/agents/000/config/auth/auth',
-          {},
-        );
-        return (result.data || {}).data || {};
-      } catch (error) {
-        ErrorHandler.handleError(error);
-      }
+      return masterConfig;
     };
 
     useEffect(() => {
       const fetchData = async () => {
         try {
           const wazuhVersion = await getWazuhVersion();
-          await getRemoteConfig();
-          const authInfo = await getAuthInfo();
+          const { auth: authConfig } = await getMasterConfig();
           // get wazuh password configuration
           let wazuhPassword = '';
-          const needsPassword = (authInfo.auth || {}).use_password === 'yes';
+          const needsPassword = authConfig?.auth?.use_password === 'yes';
           if (needsPassword) {
             wazuhPassword =
-              configuration['enrollment.password'] ||
-              authInfo['authd.pass'] ||
+              configuration?.['enrollment.password'] ||
+              authConfig?.['authd.pass'] ||
               '';
           }
           const groups = await getGroups();
