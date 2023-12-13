@@ -10,7 +10,6 @@ import {
 import React, { Fragment, useEffect, useState } from 'react';
 import { tOperatingSystem } from '../../core/config/os-commands-definitions';
 import { osdfucatePasswordInCommand } from '../../services/wazuh-password-service';
-import OsCommandWarning from './os-warning';
 
 interface ICommandSectionProps {
   commandText: string;
@@ -84,7 +83,6 @@ export default function CommandOutput(props: ICommandSectionProps) {
             </EuiCopy>
           )}
         </div>
-        <OsCommandWarning os={os} />
         <EuiSpacer size='s' />
         {showCommand && havePassword ? (
           <EuiSwitch

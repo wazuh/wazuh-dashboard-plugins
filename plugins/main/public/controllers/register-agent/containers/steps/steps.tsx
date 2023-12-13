@@ -33,6 +33,7 @@ import {
   tFormStepsLabel,
 } from '../../services/register-agent-steps-status-services';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import OsCommandWarning from '../../components/command-output/os-warning';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -207,13 +208,18 @@ export const Steps = ({
             />
           ) : null}
           {!missingStepsName?.length && !invalidFieldsName?.length ? (
-            <CommandOutput
-              commandText={installCommand}
-              showCommand={showCommandsSections(form.fields)}
-              os={registerAgentFormValues.operatingSystem.name}
-              onCopy={() => setInstallCommandWasCopied(true)}
-              password={registerAgentFormValues.optionalParams.wazuhPassword}
-            />
+            <>
+              <CommandOutput
+                commandText={installCommand}
+                showCommand={showCommandsSections(form.fields)}
+                os={registerAgentFormValues.operatingSystem.name}
+                onCopy={() => setInstallCommandWasCopied(true)}
+                password={registerAgentFormValues.optionalParams.wazuhPassword}
+              />
+              <OsCommandWarning
+                os={registerAgentFormValues.operatingSystem.name}
+              />
+            </>
           ) : null}
         </>
       ),
