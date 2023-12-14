@@ -12,10 +12,8 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiButtonEmpty,
-  EuiCallOut,
   EuiSpacer,
   EuiPanel,
-  EuiDataGridColumn
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
@@ -24,13 +22,13 @@ import { useDocViewer } from '../doc_viewer';
 import DocViewer from '../doc_viewer/doc_viewer';
 import { DiscoverNoResults } from '../../overview/vulnerabilities/common/components/no_results';
 import { LoadingSpinner } from '../../overview/vulnerabilities/common/components/loading_spinner';
-import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../hooks/data_grid';
+import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../data_grid';
 import { ErrorHandler, ErrorFactory, HttpError } from '../../../react-services/error-management';
 import { withErrorBoundary } from '../hocs';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
-import useSearchBar from '../hooks/search_bar/use_search_bar';
-import { search } from '../hooks/search_bar';
+import useSearchBar from '../search_bar/use_search_bar';
+import { search } from '../search_bar';
 import { getPlugins } from '../../../kibana-services';
 import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
 import { getDiscoverPanels } from './config/chart';

@@ -7,13 +7,12 @@ import {
   Filter,
   IIndexPattern,
   IndexPatternsContract,
-} from '../../../../../../../src/plugins/data/public';
-import { getDataPlugin } from '../../../../kibana-services';
+} from '../../../../../../src/plugins/data/public';
+import { getDataPlugin } from '../../../kibana-services';
 
-import { useFilterManager, useQueryManager, useTimeFilter } from '../../hooks';
-import { AUTHORIZED_AGENTS } from '../../../../../common/constants';
+import { useFilterManager, useQueryManager, useTimeFilter } from '../hooks';
+import { AUTHORIZED_AGENTS } from '../../../../common/constants';
 
-/// Input - types
 type tUseSearchBarCustomInputs = {
   defaultIndexPatternID: IIndexPattern['id'];
   onFiltersUpdated?: (filters: Filter[]) => void;
@@ -88,7 +87,7 @@ const useSearchBar = (
       try {
         return await indexPatternService.get(indexPatternID);
       } catch (error) {
-        // when the index pattern id not exists will get the default
+        // when the index pattern id not exists will get the default defined in the index pattern service
         console.error(error);
         return await indexPatternService.getDefault();
       }

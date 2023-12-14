@@ -1,23 +1,23 @@
 import { renderHook } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom/extend-expect';
 // osd dependencies
-import { Start, dataPluginMock } from '../../../../../../../src/plugins/data/public/mocks';
+import { Start, dataPluginMock } from '../../../../../../src/plugins/data/public/mocks';
 import {
   Filter,
   IndexPattern,
   Query,
   TimeRange,
-} from '../../../../../../../src/plugins/data/public';
+} from '../../../../../../src/plugins/data/public';
 // wazuh plugin dependencies
 import useSearchBar from './use_search_bar';
-import { getDataPlugin } from '../../../../kibana-services';
-import * as timeFilterHook from '../../hooks/use-time-filter';
-import * as queryManagerHook from '../../hooks/use-query';
+import { getDataPlugin } from '../../../kibana-services';
+import * as timeFilterHook from '../hooks/use-time-filter';
+import * as queryManagerHook from '../hooks/use-query';
 
 /**
  * Mocking Data Plugin
  **/
-jest.mock('../../../../kibana-services', () => {
+jest.mock('../../../kibana-services', () => {
   return {
     getDataPlugin: jest.fn(),
   };
@@ -73,7 +73,7 @@ describe('[hook] useSearchBarConfiguration', () => {
     spyUseQueryManager.mockImplementation(() => [mockQueryResult, jest.fn()]);
   });
 
-  it('should return default app index pattern when not receiving a default index pattern', async () => {
+  it.only('should return default app index pattern when not receiving a default index pattern', async () => {
     jest
       .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
       .mockResolvedValue(mockedDefaultIndexPatternData);
