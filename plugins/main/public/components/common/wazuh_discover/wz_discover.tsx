@@ -81,7 +81,7 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
   };
 
   const dataGridProps = useDataGrid({
-    ariaLabelledBy: 'Vulnerabilities Inventory Table',
+    ariaLabelledBy: 'Discover events table',
     defaultColumns: defaultTableColumns,
     results,
     indexPattern: indexPattern as IndexPattern,
@@ -143,7 +143,7 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
   return (
     <IntlProvider locale="en">
       <EuiPageTemplate
-        className="vulsInventoryContainer"
+        className="DiscoverContainerPage"
         restrictWidth="100%"
         fullHeight={true}
         grow
@@ -152,7 +152,7 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
           {isLoading ?
             <LoadingSpinner /> :
             <SearchBar
-              appName='inventory-vuls'
+              appName='wazuh-discover-search-bar'
               {...searchBarProps}
             />}
           {isSearching ?
@@ -171,13 +171,13 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
                         isFullScreenMode: false,
                         filters: searchBarProps.filters ?? [],
                         useMargins: false,
-                        id: 'vulnerability-detector-dashboard-tab-filters',
+                        id: 'wz-discover-events-histogram',
                         timeRange: {
                           from: searchBarProps.dateRangeFrom,
                           to: searchBarProps.dateRangeTo,
                         },
-                        title: 'Vulnerability detector dashboard filters',
-                        description: 'Dashboard of the Vulnerability detector filters',
+                        title: 'Discover Events Histogram',
+                        description: 'Histogram of events by date',
                         query: searchBarProps.query,
                         refreshConfig: {
                           pause: false,

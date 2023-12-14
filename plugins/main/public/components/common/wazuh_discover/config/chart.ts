@@ -3,8 +3,8 @@ import { EmbeddableInput } from "../../../../../../../src/plugins/embeddable/pub
 
 const hitsHistogram = (indexPatternId: string) => {
     return {
-        id: 'most_detected_vulnerabilities',
-        title: 'Most detected vulnerabilities',
+        id: 'events_histogram',
+        title: 'Events histogram',
         type: 'horizontal_bar',
         params: {
             type: 'histogram',
