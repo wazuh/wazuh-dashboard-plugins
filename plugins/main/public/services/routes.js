@@ -112,7 +112,8 @@ app.config($routeProvider => {
     })
     .when('/agents-preview/deploy', {
       template: agentDeployTemplate,
-      resolve: { wzConfig, ip },
+      resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+      reloadOnSearch: false,
       outerAngularWrapperRoute: true,
     })
     .when('/agents/:agent?/:tab?/:tabView?', {
