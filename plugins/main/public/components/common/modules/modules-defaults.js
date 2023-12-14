@@ -11,9 +11,7 @@
  */
 import { Dashboard } from './dashboard';
 import { Events } from './events';
-import { MainFim } from '../../agents/fim';
 import { MainSca } from '../../agents/sca';
-import { MainVuls } from '../../agents/vuls';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
@@ -21,8 +19,10 @@ import ButtonModuleExploreAgent from '../../../controllers/overview/components/o
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
-import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities'
-import { withModuleNotForAgent, withModuleTabLoader } from '../hocs';
+import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
+import { withModuleNotForAgent } from '../hocs';
+import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
+import { InventoryFim } from '../../overview/fim/inventory/inventory';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -56,12 +56,17 @@ export const ModulesDefaults = {
   fim: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
       {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonModuleExploreAgent],
-        component: MainFim,
+        component: DashboardFim,
+      },
+      {
+        id: 'inventory',
+        name: 'Inventory',
+        buttons: [ButtonModuleExploreAgent],
+        component: InventoryFim,
       },
       EventsTab,
     ],

@@ -51,6 +51,9 @@ export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities';
 
+// Wazuh fim
+export const WAZUH_FIM_PATTERN = 'wazuh-states-fim';
+
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
