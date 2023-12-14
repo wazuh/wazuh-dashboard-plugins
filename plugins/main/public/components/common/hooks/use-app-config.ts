@@ -15,5 +15,10 @@ import { useSelector } from 'react-redux';
 
 export const useAppConfig = () => {
   const appConfig = useSelector((state: AppRootState) => state.appConfig);
+  console.log(appConfig, 'appConfig in useAppConfig');
+  console.log(appConfig.data['fim.pattern'], "appConfig.data['fim.pattern']");
+
+  const FIM_INDEX_PATTERN_ID = appConfig.data['fim.pattern'];
+  console.log(FIM_INDEX_PATTERN_ID, 'FIM_INDEX_PATTERN_ID in useAppConfig');
   return appConfig;
-}
+};

@@ -60,6 +60,7 @@ export const configEquivalences = {
     'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
   'vulnerabilities.pattern':
     'Default index pattern to use for vulnerabilities.',
+  'fim.pattern': 'Default index pattern to use for fim.',
 };
 
 export const nameEquivalence = {
@@ -98,6 +99,8 @@ export const nameEquivalence = {
   'alerts.sample.prefix': 'Sample alerts prefix',
   'vulnerabilities.pattern': 'Index pattern',
   'checks.vulnerabilities.pattern': 'Vulnerabilities index pattern',
+  'fim.pattern': 'Index pattern',
+  'checks.fim.pattern': 'Fim index pattern',
 };
 
 const HEALTH_CHECK = 'Health Check';
@@ -106,6 +109,7 @@ const SECURITY = 'Security';
 const MONITORING = 'Monitoring';
 const STATISTICS = 'Statistics';
 const VULNERABILITIES = 'Vulnerabilities';
+const FIM = 'Fim';
 const CUSTOMIZATION = 'Logo Customization';
 export const categoriesNames = [
   HEALTH_CHECK,
@@ -114,6 +118,7 @@ export const categoriesNames = [
   MONITORING,
   STATISTICS,
   VULNERABILITIES,
+  FIM,
   CUSTOMIZATION,
 ];
 
@@ -153,6 +158,8 @@ export const categoriesEquivalence = {
   'alerts.sample.prefix': GENERAL,
   'vulnerabilities.pattern': VULNERABILITIES,
   'checks.vulnerabilities.pattern': HEALTH_CHECK,
+  'fim.pattern': FIM,
+  'checks.fim.pattern': HEALTH_CHECK,
 };
 
 const TEXT = 'text';
@@ -226,4 +233,6 @@ export const formEquivalence = {
   'alerts.sample.prefix': { type: TEXT },
   'vulnerabilities.pattern': { type: TEXT },
   'checks.vulnerabilities.pattern': { type: BOOLEAN },
+  'fim.pattern': { type: TEXT },
+  'checks.fim.pattern': { type: BOOLEAN },
 };

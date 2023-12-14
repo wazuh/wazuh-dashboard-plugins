@@ -86,7 +86,9 @@ const useSearchBarConfiguration = (
   const initSearchBar = async () => {
     setIsLoading(true);
     const indexPattern = await getIndexPattern(props?.defaultIndexPatternID);
+    console.log(props?.defaultIndexPatternID, 'props?.defaultIndexPatternID');
     setIndexPatternSelected(indexPattern);
+    console.log(indexPattern, 'indexPattern');
     const initialFilters = props?.filters ?? filters;
     filterManager.setFilters(initialFilters);
     setIsLoading(false);
@@ -97,10 +99,16 @@ const useSearchBarConfiguration = (
    * If not receive a ID return the default index from the index pattern service
    * @returns
    */
+  console.log(
+    props?.defaultIndexPatternID,
+    'props?.defaultIndexPatternID antes de getIndexPattern',
+  );
+
   const getIndexPattern = async (indexPatternID?: string) => {
     const indexPatternService = getDataPlugin()
       .indexPatterns as IndexPatternsContract;
     if (indexPatternID) {
+      console.log(indexPatternID, 'indexPatternID');
       try {
         return await indexPatternService.get(indexPatternID);
       } catch (error) {
