@@ -9,16 +9,6 @@ jest.mock('../../../../react-services', () => ({
   }),
 }));
 
-const mockedResponseClusterStatus = {
-  data: {
-    data: {
-      enabled: 'yes',
-      running: 'yes',
-    },
-    error: 0,
-  },
-};
-
 describe('Register agent service', () => {
   beforeEach(() => jest.clearAllMocks());
   describe('getRemoteConfiguration', () => {
@@ -51,14 +41,13 @@ describe('Register agent service', () => {
         },
       };
 
-      WzRequest.apiReq = jest
-        .fn()
-        .mockResolvedValueOnce(mockedResponseClusterStatus)
-        .mockResolvedValueOnce(mockedResponse);
+      WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
       const res = await RegisterAgentService.getRemoteConfiguration(
-        'example-node',
+        nodeName,
+        false,
       );
+      console.log(res);
       expect(res.name).toBe(nodeName);
       expect(res.haveSecureConnection).toBe(true);
     });
@@ -84,13 +73,11 @@ describe('Register agent service', () => {
           },
         },
       };
-      WzRequest.apiReq = jest
-        .fn()
-        .mockResolvedValueOnce(mockedResponseClusterStatus)
-        .mockResolvedValueOnce(mockedResponse);
+      WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
       const res = await RegisterAgentService.getRemoteConfiguration(
-        'example-node',
+        nodeName,
+        false,
       );
       expect(res.name).toBe(nodeName);
       expect(res.haveSecureConnection).toBe(false);
@@ -124,13 +111,11 @@ describe('Register agent service', () => {
           },
         },
       };
-      WzRequest.apiReq = jest
-        .fn()
-        .mockResolvedValueOnce(mockedResponseClusterStatus)
-        .mockResolvedValueOnce(mockedResponse);
+      WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
       const res = await RegisterAgentService.getRemoteConfiguration(
-        'example-node',
+        nodeName,
+        false,
       );
       expect(res.name).toBe(nodeName);
       expect(res.isUdp).toEqual(true);
@@ -164,13 +149,11 @@ describe('Register agent service', () => {
           },
         },
       };
-      WzRequest.apiReq = jest
-        .fn()
-        .mockResolvedValueOnce(mockedResponseClusterStatus)
-        .mockResolvedValueOnce(mockedResponse);
+      WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
       const res = await RegisterAgentService.getRemoteConfiguration(
-        'example-node',
+        nodeName,
+        false,
       );
       expect(res.name).toBe(nodeName);
       expect(res.isUdp).toEqual(false);
@@ -204,13 +187,11 @@ describe('Register agent service', () => {
           },
         },
       };
-      WzRequest.apiReq = jest
-        .fn()
-        .mockResolvedValueOnce(mockedResponseClusterStatus)
-        .mockResolvedValueOnce(mockedResponse);
+      WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
       const res = await RegisterAgentService.getRemoteConfiguration(
-        'example-node',
+        nodeName,
+        false,
       );
       expect(res.name).toBe(nodeName);
       expect(res.isUdp).toEqual(false);

@@ -73,7 +73,7 @@ async function getRemoteConfiguration(
         {},
       );
     }
-    const items = ((result.data || {}).data || {}).affected_items || [];
+    const items = result?.data?.data?.affected_items || [];
     const remote = items[0]?.remote;
     if (remote) {
       const remoteFiltered = remote.filter((item: RemoteItem) => {
