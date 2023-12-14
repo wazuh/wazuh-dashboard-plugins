@@ -20,7 +20,7 @@ import { Steps } from '../steps/steps';
 import { InputForm } from '../../../../common/form';
 import {
   getGroups,
-  getMasterRemoteConfiguration,
+  getMasterConfiguration,
 } from '../../services/register-agent-services';
 import { useForm } from '../../../../common/form/hooks';
 import { FormConfiguration } from '../../../../common/form/types';
@@ -99,24 +99,12 @@ export const RegisterAgent = compose(
 
   const form = useForm(initialFields);
 
-  const getRemoteConfig = async () => {
-    const remoteConfig = await getMasterRemoteConfiguration();
-    if (remoteConfig) {
-      setHaveUdpProtocol(remoteConfig.isUdp);
+  const getMasterConfig = async () => {
+    const masterConfig = await getMasterConfiguration();
+    if (masterConfig?.remote) {
+      setHaveUdpProtocol(masterConfig.remote.isUdp);
     }
-  };
-
-  const getAuthInfo = async () => {
-    try {
-      const result = await WzRequest.apiReq(
-        'GET',
-        '/agents/000/config/auth/auth',
-        {},
-      );
-      return result?.data?.data || {};
-    } catch (error) {
-      ErrorHandler.handleError(error);
-    }
+    return masterConfig;
   };
 
   const getWazuhVersion = async () => {
@@ -143,15 +131,14 @@ export const RegisterAgent = compose(
     const fetchData = async () => {
       try {
         const wazuhVersion = await getWazuhVersion();
-        await getRemoteConfig();
-        const authInfo = await getAuthInfo();
+        const { auth: authConfig } = await getMasterConfig();
         // get wazuh password configuration
         let wazuhPassword = '';
-        const needsPassword = (authInfo.auth || {}).use_password === 'yes';
+        const needsPassword = authConfig?.auth?.use_password === 'yes';
         if (needsPassword) {
           wazuhPassword =
-            configuration['enrollment.password'] ||
-            authInfo['authd.pass'] ||
+            configuration?.['enrollment.password'] ||
+            authConfig?.['authd.pass'] ||
             '';
         }
         const groups = await getGroups();

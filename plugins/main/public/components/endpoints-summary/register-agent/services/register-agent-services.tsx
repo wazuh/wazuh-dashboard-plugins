@@ -31,7 +31,7 @@ export type ServerAddressOptions = {
 /**
  * Get the cluster status
  */
-const clusterStatusResponse = async (): Promise<boolean> => {
+export const clusterStatusResponse = async (): Promise<boolean> => {
   const clusterStatus = await WzRequest.apiReq('GET', '/cluster/status', {});
   if (
     clusterStatus.data.data.enabled === 'yes' &&
@@ -48,9 +48,10 @@ const clusterStatusResponse = async (): Promise<boolean> => {
 /**
  * Get the remote configuration from api
  */
-export const getRemoteConfiguration = async (
+async function getRemoteConfiguration(
   nodeName: string,
-): Promise<RemoteConfig> => {
+  clusterStatus: boolean,
+): Promise<RemoteConfig> {
   let config: RemoteConfig = {
     name: nodeName,
     isUdp: false,
@@ -58,7 +59,6 @@ export const getRemoteConfiguration = async (
   };
 
   try {
-    const clusterStatus = await clusterStatusResponse();
     let result;
     if (clusterStatus) {
       result = await WzRequest.apiReq(
@@ -99,7 +99,20 @@ export const getRemoteConfiguration = async (
   } catch (error) {
     return config;
   }
-};
+}
+/**
+ * Get the manager/cluster auth configuration from Wazuh API
+ * @param node
+ * @returns
+ */
+async function getAuthConfiguration(node: string, clusterStatus: boolean) {
+  const authConfigUrl = clusterStatus
+    ? `/cluster/${node}/configuration/auth/auth`
+    : '/manager/configuration/auth/auth';
+  const result = await WzRequest.apiReq('GET', authConfigUrl, {});
+  const auth = result?.data?.data?.affected_items?.[0];
+  return auth;
+}
 
 /**
  * Get the remote protocol available from list of protocols
@@ -118,15 +131,19 @@ function getRemoteProtocol(protocols: Protocol[]) {
  * @param nodeSelected
  * @param defaultServerAddress
  */
-export const getConnectionConfig = async (
+async function getConnectionConfig(
   nodeSelected: ServerAddressOptions,
   defaultServerAddress?: string,
-) => {
+) {
   const nodeName = nodeSelected?.label;
   const nodeIp = nodeSelected?.value;
   if (!defaultServerAddress) {
     if (nodeSelected.nodetype !== 'custom') {
-      const remoteConfig = await getRemoteConfiguration(nodeName);
+      const clusterStatus = await clusterStatusResponse();
+      const remoteConfig = await getRemoteConfiguration(
+        nodeName,
+        clusterStatus,
+      );
       return {
         serverAddress: nodeIp,
         udpProtocol: remoteConfig.isUdp,
@@ -146,7 +163,7 @@ export const getConnectionConfig = async (
       connectionSecure: true,
     };
   }
-};
+}
 
 type NodeItem = {
   name: string;
@@ -165,14 +182,14 @@ type NodeResponse = {
 /**
  * Get the list of the cluster nodes and parse it into a list of options
  */
-const getNodeIPs = async (): Promise<any> => {
+export const getNodeIPs = async (): Promise<any> => {
   return await WzRequest.apiReq('GET', '/cluster/nodes', {});
 };
 
 /**
  * Get the list of the manager and parse it into a list of options
  */
-const getManagerNode = async (): Promise<any> => {
+export const getManagerNode = async (): Promise<any> => {
   const managerNode = await WzRequest.apiReq('GET', '/manager/api/config', {});
   return (
     managerNode?.data?.data?.affected_items?.map(item => ({
@@ -187,7 +204,9 @@ const getManagerNode = async (): Promise<any> => {
  * Parse the nodes list from the API response to a format that can be used by the EuiComboBox
  * @param nodes
  */
-const parseNodesInOptions = (nodes: NodeResponse): ServerAddressOptions[] => {
+export const parseNodesInOptions = (
+  nodes: NodeResponse,
+): ServerAddressOptions[] => {
   return nodes.data.data.affected_items.map((item: NodeItem) => ({
     label: item.name,
     value: item.ip,
@@ -198,7 +217,9 @@ const parseNodesInOptions = (nodes: NodeResponse): ServerAddressOptions[] => {
 /**
  * Get the list of the cluster nodes from API and parse it into a list of options
  */
-const fetchClusterNodesOptions = async (): Promise<ServerAddressOptions[]> => {
+export const fetchClusterNodesOptions = async (): Promise<
+  ServerAddressOptions[]
+> => {
   const clusterStatus = await clusterStatusResponse();
   if (clusterStatus) {
     // Cluster mode
@@ -216,21 +237,32 @@ const fetchClusterNodesOptions = async (): Promise<ServerAddressOptions[]> => {
  * Get the master node data from the list of cluster nodes
  * @param nodeIps
  */
-const getMasterNode = (
+export const getMasterNode = (
   nodeIps: ServerAddressOptions[],
 ): ServerAddressOptions[] => {
   return nodeIps.filter(nodeIp => nodeIp.nodetype === 'master');
 };
 
 /**
- * Get the remote configuration from manager
+ * Get the remote and the auth configuration from manager
  * This function get the config from manager mode or cluster mode
  */
-export const getMasterRemoteConfiguration = async () => {
+export const getMasterConfiguration = async () => {
   const nodes = await fetchClusterNodesOptions();
   const masterNode = getMasterNode(nodes);
-  return await getRemoteConfiguration(masterNode[0].label);
+  const clusterStatus = await clusterStatusResponse();
+  const remote = await getRemoteConfiguration(
+    masterNode[0].label,
+    clusterStatus,
+  );
+  const auth = await getAuthConfiguration(masterNode[0].label, clusterStatus);
+  return {
+    remote,
+    auth,
+  };
 };
+
+export { getConnectionConfig, getRemoteConfiguration };
 
 export const getGroups = async () => {
   try {
