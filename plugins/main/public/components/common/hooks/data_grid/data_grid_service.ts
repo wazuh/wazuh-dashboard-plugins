@@ -142,7 +142,7 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
 
     if (blobData) {
         // @ts-ignore
-        FileSaver?.saveAs(blobData, `vulnerabilities_inventory-${new Date().toISOString()}.csv`);
+        FileSaver?.saveAs(blobData, `events-${new Date().toISOString()}.csv`);
     }
 }
 
