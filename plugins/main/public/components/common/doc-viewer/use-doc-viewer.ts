@@ -1,4 +1,4 @@
-import { tDocViewerProps } from "./doc_viewer"
+import { tDocViewerProps } from "./doc-viewer"
 import { IndexPattern } from "../../../../../../src/plugins/data/common";
 
 type tUseDocViewerInputs = {

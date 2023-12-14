@@ -2,7 +2,7 @@ import { EuiDataGridCellValueElementProps, EuiDataGridColumn, EuiDataGridProps, 
 import React, { useEffect, useMemo, useState, Fragment } from "react";
 import { SearchResponse } from "@opensearch-project/opensearch/api/types";
 // ToDo: check how create this methods
-import { parseData, getFieldFormatted, parseColumns } from './data_grid_service';
+import { parseData, getFieldFormatted, parseColumns } from './data-grid-service';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 
 const MAX_ENTRIES_PER_QUERY = 10000;
