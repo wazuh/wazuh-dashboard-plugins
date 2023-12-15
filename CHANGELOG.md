@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.8.1
 
+### Fixed
+
+- Fixed the reporting notification toast, that showed an incorrect path[#6225](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6225)
+
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 00
 
 ### Added
