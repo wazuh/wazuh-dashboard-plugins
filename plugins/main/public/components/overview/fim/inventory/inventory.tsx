@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { getPlugins } from '../../../../kibana-services';
-import useSearchBarConfiguration from '../../vulnerabilities/search_bar/use_search_bar_configuration';
+import useSearchBar from '../../../common/search-bar/use-search-bar';
 
 import { IntlProvider } from 'react-intl';
 import {
@@ -46,7 +46,7 @@ import { useAppConfig } from '../../../common/hooks';
 const InventoryFimComponent = () => {
   const appConfig = useAppConfig();
   const FIM_INDEX_PATTERN_ID = appConfig.data['fim.pattern'];
-  const { searchBarProps } = useSearchBarConfiguration({
+  const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: FIM_INDEX_PATTERN_ID,
   });
   const { isLoading, filters, query, indexPatterns } = searchBarProps;
