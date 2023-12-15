@@ -11,14 +11,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import {
   EuiPage,
   EuiFlexGroup,
   EuiFlexItem,
   EuiStat,
-  EuiLoadingChart,
   EuiSpacer,
   EuiToolTip,
   EuiCard,
@@ -70,13 +68,14 @@ export const EndpointsSummary = compose(
 )(
   class EndpointsSummary extends Component {
     _isMount = false;
-    constructor(props) {
-      super(props);
+    constructor() {
+      super();
       this.state = {
-        loadingLastRegisteredAgent: false,
+        loadingSummary: true,
+        loadingLastRegisteredAgent: true,
         agentTableFilters: [],
-        agentStatusSummary: props.agentStatusSummary,
-        agentsActiveCoverage: props.agentsActiveCoverage,
+        agentStatusSummary: [],
+        agentsActiveCoverage: undefined,
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
@@ -89,6 +88,7 @@ export const EndpointsSummary = compose(
 
     async componentDidMount() {
       this._isMount = true;
+      this.getSummary();
       this.fetchLastRegisteredAgent();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
         const tabVisualizations = new TabVisualizations();
@@ -117,6 +117,52 @@ export const EndpointsSummary = compose(
         return prev;
       }, {});
     };
+
+    async getSummary() {
+      try {
+        this.setState({ loadingSummary: true });
+
+        const {
+          data: {
+            data: {
+              connection: agentStatusSummary,
+              configuration: agentConfiguration,
+            },
+          },
+        } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+
+        const agentsActiveCoverage = (
+          (agentStatusSummary?.active / agentStatusSummary?.total) *
+          100
+        ).toFixed(2);
+
+        this.setState({
+          loadingSummary: false,
+          agentStatusSummary,
+          agentsActiveCoverage: isNaN(agentsActiveCoverage)
+            ? 0
+            : agentsActiveCoverage,
+        });
+      } catch (error) {
+        this.setState({
+          loadingSummary: false,
+          agentStatusSummary: [],
+          agentsActiveCoverage: undefined,
+        });
+        const options = {
+          context: `EndpointsSummary.getSummary`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Could not get agents summary`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    }
 
     async fetchLastRegisteredAgent() {
       try {
@@ -157,10 +203,6 @@ export const EndpointsSummary = compose(
       this._isMount && this.setState({ agentTableFilters: {} });
     }
 
-    showAgent(agent) {
-      agent && this.props.tableProps.showAgent(agent);
-    }
-
     filterAgentByStatus(status) {
       this._isMount &&
         this.setState({
@@ -183,6 +225,7 @@ export const EndpointsSummary = compose(
                   <EuiFlexGroup>
                     <EuiFlexItem className='align-items-center'>
                       <VisualizationBasic
+                        isLoading={this.state.loadingSummary}
                         type='donut'
                         size={{ width: '100%', height: '150px' }}
                         showLegend
@@ -207,6 +250,7 @@ export const EndpointsSummary = compose(
                     {this.agentStatus.map(({ status, label, color }) => (
                       <EuiFlexItem key={`agent-details-status-${status}`}>
                         <EuiStat
+                          isLoading={this.state.loadingSummary}
                           title={
                             <EuiToolTip
                               position='top'
@@ -229,6 +273,7 @@ export const EndpointsSummary = compose(
                     ))}
                     <EuiFlexItem>
                       <EuiStat
+                        isLoading={this.state.loadingSummary}
                         title={`${this.state.agentsActiveCoverage}%`}
                         titleSize='s'
                         description='Agents coverage'

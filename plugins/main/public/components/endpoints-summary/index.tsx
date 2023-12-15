@@ -19,66 +19,32 @@ import { getCore } from '../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { useGetTotalEndpoints } from './hooks';
 
 export const MainEndpointsSummary = compose(
   withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([{ text: endpointSumary.title }]),
 )(() => {
-  const [isSummaryLoading, setIsSummaryLoading] = useState(true);
-  const [agentStatusSummary, setAgentStatusSummary] = useState();
-  const [agentCount, setAgentCount] = useState<number>();
-  const [agentsActiveCoverage, setAgentsActiveCoverage] = useState();
+  const { isLoading, totalEndpoints, error } = useGetTotalEndpoints();
 
-  const getSummary = async () => {
-    try {
-      setIsSummaryLoading(true);
+  if (error) {
+    const options = {
+      context: `MainEndpointsSummary.getTotalEndpoints`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: `Could not get agents summary`,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
+    // return <div>Error</div>;
+  }
 
-      const {
-        data: {
-          data: {
-            connection: agentStatusSummary,
-            configuration: agentConfiguration,
-          },
-        },
-      } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-
-      const agentsActiveCoverage = (
-        (agentStatusSummary?.active / agentStatusSummary?.total) *
-        100
-      ).toFixed(2);
-
-      setAgentStatusSummary(agentStatusSummary);
-      setAgentCount(agentStatusSummary?.total ?? 0);
-      setAgentsActiveCoverage(
-        isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
-      );
-      setIsSummaryLoading(false);
-    } catch (error) {
-      setIsSummaryLoading(false);
-      setAgentStatusSummary([]);
-      setAgentCount(0);
-      setAgentsActiveCoverage(0);
-      const options = {
-        context: `MainEndpointsSummary.getSummary`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `Could not get agents summary`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  };
-
-  useEffect(() => {
-    getSummary();
-  }, []);
-
-  if (isSummaryLoading) {
+  if (isLoading) {
     return (
       <EuiPage paddingSize='m'>
         <EuiPageBody>
@@ -88,7 +54,7 @@ export const MainEndpointsSummary = compose(
     );
   }
 
-  if (agentCount === 0) {
+  if (totalEndpoints === 0) {
     return (
       <EuiEmptyPrompt
         iconType='watchesApp'
@@ -114,10 +80,7 @@ export const MainEndpointsSummary = compose(
   return (
     <EuiPage paddingSize='m'>
       <EuiPageBody>
-        <EndpointsSummary
-          agentStatusSummary={agentStatusSummary}
-          agentsActiveCoverage={agentsActiveCoverage}
-        />
+        <EndpointsSummary />
       </EuiPageBody>
     </EuiPage>
   );
