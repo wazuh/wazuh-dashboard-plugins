@@ -28,8 +28,6 @@ const appConfigReducer: Reducer<AppConfigState, ResolverAction> = (
   state = initialState,
   action,
 ) => {
-  console.log('Current State:', state);
-  console.log('Action:', action);
   switch (action.type) {
     case 'UPDATE_APP_CONFIG_SET_IS_LOADING':
       return {

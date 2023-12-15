@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { getPlugins } from '../../../../kibana-services';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-
 import { IntlProvider } from 'react-intl';
 import {
   EuiDataGrid,

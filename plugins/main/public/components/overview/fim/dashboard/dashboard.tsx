@@ -1,6 +1,5 @@
 import React from 'react';
 import { getPlugins } from '../../../../kibana-services';
-
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
@@ -9,6 +8,7 @@ import { getDashboardFilters } from './dashboard_panels_filters';
 import './fim_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
 import { useAppConfig } from '../../../common/hooks';
+
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
