@@ -57,8 +57,8 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       {
-        id: 'inventory',
-        name: 'Inventory',
+        id: 'dashboard',
+        name: 'dashboard',
         buttons: [ButtonModuleExploreAgent],
         component: DashboardFim,
       },
