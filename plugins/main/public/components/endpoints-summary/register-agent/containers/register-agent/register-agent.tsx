@@ -184,9 +184,9 @@ export const RegisterAgent = compose(
                   <EuiButtonEmpty
                     size='s'
                     href={getCore().application.getUrlForApp(
-                      'endpoints-summary',
+                      endpointSumary.id,
                       {
-                        path: '#/agents-preview',
+                        path: `#${endpointSumary.redirectTo()}`,
                       },
                     )}
                     iconType='cross'
@@ -234,9 +234,9 @@ export const RegisterAgent = compose(
                       fill
                       color='primary'
                       href={getCore().application.getUrlForApp(
-                        'endpoints-summary',
+                        endpointSumary.id,
                         {
-                          path: '#/agents-preview',
+                          path: `#${endpointSumary.redirectTo()}`,
                         },
                       )}
                     >
