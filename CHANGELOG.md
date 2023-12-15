@@ -29,6 +29,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed exception in IT-Hygiene when an agent doesn't have policies [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
 - Fixed exception in Inventory when agents don't have S.O. information [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
 - Fixed pinned agent state in URL [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
+- Fixed the reporting notification toast, that showed an incorrect path[#6226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6226)
 
 ### Removed
 
