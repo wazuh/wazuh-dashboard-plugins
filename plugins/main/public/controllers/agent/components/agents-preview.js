@@ -54,6 +54,7 @@ import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
+import { AppNavigate } from '../../../react-services/app-navigate.js';
 
 export const AgentsPreview = compose(
   withErrorBoundary,
@@ -319,10 +320,13 @@ export const AgentsPreview = compose(
                                 content='View agent details'
                               >
                                 <EuiLink
-                                  onClick={() =>
-                                    this.showAgent(
-                                      this.state.lastRegisteredAgent,
-                                    )
+                                  onClick={ev => {
+                                    ev.stopPropagation();
+                                    AppNavigate.navigateToModule(ev, 'agents', {
+                                      tab: 'welcome',
+                                      agent: this.state.lastRegisteredAgent?.id,
+                                    });
+                                  }
                                   }
                                 >
                                   {this.state.lastRegisteredAgent?.name || '-'}
@@ -349,8 +353,13 @@ export const AgentsPreview = compose(
                                   content='View agent details'
                                 >
                                   <EuiLink
-                                    onClick={() =>
-                                      this.showAgent(this.state.agentMostActive)
+                                    onClick={ev => {
+                                      ev.stopPropagation();
+                                      AppNavigate.navigateToModule(ev, 'agents', {
+                                        tab: 'welcome',
+                                        agent: this.state.agentMostActive?.id,
+                                      });
+                                    }
                                     }
                                   >
                                     {this.state.agentMostActive?.name || '-'}
