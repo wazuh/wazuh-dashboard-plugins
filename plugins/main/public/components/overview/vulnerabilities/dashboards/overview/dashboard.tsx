@@ -50,6 +50,7 @@ const DashboardVulsComponent: React.FC = () => {
     <>
       <I18nProvider>
         <>
+          <h1>{resultIndexData?.hits?.total}</h1>
           {isLoading || isLoadingSearchbar ? <LoadingSpinner /> : null}
           {!isLoading && !isLoadingSearchbar ? (
             <SearchBar
@@ -62,10 +63,16 @@ const DashboardVulsComponent: React.FC = () => {
           ) : null}
           {!isLoadingSearchbar &&
           !isLoading &&
-          (isError || resultIndexData?.hits?.total === 0) ? (
+          (isError ||
+            !resultIndexData?.hits?.total ||
+            resultIndexData?.hits?.total === 0) ? (
             <DiscoverNoResults message={error?.message} />
           ) : null}
-          {!isLoadingSearchbar && !isLoading && isSuccess ? (
+          {!isLoadingSearchbar &&
+          !isLoading &&
+          isSuccess &&
+          resultIndexData?.hits?.total &&
+          resultIndexData?.hits?.total > 0 ? (
             <>
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer
