@@ -47,7 +47,6 @@ describe('Register agent service', () => {
         nodeName,
         false,
       );
-      console.log(res);
       expect(res.name).toBe(nodeName);
       expect(res.haveSecureConnection).toBe(true);
     });
