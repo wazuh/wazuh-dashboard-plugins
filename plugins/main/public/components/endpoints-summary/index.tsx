@@ -32,7 +32,7 @@ export const MainEndpointsSummary = compose(
     const options = {
       context: `MainEndpointsSummary.getTotalEndpoints`,
       level: UI_LOGGER_LEVELS.ERROR,
-      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      severity: UI_ERROR_SEVERITIES.CRITICAL,
       store: true,
       error: {
         error: error,
@@ -41,7 +41,6 @@ export const MainEndpointsSummary = compose(
       },
     };
     getErrorOrchestrator().handleError(options);
-    // return <div>Error</div>;
   }
 
   if (isLoading) {
