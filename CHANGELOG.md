@@ -17,7 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Moved the plugin menu to platform applications into the side menu [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
+- Moved the plugin menu to platform applications into the side menu [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840) [#6226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6226)
 - Changed dashboards. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035)
 - Change the display order of tabs in all modules. [#6067](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6067)
 - Upgraded the `axios` dependency to `1.6.1` [#5062](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5062)
@@ -29,13 +29,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed exception in IT-Hygiene when an agent doesn't have policies [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
 - Fixed exception in Inventory when agents don't have S.O. information [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
 - Fixed pinned agent state in URL [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
-- Fixed the reporting notification toast, that showed an incorrect path[#6226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6226)
 
 ### Removed
 
 - Removed the `disabled_roles` and `customization.logo.sidebar` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Removed the ability to configure the visibility of modules and removed `extensions.*` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
-- Removed the application menu in the IT Hygiene application [6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
+- Removed the application menu in the IT Hygiene application [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 - Removed the implicit filter of WQL language of the search bar UI [#6174](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6174)
 
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 01
@@ -56,7 +55,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.7.0
 - Added `status detail` column in the agents table. [#5680](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5680)
-- Added agent register wizard handle properly special characters in password [5738](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5738)
+- Added agent register wizard handle properly special characters in password [#5738](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5738)
 
 ### Changed
 
