@@ -12,9 +12,7 @@
  */
 
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import {
-  EuiButton,
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
@@ -82,6 +80,10 @@ export const AgentsTable = compose(
       if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
+    }
+
+    async reloadAgents() {
+      await this.setState({ reloadTable: Date.now() });
     }
 
     async componentDidUpdate(prevProps) {
@@ -188,7 +190,8 @@ export const AgentsTable = compose(
         name: 'Group(s)',
         sortable: true,
         show: true,
-        render: groups => (groups !== '-' ? this.renderGroups(groups) : '-'),
+        render: (groups, agent) =>
+          groups !== '-' ? this.renderGroups(groups, agent) : '-',
         searchable: true,
       },
       {
@@ -498,7 +501,7 @@ export const AgentsTable = compose(
       });
     };
 
-    renderGroups(groups) {
+    renderGroups(groups, agent) {
       return Array.isArray(groups) ? (
         <GroupTruncate
           groups={groups}
@@ -506,6 +509,9 @@ export const AgentsTable = compose(
           label={'more'}
           action={'filter'}
           filterAction={this.filterGroupBadge}
+          allowRemove
+          agent={agent}
+          reloadAgents={() => this.reloadAgents()}
           {...this.props}
         />
       ) : undefined;
