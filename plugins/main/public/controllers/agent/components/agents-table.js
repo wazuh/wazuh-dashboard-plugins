@@ -233,6 +233,7 @@ export const AgentsTable = compose(
             />
           </span>
         ),
+        render: dateAdd => formatUIDate(dateAdd),
         sortable: true,
         show: false,
         searchable: false,
@@ -250,6 +251,7 @@ export const AgentsTable = compose(
             />
           </span>
         ),
+        render: lastKeepAlive => formatUIDate(lastKeepAlive),
         sortable: true,
         show: false,
         searchable: false,
@@ -334,12 +336,6 @@ export const AgentsTable = compose(
                 return {
                   ...item,
                   ...(item.ip ? { ip: item.ip } : { ip: '-' }),
-                  ...(typeof item.dateAdd === 'string'
-                    ? { dateAdd: formatUIDate(item.dateAdd) }
-                    : { dateAdd: '-' }),
-                  ...(typeof item.lastKeepAlive === 'string'
-                    ? { lastKeepAlive: formatUIDate(item.lastKeepAlive) }
-                    : { lastKeepAlive: '-' }),
                   ...(item.node_name !== 'unknown'
                     ? { node_name: item.node_name }
                     : { node_name: '-' }),
