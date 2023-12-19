@@ -69,7 +69,7 @@ const useCheckIndexFields = (
 
       checkIndexFields();
     }
-  }, [indexPatternId, query]);
+  }, [indexPatternId, query, indexPattern]);
 
   return {
     isError,
