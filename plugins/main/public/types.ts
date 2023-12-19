@@ -12,6 +12,7 @@ import { SecurityOssPluginStart } from '../../../src/plugins/security_oss/public
 import { SavedObjectsStart } from '../../../src/plugins/saved_objects/public';
 import { TelemetryPluginStart, TelemetryPluginSetup } from '../../../src/plugins/telemetry/public';
 import { WazuhCheckUpdatesPluginStart } from '../../wazuh-check-updates/public';
+import { WazuhEndpointsPluginStart } from '../../wazuh-endpoints/public';
 import { DashboardStart } from '../../../src/plugins/dashboard/public';
 
 export interface AppPluginStartDependencies {
@@ -24,6 +25,7 @@ export interface AppPluginStartDependencies {
   savedObjects: SavedObjectsStart;
   telemetry: TelemetryPluginStart;
   wazuhCheckUpdates: WazuhCheckUpdatesPluginStart;
+  wazuhEndpoints: WazuhEndpointsPluginStart;
   dashboard: DashboardStart;
 }
 export interface AppDependencies {
