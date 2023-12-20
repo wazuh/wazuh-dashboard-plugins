@@ -27,7 +27,7 @@ export const GroupTruncateBadge = compose(
 
   const [isRemoveGroupModalVisible, setIsRemoveGroupModalVisible] =
     useState(false);
-  const [isConfirmeRemoveLoading, setIsConfirmRemoveLoading] = useState(false);
+  const [isConfirmRemoveLoading, setIsConfirmRemoveLoading] = useState(false);
 
   const hadleOnClickGroup = () => {
     switch (action) {
@@ -53,7 +53,7 @@ export const GroupTruncateBadge = compose(
       reloadAgents();
     } catch (error) {
       const options = {
-        context: `MainEndpointsSummary.getTotalAgents`,
+        context: `GroupTruncateBadge.removeAgentFromGroupService`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -89,7 +89,7 @@ export const GroupTruncateBadge = compose(
         onClick={ev => {
           ev.stopPropagation();
         }}
-        isLoading={isConfirmeRemoveLoading}
+        isLoading={isConfirmRemoveLoading}
       >
         <p>
           Remove agent <b>{agent.name}</b> from group <b>{group}</b>?

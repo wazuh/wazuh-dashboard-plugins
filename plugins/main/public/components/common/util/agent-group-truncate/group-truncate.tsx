@@ -26,7 +26,7 @@ import { endpointGroups } from '../../../../utils/applications';
 export class GroupTruncate extends React.Component {
   _isMount = false;
   state: {
-    groups: string[];
+    groups: any;
     popoverOpen: boolean;
   };
   props!: {

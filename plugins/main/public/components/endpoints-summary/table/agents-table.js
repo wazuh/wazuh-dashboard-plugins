@@ -509,6 +509,7 @@ export const AgentsTable = compose(
           label={'more'}
           action={'filter'}
           filterAction={this.filterGroupBadge}
+          allowEdit
           allowRemove
           agent={agent}
           reloadAgents={() => this.reloadAgents()}
