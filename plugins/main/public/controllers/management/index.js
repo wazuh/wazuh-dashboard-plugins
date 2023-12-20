@@ -13,7 +13,6 @@
 import { GroupsController } from './groups';
 import { ManagementController } from './management';
 import { ClusterController } from './monitoring';
-import { ManagementWelcomeWrapper } from '../../components/common/welcome/management-welcome-wrapper';
 import WzManagement from './components/management/management-provider';
 import WzManagementConfiguration from './components/management/configuration/configuration-main';
 import { getAngularModule } from '../../kibana-services';
@@ -21,13 +20,11 @@ import { getAngularModule } from '../../kibana-services';
 const app = getAngularModule();
 
 WzManagement.displayName = 'WzManagement';
-ManagementWelcomeWrapper.displayName = 'ManagementWelcomeWrapper';
 WzManagementConfiguration.displayName = 'WzManagementConfiguration';
 
 app
   .controller('managementController', ManagementController)
   .controller('groupsPreviewController', GroupsController)
   .controller('clusterController', ClusterController)
-  .value('ManagementWelcomeWrapper', ManagementWelcomeWrapper)
   .value('WzManagement', WzManagement)
   .value('WzManagementConfiguration', WzManagementConfiguration);

@@ -21,12 +21,16 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { formatUIDate } from '../../react-services/time-service';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
 import { UI_LOGGER_LEVELS, PLUGIN_APP_NAME } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getAssetURL } from '../../utils/assets';
-import { getHttp } from '../../kibana-services';
+import { getHttp, getWzCurrentAppID } from '../../kibana-services';
+import {
+  Applications,
+  serverApis,
+  appSettings,
+} from '../../utils/applications';
 
 export class SettingsController {
   /**
@@ -60,7 +64,13 @@ export class SettingsController {
     this.tabNames = TabNames;
     this.indexPatterns = [];
     this.apiEntries = [];
-    this.$scope.googleGroupsSVG = getHttp().basePath.prepend(getAssetURL('images/icons/google_groups.svg'));
+    this.$scope.googleGroupsSVG = getHttp().basePath.prepend(
+      getAssetURL('images/icons/google_groups.svg'),
+    );
+    this.tabsConfiguration = [
+      { id: 'configuration', name: 'Configuration' },
+      { id: 'miscellaneous', name: 'Miscellaneous' },
+    ];
   }
 
   /**
@@ -68,14 +78,19 @@ export class SettingsController {
    */
   async $onInit() {
     try {
-      const breadcrumb = [{ text: '' }, { text: 'Settings' }];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-
       const location = this.$location.search();
-      if (location && location.tab) {
+      if (location?.tab) {
         this.tab = location.tab;
-        if(this.tab==='about') store.dispatch(updateSelectedSettingsSection('about'));
+        const tabActiveName = Applications.find(
+          ({ id }) => getWzCurrentAppID() === id,
+        ).title;
+        const breadcrumb = [{ text: tabActiveName }];
+        store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+      } else {
+        const breadcrumb = [{ text: serverApis.title }];
+        store.dispatch(updateGlobalBreadcrumb(breadcrumb));
       }
+
       // Set component props
       this.setComponentProps();
       // Loading data
@@ -114,40 +129,30 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry),
       showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
-      testApi: (entry,force) => ApiCheck.checkApi(entry,force),
+      testApi: (entry, force) => ApiCheck.checkApi(entry, force),
       showAddApiWithInitialError: error =>
         this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
       showApiIsDown: () => this.showApiIsDown(),
-      copyToClipBoard: msg => this.copyToClipBoard(msg)
+      copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
 
     this.addApiProps = {
       checkForNewApis: () => this.checkForNewApis(),
-      closeAddApi: () => this.closeAddApi()
+      closeAddApi: () => this.closeAddApi(),
     };
 
     this.apiIsDownProps = {
       apiEntries: this.apiEntries,
       setDefault: entry => this.setDefault(entry),
-      testApi: (entry,force) => ApiCheck.checkApi(entry,force),
+      testApi: (entry, force) => ApiCheck.checkApi(entry, force),
       closeApiIsDown: () => this.closeApiIsDown(),
       getHosts: () => this.getHosts(),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
-      copyToClipBoard: msg => this.copyToClipBoard(msg)
+      copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
-
-    let tabs = [
-      { id: 'api', name: 'API' },
-      { id: 'modules', name: 'Modules' },
-      { id: 'sample_data', name: 'Sample data' },
-      { id: 'configuration', name: 'Configuration' },
-      { id: 'logs', name: 'Logs' },
-      { id: 'miscellaneous', name: 'Miscellaneous'},
-      { id: 'about', name: 'About' }
-    ];
     this.settingsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
@@ -156,14 +161,16 @@ export class SettingsController {
         }
       },
       selectedTab: this.tab || 'api',
-      tabs,
-      wazuhConfig: this.wazuhConfig
+      // Define tabs for Wazuh plugin settings application
+      tabs:
+        getWzCurrentAppID() === appSettings.id ? this.tabsConfiguration : null,
+      wazuhConfig: this.wazuhConfig,
     };
 
     this.settingsLogsProps = {
       getLogs: async () => {
         return await this.getAppLogs();
-      }
+      },
     };
   }
 
@@ -172,7 +179,6 @@ export class SettingsController {
    * @param {Object} tab
    */
   switchTab(tab) {
-    if(tab==='about') store.dispatch(updateSelectedSettingsSection('about'));
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }
@@ -185,6 +191,15 @@ export class SettingsController {
         .indexOf(this.currentDefault);
       this.currentApiEntryIndex = idx;
     }
+  }
+
+  /**
+   * Compare the string param with currentAppID
+   * @param {string} appToCompare
+   * It use into plugins/main/public/templates/settings/settings.html to show tabs into expecified App
+   */
+  compareCurrentAppID(appToCompare) {
+    return getWzCurrentAppID() === appToCompare;
   }
 
   /**
@@ -253,8 +268,8 @@ export class SettingsController {
       AppState.setCurrentAPI(
         JSON.stringify({
           name: clusterEnabled ? manager : cluster,
-          id: id
-        })
+          id: id,
+        }),
       );
 
       this.$scope.$emit('updateAPI', {});
@@ -268,11 +283,6 @@ export class SettingsController {
       ErrorHandler.info(`API with id ${idApi} set as default`);
 
       this.getCurrentAPIIndex();
-      const extensions = await AppState.getExtensions(id);
-      if (currentApi && !extensions) {
-        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        AppState.setExtensions(id, extensions);
-      }
 
       this.$scope.$applyAsync();
       return this.currentDefault;
@@ -294,9 +304,10 @@ export class SettingsController {
   // Get settings function
   async getSettings() {
     try {
-      try{
-        this.indexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns();
-      }catch(error){
+      try {
+        this.indexPatterns =
+          await SavedObject.getListOfWazuhValidIndexPatterns();
+      } catch (error) {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         this.$location.search('tab', null);
         this.$location.path('/blank-screen');
@@ -321,12 +332,6 @@ export class SettingsController {
       if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) {
         return;
       }
-      const extensions = await AppState.getExtensions(this.currentDefault);
-      if (currentApi && !extensions) {
-        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        const apiExtensions = extensions || {};
-        AppState.setExtensions(id, apiExtensions);
-      }
 
       this.$scope.$applyAsync();
     } catch (error) {
@@ -344,7 +349,7 @@ export class SettingsController {
     }
     // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
     await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {
-      entries: this.apiEntries
+      entries: this.apiEntries,
     });
     return;
   }
@@ -357,7 +362,7 @@ export class SettingsController {
     try {
       const url = `/hosts/update-hostname/${id}`;
       await this.genericReq.request('PUT', url, {
-        cluster_info: clusterInfo
+        cluster_info: clusterInfo,
       });
     } catch (error) {
       return Promise.reject(error);
@@ -379,7 +384,7 @@ export class SettingsController {
         port: port,
         cluster_info: {},
         insecure: 'true',
-        id: id
+        id: id,
       };
 
       // Test the connection
@@ -452,8 +457,8 @@ export class SettingsController {
         {
           date: new Date(),
           level: 'error',
-          message: 'Error when loading logs'
-        }
+          message: 'Error when loading logs',
+        },
       ];
     }
   }
@@ -467,8 +472,8 @@ export class SettingsController {
       const response = data.data.data;
       this.appInfo = {
         'app-version': response['app-version'],
-        installationDate: formatUIDate(response['installationDate']),
-        revision: response['revision']
+        installationDate: response['installationDate'],
+        revision: response['revision'],
       };
 
       this.load = false;
@@ -525,7 +530,7 @@ export class SettingsController {
         throw {
           message: 'There were not found any API entry in the wazuh.yml',
           type: 'warning',
-          closedEnabled: false
+          closedEnabled: false,
         };
       const notRecheable = await this.checkApisStatus();
       if (notRecheable) {
@@ -535,13 +540,13 @@ export class SettingsController {
             message:
               'Wazuh API not recheable, please review your configuration',
             type: 'danger',
-            closedEnabled: true
+            closedEnabled: true,
           };
         }
         throw {
           message: `Some of the API entries are not reachable. You can still use the ${PLUGIN_APP_NAME} but please, review your hosts configuration.`,
           type: 'warning',
-          closedEnabled: true
+          closedEnabled: true,
         };
       }
     } catch (error) {
@@ -567,7 +572,10 @@ export class SettingsController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
+      this.apiEntries =
+        this.apiTableProps.apiEntries =
+        this.apiIsDownProps.apiEntries =
+          hosts;
       if (!hosts.length) {
         this.apiIsDown = false;
         this.addingApi = true;

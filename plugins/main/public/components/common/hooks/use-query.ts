@@ -11,38 +11,6 @@
  */
 import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect } from 'react';
-import { ModulesHelper } from '../modules/modules-helper';
-import _ from 'lodash';
-
-export function useQuery(): [
-  {
-    language: 'kuery' | 'lucene';
-    query: string;
-  },
-  (query: any) => void
-] {
-  const [query, setQuery] = useState({ language: 'kuery', query: '' });
-  useEffect(() => {
-    let subscription;
-    ModulesHelper.getDiscoverScope().then((scope) => {
-      setQuery(scope.state.query);
-      subscription = scope.$watchCollection('fetchStatus', () => {
-        if (!_.isEqual(query, scope.state.query)) {
-          setQuery(scope.state.query);
-        }
-      });
-    });
-    return () => {
-      subscription && subscription();
-    };
-  }, []);
-  const updateQuery = (query) => {
-    ModulesHelper.getDiscoverScope().then((scope) => {
-      scope.state.query = query;
-    });
-  };
-  return [query, updateQuery];
-}
 
 export const useQueryManager = () => {
   const [query, setQuery] = useState(getDataPlugin().query.queryString.getQuery());

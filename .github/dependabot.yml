@@ -1,20 +1,9 @@
 version: 2
 updates:
-
-#   - package-ecosystem: "npm"
-#     directory: "/"
-#     schedule:
-#       interval: "daily"
-#     target-branch: "master"
-    
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    target-branch: "4.4-2.4-wzd"
  
   - package-ecosystem: "npm"
-    directory: "/"
+    directory: "/plugins/main"
     schedule:
       interval: "daily"
-    target-branch: "4.5"
+    target-branch: "4.6"
+    open-pull-requests-limit: 100

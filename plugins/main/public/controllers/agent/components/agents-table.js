@@ -38,15 +38,25 @@ import { AgentSynced } from '../../../components/agents/agent-synced';
 import { TableWzAPI } from '../../../components/common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
-
+import { getCore } from '../../../kibana-services';
+import { itHygiene } from '../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 const searchBarWQLOptions = {
   implicitQuery: {
     query: 'id!=000',
     conjunction: ';',
   },
 };
-
-export const AgentsTable = withErrorBoundary(
+const mapDispatchToProps = dispatch => ({
+  updateCurrentAgentData: data => dispatch(updateCurrentAgentData(data)),
+});
+export const AgentsTable = compose(
+  withErrorBoundary,
+  connect(null, mapDispatchToProps),
+)(
   class AgentsTable extends Component {
     _isMount = false;
     constructor(props) {
@@ -92,42 +102,38 @@ export const AgentsTable = withErrorBoundary(
     actionButtonsRender(agent) {
       return (
         <div className={'icon-box-action'}>
-          <EuiToolTip
-            content='Open summary panel for this agent'
-            position='left'
-          >
-            <EuiButtonIcon
-              onClick={ev => {
-                ev.stopPropagation();
-                AppNavigate.navigateToModule(ev, 'agents', {
-                  tab: 'welcome',
-                  agent: agent.id,
-                });
-              }}
-              iconType='eye'
-              color={'primary'}
-              aria-label='Open summary panel for this agent'
-            />
-          </EuiToolTip>
-          &nbsp;
-          {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
+          <RedirectAppLinks application={getCore().application}>
             <EuiToolTip
-              content='Open configuration for this agent'
+              content='Open summary panel for this agent'
               position='left'
             >
               <EuiButtonIcon
-                onClick={ev => {
-                  ev.stopPropagation();
-                  AppNavigate.navigateToModule(ev, 'agents', {
-                    tab: 'configuration',
-                    agent: agent.id,
-                  });
-                }}
+                href={getCore().application.getUrlForApp(itHygiene.id, {
+                  path: `#/agents?tab=welcome&agent=${agent.id}`,
+                })}
+                iconType='eye'
                 color={'primary'}
-                iconType='wrench'
-                aria-label='Open configuration for this agent'
+                aria-label='Open summary panel for this agent'
               />
             </EuiToolTip>
+          </RedirectAppLinks>
+          &nbsp;
+          {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
+            <RedirectAppLinks application={getCore().application}>
+              <EuiToolTip
+                content='Open configuration for this agent'
+                position='left'
+              >
+                <EuiButtonIcon
+                  href={getCore().application.getUrlForApp(itHygiene.id, {
+                    path: `#/agents?tab=configuration&agent=${agent.id}`,
+                  })}
+                  color={'primary'}
+                  iconType='wrench'
+                  aria-label='Open configuration for this agent'
+                />
+              </EuiToolTip>
+            </RedirectAppLinks>
           )}
         </div>
       );
@@ -227,6 +233,7 @@ export const AgentsTable = withErrorBoundary(
             />
           </span>
         ),
+        render: dateAdd => formatUIDate(dateAdd),
         sortable: true,
         show: false,
         searchable: false,
@@ -244,6 +251,7 @@ export const AgentsTable = withErrorBoundary(
             />
           </span>
         ),
+        render: lastKeepAlive => formatUIDate(lastKeepAlive),
         sortable: true,
         show: false,
         searchable: false,
@@ -293,11 +301,10 @@ export const AgentsTable = withErrorBoundary(
         }
         return {
           onClick: ev => {
-            AppNavigate.navigateToModule(ev, 'agents', {
-              tab: 'welcome',
-              agent: item.id,
+            this.props.updateCurrentAgentData(item);
+            getCore().application.navigateToApp(itHygiene.id, {
+              path: `#/agents?tab=welcome&agent=${item.id}`,
             });
-            ev.stopPropagation();
           },
         };
       };
@@ -329,12 +336,6 @@ export const AgentsTable = withErrorBoundary(
                 return {
                   ...item,
                   ...(item.ip ? { ip: item.ip } : { ip: '-' }),
-                  ...(typeof item.dateAdd === 'string'
-                    ? { dateAdd: formatUIDate(item.dateAdd) }
-                    : { dateAdd: '-' }),
-                  ...(typeof item.lastKeepAlive === 'string'
-                    ? { lastKeepAlive: formatUIDate(item.lastKeepAlive) }
-                    : { lastKeepAlive: '-' }),
                   ...(item.node_name !== 'unknown'
                     ? { node_name: item.node_name }
                     : { node_name: '-' }),

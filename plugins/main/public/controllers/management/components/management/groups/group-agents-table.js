@@ -14,7 +14,7 @@ import { EuiCallOut, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
-import { getToasts } from '../../../../../kibana-services';
+import { getCore, getToasts } from '../../../../../kibana-services';
 import {
   updateLoadingStatus,
   updateFileContent,
@@ -39,6 +39,8 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { AgentStatus } from '../../../../../components/agents/agent-status';
 import { WzRequest } from '../../../../../react-services';
+import { itHygiene } from '../../../../../utils/applications';
+import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -118,7 +120,10 @@ class WzGroupAgentsTable extends Component {
                 aria-label='Go to the agent'
                 iconType='eye'
                 onClick={async () => {
-                  this.props.groupsProps.showAgent(item);
+                  this.props.updateCurrentAgentData(item);
+                  getCore().application.navigateToApp(itHygiene.id, {
+                    path: `#/agents?agent=${item.id}`,
+                  });
                 }}
                 color='primary'
               />
@@ -332,6 +337,7 @@ const mapDispatchToProps = dispatch => {
     updateSortFieldAgents: sortFieldAgents =>
       dispatch(updateSortFieldAgents(sortFieldAgents)),
     updateReload: () => dispatch(updateReload()),
+    updateCurrentAgentData: data => dispatch(updateCurrentAgentData(data)),
   };
 };
 

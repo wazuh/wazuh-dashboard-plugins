@@ -12,80 +12,104 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPage, EuiToolTip } from '@elastic/eui';
+import {
+  EuiStat,
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiPage,
+  EuiToolTip,
+} from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import { UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
-import { agentStatusLabelByAgentStatus, agentStatusColorByAgentStatus } from '../../../../common/services/wz_agent_status';
+import {
+  agentStatusLabelByAgentStatus,
+  agentStatusColorByAgentStatus,
+} from '../../../../common/services/wz_agent_status';
+import { getCore } from '../../../kibana-services';
+import { endpointSumary } from '../../../utils/applications';
 
-export const Stats = withErrorBoundary (class Stats extends Component {
-  constructor(props) {
-    super(props);
+export const Stats = withErrorBoundary(
+  class Stats extends Component {
+    constructor(props) {
+      super(props);
 
-    this.state = {};
-    this.agentStatus = ['total', ...UI_ORDER_AGENT_STATUS].map(status => ({
-      status,
-      label: status !== 'total' ? agentStatusLabelByAgentStatus(status) : 'Total',
-      onClick: () => this.goToAgents(status !== 'total' ? status : null),
-      color: status !== 'total' ? agentStatusColorByAgentStatus(status) : 'primary'
-    }));
-  }
-
-  goToAgents(status) {
-    if(status){
-      sessionStorage.setItem(
-        'wz-agents-overview-table-filter',
-        JSON.stringify({q: `id!=000;status=${status}`})
-      );
-    }else if(sessionStorage.getItem('wz-agents-overview-table-filter')){
-      sessionStorage.removeItem('wz-agents-overview-table-filter');
+      this.state = {};
+      this.agentStatus = ['total', ...UI_ORDER_AGENT_STATUS].map(status => ({
+        status,
+        label:
+          status !== 'total' ? agentStatusLabelByAgentStatus(status) : 'Total',
+        onClick: () => this.goToAgents(status !== 'total' ? status : null),
+        color:
+          status !== 'total'
+            ? agentStatusColorByAgentStatus(status)
+            : 'primary',
+      }));
     }
-    window.location.href = '#/agents-preview';
-  }
 
-  renderTitle(total) {
-    return <EuiToolTip position="top" content={`Go to all agents`}>
-      <span>
-        {total}
-      </span>
-    </EuiToolTip>
-  }
+    goToAgents(status) {
+      if (status) {
+        sessionStorage.setItem(
+          'wz-agents-overview-table-filter',
+          JSON.stringify({ q: `id!=000;status=${status}` }),
+        );
+      } else if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
+        sessionStorage.removeItem('wz-agents-overview-table-filter');
+      }
+      getCore().application.navigateToApp(endpointSumary.id, {
+        path: '#/agents-preview',
+      });
+    }
 
-  render() {
-    return (
-      <EuiPage>
-        <EuiFlexGroup>
-          <EuiFlexItem />
-            {this.agentStatus.map(({status, label, onClick, color}) => (
+    renderTitle(total) {
+      return (
+        <EuiToolTip position='top' content={`Go to all agents`}>
+          <span>{total}</span>
+        </EuiToolTip>
+      );
+    }
+
+    render() {
+      return (
+        <EuiPage>
+          <EuiFlexGroup>
+            <EuiFlexItem />
+            {this.agentStatus.map(({ status, label, onClick, color }) => (
               <EuiFlexItem key={`agent-status-${status}`}>
                 <EuiStat
                   title={
-                    <EuiToolTip position="top" content={`Go to ${label.toLowerCase()} agents`}>
+                    <EuiToolTip
+                      position='top'
+                      content={`Go to ${label.toLowerCase()} agents`}
+                    >
                       <span
                         className='statWithLink'
-                        style={{ cursor: "pointer" }}
+                        style={{ cursor: 'pointer' }}
                         onClick={onClick}
                       >
-                        {typeof this.props[status] !== 'undefined' ? this.props[status] : '-'}
+                        {typeof this.props[status] !== 'undefined'
+                          ? this.props[status]
+                          : '-'}
                       </span>
                     </EuiToolTip>
                   }
                   description={`${label} agents`}
                   titleColor={color}
-                  textAlign="center"
+                  textAlign='center'
                 />
               </EuiFlexItem>
             ))}
-          <EuiFlexItem />
-        </EuiFlexGroup>
-      </EuiPage>
-    );
-  }
-});
+            <EuiFlexItem />
+          </EuiFlexGroup>
+        </EuiPage>
+      );
+    }
+  },
+);
 
 Stats.propTypes = {
   total: PropTypes.any,
   active: PropTypes.any,
   disconnected: PropTypes.any,
   pending: PropTypes.any,
-  never_connected: PropTypes.any
+  never_connected: PropTypes.any,
 };

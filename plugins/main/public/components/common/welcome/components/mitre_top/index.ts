@@ -11,4 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { MitreTopTactics } from './mitre_top';
+export * from './mitre-top';

@@ -13,7 +13,6 @@
  */
 import React, { Component, Fragment } from 'react';
 import {
-  EuiLink,
   EuiPanel,
   EuiFlexItem,
   EuiFlexGroup,
@@ -22,12 +21,9 @@ import {
   EuiFlexGrid,
   EuiButtonEmpty,
   EuiPage,
-  EuiButton,
-  EuiPopover,
   EuiLoadingChart,
   EuiToolTip,
   EuiButtonIcon,
-  EuiEmptyPrompt,
   EuiPageBody,
 } from '@elastic/eui';
 import {
@@ -37,10 +33,7 @@ import {
   RequirementVis,
 } from './components';
 import { AgentInfo } from './agents-info';
-import store from '../../../redux/store';
-import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
-import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import KibanaVis from '../../../kibana-integrations/kibana-vis';
@@ -48,84 +41,118 @@ import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
 import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
-import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
-import { getAngularModule } from '../../../kibana-services';
-import { hasAgentSupportModule } from '../../../react-services/wz-agents';
-import { withErrorBoundary, withReduxProvider } from '../hocs';
+import {
+  showExploreAgentModalGlobal,
+  updateCurrentAgentData,
+} from '../../../redux/actions/appStateActions';
+import {
+  getAngularModule,
+  getChrome,
+  getCore,
+  getDataPlugin,
+} from '../../../kibana-services';
+import {
+  withErrorBoundary,
+  withGlobalBreadcrumb,
+  withGuard,
+  withReduxProvider,
+} from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import {
+  PromptAgentNeverConnected,
+  PromptNoSelectedAgent,
+} from '../../agents/prompts';
+import { connect } from 'react-redux';
+import { WzButton } from '../buttons';
+import {
+  Applications,
+  itHygiene,
+  mitreAttack,
+} from '../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+
+const mapStateToProps = state => ({
+  agent: state.appStateReducers.currentAgentData,
+});
+
+const mapDispatchToProps = dispatch => ({
+  showExploreAgentModalGlobal: data =>
+    dispatch(showExploreAgentModalGlobal(data)),
+  updateCurrentAgentData: data => dispatch(updateCurrentAgentData(data)),
+});
 
 export const AgentsWelcome = compose(
   withReduxProvider,
   withErrorBoundary,
+  connect(mapStateToProps, mapDispatchToProps),
+  withGlobalBreadcrumb(({ agent }) => {
+    return [
+      {
+        text: itHygiene.title,
+      },
+      ...(agent?.name
+        ? [
+            {
+              text: `${agent.name}`,
+              truncate: true,
+            },
+          ]
+        : []),
+    ];
+  }),
+  withGuard(
+    props => !(props.agent && props.agent.id),
+    () => <PromptNoSelectedAgent body='You need to select an agent.' />,
+  ),
+  withGuard(
+    props => props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    PromptAgentNeverConnected,
+  ),
 )(
   class AgentsWelcome extends Component {
     _isMount = false;
     constructor(props) {
       super(props);
 
-      this.offset = 275;
-
       this.state = {
-        extensions: this.props.extensions,
         lastScans: [],
         isLoading: true,
         sortField: 'start_scan',
         sortDirection: 'desc',
         actionAgents: true, // Hide actions agents
         selectedRequirement: 'pci',
-        menuAgent: {},
-        maxModules: 6,
         widthWindow: window.innerWidth,
       };
     }
 
     updateWidth = () => {
-      let menuSize = window.innerWidth - this.offset;
-      let maxModules = 6;
-      if (menuSize > 1250) {
-        maxModules = 6;
-      } else {
-        if (menuSize > 1100) {
-          maxModules = 5;
-        } else {
-          if (menuSize > 900) {
-            maxModules = 4;
-          } else {
-            maxModules = 3;
-            if (menuSize < 750) {
-              maxModules = null;
-            }
-          }
-        }
-      }
-
-      this.setState({ maxModules: maxModules, widthWindow: window.innerWidth });
+      this.setState({ widthWindow: window.innerWidth });
     };
 
-    setGlobalBreadcrumb() {
-      const breadcrumb = [
-        { text: '' },
-        {
-          text: 'Agents',
-          href: '#/agents-preview',
-        },
-        {
-          text: `${this.props.agent.name}`,
-          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
-          truncate: false,
-        },
-      ];
-      store.dispatch(updateGlobalBreadcrumb(breadcrumb));
+    /* TODO: we should to create a unique Explore agent button instead
+      of duplicating it. It was duplicated due to the differences of requirements
+      in the Explore agent button for the modules and agent welcome
+    */
+    async removeAgentsFilter() {
+      await this.props.setAgent(false);
+      const currentAppliedFilters = getDataPlugin().query.filterManager.filters;
+      const agentFilters = currentAppliedFilters.filter(x => {
+        return x.meta.key !== 'agent.id';
+      });
+      getDataPlugin().query.filterManager.setFilters(agentFilters);
+    }
+
+    clearAgentInUrl() {
+      this.location.search('agent', null);
     }
 
     async componentDidMount() {
       this._isMount = true;
-      store.dispatch(updateCurrentAgentData(this.props.agent));
-      this.updateMenuAgents();
+      /* WORKAROUND: ensure the $scope.agent is synced with the agent stored in Redux (this.props.agent). See agents.js controller.
+       */
+      this.props.setAgent(this.props.agent);
       this.updateWidth();
-      this.setGlobalBreadcrumb();
       const tabVisualizations = new TabVisualizations();
       tabVisualizations.removeAll();
       tabVisualizations.setTab('welcome');
@@ -134,7 +161,13 @@ export const AgentsWelcome = compose(
       });
       const filterHandler = new FilterHandler(AppState.getCurrentPattern());
       const $injector = getAngularModule().$injector;
+      this.drawerLokedSubscribtion = getChrome()
+        .getIsNavDrawerLocked$()
+        .subscribe(() => {
+          this.updateWidth();
+        });
       this.router = $injector.get('$route');
+      this.location = $injector.get('$location');
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line
       await VisFactoryHandler.buildAgentsVisualizations(
         filterHandler,
@@ -144,224 +177,141 @@ export const AgentsWelcome = compose(
       );
     }
 
-    updateMenuAgents() {
-      const defaultMenuAgents = {
-        general: {
-          id: 'general',
-          text: 'Security events',
-          isPin: true,
-        },
-        fim: {
-          id: 'fim',
-          text: 'Integrity monitoring',
-          isPin: true,
-        },
-        sca: {
-          id: 'sca',
-          text: 'SCA',
-          isPin: true,
-        },
-        audit: {
-          id: 'audit',
-          text: 'System Auditing',
-          isPin: true,
-        },
-        vuls: {
-          id: 'vuls',
-          text: 'Vulnerabilities',
-          isPin: true,
-        },
-        mitre: {
-          id: 'mitre',
-          text: 'MITRE ATT&CK',
-          isPin: true,
-        },
-      };
-
-      let menuAgent = JSON.parse(window.localStorage.getItem('menuAgent'));
-
-      // Check if pinned modules to agent menu are enabled in Settings/Modules, if not then modify localstorage removing the disabled modules
-      if (menuAgent) {
-        const needUpdateMenuAgent = Object.keys(menuAgent)
-          .map(moduleName => menuAgent[moduleName])
-          .reduce((accum, item) => {
-            if (
-              typeof this.props.extensions[item.id] !== 'undefined' &&
-              this.props.extensions[item.id] === false
-            ) {
-              delete menuAgent[item.id];
-              accum = true;
-            }
-            return accum;
-          }, false);
-        if (needUpdateMenuAgent) {
-          // Update the pinned modules matching to enabled modules in Setings/Modules
-          window.localStorage.setItem('menuAgent', JSON.stringify(menuAgent));
-        }
-      } else {
-        menuAgent = defaultMenuAgents;
-        window.localStorage.setItem(
-          'menuAgent',
-          JSON.stringify(defaultMenuAgents),
-        );
+    componentDidUpdate(prevProps) {
+      /* WORKAROUND: ensure the $scope.agent is synced with the agent stored in Redux (this.props.agent). See agents.js controller.
+       */
+      if (prevProps.agent.id !== this.props.agent.id) {
+        this.props.setAgent(this.props.agent);
       }
-      this.setState({ menuAgent: menuAgent });
+    }
+    componentWillUnmount() {
+      this.drawerLokedSubscribtion?.unsubscribe();
     }
 
-    renderModules() {
-      const menuAgent = [
-        ...Object.keys(this.state.menuAgent).map(item => {
-          return this.state.menuAgent[item];
-        }),
-      ];
-
+    renderEndpointsSummaryButton() {
+      const application = Applications.find(
+        ({ id }) => id === 'endpoints-summary',
+      );
       return (
-        <Fragment>
-          {menuAgent.map((menuAgent, i) => {
-            if (
-              i < this.state.maxModules &&
-              hasAgentSupportModule(this.props.agent, menuAgent.id)
-            ) {
-              return (
-                <EuiFlexItem
-                  key={i}
-                  grow={false}
-                  style={{ marginLeft: 0, marginTop: 7 }}
-                >
-                  <EuiButtonEmpty
-                    onClick={() => {
-                      window.location.href = `#/overview/?tab=${
-                        menuAgent.id
-                      }&tabView=${
-                        menuAgent.text === 'Security configuration assessment'
-                          ? 'inventory'
-                          : 'panels'
-                      }`;
-                      this.router.reload();
-                    }}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <span>
-                      {menuAgent.text !== 'Security configuration assessment'
-                        ? menuAgent.text
-                        : 'SCA'}
-                      &nbsp;
-                    </span>
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
-              );
-            }
-          })}
-          <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-            <EuiPopover
-              button={
-                <EuiButtonEmpty
-                  iconSide='right'
-                  iconType='arrowDown'
-                  onClick={() =>
-                    this.setState({ switchModule: !this.state.switchModule })
-                  }
-                >
-                  More...
-                </EuiButtonEmpty>
-              }
-              isOpen={this.state.switchModule}
-              closePopover={() => this.setState({ switchModule: false })}
-              repositionOnScroll={false}
-              anchorPosition='downCenter'
-            >
-              <div>
-                <WzReduxProvider>
-                  <div style={{ maxWidth: 730 }}>
-                    <MenuAgent
-                      isAgent={this.props.agent}
-                      updateMenuAgents={() => this.updateMenuAgents()}
-                      closePopover={() => {
-                        this.setState({ switchModule: false });
-                      }}
-                      switchTab={module => this.props.switchTab(module)}
-                    ></MenuAgent>
-                  </div>
-                </WzReduxProvider>
-              </div>
-            </EuiPopover>
-          </EuiFlexItem>
-        </Fragment>
+        <RedirectAppLinks application={getCore().application}>
+          <WzButton
+            buttonType='empty'
+            iconType={application.euiIconType}
+            href={getCore().application.getUrlForApp('endpoints-summary')}
+            className='wz-it-hygiene-header-button'
+            tooltip={{
+              position: 'bottom',
+              content: application.title,
+              className: 'wz-it-hygiene-header-button-tooltip',
+            }}
+          >
+            {application.title}
+          </WzButton>
+        </RedirectAppLinks>
       );
     }
 
     renderTitle() {
       const notNeedStatus = true;
+      const thereAreAgentSelected = Boolean(this.props.agent?.id);
+      // Calculate if the header buttons should display the name or only the icon to be responsive
+
       return (
-        <EuiFlexGroup>
-          <EuiFlexItem className='wz-module-header-agent-title'>
-            <EuiFlexGroup>
-              {(this.state.maxModules !== null && this.renderModules()) || (
-                <EuiFlexItem style={{ marginTop: 7 }}>
-                  <EuiPopover
-                    button={
-                      <EuiButtonEmpty
-                        iconSide='right'
-                        iconType='arrowDown'
-                        onClick={() =>
-                          this.setState({
-                            switchModule: !this.state.switchModule,
-                          })
-                        }
-                      >
-                        Modules
-                      </EuiButtonEmpty>
-                    }
-                    isOpen={this.state.switchModule}
-                    closePopover={() => this.setState({ switchModule: false })}
-                    repositionOnScroll={false}
-                    anchorPosition='downCenter'
-                  >
-                    <div>
-                      <WzReduxProvider>
-                        <div style={{ maxWidth: 730 }}>
-                          <MenuAgent
-                            isAgent={this.props.agent}
-                            updateMenuAgents={() => this.updateMenuAgents()}
-                            closePopover={() => {
-                              this.setState({ switchModule: false });
-                            }}
-                            switchTab={module => this.props.switchTab(module)}
-                          ></MenuAgent>
-                        </div>
-                      </WzReduxProvider>
-                    </div>
-                  </EuiPopover>
-                </EuiFlexItem>
-              )}
-              <EuiFlexItem className='wz-agent-empty-item'></EuiFlexItem>
+        <EuiFlexGroup
+          justifyContent='spaceBetween'
+          responsive={false}
+          gutterSize='xs'
+        >
+          <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
+            <EuiFlexGroup responsive={false} gutterSize='xs'>
+              <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
+                {this.renderEndpointsSummaryButton()}
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
+            <EuiFlexGroup responsive={false} gutterSize='none'>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                <EuiButtonEmpty
+                {/* Explore agent button. TODO: See the comment on removeAgentsFilter method. */}
+                <div style={{ display: 'inline-flex' }}>
+                  <EuiButtonEmpty
+                    onClick={this.props.showExploreAgentModalGlobal}
+                    color='primary'
+                    iconType='watchesApp'
+                    style={
+                      thereAreAgentSelected
+                        ? { background: 'rgba(0, 107, 180, 0.1)' }
+                        : undefined
+                    }
+                  >
+                    {thereAreAgentSelected
+                      ? `${this.props.agent.name} (${this.props.agent.id})`
+                      : 'Explore agent'}
+                  </EuiButtonEmpty>
+                  {thereAreAgentSelected && (
+                    <WzButton
+                      buttonType='icon'
+                      className='wz-unpin-agent'
+                      iconType='pinFilled'
+                      onClick={() => {
+                        this.clearAgentInUrl();
+                        this.props.updateCurrentAgentData({});
+                        this.removeAgentsFilter();
+                      }}
+                      tooltip={{ position: 'bottom', content: 'Unpin agent' }}
+                      aria-label='Unpin agent'
+                    />
+                  )}
+                </div>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+                <WzButton
+                  buttonType='empty'
                   iconType='inspect'
                   onClick={() =>
                     this.props.switchTab('syscollector', notNeedStatus)
                   }
+                  className='wz-it-hygiene-header-button'
+                  tooltip={{
+                    position: 'bottom',
+                    content: 'Inventory data',
+                    className: 'wz-it-hygiene-header-button-tooltip',
+                  }}
                 >
                   Inventory data
-                </EuiButtonEmpty>
+                </WzButton>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                <EuiButtonEmpty
+                <WzButton
+                  buttonType='empty'
                   iconType='stats'
                   onClick={() => this.props.switchTab('stats', notNeedStatus)}
+                  className='wz-it-hygiene-header-button'
+                  tooltip={{
+                    position: 'bottom',
+                    content: 'Stats',
+                    className: 'wz-it-hygiene-header-button-tooltip',
+                  }}
                 >
                   Stats
-                </EuiButtonEmpty>
+                </WzButton>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                <EuiButtonEmpty
+                <WzButton
+                  buttonType='empty'
                   iconType='gear'
                   onClick={() =>
                     this.props.switchTab('configuration', notNeedStatus)
                   }
+                  className='wz-it-hygiene-header-button'
+                  tooltip={{
+                    position: 'bottom',
+                    content: 'Configuration',
+                    className: 'wz-it-hygiene-header-button-tooltip',
+                  }}
                 >
                   Configuration
-                </EuiButtonEmpty>
+                </WzButton>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
@@ -383,21 +333,22 @@ export const AgentsWelcome = compose(
                 <EuiFlexItem>
                   <h2 className='embPanel__title wz-headline-title'>
                     <EuiText size='xs'>
-                      <h2>MITRE</h2>
+                      <h2>MITRE ATT&CK</h2>
                     </EuiText>
                   </h2>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
-                  <EuiToolTip position='top' content='Open MITRE'>
-                    <EuiButtonIcon
-                      iconType='popout'
-                      color='primary'
-                      onClick={() => {
-                        window.location.href = `#/overview?tab=mitre`;
-                        this.router.reload();
-                      }}
-                      aria-label='Open MITRE'
-                    />
+                  <EuiToolTip position='top' content='Open MITRE ATT&CK'>
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiButtonIcon
+                        iconType='popout'
+                        color='primary'
+                        href={getCore().application.getUrlForApp(
+                          mitreAttack.id,
+                        )}
+                        aria-label='Open MITRE ATT&CK'
+                      />
+                    </RedirectAppLinks>
                   </EuiToolTip>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -477,45 +428,12 @@ export const AgentsWelcome = compose(
     render() {
       const title = this.renderTitle();
 
-      if (this.props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
-        return (
-          <EuiEmptyPrompt
-            iconType='securitySignalDetected'
-            style={{ marginTop: 20 }}
-            title={<h2>Agent has never connected.</h2>}
-            body={
-              <Fragment>
-                <p>
-                  The agent has been registered but has not yet connected to the
-                  manager.
-                </p>
-                <EuiLink
-                  href={webDocumentationLink(
-                    'user-manual/agents/agent-connection.html',
-                  )}
-                  external
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  Checking connection with the Wazuh server
-                </EuiLink>
-              </Fragment>
-            }
-            actions={
-              <EuiButton href='#/agents-preview?' color='primary' fill>
-                Back
-              </EuiButton>
-            }
-          />
-        );
-      }
-
       return (
         <div className='wz-module wz-module-welcome'>
-          <div className='wz-module-header-agent wz-module-header-agent-wrapper'>
+          <div className='wz-module-header-agent-wrapper'>
             <div className='wz-module-header-agent-main'>{title}</div>
           </div>
-          <div className='wz-module-agent-body wz-module-agents-padding-responsive'>
+          <div className='wz-module-agents-padding-responsive'>
             <EuiPage>
               <EuiPageBody component='div'>
                 <div className='wz-module-header-nav'>
@@ -560,10 +478,7 @@ export const AgentsWelcome = compose(
                     </EuiFlexGrid>
                     <EuiSpacer size='m' />
                     <EuiFlexGroup>
-                      <FimEventsTable
-                        agent={this.props.agent}
-                        router={this.router}
-                      />
+                      <FimEventsTable agent={this.props.agent} />
                     </EuiFlexGroup>
                     <EuiSpacer size='m' />
                     <EuiFlexGroup>
@@ -593,10 +508,7 @@ export const AgentsWelcome = compose(
                           {this.renderCompliancePanel()}
                         </EuiFlexGroup>
                       </EuiFlexItem>
-                      <FimEventsTable
-                        agent={this.props.agent}
-                        router={this.router}
-                      />
+                      <FimEventsTable agent={this.props.agent} />
                     </EuiFlexGrid>
                     <EuiSpacer size='l' />
                     <EuiFlexGroup>

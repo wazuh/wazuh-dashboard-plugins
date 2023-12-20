@@ -71,11 +71,21 @@ export default [
                 date: true,
                 interval: 'PT1H',
                 format: 'YYYY-MM-DD HH:mm',
-                bounds: { min: '2019-08-20T12:33:23.360Z', max: '2019-08-22T12:33:23.360Z' },
+                bounds: {
+                  min: '2019-08-20T12:33:23.360Z',
+                  max: '2019-08-22T12:33:23.360Z',
+                },
               },
               aggType: 'date_histogram',
             },
-            y: [{ accessor: 2, format: { id: 'number' }, params: {}, aggType: 'count' }],
+            y: [
+              {
+                accessor: 2,
+                format: { id: 'number' },
+                params: {},
+                aggType: 'count',
+              },
+            ],
             series: [
               {
                 accessor: 1,
@@ -94,7 +104,30 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
+          {
+            id: '4',
+            enabled: true,
+            type: 'terms',
+            schema: 'group',
+            params: {
+              field: 'rule.nist_800_53',
+              orderBy: '1',
+              order: 'desc',
+              size: 8,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: 'Requirement',
+            },
+          },
           {
             id: '2',
             enabled: true,
@@ -108,23 +141,6 @@ export default [
               drop_partials: false,
               min_doc_count: 1,
               extended_bounds: {},
-            },
-          },
-          {
-            id: '4',
-            enabled: true,
-            type: 'terms',
-            schema: 'group',
-            params: {
-              field: 'rule.nist_800_53',
-              orderBy: '1',
-              order: 'desc',
-              size: 50,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-              customLabel: 'Requirement',
             },
           },
         ],
@@ -149,7 +165,13 @@ export default [
       title: 'Alerts volume by agent',
       visState: JSON.stringify({
         aggs: [
-          { enabled: true, id: '1', params: {}, schema: 'metric', type: 'count' },
+          {
+            enabled: true,
+            id: '1',
+            params: {},
+            schema: 'metric',
+            type: 'count',
+          },
           {
             enabled: true,
             id: '3',
@@ -212,11 +234,22 @@ export default [
               aggType: 'terms',
               format: {
                 id: 'terms',
-                params: { id: 'string', missingBucketLabel: 'Missing', otherBucketLabel: 'Other' },
+                params: {
+                  id: 'string',
+                  missingBucketLabel: 'Missing',
+                  otherBucketLabel: 'Other',
+                },
               },
               params: {},
             },
-            y: [{ accessor: 2, aggType: 'count', format: { id: 'number' }, params: {} }],
+            y: [
+              {
+                accessor: 2,
+                aggType: 'count',
+                format: { id: 'number' },
+                params: {},
+              },
+            ],
           },
           enableHover: false,
           invertColors: false,
@@ -228,7 +261,12 @@ export default [
           valueAxes: [
             {
               id: 'ValueAxis-1',
-              labels: { color: 'black', overwriteColor: false, rotate: 0, show: false },
+              labels: {
+                color: 'black',
+                overwriteColor: false,
+                rotate: 0,
+                show: false,
+              },
               scale: { defaultYExtents: false, type: 'linear' },
               show: false,
               type: 'value',
@@ -322,12 +360,23 @@ export default [
               accessor: 0,
               format: {
                 id: 'terms',
-                params: { id: 'string', otherBucketLabel: 'Other', missingBucketLabel: 'Missing' },
+                params: {
+                  id: 'string',
+                  otherBucketLabel: 'Other',
+                  missingBucketLabel: 'Missing',
+                },
               },
               params: {},
               aggType: 'terms',
             },
-            y: [{ accessor: 2, format: { id: 'number' }, params: {}, aggType: 'count' }],
+            y: [
+              {
+                accessor: 2,
+                format: { id: 'number' },
+                params: {},
+                aggType: 'count',
+              },
+            ],
             series: [
               {
                 accessor: 1,
@@ -346,7 +395,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -373,7 +428,7 @@ export default [
               field: 'rule.nist_800_53',
               orderBy: '1',
               order: 'desc',
-              size: 10,
+              size: 9,
               otherBucket: false,
               otherBucketLabel: 'Other',
               missingBucket: false,
@@ -412,12 +467,26 @@ export default [
             colorsRange: [{ type: 'range', from: 0, to: 10000 }],
             labels: { show: true },
             invertColors: false,
-            style: { bgFill: '#000', bgColor: false, labelColor: false, subText: '', fontSize: 20 },
+            style: {
+              bgFill: '#000',
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+              fontSize: 20,
+            },
           },
           dimensions: {
             metrics: [
-              { type: 'vis_dimension', accessor: 0, format: { id: 'number', params: {} } },
-              { type: 'vis_dimension', accessor: 1, format: { id: 'number', params: {} } },
+              {
+                type: 'vis_dimension',
+                accessor: 0,
+                format: { id: 'number', params: {} },
+              },
+              {
+                type: 'vis_dimension',
+                accessor: 1,
+                format: { id: 'number', params: {} },
+              },
             ],
           },
           addTooltip: true,
@@ -437,7 +506,10 @@ export default [
             enabled: true,
             type: 'max',
             schema: 'metric',
-            params: { field: 'rule.level', customLabel: 'Max rule level detected' },
+            params: {
+              field: 'rule.level',
+              customLabel: 'Max rule level detected',
+            },
           },
         ],
       }),
@@ -467,9 +539,19 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
-            metric: { accessor: 1, format: { id: 'number' }, params: {}, aggType: 'count' },
+            metric: {
+              accessor: 1,
+              format: { id: 'number' },
+              params: {},
+              aggType: 'count',
+            },
             buckets: [
               {
                 accessor: 0,
@@ -488,7 +570,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -534,9 +622,19 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
-            metric: { accessor: 1, format: { id: 'number' }, params: {}, aggType: 'count' },
+            metric: {
+              accessor: 1,
+              format: { id: 'number' },
+              params: {},
+              aggType: 'count',
+            },
             buckets: [
               {
                 accessor: 0,
@@ -555,7 +653,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -605,7 +709,14 @@ export default [
           showToolbar: true,
           totalFunc: 'sum',
           dimensions: {
-            metrics: [{ accessor: 3, format: { id: 'number' }, params: {}, aggType: 'count' }],
+            metrics: [
+              {
+                accessor: 3,
+                format: { id: 'number' },
+                params: {},
+                aggType: 'count',
+              },
+            ],
             buckets: [
               {
                 accessor: 0,
@@ -650,7 +761,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,

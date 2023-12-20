@@ -55,11 +55,12 @@ import {
   agentStatusLabelByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
 import { AppNavigate } from '../../../react-services/app-navigate.js';
+import { endpointSumary } from '../../../utils/applications';
 
 export const AgentsPreview = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
+  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },

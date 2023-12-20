@@ -17,7 +17,7 @@
  * under the License.
  */
 import React from 'react';
-import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
+import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiText, EuiToolTip, EuiIcon } from '@elastic/eui';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { i18n } from '@osd/i18n';
 import { formatNumWithCommas } from '../../helpers';
@@ -35,9 +35,15 @@ export interface HitsCounterProps {
    * resets the query
    */
   onResetQuery: () => void;
+  tooltip?: {
+    content: string;
+    position: 'top' | 'bottom' | 'left' | 'right';
+    iconType: string;
+    ariaLabel: string;
+  };
 }
 
-export function HitsCounter({ hits, showResetButton, onResetQuery }: HitsCounterProps) {
+export function HitsCounter({ hits, showResetButton, onResetQuery, tooltip }: HitsCounterProps) {
   return (
     <I18nProvider>
       <EuiFlexGroup
@@ -56,7 +62,10 @@ export function HitsCounter({ hits, showResetButton, onResetQuery }: HitsCounter
               values={{
                 hits,
               }}
-            />
+            />{' '}
+            {tooltip && tooltip.content && (<EuiToolTip position={tooltip.position || 'top'} content={tooltip.content}>
+              <EuiIcon tabIndex={0} type={tooltip.iconType || 'info'} aria-label={tooltip.ariaLabel || 'Info'} />
+            </EuiToolTip>)}
           </EuiText>
         </EuiFlexItem>
         {showResetButton && (

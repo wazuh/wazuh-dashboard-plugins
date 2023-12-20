@@ -1,0 +1,16 @@
+{
+  "id": "wazuhCheckUpdates",
+  "version": "4.8.0-01",
+  "opensearchDashboardsVersion": "opensearchDashboards",
+  "server": true,
+  "ui": true,
+  "requiredPlugins": [
+    "navigation",
+    "opensearchDashboardsUtils",
+    "opensearchDashboardsReact",
+    "wazuhCore"
+  ],
+  "optionalPlugins": [
+    "securityDashboards"
+  ]
+}

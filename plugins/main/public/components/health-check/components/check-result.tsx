@@ -11,7 +11,13 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   EuiDescriptionListDescription,
   EuiDescriptionListTitle,
@@ -20,8 +26,14 @@ import {
 import InspectLogButton from './inspect-logs-button';
 import ResultIcons from './result-icons';
 
-
-type Result = 'loading' | 'ready' | 'error' | 'error_retry' | 'disabled' | 'waiting';
+type Result =
+  | 'loading'
+  | 'ready'
+  | 'warning'
+  | 'error'
+  | 'error_retry'
+  | 'disabled'
+  | 'waiting';
 
 export function CheckResult(props) {
   const [result, setResult] = useState<Result>('waiting');
@@ -32,7 +44,7 @@ export function CheckResult(props) {
   const verboseInfoWithNotificationWasOpened = useRef(false);
 
   useEffect(() => {
-    if (props.shouldCheck && !props.isLoading && awaitForIsReady()){
+    if (props.shouldCheck && !props.isLoading && awaitForIsReady()) {
       initCheck();
     } else if (props.shouldCheck === false && !props.checksReady[props.name]) {
       setResult('disabled');
@@ -41,18 +53,30 @@ export function CheckResult(props) {
   }, [props.shouldCheck, props.isLoading, props.checksReady]);
 
   useEffect(() => {
-    if (isCheckFinished){
+    if (isCheckFinished) {
+      const warnings = verboseInfo.filter(log => log.type === 'warning');
       const errors = verboseInfo.filter(log => log.type === 'error');
-      if(errors.length){
+      if (errors.length > 0) {
         props.canRetry ? setResult('error_retry') : setResult('error');
-        props.handleErrors(props.name, errors.map(({message}) => message));
-      }else{
-        setResult('ready');
-        setAsReady();
+        props.handleErrors(
+          props.name,
+          errors.map(({ message }) => message),
+        );
+      } else {
+        if (warnings.length > 0) {
+          props.handleWarnings(
+            props.name,
+            warnings.map(({ message }) => message),
+          );
+          setResult('warning');
+          setAsReady();
+        } else {
+          setResult('ready');
+          setAsReady();
+        }
       }
     }
-  }, [isCheckFinished])
-
+  }, [isCheckFinished]);
 
   const setAsReady = () => {
     props.handleCheckReady(props.name, true);
@@ -62,24 +86,36 @@ export function CheckResult(props) {
    * validate if the current check is not started and if the depending checks are ready
    */
   const awaitForIsReady = () => {
-    return !isCheckStarted && (props.awaitFor.length === 0 || props.awaitFor.every((check) => {
-      return props.checksReady[check];
-    }))
-  }
+    return (
+      !isCheckStarted &&
+      (props.awaitFor.length === 0 ||
+        props.awaitFor.every(check => {
+          return props.checksReady[check];
+        }))
+    );
+  };
 
-  const checkLogger = useMemo(() => ({
-    _log: (message: string, type: 'info' | 'error' | 'action' ) => {
-      setVerboseInfo(state => [...state, {message, type}]);
-    },
-    info: (message: string) => checkLogger._log(message, 'info'),
-    error: (message: string) => checkLogger._log(message, 'error'),
-    action: (message: string) => checkLogger._log(message, 'action')
-  }), []);
+  const checkLogger = useMemo(
+    () => ({
+      _log: (
+        message: string,
+        type: 'info' | 'warning' | 'error' | 'action',
+      ) => {
+        setVerboseInfo(state => [...state, { message, type }]);
+      },
+      info: (message: string) => checkLogger._log(message, 'info'),
+      warning: (message: string) => checkLogger._log(message, 'warning'),
+      error: (message: string) => checkLogger._log(message, 'error'),
+      action: (message: string) => checkLogger._log(message, 'action'),
+    }),
+    [],
+  );
 
   const initCheck = async () => {
     setIsCheckStarted(true);
     setResult('loading');
     setVerboseInfo([]);
+    props.cleanWarnings(props.name);
     props.cleanErrors(props.name);
     setIsCheckFinished(false);
     try {
@@ -90,39 +126,53 @@ export function CheckResult(props) {
     setIsCheckFinished(true);
   };
 
-
-  const checkDidSomeAction = useMemo(() => verboseInfo.some(log => log.type === 'action'), [verboseInfo]);
-  const shouldShowNotification = checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current;
+  const checkDidSomeAction = useMemo(
+    () => verboseInfo.some(log => log.type === 'action'),
+    [verboseInfo],
+  );
+  const shouldShowNotification =
+    checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current;
   const haveLogs = verboseInfo.length > 0;
 
   const switchVerboseDetails = useCallback(() => {
-    if(checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current){
+    if (checkDidSomeAction && !verboseInfoWithNotificationWasOpened.current) {
       verboseInfoWithNotificationWasOpened.current = true;
-    };
+    }
     setVerboseIsOpen(state => !state);
-  },[checkDidSomeAction]);
+  }, [checkDidSomeAction]);
 
-  const showLogButton = (props.showLogButton && isCheckStarted && haveLogs);
+  const showLogButton = props.showLogButton && isCheckStarted && haveLogs;
 
   return (
     <>
-      <EuiDescriptionListTitle>
-        {props.title}
-      </EuiDescriptionListTitle>
+      <EuiDescriptionListTitle>{props.title}</EuiDescriptionListTitle>
       <EuiDescriptionListDescription>
-        <p><ResultIcons result={result} initCheck={initCheck}>
-        {showLogButton ? <InspectLogButton verboseIsOpen={verboseIsOpen} haveLogs={haveLogs} switchVerboseDetails={switchVerboseDetails} shouldShowNotification={shouldShowNotification} />:<></>}
-        </ResultIcons></p>
+        <p>
+          <ResultIcons result={result} initCheck={initCheck}>
+            {showLogButton ? (
+              <InspectLogButton
+                verboseIsOpen={verboseIsOpen}
+                haveLogs={haveLogs}
+                switchVerboseDetails={switchVerboseDetails}
+                shouldShowNotification={shouldShowNotification}
+              />
+            ) : (
+              <></>
+            )}
+          </ResultIcons>
+        </p>
       </EuiDescriptionListDescription>
       {verboseInfo.length > 0 && (
         <EuiCodeBlock
-          className={`wz-width-100 ${verboseIsOpen ? "visible" : ""}`}
+          className={`wz-width-100 ${verboseIsOpen ? 'visible' : ''}`}
           paddingSize='s'
           fontSize='s'
           isCopyable
-          style={{textAlign: 'left'}}
+          style={{ textAlign: 'left' }}
         >
-          {verboseInfo.map(log => `${log.type.toUpperCase()}: ${log.message}`).join('\n')}
+          {verboseInfo
+            .map(log => `${log.type.toUpperCase()}: ${log.message}`)
+            .join('\n')}
         </EuiCodeBlock>
       )}
     </>

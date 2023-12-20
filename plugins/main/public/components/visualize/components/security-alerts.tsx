@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
-import { useFilterManager, useQuery, useRefreshAngularDiscover } from '../../common/hooks';
+import { useFilterManager, useQueryManager, useRefreshAngularDiscover } from '../../common/hooks';
 import { Discover } from '../../common/modules/discover';
 import { useAllowedAgents } from '../../common/hooks/useAllowedAgents';
 
@@ -37,7 +37,7 @@ export const SecurityAlerts = ({
   ],
   useAgentColumns = true,
 }) => {
-  const [query] = useQuery();
+  const [query] = useQueryManager();
   const { filterManager } = useFilterManager();
   const refreshAngularDiscover = useRefreshAngularDiscover();
 
