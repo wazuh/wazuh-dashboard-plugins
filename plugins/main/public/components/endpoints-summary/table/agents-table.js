@@ -502,9 +502,9 @@ export const AgentsTable = compose(
     };
 
     renderGroups(groups, agent) {
-      return Array.isArray(groups) ? (
+      return (
         <GroupTruncate
-          groups={groups}
+          groups={groups || []}
           length={25}
           label={'more'}
           action={'filter'}
@@ -515,7 +515,21 @@ export const AgentsTable = compose(
           reloadAgents={() => this.reloadAgents()}
           {...this.props}
         />
-      ) : undefined;
+      );
+      // return Array.isArray(groups) ? (
+      //   <GroupTruncate
+      //     groups={groups}
+      //     length={25}
+      //     label={'more'}
+      //     action={'filter'}
+      //     filterAction={this.filterGroupBadge}
+      //     allowEdit
+      //     allowRemove
+      //     agent={agent}
+      //     reloadAgents={() => this.reloadAgents()}
+      //     {...this.props}
+      //   />
+      // ) : undefined;
     }
     render() {
       const table = this.tableRender();

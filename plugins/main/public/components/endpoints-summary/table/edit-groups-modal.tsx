@@ -18,6 +18,10 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { useGetGroups } from '../hooks/groups';
+import {
+  addAgentToGroupService,
+  removeAgentFromGroupsService,
+} from '../services';
 
 interface EditAgentGroupsModalProps {
   agent: { id: string; name: string; group: string[] };
@@ -32,7 +36,7 @@ export const EditAgentGroupsModal = compose(
   const [selectedGroups, setSelectedGroups] = useState(
     agent.group?.map(group => ({ label: group })) || [],
   );
-  const [isConfirmLoading, setIsConfirmLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const {
     groups,
@@ -55,27 +59,45 @@ export const EditAgentGroupsModal = compose(
     getErrorOrchestrator().handleError(options);
   }
 
-  const handleOnCofirm = async () => {
-    setIsConfirmLoading(true);
+  const handleOnSave = async () => {
+    setIsSaving(true);
+
+    const flatSelectedGroups = selectedGroups.map(group => group.label);
+    const addedGroups =
+      flatSelectedGroups.filter(group => !agent.group?.includes(group)) || [];
+    const removedGroups =
+      agent.group?.filter(group => !flatSelectedGroups.includes(group)) || [];
+
+    if (!removedGroups.length && !addedGroups.length) {
+      setIsSaving(false);
+      onClose();
+      return;
+    }
 
     try {
-      // await addAgentToGroupService(agent.id, group);
+      addedGroups.length &&
+        (await Promise.all(
+          addedGroups?.map(group => addAgentToGroupService(agent.id, group)),
+        ));
+      removedGroups.length &&
+        (await removeAgentFromGroupsService(agent.id, removedGroups));
       reloadAgents();
     } catch (error) {
       const options = {
-        context: `EditAgentGroupsModal.addAgentToGroupService`,
+        context: `EditAgentGroupsModal.handleOnSave`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
         error: {
           error,
           message: error.message || error,
-          title: `Could not remove agent from group`,
+          title: `Could not save agent groups`,
         },
       };
       getErrorOrchestrator().handleError(options);
     } finally {
-      setIsConfirmLoading(false);
+      setIsSaving(false);
+      onClose();
     }
   };
 
@@ -115,9 +137,9 @@ export const EditAgentGroupsModal = compose(
       <EuiModalFooter>
         <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
         <EuiButton
-          onClick={onClose}
+          onClick={handleOnSave}
           fill
-          isLoading={isConfirmLoading}
+          isLoading={isSaving}
           disabled={isGroupsLoading || !selectedGroups?.length}
         >
           Save
