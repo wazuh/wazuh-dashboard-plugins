@@ -1,0 +1,22 @@
+
+# Wazuh - Filebeat configuration file
+filebeat.modules:
+  - module: wazuh
+    alerts:
+      enabled: true
+    archives:
+      enabled: false
+
+setup.template.json.enabled: true
+setup.template.json.path: '/etc/filebeat/wazuh-template.json'
+setup.template.json.name: 'wazuh'
+setup.template.overwrite: true
+setup.ilm.enabled: false
+output.elasticsearch:
+  hosts: ['https://wazuh.indexer:9200']
+  username: 'admin'
+  password: 'SecretPassword'
+  ssl.verification_mode: full
+  ssl.certificate_authorities: ['/etc/ssl/wazuh/ca.pem']
+  ssl.certificate: '/etc/ssl/wazuh/filebeat.pem'
+  ssl.key: '/etc/ssl/wazuh/filebeat-key.pem'

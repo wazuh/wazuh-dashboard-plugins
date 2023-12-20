@@ -27,7 +27,7 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
   const agentNameDocLink = webDocumentationLink(
     'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
     PLUGIN_VERSION_SHORT,
-  )
+  );
   const popoverAgentName = (
     <span>
       Learn about{' '}
@@ -64,7 +64,7 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
               gutterSize='s'
             >
               <EuiFlexItem grow={false}>
-                <p className='registerAgentLabels'>Assign an agent name</p>
+                <p className='registerAgentLabels'>Assign an agent name:</p>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiPopover
@@ -94,11 +94,16 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
       />
       <EuiCallOut
         color='warning'
-        title={<span>{warningForAgentName}<EuiLink
-          target='_blank'
-          href={agentNameDocLink}
-          rel='noopener noreferrer'
-        /></span>}
+        title={
+          <span>
+            {warningForAgentName}
+            <EuiLink
+              target='_blank'
+              href={agentNameDocLink}
+              rel='noopener noreferrer'
+            />
+          </span>
+        }
         iconType='iInCircle'
         className='warningForAgentName'
       />
