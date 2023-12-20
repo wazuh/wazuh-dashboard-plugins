@@ -3,11 +3,11 @@ import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
-import useSearchBarConfiguration from '../../search_bar/use_search_bar_configuration';
+import { useAppConfig } from '../../../../common/hooks';
+import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { getDashboardFilters } from './dashboard_panels_filters';
 import './vulnerability_detector_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
-import { useAppConfig } from '../../../../common/hooks';
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -23,7 +23,7 @@ export const DashboardVuls: React.FC = () => {
   const VULNERABILITIES_INDEX_PATTERN_ID =
     appConfig.data['vulnerabilities.pattern'];
 
-  const { searchBarProps } = useSearchBarConfiguration({
+  const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
     filters: [],
   });
