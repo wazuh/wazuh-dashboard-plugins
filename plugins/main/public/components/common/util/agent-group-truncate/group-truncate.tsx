@@ -100,7 +100,7 @@ export class GroupTruncate extends React.Component {
     );
   }
 
-  renderGroups(groups) {
+  renderGroups(groups = []) {
     const { length } = this.props;
     let auxGroups: Array<String> = [];
     let tooltipGroups: Array<String> = [];

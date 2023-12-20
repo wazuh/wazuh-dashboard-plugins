@@ -90,6 +90,12 @@ export const ScaScan = compose(
       this.getLastScan(this.props.agent.id);
     }
 
+    async componentDidUpdate(prevProps: Readonly<Props>) {
+      if (prevProps.agent.id !== this.props.agent.id) {
+        this.getLastScan(this.props.agent.id);
+      }
+    }
+
     async getLastScan(agentId: Number) {
       const scans = await WzRequest.apiReq(
         'GET',
@@ -209,7 +215,7 @@ export const ScaScan = compose(
                     href={getCore().application.getUrlForApp(
                       configurationAssessment.id,
                       {
-                        path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}`,
                       },
                     )}
                   >
@@ -220,7 +226,7 @@ export const ScaScan = compose(
               </RedirectAppLinks>
             </EuiFlexItem>
             <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
-              <EuiBadge color='secondary'>{lastScan.policy_id}</EuiBadge>
+              <EuiBadge color='secondary'>{lastScan?.policy_id}</EuiBadge>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiPanel>
@@ -258,6 +264,20 @@ export const ScaScan = compose(
       const loading = this.renderLoadingStatus();
       const scaScan = this.renderScanDetails();
       const emptyPrompt = this.renderEmptyPrompt();
+      if (loading) {
+        return (
+          <EuiFlexItem>
+            <EuiPanel paddingSize='m'>{loading}</EuiPanel>
+          </EuiFlexItem>
+        );
+      }
+      if (!lastScan) {
+        return (
+          <EuiFlexItem>
+            <EuiPanel paddingSize='m'>{emptyPrompt}</EuiPanel>
+          </EuiFlexItem>
+        );
+      }
       return (
         <EuiFlexItem>
           <EuiPanel paddingSize='m'>
@@ -277,7 +297,7 @@ export const ScaScan = compose(
                         href={getCore().application.getUrlForApp(
                           configurationAssessment.id,
                           {
-                            path: `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`,
+                            path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}`,
                           },
                         )}
                       >
@@ -309,8 +329,6 @@ export const ScaScan = compose(
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiText>
-            {lastScan === undefined && emptyPrompt}
-            {loading}
             {scaScan}
           </EuiPanel>
         </EuiFlexItem>

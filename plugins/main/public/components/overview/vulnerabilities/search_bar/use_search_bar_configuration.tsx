@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SearchBarProps,
   FilterManager,
@@ -44,6 +44,7 @@ const useSearchBarConfiguration = (
   props?: tUseSearchBarProps,
 ): tUserSearchBarResponse => {
   // dependencies
+  const SESSION_STORAGE_FILTERS_NAME = 'wazuh_persistent_searchbar_filters';
   const filterManager = useFilterManager().filterManager as FilterManager;
   const { filters } = useFilterManager();
   const [query, setQuery] = props?.query
@@ -56,19 +57,28 @@ const useSearchBarConfiguration = (
     useState<IIndexPattern>();
 
   useEffect(() => {
-    initSearchBar();
-  }, []);
-
-  useEffect(() => {
-    const defaultIndex = props?.defaultIndexPatternID;
-    /* Filters that do not belong to the default index are filtered */
-    const cleanedFilters = filters.filter(
-      filter => filter.meta.index === defaultIndex,
-    );
-    if (cleanedFilters.length !== filters.length) {
-      filterManager.setFilters(cleanedFilters);
+    if (filters && filters.length > 0) {
+      sessionStorage.setItem(
+        SESSION_STORAGE_FILTERS_NAME,
+        JSON.stringify(filters),
+      );
     }
-  }, [filters]);
+    initSearchBar();
+    /**
+     * When the component is disassembled, the original filters that arrived
+     * when the component was assembled are added.
+     */
+    return () => {
+      const storagePreviousFilters = sessionStorage.getItem(
+        SESSION_STORAGE_FILTERS_NAME,
+      );
+      if (storagePreviousFilters) {
+        const previousFilters = JSON.parse(storagePreviousFilters);
+        const cleanedFilters = cleanFilters(previousFilters);
+        filterManager.setFilters(cleanedFilters);
+      }
+    };
+  }, []);
 
   /**
    * Initialize the searchbar props with the corresponding index pattern and filters
@@ -77,8 +87,8 @@ const useSearchBarConfiguration = (
     setIsLoading(true);
     const indexPattern = await getIndexPattern(props?.defaultIndexPatternID);
     setIndexPatternSelected(indexPattern);
-    const filters = await getInitialFilters(indexPattern);
-    filterManager.setFilters(filters);
+    const initialFilters = props?.filters ?? filters;
+    filterManager.setFilters(initialFilters);
     setIsLoading(false);
   };
 
@@ -104,44 +114,33 @@ const useSearchBarConfiguration = (
   };
 
   /**
-   * Return the initial filters considering if hook receives initial filters
-   * When the default index pattern is the same like the received preserve the filters
-   * @param indexPattern
-   * @returns
-   */
-  const getInitialFilters = async (indexPattern: IIndexPattern) => {
-    const indexPatternService = getDataPlugin()
-      .indexPatterns as IndexPatternsContract;
-    let initialFilters: Filter[] = [];
-    if (props?.filters) {
-      return props?.filters;
-    }
-    if (indexPattern) {
-      // get filtermanager and filters
-      // if the index is the same, get filters stored
-      // else clear filters
-      const defaultIndexPattern =
-        (await indexPatternService.getDefault()) as IIndexPattern;
-      initialFilters =
-        defaultIndexPattern.id === indexPattern.id
-          ? filterManager.getFilters()
-          : [];
-    } else {
-      initialFilters = [];
-    }
-    return initialFilters;
-  };
-
-  /**
    * Return filters from filters manager.
    * Additionally solve the known issue with the auto loaded agent.id filters from the searchbar
+   * and filters those filters that are not related to the default index pattern
    * @returns
    */
   const getFilters = () => {
-    const filters = filterManager ? filterManager.getFilters() : [];
-    return filters.filter(
-      filter => filter.meta.controlledBy !== AUTHORIZED_AGENTS,
-    ); // remove auto loaded agent.id filters
+    const originalFilters = filterManager ? filterManager.getFilters() : [];
+    return originalFilters.filter(
+      (filter: Filter) =>
+        filter?.meta?.controlledBy !== AUTHORIZED_AGENTS && // remove auto loaded agent.id filters
+        filter?.meta?.index === props?.defaultIndexPatternID,
+    );
+  };
+
+  /**
+   * Return cleaned filters.
+   * Clean the known issue with the auto loaded agent.id filters from the searchbar
+   * and filters those filters that are not related to the default index pattern
+   * @param previousFilters
+   * @returns
+   */
+  const cleanFilters = (previousFilters: Filter[]) => {
+    return previousFilters.filter(
+      (filter: Filter) =>
+        filter?.meta?.controlledBy !== AUTHORIZED_AGENTS &&
+        filter?.meta?.index !== props?.defaultIndexPatternID,
+    );
   };
 
   /**
@@ -156,9 +155,24 @@ const useSearchBarConfiguration = (
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (filters: Filter[]) => {
-      // its necessary execute setter to apply filters
-      filterManager.setFilters(filters);
-      props?.onFiltersUpdated && props?.onFiltersUpdated(filters);
+      const storagePreviousFilters = sessionStorage.getItem(
+        SESSION_STORAGE_FILTERS_NAME,
+      );
+      /**
+       * If there are persisted filters, it is necessary to add them when
+       * updating the filters in the filterManager
+       */
+      if (storagePreviousFilters) {
+        const previousFilters = JSON.parse(storagePreviousFilters);
+        const cleanedFilters = cleanFilters(previousFilters);
+        filterManager.setFilters([...cleanedFilters, ...filters]);
+
+        props?.onFiltersUpdated &&
+          props?.onFiltersUpdated([...cleanedFilters, ...filters]);
+      } else {
+        filterManager.setFilters(filters);
+        props?.onFiltersUpdated && props?.onFiltersUpdated(filters);
+      }
     },
     onQuerySubmit: (
       payload: { dateRange: TimeRange; query?: Query },

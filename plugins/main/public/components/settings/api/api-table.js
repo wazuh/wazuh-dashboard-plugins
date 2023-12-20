@@ -370,7 +370,7 @@ export const ApiTable = compose(
                           color="primary"
                           iconType="questionInCircle"
                           aria-label="Info about the error"
-                          onClick={() => this.props.copyToClipBoard(item.downReason)}
+                          onClick={() => this.props.copyToClipBoard(api.error.detail)}
                         />
                       </EuiToolTip>
                     </EuiFlexItem>

@@ -82,7 +82,7 @@ export class ReportingService {
       const visualizationIDList = [];
       for (const item of idArray) {
         const tmpHTMLElement = $(`#${item}`);
-        if(tmpHTMLElement[0]){
+        if (tmpHTMLElement[0]) {
           this.vis2png.assignHTMLItem(item, tmpHTMLElement);
           visualizationIDList.push(item);
         }
@@ -120,7 +120,7 @@ export class ReportingService {
       this.showToast(
         'success',
         'Created report',
-        'Success. Go to Wazuh > Management > Reporting',
+        'Success. Go to Indexer/dashboard management > Reporting',
         4000
       );
       return;
@@ -167,7 +167,7 @@ export class ReportingService {
       this.showToast(
         'success',
         'Created report',
-        'Success. Go to Wazuh > Management > Reporting',
+        'Success. Go to Indexer/dashboard management > Reporting',
         4000
       );
       return;

@@ -45,7 +45,7 @@ const GroupInput = ({ value, options, onChange }) => {
       >
         <EuiFlexItem grow={false}>
           <p className='registerAgentLabels'>
-            Select one or more existing groups
+            Select one or more existing groups:
           </p>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
