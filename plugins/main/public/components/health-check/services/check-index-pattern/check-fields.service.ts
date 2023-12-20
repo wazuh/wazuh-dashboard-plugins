@@ -16,15 +16,22 @@ import { AppState, SavedObject } from '../../../../react-services';
 import { getDataPlugin } from '../../../../kibana-services';
 import { CheckLogger } from '../../types/check_logger';
 
-export const checkFieldsService = async (appConfig, checkLogger: CheckLogger) => {
+export const checkFieldsService = async (
+  appConfig,
+  checkLogger: CheckLogger,
+) => {
   const patternId = AppState.getCurrentPattern();
   checkLogger.info(`Index pattern id in cookie: [${patternId}]`);
-  
+
   checkLogger.info(`Getting index pattern data [${patternId}]...`);
   const pattern = await getDataPlugin().indexPatterns.get(patternId);
   checkLogger.info(`Index pattern data found: [${pattern ? 'yes' : 'no'}]`);
-  
-  checkLogger.info(`Refreshing index pattern fields: title [${pattern.title}], id [${pattern.id}]...`);
-  await SavedObject.refreshIndexPattern(pattern, null);
-  checkLogger.action(`Refreshed index pattern fields: title [${pattern.title}], id [${pattern.id}]`);
+
+  checkLogger.info(
+    `Refreshing index pattern fields: title [${pattern.title}], id [${pattern.id}]...`,
+  );
+  await SavedObject.refreshIndexPattern(pattern);
+  checkLogger.action(
+    `Refreshed index pattern fields: title [${pattern.title}], id [${pattern.id}]`,
+  );
 };

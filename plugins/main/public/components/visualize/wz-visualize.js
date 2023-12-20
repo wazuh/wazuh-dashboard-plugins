@@ -74,7 +74,6 @@ export const WzVisualize = compose(
       this.monitoringEnabled = !!(configuration || {})[
         'wazuh.monitoring.enabled'
       ];
-      this.newFields = {};
     }
 
     async componentDidMount() {
@@ -123,19 +122,15 @@ export const WzVisualize = compose(
       });
     };
 
-    refreshKnownFields = async (newField = null) => {
-      if (newField && newField.name) {
-        this.newFields[newField.name] = newField;
-      }
+    refreshKnownFields = async () => {
       if (!this.hasRefreshedKnownFields) {
         // Known fields are refreshed only once per dashboard loading
         try {
           this.hasRefreshedKnownFields = true;
           this.isRefreshing = true;
-          await PatternHandler.refreshIndexPattern(this.newFields);
+          await PatternHandler.refreshIndexPattern();
           this.isRefreshing = false;
           this.reloadToast();
-          this.newFields = {};
         } catch (error) {
           this.isRefreshing = false;
           const options = {
