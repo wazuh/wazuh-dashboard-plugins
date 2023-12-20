@@ -38,7 +38,21 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the application menu in the IT Hygiene application [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 - Removed the implicit filter of WQL language of the search bar UI [#6174](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6174)
 
-## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 01
+## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.7.2
+- Added contextual information in the register agent commands [#6208](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6208)
+- Added host name and board serial information to Agents > Inventory data [#6191](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6191)
+
+### Fixed
+
+- Fixed Agents preview page load when there are no registered agents [#6185](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6185)
+- Fixed the endpoint to get Wazuh server auth configuration [#6206](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6206) [#6213](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6213)
+- Fixed error navigating back to agent in some scenarios [#6224](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6224)
+
+## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 03
 
 ### Added
 
@@ -49,6 +63,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed problem when using non latin characters in the username [#6076](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6076)
 - Fixed UI crash on retrieving log collection configuration for macos agent. [#6104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6104)
 - Fixed incorrect validation of the agent name on the Deploy new agent window [#6105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6105)
+- Fixed missing columns in the agents table of Groups [#6184](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6184)
 
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 04
 

@@ -23,6 +23,7 @@ import {
   EuiToolTip,
   EuiCard,
   EuiLink,
+  EuiProgress,
 } from '@elastic/eui';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -53,6 +54,7 @@ import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
+import { AppNavigate } from '../../../react-services/app-navigate.js';
 import { endpointSumary } from '../../../utils/applications';
 
 export const AgentsPreview = compose(
@@ -220,6 +222,19 @@ export const AgentsPreview = compose(
     render() {
       const evolutionIsReady = this.props.resultState !== 'loading';
 
+      //This condition is because the angular template and the controller have a small delay to show the register agent component when there are no agents
+      //This condition must be removed when the controller is removed
+      if (
+        !this.state.agentStatusSummary.total ||
+        this.state.agentStatusSummary.total === '-'
+      ) {
+        return (
+          <div className='md-padding md-padding-top-16'>
+            <EuiProgress size='xs' color='primary' />
+          </div>
+        );
+      }
+
       return (
         <EuiPage className='flex-column'>
           <EuiFlexItem>
@@ -306,10 +321,13 @@ export const AgentsPreview = compose(
                                 content='View agent details'
                               >
                                 <EuiLink
-                                  onClick={() =>
-                                    this.showAgent(
-                                      this.state.lastRegisteredAgent,
-                                    )
+                                  onClick={ev => {
+                                    ev.stopPropagation();
+                                    AppNavigate.navigateToModule(ev, 'agents', {
+                                      tab: 'welcome',
+                                      agent: this.state.lastRegisteredAgent?.id,
+                                    });
+                                  }
                                   }
                                 >
                                   {this.state.lastRegisteredAgent?.name || '-'}
@@ -336,8 +354,13 @@ export const AgentsPreview = compose(
                                   content='View agent details'
                                 >
                                   <EuiLink
-                                    onClick={() =>
-                                      this.showAgent(this.state.agentMostActive)
+                                    onClick={ev => {
+                                      ev.stopPropagation();
+                                      AppNavigate.navigateToModule(ev, 'agents', {
+                                        tab: 'welcome',
+                                        agent: this.state.agentMostActive?.id,
+                                      });
+                                    }
                                     }
                                   >
                                     {this.state.agentMostActive?.name || '-'}

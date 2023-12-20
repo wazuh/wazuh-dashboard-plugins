@@ -42,7 +42,10 @@ export const clusterStatusResponse = async (): Promise<boolean> => {
 /**
  * Get the remote configuration from api
  */
-async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
+async function getRemoteConfiguration(
+  nodeName: string,
+  clusterStatus: boolean,
+): Promise<RemoteConfig> {
   let config: RemoteConfig = {
     name: nodeName,
     isUdp: false,
@@ -50,7 +53,6 @@ async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
   };
 
   try {
-    const clusterStatus = await clusterStatusResponse();
     let result;
     if (clusterStatus) {
       result = await WzRequest.apiReq(
@@ -92,6 +94,19 @@ async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
     return config;
   }
 }
+/**
+ * Get the manager/cluster auth configuration from Wazuh API
+ * @param node
+ * @returns
+ */
+async function getAuthConfiguration(node: string, clusterStatus: boolean) {
+  const authConfigUrl = clusterStatus
+    ? `/cluster/${node}/configuration/auth/auth`
+    : '/manager/configuration/auth/auth';
+  const result = await WzRequest.apiReq('GET', authConfigUrl, {});
+  const auth = result?.data?.data?.affected_items?.[0];
+  return auth;
+}
 
 /**
  * Get the remote protocol available from list of protocols
@@ -118,7 +133,11 @@ async function getConnectionConfig(
   const nodeIp = nodeSelected?.value;
   if (!defaultServerAddress) {
     if (nodeSelected.nodetype !== 'custom') {
-      const remoteConfig = await getRemoteConfiguration(nodeName);
+      const clusterStatus = await clusterStatusResponse();
+      const remoteConfig = await getRemoteConfiguration(
+        nodeName,
+        clusterStatus,
+      );
       return {
         serverAddress: nodeIp,
         udpProtocol: remoteConfig.isUdp,
@@ -213,13 +232,22 @@ export const getMasterNode = (nodeIps: any[]): any[] => {
 };
 
 /**
- * Get the remote configuration from manager
+ * Get the remote and the auth configuration from manager
  * This function get the config from manager mode or cluster mode
  */
-export const getMasterRemoteConfiguration = async () => {
+export const getMasterConfiguration = async () => {
   const nodes = await fetchClusterNodesOptions();
   const masterNode = getMasterNode(nodes);
-  return await getRemoteConfiguration(masterNode[0].label);
+  const clusterStatus = await clusterStatusResponse();
+  const remote = await getRemoteConfiguration(
+    masterNode[0].label,
+    clusterStatus,
+  );
+  const auth = await getAuthConfiguration(masterNode[0].label, clusterStatus);
+  return {
+    remote,
+    auth,
+  };
 };
 
 export { getConnectionConfig, getRemoteConfiguration };
@@ -260,16 +288,18 @@ export interface IParseRegisterFormValues {
 export const parseRegisterAgentFormValues = (
   formValues: { name: keyof UseFormReturn['fields']; value: any }[],
   OSOptionsDefined: RegisterAgentData[],
-  initialValues?: IParseRegisterFormValues
+  initialValues?: IParseRegisterFormValues,
 ) => {
   // return the values form the formFields and the value property
-  const parsedForm = initialValues || {
-    operatingSystem: {
-      architecture: '',
-      name: '',
-    },
-    optionalParams: {},
-  } as IParseRegisterFormValues;
+  const parsedForm =
+    initialValues ||
+    ({
+      operatingSystem: {
+        architecture: '',
+        name: '',
+      },
+      optionalParams: {},
+    } as IParseRegisterFormValues);
   formValues.forEach(field => {
     if (field.name === 'operatingSystemSelection') {
       // search the architecture defined in architecture array and get the os name defined in title array in the same index
@@ -284,7 +314,9 @@ export const parseRegisterAgentFormValues = (
       }
     } else {
       if (field.name === 'agentGroups') {
-        parsedForm.optionalParams[field.name as any] = field.value.map(item => item.id)
+        parsedForm.optionalParams[field.name as any] = field.value.map(
+          item => item.id,
+        );
       } else {
         parsedForm.optionalParams[field.name as any] = field.value;
       }
