@@ -37,6 +37,7 @@ import {
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
   WAZUH_INDEX_TYPE_VULNERABILITIES,
+  WAZUH_INDEX_TYPE_FIM,
 } from '../../../../common/constants';
 
 import { compose } from 'redux';
@@ -97,6 +98,19 @@ const checks = {
       checkPatternSupportService(
         appConfig.data['vulnerabilities.pattern'],
         WAZUH_INDEX_TYPE_VULNERABILITIES,
+        NOT_TIME_FIELD_NAME_INDEX_PATTERN,
+      ),
+    awaitFor: [],
+    shouldCheck: false,
+    canRetry: true,
+  },
+  'fim.pattern': {
+    title: 'Check fim index pattern',
+    label: 'Fim index pattern',
+    validator: appConfig =>
+      checkPatternSupportService(
+        appConfig.data['fim.pattern'],
+        WAZUH_INDEX_TYPE_FIM,
         NOT_TIME_FIELD_NAME_INDEX_PATTERN,
       ),
     awaitFor: [],
