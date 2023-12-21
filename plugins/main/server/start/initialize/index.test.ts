@@ -98,7 +98,7 @@ describe('[initialize] `wazuh-registry.json` not created', () => {
       fs.readFileSync(WAZUH_DATA_CONFIG_REGISTRY_PATH, 'utf8'),
     );
 
-    expect(contentRegistry.name).toMatch('Wazuh dashboard');
+    expect(contentRegistry.name).toMatch('Dashboard');
     expect(contentRegistry['app-version']).toMatch(packageInfo.version);
     expect(contentRegistry['revision']).toMatch(packageInfo.revision);
     expect(typeof contentRegistry.installationDate).toBe('string');
@@ -112,7 +112,7 @@ describe('[initialize] `wazuh-registry.json` created', () => {
   const contentRegistryFile = [
     {
       before: {
-        name: 'Wazuh dashboard',
+        name: 'Dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
         installationDate: '2022-07-25T13:55:04.363Z',
@@ -120,7 +120,7 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         hosts: {},
       },
       after: {
-        name: 'Wazuh dashboard',
+        name: 'Dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
         installationDate: '2022-07-25T13:55:04.363Z',
@@ -130,7 +130,7 @@ describe('[initialize] `wazuh-registry.json` created', () => {
     },
     {
       before: {
-        name: 'Wazuh dashboard',
+        name: 'Dashboard',
         'app-version': '0.0.0',
         revision: '0',
         installationDate: '2022-07-25T13:55:04.363Z',
@@ -138,7 +138,7 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         hosts: {},
       },
       after: {
-        name: 'Wazuh dashboard',
+        name: 'Dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
         installationDate: '2022-07-25T13:55:04.363Z',
@@ -148,7 +148,7 @@ describe('[initialize] `wazuh-registry.json` created', () => {
     },
     {
       before: {
-        name: 'Wazuh dashboard',
+        name: 'Dashboard',
         'app-version': '0.0.0',
         revision: '0',
         installationDate: '2022-07-25T13:55:04.363Z',
@@ -176,7 +176,7 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         },
       },
       after: {
-        name: 'Wazuh dashboard',
+        name: 'Dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
         installationDate: '2022-07-25T13:55:04.363Z',
@@ -188,7 +188,7 @@ describe('[initialize] `wazuh-registry.json` created', () => {
     },
     {
       before: {
-        name: 'Wazuh dashboard',
+        name: 'Dashboard',
         'app-version': '0.0.0',
         revision: '0',
         installationDate: '2022-07-25T13:55:04.363Z',
@@ -256,7 +256,7 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         },
       },
       after: {
-        name: 'Wazuh dashboard',
+        name: 'Dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
         installationDate: '2022-07-25T13:55:04.363Z',
@@ -305,7 +305,7 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         fs.readFileSync(WAZUH_DATA_CONFIG_REGISTRY_PATH, 'utf8'),
       );
 
-      expect(contentRegistryFile.name).toMatch('Wazuh dashboard');
+      expect(contentRegistryFile.name).toMatch('Dashboard');
       expect(contentRegistryFile['app-version']).toMatch(
         contentRegistryExpected['app-version'],
       );
