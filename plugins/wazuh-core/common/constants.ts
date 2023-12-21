@@ -50,6 +50,7 @@ export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities';
+export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
@@ -838,6 +839,33 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Vulnerabilities index pattern',
     description:
       'Enable or disable the vulnerabilities index pattern health check when opening the app.',
+    category: SettingCategory.HEALTH_CHECK,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  'checks.fim.pattern': {
+    title: 'Fim index pattern',
+    description:
+      'Enable or disable the fim index pattern health check when opening the app.',
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
