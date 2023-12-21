@@ -110,7 +110,8 @@ export class AgentInfo extends Component {
         <EuiFlexItem key={item.description} style={item.style || null}>
           <WzStat
             title={
-              item.description === 'Groups' ? (
+              item.description === 'Groups' &&
+              this.props.agent.group?.length ? (
                 <GroupTruncate
                   agent={this.props.agent}
                   groups={this.props.agent.group}

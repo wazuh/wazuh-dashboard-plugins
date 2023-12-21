@@ -34,7 +34,7 @@ export const SERVER_ADDRESS_TEXTS = [
   {
     title: 'Server address',
     subtitle:
-      'This is the address the agent uses to communicate with the Wazuh server. Enter an IP address or a fully qualified domain name (FDQN).',
+      'This is the address the agent uses to communicate with the server. Enter an IP address or a fully qualified domain name (FDQN).',
   },
 ];
 
@@ -42,6 +42,6 @@ export const OPTIONAL_PARAMETERS_TEXT = [
   {
     title: 'Optional settings',
     subtitle:
-      'The deployment sets the endpoint hostname as the agent name by default. Optionally, you can set your own name in the field below.',
+      'By default, the deployment uses the hostname as the agent name. Optionally, you can use a different agent name in the field below.',
   },
 ];
