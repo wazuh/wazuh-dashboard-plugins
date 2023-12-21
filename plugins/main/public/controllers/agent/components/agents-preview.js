@@ -315,6 +315,7 @@ export const AgentsPreview = compose(
                       <EuiFlexGroup className='mt-0'>
                         <EuiFlexItem className='agents-link-item'>
                           <EuiStat
+                            titleElement='div'
                             className='euiStatLink last-agents-link'
                             isLoading={this.state.loadingAgents}
                             title={
@@ -350,6 +351,7 @@ export const AgentsPreview = compose(
                         {
                           <EuiFlexItem className='agents-link-item'>
                             <EuiStat
+                              titleElement='div'
                               className={
                                 this.state.agentMostActive?.name
                                   ? 'euiStatLink'
