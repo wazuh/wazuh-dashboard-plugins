@@ -79,7 +79,7 @@ export const checkIndexPatternObjectService = async (
         } catch (error) {
           if (error.message.includes('No indices match pattern')) {
             checkLogger.warning(
-              `Index pattern fields for title [${pattern.title}], id [${pattern.id}] could not be refreshed due to: ${error.message}. This could be an indicator of some problem in the  generation, non running server service or configuration to ingest of alerts data.`,
+              `Index pattern fields for title [${pattern.title}], id [${pattern.id}] could not be refreshed due to: ${error.message}. This could be an indicator of some problem in the generation, not running server service or configuration to ingest of alerts data.`,
             );
           }
         }
