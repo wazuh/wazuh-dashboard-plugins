@@ -54,6 +54,7 @@ import { endpointSumary, itHygiene } from '../../utils/applications';
 import { ShareAgent } from '../../factories/share-agent';
 import { getCore } from '../../kibana-services';
 import './endpoints-summary.scss';
+import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export const EndpointsSummary = compose(
   withErrorBoundary,
@@ -284,28 +285,33 @@ export const EndpointsSummary = compose(
                   <EuiFlexGroup className='mt-0'>
                     <EuiFlexItem className='agents-link-item'>
                       <EuiStat
+                        titleElement='div'
                         className='euiStatLink last-agents-link'
                         isLoading={this.state.loadingLastRegisteredAgent}
                         title={
-                          <EuiToolTip
-                            position='top'
-                            content='View agent details'
-                          >
-                            {this.state.lastRegisteredAgent?.id ? (
-                              <EuiLink
-                                href={getCore().application.getUrlForApp(
-                                  itHygiene.id,
-                                  {
-                                    path: `#/agents?tab=welcome&agent=${this.state.lastRegisteredAgent.id}`,
-                                  },
-                                )}
+                          this.state.lastRegisteredAgent?.id ? (
+                            <EuiToolTip
+                              position='top'
+                              content='View agent details'
+                            >
+                              <RedirectAppLinks
+                                application={getCore().application}
                               >
-                                {this.state.lastRegisteredAgent.name || '-'}
-                              </EuiLink>
-                            ) : (
-                              <EuiText>-</EuiText>
-                            )}
-                          </EuiToolTip>
+                                <EuiLink
+                                  href={getCore().application.getUrlForApp(
+                                    itHygiene.id,
+                                    {
+                                      path: `#/agents?tab=welcome&agent=${this.state.lastRegisteredAgent?.id}`,
+                                    },
+                                  )}
+                                >
+                                  {this.state.lastRegisteredAgent?.name}
+                                </EuiLink>
+                              </RedirectAppLinks>
+                            </EuiToolTip>
+                          ) : (
+                            <EuiText>-</EuiText>
+                          )
                         }
                         titleSize='s'
                         description='Last registered agent'
