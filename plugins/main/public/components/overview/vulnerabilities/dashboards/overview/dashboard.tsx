@@ -72,7 +72,7 @@ const DashboardVulsComponent: React.FC = () => {
           isSuccess &&
           resultIndexData &&
           resultIndexData?.hits?.total !== 0 ? (
-            <>
+            <div className='vulnerability-dashboard-responsive'>
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer
                   input={{
@@ -144,7 +144,7 @@ const DashboardVulsComponent: React.FC = () => {
                   hidePanelTitles: false,
                 }}
               />
-            </>
+            </div>
           ) : null}
         </>
       </I18nProvider>
