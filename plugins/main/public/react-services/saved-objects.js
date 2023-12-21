@@ -238,16 +238,19 @@ export class SavedObject {
    * Optionally force a new field
    */
   static async refreshIndexPattern(pattern) {
-    try {
-      // Refresh fields using the same way that the Dashboards Management/Index patterns
-      // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.11.0/src/plugins/index_pattern_management/public/components/edit_index_pattern/edit_index_pattern.tsx#L136-L137
-      await getDataPlugin().indexPatterns.refreshFields(pattern);
-      await getDataPlugin().indexPatterns.updateSavedObject(pattern);
-    } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? error.data.message
-        : error.message || error;
-    }
+    /* Refresh fields using the same way that the Dashboards Management/Index patterns
+        https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.11.0/src/plugins/index_pattern_management/public/components/edit_index_pattern/edit_index_pattern.tsx#L136-L137
+
+        This approach takes the definition of indexPatterns.refreshFields instead of using it due to
+        the error management that causes that unwanted toasts are displayed when there are no
+        indices for the index pattern
+      */
+    const fields = await getDataPlugin().indexPatterns.getFieldsForIndexPattern(
+      pattern,
+    );
+    const scripted = pattern.getScriptedFields().map(field => field.spec);
+    pattern.fields.replaceAll([...fields, ...scripted]);
+    await getDataPlugin().indexPatterns.updateSavedObject(pattern);
   }
 
   /**

@@ -30,8 +30,16 @@ export const checkFieldsService = async (
   checkLogger.info(
     `Refreshing index pattern fields: title [${pattern.title}], id [${pattern.id}]...`,
   );
-  await SavedObject.refreshIndexPattern(pattern);
-  checkLogger.action(
-    `Refreshed index pattern fields: title [${pattern.title}], id [${pattern.id}]`,
-  );
+  try {
+    await SavedObject.refreshIndexPattern(pattern);
+    checkLogger.action(
+      `Refreshed index pattern fields: title [${pattern.title}], id [${pattern.id}]`,
+    );
+  } catch (error) {
+    if (error.message.includes('No indices match pattern')) {
+      checkLogger.warning(
+        `Index pattern fields for title [${pattern.title}], id [${pattern.id}] could not be refreshed due to: ${error.message}. This could be an indicator of some problem in the  generation, non running server service or configuration to ingest of alerts data.`,
+      );
+    }
+  }
 };

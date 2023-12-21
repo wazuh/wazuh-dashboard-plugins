@@ -381,7 +381,7 @@ class KibanaVis extends Component {
           this.renderInProgress = false;
           this.rendered = false;
 
-          await this.props.refreshKnownFields(foundField);
+          await this.props.refreshKnownFields();
         }
         this.renderInProgress = false;
         return this.myRender(raw);
