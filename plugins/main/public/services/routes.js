@@ -20,6 +20,7 @@ import { settingsWizard, getSavedSearch, getIp, getWzConfig } from './resolves';
 // HTML templates
 import healthCheckTemplate from '../templates/health-check/health-check.html';
 import agentsTemplate from '../templates/agents/dashboards.html';
+import agentDeployTemplate from '../templates/agents/deploy/agent-deploy.html';
 import agentsPrevTemplate from '../templates/agents-prev/agents-prev.html';
 import managementTemplate from '../templates/management/management.html';
 import overviewTemplate from '../templates/visualize/dashboards.html';
@@ -107,6 +108,12 @@ app.config($routeProvider => {
     .when('/health-check', {
       template: healthCheckTemplate,
       resolve: { wzConfig, ip },
+      outerAngularWrapperRoute: true,
+    })
+    .when('/agents-preview/deploy', {
+      template: agentDeployTemplate,
+      resolve: { enableWzMenu, nestedResolve, ip, savedSearch },
+      reloadOnSearch: false,
       outerAngularWrapperRoute: true,
     })
     .when('/agents/:agent?/:tab?/:tabView?', {

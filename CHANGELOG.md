@@ -2,6 +2,14 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.9.0 - OpenSearch Dashboards 2.11.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.9.0
+- Added AngularJS dependencies [#6145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6145)
+- Remove embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120)
+- Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
 
 ## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 00
 
