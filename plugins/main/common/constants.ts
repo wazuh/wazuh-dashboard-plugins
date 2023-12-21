@@ -332,7 +332,7 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
 };
 
 // Plugin app
-export const PLUGIN_APP_NAME = 'Wazuh dashboard';
+export const PLUGIN_APP_NAME = 'Dashboard';
 
 // UI
 export const API_NAME_AGENT_STATUS = {
