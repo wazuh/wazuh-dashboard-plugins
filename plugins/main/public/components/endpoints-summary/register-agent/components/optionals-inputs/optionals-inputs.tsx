@@ -64,7 +64,7 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
               gutterSize='s'
             >
               <EuiFlexItem grow={false}>
-                <p className='registerAgentLabels'>Assign an agent name</p>
+                <p className='registerAgentLabels'>Assign an agent name:</p>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiPopover

@@ -472,7 +472,7 @@ export class SettingsController {
       const response = data.data.data;
       this.appInfo = {
         'app-version': response['app-version'],
-        installationDate: formatUIDate(response['installationDate']),
+        installationDate: response['installationDate'],
         revision: response['revision'],
       };
 
