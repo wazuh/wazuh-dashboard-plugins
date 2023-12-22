@@ -38,28 +38,19 @@ import { getSettingDefaultValue } from '../../common/services/settings';
 import { WAZUH_INDEXER_NAME } from '../../common/constants';
 
 export class WazuhElasticCtrl {
-  wzSampleAlertsIndexPrefix: string;
-  constructor() {
-    this.wzSampleAlertsIndexPrefix = this.getSampleAlertPrefix();
-  }
+  constructor() {}
 
   /**
    * This returns the index according the category
    * @param {string} category
    */
-  buildSampleIndexByCategory(category: string): string {
-    return `${this.wzSampleAlertsIndexPrefix}sample-${category}`;
-  }
-
-  /**
-   * This returns the defined config for sample alerts prefix or the default value.
-   */
-  getSampleAlertPrefix(): string {
-    const config = getConfiguration();
-    return (
-      config['alerts.sample.prefix'] ||
-      getSettingDefaultValue('alerts.sample.prefix')
-    );
+  async buildSampleIndexByCategory(
+    context: RequestHandlerContext,
+    category: string,
+  ): Promise<string> {
+    return `${await context.wazuh_core.configuration.get(
+      'alerts.sample.prefix',
+    )}sample-${category}`;
   }
 
   /**
@@ -602,10 +593,11 @@ export class WazuhElasticCtrl {
     try {
       // Check if wazuh sample alerts index exists
       const results = await Promise.all(
-        Object.keys(WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS).map(category =>
-          context.core.opensearch.client.asCurrentUser.indices.exists({
-            index: this.buildSampleIndexByCategory(category),
-          }),
+        Object.keys(WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS).map(
+          async category =>
+            context.core.opensearch.client.asCurrentUser.indices.exists({
+              index: await this.buildSampleIndexByCategory(context, category),
+            }),
         ),
       );
       return response.ok({
@@ -634,7 +626,8 @@ export class WazuhElasticCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const sampleAlertsIndex = this.buildSampleIndexByCategory(
+      const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+        context,
         request.params.category,
       );
       // Check if wazuh sample alerts index exists
@@ -685,7 +678,8 @@ export class WazuhElasticCtrl {
     request: OpenSearchDashboardsRequest<{ category: string }>,
     response: OpenSearchDashboardsResponseFactory,
   ) {
-    const sampleAlertsIndex = this.buildSampleIndexByCategory(
+    const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+      context,
       request.params.category,
     );
 
@@ -806,7 +800,8 @@ export class WazuhElasticCtrl {
   ) {
     // Delete Wazuh sample alert index
 
-    const sampleAlertsIndex = this.buildSampleIndexByCategory(
+    const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+      context,
       request.params.category,
     );
 
