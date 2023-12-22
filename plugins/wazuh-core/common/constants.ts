@@ -458,6 +458,9 @@ export enum EpluginSettingType {
   editor = 'editor',
   select = 'select',
   filepicker = 'filepicker',
+  password = 'password',
+  arrayOf = 'arrayOf',
+  custom = 'custom',
 }
 
 export type TPluginSetting = {
@@ -562,6 +565,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Sample alerts prefix',
     description:
       'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_SAMPLE_ALERT_PREFIX,
@@ -593,6 +603,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'checks.api': {
     title: 'API connection',
     description: 'Enable or disable the API health check when opening the app.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -620,6 +637,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Known fields',
     description:
       'Enable or disable the known fields health check when opening the app.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -647,6 +671,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Set max buckets to 200000',
     description:
       'Change the default value of the plugin platform max buckets configuration.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -674,6 +705,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Remove meta fields',
     description:
       'Change the default value of the plugin platform metaField configuration.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -701,6 +739,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Index pattern',
     description:
       'Enable or disable the index pattern health check when opening the app.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -728,6 +773,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'API version',
     description:
       'Enable or disable the setup health check when opening the app.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -755,6 +807,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Index template',
     description:
       'Enable or disable the template health check when opening the app.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -782,6 +841,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Set time filter to 24h',
     description:
       'Change the default value of the plugin platform timeFilter configuration.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -809,6 +875,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Vulnerabilities index pattern',
     description:
       'Enable or disable the vulnerabilities index pattern health check when opening the app.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -835,6 +908,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'cron.prefix': {
     title: 'Cron prefix',
     description: 'Define the index prefix of predefined jobs.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_STATISTICS_DEFAULT_PREFIX,
@@ -866,6 +946,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Includes APIs',
     description:
       'Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.editor,
     defaultValue: [],
@@ -913,6 +1000,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'cron.statistics.index.creation': {
     title: 'Index creation',
     description: 'Define the interval in which a new index will be created.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'keyword',
+        },
+      },
+    },
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.select,
     options: {
@@ -954,6 +1048,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Index name',
     description:
       'Define the name of the index in which the documents will be saved.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_STATISTICS_DEFAULT_NAME,
@@ -986,6 +1087,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Index replicas',
     description:
       'Define the number of replicas to use for the statistics indices.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'integer',
+        },
+      },
+    },
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
@@ -1019,6 +1127,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Index shards',
     description:
       'Define the number of shards to use for the statistics indices.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'integer',
+        },
+      },
+    },
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
@@ -1046,28 +1161,35 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.number({ validate: this.validate.bind(this) });
     },
   },
-  'cron.statistics.interval': {
-    title: 'Interval',
-    description:
-      'Define the frequency of task execution using cron schedule expressions.',
-    category: SettingCategory.STATISTICS,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
-    requiresRestartingPluginPlatform: true,
-    validate: function (value: string) {
-      return validateNodeCronInterval(value)
-        ? undefined
-        : 'Interval is not valid.';
-    },
-    validateBackend: function (schema) {
-      return schema.string({ validate: this.validate });
-    },
-  },
+  // 'cron.statistics.interval': {
+  //   title: 'Interval',
+  //   description:
+  //     'Define the frequency of task execution using cron schedule expressions.',
+  //   category: SettingCategory.STATISTICS,
+  //   type: EpluginSettingType.text,
+  //   defaultValue: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
+  //   isConfigurableFromFile: true,
+  //   isConfigurableFromUI: true,
+  //   requiresRestartingPluginPlatform: true,
+  //   validate: function (value: string) {
+  //     return validateNodeCronInterval(value)
+  //       ? undefined
+  //       : 'Interval is not valid.';
+  //   },
+  //   validateBackend: function (schema) {
+  //     return schema.string({ validate: this.validate });
+  //   },
+  // },
   'cron.statistics.status': {
     title: 'Status',
     description: 'Enable or disable the statistics tasks.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.switch,
     defaultValue: WAZUH_STATISTICS_DEFAULT_STATUS,
@@ -1094,6 +1216,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'customization.enabled': {
     title: 'Status',
     description: 'Enable or disable the customization.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -1121,6 +1250,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'customization.logo.app': {
     title: 'App main logo',
     description: `This logo is used as loading indicator while the user is logging into Wazuh API.`,
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.filepicker,
     defaultValue: '',
@@ -1165,6 +1301,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'customization.logo.healthcheck': {
     title: 'Healthcheck logo',
     description: `This logo is displayed during the Healthcheck routine of the app.`,
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.filepicker,
     defaultValue: '',
@@ -1209,6 +1352,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'customization.logo.reports': {
     title: 'PDF reports logo',
     description: `This logo is used in the PDF reports generated by the app. It's placed at the top left corner of every page of the PDF.`,
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.filepicker,
     defaultValue: '',
@@ -1252,6 +1402,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'customization.reports.footer': {
     title: 'Reports footer',
     description: 'Set the footer of the reports.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.textarea,
     defaultValue: '',
@@ -1272,6 +1429,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'customization.reports.header': {
     title: 'Reports header',
     description: 'Set the header of the reports.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.textarea,
     defaultValue: '',
@@ -1293,6 +1457,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Enrollment DNS',
     description:
       'Specifies the Wazuh registration server, used for the agent enrollment.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: '',
@@ -1307,6 +1478,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Enrollment password',
     description:
       'Specifies the password used to authenticate during the agent enrollment.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: '',
@@ -1320,6 +1498,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   hideManagerAlerts: {
     title: 'Hide manager alerts',
     description: 'Hide the alerts of the manager in every dashboard.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
     defaultValue: false,
@@ -1344,10 +1529,179 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.boolean();
     },
   },
+  hosts: {
+    title: 'Server hosts',
+    description: 'Configure the server hosts.',
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.arrayOf,
+    defaultValue: [
+      {
+        id: 'default',
+        url: 'https://localhost',
+        port: 55000,
+        username: 'wazuh-wui',
+        password: 'wazuh-wui',
+        run_as: false,
+      },
+    ],
+    persistence: {
+      savedObject: {
+        mapping: {
+          properties: {
+            id: {
+              type: 'keyword',
+            },
+            url: {
+              type: 'text',
+            },
+            port: {
+              type: 'integer',
+            },
+            username: {
+              type: 'text',
+            },
+            password: {
+              type: 'text',
+            },
+            run_as: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
+    },
+    options: {
+      arrayOf: {
+        id: {
+          title: 'Identifier',
+          description: 'API host identifier',
+          type: EpluginSettingType.text,
+          defaultValue: 'default',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          validate: SettingsValidator.isNotEmptyString,
+          validateBackend: function (schema) {
+            return schema.string({ validate: this.validate });
+          },
+        },
+        url: {
+          title: 'URL',
+          description: 'URL address',
+          type: EpluginSettingType.text,
+          defaultValue: 'https://localhost',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          validate: SettingsValidator.isNotEmptyString,
+          validateBackend: function (schema) {
+            return schema.string({ validate: this.validate });
+          },
+        },
+        port: {
+          title: 'Port',
+          description: 'Port',
+          type: EpluginSettingType.number,
+          defaultValue: 55000,
+          defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          options: {
+            number: {
+              min: 0,
+              max: 65535,
+              integer: true,
+            },
+          },
+          uiFormTransformConfigurationValueToInputValue: function (
+            value: number,
+          ) {
+            return String(value);
+          },
+          uiFormTransformInputValueToConfigurationValue: function (
+            value: string,
+          ): number {
+            return Number(value);
+          },
+          validate: function (value) {
+            return SettingsValidator.number(this.options.number)(value);
+          },
+          validateBackend: function (schema) {
+            return schema.number({ validate: this.validate.bind(this) });
+          },
+        },
+        username: {
+          title: 'Username',
+          description: 'Username',
+          type: EpluginSettingType.text,
+          defaultValue: 'wazuh-wui',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          validate: SettingsValidator.isNotEmptyString,
+          validateBackend: function (schema) {
+            return schema.string({ validate: this.validate });
+          },
+        },
+        password: {
+          title: 'Password',
+          description: 'Password',
+          type: EpluginSettingType.password,
+          defaultValue: 'wazuh-wui',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          validate: SettingsValidator.isNotEmptyString,
+          validateBackend: function (schema) {
+            return schema.string({ validate: this.validate });
+          },
+        },
+        run_as: {
+          title: 'Run as',
+          description: 'Use the authentication context.',
+          type: EpluginSettingType.switch,
+          defaultValue: 'wazuh-wui',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          options: {
+            switch: {
+              values: {
+                disabled: { label: 'false', value: false },
+                enabled: { label: 'true', value: true },
+              },
+            },
+          },
+          uiFormTransformChangedInputValue: function (
+            value: boolean | string,
+          ): boolean {
+            return Boolean(value);
+          },
+          validate: SettingsValidator.isBoolean,
+          validateBackend: function (schema) {
+            return schema.boolean();
+          },
+        },
+      },
+    },
+    isConfigurableFromFile: false,
+    isConfigurableFromUI: true,
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
   'ip.ignore': {
     title: 'Index pattern ignore',
     description:
       'Disable certain index pattern names from being available in index pattern selector.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.editor,
     defaultValue: [],
@@ -1423,6 +1777,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'IP selector',
     description:
       'Define if the user is allowed to change the selected index pattern directly from the top menu bar.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
     defaultValue: true,
@@ -1448,6 +1809,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   },
   pattern: {
     title: 'Index pattern',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     description:
       "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
     category: SettingCategory.GENERAL,
@@ -1480,6 +1848,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   },
   timeout: {
     title: 'Request timeout',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'integer',
+        },
+      },
+    },
     description:
       'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
     category: SettingCategory.GENERAL,
@@ -1512,6 +1887,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Index creation',
     description:
       'Define the interval in which a new wazuh-monitoring index will be created.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'keyword',
+        },
+      },
+    },
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.select,
     options: {
@@ -1553,6 +1935,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Status',
     description:
       'Enable or disable the wazuh-monitoring index creation and/or visualization.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'boolean',
+        },
+      },
+    },
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.switch,
     defaultValue: WAZUH_MONITORING_DEFAULT_ENABLED,
@@ -1581,6 +1970,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Frequency',
     description:
       'Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'integer',
+        },
+      },
+    },
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_MONITORING_DEFAULT_FREQUENCY,
@@ -1611,6 +2007,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'wazuh.monitoring.pattern': {
     title: 'Index pattern',
     description: 'Default index pattern to use for Wazuh monitoring.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_MONITORING_PATTERN,
@@ -1642,6 +2045,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Index replicas',
     description:
       'Define the number of replicas to use for the wazuh-monitoring-* indices.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'integer',
+        },
+      },
+    },
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
@@ -1673,6 +2083,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Index shards',
     description:
       'Define the number of shards to use for the wazuh-monitoring-* indices.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'integer',
+        },
+      },
+    },
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
@@ -1703,6 +2120,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'vulnerabilities.pattern': {
     title: 'Index pattern',
     description: 'Default index pattern to use for vulnerabilities.',
+    persistence: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.VULNERABILITIES,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_VULNERABILITIES_PATTERN,
