@@ -2,18 +2,20 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 03-hl
+
+### Added
+
+- Support for Wazuh 4.7.1
+
+### Fixed
+
+- Fixed problem when using non latin characters in the username [#6076](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6076)
+- Fixed UI crash on retrieving log collection configuration for macos agent. [#6104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6104)
+- Fixed incorrect validation of the agent name on the Deploy new agent window [#6105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6105)
+- Fixed missing columns in the agents table of Groups [#6184](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6184)
+
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 04-hl
-
-### Removed
-
-- Removed the visualization of agent status evolution due to performance problems in environments with heavy load
-- Removed the stat of most active agent in the agents section due to performance problems in environments with heavy load
-
-### Changed
-
-- Allowed the Details panel in Agents section to grow
-
-## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 04
 
 ### Added
 
@@ -26,6 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed Network ports table columns for Linux agents. [#5636](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5636)
 - Updated development dependencies (`@typescript-eslint/eslint-plugin, @typescript-eslint/parser, eslint, swagger-client`)[#5748](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5748)
 - Changed timelion type displays in the management > statistics section to line type displays. [5707](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5707)
+- - Allowed the Details panel in Agents section to grow
 
 ### Fixed
 
@@ -37,6 +40,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Removed
 
 - Removed views in JSON and XML formats from management settings. [#5747](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5747)
+- Removed the visualization of agent status evolution due to performance problems in environments with heavy load
+- Removed the stat of most active agent in the agents section due to performance problems in environments with heavy load
 
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.8.0 - Revision 03
 
