@@ -55,7 +55,6 @@ export default function CommandOutput(props: ICommandSectionProps) {
   const onChangeShowPassword = (event: EuiSwitchEvent) => {
     setShowPassword(event.target.checked);
   };
-
   return (
     <Fragment>
       <EuiSpacer />
@@ -64,6 +63,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
           <EuiCodeBlock
             style={{
               zIndex: '100',
+              wordWrap: 'break-word',
             }}
             language='tsx'
           >

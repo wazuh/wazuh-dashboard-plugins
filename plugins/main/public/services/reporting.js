@@ -71,9 +71,8 @@ export class ReportingService {
       const appliedFilters = await this.visHandlers.getAppliedFilters(syscollectorFilters);
 
       const array = await this.vis2png.checkArray(idArray);
-      const name = `wazuh-${isAgents ? 'agents' : 'overview'}-${tab}-${
-        (Date.now() / 1000) | 0
-      }.pdf`;
+      const name = `wazuh-${isAgents ? 'agents' : 'overview'}-${tab}-${(Date.now() / 1000) | 0
+        }.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 
@@ -96,7 +95,7 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      ErrorHandler.info('Success. Go to Wazuh > Management > Reporting', 'Reporting');
+      ErrorHandler.info('Success. Go to Indexer/dashboard management > Reporting', 'Reporting');
 
       return;
     } catch (error) {
@@ -134,7 +133,7 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      ErrorHandler.info('Success. Go to Wazuh > Management > Reporting', 'Reporting');
+      ErrorHandler.info('Success. Go to Indexer/dashboard management > Reporting', 'Reporting');
 
       return;
     } catch (error) {
