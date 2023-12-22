@@ -28,7 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed Network ports table columns for Linux agents. [#5636](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5636)
 - Updated development dependencies (`@typescript-eslint/eslint-plugin, @typescript-eslint/parser, eslint, swagger-client`)[#5748](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5748)
 - Changed timelion type displays in the management > statistics section to line type displays. [5707](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5707)
-- - Allowed the Details panel in Agents section to grow
+- Allowed the Details panel in Agents section to grow
 
 ### Fixed
 
