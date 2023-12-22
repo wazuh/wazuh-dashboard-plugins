@@ -37,7 +37,6 @@ export class ConfigurationStore implements IConfigurationStore {
       this.logger.debug('Setup');
       const savedObjectSchema = this.getSavedObjectDefinition(settings);
       this.logger.info(`Schema: ${JSON.stringify(savedObjectSchema)}`);
-      console.log({ savedObjectSchema: savedObjectSchema.mappings });
       await this.savedObjects.registerType(savedObjectSchema);
       this.logger.info('Schema registered');
     } catch (error) {
