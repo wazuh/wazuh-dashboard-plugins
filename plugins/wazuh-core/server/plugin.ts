@@ -20,17 +20,22 @@ import {
   ServerAPIHostEntries,
   UpdateConfigurationFile,
   UpdateRegistry,
+  ConfigurationStore,
 } from './services';
+import { Configuration } from '../common/services/configuration';
+import { PLUGIN_SETTINGS } from '../common/constants';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
   private readonly logger: Logger;
   private services: { [key: string]: any };
+  private _internal: { [key: string]: any };
 
   constructor(initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
     this.services = {};
+    this._internal = {};
   }
 
   public async setup(
@@ -69,6 +74,21 @@ export class WazuhCorePlugin
       this.services.cacheAPIUserAllowRunAs,
     );
 
+    this._internal.configurationStore = new ConfigurationStore(
+      this.logger.get('configuration-saved-object'),
+      core.savedObjects,
+    );
+    this.services.configuration = new Configuration(
+      this.logger.get('configuration'),
+      this._internal.configurationStore,
+    );
+
+    Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
+      this.services.configuration.register(key, value),
+    );
+
+    this.services.configuration.setup();
+
     this.services.updateConfigurationFile = new UpdateConfigurationFile(
       this.logger.get('update-configuration-file'),
     );
@@ -100,8 +120,14 @@ export class WazuhCorePlugin
     };
   }
 
-  public start(core: CoreStart): WazuhCorePluginStart {
+  public async start(core: CoreStart): WazuhCorePluginStart {
     this.logger.debug('wazuhCore: Started');
+
+    this._internal.configurationStore.setSavedObjectRepository(
+      core.savedObjects.createInternalRepository(),
+    );
+
+    await this.services.configuration.start();
 
     setCore(core);
 

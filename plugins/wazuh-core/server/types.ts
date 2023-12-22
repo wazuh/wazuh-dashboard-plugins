@@ -9,11 +9,13 @@ import {
   UpdateConfigurationFile,
   UpdateRegistry,
 } from './services';
+import { Configuration } from '../common/services/configuration';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginSetup {
   dashboardSecurity: ISecurityFactory;
   cacheAPIUserAllowRunAs: CacheAPIUserAllowRunAs;
+  configuration: Configuration;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
   serverAPIHostEntries: ServerAPIHostEntries;
@@ -30,6 +32,7 @@ export interface WazuhCorePluginSetup {
 export interface WazuhCorePluginStart {
   dashboardSecurity: ISecurityFactory;
   cacheAPIUserAllowRunAs: CacheAPIUserAllowRunAs;
+  configuration: Configuration;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
   serverAPIHostEntries: ServerAPIHostEntries;

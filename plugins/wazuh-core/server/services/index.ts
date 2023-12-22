@@ -11,6 +11,7 @@
  */
 
 export * from './cache-api-user-has-run-as';
+export * from './configuration-store';
 export * from './cookie';
 export * from './filesystem';
 export * from './get-configuration';
