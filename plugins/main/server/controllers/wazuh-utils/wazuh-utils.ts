@@ -12,13 +12,8 @@
 
 // Require some libraries
 import { ErrorResponse } from '../../lib/error-response';
-import { getConfiguration } from '../../lib/get-configuration';
-import { read } from 'read-last-lines';
 import jwtDecode from 'jwt-decode';
-import {
-  WAZUH_ROLE_ADMINISTRATOR_ID,
-  PLUGIN_SETTINGS,
-} from '../../../common/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../../common/constants';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
@@ -46,19 +41,22 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  getConfigurationFile(
+  async getConfigurationFile(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const configFile = getConfiguration();
-
+      context.wazuh.logger.debug('Getting configuration');
+      const configuration = await context.wazuh_core.configuration.get();
+      context.wazuh.logger.debug(
+        `Configuration: ${JSON.stringify(configuration)}`,
+      );
       return response.ok({
         body: {
           statusCode: 200,
           error: 0,
-          data: configFile || {},
+          data: configuration,
         },
       });
     } catch (error) {
@@ -80,53 +78,48 @@ export class WazuhUtilsCtrl {
         request: OpenSearchDashboardsRequest,
         response: OpenSearchDashboardsResponseFactory,
       ) => {
-        let requiresRunningHealthCheck: boolean = false,
-          requiresReloadingBrowserTab: boolean = false,
-          requiresRestartingPluginPlatform: boolean = false;
+        // TODO: add validation of body
+        let requiresRunningHealthCheck = false,
+          requiresReloadingBrowserTab = false,
+          requiresRestartingPluginPlatform = false;
 
-        // Plugin settings configurables in the configuration file.
-        const pluginSettingsConfigurableFile = Object.keys(request.body)
-          .filter(
-            pluginSettingKey =>
-              PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile,
-          )
-          .reduce(
-            (accum, pluginSettingKey: string) => ({
-              ...accum,
-              [pluginSettingKey]: request.body[pluginSettingKey],
-            }),
-            {},
-          );
+        context.wazuh.logger.debug(
+          `Updating configuration: ${JSON.stringify(request.body)}`,
+        );
 
-        if (Object.keys(pluginSettingsConfigurableFile).length) {
-          // Update the configuration file.
-          await context.wazuh_core.updateConfigurationFile.updateConfiguration(
-            pluginSettingsConfigurableFile,
-          );
+        const updatedSettings = {
+          ...request.body,
+        };
+        context.wazuh.logger.debug(
+          `Updating configuration with ${JSON.stringify(updatedSettings)}`,
+        );
+        const pluginSettings = await context.wazuh_core.configuration.set(
+          updatedSettings,
+        );
+        context.wazuh.logger.debug('Configuration updated');
 
-          requiresRunningHealthCheck =
-            Object.keys(pluginSettingsConfigurableFile).some(
-              (pluginSettingKey: string) =>
-                Boolean(
-                  PLUGIN_SETTINGS[pluginSettingKey].requiresRunningHealthCheck,
-                ),
-            ) || requiresRunningHealthCheck;
-          requiresReloadingBrowserTab =
-            Object.keys(pluginSettingsConfigurableFile).some(
-              (pluginSettingKey: string) =>
-                Boolean(
-                  PLUGIN_SETTINGS[pluginSettingKey].requiresReloadingBrowserTab,
-                ),
-            ) || requiresReloadingBrowserTab;
-          requiresRestartingPluginPlatform =
-            Object.keys(pluginSettingsConfigurableFile).some(
-              (pluginSettingKey: string) =>
-                Boolean(
-                  PLUGIN_SETTINGS[pluginSettingKey]
-                    .requiresRestartingPluginPlatform,
-                ),
-            ) || requiresRestartingPluginPlatform;
-        }
+        // TODO: this doesn't support the update of hosts
+        requiresRunningHealthCheck =
+          Object.keys(request.body).some((pluginSettingKey: string) =>
+            Boolean(
+              context.wazuh_core.configuration._settings.get(pluginSettingKey)
+                .requiresRunningHealthCheck,
+            ),
+          ) || requiresRunningHealthCheck;
+        requiresReloadingBrowserTab =
+          Object.keys(request.body).some((pluginSettingKey: string) =>
+            Boolean(
+              context.wazuh_core.configuration._settings.get(pluginSettingKey)
+                .requiresReloadingBrowserTab,
+            ),
+          ) || requiresReloadingBrowserTab;
+        requiresRestartingPluginPlatform =
+          Object.keys(request.body).some((pluginSettingKey: string) =>
+            Boolean(
+              context.wazuh_core.configuration._settings.get(pluginSettingKey)
+                .requiresRestartingPluginPlatform,
+            ),
+          ) || requiresRestartingPluginPlatform;
 
         return response.ok({
           body: {
@@ -134,7 +127,7 @@ export class WazuhUtilsCtrl {
               requiresRunningHealthCheck,
               requiresReloadingBrowserTab,
               requiresRestartingPluginPlatform,
-              updatedConfiguration: pluginSettingsConfigurableFile,
+              updatedConfiguration: pluginSettings,
             },
           },
         });
@@ -157,7 +150,8 @@ export class WazuhUtilsCtrl {
     ) => {
       const { key } = request.params;
       const { file: bufferFile } = request.body;
-      const pluginSetting = PLUGIN_SETTINGS[key];
+
+      const pluginSetting = context.wazuh_core.configuration._settings.get(key);
 
       // Check file extension
       const fileExtension = getFileExtensionFromBuffer(bufferFile);
@@ -181,20 +175,27 @@ export class WazuhUtilsCtrl {
         '../../..',
         pluginSetting.options.file.store.relativePathFileSystem,
       );
+      context.wazuh.logger.debug(`Directory: ${targetDirectory}`);
       createDirectoryIfNotExists(targetDirectory);
       // Get the files related to the setting and remove them
       const files = glob.sync(path.join(targetDirectory, `${key}.*`));
+      context.wazuh.logger.debug(
+        `Removing previous files: ${files.join(', ')}`,
+      );
       files.forEach(fs.unlinkSync);
 
       // Store the file in the target directory.
-      fs.writeFileSync(path.join(targetDirectory, fileNamePath), bufferFile);
+      const storeFilePath = path.join(targetDirectory, fileNamePath);
+      context.wazuh.logger.debug(`Storing file on : ${files.join(', ')}`);
+      fs.writeFileSync(storeFilePath, bufferFile);
 
       // Update the setting in the configuration cache
       const pluginSettingValue =
         pluginSetting.options.file.store.resolveStaticURL(fileNamePath);
-      await context.wazuh_core.updateConfigurationFile.updateConfiguration({
+      const updatedConfiguration = {
         [key]: pluginSettingValue,
-      });
+      };
+      await context.wazuh_core.configuration.set(updatedConfiguration);
 
       return response.ok({
         body: {
@@ -208,9 +209,7 @@ export class WazuhUtilsCtrl {
             requiresRestartingPluginPlatform: Boolean(
               pluginSetting.requiresRestartingPluginPlatform,
             ),
-            updatedConfiguration: {
-              [key]: pluginSettingValue,
-            },
+            updatedConfiguration,
           },
         },
       });
@@ -232,7 +231,7 @@ export class WazuhUtilsCtrl {
       response: KibanaResponseFactory,
     ) => {
       const { key } = request.params;
-      const pluginSetting = PLUGIN_SETTINGS[key];
+      const pluginSetting = context.wazuh_core.configuration._settings.get(key);
 
       // Get the files related to the setting and remove them
       const targetDirectory = path.join(
@@ -240,14 +239,19 @@ export class WazuhUtilsCtrl {
         '../../..',
         pluginSetting.options.file.store.relativePathFileSystem,
       );
+      context.wazuh.logger.debug(`Directory: ${targetDirectory}`);
       const files = glob.sync(path.join(targetDirectory, `${key}.*`));
+      context.wazuh.logger.debug(
+        `Removing previous files: ${files.join(', ')}`,
+      );
       files.forEach(fs.unlinkSync);
 
       // Update the setting in the configuration cache
       const pluginSettingValue = pluginSetting.defaultValue;
-      await context.wazuh_core.updateConfigurationFile.updateConfiguration({
+      const updatedConfiguration = {
         [key]: pluginSettingValue,
-      });
+      };
+      await context.wazuh_core.configuration.clean(key);
 
       return response.ok({
         body: {
@@ -263,9 +267,7 @@ export class WazuhUtilsCtrl {
             requiresRestartingPluginPlatform: Boolean(
               pluginSetting.requiresRestartingPluginPlatform,
             ),
-            updatedConfiguration: {
-              [key]: pluginSettingValue,
-            },
+            updatedConfiguration,
           },
         },
       });
