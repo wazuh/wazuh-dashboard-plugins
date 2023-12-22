@@ -200,10 +200,6 @@ export const EndpointsSummary = compose(
       }
     }
 
-    removeFilters() {
-      this._isMount && this.setState({ agentTableFilters: {} });
-    }
-
     filterAgentByStatus(status) {
       this._isMount &&
         this.setState({
@@ -324,11 +320,7 @@ export const EndpointsSummary = compose(
             </EuiFlexGroup>
             <EuiSpacer size='m' />
             <WzReduxProvider>
-              <AgentsTable
-                filters={this.state.agentTableFilters}
-                removeFilters={() => this.removeFilters()}
-                formatUIDate={date => formatUIDate(date)}
-              />
+              <AgentsTable filters={this.state.agentTableFilters} />
             </WzReduxProvider>
           </EuiFlexItem>
         </EuiPage>
