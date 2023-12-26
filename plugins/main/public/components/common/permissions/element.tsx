@@ -45,11 +45,10 @@ export const WzElementPermissions = ({
   tooltip,
   ...rest
 }: IWzElementPermissionsProps) => {
-  const [userPermissionRequirements, userPermissions] =
-    useUserPermissionsRequirements(
-      typeof permissions === 'function' ? permissions(rest) : permissions,
-    );
-  const [userRolesRequirements, userRoles] = useUserRolesRequirements(
+  const [userPermissionRequirements] = useUserPermissionsRequirements(
+    typeof permissions === 'function' ? permissions(rest) : permissions,
+  );
+  const [userRolesRequirements] = useUserRolesRequirements(
     typeof roles === 'function' ? roles(rest) : roles,
   );
 

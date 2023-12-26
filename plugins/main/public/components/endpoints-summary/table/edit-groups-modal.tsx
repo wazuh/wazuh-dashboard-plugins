@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiModal,
   EuiModalHeader,
@@ -108,7 +108,12 @@ export const EditAgentGroupsModal = compose(
           <b>{agent.name}</b>
         </EuiText>
       </EuiFormRow>
-      <EuiFormRow label='Groups'>
+      <EuiFormRow
+        label='Groups'
+        isRequired
+        isInvalid={!selectedGroups?.length}
+        error={['You must add at least one group']}
+      >
         <EuiComboBox
           placeholder='Select groups'
           options={groups?.map(group => ({ label: group })) || []}
