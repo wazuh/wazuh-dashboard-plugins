@@ -12,19 +12,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-  EuiIconTip,
-  EuiToolTip,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiIconTip } from '@elastic/eui';
 import { GroupTruncate } from '../../common/util';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
 import { withErrorBoundary } from '../../common/hocs';
 import {
-  API_NAME_AGENT_STATUS,
   UI_ORDER_AGENT_STATUS,
   AGENT_SYNCED_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
@@ -41,7 +34,7 @@ import { useUserPermissionsRequirements } from '../../common/hooks/useUserPermis
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
-import { WzElementPermissions } from '../../common/permissions/element';
+import { agentsTableActions } from './actions';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -95,66 +88,6 @@ export const AgentsTable = compose(
   const reloadAgents = async () => {
     await setReloadTable(Date.now());
   };
-
-  const actions = [
-    {
-      name: 'View agent details',
-      description: 'View agent details',
-      icon: 'eye',
-      type: 'icon',
-      color: 'primary',
-      isPrimary: true,
-      onClick: agent =>
-        getCore().application.navigateToApp(itHygiene.id, {
-          path: `#/agents?tab=welcome&agent=${agent.id}`,
-        }),
-    },
-    {
-      name: agent => {
-        const name = 'Agent configuration';
-
-        if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
-          return name;
-        }
-
-        return (
-          <EuiToolTip content='Since the agent never connected, it is not possible to access its configuration'>
-            <span>{name}</span>
-          </EuiToolTip>
-        );
-      },
-      description: 'Agent configuration',
-      icon: 'wrench',
-      type: 'icon',
-      color: 'primary',
-      onClick: agent =>
-        getCore().application.navigateToApp(itHygiene.id, {
-          path: `#/agents?tab=configuration&agent=${agent.id}`,
-        }),
-      enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
-      'data-test-subj': 'action-configuration',
-    },
-    {
-      name: (
-        <WzElementPermissions
-          permissions={[
-            { action: 'group:modify_assignments', resource: 'group:id:*' },
-          ]}
-        >
-          <span>Edit groups</span>
-        </WzElementPermissions>
-      ),
-      description: 'Edit groups',
-      icon: 'pencil',
-      type: 'icon',
-      onClick: agent => {
-        setAgent(agent);
-        setIsEditGroupsVisible(true);
-      },
-      'data-test-subj': 'action-groups',
-      enabled: () => !userPermissionRequirements,
-    },
-  ];
 
   const addIconPlatformRender = agent => {
     let icon = '';
@@ -292,7 +225,11 @@ export const AgentsTable = compose(
     {
       name: 'Actions',
       show: true,
-      actions,
+      actions: agentsTableActions(
+        userPermissionRequirements,
+        setAgent,
+        setIsEditGroupsVisible,
+      ),
     },
   ];
 
