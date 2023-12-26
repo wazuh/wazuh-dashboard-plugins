@@ -27,7 +27,6 @@ const DashboardVulsComponent: React.FC = () => {
   const appConfig = useAppConfig();
   const VULNERABILITIES_INDEX_PATTERN_ID =
     appConfig.data['vulnerabilities.pattern'];
-
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
   });
@@ -63,11 +62,17 @@ const DashboardVulsComponent: React.FC = () => {
           ) : null}
           {!isLoadingSearchbar &&
           !isLoading &&
-          (isError || resultIndexData?.hits?.total === 0) ? (
+          (isError ||
+            !resultIndexData ||
+            resultIndexData?.hits?.total === 0) ? (
             <DiscoverNoResults message={error?.message} />
           ) : null}
-          {!isLoadingSearchbar && !isLoading && isSuccess ? (
-            <>
+          {!isLoadingSearchbar &&
+          !isLoading &&
+          isSuccess &&
+          resultIndexData &&
+          resultIndexData?.hits?.total !== 0 ? (
+            <div className='vulnerability-dashboard-responsive'>
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer
                   input={{
@@ -139,7 +144,7 @@ const DashboardVulsComponent: React.FC = () => {
                   hidePanelTitles: false,
                 }}
               />
-            </>
+            </div>
           ) : null}
         </>
       </I18nProvider>
