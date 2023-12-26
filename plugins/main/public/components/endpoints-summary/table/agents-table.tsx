@@ -41,6 +41,7 @@ import { useUserPermissionsRequirements } from '../../common/hooks/useUserPermis
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
+import { WzElementPermissions } from '../../common/permissions/element';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -135,12 +136,13 @@ export const AgentsTable = compose(
     },
     {
       name: (
-        <WzButtonPermissions
-          content={<span>Edit groups</span>}
+        <WzElementPermissions
           permissions={[
             { action: 'group:modify_assignments', resource: 'group:id:*' },
           ]}
-        />
+        >
+          <span>Edit groups</span>
+        </WzElementPermissions>
       ),
       description: 'Edit groups',
       icon: 'pencil',
@@ -151,13 +153,6 @@ export const AgentsTable = compose(
       },
       'data-test-subj': 'action-groups',
       enabled: () => !userPermissionRequirements,
-    },
-    {
-      name: 'Upgrade agent',
-      description: 'Upgrade agent',
-      icon: 'package',
-      type: 'icon',
-      onClick: agent => {},
     },
   ];
 
@@ -216,8 +211,7 @@ export const AgentsTable = compose(
       name: 'Group(s)',
       sortable: true,
       show: true,
-      render: (groups, agent) =>
-        groups !== '-' ? renderGroups(groups, agent) : '-',
+      render: groups => renderGroups(groups),
       searchable: true,
     },
     {
@@ -519,10 +513,10 @@ export const AgentsTable = compose(
     });
   };
 
-  const renderGroups = (groups: string[], agent: any) => {
+  const renderGroups = (groups: string[]) => {
     return groups?.length ? (
       <GroupTruncate
-        groups={groups || []}
+        groups={groups}
         length={25}
         label={'more'}
         action={'filter'}

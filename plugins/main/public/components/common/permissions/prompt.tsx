@@ -18,7 +18,7 @@ import {
   TUserPermissionsFunction,
   TUserRoles,
   TUserRolesFunction,
-} from '../permissions/button';
+} from '../permissions/element';
 import { WzPermissionsFormatted } from './format';
 import { withErrorBoundary } from '../hocs/error-boundary/with-error-boundary';
 
