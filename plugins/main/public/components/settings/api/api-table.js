@@ -409,12 +409,10 @@ export const ApiTable = compose(
                         content={api.error.detail}
                       >
                         <EuiButtonIcon
-                          color='primary'
-                          iconType='questionInCircle'
-                          aria-label='Info about the error'
-                          onClick={() =>
-                            this.props.copyToClipBoard(item.downReason)
-                          }
+                          color="primary"
+                          iconType="questionInCircle"
+                          aria-label="Info about the error"
+                          onClick={() => this.props.copyToClipBoard(api.error.detail)}
                         />
                       </EuiToolTip>
                     </EuiFlexItem>

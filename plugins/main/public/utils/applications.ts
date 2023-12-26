@@ -76,7 +76,7 @@ export const endpointSumary = {
   description: i18n.translate('wz-app-endpoints-summary-description', {
     defaultMessage: 'Summary of agents and their status.',
   }),
-  euiIconType: 'usersRolesApp',
+  euiIconType: 'spacesApp',
   order: 600,
   showInOverviewApp: false,
   showInAgentMenu: false,

@@ -1,0 +1,103 @@
+.flex-column {
+  flex-direction: column;
+}
+
+.mt-0 {
+  margin-top: 0px;
+}
+
+.loading-chart {
+  margin: 75px auto;
+}
+
+.eui-panel {
+  padding-bottom: 0px;
+  min-height: 168px;
+  min-width: 350px;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.group-details {
+  padding: 12px 0px;
+}
+
+.white-space-nowrap {
+  white-space: nowrap;
+}
+
+.pb-12 {
+  padding-bottom: 12px;
+}
+
+.loading-chart-xl {
+  display: block;
+  text-align: center;
+  padding: 30px;
+}
+
+.columnsSelectedCheckboxs {
+  display: flex;
+  align-items: baseline;
+  margin: 15px 0px;
+  flex-wrap: wrap;
+}
+
+.columnsSelectedCheckboxs div {
+  margin-right: 20px;
+}
+.copy-codeblock-wrapper {
+  position: relative;
+
+  .euiToolTipAnchor {
+    opacity: 0;
+    transition: 150ms opacity ease-in-out;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.75);
+
+    &:hover {
+      opacity: 1;
+    }
+    .copy-overlay {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      width: 100%;
+      p {
+        margin: 0;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+    }
+  }
+
+  code.euiCodeBlock__code {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+.agents-status-pie {
+  .euiListGroupItem__label {
+    white-space: nowrap;
+  }
+}
