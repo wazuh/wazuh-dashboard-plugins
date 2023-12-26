@@ -67,13 +67,14 @@ export const AgentsTable = compose(
   const [agent, setAgent] = useState();
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
 
-  const [userPermissionRequirements, userPermissions] =
-    useUserPermissionsRequirements([
-      { action: 'group:modify_assignments', resource: 'group:id:*' },
-    ]);
+  const [userPermissionRequirements] = useUserPermissionsRequirements([
+    { action: 'group:modify_assignments', resource: 'group:id:*' },
+  ]);
 
   useEffect(() => {
-    setFilters(props.filters);
+    if (props.filters && Object.keys(props.filters).length) {
+      setFilters(props.filters);
+    }
   }, [props.filters]);
 
   useEffect(() => {

@@ -74,7 +74,7 @@ export const EndpointsSummary = compose(
       this.state = {
         loadingSummary: true,
         loadingLastRegisteredAgent: true,
-        agentTableFilters: [],
+        agentTableFilters: {},
         agentStatusSummary: [],
         agentsActiveCoverage: undefined,
       };
