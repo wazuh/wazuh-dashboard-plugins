@@ -18,6 +18,7 @@
     "opensearchDashboardsUtils",
     "opensearchDashboardsLegacy",
     "wazuhCheckUpdates",
+    "wazuhCore",
     "wazuhEndpoints"
   ],
   "optionalPlugins": [

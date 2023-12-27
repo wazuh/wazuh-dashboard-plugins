@@ -24,6 +24,7 @@ import {
   setWzCurrentAppID,
   setWazuhCheckUpdatesPlugin,
   setHeaderActionMenuMounter,
+  setWazuhCorePlugin,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -56,7 +57,10 @@ export class WazuhPlugin
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
   private hideTelemetryBanner?: () => void;
-  public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
+  public async setup(
+    core: CoreSetup,
+    plugins: WazuhSetupPlugins,
+  ): Promise<WazuhSetup> {
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState = {};
     try {
@@ -221,6 +225,7 @@ export class WazuhPlugin
     setOverlays(core.overlays);
     setErrorOrchestrator(ErrorOrchestratorService);
     setWazuhCheckUpdatesPlugin(plugins.wazuhCheckUpdates);
+    setWazuhCorePlugin(plugins.wazuhCore);
     return {};
   }
 }

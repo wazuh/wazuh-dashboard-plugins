@@ -20,8 +20,7 @@
   "dependencies": {
     "axios": "^1.6.1",
     "md5": "^2.3.0",
-    "node-cron": "^3.0.2",
-    "winston": "^3.10.0"
+    "node-cron": "^3.0.2"
   },
   "devDependencies": {
     "@testing-library/user-event": "^14.5.0",

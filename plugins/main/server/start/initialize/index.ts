@@ -9,10 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { log } from '../../lib/logger';
 import packageJSON from '../../../package.json';
 import { pluginPlatformTemplate } from '../../integration-files/kibana-template';
-import { getConfiguration } from '../../lib/get-configuration';
 import { totalmem } from 'os';
 import fs from 'fs';
 import {
@@ -22,52 +20,27 @@ import {
   PLUGIN_PLATFORM_NAME,
   PLUGIN_PLATFORM_INSTALLATION_USER_GROUP,
   PLUGIN_PLATFORM_INSTALLATION_USER,
-  WAZUH_DEFAULT_APP_CONFIG,
   PLUGIN_APP_NAME,
 } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
 import _ from 'lodash';
-import {
-  getSettingDefaultValue,
-  getSettingsDefault,
-} from '../../../common/services/settings';
 
 export function jobInitializeRun(context) {
   const PLUGIN_PLATFORM_INDEX =
     context.server.config.opensearchDashboards.index;
-  log(
-    'initialize',
+  context.wazuh.logger.info(
     `${PLUGIN_PLATFORM_NAME} index: ${PLUGIN_PLATFORM_INDEX}`,
-    'info',
   );
-  log('initialize', `App revision: ${packageJSON.revision}`, 'info');
-
-  let configurationFile = {};
-  let pattern = null;
-  // Read config from package.json and wazuh.yml
-  try {
-    configurationFile = getConfiguration();
-
-    pattern =
-      configurationFile && typeof configurationFile.pattern !== 'undefined'
-        ? configurationFile.pattern
-        : getSettingDefaultValue('pattern');
-  } catch (error) {
-    log('initialize', error.message || error);
-    context.wazuh.logger.error(
-      'Something went wrong while reading the configuration.' +
-        (error.message || error),
-    );
-  }
+  context.wazuh.logger.info(`App revision: ${packageJSON.revision}`);
 
   try {
     // RAM in MB
+    context.wazuh.logger.debug('Getting the total RAM memory');
     const ram = Math.ceil(totalmem() / 1024 / 1024);
-    log('initialize', `Total RAM: ${ram}MB`, 'info');
+    context.wazuh.logger.info(`Total RAM: ${ram}MB`);
   } catch (error) {
-    log(
-      'initialize',
-      `Could not check total RAM due to: ${error.message || error}`,
+    context.wazuh.logger.error(
+      `Could not check total RAM due to: ${error.message}`,
     );
   }
 
@@ -75,7 +48,6 @@ export function jobInitializeRun(context) {
   const saveConfiguration = async (hosts = {}) => {
     try {
       const commonDate = new Date().toISOString();
-
       const configuration = {
         name: PLUGIN_APP_NAME,
         'app-version': packageJSON.version,
@@ -84,35 +56,24 @@ export function jobInitializeRun(context) {
         lastRestart: commonDate,
         hosts,
       };
-      try {
-        createDataDirectoryIfNotExists();
-        createDataDirectoryIfNotExists('config');
-        log(
-          'initialize:saveConfiguration',
-          `Saving configuration in registry file: ${JSON.stringify(
-            configuration,
-          )}`,
-          'debug',
-        );
-        await fs.writeFileSync(
-          WAZUH_DATA_CONFIG_REGISTRY_PATH,
-          JSON.stringify(configuration),
-          'utf8',
-        );
-        log(
-          'initialize:saveConfiguration',
-          'Wazuh configuration registry saved.',
-          'debug',
-        );
-      } catch (error) {
-        log('initialize:saveConfiguration', error.message || error);
-        context.wazuh.logger.error(
-          'Could not create Wazuh configuration registry',
-        );
-      }
+      context.wazuh.logger.debug('Saving the configuration');
+      createDataDirectoryIfNotExists();
+      createDataDirectoryIfNotExists('config');
+      context.wazuh.logger.debug(
+        `Saving configuration in registry file: ${JSON.stringify(
+          configuration,
+        )}`,
+      );
+      await fs.writeFileSync(
+        WAZUH_DATA_CONFIG_REGISTRY_PATH,
+        JSON.stringify(configuration),
+        'utf8',
+      );
+      context.wazuh.logger.info('Configuration registry saved.');
     } catch (error) {
-      log('initialize:saveConfiguration', error.message || error);
-      context.wazuh.logger.error('Error creating wazuh-registry.json file.');
+      context.wazuh.logger.error(
+        `Error creating the registry file: ${error.message}`,
+      );
     }
   };
 
@@ -123,11 +84,7 @@ export function jobInitializeRun(context) {
    * - no: create the file with empty hosts
    */
   const checkWazuhRegistry = async () => {
-    log(
-      'initialize:checkwazuhRegistry',
-      'Checking wazuh-registry.json file.',
-      'debug',
-    );
+    context.wazuh.logger.debug('Checking the existence app data directory.');
 
     if (!fs.existsSync(WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH)) {
       throw new Error(
@@ -135,20 +92,22 @@ export function jobInitializeRun(context) {
       );
     }
 
+    context.wazuh.logger.debug('Checking the existence of registry file.');
+
     if (!fs.existsSync(WAZUH_DATA_CONFIG_REGISTRY_PATH)) {
-      log(
-        'initialize:checkwazuhRegistry',
-        'wazuh-registry.json file does not exist. Initializing configuration.',
-        'debug',
+      context.wazuh.logger.debug(
+        'Registry file does not exist. Initializing configuration.',
       );
 
       // Create the app registry file for the very first time
       await saveConfiguration();
     } else {
+      context.wazuh.logger.debug('Reading the registry file');
       // If this function fails, it throws an exception
       const source = JSON.parse(
         fs.readFileSync(WAZUH_DATA_CONFIG_REGISTRY_PATH, 'utf8'),
       );
+      context.wazuh.logger.debug('The registry file was read');
 
       // Check if the stored revision differs from the package.json revision
       const isUpgradedApp =
@@ -157,11 +116,13 @@ export function jobInitializeRun(context) {
 
       // Rebuild the registry file if revision or version fields are differents
       if (isUpgradedApp) {
-        // Generate the hosts data
+        context.wazuh.logger.info(
+          'App revision or version changed, regenerating registry file',
+        );
+        // Generate the hosts data.
         const registryHostsData = Object.entries(source.hosts).reduce(
           (accum, [hostID, hostData]) => {
-            // We have removed the 'extensions' property from the host as module
-            // logic has been eliminated, so this is a migration process.
+            // Migration: Remove the extensions property of the hosts data.
             if (hostData.extensions) {
               delete hostData.extensions;
             }
@@ -171,21 +132,10 @@ export function jobInitializeRun(context) {
           {},
         );
 
-        log(
-          'initialize:checkwazuhRegistry',
-          'Wazuh app revision or version changed, regenerating wazuh-registry.json.',
-          'info',
-        );
-
-        // Rebuild the registry file with the migrated host data (extensions are
-        // migrated to these supported by the installed plugin).
+        // Rebuild the registry file with the migrated host data
         await saveConfiguration(registryHostsData);
 
-        log(
-          'initialize:checkwazuhRegistry',
-          'Migrated the registry file.',
-          'info',
-        );
+        context.wazuh.logger.info('Migrated the registry file.');
       }
     }
   };
@@ -196,17 +146,14 @@ export function jobInitializeRun(context) {
   };
 
   const createKibanaTemplate = () => {
-    log(
-      'initialize:createKibanaTemplate',
+    context.wazuh.logger.debug(
       `Creating template for ${PLUGIN_PLATFORM_INDEX}`,
-      'debug',
     );
 
     try {
       pluginPlatformTemplate.template = PLUGIN_PLATFORM_INDEX + '*';
     } catch (error) {
-      log('initialize:createKibanaTemplate', error.message || error);
-      context.wazuh.logger.error('Exception: ' + error.message || error);
+      context.wazuh.logger.error('Exception: ' + error.message);
     }
 
     return context.core.opensearch.client.asInternalUser.indices.putTemplate({
@@ -219,64 +166,46 @@ export function jobInitializeRun(context) {
 
   const createEmptyKibanaIndex = async () => {
     try {
-      log(
-        'initialize:createEmptyKibanaIndex',
-        `Creating ${PLUGIN_PLATFORM_INDEX} index.`,
-        'info',
-      );
+      context.wazuh.logger.debug(`Creating ${PLUGIN_PLATFORM_INDEX} index.`);
       await context.core.opensearch.client.asInternalUser.indices.create({
         index: PLUGIN_PLATFORM_INDEX,
       });
-      log(
-        'initialize:createEmptyKibanaIndex',
-        `Successfully created ${PLUGIN_PLATFORM_INDEX} index.`,
-        'debug',
-      );
+      context.wazuh.logger.info(`${PLUGIN_PLATFORM_INDEX} index created`);
       await init();
     } catch (error) {
-      return Promise.reject(
-        new Error(
-          `Error creating ${PLUGIN_PLATFORM_INDEX} index due to ${
-            error.message || error
-          }`,
-        ),
+      throw new Error(
+        `Error creating ${PLUGIN_PLATFORM_INDEX} index: ${error.message}`,
       );
     }
   };
 
   const fixKibanaTemplate = async () => {
     try {
+      context.wazuh.logger.debug(`Fixing ${PLUGIN_PLATFORM_INDEX} template`);
       await createKibanaTemplate();
-      log(
-        'initialize:fixKibanaTemplate',
-        `Successfully created ${PLUGIN_PLATFORM_INDEX} template.`,
-        'debug',
-      );
+      context.wazuh.logger.info(`${PLUGIN_PLATFORM_INDEX} template created`);
       await createEmptyKibanaIndex();
     } catch (error) {
-      return Promise.reject(
-        new Error(
-          `Error creating template for ${PLUGIN_PLATFORM_INDEX} due to ${
-            error.message || error
-          }`,
-        ),
+      throw new Error(
+        `Error creating template for ${PLUGIN_PLATFORM_INDEX}: ${error.message}`,
       );
     }
   };
 
   const getTemplateByName = async () => {
     try {
+      context.wazuh.logger.debug(
+        `Getting ${WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME} template`,
+      );
       await context.core.opensearch.client.asInternalUser.indices.getTemplate({
         name: WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME,
       });
-      log(
-        'initialize:getTemplateByName',
+      context.wazuh.logger.debug(
         `No need to create the ${PLUGIN_PLATFORM_INDEX} template, already exists.`,
-        'debug',
       );
       await createEmptyKibanaIndex();
     } catch (error) {
-      log('initialize:getTemplateByName', error.message || error);
+      context.wazuh.logger.warn(error.message || error);
       return fixKibanaTemplate();
     }
   };
@@ -284,24 +213,26 @@ export function jobInitializeRun(context) {
   // Does Kibana index exist?
   const checkKibanaStatus = async () => {
     try {
+      context.wazuh.logger.debug(
+        `Checking the existence of ${PLUGIN_PLATFORM_INDEX} index`,
+      );
       const response =
         await context.core.opensearch.client.asInternalUser.indices.exists({
           index: PLUGIN_PLATFORM_INDEX,
         });
       if (response.body) {
+        context.wazuh.logger.debug(`${PLUGIN_PLATFORM_INDEX} index exist`);
         // It exists, initialize!
         await init();
       } else {
-        // No Kibana index created...
-        log(
-          'initialize:checkKibanaStatus',
-          `Not found ${PLUGIN_PLATFORM_INDEX} index`,
-          'info',
+        context.wazuh.logger.debug(
+          `${PLUGIN_PLATFORM_INDEX} index does not exist`,
         );
+        // No Kibana index created...
+        context.wazuh.logger.info(`${PLUGIN_PLATFORM_INDEX} index not found`);
         await getTemplateByName();
       }
     } catch (error) {
-      log('initialize:checkKibanaStatus', error.message || error);
       context.wazuh.logger.error(error.message || error);
     }
   };
@@ -313,10 +244,8 @@ export function jobInitializeRun(context) {
       // await server.plugins.opensearch.waitUntilReady();
       return await checkKibanaStatus();
     } catch (error) {
-      log(
-        'initialize:checkStatus',
+      context.wazuh.logger.debug(
         'Waiting for opensearch plugin to be ready...',
-        'debug',
       );
       setTimeout(() => checkStatus(), 3000);
     }

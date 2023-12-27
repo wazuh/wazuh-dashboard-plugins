@@ -16,18 +16,21 @@ import {
   PLUGIN_PLATFORM_NAME,
   WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
 } from '../../common/constants';
-import { APIUserAllowRunAs } from '../services/cache-api-user-has-run-as';
-import { log } from '../services/logger';
-import { ManageHosts } from '../services/manage-hosts';
-import { UpdateRegistry } from '../services/update-registry';
+import { CacheAPIUserAllowRunAs } from './cache-api-user-has-run-as';
+import { ManageHosts } from './manage-hosts';
+import { UpdateRegistry } from './update-registry';
+import { Logger } from 'opensearch-dashboards/server';
 
-export class WazuhHostsCtrl {
-  manageHosts: ManageHosts;
-  updateRegistry: UpdateRegistry;
-  constructor() {
-    this.manageHosts = new ManageHosts();
-    this.updateRegistry = new UpdateRegistry();
-  }
+/**
+ * This service gets information about the API host entries
+ */
+export class ServerAPIHostEntries {
+  constructor(
+    private logger: Logger,
+    private manageHosts: ManageHosts,
+    private updateRegistry: UpdateRegistry,
+    private cacheAPIUserAllowRunAs: CacheAPIUserAllowRunAs,
+  ) {}
 
   /**
    * This get all hosts entries in the wazuh.yml and the related info in the wazuh-registry.json
@@ -59,7 +62,7 @@ export class WazuhHostsCtrl {
         throw new Error(`Error getting the hosts entries: The \'${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}\' directory could not exist in your ${PLUGIN_PLATFORM_NAME} installation.
             If this doesn't exist, create it and give the permissions 'sudo mkdir ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH};sudo chown -R ${PLUGIN_PLATFORM_INSTALLATION_USER}:${PLUGIN_PLATFORM_INSTALLATION_USER_GROUP} ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}'. After, restart the ${PLUGIN_PLATFORM_NAME} service.`);
       }
-      log('wazuh-hosts:getHostsEntries', error.message || error);
+      this.logger.error(error);
       throw new Error(error);
     }
   }
@@ -70,7 +73,7 @@ export class WazuhHostsCtrl {
    * @param {Object} registry
    * @param {Boolean} removePassword
    */
-  async joinHostRegistry(
+  private async joinHostRegistry(
     hosts: any,
     registry: any,
     removePassword: boolean = true,
@@ -86,7 +89,7 @@ export class WazuhHostsCtrl {
           const api = Object.assign(h[id], { id: id });
           const host = Object.assign(api, registry[id]);
           // Add to run_as from API user. Use the cached value or get it doing a request
-          host.allow_run_as = await APIUserAllowRunAs.check(id);
+          host.allow_run_as = await this.cacheAPIUserAllowRunAs.check(id);
           if (removePassword) {
             delete host.password;
             delete host.token;
