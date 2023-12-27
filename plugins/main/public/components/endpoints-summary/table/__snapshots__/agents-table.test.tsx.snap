@@ -475,23 +475,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                       </span>
                     </button>
                   </th>
-                  <th
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_actions_8"
-                    role="columnheader"
-                    scope="col"
-                    style="width:5%"
-                  >
-                    <span
-                      class="euiTableCellContent euiTableCellContent--alignRight"
-                    >
-                      <span
-                        class="euiTableCellContent__text"
-                      >
-                        Actions
-                      </span>
-                    </span>
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -500,7 +483,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                 >
                   <td
                     class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="9"
+                    colspan="8"
                   >
                     <div
                       class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -980,23 +963,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                       </span>
                     </button>
                   </th>
-                  <th
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_actions_6"
-                    role="columnheader"
-                    scope="col"
-                    style="width:5%"
-                  >
-                    <span
-                      class="euiTableCellContent euiTableCellContent--alignRight"
-                    >
-                      <span
-                        class="euiTableCellContent__text"
-                      >
-                        Actions
-                      </span>
-                    </span>
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -1005,7 +971,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                 >
                   <td
                     class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="7"
+                    colspan="6"
                   >
                     <div
                       class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -1535,10 +1501,8 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                   </th>
                   <th
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_actions_8"
                     role="columnheader"
                     scope="col"
-                    style="width:5%"
                   >
                     <span
                       class="euiTableCellContent euiTableCellContent--alignRight"
