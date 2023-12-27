@@ -224,6 +224,7 @@ export const AgentsTable = compose(
       searchable: true,
     },
     {
+      field: 'actions',
       name: 'Actions',
       show: true,
       actions: agentsTableActions(
