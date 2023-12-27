@@ -1,10 +1,9 @@
-import { ApiCheck, AppState, formatUIDate } from '../../react-services';
+import { ApiCheck, formatUIDate } from '../../react-services';
 import { SettingsController } from './settings';
 import { ErrorHandler } from '../../react-services/error-management';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 
-import { ManageHosts } from '../../../server/lib/manage-hosts';
 import axios, { AxiosResponse } from 'axios';
 jest.mock('../../react-services/time-service');
 jest.mock('../../react-services/app-state');
@@ -155,8 +154,18 @@ describe('Settings Controller', () => {
       );
       controller.getSettings = jest.fn().mockResolvedValue([]);
       // mocking manager hosts - apiEntries from wazuh.yml
-      const manageHosts = new ManageHosts();
-      controller.apiEntries = await manageHosts.getHosts();
+
+      controller.apiEntries = [
+        {
+          manager: {
+            url: 'https://wazuh.manager',
+            port: 55000,
+            username: 'wazuh-wui',
+            password: 'mypassword1-',
+            run_as: false,
+          },
+        },
+      ];
       await controller.$onInit();
       expect(mockedGetErrorOrchestrator.handleError).toBeCalledTimes(1);
       expect(mockedGetErrorOrchestrator.handleError).toBeCalledWith(

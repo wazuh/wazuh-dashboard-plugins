@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module for ui logging functions
+ * Wazuh app - Cookie util functions
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,10 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { BaseLogger } from './base-logger';
-import {
-  WAZUH_UI_LOGS_PLAIN_FILENAME,
-  WAZUH_UI_LOGS_RAW_FILENAME
-} from '../../common/constants';
 
-export default new BaseLogger(WAZUH_UI_LOGS_PLAIN_FILENAME,WAZUH_UI_LOGS_RAW_FILENAME);
+export const getCookieValueByName = (
+  cookie: string,
+  name: string,
+): string | undefined => {
+  if (!cookie) return;
+  const cookieRegExp = new RegExp(`.*${name}=([^;]+)`);
+  const [_, cookieNameValue] = cookie.match(cookieRegExp) || [];
+  return cookieNameValue;
+};

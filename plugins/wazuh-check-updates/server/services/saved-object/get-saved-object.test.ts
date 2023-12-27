@@ -1,8 +1,14 @@
-import { getInternalSavedObjectsClient, getWazuhCore } from '../../plugin-services';
+import {
+  getInternalSavedObjectsClient,
+  getWazuhCore,
+  getWazuhCheckUpdatesServices,
+} from '../../plugin-services';
 import { getSavedObject } from './get-saved-object';
 
-const mockedGetInternalObjectsClient = getInternalSavedObjectsClient as jest.Mock;
-const mockedGetWazuhCore = getWazuhCore as jest.Mock;
+const mockedGetInternalObjectsClient =
+  getInternalSavedObjectsClient as jest.Mock;
+const mockedGetWazuhCheckUpdatesServices =
+  getWazuhCheckUpdatesServices as jest.Mock;
 jest.mock('../../plugin-services');
 
 describe('getSavedObject function', () => {
@@ -24,8 +30,13 @@ describe('getSavedObject function', () => {
     mockedGetInternalObjectsClient.mockImplementation(() => ({
       get: jest.fn().mockRejectedValue({ output: { statusCode: 404 } }),
     }));
-    mockedGetWazuhCore.mockImplementation(() => ({
-      services: { log: jest.fn().mockImplementation(() => {}) },
+    mockedGetWazuhCheckUpdatesServices.mockImplementation(() => ({
+      logger: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
     }));
 
     const response = await getSavedObject('type');
@@ -37,8 +48,13 @@ describe('getSavedObject function', () => {
     mockedGetInternalObjectsClient.mockImplementation(() => ({
       get: jest.fn().mockRejectedValue(new Error('getSavedObject error')),
     }));
-    mockedGetWazuhCore.mockImplementation(() => ({
-      services: { log: jest.fn().mockImplementation(() => {}) },
+    mockedGetWazuhCheckUpdatesServices.mockImplementation(() => ({
+      logger: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
     }));
 
     const promise = getSavedObject('type');

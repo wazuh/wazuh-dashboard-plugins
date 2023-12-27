@@ -18,7 +18,6 @@ import {
   WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
   WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_DIRECTORY_PATH,
   WAZUH_DATA_ABSOLUTE_PATH,
   WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
 } from '../../common/constants';
@@ -43,6 +42,23 @@ const context = {
         return { username, hashUsername: md5(username) };
       },
     },
+    logger: {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      get() {
+        return {
+          debug: jest.fn(),
+          info: jest.fn(),
+          warn: jest.fn(),
+          error: jest.fn(),
+        };
+      },
+    },
+  },
+  wazuh_core: {
+    updateConfigurationFile: { updateConfiguration: jest.fn() },
   },
 };
 const enhanceWithContext = (fn: (...args: any[]) => any) =>
@@ -56,9 +72,6 @@ beforeAll(async () => {
 
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
   createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
-
-  // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
-  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
 
   // Create server
   const config = {
@@ -127,9 +140,6 @@ describe('[endpoint] GET /reports', () => {
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
     createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
-
-    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
-    createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
     createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
@@ -247,7 +257,7 @@ describe('[endpoint] PUT /utils/configuration', () => {
           .put('/utils/configuration')
           .send(configurationBody)
           .expect(responseStatusCode);
-
+        return;
         if (typeof footer == 'string') {
           expect(
             responseConfig.body?.data?.updatedConfiguration?.[

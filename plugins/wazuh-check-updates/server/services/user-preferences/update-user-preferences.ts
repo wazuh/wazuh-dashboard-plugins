@@ -1,19 +1,26 @@
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
 import { UserPreferences } from '../../../common/types';
-import { getWazuhCore } from '../../plugin-services';
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 import { getSavedObject, setSavedObject } from '../saved-object';
 
 export const updateUserPreferences = async (
   username: string,
-  preferences: UserPreferences
+  preferences: UserPreferences,
 ): Promise<UserPreferences> => {
   try {
     const userPreferences =
-      ((await getSavedObject(SAVED_OBJECT_USER_PREFERENCES, username)) as UserPreferences) || {};
+      ((await getSavedObject(
+        SAVED_OBJECT_USER_PREFERENCES,
+        username,
+      )) as UserPreferences) || {};
 
     const newUserPreferences = { ...userPreferences, ...preferences };
 
-    await setSavedObject(SAVED_OBJECT_USER_PREFERENCES, newUserPreferences, username);
+    await setSavedObject(
+      SAVED_OBJECT_USER_PREFERENCES,
+      newUserPreferences,
+      username,
+    );
 
     return newUserPreferences;
   } catch (error) {
@@ -24,11 +31,9 @@ export const updateUserPreferences = async (
         ? error
         : 'Error trying to update user preferences';
 
-    const {
-      services: { log },
-    } = getWazuhCore();
+    const { logger } = getWazuhCheckUpdatesServices();
 
-    log('wazuh-check-updates:getUserPreferences', message);
+    logger.error(message);
     return Promise.reject(error);
   }
 };
