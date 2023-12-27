@@ -460,7 +460,7 @@ export const AgentsTable = compose(
         action={'filter'}
         filterAction={filterGroupBadge}
       />
-    ) : undefined;
+    ) : null;
   };
 
   const table = tableRender();
