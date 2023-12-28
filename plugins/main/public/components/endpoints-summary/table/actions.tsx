@@ -78,24 +78,4 @@ export const agentsTableActions = (
     'data-test-subj': 'action-groups',
     enabled: () => !allowEditGroups,
   },
-  {
-    name: (
-      <WzElementPermissions
-        permissions={[
-          { action: 'group:modify_assignments', resource: 'group:id:*' },
-        ]}
-      >
-        <span>Upgrade</span>
-      </WzElementPermissions>
-    ),
-    description: 'Upgrade',
-    icon: 'package',
-    type: 'icon',
-    onClick: agent => {
-      setAgent(agent);
-      setIsEditGroupsVisible(true);
-    },
-    'data-test-subj': 'action-upgrade',
-    enabled: () => !allowEditGroups,
-  },
 ];
