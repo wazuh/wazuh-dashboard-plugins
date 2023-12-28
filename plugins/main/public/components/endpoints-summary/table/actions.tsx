@@ -11,12 +11,24 @@ export const agentsTableActions = (
   setIsEditGroupsVisible: (visible: boolean) => void,
 ) => [
   {
-    name: 'View agent details',
+    name: agent => {
+      const name = 'View agent details';
+
+      if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
+        return name;
+      }
+
+      return (
+        <EuiToolTip content='Since the agent never connected, it is not possible to access its details'>
+          <span>{name}</span>
+        </EuiToolTip>
+      );
+    },
     description: 'View agent details',
     icon: 'eye',
     type: 'icon',
-    color: 'primary',
     isPrimary: true,
+    enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     onClick: agent =>
       getCore().application.navigateToApp(itHygiene.id, {
         path: `#/agents?tab=welcome&agent=${agent.id}`,
@@ -39,7 +51,6 @@ export const agentsTableActions = (
     description: 'Agent configuration',
     icon: 'wrench',
     type: 'icon',
-    color: 'primary',
     onClick: agent =>
       getCore().application.navigateToApp(itHygiene.id, {
         path: `#/agents?tab=configuration&agent=${agent.id}`,
@@ -65,6 +76,26 @@ export const agentsTableActions = (
       setIsEditGroupsVisible(true);
     },
     'data-test-subj': 'action-groups',
+    enabled: () => !allowEditGroups,
+  },
+  {
+    name: (
+      <WzElementPermissions
+        permissions={[
+          { action: 'group:modify_assignments', resource: 'group:id:*' },
+        ]}
+      >
+        <span>Upgrade</span>
+      </WzElementPermissions>
+    ),
+    description: 'Upgrade',
+    icon: 'package',
+    type: 'icon',
+    onClick: agent => {
+      setAgent(agent);
+      setIsEditGroupsVisible(true);
+    },
+    'data-test-subj': 'action-upgrade',
     enabled: () => !allowEditGroups,
   },
 ];
