@@ -475,6 +475,21 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                       </span>
                     </button>
                   </th>
+                  <th
+                    class="euiTableHeaderCell"
+                    role="columnheader"
+                    scope="col"
+                  >
+                    <span
+                      class="euiTableCellContent euiTableCellContent--alignRight"
+                    >
+                      <span
+                        class="euiTableCellContent__text"
+                      >
+                        Actions
+                      </span>
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -483,7 +498,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                 >
                   <td
                     class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="8"
+                    colspan="9"
                   >
                     <div
                       class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -963,6 +978,21 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                       </span>
                     </button>
                   </th>
+                  <th
+                    class="euiTableHeaderCell"
+                    role="columnheader"
+                    scope="col"
+                  >
+                    <span
+                      class="euiTableCellContent euiTableCellContent--alignRight"
+                    >
+                      <span
+                        class="euiTableCellContent__text"
+                      >
+                        Actions
+                      </span>
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -971,7 +1001,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                 >
                   <td
                     class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="6"
+                    colspan="7"
                   >
                     <div
                       class="euiTableCellContent euiTableCellContent--alignCenter"
