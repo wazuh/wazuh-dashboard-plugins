@@ -1,1 +1,1 @@
-export { useGetTotalEndpoints } from './endpoints';
+export { useGetTotalAgents } from './agents';

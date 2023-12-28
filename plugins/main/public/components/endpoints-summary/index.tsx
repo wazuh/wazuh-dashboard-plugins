@@ -6,7 +6,6 @@ import {
   EuiProgress,
 } from '@elastic/eui';
 import { EndpointsSummary } from './endpoints-summary';
-import { WzRequest } from '../../react-services/wz-request';
 import { endpointSumary } from '../../utils/applications';
 import {
   withErrorBoundary,
@@ -19,23 +18,23 @@ import { getCore } from '../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
-import { useGetTotalEndpoints } from './hooks';
+import { useGetTotalAgents } from './hooks';
 
 export const MainEndpointsSummary = compose(
   withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([{ text: endpointSumary.title }]),
 )(() => {
-  const { isLoading, totalEndpoints, error } = useGetTotalEndpoints();
+  const { isLoading, totalAgents, error } = useGetTotalAgents();
 
   if (error) {
     const options = {
-      context: `MainEndpointsSummary.getTotalEndpoints`,
+      context: `MainEndpointsSummary.getTotalAgents`,
       level: UI_LOGGER_LEVELS.ERROR,
       severity: UI_ERROR_SEVERITIES.CRITICAL,
       store: true,
       error: {
-        error: error,
+        error,
         message: error.message || error,
         title: `Could not get agents summary`,
       },
@@ -53,7 +52,7 @@ export const MainEndpointsSummary = compose(
     );
   }
 
-  if (totalEndpoints === 0) {
+  if (totalAgents === 0) {
     return (
       <EuiEmptyPrompt
         iconType='watchesApp'
