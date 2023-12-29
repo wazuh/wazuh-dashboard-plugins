@@ -1,0 +1,18 @@
+.discoverContainer {
+    height: calc(100vh - 104px);
+}
+
+
+.headerIsExpanded .discoverContainer {
+    height: calc(100vh - 153px);
+}
+
+.discoverContainer .euiDataGrid--fullScreen {
+    height: calc(100vh - 49px);
+    bottom: 0;
+    top: auto;
+}
+
+.discoverContainer .discoverDataGrid {
+   height: calc(100vh - 496px);
+}

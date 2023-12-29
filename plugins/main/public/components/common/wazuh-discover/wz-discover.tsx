@@ -16,7 +16,7 @@ import {
   EuiPanel,
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
-import { IndexPattern } from '../../../../../../src/plugins/data/common';
+import { Filter, IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { useDocViewer } from '../doc-viewer';
 import DocViewer from '../doc-viewer/doc-viewer';
@@ -33,6 +33,7 @@ import { getPlugins } from '../../../kibana-services';
 import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
 import { getDiscoverPanels } from './config/chart';
 const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
+import './discover.scss';
 
 /**
  * ToDo:
@@ -49,10 +50,6 @@ type WazuhDiscoverProps = {
 
 const WazuhDiscover = (props: WazuhDiscoverProps) => {
   const { indexPatternName, tableColumns: defaultTableColumns } = props
-  const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: indexPatternName,
-  })
-  const { isLoading, filters, query, indexPatterns } = searchBarProps;
   const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
@@ -78,12 +75,22 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
     );
   };
 
+  const { searchBarProps } = useSearchBar({
+    defaultIndexPatternID: indexPatternName,
+  })
+  const { isLoading, filters, query, indexPatterns, dateRangeFrom, dateRangeTo } = searchBarProps;
+
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
     defaultColumns: defaultTableColumns,
     results,
     indexPattern: indexPattern as IndexPattern,
-    DocViewInspectButton
+    DocViewInspectButton,
+    pagination: {
+      pageIndex: 0,
+      pageSize: 15,
+      pageSizeOptions: [15, 25, 50, 100],
+    }
   })
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
@@ -96,22 +103,36 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
   useEffect(() => {
     if (!isLoading) {
       setIndexPattern(indexPatterns?.[0] as IndexPattern);
+      /*const timeFilter: Filter['query'] = [{
+        range: {
+          '@timestamp': {
+            gte: searchBarProps?.dateRangeFrom,
+            lte: searchBarProps?.dateRangeTo,
+            format: 'strict_date_optional_time',
+          },
+        },
+      }]
+      const allFilters = [...timeFilter, ...(filters || [])];
+      console.log('searching...', allFilters, query, pagination, sorting, dateRangeFrom, dateRangeTo);
+      */
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,
+        //filters: allFilters,
         filters,
         query,
         pagination,
         sorting
       }).then((results) => {
+        console.log('found...', results?.hits?.total);
         setResults(results);
         setIsSearching(false);
       }).catch((error) => {
-        const searchError = ErrorFactory.create(HttpError, { error, message: 'Error fetching vulnerabilities' })
+        const searchError = ErrorFactory.create(HttpError, { error, message: 'Error fetching data' })
         ErrorHandler.handleError(searchError);
         setIsSearching(false);
       })
     }
-  }, [JSON.stringify(searchBarProps), JSON.stringify(pagination), JSON.stringify(sorting)]);
+  }, [JSON.stringify(searchBarProps)]);
 
   const timeField = indexPattern?.timeFieldName ? indexPattern.timeFieldName : undefined;
 
@@ -141,7 +162,7 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
   return (
     <IntlProvider locale="en">
       <EuiPageTemplate
-        className="DiscoverContainerPage"
+        className="discoverContainer"
         restrictWidth="100%"
         fullHeight={true}
         grow
@@ -188,37 +209,40 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
                 </EuiPanel>
               </EuiFlexItem>
               <EuiSpacer size="m" />
-              <EuiDataGrid
-                {...dataGridProps}
-                toolbarVisibility={{
-                  additionalControls: (
-                    <>
-                      <HitsCounter
-                        hits={results?.hits?.total}
-                        showResetButton={false}
-                        onResetQuery={() => { }}
-                        tooltip={results?.hits?.total && results?.hits?.total > MAX_ENTRIES_PER_QUERY ? {
-                          ariaLabel: 'Warning',
-                          content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(MAX_ENTRIES_PER_QUERY)} hits.`,
-                          iconType: 'alert',
-                          position: 'top'
-                        } : undefined}
-                      />
-                      <EuiButtonEmpty
-                        disabled={results?.hits?.total === 0}
-                        size="xs"
-                        iconType="exportAction"
-                        color="primary"
-                        isLoading={isExporting}
-                        className="euiDataGrid__controlBtn"
-                        onClick={onClickExportResults}>
-                        Export Formated
-                      </EuiButtonEmpty>
-                    </>
-                  )
-                }}
-              />
-            </>) : null}
+              <div className="discoverDataGrid">
+                <EuiDataGrid
+                  {...dataGridProps}
+                  toolbarVisibility={{
+                    additionalControls: (
+                      <>
+                        <HitsCounter
+                          hits={results?.hits?.total}
+                          showResetButton={false}
+                          onResetQuery={() => { }}
+                          tooltip={results?.hits?.total && results?.hits?.total > MAX_ENTRIES_PER_QUERY ? {
+                            ariaLabel: 'Warning',
+                            content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(MAX_ENTRIES_PER_QUERY)} hits.`,
+                            iconType: 'alert',
+                            position: 'top'
+                          } : undefined}
+                        />
+                        <EuiButtonEmpty
+                          disabled={results?.hits?.total === 0}
+                          size="xs"
+                          iconType="exportAction"
+                          color="primary"
+                          isLoading={isExporting}
+                          className="euiDataGrid__controlBtn"
+                          onClick={onClickExportResults}>
+                          Export Formated
+                        </EuiButtonEmpty>
+                      </>
+                    )
+                  }}
+                />
+              </div>
+            </>
+          ) : null}
           {inspectedHit && (
             <EuiFlyout onClose={() => setInspectedHit(undefined)} size="m">
               <EuiFlyoutHeader>
