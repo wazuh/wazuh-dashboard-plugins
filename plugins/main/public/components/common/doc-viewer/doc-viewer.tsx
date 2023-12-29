@@ -115,12 +115,11 @@ const DocViewer = (props: tDocViewerProps) => {
                                             <EuiFlexItem grow={false}>
                                                 <FieldIcon type={fieldType} label={typeName} scripted={scripted} {...fieldIconProps} />
                                             </EuiFlexItem>
-                                            <EuiFlexItem className="eui-textTruncate">
+                                            <EuiFlexItem>
                                                 <EuiToolTip
                                                     position="top"
                                                     content={displayName}
                                                     delay="long"
-                                                    anchorClassName="eui-textTruncate"
                                                 >
                                                     <span>{displayName}</span>
                                                 </EuiToolTip>

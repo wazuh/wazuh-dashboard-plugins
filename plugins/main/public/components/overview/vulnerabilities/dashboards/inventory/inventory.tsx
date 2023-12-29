@@ -221,7 +221,7 @@ const InventoryVulsComponent = () => {
                       }
                     />
                     <EuiButtonEmpty
-                      disabled={results?.hits?.total === 0}
+                      disabled={results?.hits?.total === 0 || !columnVisibility?.visibleColumns?.length}
                       size='xs'
                       iconType='exportAction'
                       color='primary'
