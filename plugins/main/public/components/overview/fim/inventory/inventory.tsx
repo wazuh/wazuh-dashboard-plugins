@@ -18,20 +18,20 @@ import {
 } from '@elastic/eui';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../../../src/core/server';
-import DocViewer from '../../vulnerabilities/doc_viewer/doc_viewer';
+import DocViewer from '../../../common/doc-viewer/doc-viewer';
 import { DiscoverNoResults } from '../../vulnerabilities/common/components/no_results';
 import { LoadingSpinner } from '../../vulnerabilities/common/components/loading_spinner';
-import { useDataGrid } from '../../vulnerabilities/data_grid/use_data_grid';
+import { useDataGrid } from '../../../common/data-grid/use-data-grid';
 import {
   MAX_ENTRIES_PER_QUERY,
   inventoryTableDefaultColumns,
 } from '../../vulnerabilities/dashboards/inventory/config';
-import { useDocViewer } from '../../vulnerabilities/doc_viewer/use_doc_viewer';
+import { useDocViewer } from '../../../common/doc-viewer/use-doc-viewer';
 import './inventory.scss';
 import {
   search,
   exportSearchToCSV,
-} from '../../vulnerabilities/dashboards/inventory/inventory_service';
+} from '../../../common/search-bar/search-bar-service';
 import {
   ErrorHandler,
   ErrorFactory,
