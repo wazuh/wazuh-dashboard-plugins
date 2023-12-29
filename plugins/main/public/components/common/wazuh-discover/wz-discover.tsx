@@ -35,12 +35,6 @@ import { getDiscoverPanels } from './config/chart';
 const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 
-/**
- * ToDo:
- * - add possibility to customize column render
- * - add save query feature
- */
-
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
 type WazuhDiscoverProps = {
@@ -181,7 +175,7 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
           {!isLoading && !isSearching && results?.hits?.total > 0 ? (
             <>
               <EuiFlexItem grow={false}>
-                <EuiPanel hasBorder={false} hasShadow={false} color="transparent" paddingSize="none">
+                <EuiPanel hasBorder={false} hasShadow={false} color="transparent" paddingSize="none" className="discoverChartContainer">
                   <EuiPanel>
                     <DashboardByRenderer
                       input={{
