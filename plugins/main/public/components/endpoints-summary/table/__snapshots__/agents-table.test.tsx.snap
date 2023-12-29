@@ -477,10 +477,8 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                   </th>
                   <th
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_actions_8"
                     role="columnheader"
                     scope="col"
-                    style="width:5%"
                   >
                     <span
                       class="euiTableCellContent euiTableCellContent--alignRight"
@@ -982,10 +980,8 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                   </th>
                   <th
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_actions_6"
                     role="columnheader"
                     scope="col"
-                    style="width:5%"
                   >
                     <span
                       class="euiTableCellContent euiTableCellContent--alignRight"
@@ -1535,10 +1531,8 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                   </th>
                   <th
                     class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_actions_8"
                     role="columnheader"
                     scope="col"
-                    style="width:5%"
                   >
                     <span
                       class="euiTableCellContent euiTableCellContent--alignRight"

@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235)
 - Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
+- Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
 
 ## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 00
 
