@@ -211,10 +211,6 @@ export const ApiTable = compose(
           text: 'Error checking updates',
           color: 'danger',
         },
-        undefined: {
-          text: 'Never checked',
-          color: 'subdued',
-        },
       };
 
       const isLoading = this.state.refreshingEntries || this.state.refreshingAvailableUpdates;
@@ -340,9 +336,9 @@ export const ApiTable = compose(
           name: 'Updates status',
           sortable: true,
           render: (item, api) => {
-            const color = API_UPDATES_STATUS_COLUMN[item]?.color;
+            const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
 
-            const content = API_UPDATES_STATUS_COLUMN[item]?.text;
+            const content = API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
 
             if (!this.state.refreshingAvailableUpdates) {
               return (
