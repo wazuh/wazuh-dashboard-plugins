@@ -2,6 +2,9 @@ import moment from 'moment-timezone';
 import { getUiSettings } from '../plugin-services';
 
 export const formatUIDate = (date: Date) => {
+  if (typeof date !== 'string') {
+    return '-';
+  }
   const dateFormat = getUiSettings().get('dateFormat');
   const timezone = getTimeZone();
   const momentDate = moment(date);

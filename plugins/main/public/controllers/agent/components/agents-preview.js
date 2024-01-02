@@ -23,6 +23,8 @@ import {
   EuiToolTip,
   EuiCard,
   EuiLink,
+  EuiProgress,
+  EuiText,
 } from '@elastic/eui';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -53,7 +55,9 @@ import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
-import { endpointSumary } from '../../../utils/applications';
+import { endpointSumary, itHygiene } from '../../../utils/applications';
+import { getCore } from '../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export const AgentsPreview = compose(
   withErrorBoundary,
@@ -220,6 +224,19 @@ export const AgentsPreview = compose(
     render() {
       const evolutionIsReady = this.props.resultState !== 'loading';
 
+      //This condition is because the angular template and the controller have a small delay to show the register agent component when there are no agents
+      //This condition must be removed when the controller is removed
+      if (
+        !this.state.agentStatusSummary.total ||
+        this.state.agentStatusSummary.total === '-'
+      ) {
+        return (
+          <div className='md-padding md-padding-top-16'>
+            <EuiProgress size='xs' color='primary' />
+          </div>
+        );
+      }
+
       return (
         <EuiPage className='flex-column'>
           <EuiFlexItem>
@@ -298,23 +315,33 @@ export const AgentsPreview = compose(
                       <EuiFlexGroup className='mt-0'>
                         <EuiFlexItem className='agents-link-item'>
                           <EuiStat
+                            titleElement='div'
                             className='euiStatLink last-agents-link'
                             isLoading={this.state.loadingAgents}
                             title={
-                              <EuiToolTip
-                                position='top'
-                                content='View agent details'
-                              >
-                                <EuiLink
-                                  onClick={() =>
-                                    this.showAgent(
-                                      this.state.lastRegisteredAgent,
-                                    )
-                                  }
+                              this.state.lastRegisteredAgent?.id ? (
+                                <EuiToolTip
+                                  position='top'
+                                  content='View agent details'
                                 >
-                                  {this.state.lastRegisteredAgent?.name || '-'}
-                                </EuiLink>
-                              </EuiToolTip>
+                                  <RedirectAppLinks
+                                    application={getCore().application}
+                                  >
+                                    <EuiLink
+                                      href={getCore().application.getUrlForApp(
+                                        itHygiene.id,
+                                        {
+                                          path: `#/agents?tab=welcome&agent=${this.state.lastRegisteredAgent?.id}`,
+                                        },
+                                      )}
+                                    >
+                                      {this.state.lastRegisteredAgent?.name}
+                                    </EuiLink>
+                                  </RedirectAppLinks>
+                                </EuiToolTip>
+                              ) : (
+                                <EuiText>-</EuiText>
+                              )
                             }
                             titleSize='s'
                             description='Last registered agent'
@@ -324,6 +351,7 @@ export const AgentsPreview = compose(
                         {
                           <EuiFlexItem className='agents-link-item'>
                             <EuiStat
+                              titleElement='div'
                               className={
                                 this.state.agentMostActive?.name
                                   ? 'euiStatLink'
@@ -331,18 +359,29 @@ export const AgentsPreview = compose(
                               }
                               isLoading={this.state.loadingAgents}
                               title={
-                                <EuiToolTip
-                                  position='top'
-                                  content='View agent details'
-                                >
-                                  <EuiLink
-                                    onClick={() =>
-                                      this.showAgent(this.state.agentMostActive)
-                                    }
+                                this.state.agentMostActive?.id ? (
+                                  <EuiToolTip
+                                    position='top'
+                                    content='View agent details'
                                   >
-                                    {this.state.agentMostActive?.name || '-'}
-                                  </EuiLink>
-                                </EuiToolTip>
+                                    <RedirectAppLinks
+                                      application={getCore().application}
+                                    >
+                                      <EuiLink
+                                        href={getCore().application.getUrlForApp(
+                                          itHygiene.id,
+                                          {
+                                            path: `#/agents?tab=welcome&agent=${this.state.agentMostActive?.id}`,
+                                          },
+                                        )}
+                                      >
+                                        {this.state.agentMostActive?.name}
+                                      </EuiLink>
+                                    </RedirectAppLinks>
+                                  </EuiToolTip>
+                                ) : (
+                                  <EuiText>-</EuiText>
+                                )
                               }
                               titleSize='s'
                               description='Most active agent'

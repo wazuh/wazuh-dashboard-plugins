@@ -33,6 +33,7 @@ import {
   tFormStepsLabel,
 } from '../../services/register-agent-steps-status-services';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import OsCommandWarning from '../../components/command-output/os-warning';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -141,14 +142,14 @@ export const Steps = ({
       status: getOSSelectorStepStatus(form.fields),
     },
     {
-      title: 'Server address',
+      title: 'Server address:',
       children: <ServerAddress formField={form.fields.serverAddress} />,
       status: getServerAddressStepStatus(form.fields),
     },
     ...(needsPassword && !wazuhPassword
       ? [
           {
-            title: 'Wazuh password',
+            title: 'Wazuh password:',
             children: (
               <EuiCallOut
                 color='warning'
@@ -176,7 +177,7 @@ export const Steps = ({
         ]
       : []),
     {
-      title: 'Optional settings',
+      title: 'Optional settings:',
       children: <OptionalsInputs formFields={form.fields} />,
       status: getOptionalParameterStepStatus(
         form.fields,
@@ -184,8 +185,7 @@ export const Steps = ({
       ),
     },
     {
-      title:
-        'Run the following commands to download and install the Wazuh agent:',
+      title: 'Run the following commands to download and install the agent:',
       children: (
         <>
           {missingStepsName?.length ? (
@@ -208,20 +208,25 @@ export const Steps = ({
             />
           ) : null}
           {!missingStepsName?.length && !invalidFieldsName?.length ? (
-            <CommandOutput
-              commandText={installCommand}
-              showCommand={showCommandsSections(form.fields)}
-              os={registerAgentFormValues.operatingSystem.name}
-              onCopy={() => setInstallCommandWasCopied(true)}
-              password={registerAgentFormValues.optionalParams.wazuhPassword}
-            />
+            <>
+              <CommandOutput
+                commandText={installCommand}
+                showCommand={showCommandsSections(form.fields)}
+                os={registerAgentFormValues.operatingSystem.name}
+                onCopy={() => setInstallCommandWasCopied(true)}
+                password={registerAgentFormValues.optionalParams.wazuhPassword}
+              />
+              <OsCommandWarning
+                os={registerAgentFormValues.operatingSystem.name}
+              />
+            </>
           ) : null}
         </>
       ),
       status: installCommandStepStatus,
     },
     {
-      title: 'Start the Wazuh agent:',
+      title: 'Start the agent:',
       children: (
         <>
           {missingStepsName?.length ? (
