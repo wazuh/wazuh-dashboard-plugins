@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { search } from '../../dashboards/inventory/inventory_service';
+import { search } from '../../../../common/search-bar/search-bar-service';
 import {
   IIndexPattern,
   IndexPattern,
@@ -69,7 +69,7 @@ const useCheckIndexFields = (
 
       checkIndexFields();
     }
-  }, [indexPatternId]);
+  }, [indexPatternId, query, indexPattern]);
 
   return {
     isError,

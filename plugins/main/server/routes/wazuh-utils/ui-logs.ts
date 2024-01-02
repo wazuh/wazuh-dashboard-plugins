@@ -15,13 +15,6 @@ import { schema } from '@osd/config-schema';
 
 export const UiLogsRoutes = (router: IRouter) => {
   const ctrl = new UiLogsCtrl();
-  router.get(
-    {
-      path: '/utils/logs/ui',
-      validate: false,
-    },
-    async (context, request, response) => await ctrl.getUiLogs(response)
-  );
 
   router.post(
     {
@@ -34,6 +27,7 @@ export const UiLogsRoutes = (router: IRouter) => {
         }),
       },
     },
-    async (context, request, response) => await ctrl.createUiLogs(request, response)
+    async (context, request, response) =>
+      await ctrl.createUiLogs(context, request, response),
   );
 };

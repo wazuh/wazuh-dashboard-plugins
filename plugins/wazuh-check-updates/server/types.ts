@@ -10,7 +10,7 @@ export interface WazuhCheckUpdatesPluginStart {}
 
 export type PluginSetup = {
   securityDashboards?: {}; // TODO: Add OpenSearch Dashboards Security interface
-  wazuhCore: { wazuhSecurity: ISecurityFactory };
+  wazuhCore: { dashboardSecurity: ISecurityFactory };
 };
 
 export interface AppPluginStartDependencies {

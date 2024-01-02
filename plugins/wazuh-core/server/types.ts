@@ -1,31 +1,44 @@
-import { AxiosResponse } from 'axios';
-import { APIInterceptorRequestOptionsInternalUser } from './services/api-interceptor';
-import { WazuhHostsCtrl } from './controllers';
-import { ISecurityFactory } from './services/security-factory';
+import {
+  CacheAPIUserAllowRunAs,
+  ISecurityFactory,
+  ManageHosts,
+  ServerAPIClient,
+  ServerAPIHostEntries,
+  ServerAPIInternalUserClient,
+  ServerAPIScopedUserClient,
+  UpdateConfigurationFile,
+  UpdateRegistry,
+} from './services';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginSetup {
-  wazuhSecurity: ISecurityFactory;
+  dashboardSecurity: ISecurityFactory;
+  cacheAPIUserAllowRunAs: CacheAPIUserAllowRunAs;
+  manageHosts: ManageHosts;
+  serverAPIClient: ServerAPIClient;
+  serverAPIHostEntries: ServerAPIHostEntries;
+  updateRegistry: UpdateRegistry;
+  updateConfigurationFile: UpdateConfigurationFile;
+  api: {
+    client: {
+      asInternalUser: ServerAPIInternalUserClient;
+      asScoped: (context: any, request: any) => ServerAPIScopedUserClient;
+    };
+  };
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginStart {
-  controllers: {
-    WazuhHostsCtrl: typeof WazuhHostsCtrl;
-  };
-  services: {
-    log: (location: string, message: string, level?: string) => void;
-    wazuhApiClient: {
-      client: {
-        asInternalUser: {
-          authenticate: (apiHostID: string) => Promise<string>;
-          request: (
-            method: string,
-            path: string,
-            data: any,
-            options: APIInterceptorRequestOptionsInternalUser
-          ) => Promise<AxiosResponse<any, any>>;
-        };
-      };
+  dashboardSecurity: ISecurityFactory;
+  cacheAPIUserAllowRunAs: CacheAPIUserAllowRunAs;
+  manageHosts: ManageHosts;
+  serverAPIClient: ServerAPIClient;
+  serverAPIHostEntries: ServerAPIHostEntries;
+  updateRegistry: UpdateRegistry;
+  updateConfigurationFile: UpdateConfigurationFile;
+  api: {
+    client: {
+      asInternalUser: ServerAPIInternalUserClient;
+      asScoped: (context: any, request: any) => ServerAPIScopedUserClient;
     };
   };
 }

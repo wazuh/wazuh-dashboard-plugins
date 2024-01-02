@@ -1,7 +1,9 @@
 import fs from 'fs';
 import yml from 'js-yaml';
-import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_CACHE_TIME } from '../../common/constants';
-import { getSettingsDefault } from '../../common/services/settings';
+import {
+  WAZUH_DATA_CONFIG_APP_PATH,
+  WAZUH_CONFIGURATION_CACHE_TIME,
+} from '../../common/constants';
 
 let cachedConfiguration: any = null;
 let lastAssign: number = new Date().getTime();
@@ -15,16 +17,22 @@ export function getConfiguration(options: { force?: boolean } = {}) {
   try {
     const now = new Date().getTime();
     const dateDiffer = now - lastAssign;
-    const defaultConfiguration = getSettingsDefault();
-    if (!cachedConfiguration || dateDiffer >= WAZUH_CONFIGURATION_CACHE_TIME || options?.force) {
+    if (
+      !cachedConfiguration ||
+      dateDiffer >= WAZUH_CONFIGURATION_CACHE_TIME ||
+      options?.force
+    ) {
       cachedConfiguration = obfuscateHostsConfiguration(
         readPluginConfigurationFile(WAZUH_DATA_CONFIG_APP_PATH),
-        ['password']
+        ['password'],
       );
 
       lastAssign = now;
     }
-    return { ...defaultConfiguration, ...cachedConfiguration };
+    /* WARNING: This should only return the configuration defined in the configuration file.
+    Merging the default settings with the user settings could cause side effects in other services.
+    */
+    return cachedConfiguration;
   } catch (error) {
     return false;
   }
@@ -46,23 +54,31 @@ function readPluginConfigurationFile(filepath: string) {
  * @param obfuscateHostConfigurationKeys Keys to obfuscate its value in the hosts configuration.
  * @returns
  */
-function obfuscateHostsConfiguration(configuration: any, obfuscateHostConfigurationKeys: string[]) {
+function obfuscateHostsConfiguration(
+  configuration: any,
+  obfuscateHostConfigurationKeys: string[],
+) {
   if (configuration.hosts) {
-    configuration.hosts = configuration.hosts.map((host: { [hostID: string]: any }) => {
-      const hostID = Object.keys(host)[0];
-      return {
-        [hostID]: {
-          ...host[hostID],
-          ...obfuscateHostConfigurationKeys.reduce(
-            (accumObfuscateHostConfigurationKeys, obfuscateHostConfigurationKey) => ({
-              ...accumObfuscateHostConfigurationKeys,
-              [obfuscateHostConfigurationKey]: '*****',
-            }),
-            {}
-          ),
-        },
-      };
-    });
+    configuration.hosts = configuration.hosts.map(
+      (host: { [hostID: string]: any }) => {
+        const hostID = Object.keys(host)[0];
+        return {
+          [hostID]: {
+            ...host[hostID],
+            ...obfuscateHostConfigurationKeys.reduce(
+              (
+                accumObfuscateHostConfigurationKeys,
+                obfuscateHostConfigurationKey,
+              ) => ({
+                ...accumObfuscateHostConfigurationKeys,
+                [obfuscateHostConfigurationKey]: '*****',
+              }),
+              {},
+            ),
+          },
+        };
+      },
+    );
   }
   return configuration;
 }

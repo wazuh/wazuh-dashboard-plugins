@@ -27,7 +27,6 @@ import {
   buildAgentsTable,
 } from '../lib/reporting/extended-information';
 import { ReportPrinter } from '../lib/reporting/printer';
-import { log } from '../lib/logger';
 import {
   WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
   WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
@@ -46,25 +45,19 @@ interface AgentsFilter {
 }
 
 export class WazuhReportingCtrl {
-  constructor() { }
+  constructor() {}
   /**
    * This do format to filters
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @param {String} searchBar search term
    */
   private sanitizeKibanaFilters(
+    context: any,
     filters: any,
     searchBar?: string,
   ): [string, AgentsFilter] {
-    log(
-      'reporting:sanitizeKibanaFilters',
-      `Started to sanitize filters`,
-      'info',
-    );
-    log(
-      'reporting:sanitizeKibanaFilters',
-      `filters: ${filters.length}, searchBar: ${searchBar}`,
-      'debug',
+    context.wazuh.logger.debug(
+      `Started to sanitize filters. filters: ${filters.length}, searchBar: ${searchBar}`,
     );
     let str = '';
 
@@ -109,10 +102,8 @@ export class WazuhReportingCtrl {
       .map(filter => filter.meta.value)
       .join(',');
 
-    log(
-      'reporting:sanitizeKibanaFilters',
+    context.wazuh.logger.debug(
       `str: ${str}, agentsFilterStr: ${agentsFilter.agentsText}`,
-      'debug',
     );
 
     return [str, agentsFilter];
@@ -128,10 +119,8 @@ export class WazuhReportingCtrl {
    */
   private async renderHeader(context, printer, section, tab, isAgents, apiId) {
     try {
-      log(
-        'reporting:renderHeader',
+      context.wazuh.logger.debug(
         `section: ${section}, tab: ${tab}, isAgents: ${isAgents}, apiId: ${apiId}`,
-        'debug',
       );
       if (section && typeof section === 'string') {
         if (!['agentConfig', 'groupConfig'].includes(section)) {
@@ -199,13 +188,13 @@ export class WazuhReportingCtrl {
         });
       }
     } catch (error) {
-      log('reporting:renderHeader', error.message || error);
+      context.wazuh.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
 
-  private getConfigRows(data, labels) {
-    log('reporting:getConfigRows', `Building configuration rows`, 'info');
+  private getConfigRows(context, data, labels) {
+    context.wazuh.logger.debug('Building configuration rows');
     const result = [];
     for (let prop in data || []) {
       if (Array.isArray(data[prop])) {
@@ -221,8 +210,8 @@ export class WazuhReportingCtrl {
     return result;
   }
 
-  private getConfigTables(data, section, tab, array = []) {
-    log('reporting:getConfigTables', `Building configuration tables`, 'info');
+  private getConfigTables(context, data, section, tab, array = []) {
+    context.wazuh.logger.debug('Building configuration tables');
     let plainData = {};
     const nestedData = [];
     const tableData = [];
@@ -259,10 +248,10 @@ export class WazuhReportingCtrl {
       title: (section.options || {}).hideHeader
         ? ''
         : (section.tabs || [])[tab] ||
-        (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
+          (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
       columns: ['', ''],
       type: 'config',
-      rows: this.getConfigRows(plainData, (section.labels || [])[0]),
+      rows: this.getConfigRows(context, plainData, (section.labels || [])[0]),
     });
     for (let key in tableData) {
       const columns = Object.keys(tableData[key][0]);
@@ -296,7 +285,7 @@ export class WazuhReportingCtrl {
       });
     }
     nestedData.forEach(nest => {
-      this.getConfigTables(nest, section, tab + 1, array);
+      this.getConfigTables(context, nest, section, tab + 1, array);
     });
     return array;
   }
@@ -315,7 +304,7 @@ export class WazuhReportingCtrl {
       response: OpenSearchDashboardsResponseFactory,
     ) => {
       try {
-        log('reporting:createReportsModules', `Report started`, 'info');
+        context.wazuh.logger.debug('Report started');
         const {
           array,
           agents,
@@ -333,7 +322,9 @@ export class WazuhReportingCtrl {
         const { from, to } = time || {};
         let additionalTables = [];
         // Init
-        const printer = new ReportPrinter();
+        const printer = new ReportPrinter(
+          context.wazuh.logger.get('report-printer'),
+        );
 
         createDataDirectoryIfNotExists();
         createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
@@ -355,7 +346,7 @@ export class WazuhReportingCtrl {
         );
 
         const [sanitizedFilters, agentsFilter] = filters
-          ? this.sanitizeKibanaFilters(filters, searchBar)
+          ? this.sanitizeKibanaFilters(context, filters, searchBar)
           : [false, null];
 
         if (time && sanitizedFilters) {
@@ -426,11 +417,13 @@ export class WazuhReportingCtrl {
       response: OpenSearchDashboardsResponseFactory,
     ) => {
       try {
-        log('reporting:createReportsGroups', `Report started`, 'info');
+        context.wazuh.logger.debug('Report started');
         const { components, apiId } = request.body;
         const { groupID } = request.params;
         // Init
-        const printer = new ReportPrinter();
+        const printer = new ReportPrinter(
+          context.wazuh.logger.get('report-printer'),
+        );
 
         createDataDirectoryIfNotExists();
         createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
@@ -594,7 +587,9 @@ export class WazuhReportingCtrl {
                     });
                   } else {
                     for (let _d2 of config.config[_d]) {
-                      tables.push(...this.getConfigTables(_d2, section, idx));
+                      tables.push(
+                        ...this.getConfigTables(context, _d2, section, idx),
+                      );
                     }
                   }
                 } else {
@@ -603,7 +598,12 @@ export class WazuhReportingCtrl {
                     const directories = config.config[_d].directories;
                     delete config.config[_d].directories;
                     tables.push(
-                      ...this.getConfigTables(config.config[_d], section, idx),
+                      ...this.getConfigTables(
+                        context,
+                        config.config[_d],
+                        section,
+                        idx,
+                      ),
                     );
                     let diffOpts = [];
                     Object.keys(section.opts).forEach(x => {
@@ -640,7 +640,12 @@ export class WazuhReportingCtrl {
                     });
                   } else {
                     tables.push(
-                      ...this.getConfigTables(config.config[_d], section, idx),
+                      ...this.getConfigTables(
+                        context,
+                        config.config[_d],
+                        section,
+                        idx,
+                      ),
                     );
                   }
                 }
@@ -682,7 +687,7 @@ export class WazuhReportingCtrl {
           },
         });
       } catch (error) {
-        log('reporting:createReportsGroups', error.message || error);
+        context.wazuh.logger.error(error.message || error);
         return ErrorResponse(error.message || error, 5029, 500, response);
       }
     },
@@ -705,15 +710,13 @@ export class WazuhReportingCtrl {
         response: OpenSearchDashboardsResponseFactory,
       ) => {
         try {
-          log(
-            'reporting:createReportsAgentsConfiguration',
-            `Report started`,
-            'info',
-          );
+          context.wazuh.logger.debug('Report started');
           const { components, apiId } = request.body;
           const { agentID } = request.params;
 
-          const printer = new ReportPrinter();
+          const printer = new ReportPrinter(
+            context.wazuh.logger.get('report-printer'),
+          );
           createDataDirectoryIfNotExists();
           createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
           createDirectoryIfNotExists(
@@ -737,7 +740,7 @@ export class WazuhReportingCtrl {
                 { apiHostID: apiId },
               );
           } catch (error) {
-            log('reporting:report', error.message || error, 'debug');
+            context.wazuh.logger.debug(error.message || error);
           }
 
           await this.renderHeader(
@@ -752,10 +755,8 @@ export class WazuhReportingCtrl {
           let idxComponent = 0;
           for (let config of AgentConfiguration.configurations) {
             let titleOfSection = false;
-            log(
-              'reporting:createReportsAgentsConfiguration',
+            context.wazuh.logger.debug(
               `Iterate over ${config.sections.length} configuration sections`,
-              'debug',
             );
             for (let section of config.sections) {
               let titleOfSubsection = false;
@@ -767,10 +768,8 @@ export class WazuhReportingCtrl {
                 const configs = (section.config || []).concat(
                   section.wodle || [],
                 );
-                log(
-                  'reporting:createReportsAgentsConfiguration',
+                context.wazuh.logger.debug(
                   `Iterate over ${configs.length} configuration blocks`,
-                  'debug',
                 );
                 for (let conf of configs) {
                   let agentConfigResponse = {};
@@ -875,6 +874,7 @@ export class WazuhReportingCtrl {
                           ) {
                             tables.push(
                               ...this.getConfigTables(
+                                context,
                                 agentConfig[agentConfigKey],
                                 section,
                                 idx,
@@ -883,7 +883,12 @@ export class WazuhReportingCtrl {
                           } else {
                             for (let _d2 of agentConfig[agentConfigKey]) {
                               tables.push(
-                                ...this.getConfigTables(_d2, section, idx),
+                                ...this.getConfigTables(
+                                  context,
+                                  _d2,
+                                  section,
+                                  idx,
+                                ),
                               );
                             }
                           }
@@ -898,9 +903,15 @@ export class WazuhReportingCtrl {
                               ...rest
                             } = agentConfig[agentConfigKey];
                             tables.push(
-                              ...this.getConfigTables(rest, section, idx),
+                              ...this.getConfigTables(
+                                context,
+                                rest,
+                                section,
+                                idx,
+                              ),
                               ...(diff && diff.disk_quota
                                 ? this.getConfigTables(
+                                    context,
                                     diff.disk_quota,
                                     { tabs: ['Disk quota'] },
                                     0,
@@ -908,6 +919,7 @@ export class WazuhReportingCtrl {
                                 : []),
                               ...(diff && diff.file_size
                                 ? this.getConfigTables(
+                                    context,
                                     diff.file_size,
                                     { tabs: ['File size'] },
                                     0,
@@ -915,6 +927,7 @@ export class WazuhReportingCtrl {
                                 : []),
                               ...(synchronization
                                 ? this.getConfigTables(
+                                    context,
                                     synchronization,
                                     { tabs: ['Synchronization'] },
                                     0,
@@ -922,6 +935,7 @@ export class WazuhReportingCtrl {
                                 : []),
                               ...(file_limit
                                 ? this.getConfigTables(
+                                    context,
                                     file_limit,
                                     { tabs: ['File limit'] },
                                     0,
@@ -965,6 +979,7 @@ export class WazuhReportingCtrl {
                           } else {
                             tables.push(
                               ...this.getConfigTables(
+                                context,
                                 agentConfig[agentConfigKey],
                                 section,
                                 idx,
@@ -988,7 +1003,7 @@ export class WazuhReportingCtrl {
                       });
                     }
                   } catch (error) {
-                    log('reporting:report', error.message || error, 'debug');
+                    context.wazuh.logger.debug(error.message || error);
                   }
                   idx++;
                 }
@@ -1010,10 +1025,7 @@ export class WazuhReportingCtrl {
             },
           });
         } catch (error) {
-          log(
-            'reporting:createReportsAgentsConfiguration',
-            error.message || error,
-          );
+          context.wazuh.logger.debug(error.message || error);
           return ErrorResponse(error.message || error, 5029, 500, response);
         }
       },
@@ -1036,11 +1048,7 @@ export class WazuhReportingCtrl {
         response: OpenSearchDashboardsResponseFactory,
       ) => {
         try {
-          log(
-            'reporting:createReportsAgentsInventory',
-            `Report started`,
-            'info',
-          );
+          context.wazuh.logger.debug('Report started');
           const {
             searchBar,
             filters,
@@ -1052,7 +1060,9 @@ export class WazuhReportingCtrl {
           const { agentID } = request.params;
           const { from, to } = time || {};
           // Init
-          const printer = new ReportPrinter();
+          const printer = new ReportPrinter(
+            context.wazuh.logger.get('report-printer'),
+          );
 
           const { hashUsername } = await context.wazuh.security.getCurrentUser(
             request,
@@ -1070,13 +1080,9 @@ export class WazuhReportingCtrl {
             ),
           );
 
-          log(
-            'reporting:createReportsAgentsInventory',
-            `Syscollector report`,
-            'debug',
-          );
+          context.wazuh.logger.debug('Syscollector report');
           const [sanitizedFilters, agentsFilter] = filters
-            ? this.sanitizeKibanaFilters(filters, searchBar)
+            ? this.sanitizeKibanaFilters(context, filters, searchBar)
             : [false, null];
 
           // Get the agent OS
@@ -1101,11 +1107,7 @@ export class WazuhReportingCtrl {
             agentOs =
               (isAgentWindows && 'windows') || (isAgentLinux && 'linux') || '';
           } catch (error) {
-            log(
-              'reporting:createReportsAgentsInventory',
-              error.message || error,
-              'debug',
-            );
+            context.wazuh.logger.debug(error.message || error);
           }
 
           // Add title
@@ -1244,11 +1246,7 @@ export class WazuhReportingCtrl {
 
           const requestInventory = async agentRequestInventory => {
             try {
-              log(
-                'reporting:createReportsAgentsInventory',
-                agentRequestInventory.loggerMessage,
-                'debug',
-              );
+              context.wazuh.logger.debug(agentRequestInventory.loggerMessage);
 
               const inventoryResponse =
                 await context.wazuh.api.client.asCurrentUser.request(
@@ -1272,11 +1270,7 @@ export class WazuhReportingCtrl {
                 };
               }
             } catch (error) {
-              log(
-                'reporting:createReportsAgentsInventory',
-                error.message || error,
-                'debug',
-              );
+              context.wazuh.logger.debug(error.message || error);
             }
           };
 
@@ -1320,7 +1314,7 @@ export class WazuhReportingCtrl {
             },
           });
         } catch (error) {
-          log('reporting:createReportsAgents', error.message || error);
+          context.wazuh.logger.error(error.message || error);
           return ErrorResponse(error.message || error, 5029, 500, response);
         }
       },
@@ -1341,7 +1335,7 @@ export class WazuhReportingCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      log('reporting:getReports', `Fetching created reports`, 'info');
+      context.wazuh.logger.debug('Fetching created reports');
       const { hashUsername } = await context.wazuh.security.getCurrentUser(
         request,
         context,
@@ -1354,11 +1348,7 @@ export class WazuhReportingCtrl {
         hashUsername,
       );
       createDirectoryIfNotExists(userReportsDirectoryPath);
-      log(
-        'reporting:getReports',
-        `Directory: ${userReportsDirectoryPath}`,
-        'debug',
-      );
+      context.wazuh.logger.debug(`Directory: ${userReportsDirectoryPath}`);
 
       const sortReportsByDate = (a, b) =>
         a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
@@ -1376,18 +1366,16 @@ export class WazuhReportingCtrl {
           date: stats[birthTimeField],
         };
       });
-      log(
-        'reporting:getReports',
+      context.wazuh.logger.debug(
         `Using TimSort for sorting ${reports.length} items`,
-        'debug',
       );
       TimSort.sort(reports, sortReportsByDate);
-      log('reporting:getReports', `Total reports: ${reports.length}`, 'debug');
+      context.wazuh.logger.debug(`Total reports: ${reports.length}`);
       return response.ok({
         body: { reports },
       });
     } catch (error) {
-      log('reporting:getReports', error.message || error);
+      context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 5031, 500, response);
     }
   }
@@ -1406,10 +1394,8 @@ export class WazuhReportingCtrl {
       response: OpenSearchDashboardsResponseFactory,
     ) => {
       try {
-        log(
-          'reporting:getReportByName',
+        context.wazuh.logger.debug(
           `Getting ${context.wazuhEndpointParams.pathFilename} report`,
-          'debug',
         );
         const reportFileBuffer = fs.readFileSync(
           context.wazuhEndpointParams.pathFilename,
@@ -1419,7 +1405,7 @@ export class WazuhReportingCtrl {
           body: reportFileBuffer,
         });
       } catch (error) {
-        log('reporting:getReportByName', error.message || error);
+        context.wazuh.logger.error(error.message || error);
         return ErrorResponse(error.message || error, 5030, 500, response);
       }
     },
@@ -1440,22 +1426,18 @@ export class WazuhReportingCtrl {
       response: OpenSearchDashboardsResponseFactory,
     ) => {
       try {
-        log(
-          'reporting:deleteReportByName',
+        context.wazuh.logger.debug(
           `Deleting ${context.wazuhEndpointParams.pathFilename} report`,
-          'debug',
         );
         fs.unlinkSync(context.wazuhEndpointParams.pathFilename);
-        log(
-          'reporting:deleteReportByName',
+        context.wazuh.logger.info(
           `${context.wazuhEndpointParams.pathFilename} report was deleted`,
-          'info',
         );
         return response.ok({
           body: { error: 0 },
         });
       } catch (error) {
-        log('reporting:deleteReportByName', error.message || error);
+        context.wazuh.logger.error(error.message || error);
         return ErrorResponse(error.message || error, 5032, 500, response);
       }
     },
@@ -1480,19 +1462,15 @@ export class WazuhReportingCtrl {
         );
         const filename = reportFileNameAccessor(request);
         const pathFilename = path.join(userReportsDirectoryPath, filename);
-        log(
-          'reporting:checkReportsUserDirectoryIsValidRouteDecorator',
+        context.wazuh.logger.debug(
           `Checking the user ${username}(${hashUsername}) can do actions in the reports file: ${pathFilename}`,
-          'debug',
         );
         if (
           !pathFilename.startsWith(userReportsDirectoryPath) ||
           pathFilename.includes('../')
         ) {
-          log(
-            'security:reporting:checkReportsUserDirectoryIsValidRouteDecorator',
+          context.wazuh.logger.warn(
             `User ${username}(${hashUsername}) tried to access to a non user report file: ${pathFilename}`,
-            'warn',
           );
           return response.badRequest({
             body: {
@@ -1500,10 +1478,8 @@ export class WazuhReportingCtrl {
             },
           });
         }
-        log(
-          'reporting:checkReportsUserDirectoryIsValidRouteDecorator',
+        context.wazuh.logger.debug(
           'Checking the user can do actions in the reports file',
-          'debug',
         );
         return await routeHandler.bind(this)(
           {
@@ -1514,10 +1490,7 @@ export class WazuhReportingCtrl {
           response,
         );
       } catch (error) {
-        log(
-          'reporting:checkReportsUserDirectoryIsValidRouteDecorator',
-          error.message || error,
-        );
+        context.wazuh.logger.error(error.message || error);
         return ErrorResponse(error.message || error, 5040, 500, response);
       }
     };

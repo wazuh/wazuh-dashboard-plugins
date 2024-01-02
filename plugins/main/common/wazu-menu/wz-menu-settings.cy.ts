@@ -16,7 +16,6 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID {
   MODULES = 'menuSettingsModulesLink',
   SAMPLE_DATA = 'menuSettingsSampleDataLink',
   CONFIGURATION = 'menuSettingsConfigurationLink',
-  LOGS = 'menuSettingsLogsLink',
   MISCELLANEOUS = 'menuSettingsMiscellaneousLink',
   ABOUT = 'menuSettingsAboutLink',
 }

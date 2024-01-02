@@ -9,27 +9,30 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { log } from '../lib/logger';
 
-export const tryCatchForIndexPermissionError = (wazuhIndex: string) => (functionToTryCatch) => async () => {
+export const tryCatchForIndexPermissionError =
+  (wazuhIndex: string) => functionToTryCatch => async () => {
     try {
-        await functionToTryCatch();
+      await functionToTryCatch();
+    } catch (error) {
+      enum errorTypes {
+        SECURITY_EXCEPTION = 'security_exception',
+        RESPONSE_ERROR = 'Response Error',
+      }
+      switch (error.message) {
+        case errorTypes.SECURITY_EXCEPTION:
+          error.message =
+            (
+              (
+                ((error.meta || error.message).body || error.message).error ||
+                error.message
+              ).root_cause[0] || error.message
+            ).reason || error.message;
+          break;
+        case errorTypes.RESPONSE_ERROR:
+          error.message = `Could not check if the index ${wazuhIndex} exists due to no permissions for create, delete or check`;
+          break;
+      }
+      return Promise.reject(error);
     }
-    catch (error) {
-        enum errorTypes{
-            SECURITY_EXCEPTION = 'security_exception',
-            RESPONSE_ERROR = 'Response Error',
-        }
-        switch(error.message){
-            case errorTypes.SECURITY_EXCEPTION:
-              error.message = (((((error.meta || error.message).body || error.message).error || error.message).root_cause[0] || error.message).reason || error.message);
-              break;
-            case errorTypes.RESPONSE_ERROR:
-              error.message = `Could not check if the index ${
-                wazuhIndex
-              } exists due to no permissions for create, delete or check`;
-              break;
-        }
-        return Promise.reject(error);
-    }
-}
+  };
