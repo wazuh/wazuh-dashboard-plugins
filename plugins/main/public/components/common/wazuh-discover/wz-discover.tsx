@@ -31,7 +31,7 @@ import useSearchBar from '../search-bar/use-search-bar';
 import { search } from '../search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
-import { getDiscoverPanels } from './config/chart';
+import { getDiscoverPanels } from './config/histogram-chart';
 const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 
@@ -96,28 +96,20 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
 
   useEffect(() => {
     if (!isLoading) {
+      setIsSearching(true);
       setIndexPattern(indexPatterns?.[0] as IndexPattern);
-      /*const timeFilter: Filter['query'] = [{
-        range: {
-          '@timestamp': {
-            gte: searchBarProps?.dateRangeFrom,
-            lte: searchBarProps?.dateRangeTo,
-            format: 'strict_date_optional_time',
-          },
-        },
-      }]
-      const allFilters = [...timeFilter, ...(filters || [])];
-      console.log('searching...', allFilters, query, pagination, sorting, dateRangeFrom, dateRangeTo);
-      */
+      const dateRange = {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      }
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,
-        //filters: allFilters,
         filters,
         query,
         pagination,
-        sorting
+        sorting,
+        dateRange
       }).then((results) => {
-        console.log('found...', results?.hits?.total);
         setResults(results);
         setIsSearching(false);
       }).catch((error) => {
@@ -162,11 +154,13 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
         grow
       >
         <>
+        { isSearching.toString() }
           {isLoading ?
             <LoadingSpinner /> :
             <SearchBar
               appName='wazuh-discover-search-bar'
               {...searchBarProps}
+              showSaveQuery={true}
             />}
           {isSearching ?
             <LoadingSpinner /> : null}
