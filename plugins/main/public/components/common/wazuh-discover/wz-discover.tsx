@@ -30,8 +30,7 @@ import { formatNumWithCommas } from '../../../kibana-integrations/discover/appli
 import useSearchBar from '../search-bar/use-search-bar';
 import { search } from '../search-bar';
 import { getPlugins } from '../../../kibana-services';
-import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
-import { getDiscoverPanels } from './config/histogram-chart';
+import { getDiscoverPanels, histogramChartInput } from './config/histogram-chart';
 const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 
@@ -98,17 +97,16 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
     if (!isLoading) {
       setIsSearching(true);
       setIndexPattern(indexPatterns?.[0] as IndexPattern);
-      const dateRange = {
-        from: dateRangeFrom,
-        to: dateRangeTo,
-      }
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,
         filters,
         query,
         pagination,
         sorting,
-        dateRange
+        dateRange: {
+          from: dateRangeFrom,
+          to: dateRangeTo,
+        }
       }).then((results) => {
         setResults(results);
         setIsSearching(false);
@@ -154,7 +152,6 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
         grow
       >
         <>
-        { isSearching.toString() }
           {isLoading ?
             <LoadingSpinner /> :
             <SearchBar
@@ -168,30 +165,11 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} /> : null}
           {!isLoading && !isSearching && results?.hits?.total > 0 ? (
             <>
-              <EuiFlexItem grow={false}>
-                <EuiPanel hasBorder={false} hasShadow={false} color="transparent" paddingSize="none" className="discoverChartContainer">
+              <EuiFlexItem grow={false} className="discoverChartContainer">
+                <EuiPanel hasBorder={false} hasShadow={false} color="transparent" paddingSize="none">
                   <EuiPanel>
                     <DashboardByRenderer
-                      input={{
-                        viewMode: ViewMode.VIEW,
-                        panels: getDiscoverPanels('wazuh-alerts-*'),
-                        isFullScreenMode: false,
-                        filters: searchBarProps.filters ?? [],
-                        useMargins: false,
-                        id: 'wz-discover-events-histogram',
-                        timeRange: {
-                          from: searchBarProps.dateRangeFrom,
-                          to: searchBarProps.dateRangeTo,
-                        },
-                        title: 'Discover Events Histogram',
-                        description: 'Histogram of events by date',
-                        query: searchBarProps.query,
-                        refreshConfig: {
-                          pause: false,
-                          value: 15,
-                        },
-                        hidePanelTitles: true,
-                      }}
+                      input={histogramChartInput(indexPatternName, filters, query, dateRangeFrom, dateRangeTo)}
                     />
                   </EuiPanel>
                 </EuiPanel>
