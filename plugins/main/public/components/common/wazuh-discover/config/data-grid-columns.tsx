@@ -1,6 +1,5 @@
-import { EuiBadge } from "@elastic/eui";
 import React from 'react';
-import { tDataGridColumn } from '../../hooks/data_grid'
+import { tDataGridColumn } from '../../data_grid'
 
 export const threatHuntingColumns: tDataGridColumn[] = [{
     id: 'timestamp'
@@ -17,3 +16,6 @@ export const threatHuntingColumns: tDataGridColumn[] = [{
 {
     id: 'rule.id'
 }]
+
+
+
