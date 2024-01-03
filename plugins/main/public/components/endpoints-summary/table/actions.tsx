@@ -76,6 +76,6 @@ export const agentsTableActions = (
       setIsEditGroupsVisible(true);
     },
     'data-test-subj': 'action-groups',
-    enabled: () => !allowEditGroups,
+    enabled: () => allowEditGroups,
   },
 ];

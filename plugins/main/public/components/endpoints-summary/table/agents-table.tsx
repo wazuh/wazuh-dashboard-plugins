@@ -11,19 +11,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiIconTip } from '@elastic/eui';
-import { GroupTruncate } from '../../common/util';
+import React, { useState, useEffect, useRef } from 'react';
+import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
-import { formatUIDate } from '../../../react-services/time-service';
 import { withErrorBoundary } from '../../common/hocs';
 import {
   UI_ORDER_AGENT_STATUS,
   AGENT_SYNCED_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
 } from '../../../../common/constants';
-import { AgentStatus } from '../../agents/agent-status';
-import { AgentSynced } from '../../agents/agent-synced';
 import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
@@ -34,7 +30,8 @@ import { useUserPermissionsRequirements } from '../../common/hooks/useUserPermis
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
-import { agentsTableActions } from './actions';
+import { agentsTableColumns } from './columns';
+import { AgentsTableGlobalActions } from './global-actions';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -67,7 +64,9 @@ export const AgentsTable = compose(
   const [agent, setAgent] = useState();
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
 
-  const [userPermissionRequirements] = useUserPermissionsRequirements([
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
+
+  const [denyEditGroups] = useUserPermissionsRequirements([
     { action: 'group:modify_assignments', resource: 'group:id:*' },
   ]);
 
@@ -90,176 +89,38 @@ export const AgentsTable = compose(
     await setReloadTable(Date.now());
   };
 
-  const addIconPlatformRender = agent => {
-    let icon = '';
-    const os = agent?.os || {};
-
-    if ((os?.uname || '').includes('Linux')) {
-      icon = 'linux';
-    } else if (os?.platform === 'windows') {
-      icon = 'windows';
-    } else if (os?.platform === 'darwin') {
-      icon = 'apple';
-    }
-    const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
-
-    return (
-      <EuiFlexGroup gutterSize='xs'>
-        <EuiFlexItem grow={false}>
-          <i
-            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-            aria-hidden='true'
-          ></i>
-        </EuiFlexItem>{' '}
-        <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
-      </EuiFlexGroup>
-    );
+  const onSelectionChange = (selectedItems: any[]) => {
+    setSelectedItems(selectedItems);
   };
 
-  // Columns with the property truncateText: true won't wrap the text
-  // This is added to prevent the wrap because of the table-layout: auto
-  const defaultColumns = [
-    {
-      field: 'id',
-      name: 'ID',
-      sortable: true,
-      show: true,
-      searchable: true,
-    },
-    {
-      field: 'name',
-      name: 'Name',
-      sortable: true,
-      show: true,
-      searchable: true,
-    },
-    {
-      field: 'ip',
-      name: 'IP address',
-      sortable: true,
-      show: true,
-      searchable: true,
-    },
-    {
-      field: 'group',
-      name: 'Group(s)',
-      sortable: true,
-      show: true,
-      render: groups => renderGroups(groups),
-      searchable: true,
-    },
-    {
-      field: 'os.name,os.version',
-      composeField: ['os.name', 'os.version'],
-      name: 'Operating system',
-      sortable: true,
-      show: true,
-      render: (field, agentData) => addIconPlatformRender(agentData),
-      searchable: true,
-    },
-    {
-      field: 'node_name',
-      name: 'Cluster node',
-      sortable: true,
-      show: true,
-      searchable: true,
-    },
-    {
-      field: 'version',
-      name: 'Version',
-      sortable: true,
-      show: true,
-      searchable: true,
-      width: '10%',
-    },
-    {
-      field: 'dateAdd',
-      name: (
-        <span>
-          Registration date{' '}
-          <EuiIconTip
-            content='This is not searchable through a search term.'
-            size='s'
-            color='subdued'
-            type='alert'
-          />
-        </span>
-      ),
-      render: dateAdd => formatUIDate(dateAdd),
-      sortable: true,
-      show: false,
-      searchable: false,
-    },
-    {
-      field: 'lastKeepAlive',
-      name: (
-        <span>
-          Last keep alive{' '}
-          <EuiIconTip
-            content='This is not searchable through a search term.'
-            size='s'
-            color='subdued'
-            type='alert'
-          />
-        </span>
-      ),
-      render: lastKeepAlive => formatUIDate(lastKeepAlive),
-      sortable: true,
-      show: false,
-      searchable: false,
-    },
-    {
-      field: 'status',
-      name: 'Status',
-      truncateText: true,
-      sortable: true,
-      show: true,
-      render: (status, agent) => <AgentStatus status={status} agent={agent} />,
-    },
-    {
-      field: 'group_config_status',
-      name: 'Synced',
-      sortable: true,
-      show: false,
-      render: synced => <AgentSynced synced={synced} />,
-      searchable: true,
-    },
-    {
-      field: 'actions',
-      name: 'Actions',
-      show: true,
-      actions: agentsTableActions(
-        userPermissionRequirements,
-        setAgent,
-        setIsEditGroupsVisible,
-      ),
-    },
-  ];
+  const selection = {
+    onSelectionChange: onSelectionChange,
+  };
+
+  const getRowProps = item => {
+    const { id } = item;
+    return {
+      'data-test-subj': `row-${id}`,
+      className: 'customRowClass',
+      onClick: () => {},
+    };
+  };
+
+  const getCellProps = (item, column) => {
+    if (column.field == 'actions') {
+      return;
+    }
+    return {
+      onClick: ev => {
+        props.updateCurrentAgentData(item);
+        getCore().application.navigateToApp(endpointSummary.id, {
+          path: `#/agents?tab=welcome&agent=${item.id}`,
+        });
+      },
+    };
+  };
 
   const tableRender = () => {
-    const getRowProps = item => {
-      const { id } = item;
-      return {
-        'data-test-subj': `row-${id}`,
-        className: 'customRowClass',
-        onClick: () => {},
-      };
-    };
-
-    const getCellProps = (item, column) => {
-      if (column.field == 'actions') {
-        return;
-      }
-      return {
-        onClick: ev => {
-          props.updateCurrentAgentData(item);
-          getCore().application.navigateToApp(endpointSummary.id, {
-            path: `#/agents?tab=welcome&agent=${item.id}`,
-          });
-        },
-      };
-    };
-
     // The EuiBasicTable tableLayout is set to "auto" to improve the use of empty space in the component.
     // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
     // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
@@ -269,6 +130,10 @@ export const AgentsTable = compose(
           <TableWzAPI
             title='Agents'
             actionButtons={[
+              <AgentsTableGlobalActions
+                agents={selectedItems}
+                allowEditGroups={!denyEditGroups}
+              />,
               <WzButtonPermissions
                 buttonType='empty'
                 permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
@@ -281,7 +146,12 @@ export const AgentsTable = compose(
               </WzButtonPermissions>,
             ]}
             endpoint='/agents'
-            tableColumns={defaultColumns}
+            tableColumns={agentsTableColumns(
+              !denyEditGroups,
+              setAgent,
+              setIsEditGroupsVisible,
+              setFilters,
+            )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
             reload={reloadTable}
@@ -437,32 +307,17 @@ export const AgentsTable = compose(
               key: 'wz-agents-overview-table',
             }}
             tableProps={{
+              itemId: 'id',
               tableLayout: 'auto',
               cellProps: getCellProps,
+              hasActions: true,
+              selection,
+              isSelectable: true,
             }}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
     );
-  };
-
-  const filterGroupBadge = (group: string) => {
-    setFilters({
-      default: { q: 'id!=000' },
-      q: `id!=000;group=${group}`,
-    });
-  };
-
-  const renderGroups = (groups: string[]) => {
-    return groups?.length ? (
-      <GroupTruncate
-        groups={groups}
-        length={25}
-        label={'more'}
-        action={'filter'}
-        filterAction={filterGroupBadge}
-      />
-    ) : null;
   };
 
   const table = tableRender();
