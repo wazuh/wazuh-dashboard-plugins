@@ -131,7 +131,7 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
 const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
-    title: 'The most vulnerable endpoints',
+    title: 'Most vulnerable endpoints',
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
