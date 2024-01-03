@@ -1,7 +1,8 @@
 .chart-legend > li {
-    margin-top: 0px;
+  margin-top: 0px;
 }
 
 .chart-legend > li > * {
-    padding: 0px;
+  padding: 0px;
+  overflow: hidden;
 }
