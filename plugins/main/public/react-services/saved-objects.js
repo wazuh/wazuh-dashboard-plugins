@@ -22,7 +22,7 @@ import {
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../common/constants';
-import { getSavedObjects } from '../kibana-services';
+import { getDataPlugin, getSavedObjects } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { ErrorFactory } from './error-management';
 import { WarningError } from './error-management/error-factory/errors/WarningError';
@@ -239,45 +239,20 @@ export class SavedObject {
    * Refresh an index pattern
    * Optionally force a new field
    */
-  static async refreshIndexPattern(pattern, newFields = null) {
-    try {
-      const fields = await SavedObject.getIndicesFields(
-        pattern.title,
-        WAZUH_INDEX_TYPE_ALERTS,
-      );
+  static async refreshIndexPattern(pattern) {
+    /* Refresh fields using the same way that the Dashboards Management/Index patterns
+        https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.11.0/src/plugins/index_pattern_management/public/components/edit_index_pattern/edit_index_pattern.tsx#L136-L137
 
-      if (newFields && typeof newFields == 'object')
-        Object.keys(newFields).forEach(fieldName => {
-          if (this.isValidField(newFields[fieldName]))
-            fields.push(newFields[fieldName]);
-        });
-
-      await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
-    } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? error.data.message
-        : error.message || error;
-    }
-  }
-
-  /**
-   * Checks the field has a proper structure
-   * @param {index-pattern-field} field
-   */
-  static isValidField(field) {
-    if (field == null || typeof field != 'object') return false;
-
-    const isValid = [
-      'name',
-      'type',
-      'esTypes',
-      'searchable',
-      'aggregatable',
-      'readFromDocValues',
-    ].reduce((ok, prop) => {
-      return ok && Object.keys(field).includes(prop);
-    }, true);
-    return isValid;
+        This approach takes the definition of indexPatterns.refreshFields instead of using it due to
+        the error management that causes that unwanted toasts are displayed when there are no
+        indices for the index pattern
+      */
+    const fields = await getDataPlugin().indexPatterns.getFieldsForIndexPattern(
+      pattern,
+    );
+    const scripted = pattern.getScriptedFields().map(field => field.spec);
+    pattern.fields.replaceAll([...fields, ...scripted]);
+    await getDataPlugin().indexPatterns.updateSavedObject(pattern);
   }
 
   /**
