@@ -15,6 +15,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
 - Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
 
+# Fixed
+
+- Fixed the scripted fields disappear when the fields of the events index pattern was refreshed [#6237](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6237)
+
 ## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 00
 
 ### Added
