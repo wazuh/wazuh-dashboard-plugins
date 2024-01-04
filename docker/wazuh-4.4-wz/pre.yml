@@ -5,13 +5,13 @@ x-logging: &logging
   logging:
     driver: loki
     options:
-      loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+      loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
 
 services:
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
     <<: *logging
-    hostname: "exporter-kbn-${WAZUH_STACK}"
+    hostname: 'exporter-kbn-${WAZUH_STACK}'
     networks:
       - wzd-pre
       - mon
@@ -22,7 +22,7 @@ services:
 
   imposter:
     image: outofcoffee/imposter
-    hostname: "imposter-kbn-${WAZUH_STACK}"
+    hostname: 'imposter-kbn-${WAZUH_STACK}'
     networks:
       - wzd-pre
       - mon
@@ -42,64 +42,64 @@ services:
       - ./config/certs:/conf
     entrypoint: /bin/bash
     command: >
-        -c '
-          export certs=/tmp/certs
-          mkdir $$certs
-        	cd $$certs
+      -c '
+        export certs=/tmp/certs
+        mkdir $$certs
+      	cd $$certs
 
-        	echo "Generating CA"
-        	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
+      	echo "Generating CA"
+      	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
 
-        	echo "Generating servers certificates"
-        	for i in wazuh.indexer wazuh.dashboard wazuh.manager; do
+      	echo "Generating servers certificates"
+      	for i in wazuh.indexer wazuh.dashboard wazuh.manager; do
+      		echo "Generating cert for $$i"
+      		cat /conf/host.json | \
+      		sed "s/HOST/$$i/g" | \
+      		cfssl gencert \
+      			-ca $$certs/ca.pem \
+      			-ca-key $$certs/ca-key.pem \
+      			-config /conf/cfssl.json \
+      			-profile=server - | \
+      		cfssljson -bare $$i
+      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+      	done
+
+      	echo "Generating clients certificates"
+        	for i in admin filebeat; do
         		echo "Generating cert for $$i"
-        		cat /conf/host.json | \
-        		sed "s/HOST/$$i/g" | \
-        		cfssl gencert \
-        			-ca $$certs/ca.pem \
-        			-ca-key $$certs/ca-key.pem \
-        			-config /conf/cfssl.json \
-        			-profile=server - | \
-        		cfssljson -bare $$i
-        		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-        	done
+      		cat /conf/host.json | \
+      		sed "s/HOST/$$i/g" | \
+      		cfssl gencert \
+      			-ca $$certs/ca.pem \
+      			-ca-key $$certs/ca-key.pem \
+      			-config /conf/cfssl.json \
+      			-profile=client - | \
+      		cfssljson -bare $$i
+      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+      	done
 
-        	echo "Generating clients certificates"
-          	for i in admin filebeat; do
-          		echo "Generating cert for $$i"
-        		cat /conf/host.json | \
-        		sed "s/HOST/$$i/g" | \
-        		cfssl gencert \
-        			-ca $$certs/ca.pem \
-        			-ca-key $$certs/ca-key.pem \
-        			-config /conf/cfssl.json \
-        			-profile=client - | \
-        		cfssljson -bare $$i
-        		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-        	done
+          echo "Setting up permissions"
 
-            echo "Setting up permissions"
+          rm /certs/wi/* /certs/wd/* /certs/wm/*
 
-            rm /certs/wi/* /certs/wd/* /certs/wm/*
+          mv $$certs/wazuh.indexer* /certs/wi
+          mv $$certs/admin* /certs/wi
+          mv /certs/wi/admin.key /certs/wi/admin-key.pem
+          cp $$certs/*ca* /certs/wi
 
-            mv $$certs/wazuh.indexer* /certs/wi
-            mv $$certs/admin* /certs/wi
-            mv /certs/wi/admin.key /certs/wi/admin-key.pem
-            cp $$certs/*ca* /certs/wi
+          mv $$certs/wazuh.dashboard* /certs/wd
+          cp $$certs/*ca* /certs/wd
 
-            mv $$certs/wazuh.dashboard* /certs/wd
-            cp $$certs/*ca* /certs/wd
+          mv $$certs/*.* /certs/wm
 
-            mv $$certs/*.* /certs/wm
+          chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
+          chown -R 1000:1000 /certs/*
+          ls -alR /certs/
 
-            chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
-            chown -R 1000:1000 /certs/*
-            ls -alR /certs/
-
-            sleep 30
-        '
+          sleep 30
+      '
     healthcheck:
-      test: ["CMD-SHELL", "[ -r /certs/wm/wazuh.manager.pem ]"]
+      test: ['CMD-SHELL', '[ -r /certs/wm/wazuh.manager.pem ]']
       interval: 2s
       timeout: 5s
       retries: 10
@@ -110,7 +110,7 @@ services:
         condition: service_healthy
     image: elastic/filebeat:7.10.2
     hostname: filebeat
-    user: "0:0"
+    user: '0:0'
     networks:
       - wzd-pre
       - mon
@@ -123,7 +123,7 @@ services:
         echo admin | filebeat keystore add username --stdin --force
         echo SecretPassword| filebeat keystore add password --stdin --force
         curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
-        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.3.tar.gz | tar -xvz -C /usr/share/filebeat/module
+        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.4.tar.gz | tar -xvz -C /usr/share/filebeat/module
         # copy filebeat to preserve correct permissions without
         # affecting host filesystem
         cp /tmp/filebeat.yml /usr/share/filebeat/filebeat.yml
@@ -136,7 +136,6 @@ services:
       - wm_certs:/etc/ssl/wazuh
       - ./config/filebeat/filebeat.yml:/tmp/filebeat.yml
 
-
   wazuh.indexer:
     depends_on:
       generator:
@@ -148,8 +147,8 @@ services:
       - mon
     <<: *logging
     environment:
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "OPENSEARCH_PATH_CONF=/usr/share/wazuh-indexer/config"
+      - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m'
+      - 'OPENSEARCH_PATH_CONF=/usr/share/wazuh-indexer/config'
     ulimits:
       memlock:
         soft: -1
@@ -168,14 +167,12 @@ services:
     healthcheck:
       test:
         [
-          "CMD-SHELL",
-          "/usr/share/wazuh-indexer/bin/opensearch-plugin list | grep -q security",
+          'CMD-SHELL',
+          '/usr/share/wazuh-indexer/bin/opensearch-plugin list | grep -q security',
         ]
       interval: 10s
       timeout: 10s
       retries: 120
-
-
 
   wazuh.dashboard:
     image: wazuh/wazuh-dashboard:${WAZUH_STACK}
