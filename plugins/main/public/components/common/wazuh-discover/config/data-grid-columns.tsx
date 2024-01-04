@@ -1,5 +1,5 @@
 import React from 'react';
-import { tDataGridColumn } from '../../data_grid'
+import { tDataGridColumn } from '../../data-grid';
 
 export const threatHuntingColumns: tDataGridColumn[] = [{
     id: 'timestamp'
