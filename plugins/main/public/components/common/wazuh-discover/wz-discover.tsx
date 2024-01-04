@@ -116,7 +116,10 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
         setIsSearching(false);
       })
     }
-  }, [JSON.stringify(searchBarProps)]);
+  },
+    [JSON.stringify(searchBarProps),
+    JSON.stringify(pagination),
+    JSON.stringify(sorting)]);
 
   const timeField = indexPattern?.timeFieldName ? indexPattern.timeFieldName : undefined;
 
@@ -159,11 +162,9 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
               {...searchBarProps}
               showSaveQuery={true}
             />}
-          {isSearching ?
-            <LoadingSpinner /> : null}
-          {!isLoading && !isSearching && results?.hits?.total === 0 ?
+          {!isLoading && results?.hits?.total === 0 ?
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} /> : null}
-          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+          {!isLoading && results?.hits?.total > 0 ? (
             <>
               <EuiFlexItem grow={false} className="discoverChartContainer">
                 <EuiPanel hasBorder={false} hasShadow={false} color="transparent" paddingSize="none">
@@ -193,7 +194,7 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
                           } : undefined}
                         />
                         <EuiButtonEmpty
-                          disabled={results?.hits?.total === 0}
+                          disabled={results?.hits?.total === 0 || columnVisibility.visibleColumns.length === 0}
                           size="xs"
                           iconType="exportAction"
                           color="primary"
