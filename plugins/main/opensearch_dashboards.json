@@ -1,6 +1,6 @@
 {
   "id": "wazuh",
-  "version": "4.7.2-01",
+  "version": "4.8.0-01",
   "opensearchDashboardsVersion": "opensearchDashboards",
   "configPath": [
     "wazuh"
@@ -8,6 +8,8 @@
   "requiredPlugins": [
     "navigation",
     "data",
+    "dashboard",
+    "embeddable",
     "discover",
     "inspector",
     "visualizations",
@@ -16,7 +18,8 @@
     "savedObjects",
     "opensearchDashboardsReact",
     "opensearchDashboardsUtils",
-    "opensearchDashboardsLegacy"
+    "opensearchDashboardsLegacy",
+    "wazuhCheckUpdates"
   ],
   "optionalPlugins": [
     "security",

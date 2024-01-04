@@ -18,13 +18,15 @@ import { act } from 'react-dom/test-utils';
 
 describe('Check result component', () => {
   const validationService = jest.fn();
+  const handleWarnings = jest.fn();
   const handleErrors = jest.fn();
   const handleCheckReady = jest.fn();
+  const cleanWarnings = jest.fn();
   const cleanErrors = jest.fn();
 
   const awaitForMyComponent = async (wrapper: any) => {
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 0));
       wrapper.update();
     });
   };
@@ -38,13 +40,15 @@ describe('Check result component', () => {
         awaitFor={[]}
         check={true}
         validationService={validationService}
+        handleWarnings={handleWarnings}
         handleErrors={handleErrors}
         isLoading={false}
         handleCheckReady={handleCheckReady}
         checksReady={{}}
+        cleanWarnings={cleanWarnings}
         cleanErrors={cleanErrors}
         canRetry={true}
-      />
+      />,
     );
 
     expect(component).toMatchSnapshot();
@@ -59,13 +63,15 @@ describe('Check result component', () => {
         awaitFor={[]}
         shouldCheck={true}
         validationService={validationService}
+        handleWarnings={handleWarnings}
         handleErrors={handleErrors}
         isLoading={false}
         handleCheckReady={handleCheckReady}
         checksReady={{}}
+        cleanWarnings={cleanWarnings}
         cleanErrors={cleanErrors}
         canRetry={true}
-      />
+      />,
     );
 
     await awaitForMyComponent(wrapper);
@@ -85,13 +91,15 @@ describe('Check result component', () => {
         awaitFor={[]}
         shouldCheck={true}
         validationService={validationService}
+        handleWarnings={handleWarnings}
         handleErrors={handleErrors}
         isLoading={false}
         handleCheckReady={handleCheckReady}
         checksReady={{}}
+        cleanWarnings={cleanWarnings}
         cleanErrors={cleanErrors}
         canRetry={true}
-      />
+      />,
     );
 
     await awaitForMyComponent(wrapper);
@@ -111,13 +119,15 @@ describe('Check result component', () => {
         awaitFor={[]}
         shouldCheck={true}
         validationService={validationService}
+        handleWarnings={handleWarnings}
         handleErrors={handleErrors}
         isLoading={false}
         handleCheckReady={handleCheckReady}
         checksReady={{}}
+        cleanWarnings={cleanWarnings}
         cleanErrors={cleanErrors}
         canRetry={false}
-      />
+      />,
     );
 
     expect(wrapper.find('ResultIcons').exists()).toBeTruthy();

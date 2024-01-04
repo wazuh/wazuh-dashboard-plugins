@@ -12,8 +12,7 @@
 import { OverviewController } from './overview';
 import { OverviewWelcome } from '../../components/common/welcome/overview-welcome';
 import { WzCurrentOverviewSectionWrapper } from '../../components/common/modules/overview-current-section-wrapper';
-import { WzCurrentAgentsSectionWrapper } from '../../components/common/modules/agents-current-section-wrapper';
-import { Mitre } from '../../components/overview'
+import { Mitre } from '../../components/overview';
 import { Stats } from './components/stats';
 import { SelectAgent } from './components/select-agent';
 import { RequirementCard } from './components/requirement-card';
@@ -23,7 +22,6 @@ const app = getAngularModule();
 
 OverviewWelcome.displayName = 'OverviewWelcome';
 WzCurrentOverviewSectionWrapper.displayName = 'WzCurrentOverviewSectionWrapper';
-WzCurrentAgentsSectionWrapper.displayName = 'WzCurrentAgentsSectionWrapper';
 Stats.displayName = 'StatsOverview';
 Mitre.displayName = 'Mitre';
 SelectAgent.displayName = 'SelectAgent';
@@ -33,7 +31,6 @@ app
   .controller('overviewController', OverviewController)
   .value('OverviewWelcome', OverviewWelcome)
   .value('WzCurrentOverviewSectionWrapper', WzCurrentOverviewSectionWrapper)
-  .value('WzCurrentAgentsSectionWrapper', WzCurrentAgentsSectionWrapper)
   .value('StatsOverview', Stats)
   .value('Mitre', Mitre)
   .value('SelectAgent', SelectAgent)

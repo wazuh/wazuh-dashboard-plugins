@@ -41,13 +41,14 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { WzFieldSearchDelay } from '../../../../../components/common/search';
+import { logs } from '../../../../../utils/applications';
 
 export default compose(
-  withGlobalBreadcrumb([{ text: '' }, { text: 'Management', href: '#/manager' }, { text: 'Logs' }]),
+  withGlobalBreadcrumb([{ text: logs.title }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
-  ])
+  ]),
 )(
   class WzLogs extends Component {
     constructor(props) {
@@ -100,7 +101,7 @@ export default compose(
             this.setState({
               isLoading: false,
             });
-          }
+          },
         );
       } catch (error) {
         this.setState({
@@ -131,7 +132,12 @@ export default compose(
       try {
         const path = logsPath + '/summary';
         const responseLogsSummary = await WzRequest.apiReq('GET', path, {});
-        const daemonsList = ['all', ...responseLogsSummary?.data?.data?.affected_items.map(logSummary => Object.keys(logSummary)[0]).sort()];
+        const daemonsList = [
+          'all',
+          ...responseLogsSummary?.data?.data?.affected_items
+            .map(logSummary => Object.keys(logSummary)[0])
+            .sort(),
+        ];
         this.setState({ daemonsList });
       } catch (error) {
         throw new Error('Error fetching daemons list: ' + error);
@@ -140,7 +146,7 @@ export default compose(
 
     parseLogsToText(logs) {
       let result = '';
-      logs.forEach((item) => {
+      logs.forEach(item => {
         result +=
           formatUIDate(item.timestamp) +
           ' ' +
@@ -159,8 +165,10 @@ export default compose(
       if (customOffset) {
         result['offset'] = customOffset;
       }
-      if (this.state.logLevelSelect !== 'all') result['level'] = this.state.logLevelSelect;
-      if (this.state.selectedDaemon !== 'all') result['tag'] = this.state.selectedDaemon;
+      if (this.state.logLevelSelect !== 'all')
+        result['level'] = this.state.logLevelSelect;
+      if (this.state.selectedDaemon !== 'all')
+        result['tag'] = this.state.selectedDaemon;
       if (this.state.appliedSearch) result['search'] = this.state.appliedSearch;
       result['sort'] = `${this.state.descendingSort ? '-' : '+'}timestamp`;
 
@@ -219,7 +227,11 @@ export default compose(
      */
     async getLogsPath() {
       try {
-        const clusterStatus = await WzRequest.apiReq('GET', '/cluster/status', {});
+        const clusterStatus = await WzRequest.apiReq(
+          'GET',
+          '/cluster/status',
+          {},
+        );
         const clusterEnabled =
           clusterStatus?.data?.data?.running === 'yes' &&
           clusterStatus?.data?.data?.enabled === 'yes';
@@ -227,11 +239,15 @@ export default compose(
         if (clusterEnabled) {
           let nodeList = '';
           let selectedNode = '';
-          const nodeListTmp = await WzRequest.apiReq('GET', '/cluster/nodes', {});
+          const nodeListTmp = await WzRequest.apiReq(
+            'GET',
+            '/cluster/nodes',
+            {},
+          );
           if (Array.isArray(nodeListTmp?.data?.data?.affected_items)) {
             nodeList = nodeListTmp.data.data.affected_items;
             selectedNode = nodeListTmp.data.data.affected_items.filter(
-              (item) => item.type === 'master'
+              item => item.type === 'master',
             )[0].name;
           }
           return {
@@ -249,7 +265,7 @@ export default compose(
 
     getDaemonsOptions() {
       return this.state.daemonsList.length > 0
-        ? this.state.daemonsList.map((item) => {
+        ? this.state.daemonsList.map(item => {
             return { value: item, text: item === 'all' ? 'All daemons' : item };
           })
         : [{ value: 'all', text: 'All daemons' }];
@@ -270,7 +286,7 @@ export default compose(
     getNodeList() {
       try {
         if (this.state.nodeList && Array.isArray(this.state.nodeList)) {
-          return this.state.nodeList.map((item) => {
+          return this.state.nodeList.map(item => {
             return { value: item.name, text: `${item.name} (${item.type})` };
           });
         } else {
@@ -293,69 +309,76 @@ export default compose(
       }
     }
 
-    onDaemonChange = (e) => {
+    onDaemonChange = e => {
       this.setState(
         {
           selectedDaemon: e.target.value,
         },
-        this.setFullLogs
+        this.setFullLogs,
       );
     };
 
-    onLogLevelChange = (e) => {
+    onLogLevelChange = e => {
       this.setState(
         {
           logLevelSelect: e.target.value,
         },
-        this.setFullLogs
+        this.setFullLogs,
       );
     };
 
-    onSortSwitchChange = (e) => {
+    onSortSwitchChange = e => {
       this.setState(
         {
           descendingSort: e.target.checked,
         },
-        this.setFullLogs
+        this.setFullLogs,
       );
     };
 
-    onSelectNode = (e) => {
+    onSelectNode = e => {
       this.setState(
         {
           selectedNode: e.target.value,
           logsPath: `/cluster/${e.target.value}/logs`,
         },
-        this.setFullLogs
+        this.setFullLogs,
       );
     };
 
-    onSearchBarChange = (e) => {
+    onSearchBarChange = e => {
       this.setState({
         searchBarValue: e,
       });
     };
 
-    onSearchBarSearch = (e) => {
+    onSearchBarSearch = e => {
       this.setState(
         {
           appliedSearch: e,
         },
-        this.setFullLogs
+        this.setFullLogs,
       );
     };
 
     makeSearch() {
-      this.setState({ appliedSearch: this.state.searchBarValue }, this.setFullLogs);
+      this.setState(
+        { appliedSearch: this.state.searchBarValue },
+        this.setFullLogs,
+      );
     }
 
     setRealTimeInterval() {
-      if (this.state.realTime) this.realTimeInterval = setInterval(() => this.setFullLogs(), 5000);
+      if (this.state.realTime)
+        this.realTimeInterval = setInterval(() => this.setFullLogs(), 5000);
       else clearInterval(this.realTimeInterval);
     }
 
     switchRealTime() {
-      this.setState({ realTime: !this.state.realTime }, this.setRealTimeInterval);
+      this.setState(
+        { realTime: !this.state.realTime },
+        this.setRealTimeInterval,
+      );
     }
 
     showToast = (color, title, time) => {
@@ -369,12 +392,23 @@ export default compose(
     exportFormatted = async () => {
       try {
         this.setState({ generatingCsv: true });
-        this.showToast('success', 'Your download should begin automatically...', 3000);
+        this.showToast(
+          'success',
+          'Your download should begin automatically...',
+          3000,
+        );
         const filters = this.buildFilters();
         await exportCsv(
-          this.state.selectedNode ? `/cluster/${this.state.selectedNode}/logs` : '/manager/logs',
-          Object.keys(filters).map((filter) => ({ name: filter, value: filters[filter] })),
-          `wazuh-${this.state.selectedNode ? `${this.state.selectedNode}-` : ''}ossec-log`
+          this.state.selectedNode
+            ? `/cluster/${this.state.selectedNode}/logs`
+            : '/manager/logs',
+          Object.keys(filters).map(filter => ({
+            name: filter,
+            value: filters[filter],
+          })),
+          `wazuh-${
+            this.state.selectedNode ? `${this.state.selectedNode}-` : ''
+          }ossec-log`,
         );
       } catch (error) {
         const options = {
@@ -410,7 +444,7 @@ export default compose(
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
                   <EuiButtonEmpty
-                    iconType="importAction"
+                    iconType='importAction'
                     onClick={this.exportFormatted}
                     isLoading={this.state.generatingCsv}
                     isDisabled={!this.state.logsList}
@@ -423,7 +457,7 @@ export default compose(
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiTextColor color="subdued">
+              <EuiTextColor color='subdued'>
                 <p>List and filter Wazuh logs.</p>
               </EuiTextColor>
             </EuiFlexItem>
@@ -433,43 +467,43 @@ export default compose(
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
                   <EuiSelect
-                    id="filterDaemon"
+                    id='filterDaemon'
                     options={daemonsOptions}
                     value={this.state.selectedDaemon}
                     onChange={this.onDaemonChange}
-                    aria-label="Filter by daemon"
+                    aria-label='Filter by daemon'
                   />
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   <EuiSelect
-                    id="filterLogLevel"
+                    id='filterLogLevel'
                     options={logLevelOptions}
                     value={this.state.logLevelSelect}
                     onChange={this.onLogLevelChange}
-                    aria-label="Filter by log level"
+                    aria-label='Filter by log level'
                   />
                 </EuiFlexItem>
                 {this.state.selectedNode && (
                   <EuiFlexItem grow={false}>
                     <EuiSelect
-                      id="selectNode"
+                      id='selectNode'
                       options={nodeList}
                       value={this.state.selectedNode}
                       onChange={this.onSelectNode}
-                      aria-label="Select node"
+                      aria-label='Select node'
                     />
                   </EuiFlexItem>
                 )}
                 <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
                   <EuiSwitch
-                    label="Descending sort"
+                    label='Descending sort'
                     checked={this.state.descendingSort}
                     onChange={this.onSortSwitchChange}
                   />
                 </EuiFlexItem>
                 <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
                   <EuiSwitch
-                    label="Realtime"
+                    label='Realtime'
                     checked={this.state.realTime}
                     onChange={() => this.switchRealTime()}
                   />
@@ -484,8 +518,8 @@ export default compose(
                 delay={500}
                 onChange={this.onSearchBarChange}
                 onSearch={this.onSearchBarSearch}
-                placeholder="Filter logs"
-                aria-label="Filter logs"
+                placeholder='Filter logs'
+                aria-label='Filter logs'
                 fullWidth
               />
             </EuiFlexItem>
@@ -510,25 +544,34 @@ export default compose(
         <div>
           {(this.state.logsList && (
             <Fragment>
-              <div className="code-block-log-viewer-container">
+              <div className='code-block-log-viewer-container'>
                 <EuiCodeBlock
-                  fontSize="s"
-                  paddingSize="m"
-                  color="dark"
-                  overflowHeight={window.innerHeight - this.HEIGHT_WITHOUT_CODE_EDITOR}
+                  fontSize='s'
+                  paddingSize='m'
+                  color='dark'
+                  overflowHeight={
+                    window.innerHeight - this.HEIGHT_WITHOUT_CODE_EDITOR
+                  }
                 >
                   {this.state.logsList}
                 </EuiCodeBlock>
               </div>
-              <EuiSpacer size="m" />
+              <EuiSpacer size='m' />
               {this.state.offset + 100 < this.state.totalItems && (
-                <EuiFlexGroup justifyContent="center">
-                  <EuiFlexItem grow={false} style={{ marginTop: 0, marginBottom: 0 }}>
+                <EuiFlexGroup justifyContent='center'>
+                  <EuiFlexItem
+                    grow={false}
+                    style={{ marginTop: 0, marginBottom: 0 }}
+                  >
                     <EuiButtonEmpty
-                      iconType="refresh"
+                      iconType='refresh'
                       isLoading={this.state.loadingLogs}
                       isDisabled={this.state.loadingLogs}
-                      onClick={!this.state.loadingLogs ? () => this.loadExtraLogs() : undefined}
+                      onClick={
+                        !this.state.loadingLogs
+                          ? () => this.loadExtraLogs()
+                          : undefined
+                      }
                     >
                       Load more logs
                     </EuiButtonEmpty>
@@ -538,9 +581,9 @@ export default compose(
             </Fragment>
           )) || (
             <EuiCallOut
-              color="warning"
-              title="No results match your search criteria."
-              iconType="alert"
+              color='warning'
+              title='No results match your search criteria.'
+              iconType='alert'
             />
           )}
         </div>
@@ -551,14 +594,14 @@ export default compose(
       return (
         <EuiPage>
           <EuiPageBody>
-            <EuiPanel paddingSize="l">
+            <EuiPanel paddingSize='l'>
               {this.header()}
               <EuiSpacer size={'m'} />
               {(!this.state.isLoading && this.logsTable()) || (
-                <EuiFlexGroup alignItems="center" justifyContent="center">
+                <EuiFlexGroup alignItems='center' justifyContent='center'>
                   <EuiFlexItem>
                     <EuiSpacer />
-                    <EuiProgress size="xs" color="primary" />
+                    <EuiProgress size='xs' color='primary' />
                   </EuiFlexItem>
                 </EuiFlexGroup>
               )}
@@ -567,5 +610,5 @@ export default compose(
         </EuiPage>
       );
     }
-  }
+  },
 );

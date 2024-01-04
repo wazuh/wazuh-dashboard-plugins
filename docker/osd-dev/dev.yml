@@ -9,7 +9,9 @@ version: '2.2'
 services:
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
-    #<<: *logging
+
+    # <<: *logging
+
     hostname: exporter-osd-${OS_VERSION}
     profiles:
       - 'server'
@@ -25,7 +27,8 @@ services:
 
   imposter:
     image: outofcoffee/imposter
-    #<<: *logging
+
+    # <<: *logging
     hostname: imposter-osd-${OS_VERSION}
     networks:
       - os-dev
@@ -38,7 +41,8 @@ services:
 
   generator:
     image: cfssl/cfssl
-    #<<: *logging
+
+    # <<: *logging
     profiles:
       - 'server'
       - 'saml'
@@ -130,7 +134,8 @@ services:
         condition: service_completed_successfully
         required: false
     image: opensearchproject/opensearch:${OS_VERSION}
-    #<<: *logging
+
+    # <<: *logging
     profiles:
       - 'server'
       - 'saml'
@@ -189,7 +194,8 @@ services:
     networks:
       - os-dev
       - mon
-    #<<: *logging
+
+    # <<: *logging
     # restart: always
     entrypoint:
       - '/bin/bash'
@@ -199,7 +205,7 @@ services:
         echo admin | filebeat keystore add username --stdin --force
         echo ${PASSWORD}| filebeat keystore add password --stdin --force
         curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
-        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.3.tar.gz | tar -xvz -C /usr/share/filebeat/module
+        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.4.tar.gz | tar -xvz -C /usr/share/filebeat/module
         # copy filebeat to preserve correct permissions without
         # affecting host filesystem
         cp /tmp/filebeat.yml /usr/share/filebeat/filebeat.yml
@@ -227,7 +233,8 @@ services:
       - devel
       - mon
     user: '1000:1000'
-    #<<: *logging
+
+    # <<: *logging
     ports:
       - ${OSD_PORT}:5601
     environment:
@@ -235,7 +242,9 @@ services:
     entrypoint: ['tail', '-f', '/dev/null']
     volumes:
       - osd_cache:/home/node/.cache
-      - '${SRC}:/home/node/kbn/plugins/wazuh'
+      - '${SRC}/main:/home/node/kbn/plugins/wazuh'
+      - '${SRC}/wazuh-core:/home/node/kbn/plugins/wazuh-core'
+      - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
@@ -279,7 +288,8 @@ services:
     profiles:
       - 'saml'
     hostname: idp
-    #<<: *logging
+
+    # <<: *logging
     networks:
       - os-dev
       - mon
@@ -308,7 +318,8 @@ services:
     profiles:
       - 'saml'
     hostname: idpsetup
-    #<<: *logging
+
+    # <<: *logging
     networks:
       - os-dev
       - mon

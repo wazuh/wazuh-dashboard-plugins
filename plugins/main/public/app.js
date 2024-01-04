@@ -20,9 +20,6 @@ require('./utils/dom-to-image.js');
 // EUI React components wrapper
 import './components';
 
-// pin-wz-menu.js
-import { changeWazuhNavLogo } from './utils/wz-logo-menu';
-
 // Font Awesome, plugin platform UI framework and others
 import './utils/fontawesome/scss/font-awesome.scss';
 
@@ -74,7 +71,6 @@ app.config([
 app.run([
   '$injector',
   function (_$injector) {
-    changeWazuhNavLogo();
     app.$injector = _$injector;
 
     // Set currentSecurity platform in Redux when app starts.
@@ -103,6 +99,7 @@ app.run(function ($rootElement) {
       <react-component name="WzMenuWrapper" props=""></react-component>
       <react-component name="WzAgentSelectorWrapper" props=""></react-component>
       <react-component name="ToastNotificationsModal" props=""></react-component>
+      <react-component name="WzUpdatesNotification" props=""></react-component>
     </div>`);
 
   // Add plugin help links as extension to plugin platform help menu

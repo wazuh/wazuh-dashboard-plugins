@@ -17,7 +17,7 @@ import {
   EuiModal,
   EuiModalHeader,
   EuiModalBody,
-  EuiModalHeaderTitle
+  EuiModalHeaderTitle,
 } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
@@ -26,13 +26,12 @@ import { AgentSelectionTable } from '../../controllers/overview/components/overv
 import { getSettingDefaultValue } from '../../../common/services/settings';
 import { AppState } from '../../react-services/app-state';
 import { getAngularModule, getDataPlugin } from '../../kibana-services';
+import { getServices } from '../../kibana-integrations/discover/kibana_services';
 
 class WzAgentSelector extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-   
-    };
+    this.state = {};
     this.store = store;
   }
 
@@ -42,18 +41,31 @@ class WzAgentSelector extends Component {
     this.location = $injector.get('$location');
   }
 
-  closeAgentModal(){
+  closeAgentModal() {
     store.dispatch(showExploreAgentModalGlobal(false));
   }
 
-  agentTableSearch(agentIdList){
+  agentTableSearch(agentIdList) {
     this.closeAgentModal();
-    if(window.location.href.includes("/agents?")){
-      this.location.search('agent', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null);
+    if (window.location.href.includes('/agents?')) {
+      const seletedAgent =
+        agentIdList?.[0] ||
+        store.getState().appStateReducers.currentAgentData.id;
+      this.location.search('agent', seletedAgent ? String(seletedAgent) : null);
       this.route.reload();
       return;
     }
-    this.location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id):null);
+
+    // This timeout is required because modifiying the filters on the filter manager changes the
+    // URL too and could cause the agentId parameter is not present.
+    setTimeout(() => {
+      this.location.search(
+        window.location.href.includes('/agents') ? 'agent' : 'agentId',
+        store.getState().appStateReducers.currentAgentData.id
+          ? String(store.getState().appStateReducers.currentAgentData.id)
+          : null,
+      );
+    }, 1);
 
     const { filterManager } = getDataPlugin().query;
     if (agentIdList && agentIdList.length) {
@@ -63,24 +75,25 @@ class WzAgentSelector extends Component {
           return x.meta.key !== 'agent.id';
         });
         const filter = {
-          "meta": {
-            "alias": null,
-            "disabled": false,
-            "key": "agent.id",
-            "negate": false,
-            "params": { "query": agentIdList[0] },
-            "type": "phrase",
-            "index": AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
+          meta: {
+            alias: null,
+            disabled: false,
+            key: 'agent.id',
+            negate: false,
+            params: { query: agentIdList[0] },
+            type: 'phrase',
+            index:
+              AppState.getCurrentPattern() || getSettingDefaultValue('pattern'),
           },
-          "query": {
-            "match": {
+          query: {
+            match: {
               'agent.id': {
                 query: agentIdList[0],
-                type: 'phrase'
-              }
-            }
+                type: 'phrase',
+              },
+            },
           },
-          "$state": { "store": "appState", "isImplicit": true},
+          $state: { store: 'appState', isImplicit: true },
         };
         agentFilters.push(filter);
         filterManager.setFilters(agentFilters);
@@ -88,13 +101,8 @@ class WzAgentSelector extends Component {
     }
   }
 
-  removeAgentsFilter(shouldUpdate){
+  removeAgentsFilter() {
     this.closeAgentModal();
-    if(window.location.href.includes("/agents?")){
-      window.location.href = "#/agents-preview"
-      this.route.reload();
-      return;
-    }
     const { filterManager } = getServices();
     const currentAppliedFilters = filterManager.filters;
     const agentFilters = currentAppliedFilters.filter(x => {
@@ -103,28 +111,39 @@ class WzAgentSelector extends Component {
     agentFilters.map(x => {
       filterManager.removeFilter(x);
     });
-    this.closeAgentModal();
+
+    setTimeout(() => {
+      // This removes the search parameter in the URL.
+      // agent is used by IT Hygiene
+      // agentId is used by the alert modules
+      ['agent', 'agentId'].forEach(param => {
+        if (this.location.search()[param]) {
+          this.location.search(param, null);
+        }
+      });
+    }, 1);
   }
 
-  getSelectedAgents(){
+  getSelectedAgents() {
     const selectedAgents = {};
     const agentId = store.getState().appStateReducers.currentAgentData.id;
-    if(agentId)
-      selectedAgents[agentId] = true;
+    if (agentId) selectedAgents[agentId] = true;
     return selectedAgents;
   }
 
   render() {
-    let modal = (<></>);
+    let modal = <></>;
 
     if (this.props.state.showExploreAgentModalGlobal) {
       modal = (
         <EuiOverlayMask>
-          <EuiOutsideClickDetector onOutsideClick={() => this.closeAgentModal()}>
+          <EuiOutsideClickDetector
+            onOutsideClick={() => this.closeAgentModal()}
+          >
             <EuiModal
-              className="wz-select-agent-modal"
+              className='wz-select-agent-modal'
               onClose={() => this.closeAgentModal()}
-              initialFocus="[name=popswitch]"
+              initialFocus='[name=popswitch]'
             >
               <EuiModalHeader>
                 <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
@@ -132,8 +151,12 @@ class WzAgentSelector extends Component {
 
               <EuiModalBody>
                 <AgentSelectionTable
-                  updateAgentSearch={agentsIdList => this.agentTableSearch(agentsIdList)}
-                  removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
+                  updateAgentSearch={agentsIdList =>
+                    this.agentTableSearch(agentsIdList)
+                  }
+                  removeAgentsFilter={shouldUpdate =>
+                    this.removeAgentsFilter(shouldUpdate)
+                  }
                   selectedAgents={this.getSelectedAgents()}
                 ></AgentSelectionTable>
               </EuiModalBody>
@@ -148,11 +171,8 @@ class WzAgentSelector extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.appStateReducers
+    state: state.appStateReducers,
   };
 };
 
-export default connect(
-  mapStateToProps,
-  null
-)(WzAgentSelector);
+export default connect(mapStateToProps, null)(WzAgentSelector);

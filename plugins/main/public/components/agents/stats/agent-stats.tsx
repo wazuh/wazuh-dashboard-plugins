@@ -18,22 +18,35 @@ import {
   EuiPage,
   EuiPageBody,
   EuiSpacer,
-  EuiText
+  EuiText,
 } from '@elastic/eui';
 
-import { withGlobalBreadcrumb, withReduxProvider, withGuard, withUserAuthorizationPrompt, withErrorBoundary } from '../../common/hocs';
+import {
+  withGlobalBreadcrumb,
+  withReduxProvider,
+  withGuard,
+  withUserAuthorizationPrompt,
+  withErrorBoundary,
+} from '../../common/hocs';
 import { compose } from 'redux';
 import { WzRequest, formatUIDate } from '../../../react-services';
 import { AgentStatTable } from './table';
-import { PromptNoActiveAgentWithoutSelect, PromptAgentFeatureVersion } from '../prompts';
+import {
+  PromptNoActiveAgentWithoutSelect,
+  PromptAgentFeatureVersion,
+} from '../prompts';
 import {
   UIErrorLog,
   UI_ERROR_SEVERITIES,
   UILogLevel,
   UIErrorSeverity,
 } from '../../../react-services/error-orchestrator/types';
-import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
+import {
+  API_NAME_AGENT_STATUS,
+  UI_LOGGER_LEVELS,
+} from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { itHygiene } from '../../../utils/applications';
 
 const tableColumns = [
   {
@@ -50,83 +63,108 @@ const tableColumns = [
     field: 'bytes',
     name: 'Bytes',
     sortable: true,
-  }
+  },
 ];
 
-const statsAgents: {title: string, field: string, render?: (value) => any}[] = [
-  {
-    title: 'Status',
-    field: 'status',
-  },
-  {
-    title: 'Buffer',
-    field: 'buffer_enabled',
-    render: (value) => value ? 'enabled' : 'disabled'
-  },
-  {
-    title: 'Message buffer',
-    field: 'msg_buffer'
-  },
-  {
-    title: 'Messages count',
-    field: 'msg_count'
-  },
-  {
-    title: 'Messages sent',
-    field: 'msg_sent'
-  },
-  {
-    title: 'Last ack',
-    field: 'last_ack',
-    render: formatUIDate
-  },
-  {
-    title: 'Last keep alive',
-    field: 'last_keepalive',
-    render: formatUIDate
-  }
-];
+const statsAgents: { title: string; field: string; render?: (value) => any }[] =
+  [
+    {
+      title: 'Status',
+      field: 'status',
+    },
+    {
+      title: 'Buffer',
+      field: 'buffer_enabled',
+      render: value => (value ? 'enabled' : 'disabled'),
+    },
+    {
+      title: 'Message buffer',
+      field: 'msg_buffer',
+    },
+    {
+      title: 'Messages count',
+      field: 'msg_count',
+    },
+    {
+      title: 'Messages sent',
+      field: 'msg_sent',
+    },
+    {
+      title: 'Last ack',
+      field: 'last_ack',
+      render: formatUIDate,
+    },
+    {
+      title: 'Last keep alive',
+      field: 'last_keepalive',
+      render: formatUIDate,
+    },
+  ];
 
 export const MainAgentStats = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb(({agent}) => [
+  withGlobalBreadcrumb(({ agent }) => [
     {
-      text: ''
-    },
-    {
-      text: 'Agents',
-      href: "#/agents-preview"
+      text: itHygiene.title,
     },
     { agent },
     {
-      text: 'Stats'
+      text: 'Stats',
     },
   ]),
-  withUserAuthorizationPrompt(({agent}) => [[
-    {action: 'agent:read', resource: `agent:id:${agent.id}`},
-    ...(agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
-  ]]),
-  withGuard(({agent}) => agent.status !== API_NAME_AGENT_STATUS.ACTIVE, PromptNoActiveAgentWithoutSelect),
-  withGuard(({agent}) => {
-    const [major, minor, patch] = agent.version.replace('Wazuh v','').split('.').map(value => parseInt(value));
-    return !(major >= 4 && minor >= 2 && patch >= 0)
-  }, () => <PromptAgentFeatureVersion version='equal or higher version than 4.2.0'/>)
+  withUserAuthorizationPrompt(({ agent }) => [
+    [
+      { action: 'agent:read', resource: `agent:id:${agent.id}` },
+      ...(agent.group || []).map(group => ({
+        action: 'agent:read',
+        resource: `agent:group:${group}`,
+      })),
+    ],
+  ]),
+  withGuard(
+    ({ agent }) => agent.status !== API_NAME_AGENT_STATUS.ACTIVE,
+    PromptNoActiveAgentWithoutSelect,
+  ),
+  withGuard(
+    ({ agent }) => {
+      const [major, minor, patch] = agent.version
+        .replace('Wazuh v', '')
+        .split('.')
+        .map(value => parseInt(value));
+      return !(major >= 4 && minor >= 2 && patch >= 0);
+    },
+    () => (
+      <PromptAgentFeatureVersion version='equal or higher version than 4.2.0' />
+    ),
+  ),
 )(AgentStats);
 
-function AgentStats({agent}){
+function AgentStats({ agent }) {
   const [loading, setLoading] = useState();
   const [dataStatLogcollector, setDataStatLogcollector] = useState({});
   const [dataStatAgent, setDataStatAgent] = useState();
   useEffect(() => {
-    (async function(){
+    (async function () {
       setLoading(true);
-      try{
-        const responseDataStatLogcollector = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/logcollector`, {});
-        const responseDataStatAgent = await WzRequest.apiReq('GET', `/agents/${agent.id}/stats/agent`, {});
-        setDataStatLogcollector(responseDataStatLogcollector?.data?.data?.affected_items?.[0] || {});
-        setDataStatAgent(responseDataStatAgent?.data?.data?.affected_items?.[0] || undefined);
-      } catch(error) {
+      try {
+        const responseDataStatLogcollector = await WzRequest.apiReq(
+          'GET',
+          `/agents/${agent.id}/stats/logcollector`,
+          {},
+        );
+        const responseDataStatAgent = await WzRequest.apiReq(
+          'GET',
+          `/agents/${agent.id}/stats/agent`,
+          {},
+        );
+        setDataStatLogcollector(
+          responseDataStatLogcollector?.data?.data?.affected_items?.[0] || {},
+        );
+        setDataStatAgent(
+          responseDataStatAgent?.data?.data?.affected_items?.[0] || undefined,
+        );
+      } catch (error) {
         const options: UIErrorLog = {
           context: `${AgentStats.name}.useEffect`,
           level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
@@ -141,18 +179,31 @@ function AgentStats({agent}){
       } finally {
         setLoading(false);
       }
-    })()
+    })();
   }, []);
   return (
     <EuiPage>
       <EuiPageBody>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiPanel paddingSize="m">
+            <EuiPanel paddingSize='m'>
               <EuiFlexGroup>
                 {statsAgents.map(stat => (
                   <EuiFlexItem key={`agent-stat-${stat.field}`} grow={false}>
-                    <EuiText>{stat.title}: {loading ? <EuiLoadingSpinner size="s" /> : <strong>{dataStatAgent !== undefined ? (stat.render ? stat.render(dataStatAgent[stat.field]) : dataStatAgent?.[stat.field]) : '-'}</strong>}</EuiText>
+                    <EuiText>
+                      {stat.title}:{' '}
+                      {loading ? (
+                        <EuiLoadingSpinner size='s' />
+                      ) : (
+                        <strong>
+                          {dataStatAgent !== undefined
+                            ? stat.render
+                              ? stat.render(dataStatAgent[stat.field])
+                              : dataStatAgent?.[stat.field]
+                            : '-'}
+                        </strong>
+                      )}
+                    </EuiText>
                   </EuiFlexItem>
                 ))}
               </EuiFlexGroup>
@@ -186,5 +237,5 @@ function AgentStats({agent}){
         </EuiFlexGroup>
       </EuiPageBody>
     </EuiPage>
-  )
+  );
 }

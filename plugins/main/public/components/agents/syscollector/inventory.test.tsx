@@ -13,7 +13,9 @@ describe('Inventory component', () => {
     };
     const wrapper = render(<SyscollectorInventory agent={agent} />);
     const networkPortsCard = wrapper.find('.euiFlexItem--flexGrow2').last();
-    const networkPortsTitle = networkPortsCard.find('.euiTitle.euiTitle--small').text();
+    const networkPortsTitle = networkPortsCard
+      .find('.euiTitle.euiTitle--small')
+      .text();
     const networkPortsColumns = networkPortsCard.find('th');
 
     // This is done because the ID of the tables changes at each execution and breaks the snapshot.
@@ -51,7 +53,9 @@ describe('Inventory component', () => {
     };
     const wrapper = render(<SyscollectorInventory agent={agent} />);
     const networkPortsCard = wrapper.find('.euiFlexItem--flexGrow2').last();
-    const networkPortsTitle = networkPortsCard.find('.euiTitle.euiTitle--small').text();
+    const networkPortsTitle = networkPortsCard
+      .find('.euiTitle.euiTitle--small')
+      .text();
     const networkPortsColumns = networkPortsCard.find('th');
 
     // This is done because the ID of the tables changes at each execution and breaks the snapshot.
@@ -88,7 +92,9 @@ describe('Inventory component', () => {
     };
     const wrapper = render(<SyscollectorInventory agent={agent} />);
     const networkPortsCard = wrapper.find('.euiFlexItem--flexGrow2').last();
-    const networkPortsTitle = networkPortsCard.find('.euiTitle.euiTitle--small').text();
+    const networkPortsTitle = networkPortsCard
+      .find('.euiTitle.euiTitle--small')
+      .text();
     const networkPortsColumns = networkPortsCard.find('th');
 
     // This is done because the ID of the tables changes at each execution and breaks the snapshot.

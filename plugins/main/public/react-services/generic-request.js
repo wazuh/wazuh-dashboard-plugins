@@ -14,7 +14,7 @@ import { AppState } from './app-state';
 import { WazuhConfig } from './wazuh-config';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
-import { getHttp, getDataPlugin } from '../kibana-services';
+import { getHttp, getDataPlugin, getWzCurrentAppID } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 
@@ -106,7 +106,7 @@ export class GenericRequest {
             !window.location.hash.includes('#/blank-screen')
           ) {
             window.location.href = getHttp().basePath.prepend(
-              '/app/wazuh#/health-check',
+              `/app/${getWzCurrentAppID()}#/health-check`,
             );
           }
         }

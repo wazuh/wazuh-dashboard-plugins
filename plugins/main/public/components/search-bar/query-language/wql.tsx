@@ -7,10 +7,7 @@ import {
   EuiCode,
 } from '@elastic/eui';
 import { tokenizer as tokenizerUQL } from './aql';
-import {
-  PLUGIN_VERSION,
-  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT,
-} from '../../../../common/constants';
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 /* UI Query language
@@ -1159,38 +1156,6 @@ export const WQL = {
             );
           }
         },
-        prepend: implicitQueryAsQL ? (
-          <EuiPopover
-            button={
-              <EuiButtonEmpty
-                onClick={() =>
-                  params.setQueryLanguageConfiguration(state => ({
-                    ...state,
-                    isOpenPopoverImplicitFilter:
-                      !state.isOpenPopoverImplicitFilter,
-                  }))
-                }
-                iconType='filter'
-              >
-                <EuiCode>{implicitQueryAsQL}</EuiCode>
-              </EuiButtonEmpty>
-            }
-            isOpen={
-              params.queryLanguage.configuration.isOpenPopoverImplicitFilter
-            }
-            closePopover={() =>
-              params.setQueryLanguageConfiguration(state => ({
-                ...state,
-                isOpenPopoverImplicitFilter: false,
-              }))
-            }
-          >
-            <EuiText>
-              Implicit query: <EuiCode>{implicitQueryAsQL}</EuiCode>
-            </EuiText>
-            <EuiText color='subdued'>This query is added to the input.</EuiText>
-          </EuiPopover>
-        ) : null,
         // Disable the focus trap in the EuiInputPopover.
         // This causes when using the Search suggestion, the suggestion popover can be closed.
         // If this is disabled, then the suggestion popover is open after a short time for this

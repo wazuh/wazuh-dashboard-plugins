@@ -31,7 +31,6 @@ export const TabNames = {
   syscollector: 'Inventory data',
   stats: 'Stats',
   api: 'API configuration',
-  extensions: 'Extensions',
   pattern: 'Index pattern',
   about: 'About',
   status: 'Status',
@@ -68,5 +67,5 @@ export const TabNames = {
   'client-buffer': 'Anti-flooding settings',
   sca: 'SCA',
   'docker-listener': 'Docker listener',
-  docker: 'Docker listener'
+  docker: 'Docker listener',
 };

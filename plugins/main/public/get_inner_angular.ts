@@ -71,7 +71,7 @@ export function initializeInnerAngularModule(name = 'app/wazuh', navigation: Nav
     initialized = true;
   }
 
-  const discoverModule = angular.module('app/discover', [
+  const discoverModule = angular.module('app/wz-discover', [
     'discoverI18n',
     'discoverPrivate',
     'discoverPromise',
@@ -88,7 +88,7 @@ export function initializeInnerAngularModule(name = 'app/wazuh', navigation: Nav
       'react',
       'ngMaterial',
       'ui.bootstrap',
-      'app/discover',
+      'app/wz-discover',
     ])
     .config(watchMultiDecorator)
     .run(registerListenEventListener)

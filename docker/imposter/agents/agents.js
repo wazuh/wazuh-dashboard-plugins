@@ -1,5 +1,13 @@
 var agentId = context.request.queryParams.agents_list;
 
+var queryParamsQ = context.request.queryParams.q;
+var queryAgentIdExist =
+  queryParamsQ !== undefined && queryParamsQ !== 'id!=000';
+if (queryAgentIdExist) {
+  agentIdarray = queryParamsQ.split('=');
+  agentId = agentIdarray[1];
+}
+
 switch (agentId) {
   case undefined:
     respond().withStatusCode(200).withFile('agents/agents.json');

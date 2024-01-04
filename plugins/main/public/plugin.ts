@@ -1,5 +1,10 @@
-import { BehaviorSubject } from 'rxjs';
-import { AppMountParameters, CoreSetup, CoreStart, AppUpdater, Plugin, PluginInitializerContext } from 'opensearch_dashboards/public';
+import {
+  AppMountParameters,
+  CoreSetup,
+  CoreStart,
+  Plugin,
+  PluginInitializerContext,
+} from 'opensearch_dashboards/public';
 import {
   setDataPlugin,
   setHttp,
@@ -15,6 +20,10 @@ import {
   setCore,
   setPlugins,
   setCookies,
+  setWzMainParams,
+  setWzCurrentAppID,
+  setWazuhCheckUpdatesPlugin,
+  setHeaderActionMenuMounter,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -27,54 +36,102 @@ import { Cookies } from 'react-cookie';
 import { AppState } from './react-services/app-state';
 import { setErrorOrchestrator } from './react-services/common-services';
 import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
-import { getThemeAssetURL, getAssetURL } from './utils/assets';
 import store from './redux/store';
 import { updateAppConfig } from './redux/actions/appConfigActions';
-import { initializeInterceptor, unregisterInterceptor } from './services/request-handler';
+import {
+  initializeInterceptor,
+  unregisterInterceptor,
+} from './services/request-handler';
+import { Applications, Categories } from './utils/applications';
+import { syncHistoryLocations } from './kibana-integrations/discover/kibana_services';
+import { euiPaletteColorBlind } from '@elastic/eui';
 
-const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';
 
-export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
-  constructor(private readonly initializerContext: PluginInitializerContext) { }
+export class WazuhPlugin
+  implements
+    Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins>
+{
+  constructor(private readonly initializerContext: PluginInitializerContext) {}
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
-  private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
   public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
-    const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
-
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState = {};
     try {
       logosInitialState = await core.http.get(`/api/logos`);
-    }
-    catch (error) {
+    } catch (error) {
       console.error('plugin.ts: Error getting logos configuration', error);
     }
 
-    //Check if user has wazuh disabled and avoid registering the application if not
-    let response = { isWazuhDisabled: 1 };
-    try {
-      response = await core.http.get('/api/check-wazuh');
-    }
-    catch (error) {
-      console.error('plugin.ts: Error checking if Wazuh is enabled', error);
-    }
+    // Redefine the mapKeys method to change the properties sent to euiPaletteColorBlind.
+    // This is a workaround until the issue reported in Opensearch Dashboards is fixed.
+    // https://github.com/opensearch-project/OpenSearch-Dashboards/issues/5422
+    // This should be reomved when the issue is fixed. Probably in OSD 2.12.0
+    plugins.charts.colors.mappedColors.mapKeys = function (
+      keys: Array<string | number>,
+    ) {
+      const configMapping = this.getConfigColorMapping();
+      const configColors = _.values(configMapping);
+      const oldColors = _.values(this._oldMap);
 
-    if (!response.isWazuhDisabled) {
+      let alreadyUsedColors: string[] = [];
+      const keysToMap: Array<string | number> = [];
+      _.each(keys, key => {
+        // If this key is mapped in the config, it's unnecessary to have it mapped here
+        if (configMapping[key as any]) {
+          delete this._mapping[key];
+          alreadyUsedColors.push(configMapping[key]);
+        }
+
+        // If this key is mapped to a color used by the config color mapping, we need to remap it
+        if (_.includes(configColors, this._mapping[key])) keysToMap.push(key);
+
+        // if key exist in oldMap, move it to mapping
+        if (this._oldMap[key]) {
+          this._mapping[key] = this._oldMap[key];
+          alreadyUsedColors.push(this._mapping[key]);
+        }
+
+        // If this key isn't mapped, we need to map it
+        if (this.get(key) == null) keysToMap.push(key);
+      });
+
+      alreadyUsedColors.push(...Object.values(this._mapping));
+      alreadyUsedColors = alreadyUsedColors.map(color =>
+        color.toLocaleLowerCase(),
+      );
+      // Choose colors from euiPaletteColorBlind and filter out any already assigned to keys
+      const colorPalette = euiPaletteColorBlind({
+        rotations: Math.ceil(
+          (keysToMap.length + alreadyUsedColors.length) / 10,
+        ),
+        direction: core.uiSettings.get('theme:darkMode') ? 'darker' : 'lighter',
+      })
+        .filter(color => !alreadyUsedColors.includes(color.toLowerCase()))
+        .slice(0, keysToMap.length);
+
+      _.merge(this._mapping, _.zipObject(keysToMap, colorPalette));
+    };
+
+    // Register the applications
+    Applications.forEach(app => {
+      const { category, id, title, redirectTo, order } = app;
       core.application.register({
-        id: `wazuh`,
-        title: 'Wazuh',
-        icon: core.http.basePath.prepend(
-          logosInitialState?.logos?.[SIDEBAR_LOGO] ?
-            getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) :
-            getThemeAssetURL('icon.svg', UI_THEME)),
+        id,
+        title,
+        order,
         mount: async (params: AppMountParameters) => {
           try {
+            // Set the dynamic redirection
+            setWzMainParams(redirectTo());
+            setWzCurrentAppID(id);
             initializeInterceptor(core);
             if (!this.initializeInnerAngular) {
-              throw Error('Wazuh plugin method initializeInnerAngular is undefined');
+              throw Error(
+                'Wazuh plugin method initializeInnerAngular is undefined',
+              );
             }
 
             // Update redux app state logos with the custom logos
@@ -83,8 +140,14 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
             }
             // hide the telemetry banner.
             // Set the flag in the telemetry saved object as the notice was seen and dismissed
-            this.hideTelemetryBanner && await this.hideTelemetryBanner();
+            this.hideTelemetryBanner && (await this.hideTelemetryBanner());
             setScopedHistory(params.history);
+            // This allows you to add the selectors to the navbar
+            setHeaderActionMenuMounter(params.setHeaderActionMenu);
+            // Discover currently uses two history instances:
+            // one from Kibana Platform and another from history package.
+            // Below function is used every time Discover app is loaded to synchronize both instances
+            syncHistoryLocations();
             // Load application bundle
             const { renderApp } = await import('./application');
             // Get start services as specified in kibana.json
@@ -92,23 +155,12 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
             setErrorOrchestrator(ErrorOrchestratorService);
             setHttp(core.http);
             setCookies(new Cookies());
-            if (!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
+            if (!AppState.checkCookies()) {
               window.location.reload();
             }
             await this.initializeInnerAngular();
             params.element.classList.add('dscAppWrapper', 'wz-app');
             const unmount = await renderApp(innerAngularName, params.element);
-            this.stateUpdater.next(() => {
-              return {
-                status: response.isWazuhDisabled,
-                category: {
-                  id: 'wazuh',
-                  label: 'Wazuh',
-                  order: 0,
-                  euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
-                }
-              }
-            })
             return () => {
               unmount();
               unregisterInterceptor();
@@ -117,26 +169,26 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
             console.debug(error);
           }
         },
-        category: {
-          id: 'wazuh',
-          label: 'Wazuh',
-          order: 0,
-          euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
-        },
-        updater$: this.stateUpdater
+        category: Categories.find(
+          ({ id: categoryID }) => categoryID === category,
+        ),
       });
-    }
+    });
     return {};
   }
-  public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
+  public start(
+    core: CoreStart,
+    plugins: AppPluginStartDependencies,
+  ): WazuhStart {
     // hide security alert
     if (plugins.securityOss) {
       plugins.securityOss.insecureCluster.hideAlert(true);
-    };
+    }
     if (plugins?.telemetry?.telemetryNotifications?.setOptedInNoticeSeen) {
       // assign to a method to hide the telemetry banner used when the app is mounted
-      this.hideTelemetryBanner = () => plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
-    };
+      this.hideTelemetryBanner = () =>
+        plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
+    }
     // we need to register the application service at setup, but to render it
     // there are some start dependencies necessary, for this reason
     // initializeInnerAngular + initializeServices are assigned at start and used
@@ -151,7 +203,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         innerAngularName,
         core,
         plugins,
-        this.initializerContext
+        this.initializerContext,
       );
       setAngularModule(module);
       this.innerAngularInitialized = true;
@@ -168,6 +220,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
     setErrorOrchestrator(ErrorOrchestratorService);
+    setWazuhCheckUpdatesPlugin(plugins.wazuhCheckUpdates);
     return {};
   }
 }

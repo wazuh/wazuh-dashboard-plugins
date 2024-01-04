@@ -28,6 +28,7 @@ jest.mock('../kibana-services', () => ({
       },
     },
   }),
+  getWzCurrentAppID: jest.fn().mockReturnValue('wz-endpoints-summary'),
   getCookies: jest.fn(),
 }));
 
@@ -71,7 +72,7 @@ describe('Generic Request', () => {
       await GenericRequest.request(null, '/api/request');
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
-      if(error instanceof Error) 
+      if(error instanceof Error)
       expect(error.message).toBe('Missing parameters');
     }
   });

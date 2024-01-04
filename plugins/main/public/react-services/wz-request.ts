@@ -15,7 +15,7 @@ import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 import IApiResponse from './interfaces/api-response.interface';
-import { getHttp } from '../kibana-services';
+import { getHttp, getWzCurrentAppID } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 
@@ -32,15 +32,28 @@ export class WzRequest {
     method,
     path,
     payload: any = null,
-    extraOptions: { shouldRetry?: boolean, checkCurrentApiIsUp?: boolean, overwriteHeaders?: any } = {
-      shouldRetry: true, 
+    extraOptions: {
+      shouldRetry?: boolean;
+      checkCurrentApiIsUp?: boolean;
+      overwriteHeaders?: any;
+    } = {
+      shouldRetry: true,
       checkCurrentApiIsUp: true,
-      overwriteHeaders: {}
-    }
+      overwriteHeaders: {},
+    },
   ) {
-    const shouldRetry = typeof extraOptions.shouldRetry === 'boolean' ? extraOptions.shouldRetry : true; 
-    const checkCurrentApiIsUp = typeof extraOptions.checkCurrentApiIsUp === 'boolean' ? extraOptions.checkCurrentApiIsUp : true;
-    const overwriteHeaders = typeof extraOptions.overwriteHeaders === 'object' ? extraOptions.overwriteHeaders : {};
+    const shouldRetry =
+      typeof extraOptions.shouldRetry === 'boolean'
+        ? extraOptions.shouldRetry
+        : true;
+    const checkCurrentApiIsUp =
+      typeof extraOptions.checkCurrentApiIsUp === 'boolean'
+        ? extraOptions.checkCurrentApiIsUp
+        : true;
+    const overwriteHeaders =
+      typeof extraOptions.overwriteHeaders === 'object'
+        ? extraOptions.overwriteHeaders
+        : {};
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -52,7 +65,11 @@ export class WzRequest {
       const url = getHttp().basePath.prepend(path);
       const options = {
         method: method,
-        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json', ...overwriteHeaders },
+        headers: {
+          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+          'content-type': 'application/json',
+          ...overwriteHeaders,
+        },
         url: url,
         data: payload,
         timeout: timeout,
@@ -67,7 +84,7 @@ export class WzRequest {
       return Promise.resolve(data);
     } catch (error) {
       //if the requests fails, we need to check if the API is down
-      if(checkCurrentApiIsUp){
+      if (checkCurrentApiIsUp) {
         const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
         if (currentApi && currentApi.id) {
           try {
@@ -76,14 +93,19 @@ export class WzRequest {
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
             if (!window.location.hash.includes('#/settings')) {
-              window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
+              window.location.href = getHttp().basePath.prepend(
+                `/app/${getWzCurrentAppID()}#/health-check`,
+              );
             }
             throw new Error(error);
           }
         }
       }
       const errorMessage =
-        (error && error.response && error.response.data && error.response.data.message) ||
+        (error &&
+          error.response &&
+          error.response.data &&
+          error.response.data.message) ||
         (error || {}).message;
       if (
         typeof errorMessage === 'string' &&
@@ -95,13 +117,17 @@ export class WzRequest {
           return this.genericReq(method, path, payload, { shouldRetry: false });
         } catch (error) {
           return ((error || {}).data || {}).message || false
-            ? Promise.reject(this.returnErrorInstance(error, error.data.message))
+            ? Promise.reject(
+                this.returnErrorInstance(error, error.data.message),
+              )
             : Promise.reject(this.returnErrorInstance(error, error.message));
         }
       }
       return errorMessage
         ? Promise.reject(this.returnErrorInstance(error, errorMessage))
-        : Promise.reject(this.returnErrorInstance(error,'Server did not respond'));
+        : Promise.reject(
+            this.returnErrorInstance(error, 'Server did not respond'),
+          );
     }
   }
 
@@ -112,10 +138,10 @@ export class WzRequest {
    * @param {Object} body Request body
    */
   static async apiReq(
-    method, 
-    path, 
-    body, 
-    options: { checkCurrentApiIsUp?: boolean } = { checkCurrentApiIsUp: true }
+    method,
+    path,
+    body,
+    options: { checkCurrentApiIsUp?: boolean } = { checkCurrentApiIsUp: true },
   ): Promise<IApiResponse<any>> {
     try {
       if (!method || !path || !body) {
@@ -123,17 +149,29 @@ export class WzRequest {
       }
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
-      const response = await this.genericReq('POST', '/api/request', requestData, options);
+      const response = await this.genericReq(
+        'POST',
+        '/api/request',
+        requestData,
+        options,
+      );
 
-      const hasFailed = (((response || {}).data || {}).data || {}).total_failed_items || 0;
+      const hasFailed =
+        (((response || {}).data || {}).data || {}).total_failed_items || 0;
 
       if (hasFailed) {
         const error =
-          ((((response.data || {}).data || {}).failed_items || [])[0] || {}).error || {};
+          ((((response.data || {}).data || {}).failed_items || [])[0] || {})
+            .error || {};
         const failed_ids =
-          ((((response.data || {}).data || {}).failed_items || [])[0] || {}).id || {};
+          ((((response.data || {}).data || {}).failed_items || [])[0] || {})
+            .id || {};
         const message = (response.data || {}).message || 'Unexpected error';
-        const errorMessage = `${message} (${error.code}) - ${error.message} ${failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''}`
+        const errorMessage = `${message} (${error.code}) - ${error.message} ${
+          failed_ids && failed_ids.length > 1
+            ? ` Affected ids: ${failed_ids} `
+            : ''
+        }`;
         return Promise.reject(this.returnErrorInstance(null, errorMessage));
       }
       return Promise.resolve(response);
@@ -167,15 +205,15 @@ export class WzRequest {
 
   /**
    * Customize message and return an error object
-   * @param error 
-   * @param message 
+   * @param error
+   * @param message
    * @returns error
    */
-  static returnErrorInstance(error: any, message: string | undefined){
-    if(!error || typeof error === 'string'){
+  static returnErrorInstance(error: any, message: string | undefined) {
+    if (!error || typeof error === 'string') {
       return new Error(message || error);
     }
-    error.message = message
-    return error
+    error.message = message;
+    return error;
   }
 }

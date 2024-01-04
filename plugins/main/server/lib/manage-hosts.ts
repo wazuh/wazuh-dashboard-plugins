@@ -74,7 +74,10 @@ export class ManageHosts {
       createDataDirectoryIfNotExists();
       createDataDirectoryIfNotExists('config');
       if (!fs.existsSync(WAZUH_DATA_CONFIG_APP_PATH)) {
-        await fs.writeFileSync(this.file, this.initialConfig, { encoding: 'utf8', mode: 0o600 });
+        await fs.writeFileSync(this.file, this.initialConfig, {
+          encoding: 'utf8',
+          mode: 0o600,
+        });
       }
       const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
       this.busy = false;
@@ -135,7 +138,7 @@ export class ManageHosts {
       const host = hosts.filter(h => {
         return Object.keys(h)[0] == id;
       });
-      if(host && !host.length){
+      if (host && !host.length) {
         throw new Error('Selected API is no longer available in wazuh.yml');
       }
       const key = Object.keys(host[0])[0];
@@ -172,14 +175,13 @@ export class ManageHosts {
           username: host.api_username,
           password: this.decodeApiPassword(host.api_password),
           cluster_info: host.cluster_info,
-          extensions: host.extensions
         };
         entries.push(api);
       });
       log(
         'manage-hosts:transformIndexedApis',
         'Transforming index API schedule to wazuh.yml',
-        'debug'
+        'debug',
       );
     } catch (error) {
       log('manage-hosts:transformIndexedApis', error.message || error);
@@ -215,7 +217,7 @@ export class ManageHosts {
       log(
         'manage-hosts:cleanExistingHosts',
         'Preventing add existings hosts',
-        'debug'
+        'debug',
       );
       return cleanHosts;
     } catch (error) {
@@ -275,12 +277,12 @@ export class ManageHosts {
         if (lastHost) {
           const lastHostObject = this.composeHost(
             lastHost[Object.keys(lastHost)[0]],
-            Object.keys(lastHost)[0]
+            Object.keys(lastHost)[0],
           );
           const regex = this.composeRegex(lastHost);
           const replace = data.replace(
             regex,
-            `\n${lastHostObject}\n${compose}\n`
+            `\n${lastHostObject}\n${compose}\n`,
           );
           await fs.writeFileSync(this.file, replace, 'utf8');
         }
@@ -289,7 +291,6 @@ export class ManageHosts {
       this.updateRegistry.migrateToRegistry(
         id,
         host.cluster_info,
-        host.extensions
       );
       log('manage-hosts:addHost', `Host ${id} was properly added`, 'debug');
       return id;
@@ -327,7 +328,7 @@ export class ManageHosts {
           data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
           const clearHosts = data.replace(
             new RegExp(`hosts:\\s*[\\n\\r]`, 'gm'),
-            ''
+            '',
           );
           await fs.writeFileSync(this.file, clearHosts, 'utf8');
         }
@@ -336,7 +337,7 @@ export class ManageHosts {
       log(
         'manage-hosts:deleteHost',
         `Host ${req.params.id} was properly deleted`,
-        'debug'
+        'debug',
       );
       return true;
     } catch (error) {
@@ -374,7 +375,7 @@ export class ManageHosts {
       log(
         'manage-hosts:updateHost',
         `Host ${id} was properly updated`,
-        'debug'
+        'debug',
       );
       return true;
     } catch (error) {
