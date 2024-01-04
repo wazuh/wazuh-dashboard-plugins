@@ -14,11 +14,11 @@ interface AgentsByStatusCardProps {
 }
 
 const DonutCard = ({
-  title,
-  description,
+  title = '',
+  description = '',
   betaBadgeLabel,
-  noDataTitle,
-  noDataMessage,
+  noDataTitle = 'No results',
+  noDataMessage = 'No results were found',
   getInfo,
   onClickLabel,
 }: AgentsByStatusCardProps) => {
@@ -49,8 +49,8 @@ const DonutCard = ({
                 ...item,
                 onClick: () => handleClick(item),
               }))}
-              noDataTitle={noDataTitle ?? 'No results'}
-              noDataMessage={noDataMessage ?? 'No results were found.'}
+              noDataTitle={noDataTitle}
+              noDataMessage={noDataMessage}
             />
           </EuiFlexItem>
         </EuiFlexGroup>

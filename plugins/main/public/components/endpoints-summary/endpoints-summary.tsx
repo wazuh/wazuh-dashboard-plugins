@@ -59,6 +59,7 @@ export const EndpointsSummary = compose(
       this.filterAgentByStatus = this.filterAgentByStatus.bind(this);
       this.filterAgentByOS = this.filterAgentByOS.bind(this);
       this.filterAgentByGroup = this.filterAgentByGroup.bind(this);
+      this.filterByOutdatedAgent = this.filterByOutdatedAgent.bind(this);
     }
 
     async componentDidMount() {
@@ -112,6 +113,16 @@ export const EndpointsSummary = compose(
         });
     }
 
+    filterByOutdatedAgent(outdatedAgents: any) {
+      const ids: string[] = outdatedAgents
+        .map((agent: any) => `id=${agent.id}`)
+        .join(' or ');
+      this._isMount &&
+        this.setState({
+          agentTableFilters: { q: `id!=000;${ids}` },
+        });
+    }
+
     render() {
       return (
         <EuiPage className='flex-column'>
@@ -132,7 +143,7 @@ export const EndpointsSummary = compose(
                 onClickLabel={this.filterAgentByGroup}
                 getInfo={getAgentsByGroup}
               />
-              <OutdatedAgentsCard />
+              <OutdatedAgentsCard onClick={this.filterByOutdatedAgent} />
             </EuiFlexGroup>
             <EuiSpacer size='m' />
             <WzReduxProvider>
