@@ -16,8 +16,6 @@ import {
   WAZUH_DATA_ABSOLUTE_PATH,
   WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_RAW_PATH,
 } from '../../../common/constants';
 import { execSync } from 'child_process';
 import fs from 'fs';
@@ -28,6 +26,9 @@ const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
 const context = {
   wazuh: {},
+  wazuh_core: {
+    updateConfigurationFile: { updateConfiguration: jest.fn() },
+  },
 };
 
 const enhanceWithContext = (fn: (...args: any[]) => any) =>
@@ -39,9 +40,6 @@ beforeAll(async () => {
   createDataDirectoryIfNotExists();
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
   createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
-
-  // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/logs directory.
-  createDirectoryIfNotExists(WAZUH_DATA_LOGS_DIRECTORY_PATH);
 
   // Create server
   const config = {
@@ -159,9 +157,9 @@ hosts:
   });
 
   it.each`
-    settings                                                      | responseStatusCode
-    ${{ pattern: 'test-alerts-groupA-*' }}                        | ${200}
-    ${{ pattern: 'test-alerts-groupA-*', 'logs.level': 'debug' }} | ${200}
+    settings                                               | responseStatusCode
+    ${{ pattern: 'test-alerts-groupA-*' }}                 | ${200}
+    ${{ pattern: 'test-alerts-groupA-*', timeout: 15000 }} | ${200}
   `(
     `Update the plugin configuration: $settings. PUT /utils/configuration - $responseStatusCode`,
     async ({ responseStatusCode, settings }) => {
@@ -186,7 +184,7 @@ hosts:
     },
     {
       testTitle: 'Update the plugin configuration',
-      settings: { pattern: 'test-alerts-groupA-*', 'logs.level': 'debug' },
+      settings: { pattern: 'test-alerts-groupA-*', timeout: 15000 },
       responseStatusCode: 200,
       responseBodyMessage: null,
     },
@@ -208,7 +206,7 @@ hosts:
       testTitle: 'Bad request, unknown setting',
       settings: {
         'unknown.setting': 'test-alerts-groupA-*',
-        'logs.level': 'debug',
+        timeout: 15000,
       },
       responseStatusCode: 400,
       responseBodyMessage:
@@ -381,9 +379,6 @@ hosts:
     ${'ip.ignore'}                      | ${['test', 'test#']}                                             | ${400}             | ${'[request body.ip.ignore.1]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'ip.selector'}                    | ${true}                                                          | ${200}             | ${null}
     ${'ip.selector'}                    | ${''}                                                            | ${400}             | ${'[request body.ip.selector]: expected value of type [boolean] but got [string]'}
-    ${'logs.level'}                     | ${'info'}                                                        | ${200}             | ${null}
-    ${'logs.level'}                     | ${'debug'}                                                       | ${200}             | ${null}
-    ${'logs.level'}                     | ${''}                                                            | ${400}             | ${'[request body.logs.level]: types that failed validation:\n- [request body.logs.level.0]: expected value to equal [info]\n- [request body.logs.level.1]: expected value to equal [debug]'}
     ${'pattern'}                        | ${'test'}                                                        | ${200}             | ${null}
     ${'pattern'}                        | ${'test*'}                                                       | ${200}             | ${null}
     ${'pattern'}                        | ${''}                                                            | ${400}             | ${'[request body.pattern]: Value can not be empty.'}
@@ -681,28 +676,4 @@ hosts:
       }
     },
   );
-});
-
-describe('[endpoint] GET /utils/logs', () => {
-  beforeAll(() => {
-    // Create the configuration file with custom content
-    const fileContent = `---
-{"date":"2022-09-20T08:36:16.688Z","level":"info","location":"initialize","message":"Kibana index: .kibana"}
-{"date":"2022-09-20T08:36:16.689Z","level":"info","location":"initialize","message":"App revision: 4400"}
-`;
-    fs.writeFileSync(WAZUH_DATA_LOGS_RAW_PATH, fileContent, 'utf8');
-  });
-
-  afterAll(() => {
-    // Remove the configuration file
-    fs.unlinkSync(WAZUH_DATA_LOGS_RAW_PATH);
-  });
-
-  it(`Get plugin logs. GET /utils/logs`, async () => {
-    const response = await supertest(innerServer.listener)
-      .get('/utils/logs')
-      .expect(200);
-
-    expect(response.body.lastLogs).toBeDefined();
-  });
 });

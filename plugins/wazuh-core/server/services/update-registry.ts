@@ -10,13 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 import fs from 'fs';
-import { log } from './logger';
 import { WAZUH_DATA_CONFIG_REGISTRY_PATH } from '../../common/constants';
+import { Logger } from 'opensearch-dashboards/server';
 
+/**
+ * This service updates the registry file
+ */
 export class UpdateRegistry {
   busy: boolean;
   file: string;
-  constructor() {
+  constructor(private logger: Logger) {
     this.busy = false;
     this.file = WAZUH_DATA_CONFIG_REGISTRY_PATH;
   }
@@ -26,11 +29,11 @@ export class UpdateRegistry {
    */
   async readContent() {
     try {
-      log('update-registry:readContent', 'Reading wazuh-registry.json content', 'debug');
+      this.logger.debug('Reading registry file');
       const content = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       return JSON.parse(content);
     } catch (error) {
-      log('update-registry:readContent', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -40,11 +43,11 @@ export class UpdateRegistry {
    */
   async getHosts() {
     try {
-      log('update-registry:getHosts', 'Getting hosts from registry', 'debug');
+      this.logger.debug('Getting hosts from registry', 'debug');
       const content = await this.readContent();
       return content.hosts || {};
     } catch (error) {
-      log('update-registry:getHosts', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -59,7 +62,7 @@ export class UpdateRegistry {
       const hosts = await this.getHosts();
       return hosts.id || {};
     } catch (error) {
-      log('update-registry:getClusterInfoByAPI', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -70,7 +73,7 @@ export class UpdateRegistry {
    */
   async writeContent(content) {
     try {
-      log('update-registry:writeContent', 'Writting wazuh-registry.json content', 'debug');
+      this.logger.debug('Writting wazuh-registry.json content');
       if (this.busy) {
         throw new Error('Another process is updating the registry file');
       }
@@ -78,7 +81,7 @@ export class UpdateRegistry {
       await fs.writeFileSync(this.file, JSON.stringify(content));
       this.busy = false;
     } catch (error) {
-      log('update-registry:writeContent', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -92,7 +95,7 @@ export class UpdateRegistry {
     try {
       return Object.keys(hosts).includes(id);
     } catch (error) {
-      log('update-registry:checkHost', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -106,14 +109,15 @@ export class UpdateRegistry {
   async migrateToRegistry(id, clusterInfo, clusterExtensions) {
     try {
       const content = await this.readContent();
-      if (!Object.keys(content).includes('hosts')) Object.assign(content, { hosts: {} });
+      if (!Object.keys(content).includes('hosts'))
+        Object.assign(content, { hosts: {} });
       const info = { cluster_info: clusterInfo, extensions: clusterExtensions };
       content.hosts[id] = info;
       await this.writeContent(content);
-      log('update-registry:migrateToRegistry', `API ${id} was properly migrated`, 'debug');
+      this.logger.info(`API ${id} was properly migrated`);
       return info;
     } catch (error) {
-      log('update-registry:migrateToRegistry', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -130,14 +134,10 @@ export class UpdateRegistry {
       if (!content.hosts[id]) content.hosts[id] = {};
       content.hosts[id].cluster_info = clusterInfo;
       await this.writeContent(content);
-      log(
-        'update-registry:updateClusterInfo',
-        `API ${id} information was properly updated`,
-        'debug'
-      );
+      this.logger.debug(`API ${id} information was properly updated`);
       return id;
     } catch (error) {
-      log('update-registry:updateClusterInfo', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -150,16 +150,12 @@ export class UpdateRegistry {
   async updateAPIExtensions(id, extensions) {
     try {
       const content = await this.readContent();
-      if(content.hosts[id]) content.hosts[id].extensions = extensions;
+      if (content.hosts[id]) content.hosts[id].extensions = extensions;
       await this.writeContent(content);
-      log(
-        'update-registry:updateAPIExtensions',
-        `API ${id} extensions were properly updated`,
-        'debug'
-      );
+      this.logger.info(`API ${id} extensions were properly updated`);
       return id;
     } catch (error) {
-      log('update-registry:updateAPIHostname', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -170,12 +166,12 @@ export class UpdateRegistry {
    */
   async removeHostEntries(ids) {
     try {
-      log('update-registry:removeHostEntry', 'Removing entry', 'debug');
+      this.logger.debug('Removing entry');
       const content = await this.readContent();
       ids.forEach(id => delete content.hosts[id]);
       await this.writeContent(content);
     } catch (error) {
-      log('update-registry:removeHostEntry', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -186,7 +182,7 @@ export class UpdateRegistry {
    */
   async removeOrphanEntries(hosts) {
     try {
-      log('update-registry:removeOrphanEntries', 'Checking orphan registry entries', 'debug');
+      this.logger.debug('Checking orphan registry entries');
       const entries = await this.getHosts();
       const hostsKeys = hosts.map(h => {
         return h.id;
@@ -197,7 +193,7 @@ export class UpdateRegistry {
       });
       await this.removeHostEntries(diff);
     } catch (error) {
-      log('update-registry:removeOrphanEntries', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -212,7 +208,7 @@ export class UpdateRegistry {
       const hosts = await this.getHosts();
       return hosts[id] ? hosts[id].token || null : null;
     } catch (error) {
-      log('update-registry:getTokenById', error.message || error);
+      this.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -229,10 +225,10 @@ export class UpdateRegistry {
       if (!content.hosts[id]) content.hosts[id] = {};
       content.hosts[id].token = token;
       await this.writeContent(content);
-      log('update-registry:updateToken', `API ${id} information was properly updated`, 'debug');
+      this.logger.info(`API ${id} information was properly updated`);
       return id;
     } catch (error) {
-      log('update-registry:updateToken', error.message || error);
+      this.logger.debug(error.message || error);
       return Promise.reject(error);
     }
   }

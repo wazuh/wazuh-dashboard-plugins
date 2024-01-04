@@ -151,9 +151,6 @@ describe('[settings] Input validation', () => {
     ${'ip.ignore'}                      | ${['test', 'test#']}                                                   | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'ip.selector'}                    | ${true}                                                                | ${undefined}
     ${'ip.selector'}                    | ${''}                                                                  | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'logs.level'}                     | ${'info'}                                                              | ${undefined}
-    ${'logs.level'}                     | ${'debug'}                                                             | ${undefined}
-    ${'logs.level'}                     | ${''}                                                                  | ${'Invalid value. Allowed values: info, debug.'}
     ${'pattern'}                        | ${'test'}                                                              | ${undefined}
     ${'pattern'}                        | ${'test*'}                                                             | ${undefined}
     ${'pattern'}                        | ${''}                                                                  | ${'Value can not be empty.'}

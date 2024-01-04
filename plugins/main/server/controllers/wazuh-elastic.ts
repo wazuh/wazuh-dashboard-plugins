@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { ErrorResponse } from '../lib/error-response';
-import { log } from '../lib/logger';
 import { getConfiguration } from '../lib/get-configuration';
 import {
   AgentsVisualizations,
@@ -25,13 +24,10 @@ import {
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
 } from '../../common/constants';
 import jwtDecode from 'jwt-decode';
-import { ManageHosts } from '../lib/manage-hosts';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
   OpenSearchDashboardsResponseFactory,
-  SavedObject,
-  SavedObjectsFindResponse,
 } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
 import {
@@ -43,10 +39,8 @@ import { WAZUH_INDEXER_NAME } from '../../common/constants';
 
 export class WazuhElasticCtrl {
   wzSampleAlertsIndexPrefix: string;
-  manageHosts: ManageHosts;
   constructor() {
     this.wzSampleAlertsIndexPrefix = this.getSampleAlertPrefix();
-    this.manageHosts = new ManageHosts();
   }
 
   /**
@@ -125,14 +119,12 @@ export class WazuhElasticCtrl {
         item = lastChar === '*' ? item.slice(0, -1) : item;
         return item.includes(pattern) || pattern.includes(item);
       });
-      log(
-        'wazuh-elastic:getTemplate',
+      context.wazuh.logger.debug(
         `Template is valid: ${
           isIncluded && Array.isArray(isIncluded) && isIncluded.length
             ? 'yes'
             : 'no'
         }`,
-        'debug',
       );
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? response.ok({
@@ -150,7 +142,7 @@ export class WazuhElasticCtrl {
             },
           });
     } catch (error) {
-      log('wazuh-elastic:getTemplate', error.message || error);
+      context.wazuh.logger.error(error.message || error);
       return ErrorResponse(
         `Could not retrieve templates from ${WAZUH_INDEXER_NAME} due to ${
           error.message || error
@@ -254,7 +246,7 @@ export class WazuhElasticCtrl {
             },
           });
     } catch (error) {
-      log('wazuh-elastic:getFieldTop', error.message || error);
+      context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 4004, 500, response);
     }
   }
@@ -333,7 +325,7 @@ export class WazuhElasticCtrl {
         },
       });
     } catch (error) {
-      log('wazuh-elastic:getCurrentPlatform', error.message || error);
+      context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 4011, 500, response);
     }
   }
@@ -343,85 +335,68 @@ export class WazuhElasticCtrl {
    * @param {Array<Object>} app_objects Object containing raw visualizations.
    * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
    */
-  async buildVisualizationsRaw(app_objects, id, namespace = false) {
-    try {
-      const config = getConfiguration();
-      let monitoringPattern =
-        (config || {})['wazuh.monitoring.pattern'] ||
-        getSettingDefaultValue('wazuh.monitoring.pattern');
-      log(
-        'wazuh-elastic:buildVisualizationsRaw',
-        `Building ${app_objects.length} visualizations`,
-        'debug',
-      );
-      log(
-        'wazuh-elastic:buildVisualizationsRaw',
-        `Index pattern ID: ${id}`,
-        'debug',
-      );
-      const visArray = [];
-      let aux_source, bulk_content;
-      for (let element of app_objects) {
-        aux_source = JSON.parse(JSON.stringify(element._source));
+  buildVisualizationsRaw(context, app_objects, id, namespace = false) {
+    const config = getConfiguration();
+    let monitoringPattern =
+      (config || {})['wazuh.monitoring.pattern'] ||
+      getSettingDefaultValue('wazuh.monitoring.pattern');
+    context.wazuh.logger.debug(`Building ${app_objects.length} visualizations`);
+    context.wazuh.logger.debug(`Index pattern ID: ${id}`);
+    const visArray = [];
+    let aux_source, bulk_content;
+    for (let element of app_objects) {
+      aux_source = JSON.parse(JSON.stringify(element._source));
 
-        // Replace index-pattern for visualizations
-        if (
-          aux_source &&
-          aux_source.kibanaSavedObjectMeta &&
-          aux_source.kibanaSavedObjectMeta.searchSourceJSON &&
-          typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'
-        ) {
-          const defaultStr = aux_source.kibanaSavedObjectMeta.searchSourceJSON;
+      // Replace index-pattern for visualizations
+      if (
+        aux_source &&
+        aux_source.kibanaSavedObjectMeta &&
+        aux_source.kibanaSavedObjectMeta.searchSourceJSON &&
+        typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'
+      ) {
+        const defaultStr = aux_source.kibanaSavedObjectMeta.searchSourceJSON;
 
-          const isMonitoring = defaultStr.includes('wazuh-monitoring');
-          if (isMonitoring) {
-            if (namespace && namespace !== 'default') {
-              if (
-                monitoringPattern.includes(namespace) &&
-                monitoringPattern.includes('index-pattern:')
-              ) {
-                monitoringPattern =
-                  monitoringPattern.split('index-pattern:')[1];
-              }
+        const isMonitoring = defaultStr.includes('wazuh-monitoring');
+        if (isMonitoring) {
+          if (namespace && namespace !== 'default') {
+            if (
+              monitoringPattern.includes(namespace) &&
+              monitoringPattern.includes('index-pattern:')
+            ) {
+              monitoringPattern = monitoringPattern.split('index-pattern:')[1];
             }
-            aux_source.kibanaSavedObjectMeta.searchSourceJSON =
-              defaultStr.replace(
-                /wazuh-monitoring/g,
-                monitoringPattern[monitoringPattern.length - 1] === '*' ||
-                  (namespace && namespace !== 'default')
-                  ? monitoringPattern
-                  : monitoringPattern + '*',
-              );
-          } else {
-            aux_source.kibanaSavedObjectMeta.searchSourceJSON =
-              defaultStr.replace(/wazuh-alerts/g, id);
           }
+          aux_source.kibanaSavedObjectMeta.searchSourceJSON =
+            defaultStr.replace(
+              /wazuh-monitoring/g,
+              monitoringPattern[monitoringPattern.length - 1] === '*' ||
+                (namespace && namespace !== 'default')
+                ? monitoringPattern
+                : monitoringPattern + '*',
+            );
+        } else {
+          aux_source.kibanaSavedObjectMeta.searchSourceJSON =
+            defaultStr.replace(/wazuh-alerts/g, id);
         }
-
-        // Replace index-pattern for selector visualizations
-        if (typeof (aux_source || {}).visState === 'string') {
-          aux_source.visState = aux_source.visState.replace(
-            /wazuh-alerts/g,
-            id,
-          );
-        }
-
-        // Bulk source
-        bulk_content = {};
-        bulk_content[element._type] = aux_source;
-
-        visArray.push({
-          attributes: bulk_content.visualization,
-          type: element._type,
-          id: element._id,
-          _version: bulk_content.visualization.version,
-        });
       }
-      return visArray;
-    } catch (error) {
-      log('wazuh-elastic:buildVisualizationsRaw', error.message || error);
-      return Promise.reject(error);
+
+      // Replace index-pattern for selector visualizations
+      if (typeof (aux_source || {}).visState === 'string') {
+        aux_source.visState = aux_source.visState.replace(/wazuh-alerts/g, id);
+      }
+
+      // Bulk source
+      bulk_content = {};
+      bulk_content[element._type] = aux_source;
+
+      visArray.push({
+        attributes: bulk_content.visualization,
+        type: element._type,
+        id: element._id,
+        _version: bulk_content.visualization.version,
+      });
     }
+    return visArray;
   }
 
   /**
@@ -433,6 +408,7 @@ export class WazuhElasticCtrl {
    * @param {String} master_node Master node name. Eg: 'node01'
    */
   buildClusterVisualizationsRaw(
+    context,
     app_objects,
     id,
     nodes = [],
@@ -493,10 +469,7 @@ export class WazuhElasticCtrl {
 
       return visArray;
     } catch (error) {
-      log(
-        'wazuh-elastic:buildClusterVisualizationsRaw',
-        error.message || error,
-      );
+      context.wazuh.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
@@ -539,12 +512,11 @@ export class WazuhElasticCtrl {
           },
         });
       }
-      log(
-        'wazuh-elastic:createVis',
+      context.wazuh.logger.debug(
         `${tabPrefix}[${tabSufix}] with index pattern ${request.params.pattern}`,
-        'debug',
       );
       const raw = await this.buildVisualizationsRaw(
+        context,
         file,
         request.params.pattern,
       );
@@ -552,7 +524,7 @@ export class WazuhElasticCtrl {
         body: { acknowledge: true, raw: raw },
       });
     } catch (error) {
-      log('wazuh-elastic:createVis', error.message || error);
+      context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 4007, 500, response);
     }
   }
@@ -596,6 +568,7 @@ export class WazuhElasticCtrl {
       const { id: patternID, title: patternName } = request.body.pattern;
 
       const raw = await this.buildClusterVisualizationsRaw(
+        context,
         file,
         patternID,
         nodes,
@@ -608,7 +581,7 @@ export class WazuhElasticCtrl {
         body: { acknowledge: true, raw: raw },
       });
     } catch (error) {
-      log('wazuh-elastic:createClusterVis', error.message || error);
+      context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 4009, 500, response);
     }
   }
@@ -673,8 +646,7 @@ export class WazuhElasticCtrl {
         body: { index: sampleAlertsIndex, exists: existsSampleIndex.body },
       });
     } catch (error) {
-      log(
-        'wazuh-elastic:haveSampleAlertsOfCategory',
+      context.wazuh.logger.error(
         `Error checking if there are sample alerts indices: ${
           error.message || error
         }`,
@@ -795,28 +767,21 @@ export class WazuhElasticCtrl {
           index: sampleAlertsIndex,
           body: configuration,
         });
-        log(
-          'wazuh-elastic:createSampleAlerts',
-          `Created ${sampleAlertsIndex} index`,
-          'debug',
-        );
+        context.wazuh.logger.info(`Index ${sampleAlertsIndex} created`);
       }
 
       await context.core.opensearch.client.asCurrentUser.bulk({
         index: sampleAlertsIndex,
         body: bulk,
       });
-      log(
-        'wazuh-elastic:createSampleAlerts',
+      context.wazuh.logger.info(
         `Added sample alerts to ${sampleAlertsIndex} index`,
-        'debug',
       );
       return response.ok({
         body: { index: sampleAlertsIndex, alertCount: sampleAlerts.length },
       });
     } catch (error) {
-      log(
-        'wazuh-elastic:createSampleAlerts',
+      context.wazuh.logger.error(
         `Error adding sample alerts to ${sampleAlertsIndex} index: ${
           error.message || error
         }`,
@@ -887,11 +852,7 @@ export class WazuhElasticCtrl {
         await context.core.opensearch.client.asCurrentUser.indices.delete({
           index: sampleAlertsIndex,
         });
-        log(
-          'wazuh-elastic:deleteSampleAlerts',
-          `Deleted ${sampleAlertsIndex} index`,
-          'debug',
-        );
+        context.wazuh.logger.info(`Deleted ${sampleAlertsIndex} index`);
         return response.ok({
           body: { result: 'deleted', index: sampleAlertsIndex },
         });
@@ -904,8 +865,7 @@ export class WazuhElasticCtrl {
         );
       }
     } catch (error) {
-      log(
-        'wazuh-elastic:deleteSampleAlerts',
+      context.wazuh.logger.error(
         `Error deleting sample alerts of ${sampleAlertsIndex} index: ${
           error.message || error
         }`,
@@ -929,7 +889,7 @@ export class WazuhElasticCtrl {
         body: data.body,
       });
     } catch (error) {
-      log('wazuh-elastic:alerts', error.message || error);
+      context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 4010, 500, response);
     }
   }
@@ -954,7 +914,7 @@ export class WazuhElasticCtrl {
         body: existIndex.body,
       });
     } catch (error) {
-      log('wazuh-elastic:existsStatisticsIndices', error.message || error);
+      context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 1000, 500, response);
     }
   }

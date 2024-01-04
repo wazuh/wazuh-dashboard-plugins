@@ -29,13 +29,15 @@ import {
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { AppState } from '../../../react-services/app-state';
-import { API_USER_STATUS_RUN_AS } from '../../../../server/lib/cache-api-user-has-run-as';
 import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
+import {
+  getWazuhCheckUpdatesPlugin,
+  getWazuhCorePlugin,
+} from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
 import { formatUIDate } from '../../../react-services/time-service';
 
@@ -75,9 +77,8 @@ export const ApiTable = compose(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error checking available updates: ${
-              error.message || error
-            }`,
+            title: `Error checking available updates: ${error.message || error
+              }`,
           },
         };
 
@@ -126,8 +127,8 @@ export const ApiTable = compose(
               typeof error === 'string'
                 ? error
                 : (error || {}).message ||
-                  ((error || {}).data || {}).message ||
-                  'Wazuh is not reachable';
+                ((error || {}).data || {}).message ||
+                'Wazuh is not reachable';
             const status = code === 3099 ? 'down' : 'unknown';
             entries[idx].status = { status, downReason };
             if (entries[idx].id === this.props.currentDefault) {
@@ -173,8 +174,8 @@ export const ApiTable = compose(
             typeof error === 'string'
               ? error
               : (error || {}).message ||
-                ((error || {}).data || {}).message ||
-                'Wazuh is not reachable';
+              ((error || {}).data || {}).message ||
+              'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
           throw error;
@@ -192,9 +193,8 @@ export const ApiTable = compose(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error checking manager connection: ${
-              error.message || error
-            }`,
+            title: `Error checking manager connection: ${error.message || error
+              }`,
           },
         };
 
@@ -375,6 +375,7 @@ export const ApiTable = compose(
                   <EuiFlexItem grow={false}>
                     <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
                       {content}
+
                     </EuiHealth>
                   </EuiFlexItem>
                   {!item ? (
@@ -447,14 +448,16 @@ export const ApiTable = compose(
           sortable: true,
           width: '80px',
           render: value => {
-            return value === API_USER_STATUS_RUN_AS.ENABLED ? (
+            return value ===
+              getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ENABLED ? (
               <EuiToolTip
                 position='top'
                 content='The configured API user uses the authentication context.'
               >
                 <EuiIcon type='check' />
               </EuiToolTip>
-            ) : value === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED ? (
+            ) : value ===
+              getWazuhCorePlugin().API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED ? (
               <EuiToolTip
                 position='top'
                 content='The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in the host configuration.'
@@ -554,10 +557,10 @@ export const ApiTable = compose(
                       content={
                         this.state.availableUpdates?.last_check_date
                           ? formatUIDate(
-                              new Date(
-                                this.state.availableUpdates.last_check_date,
-                              ),
-                            )
+                            new Date(
+                              this.state.availableUpdates.last_check_date,
+                            ),
+                          )
                           : '-'
                       }
                     >

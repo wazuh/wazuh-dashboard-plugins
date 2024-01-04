@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import store from "../redux/store";
-import { updateAppConfig } from "../redux/actions/appConfigActions";
+import store from '../redux/store';
+import { updateAppConfig } from '../redux/actions/appConfigActions';
 
 export class WazuhConfig {
   constructor() {
@@ -19,7 +19,6 @@ export class WazuhConfig {
       return WazuhConfig.instance;
     }
     WazuhConfig.instance = this;
-
 
     return this;
   }
@@ -29,7 +28,7 @@ export class WazuhConfig {
    * @param {Object} cfg
    */
   setConfig(cfg) {
-    store.dispatch(updateAppConfig({...cfg}));
+    store.dispatch(updateAppConfig({ ...cfg }));
   }
 
   /**
@@ -37,12 +36,5 @@ export class WazuhConfig {
    */
   getConfig() {
     return store.getState().appConfig.data;
-  }
-
-  /**
-   * Returns true if debug level is enabled, otherwise it returns false.
-   */
-  isDebug() {
-    return ((this.getConfig() || {})['logs.level'] || false) === 'debug';
   }
 }

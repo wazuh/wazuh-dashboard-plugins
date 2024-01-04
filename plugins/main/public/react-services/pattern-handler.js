@@ -26,8 +26,12 @@ export class PatternHandler {
 
       const defaultPatterns = [pattern];
       const selectedPattern = AppState.getCurrentPattern();
-      if (selectedPattern && selectedPattern !== pattern) defaultPatterns.push(selectedPattern);
-      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(defaultPatterns, origin);
+      if (selectedPattern && selectedPattern !== pattern)
+        defaultPatterns.push(selectedPattern);
+      let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(
+        defaultPatterns,
+        origin,
+      );
 
       return patternList;
     } catch (error) {
@@ -54,11 +58,11 @@ export class PatternHandler {
    * Refresh current pattern for the given pattern
    * @param newFields
    */
-  static async refreshIndexPattern(newFields = null) {
+  static async refreshIndexPattern() {
     try {
       const currentPattern = AppState.getCurrentPattern();
       const pattern = await getDataPlugin().indexPatterns.get(currentPattern);
-      await SavedObject.refreshIndexPattern(pattern, newFields);
+      await SavedObject.refreshIndexPattern(pattern);
     } catch (error) {
       throw new Error(error);
     }

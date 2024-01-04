@@ -52,6 +52,9 @@ export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 
+// Wazuh fim
+export const WAZUH_FIM_PATTERN = 'wazuh-states-fim';
+
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
@@ -135,35 +138,6 @@ export const WAZUH_DATA_CONFIG_APP_PATH = path.join(
 export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
   'wazuh-registry.json',
-);
-
-// Wazuh data path - logs
-export const MAX_MB_LOG_FILES = 100;
-export const WAZUH_DATA_LOGS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'logs',
-);
-export const WAZUH_DATA_LOGS_PLAIN_FILENAME = 'wazuhapp-plain.log';
-export const WAZUH_DATA_LOGS_PLAIN_PATH = path.join(
-  WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_PLAIN_FILENAME,
-);
-export const WAZUH_DATA_LOGS_RAW_FILENAME = 'wazuhapp.log';
-export const WAZUH_DATA_LOGS_RAW_PATH = path.join(
-  WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  WAZUH_DATA_LOGS_RAW_FILENAME,
-);
-
-// Wazuh data path - UI logs
-export const WAZUH_UI_LOGS_PLAIN_FILENAME = 'wazuh-ui-plain.log';
-export const WAZUH_UI_LOGS_RAW_FILENAME = 'wazuh-ui.log';
-export const WAZUH_UI_LOGS_PLAIN_PATH = path.join(
-  WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  WAZUH_UI_LOGS_PLAIN_FILENAME,
-);
-export const WAZUH_UI_LOGS_RAW_PATH = path.join(
-  WAZUH_DATA_LOGS_DIRECTORY_PATH,
-  WAZUH_UI_LOGS_RAW_FILENAME,
 );
 
 // Wazuh data path - downloads
@@ -862,6 +836,33 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.boolean();
     },
   },
+  'checks.fim.pattern': {
+    title: 'Fim index pattern',
+    description:
+      'Enable or disable the fim index pattern health check when opening the app.',
+    category: SettingCategory.HEALTH_CHECK,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
   'cron.prefix': {
     title: 'Cron prefix',
     description: 'Define the index prefix of predefined jobs.',
@@ -1474,38 +1475,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     validate: SettingsValidator.isBoolean,
     validateBackend: function (schema) {
       return schema.boolean();
-    },
-  },
-  'logs.level': {
-    title: 'Log level',
-    description: 'Logging level of the App.',
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.select,
-    options: {
-      select: [
-        {
-          text: 'Info',
-          value: 'info',
-        },
-        {
-          text: 'Debug',
-          value: 'debug',
-        },
-      ],
-    },
-    defaultValue: 'info',
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
-    requiresRestartingPluginPlatform: true,
-    validate: function (value) {
-      return SettingsValidator.literal(
-        this.options.select.map(({ value }) => value),
-      )(value);
-    },
-    validateBackend: function (schema) {
-      return schema.oneOf(
-        this.options.select.map(({ value }) => schema.literal(value)),
-      );
     },
   },
   pattern: {
