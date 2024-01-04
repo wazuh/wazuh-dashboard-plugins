@@ -5,6 +5,7 @@ export class WarningError extends WazuhError {
   logOptions: IWazuhErrorLogOpts;
   constructor(error: Error, info?: IWazuhErrorInfo) {
     super(error, info);
+    Object.setPrototypeOf(this, WarningError.prototype);
     this.logOptions = {
       error: {
         message: `[${this.constructor.name}]: ${error.message}`,

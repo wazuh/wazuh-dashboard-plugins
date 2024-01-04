@@ -19,17 +19,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.8.0
-- Added the ability to check if there are available updates from the UI. [#6093](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6093)
+- Added the ability to check if there are available updates from the UI. [#6093](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6093) [#6256](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6256)
 - Added remember server address check [#5791](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5791)
 - Added the ssl_agent_ca configuration to the SSL Settings form [#6083](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6083)
-- Added global vulnerabilities dashboards [#5896](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5896) [#6179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6179) [#6173](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6173) [#6147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6147)
+- Added global vulnerabilities dashboards [#5896](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5896) [#6179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6179) [#6173](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6173) [#6147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6147) [#6231](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6231) [#6246](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6246)
 - Added an agent selector to the IT Hygiene application [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Added query results limit when the search exceed 10000 hits [#6106](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6106)
 - Added a redirection button to Endpoint Summary from IT Hygiene application [6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 
 ### Changed
 
-- Moved the plugin menu to platform applications into the side menu [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840) [#6226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6226)
+- Moved the plugin menu to platform applications into the side menu [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840) [#6226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6226) [#6244](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6244)
 - Changed dashboards. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035)
 - Change the display order of tabs in all modules. [#6067](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6067)
 - Upgraded the `axios` dependency to `1.6.1` [#5062](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5062)
@@ -39,7 +39,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a problem with the agent menu header when the side menu is docked [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Fixed how the query filters apply on the Security Alerts table [#6102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6102)
 - Fixed exception in IT-Hygiene when an agent doesn't have policies [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
-- Fixed exception in Inventory when agents don't have S.O. information [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
+- Fixed exception in Inventory when agents don't have OS information [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
 - Fixed pinned agent state in URL [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
 - Fixed invalid date format in about and agent views [#6234](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6234)
 
@@ -50,7 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the application menu in the IT Hygiene application [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 - Removed the implicit filter of WQL language of the search bar UI [#6174](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6174)
 
-## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 00
+## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 01
 
 ### Added
 
