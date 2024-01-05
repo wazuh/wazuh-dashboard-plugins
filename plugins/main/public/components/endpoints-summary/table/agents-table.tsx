@@ -25,13 +25,14 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
 import { getCore } from '../../../kibana-services';
 import { endpointSummary } from '../../../utils/applications';
-import { EditAgentGroupsModal } from './edit-groups-modal';
+import { EditAgentGroupsModal } from './actions/edit-groups-modal';
 import { useUserPermissionsRequirements } from '../../common/hooks/useUserPermissions';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import { agentsTableColumns } from './columns';
-import { AgentsTableGlobalActions } from './global-actions';
+import { AgentsTableGlobalActions } from './global-actions/global-actions';
+import { Agent } from '../types';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -61,10 +62,10 @@ export const AgentsTable = compose(
   };
   const [filters, setFilters] = useState(defaultFilters);
   const [reloadTable, setReloadTable] = useState(0);
-  const [agent, setAgent] = useState();
+  const [agent, setAgent] = useState<Agent>();
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
 
-  const [selectedItems, setSelectedItems] = useState<any[]>([]);
+  const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
 
   const [denyEditGroups] = useUserPermissionsRequirements([
     { action: 'group:modify_assignments', resource: 'group:id:*' },
@@ -89,7 +90,7 @@ export const AgentsTable = compose(
     await setReloadTable(Date.now());
   };
 
-  const onSelectionChange = (selectedItems: any[]) => {
+  const onSelectionChange = (selectedItems: Agent[]) => {
     setSelectedItems(selectedItems);
   };
 
@@ -130,10 +131,6 @@ export const AgentsTable = compose(
           <TableWzAPI
             title='Agents'
             actionButtons={[
-              <AgentsTableGlobalActions
-                agents={selectedItems}
-                allowEditGroups={!denyEditGroups}
-              />,
               <WzButtonPermissions
                 buttonType='empty'
                 permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
@@ -144,6 +141,11 @@ export const AgentsTable = compose(
               >
                 Deploy new agent
               </WzButtonPermissions>,
+              <AgentsTableGlobalActions
+                agents={selectedItems}
+                allowEditGroups={!denyEditGroups}
+                reloadAgents={() => reloadAgents()}
+              />,
             ]}
             endpoint='/agents'
             tableColumns={agentsTableColumns(

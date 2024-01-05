@@ -1,16 +1,17 @@
 import React from 'react';
-import { agentsTableActions } from './actions';
+import { agentsTableActions } from './actions/actions';
 import { AgentSynced } from '../../agents/agent-synced';
 import { AgentStatus } from '../../agents/agent-status';
 import { formatUIDate } from '../../../react-services/time-service';
 import { GroupTruncate } from '../../common/util';
 import { EuiFlexGroup, EuiFlexItem, EuiIconTip } from '@elastic/eui';
+import { Agent } from '../types';
 
 // Columns with the property truncateText: true won't wrap the text
 // This is added to prevent the wrap because of the table-layout: auto
 export const agentsTableColumns = (
   allowEditGroups: boolean,
-  setAgent: (agent) => void,
+  setAgent: (agents: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
   setFilters: (filters) => void,
 ) => [

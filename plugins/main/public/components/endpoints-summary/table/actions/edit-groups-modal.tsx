@@ -13,18 +13,20 @@ import {
   EuiText,
 } from '@elastic/eui';
 import { compose } from 'redux';
-import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
-import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { useGetGroups } from '../hooks/groups';
+import { withErrorBoundary, withReduxProvider } from '../../../common/hocs';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { useGetGroups } from '../../hooks';
 import {
   addAgentToGroupService,
   removeAgentFromGroupsService,
-} from '../services';
+} from '../../services';
+import { Agent } from '../../types';
+import { getToasts } from '../../../../kibana-services';
 
 interface EditAgentGroupsModalProps {
-  agent: { id: string; name: string; group: string[] };
+  agent: Agent;
   onClose: () => void;
   reloadAgents: () => void;
 }
@@ -59,6 +61,20 @@ export const EditAgentGroupsModal = compose(
     getErrorOrchestrator().handleError(options);
   }
 
+  const showToast = (
+    color: string,
+    title: string = '',
+    text: string = '',
+    time: number = 3000,
+  ) => {
+    getToasts().add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
   const handleOnSave = async () => {
     setIsSaving(true);
 
@@ -81,6 +97,7 @@ export const EditAgentGroupsModal = compose(
         ));
       removedGroups.length &&
         (await removeAgentFromGroupsService(agent.id, removedGroups));
+      showToast('success', 'Edit agent groups', 'Groups saved successfully');
       reloadAgents();
     } catch (error) {
       const options = {
@@ -120,6 +137,7 @@ export const EditAgentGroupsModal = compose(
           selectedOptions={selectedGroups}
           onChange={selectedGroups => setSelectedGroups(selectedGroups)}
           isLoading={isGroupsLoading}
+          clearOnBlur
         />
       </EuiFormRow>
     </EuiForm>
@@ -128,7 +146,6 @@ export const EditAgentGroupsModal = compose(
   return (
     <EuiModal
       onClose={onClose}
-      initialFocus='[name=popswitch]'
       onClick={ev => {
         ev.stopPropagation();
       }}
