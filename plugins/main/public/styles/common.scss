@@ -1775,6 +1775,19 @@ iframe.width-changed {
   }
 }
 
+/* OSD Data grid full screen with dock navigation left sidebar */
+
+
+.euiDataGrid__restrictBody.euiBody--hasFlyout {
+  .euiDataGrid--fullScreen {
+    left: 320px;
+    
+    .euiDataGrid__virtualized {
+      max-width: calc(100vw - 320px);
+    }
+  }
+}
+
 /* Custom Searchbar styles */
 
 .application .filters-search-bar .globalQueryBar,
