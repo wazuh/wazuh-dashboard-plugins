@@ -10,6 +10,8 @@ import {
   EuiForm,
   EuiFormRow,
   EuiComboBox,
+  EuiCallOut,
+  EuiSpacer,
 } from '@elastic/eui';
 import { compose } from 'redux';
 import { withErrorBoundary, withReduxProvider } from '../../../common/hocs';
@@ -23,6 +25,7 @@ import {
 } from '../../services';
 import { Agent } from '../../types';
 import { getToasts } from '../../../../kibana-services';
+import { AgentList } from './agent-list';
 
 interface EditAgentsGroupsModalProps {
   agents: Agent[];
@@ -30,6 +33,10 @@ interface EditAgentsGroupsModalProps {
   reloadAgents: () => void;
   addOrRemove: 'add' | 'remove';
 }
+
+type Option = {
+  label: string;
+};
 
 export const EditAgentsGroupsModal = compose(
   withErrorBoundary,
@@ -41,10 +48,11 @@ export const EditAgentsGroupsModal = compose(
     reloadAgents,
     addOrRemove,
   }: EditAgentsGroupsModalProps) => {
-    const [selectedGroups, setSelectedGroups] = useState<{ label: string }[]>(
+    const [selectedGroups, setSelectedGroups] = useState<Option[]>([]);
+    const [isSaving, setIsSaving] = useState(false);
+    const [agentsIgnoreToRemove, setAgentsIgnoreToRemove] = useState<Agent[]>(
       [],
     );
-    const [isSaving, setIsSaving] = useState(false);
 
     const {
       groups,
@@ -59,8 +67,8 @@ export const EditAgentsGroupsModal = compose(
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
         error: {
-          error,
-          message: error.message || error,
+          error: errorGroups,
+          message: errorGroups.message || errorGroups,
           title: `Could not get groups`,
         },
       };
@@ -81,15 +89,36 @@ export const EditAgentsGroupsModal = compose(
       });
     };
 
-    //Only allow remove groups from an agent if the agent at least keep one group
-    const allowRemoveGroupsFromAgents = (
-      agentGroups: string[],
-      groupsToRemove: string[],
-    ) => {
-      const finalAgentGroups = agentGroups.filter(group =>
-        groupsToRemove.includes(group),
-      );
-      return finalAgentGroups.length > 0;
+    const getStringArrayGroups = (options: Option[]) => {
+      return options.map(group => group.label);
+    };
+
+    const updateAgentsIgnoreToRemove = (selectedGroups: Option[]) => {
+      //Only allow remove groups from an agent if the agent at least keep one group
+      const agentsIgnoreToRemove = agents.reduce((acc, agent) => {
+        if (!agent.group?.length) {
+          return acc;
+        }
+
+        const finalAgentGroups = agent.group?.filter(
+          group =>
+            !selectedGroups.find(
+              selectedGroup => selectedGroup.label === group,
+            ),
+        );
+
+        if (!finalAgentGroups?.length) {
+          return [...acc, agent];
+        }
+
+        return acc;
+      }, [] as Agent[]);
+      setAgentsIgnoreToRemove(agentsIgnoreToRemove);
+    };
+
+    const handleOnChange = (selectedGroups: Option[]) => {
+      setSelectedGroups(selectedGroups);
+      updateAgentsIgnoreToRemove(selectedGroups);
     };
 
     const handleOnSave = async () => {
@@ -103,9 +132,9 @@ export const EditAgentsGroupsModal = compose(
             );
           }
 
-          const groups = selectedGroups.map(group => group.label);
+          const groups = getStringArrayGroups(selectedGroups);
 
-          if (allowRemoveGroupsFromAgents(agent.group, groups)) {
+          if (agent.group?.length && !agentsIgnoreToRemove.includes(agent)) {
             return removeAgentFromGroupsService(agent.id, groups);
           }
 
@@ -141,7 +170,7 @@ export const EditAgentsGroupsModal = compose(
 
     const form = (
       <EuiForm component='form'>
-        <EuiFormRow label='Groups' isRequired>
+        <EuiFormRow label='Groups'>
           <EuiComboBox
             placeholder={
               addOrRemove === 'add'
@@ -150,7 +179,7 @@ export const EditAgentsGroupsModal = compose(
             }
             options={groups?.map(group => ({ label: group })) || []}
             selectedOptions={selectedGroups}
-            onChange={selectedGroups => setSelectedGroups(selectedGroups)}
+            onChange={handleOnChange}
             isLoading={isGroupsLoading}
             clearOnBlur
           />
@@ -173,7 +202,25 @@ export const EditAgentsGroupsModal = compose(
           </EuiModalHeaderTitle>
         </EuiModalHeader>
 
-        <EuiModalBody>{form}</EuiModalBody>
+        <EuiModalBody>
+          {form}
+          {agentsIgnoreToRemove.length ? (
+            <>
+              <EuiSpacer />
+              <EuiCallOut
+                title='Agents without groups'
+                color='warning'
+                iconType='alert'
+              >
+                <p>
+                  The groups of the <b>following agents</b> will not be removed
+                  because these agents would be left without a group.
+                </p>
+                <AgentList agents={agentsIgnoreToRemove} />
+              </EuiCallOut>
+            </>
+          ) : null}
+        </EuiModalBody>
 
         <EuiModalFooter>
           <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>

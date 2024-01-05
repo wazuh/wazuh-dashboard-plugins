@@ -40,7 +40,7 @@ export const AgentsTableGlobalActions = ({
       iconSide='right'
       onClick={onButtonClick}
     >
-      Group actions
+      Add/Remove groups
     </EuiButtonEmpty>
   );
 

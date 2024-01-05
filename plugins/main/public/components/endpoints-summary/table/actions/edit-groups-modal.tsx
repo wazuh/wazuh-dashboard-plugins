@@ -10,7 +10,7 @@ import {
   EuiForm,
   EuiFormRow,
   EuiComboBox,
-  EuiText,
+  EuiBadge,
 } from '@elastic/eui';
 import { compose } from 'redux';
 import { withErrorBoundary, withReduxProvider } from '../../../common/hocs';
@@ -53,8 +53,8 @@ export const EditAgentGroupsModal = compose(
       severity: UI_ERROR_SEVERITIES.BUSINESS,
       store: true,
       error: {
-        error,
-        message: error.message || error,
+        error: errorGroups,
+        message: errorGroups.message || errorGroups,
         title: `Could not get groups`,
       },
     };
@@ -121,9 +121,7 @@ export const EditAgentGroupsModal = compose(
   const form = (
     <EuiForm component='form'>
       <EuiFormRow label='Agent'>
-        <EuiText>
-          <b>{agent.name}</b>
-        </EuiText>
+        <EuiBadge color='hollow'>{agent.name}</EuiBadge>
       </EuiFormRow>
       <EuiFormRow
         label='Groups'
