@@ -77,9 +77,8 @@ export const ApiTable = compose(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error checking available updates: ${
-              error.message || error
-            }`,
+            title: `Error checking available updates: ${error.message || error
+              }`,
           },
         };
 
@@ -128,8 +127,8 @@ export const ApiTable = compose(
               typeof error === 'string'
                 ? error
                 : (error || {}).message ||
-                  ((error || {}).data || {}).message ||
-                  'Wazuh is not reachable';
+                ((error || {}).data || {}).message ||
+                'Wazuh is not reachable';
             const status = code === 3099 ? 'down' : 'unknown';
             entries[idx].status = { status, downReason };
             if (entries[idx].id === this.props.currentDefault) {
@@ -175,8 +174,8 @@ export const ApiTable = compose(
             typeof error === 'string'
               ? error
               : (error || {}).message ||
-                ((error || {}).data || {}).message ||
-                'Wazuh is not reachable';
+              ((error || {}).data || {}).message ||
+              'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
           throw error;
@@ -194,9 +193,8 @@ export const ApiTable = compose(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error checking manager connection: ${
-              error.message || error
-            }`,
+            title: `Error checking manager connection: ${error.message || error
+              }`,
           },
         };
 
@@ -362,13 +360,10 @@ export const ApiTable = compose(
           name: 'Updates status',
           sortable: true,
           render: (item, api) => {
-            const getColor = () => {
-              return API_UPDATES_STATUS_COLUMN[item]?.color;
-            };
+            const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
 
-            const getContent = () => {
-              return API_UPDATES_STATUS_COLUMN[item]?.text;
-            };
+            const content =
+              API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
 
             if (!this.state.refreshingAvailableUpdates) {
               return (
@@ -378,13 +373,28 @@ export const ApiTable = compose(
                   responsive={false}
                 >
                   <EuiFlexItem grow={false}>
-                    <EuiHealth
-                      color={getColor()}
-                      style={{ wordBreak: 'normal' }}
-                    >
-                      {getContent()}
+                    <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
+                      {content}
+
                     </EuiHealth>
                   </EuiFlexItem>
+                  {!item ? (
+                    <EuiFlexItem grow={false}>
+                      <EuiToolTip
+                        position='top'
+                        content={
+                          <p>
+                            Click <b>Check updates</b> button to get information
+                          </p>
+                        }
+                      >
+                        <EuiButtonIcon
+                          aria-label={content}
+                          iconType='questionInCircle'
+                        />
+                      </EuiToolTip>
+                    </EuiFlexItem>
+                  ) : null}
                   {item === 'availableUpdates' ? (
                     <EuiFlexItem grow={false}>
                       <EuiToolTip
@@ -409,10 +419,12 @@ export const ApiTable = compose(
                         content={api.error.detail}
                       >
                         <EuiButtonIcon
-                          color="primary"
-                          iconType="questionInCircle"
-                          aria-label="Info about the error"
-                          onClick={() => this.props.copyToClipBoard(api.error.detail)}
+                          color='primary'
+                          iconType='questionInCircle'
+                          aria-label='Info about the error'
+                          onClick={() =>
+                            this.props.copyToClipBoard(api.error.detail)
+                          }
                         />
                       </EuiToolTip>
                     </EuiFlexItem>
@@ -545,10 +557,10 @@ export const ApiTable = compose(
                       content={
                         this.state.availableUpdates?.last_check_date
                           ? formatUIDate(
-                              new Date(
-                                this.state.availableUpdates.last_check_date,
-                              ),
-                            )
+                            new Date(
+                              this.state.availableUpdates.last_check_date,
+                            ),
+                          )
                           : '-'
                       }
                     >
