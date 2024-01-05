@@ -31,7 +31,7 @@ import { LoadingSpinner } from '../../common/components/loading_spinner';
 // common components/hooks
 import DocViewer from '../../../../common/doc-viewer/doc-viewer';
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
-import { useAppConfig } from '../../../../common/hooks';
+import { useAppConfig, useDockedSideNav } from '../../../../common/hooks';
 import { useDataGrid } from '../../../../common/data-grid/use-data-grid';
 import { useDocViewer } from '../../../../common/doc-viewer/use-doc-viewer';
 import { withErrorBoundary } from '../../../../common/hocs';
@@ -56,6 +56,7 @@ const InventoryVulsComponent = () => {
   );
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const sideNavDocked = useDockedSideNav();
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
@@ -198,6 +199,7 @@ const InventoryVulsComponent = () => {
           isSuccess &&
           results?.hits?.total > 0 ? (
             <EuiDataGrid
+              className={sideNavDocked ? 'dataGridDockedNav' : ''}
               {...dataGridProps}
               toolbarVisibility={{
                 additionalControls: (

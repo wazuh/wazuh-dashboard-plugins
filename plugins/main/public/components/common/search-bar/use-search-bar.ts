@@ -178,6 +178,8 @@ const useSearchBar = (
       setQuery(query);
       props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
     },
+    // its necessary to use saved queries. if not, the load saved query not work
+    useDefaultBehaviors: true 
   };
 
   return {
