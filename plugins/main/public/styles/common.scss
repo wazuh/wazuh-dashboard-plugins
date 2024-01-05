@@ -1777,9 +1777,8 @@ iframe.width-changed {
 
 /* OSD Data grid full screen with dock navigation left sidebar */
 
-
-.euiDataGrid__restrictBody.euiBody--hasFlyout {
-  .euiDataGrid--fullScreen {
+.dataGridDockedNav {
+  &.euiDataGrid--fullScreen {
     left: 320px;
     
     .euiDataGrid__virtualized {

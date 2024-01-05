@@ -24,13 +24,13 @@ import { DiscoverNoResults } from '../../overview/vulnerabilities/common/compone
 import { LoadingSpinner } from '../../overview/vulnerabilities/common/components/loading_spinner';
 import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../data-grid';
 import { ErrorHandler, ErrorFactory, HttpError } from '../../../react-services/error-management';
-import { withErrorBoundary } from '../hocs';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
 import useSearchBar from '../search-bar/use-search-bar';
 import { search } from '../search-bar';
 import { getPlugins } from '../../../kibana-services';
-import { getDiscoverPanels, histogramChartInput } from './config/histogram-chart';
+import { histogramChartInput } from './config/histogram-chart';
+import { useDockedSideNav } from '../hooks/useDockedSideNav'
 const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 
@@ -43,12 +43,14 @@ type WazuhDiscoverProps = {
 
 const WazuhDiscover = (props: WazuhDiscoverProps) => {
   const { indexPatternName, tableColumns: defaultTableColumns } = props
+  const [sidebarDocked, setSidebarDocked] = useState<boolean>(false);
   const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(undefined);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const sideNavDocked = useDockedSideNav();
 
   const onClickInspectDoc = useMemo(() => (index: number) => {
     const rowClicked = results.hits.hits[index];
@@ -179,6 +181,7 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
               <div className="discoverDataGrid">
                 <EuiDataGrid
                   {...dataGridProps}
+                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
                   toolbarVisibility={{
                     additionalControls: (
                       <>
@@ -231,6 +234,6 @@ const WazuhDiscover = (props: WazuhDiscoverProps) => {
       </EuiPageTemplate>
     </IntlProvider >
   );
-}
+};
 
 export default WazuhDiscover;
