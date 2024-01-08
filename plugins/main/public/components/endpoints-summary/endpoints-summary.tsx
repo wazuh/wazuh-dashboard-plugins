@@ -12,7 +12,13 @@
  */
 
 import React, { Component } from 'react';
-import { EuiPage, EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
+import {
+  EuiPage,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSpacer,
+  EuiFlexGrid,
+} from '@elastic/eui';
 import { AgentsTable } from './table/agents-table';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
@@ -127,7 +133,7 @@ export const EndpointsSummary = compose(
       return (
         <EuiPage className='flex-column'>
           <EuiFlexItem>
-            <EuiFlexGroup className='agents-visualization-group mt-0'>
+            {/* <EuiFlexGrid columns={4}>
               <DonutCard
                 betaBadgeLabel='Agents by Status'
                 onClickLabel={this.filterAgentByStatus}
@@ -144,7 +150,25 @@ export const EndpointsSummary = compose(
                 getInfo={getAgentsByGroup}
               />
               <OutdatedAgentsCard onClick={this.filterByOutdatedAgent} />
-            </EuiFlexGroup>
+            </EuiFlexGrid> */}
+            <div className='endpoints-summary-container-indicators'>
+              <DonutCard
+                betaBadgeLabel='Agents by Status'
+                onClickLabel={this.filterAgentByStatus}
+                getInfo={getSummaryAgentsStatus}
+              />
+              <DonutCard
+                betaBadgeLabel='Agents by OS'
+                onClickLabel={this.filterAgentByOS}
+                getInfo={getAgentsByOs}
+              />
+              <DonutCard
+                betaBadgeLabel='Agents by Group'
+                onClickLabel={this.filterAgentByGroup}
+                getInfo={getAgentsByGroup}
+              />
+              <OutdatedAgentsCard onClick={this.filterByOutdatedAgent} />
+            </div>
             <EuiSpacer size='m' />
             <WzReduxProvider>
               <AgentsTable filters={this.state.agentTableFilters} />

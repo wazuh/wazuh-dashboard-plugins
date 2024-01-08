@@ -11,6 +11,7 @@ interface AgentsByStatusCardProps {
   noDataMessage?: string;
   getInfo: () => Promise<any[]>;
   onClickLabel?: (status: any) => void;
+  [key: string]: any;
 }
 
 const DonutCard = ({
@@ -21,6 +22,7 @@ const DonutCard = ({
   noDataMessage = 'No results were found',
   getInfo,
   onClickLabel,
+  ...props
 }: AgentsByStatusCardProps) => {
   const [loading, data] = useApiService<any>(getInfo, undefined);
 
@@ -31,31 +33,28 @@ const DonutCard = ({
   };
 
   return (
-    <EuiFlexItem className='agents-status-pie'>
-      <EuiCard
-        title={title}
-        description={description}
-        betaBadgeLabel={betaBadgeLabel}
-        className='eui-panel'
-      >
-        <EuiFlexGroup>
-          <EuiFlexItem className='align-items-center'>
-            <VisualizationBasic
-              isLoading={loading}
-              type='donut'
-              size={{ width: '100%', height: '150px' }}
-              showLegend
-              data={data?.map((item: any) => ({
-                ...item,
-                onClick: () => handleClick(item),
-              }))}
-              noDataTitle={noDataTitle}
-              noDataMessage={noDataMessage}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiCard>
-    </EuiFlexItem>
+    <EuiCard
+      title={title}
+      description={description}
+      betaBadgeLabel={betaBadgeLabel}
+    >
+      <EuiFlexGroup>
+        <EuiFlexItem className='align-items-center'>
+          <VisualizationBasic
+            isLoading={loading}
+            type='donut'
+            size={{ width: '100%', height: '150px' }}
+            showLegend
+            data={data?.map((item: any) => ({
+              ...item,
+              onClick: () => handleClick(item),
+            }))}
+            noDataTitle={noDataTitle}
+            noDataMessage={noDataMessage}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </EuiCard>
   );
 };
 

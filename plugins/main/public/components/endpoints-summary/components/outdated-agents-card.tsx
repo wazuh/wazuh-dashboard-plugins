@@ -17,9 +17,10 @@ import { webDocumentationLink } from '../../../../common/services/web_documentat
 
 interface OutdatedAgentsCardProps {
   onClick?: (status: any) => void;
+  [key: string]: any;
 }
 
-const OutdatedAgentsCard = ({ onClick }: OutdatedAgentsCardProps) => {
+const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
   const [loading, data] = useApiService<any>(getOutdatedAgents, undefined);
   const outdatedAgents = data?.length;
   const contentType = outdatedAgents > 0 ? 'warning' : 'success';
