@@ -185,16 +185,7 @@ export const ModulesDefaults = {
         name: 'Inventory',
         component: withModuleNotForAgent(InventoryVuls),
       },
-      {
-        id: 'events',
-        name: 'Events',
-        component: withModuleNotForAgent(() => (
-          <WazuhDiscover
-            indexPatternName={DEFAULT_INDEX_PATTERN}
-            tableColumns={vulnerabilitiesColumns}
-          />
-        )),
-      },
+      renderDiscoverTab(ALERTS_INDEX_PATTERN, vulnerabilitiesColumns),
     ],
     buttons: ['settings'],
     availableFor: ['manager'],
