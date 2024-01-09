@@ -27,6 +27,7 @@ import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vu
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
+import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -129,7 +130,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, configurationAssessmentColumns),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
