@@ -27,6 +27,7 @@ import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
+import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -129,7 +130,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, configurationAssessmentColumns),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
