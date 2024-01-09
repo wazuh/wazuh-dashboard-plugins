@@ -11,9 +11,9 @@ import {
   EuiButtonEmpty,
 } from '@elastic/eui';
 import './outdated-agents-card.scss';
-import { getOutdatedAgents } from '../services/get-outdated-agents';
-import { useApiService } from '../../common/hooks/useApiService';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { getOutdatedAgents } from '../../services/get-outdated-agents';
+import { useApiService } from '../../../common/hooks/useApiService';
+import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
 interface OutdatedAgentsCardProps {
   onClick?: (status: any) => void;
@@ -34,6 +34,7 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
   const handleClick = () => {
     if (onClick) {
       onClick(data);
+      setShowOutdatedAgents(false);
     }
   };
 
@@ -43,23 +44,26 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
         className='wazuh-outdated-agents-panel'
         onClick={onShowOutdatedAgents}
       >
+        <EuiIcon
+          type={contentIcon}
+          color={contentType}
+          className='wazuh-outdated-icon'
+        />
         <EuiStat
           className='wazuh-outdated-metric'
           title={
+            <EuiTextColor color={contentType}>{outdatedAgents}</EuiTextColor>
+          }
+          description={
             <EuiTextColor color={contentType}>
-              <EuiIcon
-                type={contentIcon}
-                color={contentType}
-                className='wazuh-outdated-icon'
-              />{' '}
-              {outdatedAgents}
+              <small>Agents</small>
             </EuiTextColor>
           }
-          description=''
           titleColor='danger'
           isLoading={loading}
           titleSize='l'
           textAlign='center'
+          reverse
         />
       </div>
     );
@@ -67,7 +71,7 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
 
   return (
     <EuiFlexItem>
-      <EuiCard title='' betaBadgeLabel='Outdated agents' className='eui-panel'>
+      <EuiCard title='' betaBadgeLabel='Outdated'>
         <EuiPopover
           button={renderMetric()}
           isOpen={showOutdatedAgents}

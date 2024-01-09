@@ -36,11 +36,12 @@ import { compose } from 'redux';
 import { endpointSumary, itHygiene } from '../../utils/applications';
 import { ShareAgent } from '../../factories/share-agent';
 import './endpoints-summary.scss';
-import OutdatedAgentsCard from './components/outdated-agents-card';
-import DonutCard from './components/donut-card';
+import OutdatedAgentsCard from './dashboard/components/outdated-agents-card';
+import DonutCard from './dashboard/components/donut-card';
 import { getSummaryAgentsStatus } from './services/get-summary-agents-status';
 import { getAgentsByOs } from './services/get-agents-by-os';
 import { getAgentsByGroup } from './services/get-agents-by-group';
+import { EndpointsSummaryDashboard } from './dashboard/endpoints-summary-dashboard';
 
 export const EndpointsSummary = compose(
   withErrorBoundary,
@@ -133,42 +134,12 @@ export const EndpointsSummary = compose(
       return (
         <EuiPage className='flex-column'>
           <EuiFlexItem>
-            {/* <EuiFlexGrid columns={4}>
-              <DonutCard
-                betaBadgeLabel='Agents by Status'
-                onClickLabel={this.filterAgentByStatus}
-                getInfo={getSummaryAgentsStatus}
-              />
-              <DonutCard
-                betaBadgeLabel='Agents by OS'
-                onClickLabel={this.filterAgentByOS}
-                getInfo={getAgentsByOs}
-              />
-              <DonutCard
-                betaBadgeLabel='Agents by Group'
-                onClickLabel={this.filterAgentByGroup}
-                getInfo={getAgentsByGroup}
-              />
-              <OutdatedAgentsCard onClick={this.filterByOutdatedAgent} />
-            </EuiFlexGrid> */}
-            <div className='endpoints-summary-container-indicators'>
-              <DonutCard
-                betaBadgeLabel='Agents by Status'
-                onClickLabel={this.filterAgentByStatus}
-                getInfo={getSummaryAgentsStatus}
-              />
-              <DonutCard
-                betaBadgeLabel='Agents by OS'
-                onClickLabel={this.filterAgentByOS}
-                getInfo={getAgentsByOs}
-              />
-              <DonutCard
-                betaBadgeLabel='Agents by Group'
-                onClickLabel={this.filterAgentByGroup}
-                getInfo={getAgentsByGroup}
-              />
-              <OutdatedAgentsCard onClick={this.filterByOutdatedAgent} />
-            </div>
+            <EndpointsSummaryDashboard
+              filterAgentByStatus={this.filterAgentByStatus}
+              filterAgentByOS={this.filterAgentByOS}
+              filterAgentByGroup={this.filterAgentByGroup}
+              filterByOutdatedAgent={this.filterByOutdatedAgent}
+            />
             <EuiSpacer size='m' />
             <WzReduxProvider>
               <AgentsTable filters={this.state.agentTableFilters} />

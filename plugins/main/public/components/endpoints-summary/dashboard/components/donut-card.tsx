@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiCard } from '@elastic/eui';
-import { useApiService } from '../../common/hooks/useApiService';
-import { VisualizationBasic } from '../../common/charts/visualizations/basic';
+import { useApiService } from '../../../common/hooks/useApiService';
+import { VisualizationBasic } from '../../../common/charts/visualizations/basic';
 
 interface AgentsByStatusCardProps {
   title?: string;

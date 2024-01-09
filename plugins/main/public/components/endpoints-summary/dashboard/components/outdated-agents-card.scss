@@ -1,20 +1,22 @@
 .wazuh-outdated-agents-panel {
   display: flex;
-  gap: 10px;
   align-items: center;
-  justify-content: flex-end;
-  padding: 20px 0;
+  justify-content: center;
   margin: auto;
   flex-direction: column;
   cursor: pointer;
 }
 
 .wazuh-outdated-metric .euiTitle {
-  margin-top: 2rem;
-  font-size: 5.5rem;
+  font-size: 4.5rem;
+  line-height: inherit;
+}
+
+.wazuh-outdated-metric small {
+  font-size: 1.5rem;
 }
 
 .wazuh-outdated-icon {
-  width: 5rem;
-  height: 5rem;
+  width: 3.5rem;
+  height: 3.5rem;
 }
