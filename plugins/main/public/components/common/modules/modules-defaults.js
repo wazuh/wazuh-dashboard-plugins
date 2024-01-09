@@ -19,13 +19,14 @@ import ButtonModuleExploreAgent from '../../../controllers/overview/components/o
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
-import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities'
+import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent } from '../hocs';
 import WazuhDiscover from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
+import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -36,21 +37,22 @@ const DashboardTab = {
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
 
-const renderDiscoverTab = (indexName = DEFAULT_INDEX_PATTERN, columns) => { 
+const renderDiscoverTab = (indexName = DEFAULT_INDEX_PATTERN, columns) => {
   return {
     id: 'events',
     name: 'Events',
     buttons: [ButtonModuleExploreAgent],
-    component: () => 
-      <WazuhDiscover indexPatternName={indexName} tableColumns={columns}/>,
-  }
+    component: () => (
+      <WazuhDiscover indexPatternName={indexName} tableColumns={columns} />
+    ),
+  };
 };
 
 const EventsTab = {
-    id: 'events',
-    name: 'Events',
-    buttons: [ButtonModuleExploreAgent],
-    component: Events,
+  id: 'events',
+  name: 'Events',
+  buttons: [ButtonModuleExploreAgent],
+  component: Events,
 };
 
 const RegulatoryComplianceTabs = [
@@ -67,7 +69,10 @@ const RegulatoryComplianceTabs = [
 export const ModulesDefaults = {
   general: {
     init: 'events',
-    tabs: [DashboardTab,renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns)],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   fim: {
@@ -124,7 +129,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, configurationAssessmentColumns),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
