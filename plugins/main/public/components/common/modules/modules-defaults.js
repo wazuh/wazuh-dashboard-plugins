@@ -27,6 +27,7 @@ import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
+import { githubColumns } from '../../overview/github-panel/events/github-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -163,7 +164,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: GitHubPanel,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
