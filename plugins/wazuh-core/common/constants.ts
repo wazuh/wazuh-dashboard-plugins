@@ -1656,7 +1656,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           title: 'Run as',
           description: 'Use the authentication context.',
           type: EpluginSettingType.switch,
-          defaultValue: 'wazuh-wui',
+          defaultValue: false,
           isConfigurableFromFile: true,
           isConfigurableFromUI: true,
           options: {
@@ -1680,16 +1680,17 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       },
     },
     isConfigurableFromFile: false,
-    isConfigurableFromUI: true,
+    isConfigurableFromUI: false,
     uiFormTransformChangedInputValue: function (
       value: boolean | string,
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
-    },
+    // TODO: add validation
+    // validate: SettingsValidator.isBoolean,
+    // validateBackend: function (schema) {
+    //   return schema.boolean();
+    // },
   },
   'ip.ignore': {
     title: 'Index pattern ignore',

@@ -458,6 +458,9 @@ export enum EpluginSettingType {
   editor = 'editor',
   select = 'select',
   filepicker = 'filepicker',
+  password = 'password',
+  arrayOf = 'arrayOf',
+  custom = 'custom',
 }
 
 export type TPluginSetting = {
@@ -1334,6 +1337,156 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
+  hosts: {
+    title: 'Server hosts',
+    description: 'Configure the server hosts.',
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.arrayOf,
+    defaultValue: false,
+    persistence: {
+      savedObject: {
+        mapping: {
+          properties: {
+            url: {
+              type: 'text',
+            },
+            port: {
+              type: 'integer',
+            },
+            username: {
+              type: 'text',
+            },
+            password: {
+              type: 'text',
+            },
+            run_as: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
+    },
+    options: {
+      arrayOf: {
+        id: {
+          title: 'Identifier',
+          description: 'API host identifier',
+          type: EpluginSettingType.text,
+          defaultValue: 'default',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          validate: SettingsValidator.isNotEmptyString,
+          validateBackend: function (schema) {
+            return schema.string({ validate: this.validate });
+          },
+        },
+        url: {
+          title: 'URL',
+          description: 'URL address',
+          type: EpluginSettingType.text,
+          defaultValue: 'https://localhost',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          validate: SettingsValidator.isNotEmptyString,
+          validateBackend: function (schema) {
+            return schema.string({ validate: this.validate });
+          },
+        },
+        port: {
+          title: 'Port',
+          description: 'Port',
+          type: EpluginSettingType.number,
+          defaultValue: 55000,
+          defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          options: {
+            number: {
+              min: 0,
+              max: 65535,
+              integer: true,
+            },
+          },
+          uiFormTransformConfigurationValueToInputValue: function (
+            value: number,
+          ) {
+            return String(value);
+          },
+          uiFormTransformInputValueToConfigurationValue: function (
+            value: string,
+          ): number {
+            return Number(value);
+          },
+          validate: function (value) {
+            return SettingsValidator.number(this.options.number)(value);
+          },
+          validateBackend: function (schema) {
+            return schema.number({ validate: this.validate.bind(this) });
+          },
+        },
+        username: {
+          title: 'Username',
+          description: 'Username',
+          type: EpluginSettingType.text,
+          defaultValue: 'wazuh-wui',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          validate: SettingsValidator.isNotEmptyString,
+          validateBackend: function (schema) {
+            return schema.string({ validate: this.validate });
+          },
+        },
+        password: {
+          title: 'Password',
+          description: 'Password',
+          type: EpluginSettingType.password,
+          defaultValue: 'wazuh-wui',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          validate: SettingsValidator.isNotEmptyString,
+          validateBackend: function (schema) {
+            return schema.string({ validate: this.validate });
+          },
+        },
+        run_as: {
+          title: 'Run as',
+          description: 'Use the authentication context.',
+          type: EpluginSettingType.switch,
+          defaultValue: 'wazuh-wui',
+          isConfigurableFromFile: true,
+          isConfigurableFromUI: true,
+          options: {
+            switch: {
+              values: {
+                disabled: { label: 'false', value: false },
+                enabled: { label: 'true', value: true },
+              },
+            },
+          },
+          uiFormTransformChangedInputValue: function (
+            value: boolean | string,
+          ): boolean {
+            return Boolean(value);
+          },
+          validate: SettingsValidator.isBoolean,
+          validateBackend: function (schema) {
+            return schema.boolean();
+          },
+        },
+      },
+    },
+    isConfigurableFromFile: false,
+    isConfigurableFromUI: true,
     uiFormTransformChangedInputValue: function (
       value: boolean | string,
     ): boolean {
