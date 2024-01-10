@@ -11,11 +11,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6290)
+- Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6290)
 - Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
 - Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
 
-# Fixed
+### Fixed
 
 - Fixed the scripted fields disappear when the fields of the events index pattern was refreshed [#6237](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6237)
 
