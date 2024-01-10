@@ -28,6 +28,10 @@ import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 import { pciColumns } from '../../overview/pci/events/pci-columns';
+import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
+import { nistColumns } from '../../overview/nist/events/nist-columns';
+import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
+import { tscColumns } from '../../overview/tsc/events/tsc-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -56,7 +60,7 @@ const EventsTab = {
   component: Events,
 };
 
-const RegulatoryComplianceTabs = [
+const RegulatoryComplianceTabs = columns => [
   DashboardTab,
   {
     id: 'inventory',
@@ -64,7 +68,7 @@ const RegulatoryComplianceTabs = [
     buttons: [ButtonModuleExploreAgent],
     component: ComplianceTable,
   },
-  EventsTab,
+  renderDiscoverTab(DEFAULT_INDEX_PATTERN, columns),
 ];
 
 export const ModulesDefaults = {
@@ -233,27 +237,27 @@ export const ModulesDefaults = {
   },
   pci: {
     init: 'dashboard',
-    tabs: [DashboardTab, renderDiscoverTab(DEFAULT_INDEX_PATTERN, pciColumns)],
+    tabs: RegulatoryComplianceTabs(pciColumns),
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(hipaaColumns),
     availableFor: ['manager', 'agent'],
   },
   nist: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(nistColumns),
     availableFor: ['manager', 'agent'],
   },
   gdpr: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(gdprColumns),
     availableFor: ['manager', 'agent'],
   },
   tsc: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(tscColumns),
     availableFor: ['manager', 'agent'],
   },
   syscollector: {
