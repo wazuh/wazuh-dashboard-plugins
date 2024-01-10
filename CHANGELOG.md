@@ -11,7 +11,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6288](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6288)
+- Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6288](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6288) [#6275](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6275) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287)
+- Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) 
 - Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
 - Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
 
@@ -31,7 +32,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.8.1
 
-## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 01
+## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 02
 
 ### Added
 
@@ -67,7 +68,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the application menu in the IT Hygiene application [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 - Removed the implicit filter of WQL language of the search bar UI [#6174](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6174)
 
-## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 01
+## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 02
 
 ### Added
 
