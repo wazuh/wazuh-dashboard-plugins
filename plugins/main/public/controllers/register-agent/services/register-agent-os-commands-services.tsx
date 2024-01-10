@@ -6,7 +6,7 @@ import {
 } from '../core/register-commands/types';
 import { tOperatingSystem } from '../hooks/use-register-agent-commands.test';
 
-const getAllOptionals = (
+export const getAllOptionals = (
   optionals: IOptionalParameters<tOptionalParameters>,
   osName?: tOperatingSystem['name'],
 ) => {
@@ -38,7 +38,7 @@ const getAllOptionals = (
   return paramsText;
 };
 
-const getAllOptionalsMacos = (
+export const getAllOptionalsMacos = (
   optionals: IOptionalParameters<tOptionalParameters>,
 ) => {
   // create paramNameOrderList, which is an array of the keys of optionals add interface
