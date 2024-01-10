@@ -26,6 +26,7 @@ import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
+import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 
 const DashboardTab = {
@@ -90,7 +91,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: InventoryFim,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, fileIntegrityMonitoringColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
