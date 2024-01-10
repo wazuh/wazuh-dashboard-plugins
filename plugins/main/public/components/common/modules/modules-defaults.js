@@ -233,7 +233,7 @@ export const ModulesDefaults = {
   },
   pci: {
     init: 'dashboard',
-    tabs: renderDiscoverTab(DEFAULT_INDEX_PATTERN, pciColumns),
+    tabs: [DashboardTab, renderDiscoverTab(DEFAULT_INDEX_PATTERN, pciColumns)],
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
