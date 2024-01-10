@@ -2,12 +2,10 @@ import IApiResponse from '../../../react-services/interfaces/api-response.interf
 import { WzRequest } from '../../../react-services/wz-request';
 import { Group } from '../types';
 
-export const getGroupsService = async (): Promise<Group[]> => {
+export const getGroupsService = async () => {
   const {
-    data: {
-      data: { affected_items },
-    },
+    data: { data },
   } = (await WzRequest.apiReq('GET', '/groups', {})) as IApiResponse<Group>;
 
-  return affected_items;
+  return data;
 };

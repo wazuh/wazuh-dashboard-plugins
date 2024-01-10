@@ -11,8 +11,14 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
+import React, { useState, useEffect } from 'react';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiPanel,
+  EuiCallOut,
+  EuiButton,
+} from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { withErrorBoundary } from '../../common/hocs';
 import {
@@ -33,6 +39,7 @@ import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import { agentsTableColumns } from './columns';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { Agent } from '../types';
+import { getAgentsService } from '../services';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -63,10 +70,15 @@ export const AgentsTable = compose(
   const [filters, setFilters] = useState(defaultFilters);
   const [reloadTable, setReloadTable] = useState(0);
   const [agent, setAgent] = useState<Agent>();
+  const [agentList, setAgentList] = useState<{
+    items: Agent[];
+    totalItems: number;
+  }>({ items: [], totalItems: 0 });
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
-
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
-
+  const [allAgentsSelected, setAllAgentsSelected] = useState(false);
+  const [allAgentsSelectedLoading, setAllAgentsSelectedLoading] =
+    useState(false);
   const [denyEditGroups] = useUserPermissionsRequirements([
     { action: 'group:modify_assignments', resource: 'group:id:*' },
   ]);
@@ -92,6 +104,9 @@ export const AgentsTable = compose(
 
   const onSelectionChange = (selectedItems: Agent[]) => {
     setSelectedItems(selectedItems);
+    if (selectedItems.length < agentList.totalItems) {
+      setAllAgentsSelected(false);
+    }
   };
 
   const selection = {
@@ -120,6 +135,53 @@ export const AgentsTable = compose(
       },
     };
   };
+
+  const handleOnClickSelectAllAgents = async () => {
+    if (allAgentsSelected) {
+      setSelectedItems(agentList.items);
+      setAllAgentsSelected(false);
+      return;
+    }
+
+    setAllAgentsSelectedLoading(true);
+    const result = await getAgentsService(filters.q || filters.default.q);
+    setSelectedItems(result.affected_items);
+    setAllAgentsSelected(true);
+    try {
+    } catch (error) {
+    } finally {
+      setAllAgentsSelectedLoading(false);
+    }
+  };
+
+  const showSelectAllItems =
+    (selectedItems.length === agentList.items?.length &&
+      selectedItems.length < agentList.totalItems) ||
+    allAgentsSelected;
+
+  const selectAllItemsRenderer = showSelectAllItems ? (
+    <EuiFlexGroup alignItems='center' gutterSize='s'>
+      <EuiFlexItem grow={false}>
+        <EuiCallOut
+          size='s'
+          title={`${selectedItems.length} ${
+            selectedItems.length === 1 ? 'agent' : 'agents'
+          } selected`}
+        />
+      </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiButton
+          size='s'
+          onClick={handleOnClickSelectAllAgents}
+          isLoading={allAgentsSelectedLoading}
+        >
+          {!allAgentsSelected
+            ? `Select all ${agentList.totalItems} agents`
+            : `Clear ${agentList.totalItems} agents selected`}
+        </EuiButton>
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  ) : null;
 
   const tableRender = () => {
     // The EuiBasicTable tableLayout is set to "auto" to improve the use of empty space in the component.
@@ -175,6 +237,11 @@ export const AgentsTable = compose(
             }}
             rowProps={getRowProps}
             filters={filters}
+            onFiltersChange={filters => {
+              setFilters(filters);
+              setSelectedItems([]);
+            }}
+            onDataChange={data => setAgentList(data)}
             downloadCsv
             showReload
             showFieldSelector
@@ -316,6 +383,7 @@ export const AgentsTable = compose(
               selection,
               isSelectable: true,
             }}
+            addOnTitle={selectAllItemsRenderer}
           />
         </EuiFlexItem>
       </EuiFlexGroup>

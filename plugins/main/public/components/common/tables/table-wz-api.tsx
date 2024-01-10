@@ -52,6 +52,7 @@ export function TableWzAPI({
 }: {
   actionButtons?: ReactNode | ReactNode[];
   title?: string;
+  addOnTitle?: ReactNode;
   description?: string;
   downloadCsv?: boolean | string;
   searchTable?: boolean;
@@ -61,14 +62,19 @@ export function TableWzAPI({
   showReload?: boolean;
   searchBarProps?: any;
   reload?: boolean;
+  onDataChange?: Function;
 }) {
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
   const onFiltersChange = filters =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
       : null;
+
+  const onDataChange = data =>
+    typeof rest.onDataChange === 'function' ? rest.onDataChange(data) : null;
 
   /**
    * Changing the reloadFootprint timestamp will trigger reloading the table
@@ -112,10 +118,15 @@ export function TableWzAPI({
       ).data;
       setIsLoading(false);
       setTotalItems(totalItems);
-      return {
+
+      const result = {
         items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
         totalItems,
       };
+
+      onDataChange(result);
+
+      return result;
     } catch (error) {
       setIsLoading(false);
       setTotalItems(0);
@@ -167,7 +178,7 @@ export function TableWzAPI({
 
   const header = (
     <>
-      <EuiFlexGroup wrap>
+      <EuiFlexGroup wrap alignItems='center'>
         <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
           {rest.title && (
             <EuiTitle size='s'>
@@ -181,10 +192,12 @@ export function TableWzAPI({
               </h1>
             </EuiTitle>
           )}
-          {rest.description && (
-            <EuiText color='subdued'>{rest.description}</EuiText>
-          )}
         </EuiFlexItem>
+        {rest.addOnTitle ? (
+          <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
+            {rest.addOnTitle}
+          </EuiFlexItem>
+        ) : null}
         <EuiFlexItem>
           <EuiFlexGroup wrap justifyContent={'flexEnd'} alignItems={'center'}>
             {/* Render optional custom action button */}
@@ -266,11 +279,15 @@ export function TableWzAPI({
   );
 
   return (
-    <>
-      {header}
-      {rest.description && <EuiSpacer />}
-      {table}
-    </>
+    <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
+      <EuiFlexItem>{header}</EuiFlexItem>
+      {rest.description && (
+        <EuiFlexItem>
+          <EuiText color='subdued'>{rest.description}</EuiText>
+        </EuiFlexItem>
+      )}
+      <EuiFlexItem>{table}</EuiFlexItem>
+    </EuiFlexGroup>
   );
 }
 

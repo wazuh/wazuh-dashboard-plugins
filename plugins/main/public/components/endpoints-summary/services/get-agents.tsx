@@ -2,13 +2,15 @@ import IApiResponse from '../../../react-services/interfaces/api-response.interf
 import { WzRequest } from '../../../react-services/wz-request';
 import { Agent } from '../types';
 
-export const getTotalAgentsService = async (): Promise<number> => {
+export const getAgentsService = async (
+  filters: any,
+  limit?: number,
+  offset?: number,
+) => {
   const {
-    data: {
-      data: { total_affected_items },
-    },
+    data: { data },
   } = (await WzRequest.apiReq('GET', '/agents', {
-    params: { limit: 1, q: 'id!=000' },
+    params: { limit, offset, q: filters },
   })) as IApiResponse<Agent>;
-  return total_affected_items;
+  return data;
 };

@@ -1,4 +1,4 @@
-export { getTotalAgentsService } from './get-total-agents';
+export { getAgentsService } from './get-agents';
 export { removeAgentFromGroupService } from './remove-agent-from-group';
 export { removeAgentFromGroupsService } from './remove-agent-from-groups';
 export { addAgentToGroupService } from './add-agent-to-group';

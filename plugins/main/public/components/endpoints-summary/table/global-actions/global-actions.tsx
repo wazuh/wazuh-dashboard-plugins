@@ -73,7 +73,10 @@ export const AgentsTableGlobalActions = ({
                 },
               ]}
             >
-              <span>Add groups to agents</span>
+              <span>
+                Add groups to agents
+                {agents.length ? ` (${agents.length})` : ''}
+              </span>
             </WzElementPermissions>
           </EuiContextMenuItem>
           <EuiContextMenuItem
@@ -93,7 +96,10 @@ export const AgentsTableGlobalActions = ({
                 },
               ]}
             >
-              <span>Remove groups from agents</span>
+              <span>
+                Remove groups from agents
+                {agents.length ? ` (${agents.length})` : ''}
+              </span>
             </WzElementPermissions>
           </EuiContextMenuItem>
         </EuiContextMenuPanel>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   EuiModal,
   EuiModalHeader,
@@ -10,8 +10,7 @@ import {
   EuiForm,
   EuiFormRow,
   EuiComboBox,
-  EuiCallOut,
-  EuiSpacer,
+  EuiText,
 } from '@elastic/eui';
 import { compose } from 'redux';
 import { withErrorBoundary, withReduxProvider } from '../../../common/hocs';
@@ -21,11 +20,14 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 import { useGetGroups } from '../../hooks';
 import {
   addAgentToGroupService,
-  removeAgentFromGroupsService,
+  removeAgentFromGroupService,
 } from '../../services';
 import { Agent } from '../../types';
-import { getToasts } from '../../../../kibana-services';
-import { AgentList } from './agent-list';
+import {
+  AgentsGlobalActionsResultModal,
+  RESULT_TYPE,
+  Result,
+} from './result-modal';
 
 interface EditAgentsGroupsModalProps {
   agents: Agent[];
@@ -50,9 +52,8 @@ export const EditAgentsGroupsModal = compose(
   }: EditAgentsGroupsModalProps) => {
     const [selectedGroups, setSelectedGroups] = useState<Option[]>([]);
     const [isSaving, setIsSaving] = useState(false);
-    const [agentsIgnoreToRemove, setAgentsIgnoreToRemove] = useState<Agent[]>(
-      [],
-    );
+    const [isResultModalVisible, setIsResultModalVisible] = useState(false);
+    const [results, setResults] = useState<Result[]>([]);
 
     const {
       groups,
@@ -75,81 +76,94 @@ export const EditAgentsGroupsModal = compose(
       getErrorOrchestrator().handleError(options);
     }
 
-    const showToast = (
-      color: string,
-      title: string = '',
-      text: string = '',
-      time: number = 3000,
-    ) => {
-      getToasts().add({
-        color: color,
-        title: title,
-        text: text,
-        toastLifeTimeMs: time,
-      });
-    };
-
     const getStringArrayGroups = (options: Option[]) => {
       return options.map(group => group.label);
     };
 
-    const updateAgentsIgnoreToRemove = (selectedGroups: Option[]) => {
-      //Only allow remove groups from an agent if the agent at least keep one group
-      const agentsIgnoreToRemove = agents.reduce((acc, agent) => {
-        if (!agent.group?.length) {
-          return acc;
-        }
-
-        const finalAgentGroups = agent.group?.filter(
-          group =>
-            !selectedGroups.find(
-              selectedGroup => selectedGroup.label === group,
-            ),
-        );
-
-        if (!finalAgentGroups?.length) {
-          return [...acc, agent];
-        }
-
-        return acc;
-      }, [] as Agent[]);
-      setAgentsIgnoreToRemove(agentsIgnoreToRemove);
-    };
-
     const handleOnChange = (selectedGroups: Option[]) => {
       setSelectedGroups(selectedGroups);
-      updateAgentsIgnoreToRemove(selectedGroups);
     };
 
     const handleOnSave = async () => {
       setIsSaving(true);
 
       try {
-        const promises = agents.map(agent => {
-          if (addOrRemove === 'add') {
-            return selectedGroups?.map(group =>
-              addAgentToGroupService(agent.id, group.label),
-            );
-          }
-
+        const promises = agents.reduce((acc, agent) => {
           const groups = getStringArrayGroups(selectedGroups);
 
-          if (agent.group?.length && !agentsIgnoreToRemove.includes(agent)) {
-            return removeAgentFromGroupsService(agent.id, groups);
+          if (addOrRemove === 'add') {
+            const groupsToAdd = groups.filter(
+              group => !agent.group?.includes(group),
+            );
+
+            const groupsToAddPromises = groupsToAdd?.map(group =>
+              addAgentToGroupService(agent.id, group)
+                .then(() =>
+                  setResults(results => {
+                    const newResult = {
+                      type: RESULT_TYPE.SUCCESS,
+                      agent,
+                      group,
+                    };
+                    return [...results, newResult];
+                  }),
+                )
+                .catch(error => {
+                  setResults(results => {
+                    const newResult = {
+                      type: RESULT_TYPE.ERROR,
+                      agent,
+                      group,
+                      message: error.message,
+                    };
+                    return [...results, newResult];
+                  });
+                }),
+            );
+
+            return [...acc, ...groupsToAddPromises];
           }
 
-          return [];
-        });
-        await Promise.all(promises);
-        showToast(
-          'success',
-          addOrRemove === 'add'
-            ? 'Add groups to agents'
-            : 'Remove groups from agents',
-          'Groups saved successfully',
-        );
+          const groupsToRemove = groups.filter(group =>
+            agent.group?.includes(group),
+          );
+
+          const groupsToRemovePromises = groupsToRemove?.map(group =>
+            removeAgentFromGroupService(agent.id, group)
+              .then(() =>
+                setResults(results => {
+                  const newResult = {
+                    type: RESULT_TYPE.SUCCESS,
+                    agent,
+                    group,
+                  };
+                  return [...results, newResult];
+                }),
+              )
+              .catch(error => {
+                setResults(results => {
+                  const newResult = {
+                    type: RESULT_TYPE.ERROR,
+                    agent,
+                    group,
+                    message: error.message,
+                  };
+                  return [...results, newResult];
+                });
+              }),
+          );
+
+          return [...acc, ...groupsToRemovePromises];
+        }, [] as any);
+
+        await Promise.allSettled(promises);
+
+        setIsSaving(false);
+        setIsResultModalVisible(true);
+
         reloadAgents();
       } catch (error) {
+        setIsSaving(false);
         const options = {
           context: `EditAgentsGroupsModal.handleOnSave`,
           level: UI_LOGGER_LEVELS.ERROR,
@@ -162,21 +176,22 @@ export const EditAgentsGroupsModal = compose(
           },
         };
         getErrorOrchestrator().handleError(options);
-      } finally {
-        setIsSaving(false);
-        onClose();
       }
     };
 
+    const groupsText =
+      addOrRemove === 'add'
+        ? 'Select groups to add'
+        : 'Select groups to remove';
+
     const form = (
       <EuiForm component='form'>
-        <EuiFormRow label='Groups'>
+        <EuiFormRow label='Seleted agents'>
+          <EuiText>{agents.length}</EuiText>
+        </EuiFormRow>
+        <EuiFormRow label={groupsText}>
           <EuiComboBox
-            placeholder={
-              addOrRemove === 'add'
-                ? 'Select groups to add'
-                : 'Select groups to remove'
-            }
+            placeholder={groupsText}
             options={groups?.map(group => ({ label: group })) || []}
             selectedOptions={selectedGroups}
             onChange={handleOnChange}
@@ -188,51 +203,42 @@ export const EditAgentsGroupsModal = compose(
     );
 
     return (
-      <EuiModal
-        onClose={onClose}
-        onClick={ev => {
-          ev.stopPropagation();
-        }}
-      >
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>
-            {addOrRemove === 'add'
-              ? 'Add groups to agents'
-              : 'Remove groups from agents'}
-          </EuiModalHeaderTitle>
-        </EuiModalHeader>
-
-        <EuiModalBody>
-          {form}
-          {agentsIgnoreToRemove.length ? (
-            <>
-              <EuiSpacer />
-              <EuiCallOut
-                title='Agents without groups'
-                color='warning'
-                iconType='alert'
-              >
-                <p>
-                  The groups of the <b>following agents</b> will not be removed
-                  because these agents would be left without a group.
-                </p>
-                <AgentList agents={agentsIgnoreToRemove} />
-              </EuiCallOut>
-            </>
-          ) : null}
-        </EuiModalBody>
-
-        <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
-          <EuiButton
-            onClick={handleOnSave}
-            fill
+      <EuiModal onClose={onClose}>
+        {isResultModalVisible ? (
+          <AgentsGlobalActionsResultModal
+            title={
+              addOrRemove === 'add'
+                ? 'Add groups to agents'
+                : 'Remove groups from agents'
+            }
             isLoading={isSaving}
-            disabled={isGroupsLoading || !selectedGroups?.length}
-          >
-            Save
-          </EuiButton>
-        </EuiModalFooter>
+            results={results}
+            onClose={onClose}
+            loadingMessage='Adding groups to agents...'
+          />
+        ) : (
+          <>
+            <EuiModalHeader>
+              <EuiModalHeaderTitle>
+                {addOrRemove === 'add'
+                  ? 'Add groups to agents'
+                  : 'Remove groups from agents'}
+              </EuiModalHeaderTitle>
+            </EuiModalHeader>
+            <EuiModalBody>{form}</EuiModalBody>
+            <EuiModalFooter>
+              <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+              <EuiButton
+                onClick={handleOnSave}
+                fill
+                isLoading={isSaving}
+                disabled={isGroupsLoading || !selectedGroups?.length}
+              >
+                Save
+              </EuiButton>
+            </EuiModalFooter>
+          </>
+        )}
       </EuiModal>
     );
   },
