@@ -27,6 +27,7 @@ import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
+import { pciColumns } from '../../overview/pci/events/pci-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -232,7 +233,7 @@ export const ModulesDefaults = {
   },
   pci: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: renderDiscoverTab(DEFAULT_INDEX_PATTERN, pciColumns),
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
