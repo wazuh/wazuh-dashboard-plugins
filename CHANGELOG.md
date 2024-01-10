@@ -14,7 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.8.1
 
-## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 01
+## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 02
 
 ### Added
 
@@ -50,7 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the application menu in the IT Hygiene application [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 - Removed the implicit filter of WQL language of the search bar UI [#6174](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6174)
 
-## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 01
+## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 02
 
 ### Added
 
