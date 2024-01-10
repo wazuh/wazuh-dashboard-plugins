@@ -21,11 +21,13 @@ import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent } from '../hocs';
-import WazuhDiscover from '../wazuh-discover/wz-discover';
+import { WazuhDiscover } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
+import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
+import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 import { pciColumns } from '../../overview/pci/events/pci-columns';
 import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
@@ -95,7 +97,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: InventoryFim,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, fileIntegrityMonitoringColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -190,7 +192,15 @@ export const ModulesDefaults = {
         name: 'Inventory',
         component: withModuleNotForAgent(InventoryVuls),
       },
-      EventsTab,
+      {
+        ...renderDiscoverTab(ALERTS_INDEX_PATTERN, vulnerabilitiesColumns),
+        component: withModuleNotForAgent(() => (
+          <WazuhDiscover
+            indexPatternName={DEFAULT_INDEX_PATTERN}
+            tableColumns={vulnerabilitiesColumns}
+          />
+        )),
+      },
     ],
     buttons: ['settings'],
     availableFor: ['manager'],
