@@ -199,7 +199,7 @@ describe('SchedulerJob', () => {
     );
     await expect(schedulerJob.getApiObjects()).rejects.toEqual({
       error: 10001,
-      message: 'No host configured in wazuh.yml',
+      message: 'No server API host configured',
     });
   });
 
