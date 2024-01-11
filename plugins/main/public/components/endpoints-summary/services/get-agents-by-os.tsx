@@ -10,10 +10,14 @@ export const getAgentsByOs = async () => {
       data: {
         data: { affected_items },
       },
-    }: any = await WzRequest.apiReq('GET', '/agents', {});
+    }: any = await WzRequest.apiReq(
+      'GET',
+      '/agents/stats/distinct?fields=os.platform',
+      {},
+    );
     const groupedData: any[] = [];
     affected_items?.forEach((item: any, index: number) => {
-      const itemOsName = item?.os?.name ?? 'Unknown';
+      const itemOsName = item?.os?.platform ?? 'Unknown';
       const foundItem = groupedData.find(
         (groupedItem: any) => groupedItem.label === itemOsName,
       );
@@ -22,7 +26,7 @@ export const getAgentsByOs = async () => {
       } else {
         groupedData.push({
           label: itemOsName,
-          value: 1,
+          value: item.count ?? 1,
           color: getColorPaletteByIndex(index),
         });
       }
@@ -37,7 +41,7 @@ export const getAgentsByOs = async () => {
       error: {
         error: error,
         message: error.message || error,
-        title: `Could not get agents summary`,
+        title: `Could not get agents by OS`,
       },
     };
     getErrorOrchestrator().handleError(options);
