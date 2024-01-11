@@ -21,8 +21,14 @@ import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent } from '../hocs';
+import { WazuhDiscover } from '../wazuh-discover/wz-discover';
+import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
+import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
+import React from 'react';
+import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
+import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -30,12 +36,27 @@ const DashboardTab = {
   buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
   component: Dashboard,
 };
+const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
+const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
+
+const renderDiscoverTab = (indexName = DEFAULT_INDEX_PATTERN, columns) => {
+  return {
+    id: 'events',
+    name: 'Events',
+    buttons: [ButtonModuleExploreAgent],
+    component: () => (
+      <WazuhDiscover indexPatternName={indexName} tableColumns={columns} />
+    ),
+  };
+};
+
 const EventsTab = {
   id: 'events',
   name: 'Events',
   buttons: [ButtonModuleExploreAgent],
   component: Events,
 };
+
 const RegulatoryComplianceTabs = [
   DashboardTab,
   {
@@ -49,8 +70,11 @@ const RegulatoryComplianceTabs = [
 
 export const ModulesDefaults = {
   general: {
-    init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    init: 'events',
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   fim: {
@@ -68,7 +92,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: InventoryFim,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, fileIntegrityMonitoringColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -107,7 +131,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, configurationAssessmentColumns),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
@@ -163,7 +187,15 @@ export const ModulesDefaults = {
         name: 'Inventory',
         component: withModuleNotForAgent(InventoryVuls),
       },
-      EventsTab,
+      {
+        ...renderDiscoverTab(ALERTS_INDEX_PATTERN, vulnerabilitiesColumns),
+        component: withModuleNotForAgent(() => (
+          <WazuhDiscover
+            indexPatternName={DEFAULT_INDEX_PATTERN}
+            tableColumns={vulnerabilitiesColumns}
+          />
+        )),
+      },
     ],
     buttons: ['settings'],
     availableFor: ['manager'],

@@ -1,5 +1,11 @@
-import { OpenSearchDashboardsSecurityFactory, DefaultFactory } from './factories';
-import { OpenSearchDashboardsRequest, RequestHandlerContext } from 'src/core/server';
+import {
+  OpenSearchDashboardsSecurityFactory,
+  DefaultFactory,
+} from './factories';
+import {
+  OpenSearchDashboardsRequest,
+  RequestHandlerContext,
+} from 'src/core/server';
 import { PluginSetup } from '../../types';
 
 type CurrentUser = {
@@ -11,10 +17,14 @@ export interface ISecurityFactory {
   platform?: string;
   getCurrentUser(
     request: OpenSearchDashboardsRequest,
-    context?: RequestHandlerContext
+    context?: RequestHandlerContext,
   ): Promise<CurrentUser>;
 }
 
-export async function SecurityObj({ securityDashboards }: PluginSetup): Promise<ISecurityFactory> {
-  return !!securityDashboards ? new OpenSearchDashboardsSecurityFactory() : new DefaultFactory();
+export function createDashboardSecurity({
+  securityDashboards,
+}: PluginSetup): Promise<ISecurityFactory> {
+  return !!securityDashboards
+    ? new OpenSearchDashboardsSecurityFactory()
+    : new DefaultFactory();
 }

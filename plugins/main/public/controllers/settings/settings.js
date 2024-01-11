@@ -156,21 +156,12 @@ export class SettingsController {
     this.settingsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
-        if (tab === 'logs') {
-          this.refreshLogs();
-        }
       },
       selectedTab: this.tab || 'api',
       // Define tabs for Wazuh plugin settings application
       tabs:
         getWzCurrentAppID() === appSettings.id ? this.tabsConfiguration : null,
       wazuhConfig: this.wazuhConfig,
-    };
-
-    this.settingsLogsProps = {
-      getLogs: async () => {
-        return await this.getAppLogs();
-      },
     };
   }
 
@@ -433,37 +424,6 @@ export class SettingsController {
   }
 
   /**
-   * Returns Wazuh app logs
-   */
-  async getAppLogs() {
-    try {
-      const logs = await this.genericReq.request('GET', '/utils/logs', {});
-      this.$scope.$applyAsync();
-      return logs.data.lastLogs.map(item => JSON.parse(item));
-    } catch (error) {
-      const options = {
-        context: `${SettingsController.name}.getAppLogs`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-
-      return [
-        {
-          date: new Date(),
-          level: 'error',
-          message: 'Error when loading logs',
-        },
-      ];
-    }
-  }
-
-  /**
    * Returns Wazuh app info
    */
   async getAppInfo() {
@@ -481,10 +441,6 @@ export class SettingsController {
       AppState.setPatternSelector(config['ip.selector']);
       const pattern = AppState.getCurrentPattern();
       this.selectedIndexPattern = pattern || config['pattern'];
-
-      if (this.tab === 'logs') {
-        this.getAppLogs();
-      }
 
       this.getCurrentAPIIndex();
       if (
@@ -508,13 +464,6 @@ export class SettingsController {
       };
       getErrorOrchestrator().handleError(options);
     }
-  }
-
-  /**
-   * This ask again for wazuh logs
-   */
-  refreshLogs() {
-    return this.getAppLogs();
   }
 
   /**

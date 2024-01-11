@@ -5,26 +5,30 @@ import {
 } from '../../../common/types';
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { getSavedObject, setSavedObject } from '../saved-object';
-import { getWazuhCore } from '../../plugin-services';
+import {
+  getWazuhCheckUpdatesServices,
+  getWazuhCore,
+} from '../../plugin-services';
 
-export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<AvailableUpdates> => {
+export const getUpdates = async (
+  checkAvailableUpdates?: boolean,
+): Promise<AvailableUpdates> => {
   try {
     if (!checkAvailableUpdates) {
-      const availableUpdates = (await getSavedObject(SAVED_OBJECT_UPDATES)) as AvailableUpdates;
+      const availableUpdates = (await getSavedObject(
+        SAVED_OBJECT_UPDATES,
+      )) as AvailableUpdates;
 
       return availableUpdates;
     }
 
-    const {
-      controllers: { WazuhHostsCtrl },
-      services: { wazuhApiClient },
-    } = getWazuhCore();
-    const wazuhHostsController = new WazuhHostsCtrl();
+    const { serverAPIHostEntries, api: wazuhApiClient } = getWazuhCore();
 
-    const hosts: { id: string }[] = await wazuhHostsController.getHostsEntries();
+    const hosts: { id: string }[] =
+      await serverAPIHostEntries.getHostsEntries();
 
     const apisAvailableUpdates = await Promise.all(
-      hosts?.map(async (api) => {
+      hosts?.map(async api => {
         const data = {};
         const method = 'GET';
         const path = '/manager/version/check?force_query=true';
@@ -37,7 +41,7 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             method,
             path,
             data,
-            options
+            options,
           );
 
           const update = response.data.data as ResponseApiAvailableUpdates;
@@ -89,7 +93,7 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             error,
           };
         }
-      })
+      }),
     );
 
     const savedObject = {
@@ -108,11 +112,9 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
         ? error
         : 'Error trying to get available updates';
 
-    const {
-      services: { log },
-    } = getWazuhCore();
+    const { logger } = getWazuhCheckUpdatesServices();
 
-    log('wazuh-check-updates:getUpdates', message);
+    logger.error(message);
     return Promise.reject(error);
   }
 };

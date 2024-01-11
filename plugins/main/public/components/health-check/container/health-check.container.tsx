@@ -143,6 +143,9 @@ function HealthCheckComponent() {
     window.location.href = getHttp().basePath.prepend(url);
   };
 
+  const thereAreErrors = Object.keys(checkErrors).length > 0;
+  const thereAreWarnings = Object.keys(checkWarnings).length > 0;
+
   useEffect(() => {
     if (appConfig.isReady && !checksInitiated.current) {
       checksInitiated.current = true;
@@ -154,6 +157,7 @@ function HealthCheckComponent() {
     // Redirect to app when all checks are ready
     Object.keys(checks).every(check => checksReady[check]) &&
       !isDebugMode &&
+      !thereAreWarnings &&
       (() =>
         setTimeout(
           redirectionPassHealthcheck,
@@ -210,8 +214,6 @@ function HealthCheckComponent() {
       ? getAssetURL(appConfig.data['customization.logo.healthcheck'])
       : getThemeAssetURL('logo.svg'),
   );
-  const thereAreErrors = Object.keys(checkErrors).length > 0;
-  const thereAreWarnings = Object.keys(checkWarnings).length > 0;
 
   const renderChecks = () => {
     const showLogButton = thereAreErrors || thereAreWarnings || isDebugMode;
@@ -364,7 +366,7 @@ function HealthCheckComponent() {
                 </RedirectAppLinks>
               </EuiFlexItem>
             )}
-            {isDebugMode &&
+            {(isDebugMode || thereAreWarnings) &&
               Object.keys(checks).every(check => checksReady[check]) && (
                 <EuiFlexItem grow={false}>
                   <EuiButton fill onClick={redirectionPassHealthcheck}>

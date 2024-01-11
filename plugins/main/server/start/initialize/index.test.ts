@@ -62,10 +62,6 @@ function mockContextCreator(loggerLevel: string) {
   return ctx;
 }
 
-jest.mock('../../lib/logger', () => ({
-  log: jest.fn(),
-}));
-
 jest.mock('../../lib/get-configuration', () => ({
   getConfiguration: () => ({ pattern: 'wazuh-alerts-*' }),
 }));

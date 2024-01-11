@@ -12,7 +12,11 @@
 import { WazuhUtilsCtrl } from '../../controllers';
 import { IRouter } from 'opensearch_dashboards/server';
 import { schema } from '@osd/config-schema';
-import { CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES, EpluginSettingType, PLUGIN_SETTINGS } from '../../../common/constants';
+import {
+  CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+  EpluginSettingType,
+  PLUGIN_SETTINGS,
+} from '../../../common/constants';
 
 export function WazuhUtilsRoutes(router: IRouter) {
   const ctrl = new WazuhUtilsCtrl();
@@ -21,9 +25,10 @@ export function WazuhUtilsRoutes(router: IRouter) {
   router.get(
     {
       path: '/utils/configuration',
-      validate: false
+      validate: false,
     },
-    async (context, request, response) => ctrl.getConfigurationFile(context, request, response)
+    async (context, request, response) =>
+      ctrl.getConfigurationFile(context, request, response),
   );
 
   // Returns the wazuh.yml file in raw
@@ -40,21 +45,28 @@ export function WazuhUtilsRoutes(router: IRouter) {
                 [pluginSettingKey]: schema.maybe(
                   pluginSettingConfiguration.validateBackend
                     ? pluginSettingConfiguration.validateBackend(schema)
-                    : schema.any()
+                    : schema.any(),
                 ),
               }),
-              {}
-            )
-        )
-      }
+              {},
+            ),
+        ),
+      },
     },
-    async (context, request, response) => ctrl.updateConfigurationFile(context, request, response)
+    async (context, request, response) =>
+      ctrl.updateConfigurationFile(context, request, response),
   );
 
-  const pluginSettingsTypeFilepicker = Object.entries(PLUGIN_SETTINGS)
-    .filter(([_, { type, isConfigurableFromFile }]) => type === EpluginSettingType.filepicker && isConfigurableFromFile);
+  const pluginSettingsTypeFilepicker = Object.entries(PLUGIN_SETTINGS).filter(
+    ([_, { type, isConfigurableFromFile }]) =>
+      type === EpluginSettingType.filepicker && isConfigurableFromFile,
+  );
 
-  const schemaPluginSettingsTypeFilepicker = schema.oneOf(pluginSettingsTypeFilepicker.map(([pluginSettingKey]) => schema.literal(pluginSettingKey)));
+  const schemaPluginSettingsTypeFilepicker = schema.oneOf(
+    pluginSettingsTypeFilepicker.map(([pluginSettingKey]) =>
+      schema.literal(pluginSettingKey),
+    ),
+  );
 
   // Upload an asset
   router.put(
@@ -63,20 +75,22 @@ export function WazuhUtilsRoutes(router: IRouter) {
       validate: {
         params: schema.object({
           // key parameter should be a plugin setting of `filepicker` type
-          key: schemaPluginSettingsTypeFilepicker
+          key: schemaPluginSettingsTypeFilepicker,
         }),
         body: schema.object({
           // file: buffer
           file: schema.buffer(),
-        })
+        }),
       },
       options: {
         body: {
-          maxBytes: CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
+          maxBytes:
+            CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
         },
-      }
+      },
     },
-    async (context, request, response) => ctrl.uploadFile(context, request, response)
+    async (context, request, response) =>
+      ctrl.uploadFile(context, request, response),
   );
 
   // Remove an asset
@@ -86,19 +100,11 @@ export function WazuhUtilsRoutes(router: IRouter) {
       validate: {
         params: schema.object({
           // key parameter should be a plugin setting of `filepicker` type
-          key: schemaPluginSettingsTypeFilepicker
-        })
-      }
+          key: schemaPluginSettingsTypeFilepicker,
+        }),
+      },
     },
-    async (context, request, response) => ctrl.deleteFile(context, request, response)
-  );
-
-  // Returns Wazuh app logs
-  router.get(
-    {
-      path: '/utils/logs',
-      validate: false
-    },
-    async (context, request, response) => ctrl.getAppLogs(context, request, response)
+    async (context, request, response) =>
+      ctrl.deleteFile(context, request, response),
   );
 }

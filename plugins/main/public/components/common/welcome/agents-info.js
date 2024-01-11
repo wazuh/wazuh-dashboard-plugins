@@ -118,7 +118,6 @@ export class AgentInfo extends Component {
                   length={40}
                   label={'more'}
                   action={'redirect'}
-                  agent={this.props.agent}
                   {...this.props}
                 />
               ) : item.description === 'Operating system' ? (

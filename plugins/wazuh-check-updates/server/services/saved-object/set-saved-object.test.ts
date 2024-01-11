@@ -1,8 +1,14 @@
-import { getInternalSavedObjectsClient, getWazuhCore } from '../../plugin-services';
+import {
+  getInternalSavedObjectsClient,
+  getWazuhCore,
+  getWazuhCheckUpdatesServices,
+} from '../../plugin-services';
 import { setSavedObject } from './set-saved-object';
 
-const mockedGetInternalObjectsClient = getInternalSavedObjectsClient as jest.Mock;
-const mockedGetWazuhCore = getWazuhCore as jest.Mock;
+const mockedGetInternalObjectsClient =
+  getInternalSavedObjectsClient as jest.Mock;
+const mockedGetWazuhCheckUpdatesServices =
+  getWazuhCheckUpdatesServices as jest.Mock;
 jest.mock('../../plugin-services');
 
 describe('setSavedObject function', () => {
@@ -14,11 +20,19 @@ describe('setSavedObject function', () => {
     mockedGetInternalObjectsClient.mockImplementation(() => ({
       create: () => ({ attributes: { hide_update_notifications: true } }),
     }));
+    mockedGetWazuhCheckUpdatesServices.mockImplementation(() => ({
+      logger: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
+    }));
 
     const response = await setSavedObject(
       'wazuh-check-updates-user-preferences',
       { hide_update_notifications: true },
-      'admin'
+      'admin',
     );
 
     expect(response).toEqual({ hide_update_notifications: true });
@@ -28,14 +42,19 @@ describe('setSavedObject function', () => {
     mockedGetInternalObjectsClient.mockImplementation(() => ({
       create: jest.fn().mockRejectedValue(new Error('setSavedObject error')),
     }));
-    mockedGetWazuhCore.mockImplementation(() => ({
-      services: { log: jest.fn().mockImplementation(() => {}) },
+    mockedGetWazuhCheckUpdatesServices.mockImplementation(() => ({
+      logger: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
     }));
 
     const promise = setSavedObject(
       'wazuh-check-updates-user-preferences',
       { hide_update_notifications: true },
-      'admin'
+      'admin',
     );
 
     await expect(promise).rejects.toThrow('setSavedObject error');

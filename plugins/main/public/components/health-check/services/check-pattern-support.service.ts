@@ -65,8 +65,8 @@ export const checkPatternSupportService =
         );
         checkLogger.info('Integrity of saved objects: [ok]');
       } catch (error) {
-        if (error.name === 'WarningError') {
-          checkLogger.warning(error.message || error);
+        if (error instanceof WarningError) {
+          checkLogger.warning(error.message);
         } else {
           checkLogger.error(
             `Error creating index pattern id [${pattern}]: ${
