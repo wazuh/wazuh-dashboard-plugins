@@ -67,12 +67,36 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             </div>
           </div>
           <div
-            class="euiFlexItem"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <div
               class="euiText euiText--medium"
             >
               CPU: 
+              <span
+                class="euiLoadingSpinner euiLoadingSpinner--small"
+              />
+            </div>
+          </div>
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Host name: 
+              <span
+                class="euiLoadingSpinner euiLoadingSpinner--small"
+              />
+            </div>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Board serial: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -2096,12 +2120,36 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             </div>
           </div>
           <div
-            class="euiFlexItem"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <div
               class="euiText euiText--medium"
             >
               CPU: 
+              <span
+                class="euiLoadingSpinner euiLoadingSpinner--small"
+              />
+            </div>
+          </div>
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Host name: 
+              <span
+                class="euiLoadingSpinner euiLoadingSpinner--small"
+              />
+            </div>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Board serial: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />
@@ -4199,12 +4247,36 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             </div>
           </div>
           <div
-            class="euiFlexItem"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <div
               class="euiText euiText--medium"
             >
               CPU: 
+              <span
+                class="euiLoadingSpinner euiLoadingSpinner--small"
+              />
+            </div>
+          </div>
+          <div
+            class="euiFlexItem euiFlexItem--flexGrowZero"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Host name: 
+              <span
+                class="euiLoadingSpinner euiLoadingSpinner--small"
+              />
+            </div>
+          </div>
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Board serial: 
               <span
                 class="euiLoadingSpinner euiLoadingSpinner--small"
               />

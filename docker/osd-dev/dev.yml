@@ -1,17 +1,18 @@
 version: '2.2'
 
-x-logging: &logging
-  logging:
-    driver: loki
-    options:
-      loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
+# x-logging: &logging
+#   logging:
+#     driver: loki
+#     options:
+#       loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
 
 services:
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
-    <<: *logging
+    #<<: *logging
     hostname: exporter-osd-${OS_VERSION}
     profiles:
+      - 'server'
       - 'saml'
       - 'standard'
     networks:
@@ -24,7 +25,7 @@ services:
 
   imposter:
     image: outofcoffee/imposter
-    <<: *logging
+    #<<: *logging
     hostname: imposter-osd-${OS_VERSION}
     networks:
       - os-dev
@@ -37,8 +38,9 @@ services:
 
   generator:
     image: cfssl/cfssl
-    <<: *logging
+    #<<: *logging
     profiles:
+      - 'server'
       - 'saml'
       - 'standard'
     volumes:
@@ -128,8 +130,9 @@ services:
         condition: service_completed_successfully
         required: false
     image: opensearchproject/opensearch:${OS_VERSION}
-    <<: *logging
+    #<<: *logging
     profiles:
+      - 'server'
       - 'saml'
       - 'standard'
     environment:
@@ -157,6 +160,9 @@ services:
 
       - os_logs:/var/log/os1
       - os_data:/var/lib/os1
+    ports:
+      - 9200:9200
+      - 9300:9300
     networks:
       - os-dev
       - mon
@@ -183,7 +189,7 @@ services:
     networks:
       - os-dev
       - mon
-    <<: *logging
+    #<<: *logging
     # restart: always
     entrypoint:
       - '/bin/bash'
@@ -212,6 +218,7 @@ services:
         condition: service_healthy
     image: quay.io/wazuh/osd-dev:${OSD_VERSION}
     profiles:
+      - 'server'
       - 'saml'
       - 'standard'
     hostname: osd
@@ -220,7 +227,7 @@ services:
       - devel
       - mon
     user: '1000:1000'
-    <<: *logging
+    #<<: *logging
     ports:
       - ${OSD_PORT}:5601
     environment:
@@ -272,7 +279,7 @@ services:
     profiles:
       - 'saml'
     hostname: idp
-    <<: *logging
+    #<<: *logging
     networks:
       - os-dev
       - mon
@@ -301,7 +308,7 @@ services:
     profiles:
       - 'saml'
     hostname: idpsetup
-    <<: *logging
+    #<<: *logging
     networks:
       - os-dev
       - mon
@@ -315,6 +322,37 @@ services:
        bash /enable_saml.sh
        exit 0
       '
+  wazuh.manager:
+    depends_on:
+      os1:
+        condition: service_healthy
+    image: wazuh/wazuh-manager:${WAZUH_STACK}
+    profiles:
+      - 'server'
+    hostname: wazuh.manager
+    # <<: *logging
+    networks:
+      - os-dev
+      - mon
+    environment:
+      - INDEXER_URL=https://os1:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=admin
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
+      - SSL_KEY=/etc/ssl/wazuh/filebeat.key
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - wm_certs:/etc/ssl/wazuh
+      - ./config/wazuh_cluster/wazuh_manager.conf:/wazuh-config-mount/etc/ossec.conf
+    ports:
+      - '514:514'
+      - '1514:1514'
+      - '1515:1515'
+      - '1516:1516'
+      - '55000:55000'
 
 networks:
   os-dev:
