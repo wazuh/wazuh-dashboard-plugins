@@ -55,6 +55,26 @@ const sections = {
   security: 'security',
 };
 
+function unpinedAgent() {
+  const $injector = getAngularModule().$injector;
+  const location = $injector.get('$location');
+  store.dispatch(updateCurrentAgentData({}));
+  const currentAppliedFilters = getDataPlugin().query.filterManager.filters;
+  const agentFilters = currentAppliedFilters.filter(x => {
+    return x.meta.key !== 'agent.id';
+  });
+  getDataPlugin().query.filterManager.setFilters(agentFilters);
+  setTimeout(
+    () =>
+      ['agent', 'agentId'].forEach(param => {
+        if (location.search()[param]) {
+          location.search(param, null);
+        }
+      }),
+    1,
+  );
+}
+
 export const WzMenu = withWindowSize(
   class WzMenu extends Component {
     constructor(props) {
@@ -415,7 +435,7 @@ export const WzMenu = withWindowSize(
         AppState.setCurrentAPI(
           JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
         );
-
+        unpinedAgent();
         if (this.state.currentMenuTab !== 'wazuh-dev') {
           this.router.reload();
         }
