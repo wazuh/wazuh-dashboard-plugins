@@ -35,9 +35,11 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
+import {
+  getWazuhCheckUpdatesPlugin,
+  getWazuhCorePlugin,
+} from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
-import { formatUIDate } from '../../../react-services/time-service';
 
 export const ApiTable = compose(
   withErrorBoundary,
@@ -48,12 +50,16 @@ export const ApiTable = compose(
       super(props);
 
       const { getAvailableUpdates } = getWazuhCheckUpdatesPlugin();
+      const {
+        utils: { formatUIDate },
+      } = getWazuhCorePlugin();
 
       this.state = {
         apiEntries: [],
         refreshingEntries: false,
         availableUpdates: {},
         getAvailableUpdates,
+        formatUIDate,
         refreshingAvailableUpdates: true,
         apiAvailableUpdateDetails: undefined,
       };
@@ -553,10 +559,8 @@ export const ApiTable = compose(
                       title='Last check'
                       content={
                         this.state.availableUpdates?.last_check_date
-                          ? formatUIDate(
-                              new Date(
-                                this.state.availableUpdates.last_check_date,
-                              ),
+                          ? this.state.formatUIDate(
+                              this.state.availableUpdates.last_check_date,
                             )
                           : '-'
                       }
