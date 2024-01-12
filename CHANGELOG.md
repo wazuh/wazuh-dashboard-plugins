@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed exception in Inventory when agents don't have OS information [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
 - Fixed pinned agent state in URL [#6177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6177)
 - Fixed invalid date format in about and agent views [#6234](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6234)
+- Fixed script to install agents on macOS when you have password to deploy [#6305](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6305)
 
 ### Removed
 
