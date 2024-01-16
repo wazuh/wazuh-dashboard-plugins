@@ -1353,7 +1353,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.arrayOf,
     defaultValue: false,
-    persistence: {
+    store: {
       savedObject: {
         mapping: {
           properties: {
