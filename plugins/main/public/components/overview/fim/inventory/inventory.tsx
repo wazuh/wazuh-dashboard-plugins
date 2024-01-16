@@ -41,6 +41,8 @@ import { withErrorBoundary } from '../../../common/hocs';
 import { HitsCounter } from '../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
 import { formatNumWithCommas } from '../../../../kibana-integrations/discover/application/helpers';
 import { useAppConfig } from '../../../common/hooks';
+import { WAZUH_INDEX_TYPE_FIM } from '../../../../../common/constants';
+import useCheckIndexFields from '../../vulnerabilities/common/hooks/useCheckIndexFields';
 
 const InventoryFimComponent = () => {
   const appConfig = useAppConfig();
@@ -95,6 +97,50 @@ const InventoryFimComponent = () => {
     doc: inspectedHit,
     indexPattern: indexPattern as IndexPattern,
   });
+
+  const {
+    isError,
+    error,
+    isSuccess,
+    resultIndexData,
+    isLoading: isLoadingCheckIndex,
+  } = useCheckIndexFields(
+    FIM_INDEX_PATTERN_ID,
+    indexPatterns?.[0],
+    WAZUH_INDEX_TYPE_FIM,
+    filters,
+    query,
+  );
+
+  useEffect(() => {
+    if (!isLoading && isSuccess) {
+      setIndexPattern(indexPatterns?.[0] as IndexPattern);
+      search({
+        indexPattern: indexPatterns?.[0] as IndexPattern,
+        filters,
+        query,
+        pagination,
+        sorting,
+      })
+        .then(results => {
+          setResults(results);
+          setIsSearching(false);
+        })
+        .catch(error => {
+          const searchError = ErrorFactory.create(HttpError, {
+            error,
+            message: 'Error fetching fim',
+          });
+          ErrorHandler.handleError(searchError);
+          setIsSearching(false);
+        });
+    }
+  }, [
+    JSON.stringify(searchBarProps),
+    JSON.stringify(pagination),
+    JSON.stringify(sorting),
+    isLoadingCheckIndex,
+  ]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -164,7 +210,7 @@ const InventoryFimComponent = () => {
         grow
       >
         <>
-          {isLoading ? (
+          {isLoading || isLoadingCheckIndex ? (
             <LoadingSpinner />
           ) : (
             <SearchBar
@@ -176,10 +222,17 @@ const InventoryFimComponent = () => {
             />
           )}
           {isSearching ? <LoadingSpinner /> : null}
-          {!isLoading && !isSearching && results?.hits?.total === 0 ? (
-            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+          {!isLoading &&
+          !isSearching &&
+          (isError ||
+            results?.hits?.total === 0 ||
+            resultIndexData?.hits?.total === 0) ? (
+            <DiscoverNoResults message={error?.message} />
           ) : null}
-          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+          {!isLoading &&
+          !isSearching &&
+          isSuccess &&
+          results?.hits?.total > 0 ? (
             <EuiDataGrid
               {...dataGridProps}
               toolbarVisibility={{
