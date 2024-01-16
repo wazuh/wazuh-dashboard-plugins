@@ -18,7 +18,7 @@ import {
   PLUGIN_SETTINGS,
 } from '../../../common/constants';
 
-export function WazuhUtilsRoutes(router: IRouter) {
+export function WazuhUtilsRoutes(router: IRouter, services) {
   const ctrl = new WazuhUtilsCtrl();
 
   // Returns the wazuh.yml file parsed
@@ -28,7 +28,7 @@ export function WazuhUtilsRoutes(router: IRouter) {
       validate: false,
     },
     async (context, request, response) =>
-      ctrl.getConfigurationFile(context, request, response),
+      ctrl.getConfiguration(context, request, response),
   );
 
   // Returns the wazuh.yml file in raw
@@ -36,13 +36,37 @@ export function WazuhUtilsRoutes(router: IRouter) {
     {
       path: '/utils/configuration',
       validate: {
-        body: schema.any(),
+        // body: schema.any(),
+        body: (value, response) => {
+          const validationSchema = Array.from(
+            services.configuration._settings.entries(),
+          )
+            .filter(([, { isConfigurableFromFile }]) => isConfigurableFromFile)
+            .reduce(
+              (accum, [pluginSettingKey, pluginSettingConfiguration]) => ({
+                ...accum,
+                [pluginSettingKey]: schema.maybe(
+                  pluginSettingConfiguration.validateBackend
+                    ? pluginSettingConfiguration.validateBackend(schema)
+                    : schema.any(),
+                ),
+              }),
+              {},
+            );
+          try {
+            const validation = schema.object(validationSchema).validate(value);
+            return response.ok(validation);
+          } catch (error) {
+            return response.badRequest(error.message);
+          }
+        },
       },
     },
     async (context, request, response) =>
-      ctrl.updateConfigurationFile(context, request, response),
+      ctrl.updateConfiguration(context, request, response),
   );
 
+  // TODO: remove the usage of static plugin settings
   const pluginSettingsTypeFilepicker = Object.entries(PLUGIN_SETTINGS).filter(
     ([_, { type, isConfigurableFromFile }]) =>
       type === EpluginSettingType.filepicker && isConfigurableFromFile,
@@ -59,10 +83,30 @@ export function WazuhUtilsRoutes(router: IRouter) {
     {
       path: '/utils/configuration/files/{key}',
       validate: {
-        params: schema.object({
-          // key parameter should be a plugin setting of `filepicker` type
-          key: schemaPluginSettingsTypeFilepicker,
-        }),
+        // params: schema.object({
+        //   // key parameter should be a plugin setting of `filepicker` type
+        //   key: schemaPluginSettingsTypeFilepicker,
+        // }),
+        params: (value, response) => {
+          const validationSchema = Array.from(
+            services.configuration._settings.entries(),
+          )
+            // key parameter should be a plugin setting of `filepicker` type
+            .filter(
+              ([, { isConfigurableFromFile, type }]) =>
+                type === EpluginSettingType.filepicker &&
+                isConfigurableFromFile,
+            )
+            .map(([pluginSettingKey]) => schema.literal(pluginSettingKey));
+          try {
+            const validation = schema
+              .object({ key: schema.oneOf(validationSchema) })
+              .validate(value);
+            return response.ok(validation);
+          } catch (error) {
+            return response.badRequest(error.message);
+          }
+        },
         body: schema.object({
           // file: buffer
           file: schema.buffer(),
@@ -84,10 +128,30 @@ export function WazuhUtilsRoutes(router: IRouter) {
     {
       path: '/utils/configuration/files/{key}',
       validate: {
-        params: schema.object({
-          // key parameter should be a plugin setting of `filepicker` type
-          key: schemaPluginSettingsTypeFilepicker,
-        }),
+        // params: schema.object({
+        //   // key parameter should be a plugin setting of `filepicker` type
+        //   key: schemaPluginSettingsTypeFilepicker,
+        // }),
+        params: (value, response) => {
+          const validationSchema = Array.from(
+            services.configuration._settings.entries(),
+          )
+            // key parameter should be a plugin setting of `filepicker` type
+            .filter(
+              ([, { isConfigurableFromFile, type }]) =>
+                type === EpluginSettingType.filepicker &&
+                isConfigurableFromFile,
+            )
+            .map(([pluginSettingKey]) => schema.literal(pluginSettingKey));
+          try {
+            const validation = schema
+              .object({ key: schema.oneOf(validationSchema) })
+              .validate(value);
+            return response.ok(validation);
+          } catch (error) {
+            return response.badRequest(error.message);
+          }
+        },
       },
     },
     async (context, request, response) =>

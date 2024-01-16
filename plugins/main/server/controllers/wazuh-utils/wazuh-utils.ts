@@ -35,13 +35,13 @@ export class WazuhUtilsCtrl {
   constructor() {}
 
   /**
-   * Returns the wazuh.yml file parsed
+   * Get the configuration
    * @param {Object} context
    * @param {Object} request
    * @param {Object} response
-   * @returns {Object} Configuration File or ErrorResponse
+   * @returns {Object}
    */
-  async getConfigurationFile(
+  async getConfiguration(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
@@ -65,75 +65,74 @@ export class WazuhUtilsCtrl {
   }
 
   /**
-   * Returns the wazuh.yml file in raw
+   * Update the configuration
    * @param {Object} context
    * @param {Object} request
    * @param {Object} response
-   * @returns {Object} Configuration File or ErrorResponse
+   * @returns {Object}
    */
-  updateConfigurationFile =
-    this.routeDecoratorProtectedAdministratorRoleValidToken(
-      async (
-        context: RequestHandlerContext,
-        request: OpenSearchDashboardsRequest,
-        response: OpenSearchDashboardsResponseFactory,
-      ) => {
-        // TODO: add validation of body
-        let requiresRunningHealthCheck = false,
-          requiresReloadingBrowserTab = false,
-          requiresRestartingPluginPlatform = false;
+  updateConfiguration = this.routeDecoratorProtectedAdministratorRoleValidToken(
+    async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
+      // TODO: add validation of body
+      let requiresRunningHealthCheck = false,
+        requiresReloadingBrowserTab = false,
+        requiresRestartingPluginPlatform = false;
 
-        context.wazuh.logger.debug(
-          `Updating configuration: ${JSON.stringify(request.body)}`,
-        );
+      context.wazuh.logger.debug(
+        `Updating configuration: ${JSON.stringify(request.body)}`,
+      );
 
-        const updatedSettings = {
-          ...request.body,
-        };
-        context.wazuh.logger.debug(
-          `Updating configuration with ${JSON.stringify(updatedSettings)}`,
-        );
-        const pluginSettings = await context.wazuh_core.configuration.set(
-          updatedSettings,
-        );
-        context.wazuh.logger.debug('Configuration updated');
+      const updatedSettings = {
+        ...request.body,
+      };
+      context.wazuh.logger.debug(
+        `Updating configuration with ${JSON.stringify(updatedSettings)}`,
+      );
+      const pluginSettings = await context.wazuh_core.configuration.set(
+        updatedSettings,
+      );
+      context.wazuh.logger.debug('Configuration updated');
 
-        // TODO: this doesn't support the update of hosts
-        requiresRunningHealthCheck =
-          Object.keys(request.body).some((pluginSettingKey: string) =>
-            Boolean(
-              context.wazuh_core.configuration._settings.get(pluginSettingKey)
-                .requiresRunningHealthCheck,
-            ),
-          ) || requiresRunningHealthCheck;
-        requiresReloadingBrowserTab =
-          Object.keys(request.body).some((pluginSettingKey: string) =>
-            Boolean(
-              context.wazuh_core.configuration._settings.get(pluginSettingKey)
-                .requiresReloadingBrowserTab,
-            ),
-          ) || requiresReloadingBrowserTab;
-        requiresRestartingPluginPlatform =
-          Object.keys(request.body).some((pluginSettingKey: string) =>
-            Boolean(
-              context.wazuh_core.configuration._settings.get(pluginSettingKey)
-                .requiresRestartingPluginPlatform,
-            ),
-          ) || requiresRestartingPluginPlatform;
+      // TODO: this doesn't support the update of hosts
+      requiresRunningHealthCheck =
+        Object.keys(request.body).some((pluginSettingKey: string) =>
+          Boolean(
+            context.wazuh_core.configuration._settings.get(pluginSettingKey)
+              .requiresRunningHealthCheck,
+          ),
+        ) || requiresRunningHealthCheck;
+      requiresReloadingBrowserTab =
+        Object.keys(request.body).some((pluginSettingKey: string) =>
+          Boolean(
+            context.wazuh_core.configuration._settings.get(pluginSettingKey)
+              .requiresReloadingBrowserTab,
+          ),
+        ) || requiresReloadingBrowserTab;
+      requiresRestartingPluginPlatform =
+        Object.keys(request.body).some((pluginSettingKey: string) =>
+          Boolean(
+            context.wazuh_core.configuration._settings.get(pluginSettingKey)
+              .requiresRestartingPluginPlatform,
+          ),
+        ) || requiresRestartingPluginPlatform;
 
-        return response.ok({
-          body: {
-            data: {
-              requiresRunningHealthCheck,
-              requiresReloadingBrowserTab,
-              requiresRestartingPluginPlatform,
-              updatedConfiguration: pluginSettings,
-            },
+      return response.ok({
+        body: {
+          data: {
+            requiresRunningHealthCheck,
+            requiresReloadingBrowserTab,
+            requiresRestartingPluginPlatform,
+            updatedConfiguration: pluginSettings,
           },
-        });
-      },
-      3021,
-    );
+        },
+      });
+    },
+    3021,
+  );
 
   /**
    * Upload a file
@@ -251,7 +250,7 @@ export class WazuhUtilsCtrl {
       const updatedConfiguration = {
         [key]: pluginSettingValue,
       };
-      await context.wazuh_core.configuration.clean(key);
+      await context.wazuh_core.configuration.clear(key);
 
       return response.ok({
         body: {

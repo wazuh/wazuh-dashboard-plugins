@@ -15,12 +15,6 @@ import {
   RequestHandlerContext,
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
-import {
-  PLUGIN_PLATFORM_INSTALLATION_USER,
-  PLUGIN_PLATFORM_INSTALLATION_USER_GROUP,
-  PLUGIN_PLATFORM_NAME,
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
-} from '../../common/constants';
 import { ErrorResponse } from '../lib/error-response';
 
 export class WazuhHostsCtrl {
@@ -111,6 +105,132 @@ export class WazuhHostsCtrl {
           error.message || error
         }`,
         2013,
+        500,
+        response,
+      );
+    }
+  }
+
+  /**
+   * Create or update the API host data stored in the configuration.
+   * Allow partial updates.
+   * @param context
+   * @param request
+   * @param response
+   * @returns
+   */
+  async updateAPIHost(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const { id: originalID } = request.params;
+      context.wazuh.logger.debug('Getting the API hosts');
+      const hosts = await context.wazuh_core.configuration.get('hosts');
+      context.wazuh.logger.debug(`API hosts data: ${JSON.stringify(hosts)}`);
+
+      let newHosts = [...hosts];
+
+      const hostExistIndex = newHosts.findIndex(({ id }) => id === originalID);
+      if (hostExistIndex !== -1) {
+        context.wazuh.logger.debug(`API host with ID [${originalID}] found`);
+        context.wazuh.logger.debug(`Replacing API host ID [${originalID}]`);
+        // Exist
+        // Update the API host info
+        newHosts = newHosts.map((item, index) =>
+          index === hostExistIndex ? { ...item, ...request.body } : item,
+        );
+      } else {
+        context.wazuh.logger.debug(
+          `API host with ID [${originalID}] not found`,
+        );
+        // Not exist
+        // Add new host
+        context.wazuh.logger.debug(
+          `Adding new API host with ID [${request.body.id}]`,
+        );
+        newHosts.push(request.body);
+      }
+      context.wazuh.logger.debug(
+        `API hosts to save ${JSON.stringify(newHosts)}`,
+      );
+      await context.wazuh_core.configuration.set({
+        hosts: newHosts,
+      });
+      context.wazuh.logger.info('API hosts saved');
+      return response.ok({
+        body: {
+          message: `API host with ID [${originalID}] was ${
+            hostExistIndex ? 'updated' : 'created'
+          }`,
+          data: request.body,
+        },
+      });
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(
+        `Could not update the API host entry ${error.message || error}`,
+        2014,
+        500,
+        response,
+      );
+    }
+  }
+
+  /**
+   * Delete an API host from the configuration
+   * @param context
+   * @param request
+   * @param response
+   * @returns
+   */
+  async deleteAPIHost(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const { id: originalID } = request.params;
+      context.wazuh.logger.debug('Getting the API hosts');
+      const hosts = await context.wazuh_core.configuration.get('hosts');
+      context.wazuh.logger.debug(`API hosts data: ${JSON.stringify(hosts)}`);
+
+      const newHosts = [...hosts];
+
+      const hostExistIndex = newHosts.indexOf(({ id }) => id === originalID);
+      if (hostExistIndex === -1) {
+        context.wazuh.logger.debug(
+          `API host with ID [${originalID}] not found`,
+        );
+        return response.notFound({
+          body: {
+            message: `API host with ID [${originalID}] was not found`,
+          },
+        });
+      }
+      context.wazuh.logger.debug(`API host with ID [${originalID}] found`);
+      // Exist
+      // Remove host
+      context.wazuh.logger.debug(`Removing API host with ID [${originalID}]`);
+      newHosts.splice(hostExistIndex, 1);
+
+      context.wazuh.logger.debug('Updating API hosts');
+      await context.wazuh_core.configuration.set({
+        hosts: newHosts,
+      });
+      context.wazuh.logger.debug('Updated API hosts');
+
+      return response.ok({
+        body: {
+          message: `API host with ID [${originalID}] was removed`,
+        },
+      });
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(
+        `Could not remove the API host entry ${error.message || error}`,
+        2015,
         500,
         response,
       );

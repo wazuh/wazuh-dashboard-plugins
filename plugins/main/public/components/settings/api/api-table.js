@@ -40,6 +40,12 @@ import {
 } from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
 import { formatUIDate } from '../../../react-services/time-service';
+import { AddAPIHostForm } from './add-api';
+import {
+  WzButtonPermissionsOpenFlyout,
+  WzButtonPermissionsModalConfirm,
+} from '../../common/buttons';
+import { ErrorHandler, GenericRequest } from '../../../react-services';
 
 export const ApiTable = compose(
   withErrorBoundary,
@@ -58,6 +64,7 @@ export const ApiTable = compose(
         getAvailableUpdates,
         refreshingAvailableUpdates: true,
         apiAvailableUpdateDetails: undefined,
+        addingAPI: false,
       };
     }
 
@@ -200,6 +207,29 @@ export const ApiTable = compose(
           },
         };
 
+        getErrorOrchestrator().handleError(options);
+      }
+    }
+
+    async deleteAPIHost(id) {
+      try {
+        const apiHostId = item.id;
+        const response = await GenericRequest.request(
+          'DELETE',
+          `/hosts/apis/${apiHostId}`,
+        );
+        ErrorHandler.info(response.data.message);
+      } catch (error) {
+        const options = {
+          context: `${ApiTable.name}.deleteAPIHost`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error removing the API host ${id}`,
+          },
+        };
         getErrorOrchestrator().handleError(options);
       }
     }
@@ -463,35 +493,69 @@ export const ApiTable = compose(
           name: 'Actions',
           render: item => (
             <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
-                <WzButtonPermissions
-                  buttonType='icon'
-                  roles={[]}
-                  tooltip={{ position: 'top', content: <p>Set as default</p> }}
-                  iconType={
-                    item.id === this.props.currentDefault
-                      ? 'starFilled'
-                      : 'starEmpty'
-                  }
-                  aria-label='Set as default'
-                  onClick={async () => {
-                    const currentDefault = await this.props.setDefault(item);
-                    this.setState({
-                      currentDefault,
-                    });
-                  }}
+              <WzButtonPermissions
+                buttonType='icon'
+                roles={[]}
+                tooltip={{ position: 'top', content: <p>Set as default</p> }}
+                iconType={
+                  item.id === this.props.currentDefault
+                    ? 'starFilled'
+                    : 'starEmpty'
+                }
+                aria-label='Set as default'
+                onClick={async () => {
+                  const currentDefault = await this.props.setDefault(item);
+                  this.setState({
+                    currentDefault,
+                  });
+                }}
+              />
+              <EuiToolTip position='top' content={<p>Check connection</p>}>
+                <EuiButtonIcon
+                  aria-label='Check connection'
+                  iconType='refresh'
+                  onClick={async () => await this.checkApi(item)}
+                  color='success'
                 />
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiToolTip position='top' content={<p>Check connection</p>}>
-                  <EuiButtonIcon
-                    aria-label='Check connection'
-                    iconType='refresh'
-                    onClick={async () => await this.checkApi(item)}
-                    color='success'
+              </EuiToolTip>
+              <WzButtonPermissionsOpenFlyout
+                flyoutTitle={`Edit API host: ${item.id} `}
+                roles={[]} // TODO: define permissions
+                flyoutBody={
+                  <AddAPIHostForm
+                    initialValue={{
+                      id: item.id,
+                      url: item.url,
+                      port: item.port,
+                      username: item.username,
+                      password: '',
+                      password_confirm: '',
+                    }}
+                    apiId={item.id}
                   />
-                </EuiToolTip>
-              </EuiFlexItem>
+                }
+                buttonProps={{
+                  buttonType: 'icon',
+                  iconType: 'pencil',
+                  tooltip: {
+                    content: 'Edit',
+                  },
+                }}
+              ></WzButtonPermissionsOpenFlyout>
+              <WzButtonPermissionsModalConfirm
+                buttonType='icon'
+                roles={[]} // TODO: define permissions
+                tooltip={{
+                  content: 'Delete',
+                }}
+                isDisabled={false}
+                modalTitle={`Do you want to delete the ${item.id} API host?`}
+                onConfirm={() => this.deleteAPIHost(item.id)}
+                modalProps={{ buttonColor: 'danger' }}
+                iconType='trash'
+                color='danger'
+                aria-label='Delete API host'
+              />
             </EuiFlexGroup>
           ),
         },
@@ -518,14 +582,17 @@ export const ApiTable = compose(
                 </EuiFlexGroup>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <WzButtonPermissions
-                  buttonType='empty'
-                  iconType='plusInCircle'
+                <WzButtonPermissionsOpenFlyout
+                  flyoutTitle='Add API host'
+                  flyoutBody={<AddAPIHostForm />}
                   roles={[]}
-                  onClick={() => this.props.showAddApi()}
+                  buttonProps={{
+                    buttonType: 'empty',
+                    iconType: 'plusInCircle',
+                  }}
                 >
                   Add new
-                </WzButtonPermissions>
+                </WzButtonPermissionsOpenFlyout>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
@@ -580,6 +647,11 @@ export const ApiTable = compose(
               sorting={true}
               loading={isLoading}
               tableLayout='auto'
+              message={
+                !items.length
+                  ? 'No API hosts configured. Add a new one.'
+                  : undefined
+              }
             />
           </EuiPanel>
           <AvailableUpdatesFlyout

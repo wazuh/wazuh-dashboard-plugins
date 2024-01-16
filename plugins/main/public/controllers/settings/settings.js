@@ -127,7 +127,6 @@ export class SettingsController {
       compressed: true,
       setDefault: entry => this.setDefault(entry),
       checkManager: entry => this.checkManager(entry),
-      showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
       testApi: (entry, force) => ApiCheck.checkApi(entry, force),
       showAddApiWithInitialError: error =>
@@ -139,7 +138,6 @@ export class SettingsController {
     };
 
     this.addApiProps = {
-      checkForNewApis: () => this.checkForNewApis(),
       closeAddApi: () => this.closeAddApi(),
     };
 
@@ -307,8 +305,6 @@ export class SettingsController {
 
       await this.getHosts();
 
-      // Set the addingApi flag based on if there is any API entry
-      this.addingApi = !this.apiEntries.length;
       const currentApi = AppState.getCurrentAPI();
 
       if (currentApi) {
@@ -467,54 +463,6 @@ export class SettingsController {
   }
 
   /**
-   * Checks if there are new APIs entries in the wazuh.yml
-   */
-  async checkForNewApis() {
-    try {
-      this.addingApi = true;
-      this.addApiProps.errorsAtInit = false;
-      const hosts = await this.getHosts();
-      //Tries to check if there are new APIs entries in the wazuh.yml also, checks if some of them have connection
-      if (!hosts.length)
-        throw {
-          message: 'There were not found any API entry in the wazuh.yml',
-          type: 'warning',
-          closedEnabled: false,
-        };
-      const notRecheable = await this.checkApisStatus();
-      if (notRecheable) {
-        if (notRecheable >= hosts.length) {
-          this.apiIsDown = true;
-          throw {
-            message:
-              'Wazuh API not recheable, please review your configuration',
-            type: 'danger',
-            closedEnabled: true,
-          };
-        }
-        throw {
-          message: `Some of the API entries are not reachable. You can still use the ${PLUGIN_APP_NAME} but please, review your hosts configuration.`,
-          type: 'warning',
-          closedEnabled: true,
-        };
-      }
-    } catch (error) {
-      const options = {
-        context: `${SettingsController.name}.checkForNewApis`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Get the hosts in the wazuh.yml
    */
   async getHosts() {
@@ -527,30 +475,12 @@ export class SettingsController {
           hosts;
       if (!hosts.length) {
         this.apiIsDown = false;
-        this.addingApi = true;
         this.$scope.$applyAsync();
       }
       return hosts;
     } catch (error) {
       return Promise.reject(error);
     }
-  }
-
-  /**
-   * Closes the add API component
-   */
-  closeAddApi() {
-    this.addingApi = false;
-    this.$scope.$applyAsync();
-  }
-
-  /**
-   * Shows the add API component
-   */
-  showAddApi() {
-    this.addingApi = true;
-    this.addApiProps.enableClose = true;
-    this.$scope.$applyAsync();
   }
 
   /**
@@ -573,7 +503,6 @@ export class SettingsController {
    * Shows the add api component with an initial error
    */
   showAddApiWithInitialError(error) {
-    this.addApiProps.errorsAtInit = error;
     this.apiEntries = [];
     this.addingApi = true;
     this.$scope.$applyAsync();
