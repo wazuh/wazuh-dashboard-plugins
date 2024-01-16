@@ -2,11 +2,13 @@ import { Logger } from 'opensearch-dashboards/server';
 import {
   IConfigurationStore,
   TConfigurationSetting,
+  IConfiguration,
 } from '../../common/services/configuration';
 
 export class ConfigurationStore implements IConfigurationStore {
   private type = 'plugins-configuration';
   private savedObjectRepository: any;
+  private configuration: IConfiguration;
   constructor(private logger: Logger, private savedObjects) {}
   private getSavedObjectDefinition(settings: {
     [key: string]: TConfigurationSetting;
@@ -19,8 +21,8 @@ export class ConfigurationStore implements IConfigurationStore {
         properties: Object.entries(settings).reduce(
           (accum, [key, value]) => ({
             ...accum,
-            ...(value?.persistence?.savedObject?.mapping
-              ? { [key]: value.persistence.savedObject.mapping }
+            ...(value?.store?.savedObject?.mapping
+              ? { [key]: value.store.savedObject.mapping }
               : {}),
           }),
           {},
@@ -28,8 +30,19 @@ export class ConfigurationStore implements IConfigurationStore {
       },
     };
   }
-  async setSavedObjectRepository(savedObjectRepository) {
+  setSavedObjectRepository(savedObjectRepository) {
     this.savedObjectRepository = savedObjectRepository;
+  }
+  setConfiguration(configuration: IConfiguration) {
+    this.configuration = configuration;
+  }
+  getSettingValue(key: string, value: any) {
+    const setting = this.configuration._settings.get(key);
+    return setting?.store?.savedObject?.get?.(value) ?? value;
+  }
+  setSettingValue(key: string, value: any) {
+    const setting = this.configuration._settings.get(key);
+    return setting?.store?.savedObject?.set?.(value) ?? value;
   }
   async setup(settings: { [key: string]: TConfigurationSetting }) {
     // Register the saved object
@@ -55,13 +68,22 @@ export class ConfigurationStore implements IConfigurationStore {
         ? settings.reduce(
             (accum, settingKey: string) => ({
               ...accum,
-              [settingKey]: attributes[settingKey],
+              [settingKey]: this.getSettingValue(
+                settingKey,
+                attributes[settingKey],
+              ),
             }),
             {},
           )
-        : attributes;
+        : Object.fromEntries(
+            Object.entries(attributes).map(([key, value]) => [
+              key,
+              this.getSettingValue(key, value),
+            ]),
+          );
     } catch (error) {
-      return {};
+      this.logger.error(error.message);
+      throw error;
     }
   }
   async set(settings: { [key: string]: any }): Promise<any> {
@@ -69,7 +91,12 @@ export class ConfigurationStore implements IConfigurationStore {
       const attributes = await this.get();
       const newSettings = {
         ...attributes,
-        ...settings,
+        ...Object.fromEntries(
+          Object.entries(settings).map(([key, value]) => [
+            key,
+            this.setSettingValue(key, value),
+          ]),
+        ),
       };
       this.logger.debug(
         `Updating saved object with ${JSON.stringify(newSettings)}`,
@@ -90,7 +117,7 @@ export class ConfigurationStore implements IConfigurationStore {
       throw error;
     }
   }
-  async clean(...settings: string[]): Promise<any> {
+  async clear(...settings: string[]): Promise<any> {
     try {
       const attributes = await this.get();
       const updatedSettings = {

@@ -110,9 +110,11 @@ export type TConfigurationSetting = {
     | TConfigurationSettingOptionsSelect
     | TConfigurationSettingOptionsSwitch
     | TConfigurationSettingOptionsTextArea;
-  persistence?: {
+  store?: {
     savedObject?: {
       mapping: any;
+      get?: (value: any, configuration: any) => any;
+      set?: (value: any, configuration: any) => any;
     };
   };
   // Transform the input value. The result is saved in the form global state of Settings/Configuration
@@ -145,6 +147,7 @@ export interface IConfigurationStore {
   get: (...settings: string[]) => Promise<TConfigurationSettings>;
   set: (settings: TConfigurationSettings) => Promise<any>;
   clean: (...settings: string[]) => Promise<any>;
+  setConfiguration: (configuration: IConfiguration) => void;
 }
 
 export interface IConfiguration {
@@ -155,22 +158,25 @@ export interface IConfiguration {
   register(id: string, value: any): void;
   get(...settings: string[]): Promise<TConfigurationSettings>;
   set(settings: TConfigurationSettings): Promise<any>;
-  clean(...settings: string[]): Promise<any>;
+  clear(...settings: string[]): Promise<any>;
   reset(...settings: string[]): Promise<any>;
-}
-
-export class Configuration implements IConfiguration {
-  public _settings: Map<
+  _settings: Map<
     string,
     {
       [key: string]: TConfigurationSetting;
     }
   >;
-  constructor(private logger: ILogger, private store: IConfigurationStore) {
+}
+
+export class Configuration implements IConfiguration {
+  private store: IConfigurationStore;
+  constructor(private logger: ILogger, store: IConfigurationStore) {
     this._settings = new Map();
+    this.setStore(store);
   }
   setStore(store: IConfigurationStore) {
     this.store = store;
+    this.store.setConfiguration(this);
   }
   async setup() {
     return this.store.setup(Object.fromEntries(this._settings.entries()));
@@ -197,7 +203,17 @@ export class Configuration implements IConfiguration {
     }
   }
 
+  /**
+   * Get the value for a setting from a value or someone of the default values:
+   * defaultValueIfNotSet or defaultValue
+   * @param settingKey
+   * @param value
+   * @returns
+   */
   private getSettingValue(settingKey: string, value: any) {
+    this.logger.debug(
+      `Getting value for [${settingKey}]: stored [${JSON.stringify(value)}]`,
+    );
     if (!this._settings.has(settingKey)) {
       throw new Error(`${settingKey} is not registered`);
     }
@@ -205,18 +221,23 @@ export class Configuration implements IConfiguration {
       return value;
     }
     const setting = this._settings.get(settingKey);
-    return typeof setting.defaultValueIfNotSet !== 'undefined'
-      ? setting.defaultValueIfNotSet
-      : setting.defaultValue;
+    const finalValue =
+      typeof setting.defaultValueIfNotSet !== 'undefined'
+        ? setting.defaultValueIfNotSet
+        : setting.defaultValue;
+    this.logger.debug(
+      `Value for [${settingKey}]: [${JSON.stringify(finalValue)}]`,
+    );
+    return finalValue;
   }
   /**
-   * Get all settings or a subset of them
+   * Get the value for all settings or a subset of them
    * @param rest
    * @returns
    */
   async get(...settings: string[]) {
     const stored = await this.store.get(...settings);
-    this.logger.debug(`wazuh configuration: ${JSON.stringify({ stored })}`);
+    this.logger.debug(`configuration stored: ${JSON.stringify({ stored })}`);
 
     return settings && settings.length === 1
       ? this.getSettingValue(settings[0], stored[settings[0]])
@@ -224,15 +245,15 @@ export class Configuration implements IConfiguration {
           ? settings
           : Array.from(this._settings.keys())
         ).reduce(
-          (accum, settingKey) => ({
+          (accum, key) => ({
             ...accum,
-            [settingKey]: this.getSettingValue(settingKey, stored[settingKey]),
+            [key]: this.getSettingValue(key, stored[key]),
           }),
           {},
         );
   }
   /**
-   * Set a subset of settings
+   * Set a the value for a subset of settings
    * @param settings
    * @returns
    */
@@ -261,32 +282,33 @@ export class Configuration implements IConfiguration {
   }
 
   /**
-   * Clean the settings or a subset of them
+   * Clean the values for all settings or a subset of them
    * @param rest
    * @returns
    */
-  async clean(...settings: string[]) {
+  async clear(...settings: string[]) {
     if (settings) {
       this.logger.debug(`Clean settings: ${settings.join(', ')}`);
-      const response = await this.store.clean(...settings);
+      const response = await this.store.clear(...settings);
       this.logger.info('Settings were cleaned');
       return response;
     } else {
-      return await this.clean();
+      return await this.clear();
     }
   }
 
+  /**
+   * Reset the values for all settings or a subset of them
+   * @param settings
+   * @returns
+   */
   async reset(...settings: string[]) {
     if (settings) {
       this.logger.debug(`Reset settings: ${settings.join(', ')}`);
       const updatedSettings = settings.reduce((accum, settingKey: string) => {
-        const setting = this._settings.get(settingKey);
         return {
           ...accum,
-          [settingKey]:
-            typeof setting.defaultValueIfNotSet !== 'undefined'
-              ? setting.defaultValueIfNotSet
-              : setting.defaultValue,
+          [settingKey]: this.getSettingValue(settingKey),
         };
       }, {});
       const response = await this.store.set(updatedSettings);

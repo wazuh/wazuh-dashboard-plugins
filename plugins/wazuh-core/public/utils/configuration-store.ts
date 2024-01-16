@@ -2,6 +2,7 @@ import {
   TConfigurationSetting,
   IConfigurationStore,
   ILogger,
+  IConfiguration,
 } from '../../common/services/configuration';
 
 export class ConfigurationStore implements IConfigurationStore {
@@ -13,11 +14,14 @@ export class ConfigurationStore implements IConfigurationStore {
       this.logger.error(error.message);
     }
   }
+  setConfiguration(configuration: IConfiguration) {
+    this.configuration = configuration;
+  }
   async start() {}
   async stop() {}
   async fetch() {}
   async get(...settings: string[]): Promise<any | { [key: string]: any }> {
-    const { attributes } = await this.savedObjectRepository.get(
+    const { attributes = {} } = await this.savedObjectRepository.get(
       this.type,
       this.type,
     );
@@ -58,7 +62,7 @@ export class ConfigurationStore implements IConfigurationStore {
       throw error;
     }
   }
-  async clean(...settings: string[]): Promise<any> {
+  async clear(...settings: string[]): Promise<any> {
     try {
       const attributes = await this.get();
       const updatedSettings = {
