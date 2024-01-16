@@ -11,7 +11,7 @@
  */
 import path from 'path';
 import { version } from '../package.json';
-import { validate as validateNodeCronInterval } from 'node-cron';
+// import { validate as validateNodeCronInterval } from 'node-cron';
 import { SettingsValidator } from '../common/services/settings-validator';
 
 // Plugin
@@ -1161,25 +1161,26 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.number({ validate: this.validate.bind(this) });
     },
   },
-  // 'cron.statistics.interval': {
-  //   title: 'Interval',
-  //   description:
-  //     'Define the frequency of task execution using cron schedule expressions.',
-  //   category: SettingCategory.STATISTICS,
-  //   type: EpluginSettingType.text,
-  //   defaultValue: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
-  //   isConfigurableFromFile: true,
-  //   isConfigurableFromUI: true,
-  //   requiresRestartingPluginPlatform: true,
-  //   validate: function (value: string) {
-  //     return validateNodeCronInterval(value)
-  //       ? undefined
-  //       : 'Interval is not valid.';
-  //   },
-  //   validateBackend: function (schema) {
-  //     return schema.string({ validate: this.validate });
-  //   },
-  // },
+  'cron.statistics.interval': {
+    title: 'Interval',
+    description:
+      'Define the frequency of task execution using cron schedule expressions.',
+    category: SettingCategory.STATISTICS,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: true,
+    requiresRestartingPluginPlatform: true,
+    // Workaround: this need to be defined in the frontend side and backend side because an optimization error in the frontend side related to some module can not be loaded.
+    // validate: function (value: string) {
+    //   return validateNodeCronInterval(value)
+    //     ? undefined
+    //     : 'Interval is not valid.';
+    // },
+    // validateBackend: function (schema) {
+    //   return schema.string({ validate: this.validate });
+    // },
+  },
   'cron.statistics.status': {
     title: 'Status',
     description: 'Enable or disable the statistics tasks.',

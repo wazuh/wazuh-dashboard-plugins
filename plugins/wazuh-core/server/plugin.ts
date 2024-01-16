@@ -5,7 +5,7 @@ import {
   Plugin,
   Logger,
 } from 'opensearch-dashboards/server';
-
+import { validate as validateNodeCronInterval } from 'node-cron';
 import {
   PluginSetup,
   WazuhCorePluginSetup,
@@ -86,6 +86,24 @@ export class WazuhCorePlugin
     Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
       this.services.configuration.register(key, value),
     );
+
+    /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
+      Because the settings are defined in the backend and frontend side using the same definitions,
+      the validation funtions are not defined there and has to be defined in the frontend side and backend side
+      */
+    const setting = this.services.configuration._settings.get(
+      'cron.statistics.interval',
+    );
+    !setting.validate &&
+      (setting.validate = function (value: string) {
+        return validateNodeCronInterval(value)
+          ? undefined
+          : 'Interval is not valid.';
+      });
+    !setting.validateBackend &&
+      (setting.validateBackend = function (schema) {
+        return schema.string({ validate: this.validate });
+      });
 
     this.services.configuration.setup();
 
