@@ -22,7 +22,9 @@
   <!-- api -->
   <div ng-if="ctrl.tab === 'api' && !ctrl.load">
     <!-- API table section-->
-    <div ng-if="!ctrl.apiIsDown">
+    <!-- <div ng-if="!ctrl.apiIsDown"> -->
+    <!-- TODO: review when the ApiIsDown view should be displayed -->
+    <div>
       <react-component
         name="ApiTable"
         props="ctrl.apiTableProps"
@@ -31,10 +33,11 @@
 
     <!-- API is down section-->
     <div layout="column" layout-padding ng-if="ctrl.apiIsDown">
-      <react-component
+      <!-- TODO: review when the ApiIsDown view should be displayed -->
+      <!-- <react-component
         name="ApiIsDown"
         props="ctrl.apiIsDownProps"
-      ></react-component>
+      ></react-component> -->
     </div>
   </div>
   <!-- End API configuration card section -->
