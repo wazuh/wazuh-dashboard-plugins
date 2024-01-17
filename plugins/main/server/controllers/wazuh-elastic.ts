@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { ErrorResponse } from '../lib/error-response';
-import { getConfiguration } from '../lib/get-configuration';
 import {
   AgentsVisualizations,
   OverviewVisualizations,
@@ -34,7 +33,6 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS,
   WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
 } from '../../common/constants';
-import { getSettingDefaultValue } from '../../common/services/settings';
 import { WAZUH_INDEXER_NAME } from '../../common/constants';
 
 export class WazuhElasticCtrl {
@@ -326,11 +324,9 @@ export class WazuhElasticCtrl {
    * @param {Array<Object>} app_objects Object containing raw visualizations.
    * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
    */
-  buildVisualizationsRaw(context, app_objects, id, namespace = false) {
-    const config = getConfiguration();
-    let monitoringPattern =
-      (config || {})['wazuh.monitoring.pattern'] ||
-      getSettingDefaultValue('wazuh.monitoring.pattern');
+  async buildVisualizationsRaw(context, app_objects, id, namespace = false) {
+    const config = await context.wazuh_core.configuration.get();
+    let monitoringPattern = `${config['wazuh.monitoring.pattern']}`;
     context.wazuh.logger.debug(`Building ${app_objects.length} visualizations`);
     context.wazuh.logger.debug(`Index pattern ID: ${id}`);
     const visArray = [];
@@ -896,10 +892,8 @@ export class WazuhElasticCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const config = getConfiguration();
-      const statisticsPattern = `${config['cron.prefix'] || 'wazuh'}-${
-        config['cron.statistics.index.name'] || 'statistics'
-      }*`; //TODO: replace by default as constants instead hardcoded ('wazuh' and 'statistics')
+      const config = await context.wazuh_core.configuration.get();
+      const statisticsPattern = `${config['cron.prefix']}-${config['cron.statistics.index.name']}*`;
       const existIndex =
         await context.core.opensearch.client.asCurrentUser.indices.exists({
           index: statisticsPattern,

@@ -17,7 +17,6 @@ import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
 import { HTTP_STATUS_CODES } from '../../common/constants';
-import { getCustomizationSetting } from '../../common/services/settings';
 import { addJobToQueue } from '../start/queue';
 import fs from 'fs';
 import jwtDecode from 'jwt-decode';
@@ -27,7 +26,6 @@ import {
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
-import { getConfiguration } from '../lib/get-configuration';
 
 export class WazuhApiCtrl {
   constructor() {}
@@ -1264,16 +1262,18 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const configuration = getConfiguration();
       const APP_LOGO = 'customization.logo.app';
       const HEALTHCHECK_LOGO = 'customization.logo.healthcheck';
 
       const logos = {
-        [APP_LOGO]: getCustomizationSetting(configuration, APP_LOGO),
-        [HEALTHCHECK_LOGO]: getCustomizationSetting(
-          configuration,
-          HEALTHCHECK_LOGO,
-        ),
+        [APP_LOGO]:
+          await context.wazuh_core.configuration.getCustomizationSetting(
+            APP_LOGO,
+          ),
+        [HEALTHCHECK_LOGO]:
+          await context.wazuh_core.configuration.getCustomizationSetting(
+            HEALTHCHECK_LOGO,
+          ),
       };
 
       return response.ok({

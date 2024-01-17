@@ -63,7 +63,7 @@ function mockContextCreator(loggerLevel: string) {
 }
 
 jest.mock('../../lib/get-configuration', () => ({
-  getConfiguration: () => ({ pattern: 'wazuh-alerts-*' }),
+  getConfiguration: () => ({ pattern: 'wazuh-alerts-*' }), // TODO: refactor
 }));
 
 beforeAll(() => {

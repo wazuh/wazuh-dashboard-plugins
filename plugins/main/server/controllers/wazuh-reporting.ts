@@ -324,6 +324,7 @@ export class WazuhReportingCtrl {
         // Init
         const printer = new ReportPrinter(
           context.wazuh.logger.get('report-printer'),
+          context.wazuh_core.configuration,
         );
 
         createDataDirectoryIfNotExists();
@@ -423,6 +424,7 @@ export class WazuhReportingCtrl {
         // Init
         const printer = new ReportPrinter(
           context.wazuh.logger.get('report-printer'),
+          context.wazuh_core.configuration,
         );
 
         createDataDirectoryIfNotExists();
@@ -716,6 +718,7 @@ export class WazuhReportingCtrl {
 
           const printer = new ReportPrinter(
             context.wazuh.logger.get('report-printer'),
+            context.wazuh_core.configuration,
           );
           createDataDirectoryIfNotExists();
           createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
@@ -1062,6 +1065,7 @@ export class WazuhReportingCtrl {
           // Init
           const printer = new ReportPrinter(
             context.wazuh.logger.get('report-printer'),
+            context.wazuh_core.configuration,
           );
 
           const { hashUsername } = await context.wazuh.security.getCurrentUser(
