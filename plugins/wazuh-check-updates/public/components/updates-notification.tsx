@@ -91,7 +91,9 @@ export const UpdatesNotification = () => {
 
   return mustNotifyUser ? (
     <I18nProvider>
-      <EuiBottomBar className={sideNavDocked && 'wz-check-updates-bottom-bar'}>
+      <EuiBottomBar
+        className={sideNavDocked ? 'wz-check-updates-bottom-bar' : ''}
+      >
         <EuiFlexGroup
           justifyContent='spaceBetween'
           alignItems='center'
