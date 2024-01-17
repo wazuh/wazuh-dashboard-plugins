@@ -49,17 +49,10 @@ export const ApiTable = compose(
     constructor(props) {
       super(props);
 
-      const { getAvailableUpdates } = getWazuhCheckUpdatesPlugin();
-      const {
-        utils: { formatUIDate },
-      } = getWazuhCorePlugin();
-
       this.state = {
         apiEntries: [],
         refreshingEntries: false,
         availableUpdates: {},
-        getAvailableUpdates,
-        formatUIDate,
         refreshingAvailableUpdates: true,
         apiAvailableUpdateDetails: undefined,
       };
@@ -68,9 +61,8 @@ export const ApiTable = compose(
     async getApisAvailableUpdates(forceUpdate = false) {
       try {
         this.setState({ refreshingAvailableUpdates: true });
-        const availableUpdates = await this.state.getAvailableUpdates(
-          forceUpdate,
-        );
+        const availableUpdates =
+          await getWazuhCheckUpdatesPlugin().getAvailableUpdates(forceUpdate);
         this.setState({ availableUpdates });
       } catch (error) {
         const options = {
@@ -559,7 +551,7 @@ export const ApiTable = compose(
                       title='Last check'
                       content={
                         this.state.availableUpdates?.last_check_date
-                          ? this.state.formatUIDate(
+                          ? getWazuhCorePlugin().utils.formatUIDate(
                               this.state.availableUpdates.last_check_date,
                             )
                           : '-'
