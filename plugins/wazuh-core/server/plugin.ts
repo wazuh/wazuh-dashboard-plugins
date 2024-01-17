@@ -13,12 +13,9 @@ import {
 } from './types';
 import { setCore } from './plugin-services';
 import {
-  CacheAPIUserAllowRunAs,
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  ServerAPIHostEntries,
-  UpdateConfigurationFile,
   UpdateRegistry,
   ConfigurationStore,
 } from './services';
@@ -45,34 +42,6 @@ export class WazuhCorePlugin
     this.logger.debug('wazuh_core: Setup');
 
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
-
-    this.services.updateRegistry = new UpdateRegistry(
-      this.logger.get('update-registry'),
-    );
-
-    this.services.manageHosts = new ManageHosts(
-      this.logger.get('manage-hosts'),
-      this.services.updateRegistry,
-    );
-
-    this.services.serverAPIClient = new ServerAPIClient(
-      this.logger.get('server-api-client'),
-      this.services.manageHosts,
-      this.services.dashboardSecurity,
-    );
-
-    this.services.cacheAPIUserAllowRunAs = new CacheAPIUserAllowRunAs(
-      this.logger.get('api-user-allow-run-as'),
-      this.services.manageHosts,
-      this.services.serverAPIClient,
-    );
-
-    this.services.serverAPIHostEntries = new ServerAPIHostEntries(
-      this.logger.get('server-api-host-entries'),
-      this.services.manageHosts,
-      this.services.updateRegistry,
-      this.services.cacheAPIUserAllowRunAs,
-    );
 
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-saved-object'),
@@ -107,9 +76,23 @@ export class WazuhCorePlugin
 
     this.services.configuration.setup();
 
-    this.services.updateConfigurationFile = new UpdateConfigurationFile(
-      this.logger.get('update-configuration-file'),
+    this.services.updateRegistry = new UpdateRegistry(
+      this.logger.get('update-registry'),
     );
+
+    this.services.manageHosts = new ManageHosts(
+      this.logger.get('manage-hosts'),
+      this.services.configuration,
+      this.services.updateRegistry,
+    );
+
+    this.services.serverAPIClient = new ServerAPIClient(
+      this.logger.get('server-api-client'),
+      this.services.manageHosts,
+      this.services.dashboardSecurity,
+    );
+
+    this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
 
     // Register a property to the context parameter of the endpoint handlers
     core.http.registerRouteHandlerContext('wazuh_core', (context, request) => {

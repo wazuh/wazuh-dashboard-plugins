@@ -33,8 +33,7 @@ export class WazuhHostsCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const result =
-        await context.wazuh_core.serverAPIHostEntries.getHostsEntries();
+      const result = await context.wazuh_core.manageHosts.getEntries();
       return response.ok({
         body: result,
       });
@@ -125,6 +124,7 @@ export class WazuhHostsCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
+      // TODO: refactor to use manageHost service
       const { id: originalID } = request.params;
       context.wazuh.logger.debug('Getting the API hosts');
       const hosts = await context.wazuh_core.configuration.get('hosts');
@@ -192,35 +192,11 @@ export class WazuhHostsCtrl {
   ) {
     try {
       const { id: originalID } = request.params;
-      context.wazuh.logger.debug('Getting the API hosts');
-      const hosts = await context.wazuh_core.configuration.get('hosts');
-      context.wazuh.logger.debug(`API hosts data: ${JSON.stringify(hosts)}`);
-
-      const newHosts = [...hosts];
-
-      const hostExistIndex = newHosts.indexOf(({ id }) => id === originalID);
-      if (hostExistIndex === -1) {
-        context.wazuh.logger.debug(
-          `API host with ID [${originalID}] not found`,
-        );
-        return response.notFound({
-          body: {
-            message: `API host with ID [${originalID}] was not found`,
-          },
-        });
-      }
-      context.wazuh.logger.debug(`API host with ID [${originalID}] found`);
-      // Exist
-      // Remove host
       context.wazuh.logger.debug(`Removing API host with ID [${originalID}]`);
-      newHosts.splice(hostExistIndex, 1);
 
-      context.wazuh.logger.debug('Updating API hosts');
-      await context.wazuh_core.configuration.set({
-        hosts: newHosts,
-      });
-      context.wazuh.logger.debug('Updated API hosts');
+      await context.wazuh_core.manageHosts.delete(originalID);
 
+      context.wazuh.logger.info(`Removed API host with ID [${originalID}]`);
       return response.ok({
         body: {
           message: `API host with ID [${originalID}] was removed`,

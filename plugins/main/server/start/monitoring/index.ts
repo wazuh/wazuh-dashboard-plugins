@@ -346,8 +346,7 @@ async function checkElasticsearchServer(context) {
  */
 async function getHostsConfiguration(context) {
   try {
-    const hosts =
-      await context.wazuh_core.serverAPIHostEntries.getHostsEntries();
+    const hosts = await context.wazuh_core.manageHosts.getEntries();
     if (hosts.length) {
       return hosts;
     }
