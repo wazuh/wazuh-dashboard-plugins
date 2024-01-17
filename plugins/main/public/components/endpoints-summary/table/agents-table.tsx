@@ -39,7 +39,6 @@ import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import { agentsTableColumns } from './columns';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { Agent } from '../types';
-import { getAgentsService } from '../services';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -77,8 +76,6 @@ export const AgentsTable = compose(
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
-  const [allAgentsSelectedLoading, setAllAgentsSelectedLoading] =
-    useState(false);
   const [denyEditGroups] = useUserPermissionsRequirements([
     { action: 'group:modify_assignments', resource: 'group:id:*' },
   ]);
@@ -143,15 +140,7 @@ export const AgentsTable = compose(
       return;
     }
 
-    setAllAgentsSelectedLoading(true);
-    const result = await getAgentsService(filters.q || filters.default.q);
-    setSelectedItems(result.affected_items);
     setAllAgentsSelected(true);
-    try {
-    } catch (error) {
-    } finally {
-      setAllAgentsSelectedLoading(false);
-    }
   };
 
   const showSelectAllItems =
@@ -159,13 +148,17 @@ export const AgentsTable = compose(
       selectedItems.length < agentList.totalItems) ||
     allAgentsSelected;
 
+  const totalSelected = allAgentsSelected
+    ? agentList.totalItems
+    : selectedItems.length;
+
   const selectAllItemsRenderer = showSelectAllItems ? (
     <EuiFlexGroup alignItems='center' gutterSize='s'>
       <EuiFlexItem grow={false}>
         <EuiCallOut
           size='s'
-          title={`${selectedItems.length} ${
-            selectedItems.length === 1 ? 'agent' : 'agents'
+          title={`${totalSelected} ${
+            totalSelected === 1 ? 'agent' : 'agents'
           } selected`}
         />
       </EuiFlexItem>
@@ -173,7 +166,7 @@ export const AgentsTable = compose(
         <EuiButton
           size='s'
           onClick={handleOnClickSelectAllAgents}
-          isLoading={allAgentsSelectedLoading}
+          color={!allAgentsSelected ? 'primary' : 'danger'}
         >
           {!allAgentsSelected
             ? `Select all ${agentList.totalItems} agents`
@@ -204,7 +197,10 @@ export const AgentsTable = compose(
                 Deploy new agent
               </WzButtonPermissions>,
               <AgentsTableGlobalActions
-                agents={selectedItems}
+                selectedAgents={selectedItems}
+                allAgentsSelected={allAgentsSelected}
+                allAgentsCount={agentList.totalItems}
+                filters={filters}
                 allowEditGroups={!denyEditGroups}
                 reloadAgents={() => reloadAgents()}
               />,

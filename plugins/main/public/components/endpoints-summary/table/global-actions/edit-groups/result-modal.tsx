@@ -30,7 +30,8 @@ export type Result = {
 
 interface AgentsGlobalActionsResultModalProps {
   title: string;
-  isLoading: boolean;
+  isLoadingAgents: boolean;
+  isAppliyngChanges: boolean;
   results: Result[];
   onClose: () => void;
   loadingMessage?: string;
@@ -41,7 +42,8 @@ interface AgentsGlobalActionsResultModalProps {
 
 export const AgentsGlobalActionsResultModal = ({
   title,
-  isLoading,
+  isLoadingAgents,
+  isAppliyngChanges,
   results,
   loadingMessage = 'Appliyng changes...',
   successMessage = 'Changes successfully applied',
@@ -131,7 +133,7 @@ export const AgentsGlobalActionsResultModal = ({
       <EuiModalBody>
         <EuiFlexGroup direction='column' gutterSize='s'>
           <EuiFlexItem>
-            {isLoading ? (
+            {isAppliyngChanges ? (
               <EuiEmptyPrompt
                 icon={<EuiLoadingSpinner size='xl' />}
                 title={<h2>{loadingMessage}</h2>}

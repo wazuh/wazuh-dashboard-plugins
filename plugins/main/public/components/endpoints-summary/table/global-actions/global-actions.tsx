@@ -7,16 +7,22 @@ import {
 } from '@elastic/eui';
 import { WzElementPermissions } from '../../../common/permissions/element';
 import { Agent } from '../../types';
-import { EditAgentsGroupsModal } from './edit-groups-modal';
+import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
 
 export interface AgentsTableGlobalActionsProps {
-  agents: Agent[];
+  selectedAgents: Agent[];
+  allAgentsSelected: boolean;
+  allAgentsCount: number;
+  filters: any;
   allowEditGroups: boolean;
   reloadAgents: () => void;
 }
 
 export const AgentsTableGlobalActions = ({
-  agents,
+  selectedAgents,
+  allAgentsSelected,
+  allAgentsCount,
+  filters,
   allowEditGroups,
   reloadAgents,
 }: AgentsTableGlobalActionsProps) => {
@@ -44,6 +50,10 @@ export const AgentsTableGlobalActions = ({
     </EuiButtonEmpty>
   );
 
+  const totalAgents = allAgentsSelected
+    ? allAgentsCount
+    : selectedAgents.length;
+
   return (
     <>
       <EuiPopover
@@ -58,7 +68,7 @@ export const AgentsTableGlobalActions = ({
         <EuiContextMenuPanel>
           <EuiContextMenuItem
             icon='plusInCircle'
-            disabled={!agents?.length || !allowEditGroups}
+            disabled={!totalAgents || !allowEditGroups}
             onClick={() => {
               setAddOrRemoveGroups('add');
               closePopover();
@@ -75,13 +85,13 @@ export const AgentsTableGlobalActions = ({
             >
               <span>
                 Add groups to agents
-                {agents.length ? ` (${agents.length})` : ''}
+                {totalAgents ? ` (${totalAgents})` : ''}
               </span>
             </WzElementPermissions>
           </EuiContextMenuItem>
           <EuiContextMenuItem
             icon='trash'
-            disabled={!agents?.length || !allowEditGroups}
+            disabled={!selectedAgents?.length || !allowEditGroups}
             onClick={() => {
               setAddOrRemoveGroups('remove');
               closePopover();
@@ -98,7 +108,7 @@ export const AgentsTableGlobalActions = ({
             >
               <span>
                 Remove groups from agents
-                {agents.length ? ` (${agents.length})` : ''}
+                {totalAgents ? ` (${totalAgents})` : ''}
               </span>
             </WzElementPermissions>
           </EuiContextMenuItem>
@@ -106,7 +116,10 @@ export const AgentsTableGlobalActions = ({
       </EuiPopover>
       {isEditGroupsVisible ? (
         <EditAgentsGroupsModal
-          agents={agents}
+          selectedAgents={selectedAgents}
+          allAgentsSelected={allAgentsSelected}
+          allAgentsCount={allAgentsCount}
+          filters={filters}
           reloadAgents={() => reloadAgents()}
           onClose={() => {
             setIsEditGroupsVisible(false);

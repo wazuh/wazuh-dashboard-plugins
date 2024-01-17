@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAgentsService } from '../services';
+import { Agent } from '../types';
 
 export const useGetTotalAgents = (filters?: any) => {
   const [totalAgents, setTotalAgents] = useState<number>();
