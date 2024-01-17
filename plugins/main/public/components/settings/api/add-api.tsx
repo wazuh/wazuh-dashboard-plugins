@@ -86,6 +86,7 @@ interface IPropsAddAPIHostForm {
 export const AddAPIHostForm = ({
   initialValue = {},
   apiId = '',
+  onSave: onSaveProp,
 }: IPropsAddAPIHostForm) => {
   const { fields, changed, errors } = useForm(
     transformPluginSettingsToFormFields(initialValue, {
@@ -126,6 +127,7 @@ export const AddAPIHostForm = ({
           {},
         ),
       );
+      await onSaveProp();
       ErrorHandler.info(response.data.message);
     } catch (error) {
       const options = {
@@ -176,7 +178,7 @@ export const AddAPIHostForm = ({
       <EuiFlexGroup>
         <EuiFlexItem grow={false}>
           <EuiButton
-            disabled={Boolean(Object.keys(errors).length) || passwordNotMatch}
+            disabled={Boolean(Object.keys(errors).length) || passwordNotMatch} // TODO: error when changing another field different to the passwords
             fill
             onClick={onSave}
           >

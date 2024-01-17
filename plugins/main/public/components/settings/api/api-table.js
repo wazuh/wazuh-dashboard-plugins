@@ -218,6 +218,7 @@ export const ApiTable = compose(
           `/hosts/apis/${id}`,
         );
         ErrorHandler.info(response.data.message);
+        await this.refresh();
       } catch (error) {
         const options = {
           context: `${ApiTable.name}.deleteAPIHost`,
@@ -520,7 +521,7 @@ export const ApiTable = compose(
               <WzButtonPermissionsOpenFlyout
                 flyoutTitle={`Edit API host: ${item.id} `}
                 roles={[]} // TODO: define permissions
-                flyoutBody={
+                flyoutBody={({ onClose }) => (
                   <AddAPIHostForm
                     initialValue={{
                       id: item.id,
@@ -531,8 +532,12 @@ export const ApiTable = compose(
                       password_confirm: '',
                     }}
                     apiId={item.id}
+                    onSave={async () => {
+                      onClose();
+                      await this.refresh();
+                    }}
                   />
-                }
+                )}
                 buttonProps={{
                   buttonType: 'icon',
                   iconType: 'pencil',
@@ -583,7 +588,14 @@ export const ApiTable = compose(
               <EuiFlexItem grow={false}>
                 <WzButtonPermissionsOpenFlyout
                   flyoutTitle='Add API host'
-                  flyoutBody={<AddAPIHostForm />}
+                  flyoutBody={({ onClose }) => (
+                    <AddAPIHostForm
+                      onSave={async () => {
+                        onClose();
+                        await this.refresh();
+                      }}
+                    />
+                  )}
                   roles={[]}
                   buttonProps={{
                     buttonType: 'empty',
