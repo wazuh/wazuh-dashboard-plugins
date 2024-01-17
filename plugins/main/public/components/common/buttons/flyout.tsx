@@ -23,7 +23,11 @@ function renderFlyout({ flyoutTitle, flyoutProps, flyoutBody, onClose }) {
           <h2>{flyoutTitle}</h2>
         </EuiTitle>
       </EuiFlyoutHeader>
-      <EuiFlyoutBody className='flyout-body'>{flyoutBody}</EuiFlyoutBody>
+      <EuiFlyoutBody className='flyout-body'>
+        {typeof flyoutBody === 'function'
+          ? flyoutBody({ onClose })
+          : flyoutBody}
+      </EuiFlyoutBody>
     </WzFlyout>
   );
 }
