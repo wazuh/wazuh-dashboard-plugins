@@ -166,6 +166,7 @@ export interface IConfiguration {
       [key: string]: TConfigurationSetting;
     }
   >;
+  getSettingValue(settingKey: string, value?: any): any;
 }
 
 export class Configuration implements IConfiguration {
@@ -210,7 +211,7 @@ export class Configuration implements IConfiguration {
    * @param value
    * @returns
    */
-  private getSettingValue(settingKey: string, value: any) {
+  getSettingValue(settingKey: string, value?: any) {
     this.logger.debug(
       `Getting value for [${settingKey}]: stored [${JSON.stringify(value)}]`,
     );

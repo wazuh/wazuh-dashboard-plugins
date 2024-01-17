@@ -163,9 +163,11 @@ export class ManageHosts {
    * @param {Object} response
    * API entries
    */
-  async getEntries() {
+  async getEntries(
+    options: { excludePassword: boolean } = { excludePassword: false },
+  ) {
     try {
-      const hosts = await this.get();
+      const hosts = await this.get(null, options);
       const registry = await this.updateRegistry.getHosts();
       const result = await this.joinHostRegistry(hosts, registry);
       return result;

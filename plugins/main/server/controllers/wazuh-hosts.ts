@@ -33,7 +33,9 @@ export class WazuhHostsCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const result = await context.wazuh_core.manageHosts.getEntries();
+      const result = await context.wazuh_core.manageHosts.getEntries({
+        excludePassword: true,
+      });
       return response.ok({
         body: result,
       });
