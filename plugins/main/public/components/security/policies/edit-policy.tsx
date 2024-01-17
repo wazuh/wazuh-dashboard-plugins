@@ -112,23 +112,25 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
 
     const actionsData = actionsRequest?.data?.data || {};
     setAvailableActions(actionsData);
-    const actions = Object.keys(actionsData).map((x, idx) => {
-      return {
-        id: idx,
-        value: x,
-        inputDisplay: x,
-        dropdownDisplay: (
-          <>
-            <strong>{x}</strong>
-            <EuiText size='s' color='subdued'>
-              <p className='euiTextColor--subdued'>
-                {actionsData[x].description}
-              </p>
-            </EuiText>
-          </>
-        ),
-      };
-    });
+    const actions = Object.keys(actionsData)
+      .map((x, idx) => {
+        return {
+          id: idx,
+          value: x,
+          inputDisplay: x,
+          dropdownDisplay: (
+            <>
+              <strong>{x}</strong>
+              <EuiText size='s' color='subdued'>
+                <p className='euiTextColor--subdued'>
+                  {actionsData[x].description}
+                </p>
+              </EuiText>
+            </>
+          ),
+        };
+      })
+      .sort((a, b) => a.value.localeCompare(b.value));
     setActions(actions);
   }
 
@@ -139,23 +141,25 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       allResources = allResources.concat(res);
     });
     const allResourcesSet = new Set(allResources);
-    const resources = Array.from(allResourcesSet).map((x, idx) => {
-      return {
-        id: idx,
-        value: x,
-        inputDisplay: x,
-        dropdownDisplay: (
-          <>
-            <strong>{x}</strong>
-            <EuiText size='s' color='subdued'>
-              <p className='euiTextColor--subdued'>
-                {(availableResources[x] || {}).description}
-              </p>
-            </EuiText>
-          </>
-        ),
-      };
-    });
+    const resources = Array.from(allResourcesSet)
+      .map((x, idx) => {
+        return {
+          id: idx,
+          value: x,
+          inputDisplay: x,
+          dropdownDisplay: (
+            <>
+              <strong>{x}</strong>
+              <EuiText size='s' color='subdued'>
+                <p className='euiTextColor--subdued'>
+                  {(availableResources[x] || {}).description}
+                </p>
+              </EuiText>
+            </>
+          ),
+        };
+      })
+      .sort((a, b) => a.value.localeCompare(b.value));
     setResources(resources);
   };
 

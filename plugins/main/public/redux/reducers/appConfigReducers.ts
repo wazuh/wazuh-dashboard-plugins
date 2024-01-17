@@ -18,12 +18,15 @@ const initialState: AppConfigState = {
   isLoading: false,
   isReady: false,
   hasError: false,
-  data: getSettingsDefault(),
+  data: {
+    'vulnerabilities.pattern': 'wazuh-states-vulnerabilities',
+    'fim.pattern': 'wazuh-states-fim',
+  },
 };
 
 const appConfigReducer: Reducer<AppConfigState, ResolverAction> = (
   state = initialState,
-  action
+  action,
 ) => {
   switch (action.type) {
     case 'UPDATE_APP_CONFIG_SET_IS_LOADING':
@@ -31,22 +34,30 @@ const appConfigReducer: Reducer<AppConfigState, ResolverAction> = (
         ...state,
         isLoading: true,
         isReady: false,
-        hasError: false
+        hasError: false,
       };
     case 'UPDATE_APP_CONFIG_SET_HAS_ERROR':
-          return {
-            ...state,
-            isLoading: false,
-            isReady: false,
-            hasError: true
-          };
+      return {
+        ...state,
+        isLoading: false,
+        isReady: false,
+        hasError: true,
+      };
     case 'UPDATE_APP_CONFIG_DATA':
       return {
         ...state,
         isLoading: false,
         isReady: true,
         hasError: false,
-        data: {...state.data, ...action.payload},
+        data: { ...state.data, ...action.payload },
+      };
+    case 'UPDATE_FIM_PATTERN':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          'fim.pattern': action.payload,
+        },
       };
     default:
       return state;

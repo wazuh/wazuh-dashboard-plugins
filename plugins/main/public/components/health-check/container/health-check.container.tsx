@@ -37,6 +37,7 @@ import {
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
   WAZUH_INDEX_TYPE_VULNERABILITIES,
+  WAZUH_INDEX_TYPE_FIM,
 } from '../../../../common/constants';
 
 import { compose } from 'redux';
@@ -103,6 +104,19 @@ const checks = {
     shouldCheck: false,
     canRetry: true,
   },
+  'fim.pattern': {
+    title: 'Check fim index pattern',
+    label: 'Fim index pattern',
+    validator: appConfig =>
+      checkPatternSupportService(
+        appConfig.data['fim.pattern'],
+        WAZUH_INDEX_TYPE_FIM,
+        NOT_TIME_FIELD_NAME_INDEX_PATTERN,
+      ),
+    awaitFor: [],
+    shouldCheck: false,
+    canRetry: true,
+  },
 };
 
 function HealthCheckComponent() {
@@ -129,6 +143,9 @@ function HealthCheckComponent() {
     window.location.href = getHttp().basePath.prepend(url);
   };
 
+  const thereAreErrors = Object.keys(checkErrors).length > 0;
+  const thereAreWarnings = Object.keys(checkWarnings).length > 0;
+
   useEffect(() => {
     if (appConfig.isReady && !checksInitiated.current) {
       checksInitiated.current = true;
@@ -140,6 +157,7 @@ function HealthCheckComponent() {
     // Redirect to app when all checks are ready
     Object.keys(checks).every(check => checksReady[check]) &&
       !isDebugMode &&
+      !thereAreWarnings &&
       (() =>
         setTimeout(
           redirectionPassHealthcheck,
@@ -196,8 +214,6 @@ function HealthCheckComponent() {
       ? getAssetURL(appConfig.data['customization.logo.healthcheck'])
       : getThemeAssetURL('logo.svg'),
   );
-  const thereAreErrors = Object.keys(checkErrors).length > 0;
-  const thereAreWarnings = Object.keys(checkWarnings).length > 0;
 
   const renderChecks = () => {
     const showLogButton = thereAreErrors || thereAreWarnings || isDebugMode;
@@ -350,7 +366,7 @@ function HealthCheckComponent() {
                 </RedirectAppLinks>
               </EuiFlexItem>
             )}
-            {isDebugMode &&
+            {(isDebugMode || thereAreWarnings) &&
               Object.keys(checks).every(check => checksReady[check]) && (
                 <EuiFlexItem grow={false}>
                   <EuiButton fill onClick={redirectionPassHealthcheck}>

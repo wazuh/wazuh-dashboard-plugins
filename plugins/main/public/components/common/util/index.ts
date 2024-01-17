@@ -11,8 +11,8 @@
  * Find more information about this on the LICENSE file.
  */
 
- export { AgentGroupTruncate, GroupTruncate} from './agent-group-truncate';
- export { TruncateHorizontalComponents } from './truncate-horizontal-components/truncate-horizontal-components';
- export { GroupingComponents } from './grouping-components';
- export * from './markdown/markdown';
- export * from './wz-overlay-mask-interface';
+export { GroupTruncate } from './agent-group-truncate';
+export { TruncateHorizontalComponents } from './truncate-horizontal-components/truncate-horizontal-components';
+export { GroupingComponents } from './grouping-components';
+export * from './markdown/markdown';
+export * from './wz-overlay-mask-interface';

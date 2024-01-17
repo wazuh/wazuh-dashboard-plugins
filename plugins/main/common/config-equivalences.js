@@ -96,6 +96,8 @@ export const nameEquivalence = {
   'alerts.sample.prefix': 'Sample alerts prefix',
   'vulnerabilities.pattern': 'Index pattern',
   'checks.vulnerabilities.pattern': 'Vulnerabilities index pattern',
+  'fim.pattern': 'Index pattern',
+  'checks.fim.pattern': 'Fim index pattern',
 };
 
 const HEALTH_CHECK = 'Health Check';

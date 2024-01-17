@@ -1,0 +1,7 @@
+{
+  "prefix": "wazuhEndpoints",
+  "paths": {
+    "wazuhEndpoints": "."
+  },
+  "translations": ["translations/en-US.json"]
+}

@@ -95,12 +95,20 @@ describe('getUpdates function', () => {
   test('should return available updates from api', async () => {
     mockedSetSavedObject.mockImplementation(() => ({}));
     mockedGetWazuhCore.mockImplementation(() => ({
+      controllers: {
+        WazuhHostsCtrl: jest.fn().mockImplementation(() => ({
+          getHostsEntries: jest
+            .fn()
+            .mockImplementation(() => [{ id: 'api id' }]),
+        })),
+      },
       api: {
         client: {
           asInternalUser: {
             request: jest.fn().mockImplementation(() => ({
               data: {
                 data: {
+                  uuid: '7f828fd6-ef68-4656-b363-247b5861b84c',
                   current_version: '4.3.1',
                   last_available_patch: {
                     description:

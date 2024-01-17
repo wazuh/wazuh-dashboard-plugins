@@ -30,9 +30,9 @@ export class GroupTruncate extends React.Component {
     popoverOpen: boolean;
   };
   props!: {
+    groups?: string[];
     label: String;
     length: number;
-    agent: Object;
     action: String;
     filterAction: any;
   };
@@ -100,10 +100,10 @@ export class GroupTruncate extends React.Component {
     );
   }
 
-  renderGroups(groups) {
+  renderGroups(groups: string[] = []) {
     const { length } = this.props;
-    let auxGroups: Array<String> = [];
-    let tooltipGroups: Array<String> = [];
+    let auxGroups: Array<React.ReactNode> = [];
+    let tooltipGroups: Array<React.ReactNode> = [];
     let auxLength = 0;
     let auxIndex = 0;
     if (groups.length >= 2 && groups.toString().length >= length) {

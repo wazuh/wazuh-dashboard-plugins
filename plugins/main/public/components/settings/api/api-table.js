@@ -392,13 +392,10 @@ export const ApiTable = compose(
           name: 'Updates status',
           sortable: true,
           render: (item, api) => {
-            const getColor = () => {
-              return API_UPDATES_STATUS_COLUMN[item]?.color;
-            };
+            const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
 
-            const getContent = () => {
-              return API_UPDATES_STATUS_COLUMN[item]?.text;
-            };
+            const content =
+              API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
 
             if (!this.state.refreshingAvailableUpdates) {
               return (
@@ -408,13 +405,27 @@ export const ApiTable = compose(
                   responsive={false}
                 >
                   <EuiFlexItem grow={false}>
-                    <EuiHealth
-                      color={getColor()}
-                      style={{ wordBreak: 'normal' }}
-                    >
-                      {getContent()}
+                    <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
+                      {content}
                     </EuiHealth>
                   </EuiFlexItem>
+                  {!item ? (
+                    <EuiFlexItem grow={false}>
+                      <EuiToolTip
+                        position='top'
+                        content={
+                          <p>
+                            Click <b>Check updates</b> button to get information
+                          </p>
+                        }
+                      >
+                        <EuiButtonIcon
+                          aria-label={content}
+                          iconType='questionInCircle'
+                        />
+                      </EuiToolTip>
+                    </EuiFlexItem>
+                  ) : null}
                   {item === 'availableUpdates' ? (
                     <EuiFlexItem grow={false}>
                       <EuiToolTip
@@ -443,7 +454,7 @@ export const ApiTable = compose(
                           iconType='questionInCircle'
                           aria-label='Info about the error'
                           onClick={() =>
-                            this.props.copyToClipBoard(item.downReason)
+                            this.props.copyToClipBoard(api.error.detail)
                           }
                         />
                       </EuiToolTip>

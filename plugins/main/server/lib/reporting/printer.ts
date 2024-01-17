@@ -622,8 +622,8 @@ export class ReportPrinter {
 
           document.pipe(fs.createWriteStream(reportPath));
           document.end();
-        } catch (ex) {
-          reject(ex);
+        } catch (error) {
+          reject(error);
         }
       });
     });

@@ -72,10 +72,10 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
             filters: [
               {
                 input: {
-                  query: 'vulnerability.severity:"critical"',
+                  query: 'vulnerability.severity:"Critical"',
                   language: 'kuery',
                 },
-                label: '- Critical Severity Alerts',
+                label: '- Critical severity alerts',
               },
             ],
           },
@@ -164,10 +164,10 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
             filters: [
               {
                 input: {
-                  query: 'vulnerability.severity:"high"',
+                  query: 'vulnerability.severity:"High"',
                   language: 'kuery',
                 },
-                label: '- High Severity Alerts',
+                label: '- High severity alerts',
               },
             ],
           },
@@ -249,10 +249,10 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
             filters: [
               {
                 input: {
-                  query: 'vulnerability.severity:"medium"',
+                  query: 'vulnerability.severity:"Medium"',
                   language: 'kuery',
                 },
-                label: '- Medium Severity Alerts',
+                label: '- Medium severity alerts',
               },
             ],
           },
@@ -334,10 +334,10 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
             filters: [
               {
                 input: {
-                  query: 'vulnerability.severity:"low"',
+                  query: 'vulnerability.severity:"Low"',
                   language: 'kuery',
                 },
-                label: '- Low Severity Alerts',
+                label: '- Low severity alerts',
               },
             ],
           },

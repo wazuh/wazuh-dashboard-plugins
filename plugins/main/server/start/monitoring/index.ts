@@ -180,7 +180,10 @@ async function insertMonitoringDataElasticsearch(context, data) {
       }
 
       // Update the index configuration
-      const appConfig = await context.wazuh_core.configuration.get();
+      const appConfig = await context.wazuh_core.configuration.get(
+        'wazuh.monitoring.shards',
+        'wazuh.monitoring.replicas',
+      );
 
       const indexConfiguration = {
         settings: {
@@ -271,7 +274,10 @@ async function insertDataToIndex(
 async function createIndex(context, indexName: string) {
   try {
     if (!MONITORING_ENABLED) return;
-    const appConfig = await context.wazuh_core.configuration.get();
+    const appConfig = await context.wazuh_core.configuration.get(
+      'wazuh.monitoring.shards',
+      'wazuh.monitoring.replicas',
+    );
 
     const IndexConfiguration = {
       settings: {
@@ -346,7 +352,7 @@ async function checkElasticsearchServer(context) {
  */
 async function getHostsConfiguration(context) {
   try {
-    const hosts = await context.wazuh_core.manageHosts.getEntries();
+    const hosts = await context.wazuh_core.manageHosts.getEntries(); // TODO: check if this needs the password or exclude them
     if (hosts.length) {
       return hosts;
     }

@@ -167,7 +167,7 @@ export class ManageHosts {
     options: { excludePassword: boolean } = { excludePassword: false },
   ) {
     try {
-      const hosts = await this.get(null, options);
+      const hosts = await this.get(undefined, options);
       const registry = await this.updateRegistry.getHosts();
       const result = await this.joinHostRegistry(hosts, registry);
       return result;
