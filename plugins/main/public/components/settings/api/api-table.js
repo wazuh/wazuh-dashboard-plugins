@@ -213,10 +213,9 @@ export const ApiTable = compose(
 
     async deleteAPIHost(id) {
       try {
-        const apiHostId = item.id;
         const response = await GenericRequest.request(
           'DELETE',
-          `/hosts/apis/${apiHostId}`,
+          `/hosts/apis/${id}`,
         );
         ErrorHandler.info(response.data.message);
       } catch (error) {
