@@ -370,7 +370,8 @@ export class WazuhReportingCtrl {
             new Date(to).getTime(),
             serverSideQuery,
             agentsFilter,
-            indexPatternTitle,
+            indexPatternTitle ||
+              context.wazuh_core.configuration.getSettingValue('pattern'),
             agents,
           );
         }
@@ -1298,7 +1299,8 @@ export class WazuhReportingCtrl {
               to,
               serverSideQuery,
               agentsFilter,
-              indexPatternTitle,
+              indexPatternTitle ||
+                context.wazuh_core.configuration.getSettingValue('pattern'),
               agentID,
             );
           }

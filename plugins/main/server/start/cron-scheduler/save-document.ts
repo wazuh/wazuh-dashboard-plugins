@@ -5,7 +5,6 @@ import {
   WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
 } from '../../../common/constants';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 export interface IIndexConfiguration {
   name: string;

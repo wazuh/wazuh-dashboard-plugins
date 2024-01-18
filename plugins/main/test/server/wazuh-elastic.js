@@ -7,7 +7,10 @@ const kibanaServer = process.env.KIBANA_IP || 'localhost';
 chai.should();
 
 const headers = {
-  headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' }
+  headers: {
+    ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+    'content-type': 'application/json',
+  },
 };
 
 describe('wazuh-elastic', () => {
@@ -15,15 +18,19 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/known-fields/{pattern}', async () => {
       const res = await needle(
         'get',
-        `${kibanaServer}:5601/elastic/known-fields/${getSettingDefaultValue('pattern')}`,
+        `${kibanaServer}:5601/elastic/known-fields/${getSettingDefaultValue(
+          'pattern',
+        )}`, // TODO: use the configuration service
         {},
-        headers
+        headers,
       );
       res.body.acknowledge.should.be.eql(true);
       res.body.output.should.be.a('object');
       //res.body.output._index.should.be.eql('.kibana');
       res.body.output._type.should.be.eql('doc');
-      res.body.output._id.should.be.eql(`index-pattern:${getSettingDefaultValue('pattern')}`);
+      res.body.output._id.should.be.eql(
+        `index-pattern:${getSettingDefaultValue('pattern')}`,
+      ); // TODO: use the configuration service
     });
   });
 
@@ -31,9 +38,11 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/visualizations/{tab}/{pattern}', async () => {
       const res = await needle(
         'get',
-        `${kibanaServer}:5601/elastic/visualizations/overview-general/${getSettingDefaultValue('pattern')}`,
+        `${kibanaServer}:5601/elastic/visualizations/overview-general/${getSettingDefaultValue(
+          'pattern',
+        )}`, // TODO: use the configuration service
         {},
-        headers
+        headers,
       );
       res.body.acknowledge.should.be.eql(true);
       res.body.raw.should.be.a('array');
@@ -46,9 +55,11 @@ describe('wazuh-elastic', () => {
     it('POST /elastic/visualizations/{tab}/{pattern}', async () => {
       const res = await needle(
         'post',
-        `${kibanaServer}:5601/elastic/visualizations/cluster-monitoring/${getSettingDefaultValue('pattern')}`,
+        `${kibanaServer}:5601/elastic/visualizations/cluster-monitoring/${getSettingDefaultValue(
+          'pattern',
+        )}`, // TODO: use the configuration service
         { nodes: { items: [], name: 'node01' } },
-        headers
+        headers,
       );
       res.body.acknowledge.should.be.eql(true);
       res.body.raw.should.be.a('array');
@@ -63,13 +74,17 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/template/{pattern}', async () => {
       const res = await needle(
         'get',
-        `${kibanaServer}:5601/elastic/template/${getSettingDefaultValue('pattern')}`,
+        `${kibanaServer}:5601/elastic/template/${getSettingDefaultValue(
+          'pattern',
+        )}`, // TODO: use the configuration service
         {},
-        headers
+        headers,
       );
       res.body.statusCode.should.be.eql(200);
       res.body.status.should.be.eql(true);
-      res.body.data.should.be.eql(`Template found for ${getSettingDefaultValue('pattern')}`);
+      res.body.data.should.be.eql(
+        `Template found for ${getSettingDefaultValue('pattern')}`,
+      ); // TODO: use the configuration service
     });
   });
 });
