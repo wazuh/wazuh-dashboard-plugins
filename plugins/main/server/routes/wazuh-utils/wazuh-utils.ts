@@ -15,7 +15,6 @@ import { schema } from '@osd/config-schema';
 import {
   CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
   EpluginSettingType,
-  PLUGIN_SETTINGS,
 } from '../../../common/constants';
 
 export function WazuhUtilsRoutes(router: IRouter, services) {
@@ -66,27 +65,11 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
       ctrl.updateConfiguration(context, request, response),
   );
 
-  // TODO: remove the usage of static plugin settings
-  const pluginSettingsTypeFilepicker = Object.entries(PLUGIN_SETTINGS).filter(
-    ([_, { type, isConfigurableFromFile }]) =>
-      type === EpluginSettingType.filepicker && isConfigurableFromFile,
-  );
-
-  const schemaPluginSettingsTypeFilepicker = schema.oneOf(
-    pluginSettingsTypeFilepicker.map(([pluginSettingKey]) =>
-      schema.literal(pluginSettingKey),
-    ),
-  );
-
   // Upload an asset
   router.put(
     {
       path: '/utils/configuration/files/{key}',
       validate: {
-        // params: schema.object({
-        //   // key parameter should be a plugin setting of `filepicker` type
-        //   key: schemaPluginSettingsTypeFilepicker,
-        // }),
         params: (value, response) => {
           const validationSchema = Array.from(
             services.configuration._settings.entries(),
@@ -128,10 +111,6 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
     {
       path: '/utils/configuration/files/{key}',
       validate: {
-        // params: schema.object({
-        //   // key parameter should be a plugin setting of `filepicker` type
-        //   key: schemaPluginSettingsTypeFilepicker,
-        // }),
         params: (value, response) => {
           const validationSchema = Array.from(
             services.configuration._settings.entries(),
