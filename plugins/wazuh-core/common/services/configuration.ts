@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+
 export interface ILogger {
   debug(message: string): void;
   info(message: string): void;
@@ -240,18 +242,22 @@ export class Configuration implements IConfiguration {
     const stored = await this.store.get(...settings);
     this.logger.debug(`configuration stored: ${JSON.stringify({ stored })}`);
 
-    return settings && settings.length === 1
-      ? this.getSettingValue(settings[0], stored[settings[0]])
-      : (settings.length > 1
-          ? settings
-          : Array.from(this._settings.keys())
-        ).reduce(
-          (accum, key) => ({
-            ...accum,
-            [key]: this.getSettingValue(key, stored[key]),
-          }),
-          {},
-        );
+    const result =
+      settings && settings.length === 1
+        ? this.getSettingValue(settings[0], stored[settings[0]])
+        : (settings.length > 1
+            ? settings
+            : Array.from(this._settings.keys())
+          ).reduce(
+            (accum, key) => ({
+              ...accum,
+              [key]: this.getSettingValue(key, stored[key]),
+            }),
+            {},
+          );
+
+    // Clone the result. This avoids the object reference can be changed when managing the result.
+    return cloneDeep(result);
   }
   /**
    * Set a the value for a subset of settings
