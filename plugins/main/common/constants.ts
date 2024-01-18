@@ -518,52 +518,6 @@ export type TPluginSettingCategory = {
   renderOrder?: number;
 };
 
-export const PLUGIN_SETTINGS_CATEGORIES: {
-  [category: number]: TPluginSettingCategory;
-} = {
-  [SettingCategory.HEALTH_CHECK]: {
-    title: 'Health check',
-    description: "Checks will be executed by the app's Healthcheck.",
-    renderOrder: SettingCategory.HEALTH_CHECK,
-  },
-  [SettingCategory.GENERAL]: {
-    title: 'General',
-    description:
-      'Basic app settings related to alerts index pattern, hide the manager alerts in the dashboards, logs level and more.',
-    renderOrder: SettingCategory.GENERAL,
-  },
-  [SettingCategory.SECURITY]: {
-    title: 'Security',
-    description: 'Application security options such as unauthorized roles.',
-    renderOrder: SettingCategory.SECURITY,
-  },
-  [SettingCategory.MONITORING]: {
-    title: 'Task:Monitoring',
-    description:
-      'Options related to the agent status monitoring job and its storage in indexes.',
-    renderOrder: SettingCategory.MONITORING,
-  },
-  [SettingCategory.STATISTICS]: {
-    title: 'Task:Statistics',
-    description:
-      'Options related to the daemons manager monitoring job and their storage in indexes.',
-    renderOrder: SettingCategory.STATISTICS,
-  },
-  [SettingCategory.VULNERABILITIES]: {
-    title: 'Vulnerabilities',
-    description:
-      'Options related to the agent vulnerabilities monitoring job and its storage in indexes.',
-    renderOrder: SettingCategory.VULNERABILITIES,
-  },
-  [SettingCategory.CUSTOMIZATION]: {
-    title: 'Custom branding',
-    description:
-      'If you want to use custom branding elements such as logos, you can do so by editing the settings below.',
-    documentationLink: 'user-manual/wazuh-dashboard/white-labeling.html',
-    renderOrder: SettingCategory.CUSTOMIZATION,
-  },
-};
-
 export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'alerts.sample.prefix': {
     title: 'Sample alerts prefix',
