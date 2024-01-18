@@ -1,41 +1,27 @@
-//IP: This is a set of four numbers, for example, 192.158.1.38. Each number in the set can range from 0 to 255. Therefore, the full range of IP addresses goes from 0.0.0.0 to 255.255.255.255
-// O ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+//IPv4: This is a set of four numbers, for example, 192.158.1.38. Each number in the set can range from 0 to 255. Therefore, the full range of IP addresses goes from 0.0.0.0 to 255.255.255.255
+//IPv6: This is a set or eight hexadecimal expressions, each from 0000 to FFFF. 2001:0db8:85a3:0000:0000:8a2e:0370:7334
 
 // FQDN: Maximum of 63 characters per label.
 // Can only contain numbers, letters and hyphens (-)
 // Labels cannot begin or end with a hyphen
 // Currently supports multilingual characters, i.e. letters not included in the English alphabet: e.g. á é í ó ú ü ñ.
 // Minimum 3 labels
-export const validateServerAddress = (value: any) => {
-  const isFQDN =
-    /^(?!-)(?!.*--)(?!.*\d$)[a-zA-Z0-9áéíóúüñ]{1,63}(?:-[a-zA-Z0-9áéíóúüñ]{1,63})*(?:\.[a-zA-Z0-9áéíóúüñ]{1,63}(?:-[a-zA-Z0-9áéíóúüñ]{1,63})*){1,}$/;
-  const isIP =
-    /^(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3}|(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4})$/;
-  const numbersAndPoints = /^[0-9.]+$/;
-  const areLettersNumbersAndColons = /^[a-zA-Z0-9:]+$/;
-  const letters = /[a-zA-Z]/;
-  const isFQDNFormatValid = isFQDN.test(value);
-  const isIPFormatValid = isIP.test(value);
-  const areNumbersAndPoints = numbersAndPoints.test(value);
-  const hasLetters = letters.test(value);
-  const hasPoints = value.includes('.');
+// A label can contain only numbers
 
-  let validation = undefined;
-  if (value.length === 0) {
-    return validation;
-  } else if (isFQDNFormatValid && value !== '') {
-    return validation; // FQDN valid
-  } else if (isIPFormatValid && value !== '') {
-    return validation; // IP valid
-  } else if (hasPoints && hasLetters && !isFQDNFormatValid) {
-    return (validation =
-      'Each label must have a letter or number at the beginning. The maximum length is 63 characters.'); // FQDN invalid
-  } else if (
-    (areNumbersAndPoints || areLettersNumbersAndColons) &&
-    !isIPFormatValid
+// Hostname: Maximum of 63 characters per label. Same rules as FQDN apply.
+
+export const validateServerAddress = (value: string) => {
+  const isFQDNOrHostname =
+    /^(?!-)(?!.*--)[a-zA-Z0-9áéíóúüñ-]{0,62}[a-zA-Z0-9áéíóúüñ](?:\.[a-zA-Z0-9áéíóúüñ-]{0,62}[a-zA-Z0-9áéíóúüñ]){0,}$/;
+  const isIPv6 = /^(?:[0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4}$/;
+
+  if (
+    value.length > 255 ||
+    (value.length > 0 && !isFQDNOrHostname.test(value) && !isIPv6.test(value))
   ) {
-    return (validation = 'Not a valid IP'); // IP invalid
+    return 'It should be a valid hostname, FQDN, IPv4 or uncompressed IPv6';
   }
+  return undefined;
 };
 
 export const validateAgentName = (value: any) => {
