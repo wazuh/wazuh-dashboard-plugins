@@ -102,7 +102,8 @@ export async function jobSchedulerRun(context) {
   // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
   // TODO: uncomment and adapt
   // await checkPluginPlatformStatus(context);
-  // for (const job in configuredJobs({})) {
+  // const jobs = await configuredJobs(context, {});
+  // for (const job in jobs) {
   //   const schedulerJob: SchedulerJob = new SchedulerJob(job, context);
   //   schedulerJobs.push(schedulerJob);
   //   const task = cron.schedule(jobs[job].interval, () => schedulerJob.run());

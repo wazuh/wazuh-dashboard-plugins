@@ -19,7 +19,9 @@ export class SchedulerJob {
   }
 
   public async run() {
-    const { index, status } = configuredJobs({})[this.jobName];
+    const { index, status } = await configuredJobs(this.context, {})[
+      this.jobName
+    ];
     if (!status) {
       return;
     }
@@ -27,9 +29,10 @@ export class SchedulerJob {
       const hosts = await this.getApiObjects();
       const jobPromises = hosts.map(async host => {
         try {
-          const { status } = configuredJobs({ host, jobName: this.jobName })[
-            this.jobName
-          ];
+          const { status } = configuredJobs(this.context, {
+            host,
+            jobName: this.jobName,
+          })[this.jobName];
           if (!status) return;
           return await this.getResponses(host);
         } catch (error) {

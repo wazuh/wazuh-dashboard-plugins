@@ -2,12 +2,17 @@ import { jobs } from './index';
 import { IApi } from './apiRequest';
 import { IJob } from './predefined-jobs';
 
-export const configuredJobs = async (params: {
-  jobName?: string;
-  host?: IApi;
-}) => {
+export const configuredJobs = async (
+  context,
+  params: {
+    jobName?: string;
+    host?: IApi;
+  },
+) => {
   const { host, jobName } = params;
-  return checkCluster(checkConfiguration(getJobs({ jobName, host })));
+  return checkCluster(
+    await checkConfiguration(context, getJobs({ jobName, host })),
+  );
 };
 
 const getJobs = (params: { jobName?: string; host?: IApi }) => {
@@ -40,12 +45,15 @@ const checkCluster = (params: {
   return newJobObj;
 };
 
-const checkConfiguration = (params: {
-  jobObj: { [key: string]: IJob };
-  host?: IApi;
-}) => {
+const checkConfiguration = async (
+  context,
+  params: {
+    jobObj: { [key: string]: IJob };
+    host?: IApi;
+  },
+) => {
   const { jobObj, host } = params;
-  const config = getConfiguration(); // TODO: replace by the configuration service
+  const config = await context.wazuh_core.configuration.get();
   const cronSettigns = Object.keys(config).filter(checkSetting);
   cronSettigns.forEach(setting =>
     applySettings(setting, config[setting], jobObj),
