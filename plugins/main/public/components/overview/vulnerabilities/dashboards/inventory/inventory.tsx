@@ -238,7 +238,7 @@ const InventoryVulsComponent = () => {
             <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
               <EuiFlyoutHeader>
                 <EuiTitle>
-                  <h2>Document Details</h2>
+                  <h2>Document details</h2>
                 </EuiTitle>
               </EuiFlyoutHeader>
               <EuiFlyoutBody>
