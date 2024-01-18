@@ -24,6 +24,7 @@ import {
   setWzCurrentAppID,
   setWazuhCheckUpdatesPlugin,
   setHeaderActionMenuMounter,
+  setWazuhCorePlugin,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -225,6 +226,7 @@ export class WazuhPlugin
     setOverlays(core.overlays);
     setErrorOrchestrator(ErrorOrchestratorService);
     setWazuhCheckUpdatesPlugin(plugins.wazuhCheckUpdates);
+    setWazuhCorePlugin(plugins.wazuhCore);
     return {};
   }
 }

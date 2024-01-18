@@ -35,9 +35,11 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
+import {
+  getWazuhCheckUpdatesPlugin,
+  getWazuhCorePlugin,
+} from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
-import { formatUIDate } from '../../../react-services/time-service';
 
 export const ApiTable = compose(
   withErrorBoundary,
@@ -47,13 +49,10 @@ export const ApiTable = compose(
     constructor(props) {
       super(props);
 
-      const { getAvailableUpdates } = getWazuhCheckUpdatesPlugin();
-
       this.state = {
         apiEntries: [],
         refreshingEntries: false,
         availableUpdates: {},
-        getAvailableUpdates,
         refreshingAvailableUpdates: true,
         apiAvailableUpdateDetails: undefined,
       };
@@ -62,9 +61,8 @@ export const ApiTable = compose(
     async getApisAvailableUpdates(forceUpdate = false) {
       try {
         this.setState({ refreshingAvailableUpdates: true });
-        const availableUpdates = await this.state.getAvailableUpdates(
-          forceUpdate,
-        );
+        const availableUpdates =
+          await getWazuhCheckUpdatesPlugin().getAvailableUpdates(forceUpdate);
         this.setState({ availableUpdates });
       } catch (error) {
         const options = {
@@ -553,10 +551,8 @@ export const ApiTable = compose(
                       title='Last check'
                       content={
                         this.state.availableUpdates?.last_check_date
-                          ? formatUIDate(
-                              new Date(
-                                this.state.availableUpdates.last_check_date,
-                              ),
+                          ? getWazuhCorePlugin().utils.formatUIDate(
+                              this.state.availableUpdates.last_check_date,
                             )
                           : '-'
                       }
