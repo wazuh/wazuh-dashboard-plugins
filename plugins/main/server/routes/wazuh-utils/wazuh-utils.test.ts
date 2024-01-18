@@ -22,13 +22,14 @@ import fs from 'fs';
 import path from 'path';
 import glob from 'glob';
 
+// TODO: this file defines some tests related to all the settings of the plugins, but these are defined
+// in the core plugin and the endpoint that manage these settings are defined in the main
+
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
 const context = {
   wazuh: {},
-  wazuh_core: {
-    updateConfigurationFile: { updateConfiguration: jest.fn() },
-  },
+  wazuh_core: {},
 };
 
 const enhanceWithContext = (fn: (...args: any[]) => any) =>

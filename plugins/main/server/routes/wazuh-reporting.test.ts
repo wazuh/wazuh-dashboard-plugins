@@ -57,9 +57,7 @@ const context = {
       },
     },
   },
-  wazuh_core: {
-    updateConfigurationFile: { updateConfiguration: jest.fn() },
-  },
+  wazuh_core: {},
 };
 const enhanceWithContext = (fn: (...args: any[]) => any) =>
   fn.bind(null, context);

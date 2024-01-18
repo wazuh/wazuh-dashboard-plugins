@@ -21,7 +21,6 @@ export class CacheAPIUserAllowRunAs {
   readonly API_USER_STATUS_RUN_AS;
   private _cache: any;
   constructor(private logger: Logger, private manageHosts: ManageHosts) {
-    // TODO: create API Client and replace API Interceptor
     // Private variable to save the cache
     this._cache = {};
     this.API_USER_STATUS_RUN_AS = API_USER_STATUS_RUN_AS;

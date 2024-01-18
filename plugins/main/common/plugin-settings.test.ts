@@ -1,6 +1,7 @@
 import { PLUGIN_SETTINGS } from './constants';
 
 describe('[settings] Input validation', () => {
+  // TODO: adapt
   it.each`
     setting                             | value                                                                  | expectedValidation
     ${'alerts.sample.prefix'}           | ${'test'}                                                              | ${undefined}

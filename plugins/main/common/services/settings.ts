@@ -75,25 +75,6 @@ export function getSettingsDefaultList(): TPluginSettingWithKey[] {
 }
 
 /**
- * Format the plugin setting value received in the backend to store in the plugin configuration file (.yml).
- * @param value plugin setting value sent to the endpoint
- * @returns valid value to .yml
- */
-export function formatSettingValueToFile(value: any) {
-  const formatter =
-    formatSettingValueToFileType[typeof value] ||
-    formatSettingValueToFileType.default;
-  return formatter(value);
-}
-
-const formatSettingValueToFileType = {
-  string: (value: string): string =>
-    `"${value.replace(/"/, '\\"').replace(/\n/g, '\\n')}"`, // Escape the " character and new line
-  object: (value: any): string => JSON.stringify(value),
-  default: (value: any): any => value,
-};
-
-/**
  * Group the settings by category
  * @param settings
  * @returns
