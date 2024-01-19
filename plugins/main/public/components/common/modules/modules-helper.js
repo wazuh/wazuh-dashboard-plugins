@@ -5,7 +5,7 @@ export class ModulesHelper {
     const $injector = getAngularModule().$injector;
     const location = $injector.get('$location');
     const initialTab = location.search().tab;
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const checkExist = setInterval(() => {
         const app = getAngularModule();
         if (app.discoverScope) {
@@ -21,9 +21,11 @@ export class ModulesHelper {
   }
 
   static async cleanAvailableFields() {
-    const fields = document.querySelectorAll(`.dscFieldChooser .dscFieldList--unpopular li`);
+    const fields = document.querySelectorAll(
+      `.dscFieldChooser .dscFieldList--unpopular li`,
+    );
     if (fields.length) {
-      fields.forEach((field) => {
+      fields.forEach(field => {
         const attr = field.getAttribute('data-attr-field');
         if (attr.startsWith('_')) {
           field.style.display = 'none';
@@ -38,51 +40,73 @@ export class ModulesHelper {
 
   static activeNoImplicitsFilters() {
     const { filterManager } = getDataPlugin().query;
-    const implicitFilters = filterManager.getFilters().filter((x) => {
-      return x.$state.isImplicit;
-    });
-    if (!(implicitFilters || []).length) {
-      setTimeout(() => {
-        this.activeNoImplicitsFilters();
-      }, 100);
+    const implicitFilters = filterManager
+      .getFilters()
+      .filter(x => x.$state.isImplicit);
+
+    if (implicitFilters.length === 0) {
+      setTimeout(() => this.activeNoImplicitsFilters(), 100);
+      return;
     }
-    // With the filter classes decide if they are from the module view or not
+
+    this.processFilters(implicitFilters);
+  }
+
+  static processFilters(implicitFilters) {
     const allFilters = $(`.globalFilterItem .euiBadge__childButton`);
-    for (let i = 0; i < allFilters.length; i++) {
-      const data = allFilters[i].attributes['data-test-subj'];
-      let found = false;
-      (implicitFilters || []).forEach((moduleFilter) => {
-        // Checks if the filter is already in use
-        // Check which of the filters are from the module view and which are not pinned filters
-        if (!moduleFilter.used) {
-          const objKey = moduleFilter.query?.match
-            ? Object.keys(moduleFilter.query.match)[0]
-            : moduleFilter.meta.key;
-          const objValue = moduleFilter.query?.match
-            ? moduleFilter.query.match[objKey].query
-            : moduleFilter.meta.value;
-          const key = `filter-key-${objKey}`;
-          const value = `filter-value-${objValue}`;
 
-          const noExcludedValues =
-            !data.value.includes('filter-pinned') && !data.value.includes('filter-negated');
-          const acceptedValues = data.value.includes(key) && data.value.includes(value);
+    allFilters.each((_index, filter) => {
+      const data = filter.attributes['data-test-subj'];
 
-          if (acceptedValues && noExcludedValues) {
-            found = true;
-            moduleFilter.used = true;
-          }
+      const found = this.checkFilterAgainstImplicitFilters(
+        data,
+        implicitFilters,
+      );
+
+      this.updateFilterState(found, filter);
+    });
+  }
+
+  static checkFilterAgainstImplicitFilters(data, implicitFilters) {
+    for (const moduleFilter of implicitFilters) {
+      if (!moduleFilter.used) {
+        const { objKey, objValue } = this.extractKeyAndValue(moduleFilter);
+
+        const noExcludedValues =
+          !data.value.includes('filter-pinned') &&
+          !data.value.includes('filter-negated');
+        const acceptedValues =
+          data.value.includes(`filter-key-${objKey}`) &&
+          data.value.includes(`filter-value-${objValue}`);
+
+        if (acceptedValues && noExcludedValues) {
+          moduleFilter.used = true;
+          return true;
         }
-      });
-      if (!found) {
-        $(allFilters[i]).siblings('.euiBadge__iconButton').removeClass('hide-close-button');
-        $(allFilters[i]).off('click');
-      } else {
-        $(allFilters[i]).siblings('.euiBadge__iconButton').addClass('hide-close-button');
-        $(allFilters[i]).on('click', (ev) => {
-          ev.stopPropagation();
-        });
       }
+    }
+    return false;
+  }
+
+  static extractKeyAndValue(moduleFilter) {
+    const objKey = moduleFilter.query?.match
+      ? Object.keys(moduleFilter.query.match)[0]
+      : moduleFilter.meta.key;
+    const objValue = moduleFilter.query?.match
+      ? moduleFilter.query.match[objKey].query
+      : moduleFilter.meta.value;
+
+    return { objKey, objValue };
+  }
+
+  static updateFilterState(found, filter) {
+    const closeButton = $(filter).siblings('.euiBadge__iconButton');
+    if (!found) {
+      closeButton.removeClass('hide-close-button');
+      $(filter).off('click');
+    } else {
+      closeButton.addClass('hide-close-button');
+      $(filter).on('click', ev => ev.stopPropagation());
     }
   }
 }
