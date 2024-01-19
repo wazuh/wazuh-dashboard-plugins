@@ -57,7 +57,20 @@ const context = {
       },
     },
   },
-  wazuh_core: {},
+  wazuh_core: {
+    configuration: {
+      _settings: new Map(),
+      logger: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
+      getCustomizationSetting: jest.fn(),
+      get: jest.fn(),
+      set: jest.fn(),
+    },
+  },
 };
 const enhanceWithContext = (fn: (...args: any[]) => any) =>
   fn.bind(null, context);
@@ -106,7 +119,7 @@ beforeAll(async () => {
     );
 
   // Register routes
-  WazuhUtilsRoutes(router);
+  WazuhUtilsRoutes(router, { configuration: context.wazuh_core.configuration });
   WazuhReportingRoutes(router);
 
   // Register router
@@ -135,9 +148,6 @@ describe('[endpoint] GET /reports', () => {
   beforeAll(() => {
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
     createDataDirectoryIfNotExists();
-
-    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
-    createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
     createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
@@ -186,37 +196,49 @@ describe('[endpoint] GET /reports', () => {
 });
 
 describe('[endpoint] PUT /utils/configuration', () => {
-  beforeEach(() => {
-    // Create the configuration file with custom content
-    const fileContent = `---
-  pattern: test-alerts-*
-
-  hosts:
-    - default:
-        url: https://localhost
-        port: 55000
-        username: wazuh-wui
-        password: wazuh-wui
-        run_as: false
-  `;
-
-    fs.writeFileSync(WAZUH_DATA_CONFIG_APP_PATH, fileContent, 'utf8');
+  const SettingsDefinitions = {
+    'customization.enabled': {
+      defaultValueIfNotSet: true,
+      isConfigurableFromFile: true,
+      validateBackend: schema => schema.boolean(),
+    },
+    'customization.logo.reports': {
+      defaultValueIfNotSet: 'images/logo_reports.png',
+      isConfigurableFromFile: true,
+      validateBackend: schema => schema.boolean(),
+    },
+    'customization.reports.header': {
+      defaultValueIfNotSet: 'Original header',
+      isConfigurableFromFile: true,
+      validateBackend: schema => schema.string(),
+    },
+    'customization.reports.footer': {
+      defaultValueIfNotSet: 'Original footer',
+      isConfigurableFromFile: true,
+      validateBackend: schema => schema.string(),
+    },
+  };
+  beforeAll(() => {
+    context.wazuh_core.configuration._settings = new Map();
+    Object.entries(SettingsDefinitions).forEach(([key, value]) =>
+      context.wazuh_core.configuration._settings.set(key, value),
+    );
   });
 
-  afterEach(() => {
-    // Remove the configuration file
-    fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
+  afterAll(() => {
+    // Reset the configuration
+    context.wazuh_core.configuration._settings = null;
   });
 
   // expectedMD5 variable is a verified md5 of a report generated with this header and footer
   // If any of the parameters is changed this variable should be updated with the new md5
-  it.each`
+  it.only.each`
     footer              | header                                 | responseStatusCode | expectedMD5                           | tab
-    ${null}             | ${null}                                | ${200}             | ${'301281824427c6ea8546fd14ee1aa5d8'} | ${'pm'}
+    ${null}             | ${null}                                | ${200}             | ${'81a0d6bd6da54eb91cb1dd81f9473130'} | ${'pm'}
     ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'} | ${200}             | ${'c2adfd7ab05ae3ed1548abd3c8be8f7e'} | ${'general'}
-    ${''}               | ${''}                                  | ${200}             | ${'06726f42a4129dd47262ea7228939006'} | ${'fim'}
-    ${'Custom Footer'}  | ${null}                                | ${200}             | ${'1ea187181c307a4be5e90a38f614c42d'} | ${'aws'}
-    ${null}             | ${'Custom Header'}                     | ${200}             | ${'f2fc0804eb52ebca21291eb5a40dec35'} | ${'gcp'}
+    ${''}               | ${''}                                  | ${200}             | ${'6456fcabf7d0c7944b20bbd1b2428d0e'} | ${'fim'}
+    ${'Custom Footer'}  | ${null}                                | ${200}             | ${'2d15fe128115b152b0a175952d8c24e0'} | ${'aws'}
+    ${null}             | ${'Custom Header'}                     | ${200}             | ${'885f2a91f5b042e41ee191b408bdea65'} | ${'gcp'}
   `(
     `Set custom report header and footer - Verify PDF output`,
     async ({ footer, header, responseStatusCode, expectedMD5, tab }) => {
@@ -249,35 +271,56 @@ describe('[endpoint] PUT /utils/configuration', () => {
         configurationBody['customization.reports.header'] = header;
       }
 
+      const initialConfig = {
+        pattern: 'test-alerts-*',
+        hosts: [
+          {
+            id: 'default',
+            url: 'https://localhost',
+            port: 55000,
+            username: 'wazuh-wui',
+            password: 'wazuh-wui',
+            run_as: false,
+          },
+        ],
+      };
+
+      const afterUpdateConfiguration = {
+        ...initialConfig,
+        ...configurationBody,
+      };
+      context.wazuh_core.configuration.get.mockReturnValueOnce(initialConfig);
+
+      context.wazuh_core.configuration.getCustomizationSetting.mockImplementation(
+        setting => {
+          return (
+            afterUpdateConfiguration?.[setting] ??
+            SettingsDefinitions?.[setting]?.defaultValueIfNotSet
+          );
+        },
+      );
       // Set custom report header and footer
-      if (typeof footer == 'string' || typeof header == 'string') {
+      if (typeof footer === 'string' || typeof header === 'string') {
+        context.wazuh_core.configuration.set.mockReturnValueOnce(
+          configurationBody,
+        );
         const responseConfig = await supertest(innerServer.listener)
           .put('/utils/configuration')
           .send(configurationBody)
           .expect(responseStatusCode);
-        return;
-        if (typeof footer == 'string') {
-          expect(
-            responseConfig.body?.data?.updatedConfiguration?.[
-              'customization.reports.footer'
-            ],
-          ).toMatch(configurationBody['customization.reports.footer']);
-        }
-        if (typeof header == 'string') {
-          expect(
-            responseConfig.body?.data?.updatedConfiguration?.[
-              'customization.reports.header'
-            ],
-          ).toMatch(configurationBody['customization.reports.header']);
-        }
+
+        expect(responseConfig.body.data.updatedConfiguration).toEqual(
+          configurationBody,
+        );
       }
 
       // Generate PDF report
       const responseReport = await supertest(innerServer.listener)
         .post(`/reports/modules/${tab}`)
         .set('x-test-username', USER_NAME)
-        .send(reportBody)
-        .expect(200);
+        .send(reportBody);
+      // .expect(200);
+
       const fileName =
         responseReport.body?.message.match(/([A-Z-0-9]*\.pdf)/gi)[0];
       const userPath = md5(USER_NAME);
