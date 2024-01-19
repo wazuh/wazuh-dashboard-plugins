@@ -1,14 +1,17 @@
 .vulsInventoryContainer {
-    height: calc(100vh - 104px);
-}
+  height: calc(100vh - 104px);
 
+  .euiDataGrid__virtualized {
+    height: calc(100vh - 345px) !important;
+  }
 
-.headerIsExpanded .vulsInventoryContainer {
-    height: calc(100vh - 153px);
-}
-
-.vulsInventoryContainer .euiDataGrid--fullScreen {
+  .euiDataGrid--fullScreen {
     height: calc(100vh - 49px);
     bottom: 0;
     top: auto;
+  }
+}
+
+.headerIsExpanded .vulsInventoryContainer {
+  height: calc(100vh - 153px);
 }
