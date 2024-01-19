@@ -157,7 +157,7 @@ export class ManageHosts {
   }
 
   /**
-   * This get all hosts entries in the wazuh.yml and the related info in the wazuh-registry.json
+   * This get all hosts entries in the plugins configuration and the related info in the wazuh-registry.json
    * @param {Object} context
    * @param {Object} request
    * @param {Object} response

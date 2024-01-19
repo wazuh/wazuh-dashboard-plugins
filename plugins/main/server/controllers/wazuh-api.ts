@@ -130,7 +130,7 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      // Get config from wazuh.yml
+      // Get config from configuration
       const id = request.body.id;
       context.wazuh.logger.debug(`Getting server API host by ID: ${id}`);
       const apiHostData = await context.wazuh_core.manageHosts.get(id, {

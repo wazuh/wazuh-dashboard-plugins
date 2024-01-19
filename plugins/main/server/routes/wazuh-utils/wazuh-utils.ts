@@ -20,7 +20,7 @@ import {
 export function WazuhUtilsRoutes(router: IRouter, services) {
   const ctrl = new WazuhUtilsCtrl();
 
-  // Returns the wazuh.yml file parsed
+  // Returns the plugins configuration
   router.get(
     {
       path: '/utils/configuration',
@@ -30,7 +30,7 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
       ctrl.getConfiguration(context, request, response),
   );
 
-  // Returns the wazuh.yml file in raw
+  // Update the plugins configuration
   router.put(
     {
       path: '/utils/configuration',

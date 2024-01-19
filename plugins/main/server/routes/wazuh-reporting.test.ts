@@ -232,7 +232,7 @@ describe('[endpoint] PUT /utils/configuration', () => {
 
   // expectedMD5 variable is a verified md5 of a report generated with this header and footer
   // If any of the parameters is changed this variable should be updated with the new md5
-  it.only.each`
+  it.each`
     footer              | header                                 | responseStatusCode | expectedMD5                           | tab
     ${null}             | ${null}                                | ${200}             | ${'81a0d6bd6da54eb91cb1dd81f9473130'} | ${'pm'}
     ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'} | ${200}             | ${'c2adfd7ab05ae3ed1548abd3c8be8f7e'} | ${'general'}

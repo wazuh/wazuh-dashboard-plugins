@@ -53,9 +53,12 @@ export class SchedulerJob {
   private async getApiObjects() {
     const { apis } = jobs[this.jobName];
     const hostsResponse: IApi[] =
-      await this.context.wazuh_core.manageHosts.getEntries(); // TODO: review if this need the password or exclude
+      await this.context.wazuh_core.manageHosts.getEntries(); // TODO: review if this need the password or exclude it
     if (!hostsResponse.length)
-      throw { error: 10001, message: 'No Wazuh host configured in wazuh.yml' };
+      throw {
+        error: 10001,
+        message: 'No API host configured in configuration',
+      };
     if (apis && apis.length) {
       return this.filterHosts(hostsResponse, apis);
     }

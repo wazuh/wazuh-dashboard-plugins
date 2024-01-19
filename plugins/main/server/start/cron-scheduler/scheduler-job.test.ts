@@ -189,7 +189,7 @@ describe('SchedulerJob', () => {
     mockContext.wazuh_core.manageHosts.getEntries.mockResolvedValue([]);
     await expect(schedulerJob.getApiObjects()).rejects.toEqual({
       error: 10001,
-      message: 'No Wazuh host configured in wazuh.yml',
+      message: 'No API host configured in configuration',
     });
   });
 
