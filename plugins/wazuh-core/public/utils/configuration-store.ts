@@ -6,7 +6,10 @@ import {
 } from '../../common/services/configuration';
 
 export class ConfigurationStore implements IConfigurationStore {
-  constructor(private logger: ILogger) {}
+  private _stored: any;
+  constructor(private logger: ILogger) {
+    this._stored = {};
+  }
   async setup(settings: { [key: string]: TConfigurationSetting }) {
     try {
       this.logger.debug('Setup');
@@ -19,43 +22,35 @@ export class ConfigurationStore implements IConfigurationStore {
   }
   async start() {}
   async stop() {}
-  async fetch() {}
+  private storeGet() {
+    return this._stored;
+  }
+  private storeSet(value: any) {
+    this._stored = value;
+  }
   async get(...settings: string[]): Promise<any | { [key: string]: any }> {
-    const { attributes = {} } = await this.savedObjectRepository.get(
-      this.type,
-      this.type,
-    );
+    const stored = this.storeGet();
 
     return settings.length
       ? settings.reduce(
           (accum, settingKey: string) => ({
             ...accum,
-            [settingKey]: attributes[settingKey],
+            [settingKey]: stored[settingKey],
           }),
           {},
         )
-      : attributes;
+      : stored;
   }
   async set(settings: { [key: string]: any }): Promise<any> {
     try {
-      const attributes = await this.get();
+      const attributes = this.storeGet();
       const newSettings = {
         ...attributes,
         ...settings,
       };
-      this.logger.debug(
-        `Updating saved object with ${JSON.stringify(newSettings)}`,
-      );
-      const response = await this.savedObjectRepository.create(
-        this.type,
-        newSettings,
-        {
-          id: this.type,
-          overwrite: true,
-          refresh: true,
-        },
-      );
-      this.logger.debug('Saved object was updated');
+      this.logger.debug(`Updating store with ${JSON.stringify(newSettings)}`);
+      const response = this.storeSet(newSettings);
+      this.logger.debug('Store was updated');
       return response;
     } catch (error) {
       this.logger.error(error.message);
@@ -69,15 +64,7 @@ export class ConfigurationStore implements IConfigurationStore {
         ...attributes,
       };
       settings.forEach(setting => delete updatedSettings[setting]);
-      const response = await this.savedObjectRepository.create(
-        this.type,
-        updatedSettings,
-        {
-          id: this.type,
-          overwrite: true,
-          refresh: true,
-        },
-      );
+      const response = this.storeSet(updatedSettings);
       return response;
     } catch (error) {
       this.logger.error(error.message);

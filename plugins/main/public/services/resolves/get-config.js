@@ -13,32 +13,41 @@
 import { getWazuhCorePlugin } from '../../kibana-services';
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
-  const defaultConfig = await getWazuhCorePlugin().configuration.get();
-
   try {
-    const config = await genericReq.request('GET', '/utils/configuration', {});
+    // TODO: this should get the default configuration instead of the current
+    const defaultConfig = await getWazuhCorePlugin().configuration.get();
 
-    if (!config || !config.data || !config.data.data) {
-      throw new Error('No config available');
-    }
+    try {
+      const config = await genericReq.request(
+        'GET',
+        '/utils/configuration',
+        {},
+      );
 
-    const ymlContent = config.data.data;
-
-    if (
-      typeof ymlContent === 'object' &&
-      (Object.keys(ymlContent) || []).length
-    ) {
-      // Replace default values with custom values from configuration file
-      for (const key in ymlContent) {
-        defaultConfig[key] = ymlContent[key];
+      if (!config || !config.data || !config.data.data) {
+        throw new Error('No config available');
       }
-    }
 
-    wazuhConfig.setConfig(defaultConfig);
+      const ymlContent = config.data.data;
+
+      if (
+        typeof ymlContent === 'object' &&
+        (Object.keys(ymlContent) || []).length
+      ) {
+        // Replace default values with custom values from configuration file
+        for (const key in ymlContent) {
+          defaultConfig[key] = ymlContent[key];
+        }
+      }
+
+      wazuhConfig.setConfig(defaultConfig);
+    } catch (error) {
+      wazuhConfig.setConfig(defaultConfig);
+      console.log('Error getting configuration, using default values.'); // eslint-disable-line
+      console.log(error.message || error); // eslint-disable-line
+    }
+    return $q.resolve(defaultConfig);
   } catch (error) {
-    wazuhConfig.setConfig(defaultConfig);
-    console.log('Error getting configuration, using default values.'); // eslint-disable-line
-    console.log(error.message || error); // eslint-disable-line
+    console.error(error);
   }
-  return $q.resolve(defaultConfig);
 }

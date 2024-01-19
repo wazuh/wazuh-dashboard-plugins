@@ -44,6 +44,32 @@ export class ConfigurationStore implements IConfigurationStore {
     const setting = this.configuration._settings.get(key);
     return setting?.store?.savedObject?.set?.(value) ?? value;
   }
+  private async storeGet() {
+    try {
+      this.logger.debug(`Fetching saved object [${this.type}:${this.type}]`);
+      const response = await this.savedObjectRepository.get(
+        this.type,
+        this.type,
+      );
+      this.logger.debug(
+        `Fetched saved object response [${JSON.stringify(response)}]`,
+      );
+      return response.attributes;
+    } catch (error) {
+      // Saved object not found
+      if (error?.output?.payload?.statusCode === 404) {
+        return {};
+      }
+      throw error;
+    }
+  }
+  private async storeSet(store: any) {
+    return await this.savedObjectRepository.create(this.type, store, {
+      id: this.type,
+      overwrite: true,
+      refresh: true,
+    });
+  }
   async setup(settings: { [key: string]: TConfigurationSetting }) {
     // Register the saved object
     try {
@@ -60,23 +86,20 @@ export class ConfigurationStore implements IConfigurationStore {
   async stop() {}
   async get(...settings: string[]): Promise<any | { [key: string]: any }> {
     try {
-      const { attributes } = await this.savedObjectRepository.get(
-        this.type,
-        this.type,
-      );
+      const stored = await this.storeGet();
       return settings.length
         ? settings.reduce(
             (accum, settingKey: string) => ({
               ...accum,
               [settingKey]: this.getSettingValue(
                 settingKey,
-                attributes[settingKey],
+                stored[settingKey],
               ),
             }),
             {},
           )
         : Object.fromEntries(
-            Object.entries(attributes).map(([key, value]) => [
+            Object.entries(stored).map(([key, value]) => [
               key,
               this.getSettingValue(key, value),
             ]),
@@ -88,9 +111,9 @@ export class ConfigurationStore implements IConfigurationStore {
   }
   async set(settings: { [key: string]: any }): Promise<any> {
     try {
-      const attributes = await this.get();
+      const stored = await this.get();
       const newSettings = {
-        ...attributes,
+        ...stored,
         ...Object.fromEntries(
           Object.entries(settings).map(([key, value]) => [
             key,
@@ -101,15 +124,7 @@ export class ConfigurationStore implements IConfigurationStore {
       this.logger.debug(
         `Updating saved object with ${JSON.stringify(newSettings)}`,
       );
-      const response = await this.savedObjectRepository.create(
-        this.type,
-        newSettings,
-        {
-          id: this.type,
-          overwrite: true,
-          refresh: true,
-        },
-      );
+      const response = await this.storeSet(newSettings);
       this.logger.debug('Saved object was updated');
       return response;
     } catch (error) {
@@ -119,20 +134,12 @@ export class ConfigurationStore implements IConfigurationStore {
   }
   async clear(...settings: string[]): Promise<any> {
     try {
-      const attributes = await this.get();
+      const stored = await this.get();
       const updatedSettings = {
-        ...attributes,
+        ...stored,
       };
       settings.forEach(setting => delete updatedSettings[setting]);
-      const response = await this.savedObjectRepository.create(
-        this.type,
-        updatedSettings,
-        {
-          id: this.type,
-          overwrite: true,
-          refresh: true,
-        },
-      );
+      const response = await this.storeSet(updatedSettings);
       return response;
     } catch (error) {
       this.logger.error(error.message);
