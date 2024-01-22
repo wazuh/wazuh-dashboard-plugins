@@ -1,5 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { parseData } from '../inventory/inventory_service';
 
 const getVisStateFilter = (
   id: string,
@@ -20,6 +21,17 @@ const getVisStateFilter = (
       showPartialRows: false,
       showTotal: false,
       totalFunc: 'sum',
+    },
+    uiState: {
+      vis: {
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 100,
+          },
+        ],
+        sorteable: false,
+      },
     },
     data: {
       searchSource: {
@@ -91,7 +103,7 @@ export const getDashboardFilters = (
           'topPackageSelector',
           indexPatternId,
           'Top packages vulnerabilities',
-          'Top 5 package names',
+          'Top 5 packages',
           'package.name',
         ),
       },
@@ -111,7 +123,7 @@ export const getDashboardFilters = (
           'topOSVulnerabilities',
           indexPatternId,
           'Top operating system vulnerabilities',
-          'Top 5 operating systems',
+          'Top 5 OS',
           'host.os.full',
         ),
       },
