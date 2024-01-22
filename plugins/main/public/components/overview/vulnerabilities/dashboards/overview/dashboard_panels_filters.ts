@@ -1,6 +1,5 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { parseData } from '../inventory/inventory_service';
 
 const getVisStateFilter = (
   id: string,
