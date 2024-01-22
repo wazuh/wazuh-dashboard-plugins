@@ -52,7 +52,7 @@ export function WzStatisticsAnalysisd({
         <EuiFlexItem>
           <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
-              <EuiFlexItem>Events Dropped</EuiFlexItem>
+              <EuiFlexItem>Events dropped</EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -100,7 +100,7 @@ export function WzStatisticsAnalysisd({
         <EuiFlexItem>
           <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
-              <EuiFlexItem>Events Decoded summary</EuiFlexItem>
+              <EuiFlexItem>Events decoded summary</EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>
