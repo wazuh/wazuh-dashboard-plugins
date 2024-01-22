@@ -164,7 +164,7 @@ export class WazuhHostsCtrl {
       return response.ok({
         body: {
           message: `API host with ID [${originalID}] was ${
-            hostExistIndex ? 'updated' : 'created'
+            hostExistIndex !== -1 ? 'updated' : 'created'
           }`,
           data: request.body,
         },

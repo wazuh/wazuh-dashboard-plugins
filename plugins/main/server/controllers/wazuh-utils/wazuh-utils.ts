@@ -35,7 +35,7 @@ export class WazuhUtilsCtrl {
   constructor() {}
 
   /**
-   * Get the configuration
+   * Get the configuration excluding the API hosts configuration
    * @param {Object} context
    * @param {Object} request
    * @param {Object} response
@@ -49,6 +49,8 @@ export class WazuhUtilsCtrl {
     try {
       context.wazuh.logger.debug('Getting configuration');
       const configuration = await context.wazuh_core.configuration.get();
+      // Exclude the API host configuration
+      const { hosts, ...rest } = configuration;
       context.wazuh.logger.debug(
         `Configuration: ${JSON.stringify(configuration)}`,
       );
@@ -56,7 +58,7 @@ export class WazuhUtilsCtrl {
         body: {
           statusCode: 200,
           error: 0,
-          data: configuration,
+          data: rest,
         },
       });
     } catch (error) {

@@ -237,15 +237,10 @@ export class WazuhApiCtrl {
               api.cluster_info,
             );
 
-            // Hide Wazuh API secret, username, password
-            const copied = { ...api };
-            copied.secret = '****'; // TODO: this could be deprecated
-            copied.password = '****';
-
             return response.ok({
               body: {
                 statusCode: HTTP_STATUS_CODES.OK,
-                data: copied,
+                data: api,
                 idChanged: request.body.idChanged || null,
               },
             });

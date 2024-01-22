@@ -15,7 +15,6 @@ import {
   createDirectoryIfNotExists,
 } from '../lib/filesystem';
 import {
-  WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
   WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   WAZUH_DATA_ABSOLUTE_PATH,

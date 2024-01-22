@@ -94,8 +94,8 @@ afterAll(async () => {
 });
 
 describe.only('[endpoint] GET /utils/configuration', () => {
-  it(`Get plugin configuration GET /utils/configuration - 200`, async () => {
-    context.wazuh_core.configuration.get.mockReturnValueOnce({
+  it(`Get plugin configuration and ensure the hosts is not returned GET /utils/configuration - 200`, async () => {
+    const initialConfig = {
       pattern: 'test-alerts-*',
       hosts: [
         {
@@ -107,23 +107,16 @@ describe.only('[endpoint] GET /utils/configuration', () => {
           run_as: false,
         },
       ],
-    });
+    };
+    context.wazuh_core.configuration.get.mockReturnValueOnce(initialConfig);
     const response = await supertest(innerServer.listener)
       .get('/utils/configuration')
       .expect(200);
 
-    expect(response.body.data).toBeDefined();
-    expect(response.body.data.pattern).toBeDefined();
-    expect(response.body.data.hosts).toEqual([
-      {
-        id: 'default',
-        url: 'https://localhost',
-        port: 55000,
-        username: 'wazuh-wui',
-        password: 'wazuh-wui',
-        run_as: false,
-      },
-    ]);
+    const { hosts, ...finalConfiguration } = initialConfig;
+    expect(response.body.data).toEqual(finalConfiguration);
+    // Ensure the API hosts is not returned
+    expect(response.body.data.hosts).not.toBeDefined();
   });
 });
 
