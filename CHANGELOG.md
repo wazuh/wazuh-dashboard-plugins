@@ -33,6 +33,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed script to install agents on macOS when you have password to deploy [#6305](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6305)
 - Fixed a problem with the address validation on Deploy New Agent [#6327](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6327)
 - Fixed a typo in an abbreviation for Fully Qualified Domain Name [#6333](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6333)
+- Fixed server statistics when cluster mode is disabled [#6352](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6352)
 
 ### Removed
 
