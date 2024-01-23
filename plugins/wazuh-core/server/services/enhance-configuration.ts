@@ -53,9 +53,7 @@ function getCustomizationSetting(
   }
 }
 
-export function enhanceConfigurationBackendService(
-  configuration: IConfiguration,
-) {
+export function enhanceConfiguration(configuration: IConfiguration) {
   configuration.getCustomizationSetting = async function (settingKey: string) {
     const currentConfiguration = await this.get(
       'customization.enabled',

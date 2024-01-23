@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 // Encrypt service based on https://stackoverflow.com/questions/6953286/how-to-encrypt-data-that-needs-to-be-decrypted-in-node-js
 // algorithm: aes-256-gcm
-export class Encryptation {
+export class Encryption {
   private algorithm: string;
   private iv: Uint8Array;
   private key: string;

@@ -1,4 +1,4 @@
-import { enhanceConfigurationBackendService } from './enhance-configuration-service';
+import { enhanceConfiguration } from './enhance-configuration';
 import { Configuration } from '../../common/services/configuration';
 
 const noop = () => undefined;
@@ -18,7 +18,7 @@ const mockConfigurationStore = {
 };
 
 const configuration = new Configuration(mockLogger, mockConfigurationStore);
-enhanceConfigurationBackendService(configuration);
+enhanceConfiguration(configuration);
 
 [
   { key: 'customization.enabled', type: 'switch', defaultValue: true },
@@ -29,14 +29,14 @@ enhanceConfigurationBackendService(configuration);
   },
 ].forEach(({ key, ...rest }) => configuration.register(key, rest));
 
-describe('enhanceConfigurationBackendService', () => {
+describe('enhanceConfiguration', () => {
   it('ensure the .getCustomizationSetting is defined and is a function', () => {
     expect(configuration.getCustomizationSetting).toBeDefined();
     expect(typeof configuration.getCustomizationSetting).toBe('function');
   });
 });
 
-describe('enhanceConfigurationBackendService', () => {
+describe('enhanceConfiguration', () => {
   it.each`
     enabledCustomization | customize       | expectedSettingValue
     ${true}              | ${'Customized'} | ${'Customized'}

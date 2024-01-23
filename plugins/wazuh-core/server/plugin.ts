@@ -21,7 +21,7 @@ import {
 } from './services';
 import { Configuration } from '../common/services/configuration';
 import { PLUGIN_SETTINGS } from '../common/constants';
-import { enhanceConfigurationBackendService } from './services/enhance-configuration-service';
+import { enhanceConfiguration } from './services/enhance-configuration';
 import { first } from 'rxjs/operators';
 import { WazuhCorePluginConfigType } from '.';
 
@@ -56,19 +56,20 @@ export class WazuhCorePlugin
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-saved-object'),
       core.savedObjects,
-      { encryptation_password: config.encryptation.password },
+      { encryption_password: config.encryption.password },
     );
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
       this._internal.configurationStore,
     );
 
+    // Enhance configurationService
+    enhanceConfiguration(this.services.configuration);
+
+    // Register the plugin settings
     Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
       this.services.configuration.register(key, value),
     );
-
-    // Enhance configurationService
-    enhanceConfigurationBackendService(this.services.configuration);
 
     /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
       Because the settings are defined in the backend and frontend side using the same definitions,

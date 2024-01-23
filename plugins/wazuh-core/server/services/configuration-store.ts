@@ -4,16 +4,16 @@ import {
   TConfigurationSetting,
   IConfiguration,
 } from '../../common/services/configuration';
-import { Encryptation } from './encryptation';
+import { Encryption } from './encryption';
 
 export class ConfigurationStore implements IConfigurationStore {
   private type = 'plugins-configuration';
   private savedObjectRepository: any;
   private configuration: IConfiguration;
-  private encryptation: any;
+  private encryption: any;
   constructor(private logger: Logger, private savedObjects, options) {
-    this.encryptation = new Encryptation(this.logger.get('encryptation'), {
-      password: options.encryptation_password,
+    this.encryption = new Encryption(this.logger.get('encryption'), {
+      password: options.encryption_password,
     });
   }
   private getSavedObjectDefinition(settings: {
@@ -45,24 +45,14 @@ export class ConfigurationStore implements IConfigurationStore {
   getSettingValue(key: string, value: any) {
     const setting = this.configuration._settings.get(key);
     return setting?.store?.savedObject?.encrypted
-      ? JSON.parse(this.encryptation.decrypt(value))
+      ? JSON.parse(this.encryption.decrypt(value))
       : value;
-    return (
-      setting?.store?.savedObject?.get?.(value, {
-        encryptation: this.encryptation,
-      }) ?? value
-    );
   }
   setSettingValue(key: string, value: any) {
     const setting = this.configuration._settings.get(key);
     return setting?.store?.savedObject?.encrypted
-      ? this.encryptation.encrypt(JSON.stringify(value))
+      ? this.encryption.encrypt(JSON.stringify(value))
       : value;
-    return (
-      setting?.store?.savedObject?.set?.(value, {
-        encryptation: this.encryptation,
-      }) ?? value
-    );
   }
   private async storeGet() {
     try {

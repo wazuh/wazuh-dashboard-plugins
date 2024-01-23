@@ -10,7 +10,7 @@ export function plugin(initializerContext: PluginInitializerContext) {
 }
 
 const configSchema = schema.object({
-  encryptation: schema.object({
+  encryption: schema.object({
     password: schema.string({ defaultValue: 'secretpassword!' }),
   }),
 });
