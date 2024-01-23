@@ -40,35 +40,25 @@ export class ModulesHelper {
 
   static activeNoImplicitsFilters() {
     const { filterManager } = getDataPlugin().query;
-    const implicitFilters = filterManager
-      .getFilters()
-      .filter(x => x.$state.isImplicit);
+    const allFilters = filterManager.getFilters();
 
-    if (implicitFilters.length === 0) {
-      setTimeout(() => this.activeNoImplicitsFilters(), 100);
-      return;
-    }
-
-    this.processFilters(implicitFilters);
+    this.processFilters(allFilters);
   }
 
-  static processFilters(implicitFilters) {
+  static processFilters(filters) {
     const allFilters = $(`.globalFilterItem .euiBadge__childButton`);
 
     allFilters.each((_index, filter) => {
       const data = filter.attributes['data-test-subj'];
 
-      const found = this.checkFilterAgainstImplicitFilters(
-        data,
-        implicitFilters,
-      );
+      const isImplicitFilter = this.checkFilterValues(data, filters);
 
-      this.updateFilterState(found, filter);
+      this.updateFilterState(isImplicitFilter, filter);
     });
   }
 
-  static checkFilterAgainstImplicitFilters(data, implicitFilters) {
-    for (const moduleFilter of implicitFilters) {
+  static checkFilterValues(data, filters) {
+    for (const moduleFilter of filters) {
       if (!moduleFilter.used) {
         const { objKey, objValue } = this.extractKeyAndValue(moduleFilter);
 
@@ -99,9 +89,9 @@ export class ModulesHelper {
     return { objKey, objValue };
   }
 
-  static updateFilterState(found, filter) {
+  static updateFilterState(isImplicitFilter, filter) {
     const closeButton = $(filter).siblings('.euiBadge__iconButton');
-    if (!found) {
+    if (!isImplicitFilter) {
       closeButton.removeClass('hide-close-button');
       $(filter).off('click');
     } else {

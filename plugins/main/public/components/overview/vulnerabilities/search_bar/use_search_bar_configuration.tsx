@@ -76,6 +76,7 @@ const useSearchBarConfiguration = (
         const previousFilters = JSON.parse(storagePreviousFilters);
         const cleanedFilters = cleanFilters(previousFilters);
         filterManager.setFilters(cleanedFilters);
+        sessionStorage.removeItem(SESSION_STORAGE_FILTERS_NAME);
       }
     };
   }, []);
