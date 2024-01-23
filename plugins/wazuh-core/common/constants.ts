@@ -1559,56 +1559,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Configure the server hosts.',
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.arrayOf,
-    defaultValue: [
-      {
-        id: 'default',
-        url: 'https://localhost',
-        port: 55000,
-        username: 'wazuh-wui',
-        password: 'wazuh-wui',
-        run_as: false,
-      },
-    ],
+    defaultValue: [],
     store: {
       savedObject: {
         mapping: {
-          properties: {
-            id: {
-              type: 'keyword',
-            },
-            url: {
-              type: 'text',
-            },
-            port: {
-              type: 'integer',
-            },
-            username: {
-              type: 'text',
-            },
-            password: {
-              type: 'text',
-            },
-            run_as: {
-              type: 'boolean',
-            },
-          },
+          type: 'text',
         },
-        get: (value, configuration) => {
-          return Array.isArray(value)
-            ? value.map(({ password, ...rest }) => ({
-                ...rest,
-                password: 'decoded',
-              }))
-            : value;
-        },
-        set: (value, configuration) => {
-          return Array.isArray(value)
-            ? value.map(({ password, ...rest }) => ({
-                ...rest,
-                password: 'encoded',
-              }))
-            : value;
-        },
+        encrypted: true,
       },
     },
     options: {

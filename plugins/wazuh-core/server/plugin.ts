@@ -22,6 +22,8 @@ import {
 import { Configuration } from '../common/services/configuration';
 import { PLUGIN_SETTINGS } from '../common/constants';
 import { enhanceConfigurationBackendService } from './services/enhance-configuration-service';
+import { first } from 'rxjs/operators';
+import { WazuhCorePluginConfigType } from '.';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -30,7 +32,7 @@ export class WazuhCorePlugin
   private services: { [key: string]: any };
   private _internal: { [key: string]: any };
 
-  constructor(initializerContext: PluginInitializerContext) {
+  constructor(private initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
     this.services = {};
     this._internal = {};
@@ -44,9 +46,17 @@ export class WazuhCorePlugin
 
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
 
+    // Get the plugin configuration
+    const config$ =
+      this.initializerContext.config.create<WazuhCorePluginConfigType>();
+    const config: WazuhCorePluginConfigType = await config$
+      .pipe(first())
+      .toPromise();
+
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-saved-object'),
       core.savedObjects,
+      { encryptation_password: config.encryptation.password },
     );
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),

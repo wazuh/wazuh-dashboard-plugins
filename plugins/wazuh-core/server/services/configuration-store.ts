@@ -4,12 +4,18 @@ import {
   TConfigurationSetting,
   IConfiguration,
 } from '../../common/services/configuration';
+import { Encryptation } from './encryptation';
 
 export class ConfigurationStore implements IConfigurationStore {
   private type = 'plugins-configuration';
   private savedObjectRepository: any;
   private configuration: IConfiguration;
-  constructor(private logger: Logger, private savedObjects) {}
+  private encryptation: any;
+  constructor(private logger: Logger, private savedObjects, options) {
+    this.encryptation = new Encryptation(this.logger.get('encryptation'), {
+      password: options.encryptation_password,
+    });
+  }
   private getSavedObjectDefinition(settings: {
     [key: string]: TConfigurationSetting;
   }) {
@@ -38,11 +44,25 @@ export class ConfigurationStore implements IConfigurationStore {
   }
   getSettingValue(key: string, value: any) {
     const setting = this.configuration._settings.get(key);
-    return setting?.store?.savedObject?.get?.(value) ?? value;
+    return setting?.store?.savedObject?.encrypted
+      ? JSON.parse(this.encryptation.decrypt(value))
+      : value;
+    return (
+      setting?.store?.savedObject?.get?.(value, {
+        encryptation: this.encryptation,
+      }) ?? value
+    );
   }
   setSettingValue(key: string, value: any) {
     const setting = this.configuration._settings.get(key);
-    return setting?.store?.savedObject?.set?.(value) ?? value;
+    return setting?.store?.savedObject?.encrypted
+      ? this.encryptation.encrypt(JSON.stringify(value))
+      : value;
+    return (
+      setting?.store?.savedObject?.set?.(value, {
+        encryptation: this.encryptation,
+      }) ?? value
+    );
   }
   private async storeGet() {
     try {
@@ -111,6 +131,7 @@ export class ConfigurationStore implements IConfigurationStore {
   }
   async set(settings: { [key: string]: any }): Promise<any> {
     try {
+      this.logger.debug('Updating saved object');
       const stored = await this.get();
       const newSettings = {
         ...stored,
