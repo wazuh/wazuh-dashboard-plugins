@@ -41,10 +41,7 @@ import {
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
 import { formatUIDate } from '../../../react-services/time-service';
 import { AddAPIHostForm } from './add-api';
-import {
-  WzButtonPermissionsOpenFlyout,
-  WzButtonPermissionsModalConfirm,
-} from '../../common/buttons';
+import { WzButtonOpenFlyout, WzButtonModalConfirm } from '../../common/buttons';
 import { ErrorHandler, GenericRequest } from '../../../react-services';
 
 export const ApiTable = compose(
@@ -64,7 +61,7 @@ export const ApiTable = compose(
         getAvailableUpdates,
         refreshingAvailableUpdates: true,
         apiAvailableUpdateDetails: undefined,
-        addingAPI: false,
+        isAdministratorError: false,
       };
     }
 
@@ -96,12 +93,24 @@ export const ApiTable = compose(
       }
     }
 
+    async getIsAdministratorCurrentUser() {
+      try {
+        await getWazuhCorePlugin().dashboardSecurity.isAdministrator();
+        this.setState({ isAdministratorError: false });
+      } catch (error) {
+        this.setState({
+          isAdministratorError: error.message,
+        });
+      }
+    }
+
     componentDidMount() {
       this.setState({
         apiEntries: this.props.apiEntries,
       });
 
       this.getApisAvailableUpdates();
+      this.getIsAdministratorCurrentUser();
     }
 
     /**
@@ -273,6 +282,13 @@ export const ApiTable = compose(
           };
         }),
       ];
+
+      const userCannotManageAPIHosts = Boolean(this.state.isAdministratorError);
+      const tooltipUserCannotManageAPIHosts = userCannotManageAPIHosts
+        ? {
+            content: this.state.isAdministratorError,
+          }
+        : false;
 
       const columns = [
         {
@@ -529,9 +545,8 @@ export const ApiTable = compose(
                   color='success'
                 />
               </EuiToolTip>
-              <WzButtonPermissionsOpenFlyout
+              <WzButtonOpenFlyout
                 flyoutTitle={`Edit API host: ${item.id} `}
-                roles={[]} // TODO: define permissions
                 flyoutBody={({ onClose }) => (
                   <AddAPIHostForm
                     initialValue={{
@@ -552,18 +567,20 @@ export const ApiTable = compose(
                 buttonProps={{
                   buttonType: 'icon',
                   iconType: 'pencil',
-                  tooltip: {
+                  tooltip: tooltipUserCannotManageAPIHosts || {
                     content: 'Edit',
                   },
+                  isDisabled: userCannotManageAPIHosts,
                 }}
-              ></WzButtonPermissionsOpenFlyout>
-              <WzButtonPermissionsModalConfirm
+              ></WzButtonOpenFlyout>
+              <WzButtonModalConfirm
                 buttonType='icon'
-                roles={[]} // TODO: define permissions
-                tooltip={{
-                  content: 'Delete',
-                }}
-                isDisabled={false}
+                tooltip={
+                  tooltipUserCannotManageAPIHosts || {
+                    content: 'Delete',
+                  }
+                }
+                isDisabled={userCannotManageAPIHosts}
                 modalTitle={`Do you want to delete the ${item.id} API host?`}
                 onConfirm={() => this.deleteAPIHost(item.id)}
                 modalProps={{ buttonColor: 'danger' }}
@@ -597,7 +614,7 @@ export const ApiTable = compose(
                 </EuiFlexGroup>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <WzButtonPermissionsOpenFlyout
+                <WzButtonOpenFlyout
                   flyoutTitle='Add API host'
                   flyoutBody={({ onClose }) => (
                     <AddAPIHostForm
@@ -607,14 +624,17 @@ export const ApiTable = compose(
                       }}
                     />
                   )}
-                  roles={[]}
                   buttonProps={{
                     buttonType: 'empty',
                     iconType: 'plusInCircle',
+                    isDisabled: userCannotManageAPIHosts,
+                    ...(tooltipUserCannotManageAPIHosts
+                      ? { tooltip: tooltipUserCannotManageAPIHosts }
+                      : {}),
                   }}
                 >
                   Add new
-                </WzButtonPermissionsOpenFlyout>
+                </WzButtonOpenFlyout>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty

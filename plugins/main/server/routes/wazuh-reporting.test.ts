@@ -106,16 +106,12 @@ beforeAll(async () => {
   innerServer = innerServerTest;
 
   // Mock decorator
-  jest
-    .spyOn(
-      WazuhUtilsCtrl.prototype as any,
-      'routeDecoratorProtectedAdministratorRoleValidToken',
-    )
-    .mockImplementation(
+  jest.mock('../controllers/decorators', () => ({
+    routeDecoratorProtectedAdministrator:
       handler =>
-        async (...args) =>
-          handler(...args),
-    );
+      async (...args) =>
+        handler(...args),
+  }));
 
   // Register routes
   WazuhUtilsRoutes(router, { configuration: context.wazuh_core.configuration });

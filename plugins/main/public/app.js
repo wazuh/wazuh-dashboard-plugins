@@ -42,12 +42,15 @@ import './controllers';
 import './factories';
 
 // Imports to update currentPlatform when app starts
-import { checkCurrentSecurityPlatform } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { WzAuthentication, loadAppConfig } from './react-services';
 
-import { getAngularModule, getHttp } from './kibana-services';
+import {
+  getAngularModule,
+  getHttp,
+  getWazuhCorePlugin,
+} from './kibana-services';
 import { addHelpMenuToAppChrome } from './utils';
 
 const app = getAngularModule();
@@ -74,7 +77,8 @@ app.run([
     app.$injector = _$injector;
 
     // Set currentSecurity platform in Redux when app starts.
-    checkCurrentSecurityPlatform()
+    getWazuhCorePlugin()
+      .dashboardSecurity.fetchCurrentPlatform()
       .then(item => {
         store.dispatch(updateCurrentPlatform(item));
       })

@@ -41,6 +41,13 @@ const enhanceWithContext = (fn: (...args: any[]) => any) =>
   fn.bind(null, context);
 let server, innerServer;
 
+jest.mock('../../controllers/decorators', () => ({
+  routeDecoratorProtectedAdministrator:
+    handler =>
+    async (...args) =>
+      handler(...args),
+}));
+
 beforeAll(async () => {
   // Create server
   const config = {
@@ -63,17 +70,6 @@ beforeAll(async () => {
     ...rest
   } = await server.setup(config);
   innerServer = innerServerTest;
-
-  const spyRouteDecoratorProtectedAdministratorRoleValidToken = jest
-    .spyOn(
-      WazuhUtilsCtrl.prototype as any,
-      'routeDecoratorProtectedAdministratorRoleValidToken',
-    )
-    .mockImplementation(
-      handler =>
-        async (...args) =>
-          handler(...args),
-    );
 
   // Register routes
   WazuhUtilsRoutes(router, { configuration: context.wazuh_core.configuration });

@@ -11,6 +11,7 @@ import {
 } from '../common/constants';
 import { formatBytes } from '../common/services/file-size';
 import { formatLabelValuePair } from '../common/services/settings';
+import { DashboardSecurity } from './utils/dashboard-security';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -163,6 +164,10 @@ export class WazuhCorePlugin
     Object.entries(PLUGIN_SETTINGS_CATEGORIES).forEach(([key, value]) => {
       this.services.configuration.registerCategory({ ...value, id: key });
     });
+
+    this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
+
+    this.services.dashboardSecurity.setup();
 
     return {
       ...this.services,

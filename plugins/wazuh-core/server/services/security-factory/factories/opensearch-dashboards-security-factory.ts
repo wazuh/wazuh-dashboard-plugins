@@ -33,4 +33,19 @@ export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
   getUserName(authContext: any) {
     return authContext['user_name'];
   }
+
+  async isAdministratorUser(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+  ) {
+    const { username, authContext } = await this.getCurrentUser(
+      request,
+      context,
+    );
+    if (!authContext.roles.includes('all_access')) {
+      throw new Error(
+        `User [${username}] has no permission: role [${'all_access'}]`,
+      );
+    }
+  }
 }

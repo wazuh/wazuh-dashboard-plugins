@@ -25,6 +25,7 @@ import path from 'path';
 import { createDirectoryIfNotExists } from '../../lib/filesystem';
 import glob from 'glob';
 import { getFileExtensionFromBuffer } from '../../../common/services/file-extension';
+import { routeDecoratorProtectedAdministrator } from '../decorators';
 
 // TODO: these controllers have no logs. We should include them.
 export class WazuhUtilsCtrl {
@@ -73,7 +74,7 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object}
    */
-  updateConfiguration = this.routeDecoratorProtectedAdministratorRoleValidToken(
+  updateConfiguration = routeDecoratorProtectedAdministrator(
     async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest,
@@ -143,7 +144,7 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  uploadFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
+  uploadFile = routeDecoratorProtectedAdministrator(
     async (
       context: RequestHandlerContext,
       request: KibanaRequest,
@@ -225,7 +226,7 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  deleteFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
+  deleteFile = routeDecoratorProtectedAdministrator(
     async (
       context: RequestHandlerContext,
       request: KibanaRequest,
@@ -275,50 +276,4 @@ export class WazuhUtilsCtrl {
     },
     3023,
   );
-
-  private routeDecoratorProtectedAdministratorRoleValidToken(
-    routeHandler,
-    errorCode: number,
-  ) {
-    return async (context, request, response) => {
-      try {
-        // Check if user has administrator role in token
-        const token = getCookieValueByName(request.headers.cookie, 'wz-token');
-        if (!token) {
-          return ErrorResponse('No token provided', 401, 401, response);
-        }
-        const decodedToken = jwtDecode(token);
-        if (!decodedToken) {
-          return ErrorResponse('No permissions in token', 401, 401, response);
-        }
-        if (
-          !decodedToken.rbac_roles ||
-          !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)
-        ) {
-          return ErrorResponse('No administrator role', 401, 401, response);
-        }
-        // Check the provided token is valid
-        const apiHostID = getCookieValueByName(
-          request.headers.cookie,
-          'wz-api',
-        );
-        if (!apiHostID) {
-          return ErrorResponse('No API id provided', 401, 401, response);
-        }
-        const responseTokenIsWorking =
-          await context.wazuh.api.client.asCurrentUser.request(
-            'GET',
-            '/',
-            {},
-            { apiHostID },
-          );
-        if (responseTokenIsWorking.status !== 200) {
-          return ErrorResponse('Token is not valid', 401, 401, response);
-        }
-        return await routeHandler(context, request, response);
-      } catch (error) {
-        return ErrorResponse(error.message || error, errorCode, 500, response);
-      }
-    };
-  }
 }

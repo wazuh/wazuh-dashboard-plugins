@@ -133,7 +133,8 @@ export const AddAPIHostForm = ({
       const options = {
         context: 'AddAPIHostForm.onSave',
         level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        display: true,
         store: false,
         error: {
           error: error,
