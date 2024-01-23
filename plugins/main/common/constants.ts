@@ -131,10 +131,6 @@ export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
   WAZUH_DATA_ABSOLUTE_PATH,
   'config',
 );
-export const WAZUH_DATA_CONFIG_APP_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh.yml',
-);
 export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
   'wazuh-registry.json',
