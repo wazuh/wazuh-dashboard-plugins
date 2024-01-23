@@ -7,7 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.8.0
-- Added the ability to check if there are available updates from the UI. [#6093](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6093) [#6256](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6256)
+- Added the ability to check if there are available updates from the UI. [#6093](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6093) [#6256](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6256) [#6328](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6328)
 - Added remember server address check [#5791](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5791)
 - Added the ssl_agent_ca configuration to the SSL Settings form [#6083](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6083)
 - Added global vulnerabilities dashboards [#5896](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5896) [#6179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6179) [#6173](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6173) [#6147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6147) [#6231](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6231) [#6246](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6246) [#6321](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6321) [#6338] (https://github.com/wazuh/wazuh-dashboard-plugins/pull/6338)
@@ -33,6 +33,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed script to install agents on macOS when you have password to deploy [#6305](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6305)
 - Fixed a problem with the address validation on Deploy New Agent [#6327](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6327)
 - Fixed a typo in an abbreviation for Fully Qualified Domain Name [#6333](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6333)
+- Fixed unnecessary scrolling in Vulnerability Inventory table [#6345](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6345)
+- Fixed wrong value at server stat Archives queue usage [#6342](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6342)
+- Fixed the inventory data table when maximized and the docked menu [#6344](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6344)
 
 ### Removed
 
