@@ -22,6 +22,6 @@ export const inventoryTableDefaultColumns: EuiDataGridColumn[] = [
     id: 'vulnerability.id',
   },
   {
-    id: 'vulnerability.score.version',
+    id: 'vulnerability.score.base',
   },
 ];
