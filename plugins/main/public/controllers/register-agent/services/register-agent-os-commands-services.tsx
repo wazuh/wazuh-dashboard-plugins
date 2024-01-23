@@ -25,16 +25,6 @@ export const getAllOptionals = (
     '',
   );
 
-  if (osName && osName.toLowerCase() === 'windows' && optionals.serverAddress) {
-    // when os is windows we must to add wazuh registration server with server address
-    paramsText =
-      paramsText +
-      `WAZUH_REGISTRATION_SERVER=${optionals.serverAddress.replace(
-        'WAZUH_MANAGER=',
-        '',
-      )} `;
-  }
-
   return paramsText;
 };
 
