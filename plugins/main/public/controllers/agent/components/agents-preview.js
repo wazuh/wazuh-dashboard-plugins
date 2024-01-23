@@ -344,7 +344,7 @@ export const AgentsPreview = compose(
                               )
                             }
                             titleSize='s'
-                            description='Last registered agent'
+                            description='Last enrolled agent'
                             titleColor='primary'
                           />
                         </EuiFlexItem>
