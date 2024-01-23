@@ -1,4 +1,5 @@
 import { PluginInitializerContext } from '../../../src/core/server';
+import { WAZUH_CORE_ENCRYPTION_PASSWORD } from '../common/constants';
 import { WazuhCorePlugin } from './plugin';
 import { schema, TypeOf } from '@osd/config-schema';
 
@@ -11,7 +12,7 @@ export function plugin(initializerContext: PluginInitializerContext) {
 
 const configSchema = schema.object({
   encryption: schema.object({
-    password: schema.string({ defaultValue: 'secretpassword!' }),
+    password: schema.string({ defaultValue: WAZUH_CORE_ENCRYPTION_PASSWORD }),
   }),
 });
 
