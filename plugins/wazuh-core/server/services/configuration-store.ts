@@ -133,15 +133,13 @@ export class ConfigurationStore implements IConfigurationStore {
     try {
       this.logger.debug('Updating saved object');
       const stored = await this.get();
-      const newSettings = {
-        ...stored,
-        ...Object.fromEntries(
-          Object.entries(settings).map(([key, value]) => [
-            key,
-            this.setSettingValue(key, value),
-          ]),
-        ),
-      };
+
+      const newSettings = Object.fromEntries(
+        Object.entries({
+          ...stored,
+          ...settings,
+        }).map(([key, value]) => [key, this.setSettingValue(key, value)]),
+      );
       this.logger.debug(
         `Updating saved object with ${JSON.stringify(newSettings)}`,
       );
