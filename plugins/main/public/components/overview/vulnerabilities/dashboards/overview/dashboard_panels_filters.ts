@@ -26,7 +26,7 @@ const getVisStateFilter = (
         columnsWidth: [
           {
             colIndex: 1,
-            width: 100,
+            width: 75,
           },
         ],
       },
