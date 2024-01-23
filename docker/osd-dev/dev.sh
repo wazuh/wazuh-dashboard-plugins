@@ -115,6 +115,15 @@ if [[ "$5" =~ "server" ]]; then
     echo
     exit -1
   fi
+
+  WAZUH_SERVER_MAJOR_MINOR_NUMBER=$(echo $6 | cut -b1,3)
+  if [[ "$WAZUH_SERVER_MAJOR_MINOR_NUMBER" -ge 48 ]];
+  then
+    export WAZUH_SERVER_CONFIG="version-higher-than-4.8"
+  else
+    export WAZUH_SERVER_CONFIG="version-lower-than-4.8"
+  fi
+
   export WAZUH_STACK="${6}"
 fi
 
