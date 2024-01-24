@@ -25,7 +25,8 @@ Threat intelligence: 300
 Security operations: 400
 Cloud security: 500
 Server management: 600
-Dashboard/indexer management (added to Wazuh dashboard default categories): 9000
+Dashboard management: 700
+Indexer management (added to Wazuh dashboard default categories): 9000
 */
 
 export const overview = {
@@ -585,7 +586,7 @@ export const logs = {
 };
 
 export const reporting = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'reporting',
   title: i18n.translate('wz-app-reporting-title', {
     defaultMessage: 'Reporting',
@@ -666,7 +667,7 @@ export const security = {
 };
 
 export const serverApis = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'server-apis',
   title: i18n.translate('wz-app-server-apis-title', {
     defaultMessage: 'Server APIs',
@@ -698,7 +699,7 @@ export const sampleData = {
 };
 
 export const appSettings = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'app-settings',
   title: i18n.translate('wz-app-settings-title', {
     defaultMessage: 'App Settings',
@@ -714,7 +715,7 @@ export const appSettings = {
 };
 
 const appLogs = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'app-logs',
   title: i18n.translate('wz-app-app-logs-title', {
     defaultMessage: 'App Logs',
@@ -730,7 +731,7 @@ const appLogs = {
 };
 
 const about = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'about',
   title: i18n.translate('wz-app-about-title', {
     defaultMessage: 'About',
@@ -846,8 +847,16 @@ export const Categories = [
     euiIconType: 'indexRollupApp',
   },
   {
+    id: 'wz-category-dashboard-management',
+    label: i18n.translate('wz-app-category-dashboard-management', {
+      defaultMessage: 'Dashboard management',
+    }),
+    order: 700,
+    euiIconType: 'dashboardApp',
+  },
+  {
     id: 'management',
-    label: 'Indexer/dashboard management',
+    label: 'Indexer management',
     order: 5e3,
     euiIconType: 'managementApp',
   },
