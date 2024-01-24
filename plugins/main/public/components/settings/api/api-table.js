@@ -517,7 +517,7 @@ export const ApiTable = compose(
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle>
-                      <h2>API Configuration</h2>
+                      <h2>API Connections</h2>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>
