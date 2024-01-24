@@ -27,11 +27,10 @@ import {
   EuiProgress,
 } from '@elastic/eui';
 
-import { clusterNodes } from '../configuration/utils/wz-fetch';
+import { clusterReq, clusterNodes } from '../configuration/utils/wz-fetch';
 import { WzStatisticsRemoted } from './statistics-dashboard-remoted';
 import { WzStatisticsAnalysisd } from './statistics-dashboard-analysisd';
 import { WzDatePicker } from '../../../../../components/wz-date-picker/wz-date-picker';
-import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { compose } from 'redux';
 import {
   withGuard,
@@ -85,17 +84,32 @@ export class WzStatisticsOverview extends Component {
   async componentDidMount() {
     this._isMounted = true;
     try {
-      const data = await clusterNodes();
-      const nodes = data.data.data.affected_items.map(item => {
-        return { value: item.name, text: `${item.name} (${item.type})` };
-      });
-      nodes.unshift({ value: 'all', text: 'All' });
-      this.setState({
-        clusterNodes: nodes,
-        clusterNodeSelected: nodes[0].value,
-      });
+      // try if it is a cluster
+      const clusterStatus = await clusterReq();
+      const isClusterMode =
+        clusterStatus.data.data.enabled === 'yes' &&
+        clusterStatus.data.data.running === 'yes';
+      if (isClusterMode) {
+        const data = await clusterNodes();
+        const nodes = data.data.data.affected_items.map(item => {
+          return { value: item.name, text: `${item.name} (${item.type})` };
+        });
+        nodes.unshift({ value: 'all', text: 'All' });
+        this.setState({
+          isClusterMode,
+          clusterNodes: nodes,
+          clusterNodeSelected: nodes[0].value,
+        });
+      } else {
+        this.setState({
+          isClusterMode,
+          clusterNodes: [],
+          clusterNodeSelected: 'all',
+        });
+      }
     } catch (error) {
       this.setState({
+        isClusterMode: undefined,
         clusterNodes: [],
         clusterNodeSelected: 'all',
       });
@@ -253,6 +267,7 @@ export class WzStatisticsOverview extends Component {
                     />
                     <EuiSpacer size={'m'} />
                     <WzStatisticsAnalysisd
+                      isClusterMode={this.state.isClusterMode}
                       clusterNodeSelected={this.state.clusterNodeSelected}
                       refreshVisualizations={this.state.refreshVisualizations}
                     />
