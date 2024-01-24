@@ -25,6 +25,7 @@ import {
   EuiLink,
   EuiProgress,
   EuiText,
+  EuiIconTip,
 } from '@elastic/eui';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -344,7 +345,7 @@ export const AgentsPreview = compose(
                               )
                             }
                             titleSize='s'
-                            description='Last registered agent'
+                            description='Last enrolled agent'
                             titleColor='primary'
                           />
                         </EuiFlexItem>
@@ -384,7 +385,16 @@ export const AgentsPreview = compose(
                                 )
                               }
                               titleSize='s'
-                              description='Most active agent'
+                              description={
+                                <>
+                                  Most active agent{' '}
+                                  <EuiIconTip
+                                    type='iInCircle'
+                                    color='primary'
+                                    content='Agent with more alerts in the last 24 hours'
+                                  />
+                                </>
+                              }
                               titleColor='primary'
                             />
                           </EuiFlexItem>

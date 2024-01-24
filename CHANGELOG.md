@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added an agent selector to the IT Hygiene application [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Added query results limit when the search exceed 10000 hits [#6106](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6106)
 - Added a redirection button to Endpoint Summary from IT Hygiene application [6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
+- Added information icon with tooltip on the most active agent in the endpoint summary view [#6364](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6364)
 
 ### Changed
 
