@@ -357,7 +357,6 @@ services:
       - API_PASSWORD=MyS3cr37P450r.*-
     volumes:
       - wm_certs:/etc/ssl/wazuh
-      - ./config/wazuh_cluster/${WAZUH_SERVER_CONFIG}/wazuh_manager.conf:/wazuh-config-mount/etc/ossec.conf
     ports:
       - '514:514'
       - '1514:1514'
