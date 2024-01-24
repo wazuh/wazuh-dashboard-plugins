@@ -325,28 +325,6 @@ const tsc = {
     }`,
 };
 
-export const itHygiene = {
-  category: 'wz-category-security-operations',
-  id: 'it-hygiene',
-  title: i18n.translate('wz-app-it-hygiene-title', {
-    defaultMessage: 'IT Hygiene',
-  }),
-  description: i18n.translate('wz-app-it-hygiene-description', {
-    defaultMessage:
-      'Applications, network configuration, open ports, and processes running on your monitored systems.',
-  }),
-  euiIconType: 'visualizeApp',
-  order: 405,
-  showInOverviewApp: true,
-  showInAgentMenu: false,
-  redirectTo: () =>
-    `/agents/?tab=welcome${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agent=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
 export const amazonWebServices = {
   category: 'wz-category-cloud-security',
   id: 'amazon-web-services',
@@ -759,7 +737,6 @@ export const Applications = [
   gdpr,
   nist80053,
   tsc,
-  itHygiene,
   devTools,
   rulesetTest,
   security,

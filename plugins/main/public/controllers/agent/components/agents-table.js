@@ -39,7 +39,7 @@ import { TableWzAPI } from '../../../components/common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
 import { getCore } from '../../../kibana-services';
-import { itHygiene } from '../../../utils/applications';
+import { endpointSumary } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -108,7 +108,7 @@ export const AgentsTable = compose(
               position='left'
             >
               <EuiButtonIcon
-                href={getCore().application.getUrlForApp(itHygiene.id, {
+                href={getCore().application.getUrlForApp(endpointSumary.id, {
                   path: `#/agents?tab=welcome&agent=${agent.id}`,
                 })}
                 iconType='eye'
@@ -125,7 +125,7 @@ export const AgentsTable = compose(
                 position='left'
               >
                 <EuiButtonIcon
-                  href={getCore().application.getUrlForApp(itHygiene.id, {
+                  href={getCore().application.getUrlForApp(endpointSumary.id, {
                     path: `#/agents?tab=configuration&agent=${agent.id}`,
                   })}
                   color={'primary'}
@@ -302,7 +302,7 @@ export const AgentsTable = compose(
         return {
           onClick: ev => {
             this.props.updateCurrentAgentData(item);
-            getCore().application.navigateToApp(itHygiene.id, {
+            getCore().application.navigateToApp(endpointSumary.id, {
               path: `#/agents?tab=welcome&agent=${item.id}`,
             });
           },

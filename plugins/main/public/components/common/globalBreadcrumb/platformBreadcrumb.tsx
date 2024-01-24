@@ -1,5 +1,5 @@
 import { getCore } from '../../../kibana-services';
-import { itHygiene } from '../../../utils/applications';
+import { endpointSumary } from '../../../utils/applications';
 
 export const setBreadcrumbs = (breadcrumbs, router) => {
   if (breadcrumbs === '' || breadcrumbs === undefined) {
@@ -12,7 +12,7 @@ export const setBreadcrumbs = (breadcrumbs, router) => {
             'euiLink euiLink--subdued osdBreadcrumbs wz-vertical-align-middle',
           onClick: ev => {
             ev.stopPropagation();
-            getCore().application.navigateToApp(itHygiene.id, {
+            getCore().application.navigateToApp(endpointSumary.id, {
               path: `#/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
             });
             router.reload();

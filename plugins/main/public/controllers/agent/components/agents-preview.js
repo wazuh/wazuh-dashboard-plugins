@@ -56,7 +56,7 @@ import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
-import { endpointSumary, itHygiene } from '../../../utils/applications';
+import { endpointSumary } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
@@ -330,7 +330,7 @@ export const AgentsPreview = compose(
                                   >
                                     <EuiLink
                                       href={getCore().application.getUrlForApp(
-                                        itHygiene.id,
+                                        endpointSumary.id,
                                         {
                                           path: `#/agents?tab=welcome&agent=${this.state.lastRegisteredAgent?.id}`,
                                         },
@@ -370,7 +370,7 @@ export const AgentsPreview = compose(
                                     >
                                       <EuiLink
                                         href={getCore().application.getUrlForApp(
-                                          itHygiene.id,
+                                          endpointSumary.id,
                                           {
                                             path: `#/agents?tab=welcome&agent=${this.state.agentMostActive?.id}`,
                                           },

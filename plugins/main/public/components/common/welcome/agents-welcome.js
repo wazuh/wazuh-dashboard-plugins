@@ -67,7 +67,7 @@ import { connect } from 'react-redux';
 import { WzButton } from '../buttons';
 import {
   Applications,
-  itHygiene,
+  endpointSumary,
   mitreAttack,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -89,7 +89,10 @@ export const AgentsWelcome = compose(
   withGlobalBreadcrumb(({ agent }) => {
     return [
       {
-        text: itHygiene.title,
+        text: endpointSumary.title,
+        href: getCore().application.getUrlForApp(endpointSumary.id, {
+          path: `#/agents-preview`,
+        }),
       },
       ...(agent?.name
         ? [

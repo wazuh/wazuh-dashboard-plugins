@@ -17,7 +17,8 @@ import {
   withReduxProvider,
 } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
-import { itHygiene, settings } from '../../../../../utils/applications';
+import { endpointSumary, settings } from '../../../../../utils/applications';
+import { getCore } from '../../../../../kibana-services';
 
 export default compose(
   withErrorBoundary,
@@ -29,7 +30,10 @@ export default compose(
     } else {
       breadcrumb = [
         {
-          text: itHygiene.title,
+          text: endpointSumary.title,
+          href: getCore().application.getUrlForApp(endpointSumary.id, {
+            path: `#/agents-preview`,
+          }),
         },
         { agent: props.agent },
         { text: 'Configuration' },
