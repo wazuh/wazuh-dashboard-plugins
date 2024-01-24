@@ -1858,3 +1858,11 @@ iframe.width-changed {
   left: 0;
   z-index: 9999;
 }
+
+/* OSD Data grid full screen with dock navigation left sidebar */
+
+.dataGridDockedNav {
+  &.euiDataGrid--fullScreen {
+    left: 320px;
+  }
+}

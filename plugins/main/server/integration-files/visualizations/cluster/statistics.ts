@@ -2216,7 +2216,7 @@ export default [
             enabled: true,
             type: 'avg',
             params: {
-              field: 'analysisd.event_queue_size',
+              field: 'analysisd.event_queue_usage',
               customLabel: 'Event queue usage',
             },
             schema: 'metric',
@@ -2226,7 +2226,7 @@ export default [
             enabled: true,
             type: 'avg',
             params: {
-              field: 'analysisd.rule_matching_queue_size',
+              field: 'analysisd.rule_matching_queue_usage',
               customLabel: 'Rule matching queue usage',
             },
             schema: 'metric',
@@ -2236,7 +2236,7 @@ export default [
             enabled: true,
             type: 'avg',
             params: {
-              field: 'analysisd.alerts_queue_size',
+              field: 'analysisd.alerts_queue_usage',
               customLabel: 'Alerts log queue usage',
             },
             schema: 'metric',
@@ -2246,7 +2246,7 @@ export default [
             enabled: true,
             type: 'avg',
             params: {
-              field: 'analysisd.firewall_queue_size',
+              field: 'analysisd.firewall_queue_usage',
               customLabel: 'Firewall log queue usage',
             },
             schema: 'metric',
@@ -2256,7 +2256,7 @@ export default [
             enabled: true,
             type: 'avg',
             params: {
-              field: 'analysisd.statistical_queue_size',
+              field: 'analysisd.statistical_queue_usage',
               customLabel: 'Statistical log queue usage',
             },
             schema: 'metric',
@@ -2266,7 +2266,7 @@ export default [
             enabled: true,
             type: 'avg',
             params: {
-              field: 'analysisd.archives_queue_size',
+              field: 'analysisd.archives_queue_usage',
               customLabel: 'Archives queue usage',
             },
             schema: 'metric',
