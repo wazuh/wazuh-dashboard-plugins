@@ -45,6 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the application menu in the IT Hygiene application [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 - Removed the implicit filter of WQL language of the search bar UI [#6174](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6174)
 - Removed notice of old Discover deprecation [#6341](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6341)
+- Removed compilation date field from the app [#6366](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6366)
 - Removed WAZUH_REGISTRATION_SERVER from Windows agent deployment command [#6361](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6361)
 
 ## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 02
