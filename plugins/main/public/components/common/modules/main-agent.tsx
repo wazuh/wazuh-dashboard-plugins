@@ -28,7 +28,7 @@ import { AgentInfo } from '../../common/welcome/agents-info';
 import { getAngularModule, getCore } from '../../../kibana-services';
 import { compose } from 'redux';
 import { withGlobalBreadcrumb } from '../hocs';
-import { endpointSumary } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -228,8 +228,8 @@ export default compose(
     if (section === 'welcome') {
       return [
         {
-          text: endpointSumary.title,
-          href: getCore().application.getUrlForApp(endpointSumary.id, {
+          text: endpointSummary.breadcrumbLabel,
+          href: getCore().application.getUrlForApp(endpointSummary.id, {
             path: `#/agents-preview`,
           }),
         },
@@ -238,8 +238,8 @@ export default compose(
     } else {
       return [
         {
-          text: endpointSumary.title,
-          href: getCore().application.getUrlForApp(endpointSumary.id, {
+          text: endpointSummary.breadcrumbLabel,
+          href: getCore().application.getUrlForApp(endpointSummary.id, {
             path: `#/agents-preview`,
           }),
         },

@@ -56,14 +56,14 @@ import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
-import { endpointSumary } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export const AgentsPreview = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
+  withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
@@ -330,7 +330,7 @@ export const AgentsPreview = compose(
                                   >
                                     <EuiLink
                                       href={getCore().application.getUrlForApp(
-                                        endpointSumary.id,
+                                        endpointSummary.id,
                                         {
                                           path: `#/agents?tab=welcome&agent=${this.state.lastRegisteredAgent?.id}`,
                                         },
@@ -370,7 +370,7 @@ export const AgentsPreview = compose(
                                     >
                                       <EuiLink
                                         href={getCore().application.getUrlForApp(
-                                          endpointSumary.id,
+                                          endpointSummary.id,
                                           {
                                             path: `#/agents?tab=welcome&agent=${this.state.agentMostActive?.id}`,
                                           },

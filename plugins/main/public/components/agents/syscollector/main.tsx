@@ -18,7 +18,7 @@ import {
 } from '../../common/hocs';
 import { SyscollectorInventory } from './inventory';
 import { compose } from 'redux';
-import { endpointSumary } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 
 export const MainSyscollector = compose(
@@ -27,8 +27,8 @@ export const MainSyscollector = compose(
   withGlobalBreadcrumb(({ agent }) => {
     return [
       {
-        text: endpointSumary.title,
-        href: getCore().application.getUrlForApp(endpointSumary.id, {
+        text: endpointSummary.breadcrumbLabel,
+        href: getCore().application.getUrlForApp(endpointSummary.id, {
           path: `#/agents-preview`,
         }),
       },

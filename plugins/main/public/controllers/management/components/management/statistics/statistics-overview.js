@@ -282,7 +282,7 @@ export class WzStatisticsOverview extends Component {
 }
 
 export default compose(
-  withGlobalBreadcrumb([{ text: statistics.title }]),
+  withGlobalBreadcrumb([{ text: statistics.breadcrumbLabel }]),
   withGuard(props => {
     return !(wzConfig.getConfig() || {})['cron.statistics.status']; // if 'cron.statistics.status' is false, then it renders PromptStatisticsDisabled component
   }, PromptStatisticsDisabled),

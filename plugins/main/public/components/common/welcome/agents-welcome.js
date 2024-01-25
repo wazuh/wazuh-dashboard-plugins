@@ -74,7 +74,7 @@ import {
   Applications,
   configurationAssessment,
   fileIntegrityMonitoring,
-  endpointSumary,
+  endpointSummary,
   mitreAttack,
   threatHunting,
   malwareDetection,
@@ -98,8 +98,8 @@ export const AgentsWelcome = compose(
   withGlobalBreadcrumb(({ agent }) => {
     return [
       {
-        text: endpointSumary.title,
-        href: getCore().application.getUrlForApp(endpointSumary.id, {
+        text: endpointSummary.breadcrumbLabel,
+        href: getCore().application.getUrlForApp(endpointSummary.id, {
           path: `#/agents-preview`,
         }),
       },
@@ -124,7 +124,7 @@ export const AgentsWelcome = compose(
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink
                   aria-label='go to Endpoint summary'
-                  href={`${endpointSumary.id}#/agents-preview`}
+                  href={`${endpointSummary.id}#/agents-preview`}
                 >
                   Endpoint summary
                 </EuiLink>
