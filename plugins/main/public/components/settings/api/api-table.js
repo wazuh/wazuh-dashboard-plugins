@@ -558,7 +558,7 @@ export const ApiTable = compose(
                   <span>
                     Check updates{' '}
                     <EuiToolTip
-                      title='Last check'
+                      title='Last dashboard check'
                       content={
                         this.state.availableUpdates?.last_check_date
                           ? getWazuhCorePlugin().utils.formatUIDate(
