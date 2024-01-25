@@ -28,7 +28,7 @@ The plugin provides a function for fetching the available updates for each API. 
 2.  The main Wazuh plugin is loaded and renders the UpdatesNotification component from the Check Updates plugin.
 3.  The `UpdatesNotification` component checks the user's preferences (stored in a saved object) to determine if the user has dismissed notifications about new updates. If the user has dismissed them, the component returns nothing; otherwise, it proceeds to the next steps.
 4.  The UpdatesNotification component checks the `checkUpdates` value in the browser's session storage to determine if a query about available updates from the Wazuh Server API has already been executed. Since the user has just logged in, this value will not exist in the session storage.
-5.  The component makes a request to the Check Updates plugin API with the `checkAvailableUpdates` parameter set to true. This indicates the plugin's API to check for updates on all configured APIs. The `checkUpdates` value in the session storage is updated to `true`.
+5.  The component makes a request to the Check Updates plugin API with the `query_api` parameter set to true. This indicates the plugin's API to check for updates on all configured APIs. The `checkUpdates` value in the session storage is updated to `true`.
 6.  The updates are stored in a saved object for future reference.
 7.  It's possible that the user has dismissed specific updates. In such cases, the dismissed updates are compared with the updates retrieved from the API. If they match, the component returns nothing; otherwise, it proceeds to the next steps.
 8.  The component displays a bottom bar to notify the user of the availability of new updates.

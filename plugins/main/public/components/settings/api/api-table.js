@@ -58,11 +58,14 @@ export const ApiTable = compose(
       };
     }
 
-    async getApisAvailableUpdates(forceUpdate = false) {
+    async getApisAvailableUpdates(queryApi = false, forceQuery = false) {
       try {
         this.setState({ refreshingAvailableUpdates: true });
         const availableUpdates =
-          await getWazuhCheckUpdatesPlugin().getAvailableUpdates(forceUpdate);
+          await getWazuhCheckUpdatesPlugin().getAvailableUpdates(
+            queryApi,
+            forceQuery,
+          );
         this.setState({ availableUpdates });
       } catch (error) {
         const options = {
@@ -548,7 +551,9 @@ export const ApiTable = compose(
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   iconType='refresh'
-                  onClick={async () => await this.getApisAvailableUpdates(true)}
+                  onClick={async () =>
+                    await this.getApisAvailableUpdates(true, true)
+                  }
                 >
                   <span>
                     Check updates{' '}

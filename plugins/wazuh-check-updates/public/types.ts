@@ -5,7 +5,10 @@ export interface WazuhCheckUpdatesPluginSetup {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCheckUpdatesPluginStart {
   UpdatesNotification: () => JSX.Element | null;
-  getAvailableUpdates: (forceUpdate: boolean) => Promise<AvailableUpdates>;
+  getAvailableUpdates: (
+    queryApi: boolean,
+    forceQuery: boolean,
+  ) => Promise<AvailableUpdates>;
   DismissNotificationCheck: () => JSX.Element | null;
 }
 
