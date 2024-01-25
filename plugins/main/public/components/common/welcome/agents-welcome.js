@@ -77,7 +77,7 @@ import {
   endpointSumary,
   mitreAttack,
   threatHunting,
-  vulnerabilityDetection,
+  malwareDetection,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
@@ -272,8 +272,8 @@ export const AgentsWelcome = compose(
               threatHunting.id,
               fileIntegrityMonitoring.id,
               configurationAssessment.id,
-              vulnerabilityDetection.id,
               mitreAttack.id,
+              malwareDetection.id,
             ];
       }
 
