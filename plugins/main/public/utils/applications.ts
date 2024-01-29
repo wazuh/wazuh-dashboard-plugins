@@ -25,7 +25,8 @@ Threat intelligence: 300
 Security operations: 400
 Cloud security: 500
 Server management: 600
-Dashboard/indexer management (added to Wazuh dashboard default categories): 9000
+Dashboard management: 700
+Indexer management (added to Wazuh dashboard default categories): 9000
 */
 
 export const overview = {
@@ -656,7 +657,7 @@ export const logs = {
 };
 
 export const reporting = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'reporting',
   title: i18n.translate('wz-app-reporting-title', {
     defaultMessage: 'Reporting',
@@ -668,7 +669,7 @@ export const reporting = {
     defaultMessage: 'Check your stored Wazuh reports.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8900,
+  order: 702,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=reporting',
@@ -752,7 +753,7 @@ export const security = {
 };
 
 export const serverApis = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'server-apis',
   title: i18n.translate('wz-app-server-apis-title', {
     defaultMessage: 'Server APIs',
@@ -764,7 +765,7 @@ export const serverApis = {
     defaultMessage: 'Manage and configure the API entries.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8901,
+  order: 703,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=api',
@@ -783,14 +784,14 @@ export const sampleData = {
     defaultMessage: 'Add sample data with events to the modules.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8902,
+  order: 9040,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=sample_data',
 };
 
 export const appSettings = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'app-settings',
   title: i18n.translate('wz-app-settings-title', {
     defaultMessage: 'App Settings',
@@ -802,14 +803,14 @@ export const appSettings = {
     defaultMessage: 'Manage your Wazuh cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8903,
+  order: 704,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=configuration',
 };
 
 const appLogs = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'app-logs',
   title: i18n.translate('wz-app-app-logs-title', {
     defaultMessage: 'App Logs',
@@ -821,14 +822,14 @@ const appLogs = {
     defaultMessage: 'Explore the logs related to the applications.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8904,
+  order: 705,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=logs',
 };
 
 const about = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'about',
   title: i18n.translate('wz-app-about-title', {
     defaultMessage: 'About',
@@ -840,7 +841,7 @@ const about = {
     defaultMessage: 'Show information about App Versions and community links.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8905,
+  order: 706,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=about',
@@ -946,8 +947,16 @@ export const Categories = [
     euiIconType: 'indexRollupApp',
   },
   {
+    id: 'wz-category-dashboard-management',
+    label: i18n.translate('wz-app-category-dashboard-management', {
+      defaultMessage: 'Dashboard management',
+    }),
+    order: 700,
+    euiIconType: 'dashboardApp',
+  },
+  {
     id: 'management',
-    label: 'Indexer/dashboard management',
+    label: 'Indexer management',
     order: 5e3,
     euiIconType: 'managementApp',
   },
