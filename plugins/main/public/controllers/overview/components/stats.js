@@ -26,7 +26,7 @@ import {
   agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
 import { getCore } from '../../../kibana-services';
-import { endpointSumary } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
 
 export const Stats = withErrorBoundary(
   class Stats extends Component {
@@ -55,7 +55,7 @@ export const Stats = withErrorBoundary(
       } else if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
-      getCore().application.navigateToApp(endpointSumary.id, {
+      getCore().application.navigateToApp(endpointSummary.id, {
         path: '#/agents-preview',
       });
     }

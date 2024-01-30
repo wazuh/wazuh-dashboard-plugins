@@ -460,7 +460,12 @@ export const ApiTable = compose(
                 <EuiIcon color='danger' type='alert' />
               </EuiToolTip>
             ) : (
-              ''
+              <EuiToolTip
+                position='top'
+                content='The configured API user does not use authentication context.'
+              >
+                <p>-</p>
+              </EuiToolTip>
             );
           },
         },
@@ -517,7 +522,7 @@ export const ApiTable = compose(
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle>
-                      <h2>API Configuration</h2>
+                      <h2>API Connections</h2>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>

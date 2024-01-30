@@ -121,7 +121,7 @@ export const EventsEnhanceDiscoverCell = {
     ...buttonStyles,
     href: content =>
       content !== '000'
-        ? getCore().application.getUrlForApp('it-hygiene', {
+        ? getCore().application.getUrlForApp('endpoints-summary', {
             path: `#/agents?tab=welcome&agent=${content}`,
           })
         : undefined,
@@ -131,7 +131,7 @@ export const EventsEnhanceDiscoverCell = {
     href: (content, rowData) => {
       const agentId = (((rowData || {})._source || {}).agent || {}).id;
       return agentId !== '000'
-        ? getCore().application.getUrlForApp('it-hygiene', {
+        ? getCore().application.getUrlForApp('endpoints-summary', {
             path: `#/agents?tab=welcome&agent=${agentId}`,
           })
         : undefined;
