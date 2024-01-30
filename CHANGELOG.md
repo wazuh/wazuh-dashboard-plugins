@@ -40,6 +40,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed unnecessary scrolling in Vulnerability Inventory table [#6345](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6345)
 - Fixed wrong value at server stat Archives queue usage [#6342](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6342)
 - Fixed the inventory data table when maximized and the docked menu [#6344](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6344)
+- Fixed implicit filter close button in the search bar [#6346](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6346)
 - Fixed the help menu, to be consistent and avoid duplication [#6374](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6374)
 
 ### Removed
