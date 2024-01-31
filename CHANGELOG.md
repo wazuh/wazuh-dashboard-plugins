@@ -42,6 +42,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the inventory data table when maximized and the docked menu [#6344](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6344)
 - Fixed implicit filter close button in the search bar [#6346](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6346)
 - Fixed the help menu, to be consistent and avoid duplication [#6374](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6374)
+- Fixed the axis label visual bug from dashboards [#6378](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6378)
 
 ### Removed
 
