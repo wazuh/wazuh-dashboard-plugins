@@ -13,7 +13,7 @@
  */
 
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Stats } from './stats';
 
@@ -46,7 +46,9 @@ jest.mock('../../../react-services/common-services', () => ({
 
 describe('Stats component', () => {
   test('renders correctly to match the snapshot', async () => {
-    const { container } = render(<Stats />);
-    expect(container).toMatchSnapshot();
+    await act(async () => {
+      const { container } = render(<Stats />);
+      expect(container).toMatchSnapshot();
+    });
   });
 });
