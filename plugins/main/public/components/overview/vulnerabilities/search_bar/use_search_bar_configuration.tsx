@@ -66,7 +66,9 @@ const useSearchBarConfiguration = (
     if (filters && filters.length > 0) {
       sessionStorage.setItem(
         SESSION_STORAGE_FILTERS_NAME,
-        JSON.stringify(filters),
+        JSON.stringify(
+          updatePrevFilters(filters, props?.defaultIndexPatternID),
+        ),
       );
     }
     sessionStorage.setItem(SESSION_STORAGE_PREV_FILTER_NAME, prevPattern);
@@ -83,10 +85,8 @@ const useSearchBarConfiguration = (
       const prevStoragePattern = sessionStorage.getItem(
         SESSION_STORAGE_PREV_FILTER_NAME,
       );
-      if (prevStoragePattern) {
-        AppState.setCurrentPattern(prevStoragePattern);
-        sessionStorage.removeItem(SESSION_STORAGE_PREV_FILTER_NAME);
-      }
+      AppState.setCurrentPattern(prevStoragePattern);
+      sessionStorage.removeItem(SESSION_STORAGE_PREV_FILTER_NAME);
       const storagePreviousFilters = sessionStorage.getItem(
         SESSION_STORAGE_FILTERS_NAME,
       );
@@ -94,7 +94,7 @@ const useSearchBarConfiguration = (
         const previousFilters = JSON.parse(storagePreviousFilters);
         const cleanedFilters = cleanFilters(
           previousFilters,
-          prevStoragePattern ?? props?.defaultIndexPatternID,
+          prevStoragePattern ?? prevPattern,
         );
         filterManager.setFilters(cleanedFilters);
         sessionStorage.removeItem(SESSION_STORAGE_FILTERS_NAME);
@@ -133,6 +133,64 @@ const useSearchBarConfiguration = (
     } else {
       return await indexPatternService.getDefault();
     }
+  };
+
+  const updatePrevFilters = (
+    previousFilters: Filter[],
+    indexPattern?: string,
+  ) => {
+    const pinnedAgent = previousFilters.find(
+      (filter: Filter) =>
+        filter.meta.key === 'agent.id' && !!filter?.$state?.isImplicit,
+    );
+    if (!pinnedAgent) {
+      const url = window.location.href;
+      const regex = new RegExp('agentId=' + '[^&]*');
+      const match = url.match(regex);
+      if (match && match[0]) {
+        const agentId = match[0].split('=')[1];
+        const agentFilters = previousFilters.filter(x => {
+          return x.meta.key !== 'agent.id';
+        });
+        const insertPinnedAgent = {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: 'agent.id',
+            negate: false,
+            params: { query: agentId },
+            type: 'phrase',
+            index: indexPattern,
+          },
+          query: {
+            match: {
+              'agent.id': {
+                query: agentId,
+                type: 'phrase',
+              },
+            },
+          },
+          $state: { store: 'appState', isImplicit: true },
+        };
+        agentFilters.push(insertPinnedAgent);
+        return agentFilters;
+      }
+    }
+    if (pinnedAgent) {
+      const agentFilters = previousFilters.filter(x => {
+        return x.meta.key !== 'agent.id';
+      });
+      agentFilters.push({
+        ...pinnedAgent,
+        meta: {
+          ...pinnedAgent.meta,
+          index: indexPattern,
+        },
+        $state: { store: FilterStateStore.APP_STATE, isImplicit: true },
+      });
+      return agentFilters;
+    }
+    return previousFilters;
   };
 
   /**
@@ -178,16 +236,56 @@ const useSearchBarConfiguration = (
    * @returns
    */
   const cleanFilters = (previousFilters: Filter[], indexPattern?: string) => {
-    const pinnedAgent = previousFilters.find(
-      (filter: Filter) =>
-        filter.meta.key === 'agent.id' && !!filter?.$state?.isImplicit,
-    );
+    /**
+     * Verify if a pinned agent exists, identifying it by its meta.isImplicit attribute or by the agentId query param URL.
+     * We also compare the agent.id filter with the agentId query param because the OSD filter definition does not include the "isImplicit" attribute that Wazuh adds.
+     * There may be cases where the "isImplicit" attribute is lost, since any action regarding filters that is done with the
+     * filterManager ( addFilters, setFilters, setGlobalFilters, setAppFilters)
+     * does a mapAndFlattenFilters mapping to the filters that removes any attributes that are not part of the filter definition.
+     * */
     const mappedFilters = previousFilters.filter(
       (filter: Filter) =>
         filter?.meta?.controlledBy !== AUTHORIZED_AGENTS && // remove auto loaded agent.id filters
         filter?.meta?.index !== props?.defaultIndexPatternID,
     );
+    const pinnedAgent = mappedFilters.find(
+      (filter: Filter) =>
+        filter.meta.key === 'agent.id' && !!filter?.$state?.isImplicit,
+    );
 
+    if (!pinnedAgent) {
+      const url = window.location.href;
+      const regex = new RegExp('agentId=' + '[^&]*');
+      const match = url.match(regex);
+      if (match && match[0]) {
+        const agentId = match[0].split('=')[1];
+        const agentFilters = mappedFilters.filter(x => {
+          return x.meta.key !== 'agent.id';
+        });
+        const insertPinnedAgent = {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: 'agent.id',
+            negate: false,
+            params: { query: agentId },
+            type: 'phrase',
+            index: indexPattern,
+          },
+          query: {
+            match: {
+              'agent.id': {
+                query: agentId,
+                type: 'phrase',
+              },
+            },
+          },
+          $state: { store: 'appState', isImplicit: true },
+        };
+        agentFilters.push(insertPinnedAgent);
+        return agentFilters;
+      }
+    }
     if (pinnedAgent) {
       mappedFilters.push({
         ...pinnedAgent,
