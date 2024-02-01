@@ -20,13 +20,14 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
-import { UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
+import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import {
   agentStatusLabelByAgentStatus,
   agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
 import { getCore } from '../../../kibana-services';
 import { endpointSummary } from '../../../utils/applications';
+import { LastAlertsStat } from './last-alerts-stat';
 
 export const Stats = withErrorBoundary(
   class Stats extends Component {
@@ -34,15 +35,14 @@ export const Stats = withErrorBoundary(
       super(props);
 
       this.state = {};
-      this.agentStatus = ['total', ...UI_ORDER_AGENT_STATUS].map(status => ({
+      this.agentStatus = [
+        API_NAME_AGENT_STATUS.ACTIVE,
+        API_NAME_AGENT_STATUS.DISCONNECTED,
+      ].map(status => ({
         status,
-        label:
-          status !== 'total' ? agentStatusLabelByAgentStatus(status) : 'Total',
-        onClick: () => this.goToAgents(status !== 'total' ? status : null),
-        color:
-          status !== 'total'
-            ? agentStatusColorByAgentStatus(status)
-            : 'primary',
+        label: agentStatusLabelByAgentStatus(status),
+        onClick: () => this.goToAgents(status),
+        color: agentStatusColorByAgentStatus(status),
       }));
     }
 
@@ -98,6 +98,7 @@ export const Stats = withErrorBoundary(
                 />
               </EuiFlexItem>
             ))}
+            <LastAlertsStat />
             <EuiFlexItem />
           </EuiFlexGroup>
         </EuiPage>
@@ -107,9 +108,6 @@ export const Stats = withErrorBoundary(
 );
 
 Stats.propTypes = {
-  total: PropTypes.any,
   active: PropTypes.any,
   disconnected: PropTypes.any,
-  pending: PropTypes.any,
-  never_connected: PropTypes.any,
 };
