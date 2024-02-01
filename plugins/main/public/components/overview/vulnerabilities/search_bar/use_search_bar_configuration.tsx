@@ -20,6 +20,7 @@ import {
 import { AUTHORIZED_AGENTS } from '../../../../../common/constants';
 import { AppState } from '../../../../react-services/app-state';
 import { getSettingDefaultValue } from '../../../../../common/services/settings';
+import { FilterStateStore } from '../../../../../../../src/plugins/data/common';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
@@ -144,7 +145,7 @@ const useSearchBarConfiguration = (
     const originalFilters = filterManager ? filterManager.getFilters() : [];
     const pinnedAgent = originalFilters.find(
       (filter: Filter) =>
-        filter.meta.key === 'agent.id' && filter.$state.isImplicit,
+        filter.meta.key === 'agent.id' && !!filter?.$state?.isImplicit,
     );
     const mappedFilters = originalFilters.filter(
       (filter: Filter) =>
@@ -176,10 +177,10 @@ const useSearchBarConfiguration = (
    * @param previousFilters
    * @returns
    */
-  const cleanFilters = (previousFilters: Filter[], indexPattern: string) => {
+  const cleanFilters = (previousFilters: Filter[], indexPattern?: string) => {
     const pinnedAgent = previousFilters.find(
       (filter: Filter) =>
-        filter.meta.key === 'agent.id' && filter.$state.isImplicit,
+        filter.meta.key === 'agent.id' && !!filter?.$state?.isImplicit,
     );
     const mappedFilters = previousFilters.filter(
       (filter: Filter) =>
@@ -194,7 +195,7 @@ const useSearchBarConfiguration = (
           ...pinnedAgent.meta,
           index: indexPattern,
         },
-        $state: { store: 'appState', isImplicit: true },
+        $state: { store: FilterStateStore.APP_STATE, isImplicit: true },
       });
     }
     return mappedFilters;
