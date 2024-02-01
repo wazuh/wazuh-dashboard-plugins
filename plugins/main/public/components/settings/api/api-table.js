@@ -789,7 +789,7 @@ export const ApiTable = compose(
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
-            {(true || this.props.apiIsDown) && calloutAPIisDown}
+            {this.props.apiIsDown && calloutAPIisDown}
             <EuiInMemoryTable
               itemId='id'
               items={items}
