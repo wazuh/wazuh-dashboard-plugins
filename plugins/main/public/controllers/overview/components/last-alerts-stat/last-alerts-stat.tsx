@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { EuiStat, EuiFlexItem, EuiLink, EuiToolTip } from '@elastic/eui';
 import { getLast24HoursAlerts } from './last-alerts-service';
 import { UI_COLOR_AGENT_STATUS } from '../../../../../common/constants';
@@ -11,17 +11,16 @@ export function LastAlertsStat() {
 
   useEffect(() => {
     const getCountLastAlerts = async () => {
-      const count = await getLast24HoursAlerts();
+      const { indexPatternName, cluster, count } = await getLast24HoursAlerts();
       setCountLastAlerts(count);
-      const urlSearchParams = new URLSearchParams(location.href);
-      //`#/search?_a=(query:(language:kuery,query:'alert.id:%20"${urlSearchParams.get('alert.id')}"'))`
-      const destURL = getCore().application.getUrlForApp('discover', {
-        path: urlSearchParams,
+      const destURL = getCore().application.getUrlForApp('data-explorer', {
+        path: `discover#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:${cluster.field},negate:!f,params:(query:${cluster.name}),type:phrase),query:(match_phrase:(${cluster.field}:${cluster.name})))),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))&_q=(filters:!(),query:(language:kuery,query:''))`,
       });
       setDiscoverLocation(destURL);
     };
     getCountLastAlerts();
   }, []);
+
   return (
     <EuiFlexItem>
       <RedirectAppLinks application={getCore().application}>
@@ -33,11 +32,11 @@ export function LastAlertsStat() {
                 style={{ fontWeight: 'normal' }}
                 href={discoverLocation}
               >
-                {countLastAlerts || '-'}
+                {countLastAlerts ?? '-'}
               </EuiLink>
             </EuiToolTip>
           }
-          description={`Last 24 hour alerts`}
+          description={`Last 24 hours alerts`}
           titleColor={UI_COLOR_AGENT_STATUS.active}
           textAlign='center'
         />

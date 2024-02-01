@@ -19,9 +19,6 @@ export const getLastAlertsQuery = (
     },
     filters: [
       {
-        match_all: {},
-      },
-      {
         range: {
           timestamp: {
             gte: 'now-24h',
@@ -35,19 +32,6 @@ export const getLastAlertsQuery = (
           match: {
             [clusterField]: {
               query: clusterValue,
-              type: 'phrase',
-            },
-          },
-        },
-        $state: {
-          store: 'appState',
-        },
-      },
-      {
-        query: {
-          match: {
-            'rule.groups': {
-              query: 'office365',
               type: 'phrase',
             },
           },
