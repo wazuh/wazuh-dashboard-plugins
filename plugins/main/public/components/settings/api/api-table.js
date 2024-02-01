@@ -26,6 +26,12 @@ import {
   EuiText,
   EuiLoadingSpinner,
   EuiIcon,
+  EuiCallOut,
+  EuiSpacer,
+  EuiSteps,
+  EuiCopy,
+  EuiCodeBlock,
+  EuiButton,
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { AppState } from '../../../react-services/app-state';
@@ -116,7 +122,7 @@ export const ApiTable = compose(
     /**
      * Refresh the API entries
      */
-    async refresh() {
+    async refresh({ selectAPIHostOnAvailable = false }) {
       try {
         let status = 'complete';
         this.setState({ error: false });
@@ -137,6 +143,9 @@ export const ApiTable = compose(
             entries[idx].cluster_info = clusterInfo;
             //Updates the cluster info in the registry
             await this.props.updateClusterInfoInRegistry(id, clusterInfo);
+            if (selectAPIHostOnAvailable) {
+              this.props.setDefault(entry);
+            }
           } catch (error) {
             numErr = numErr + 1;
             const code = ((error || {}).data || {}).code;
@@ -600,6 +609,106 @@ export const ApiTable = compose(
         },
       };
 
+      const checkAPIHostsConnectionButton = (
+        <EuiButton
+          onClick={async () =>
+            await this.refresh({
+              selectAPIHostOnAvailable: true,
+            })
+          }
+          isDisabled={this.state.refreshingEntries}
+        >
+          Check connection
+        </EuiButton>
+      );
+
+      const calloutAPIisDown = (
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiCallOut
+              title='The API seems to be down'
+              iconType='alert'
+              color='warning'
+            >
+              <EuiFlexGroup>
+                <EuiFlexItem grow={false}>
+                  <WzButtonOpenFlyout
+                    flyoutTitle={'The API seems to be down'}
+                    flyoutBody={({ close }) => {
+                      const steps = [
+                        {
+                          title: 'Check the API server service status',
+                          children: (
+                            <>
+                              {[
+                                {
+                                  label: 'For Systemd',
+                                  command:
+                                    'sudo systemctl status wazuh-manager',
+                                },
+                                {
+                                  label: 'For SysV Init',
+                                  command: 'sudo service wazuh-manager status',
+                                },
+                              ].map(({ label, command }) => (
+                                <>
+                                  <EuiText>{label}</EuiText>
+                                  <div className='copy-codeblock-wrapper'>
+                                    <EuiCodeBlock
+                                      style={{
+                                        zIndex: '100',
+                                        wordWrap: 'break-word',
+                                      }}
+                                      language='tsx'
+                                    >
+                                      {command}
+                                    </EuiCodeBlock>
+                                    <EuiCopy textToCopy={command}>
+                                      {copy => (
+                                        <div
+                                          className='copy-overlay'
+                                          onClick={copy}
+                                        >
+                                          <p>
+                                            <EuiIcon type='copy' /> Copy command
+                                          </p>
+                                        </div>
+                                      )}
+                                    </EuiCopy>
+                                  </div>
+                                  <EuiSpacer />
+                                </>
+                              ))}
+                            </>
+                          ),
+                        },
+                        {
+                          title: 'Review the API hosts configuration',
+                        },
+                        {
+                          title: 'Check the API hosts connection',
+                          children: checkAPIHostsConnectionButton,
+                        },
+                      ];
+
+                      return <EuiSteps firstStepNumber={1} steps={steps} />;
+                    }}
+                    buttonProps={{
+                      buttonType: 'empty',
+                    }}
+                  >
+                    Troubleshooting
+                  </WzButtonOpenFlyout>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  {checkAPIHostsConnectionButton}
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiCallOut>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      );
+
       return (
         <EuiPage>
           <EuiPanel paddingSize='l'>
@@ -680,6 +789,7 @@ export const ApiTable = compose(
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
+            {(true || this.props.apiIsDown) && calloutAPIisDown}
             <EuiInMemoryTable
               itemId='id'
               items={items}

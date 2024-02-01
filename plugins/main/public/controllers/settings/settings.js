@@ -140,27 +140,6 @@ export class SettingsController {
     this.addApiProps = {
       closeAddApi: () => this.closeAddApi(),
     };
-
-    this.apiIsDownProps = {
-      apiEntries: this.apiEntries,
-      setDefault: entry => this.setDefault(entry),
-      testApi: (entry, force) => ApiCheck.checkApi(entry, force),
-      closeApiIsDown: () => this.closeApiIsDown(),
-      getHosts: () => this.getHosts(),
-      updateClusterInfoInRegistry: (id, clusterInfo) =>
-        this.updateClusterInfoInRegistry(id, clusterInfo),
-      copyToClipBoard: msg => this.copyToClipBoard(msg),
-    };
-    this.settingsTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab, true);
-      },
-      selectedTab: this.tab || 'api',
-      // Define tabs for Wazuh plugin settings application
-      tabs:
-        getWzCurrentAppID() === appSettings.id ? this.tabsConfiguration : null,
-      wazuhConfig: this.wazuhConfig,
-    };
   }
 
   /**
@@ -469,10 +448,7 @@ export class SettingsController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      this.apiEntries =
-        this.apiTableProps.apiEntries =
-        this.apiIsDownProps.apiEntries =
-          hosts;
+      this.apiEntries = this.apiTableProps.apiEntries = hosts;
       if (!hosts.length) {
         this.apiIsDown = false;
         this.$scope.$applyAsync();
