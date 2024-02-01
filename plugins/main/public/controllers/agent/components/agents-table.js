@@ -216,6 +216,7 @@ export const AgentsTable = compose(
       {
         field: 'version',
         name: 'Version',
+        width: '10%',
         sortable: true,
         show: true,
         searchable: true,
