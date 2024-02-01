@@ -18,6 +18,8 @@ import {
   useTimeFilter,
 } from '../../../common/hooks';
 import { AUTHORIZED_AGENTS } from '../../../../../common/constants';
+import { AppState } from '../../../../react-services/app-state';
+import { getSettingDefaultValue } from '../../../../../common/services/settings';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
@@ -45,6 +47,7 @@ const useSearchBarConfiguration = (
 ): tUserSearchBarResponse => {
   // dependencies
   const SESSION_STORAGE_FILTERS_NAME = 'wazuh_persistent_searchbar_filters';
+  const SESSION_STORAGE_PREV_FILTER_NAME = 'wazuh_persistent_current_filter';
   const filterManager = useFilterManager().filterManager as FilterManager;
   const { filters } = useFilterManager();
   const [query, setQuery] = props?.query
@@ -57,24 +60,41 @@ const useSearchBarConfiguration = (
     useState<IIndexPattern>();
 
   useEffect(() => {
+    const prevPattern =
+      AppState.getCurrentPattern() || getSettingDefaultValue('pattern');
     if (filters && filters.length > 0) {
       sessionStorage.setItem(
         SESSION_STORAGE_FILTERS_NAME,
         JSON.stringify(filters),
       );
     }
+    sessionStorage.setItem(SESSION_STORAGE_PREV_FILTER_NAME, prevPattern);
+    AppState.setCurrentPattern(props?.defaultIndexPatternID);
     initSearchBar();
+
     /**
-     * When the component is disassembled, the original filters that arrived
-     * when the component was assembled are added.
+     * When the component is unmounted, the original filters that arrived
+     * when the component was mounted are added.
+     * Both when the component is mounted and unmounted, the index pattern is
+     * updated so that the pin action adds the agent with the correct index pattern.
      */
     return () => {
+      const prevStoragePattern = sessionStorage.getItem(
+        SESSION_STORAGE_PREV_FILTER_NAME,
+      );
+      if (prevStoragePattern) {
+        AppState.setCurrentPattern(prevStoragePattern);
+        sessionStorage.removeItem(SESSION_STORAGE_PREV_FILTER_NAME);
+      }
       const storagePreviousFilters = sessionStorage.getItem(
         SESSION_STORAGE_FILTERS_NAME,
       );
       if (storagePreviousFilters) {
         const previousFilters = JSON.parse(storagePreviousFilters);
-        const cleanedFilters = cleanFilters(previousFilters);
+        const cleanedFilters = cleanFilters(
+          previousFilters,
+          prevStoragePattern ?? props?.defaultIndexPatternID,
+        );
         filterManager.setFilters(cleanedFilters);
         sessionStorage.removeItem(SESSION_STORAGE_FILTERS_NAME);
       }
@@ -122,26 +142,62 @@ const useSearchBarConfiguration = (
    */
   const getFilters = () => {
     const originalFilters = filterManager ? filterManager.getFilters() : [];
-    return originalFilters.filter(
+    const pinnedAgent = originalFilters.find(
+      (filter: Filter) =>
+        filter.meta.key === 'agent.id' && filter.$state.isImplicit,
+    );
+    const mappedFilters = originalFilters.filter(
       (filter: Filter) =>
         filter?.meta?.controlledBy !== AUTHORIZED_AGENTS && // remove auto loaded agent.id filters
         filter?.meta?.index === props?.defaultIndexPatternID,
     );
+
+    if (pinnedAgent) {
+      const agentFilters = mappedFilters.filter(x => {
+        return x.meta.key !== 'agent.id';
+      });
+      agentFilters.push({
+        ...pinnedAgent,
+        meta: {
+          ...pinnedAgent.meta,
+          index: props?.defaultIndexPatternID,
+        },
+      });
+      return agentFilters;
+    }
+    return mappedFilters;
   };
 
   /**
    * Return cleaned filters.
    * Clean the known issue with the auto loaded agent.id filters from the searchbar
-   * and filters those filters that are not related to the default index pattern
+   * and filters those filters that are not related to the default index pattern.
+   * This cleanup adjusts the index pattern of a pinned agent, if applicable.
    * @param previousFilters
    * @returns
    */
-  const cleanFilters = (previousFilters: Filter[]) => {
-    return previousFilters.filter(
+  const cleanFilters = (previousFilters: Filter[], indexPattern: string) => {
+    const pinnedAgent = previousFilters.find(
       (filter: Filter) =>
-        filter?.meta?.controlledBy !== AUTHORIZED_AGENTS &&
+        filter.meta.key === 'agent.id' && filter.$state.isImplicit,
+    );
+    const mappedFilters = previousFilters.filter(
+      (filter: Filter) =>
+        filter?.meta?.controlledBy !== AUTHORIZED_AGENTS && // remove auto loaded agent.id filters
         filter?.meta?.index !== props?.defaultIndexPatternID,
     );
+
+    if (pinnedAgent) {
+      mappedFilters.push({
+        ...pinnedAgent,
+        meta: {
+          ...pinnedAgent.meta,
+          index: indexPattern,
+        },
+        $state: { store: 'appState', isImplicit: true },
+      });
+    }
+    return mappedFilters;
   };
 
   /**
@@ -165,7 +221,10 @@ const useSearchBarConfiguration = (
        */
       if (storagePreviousFilters) {
         const previousFilters = JSON.parse(storagePreviousFilters);
-        const cleanedFilters = cleanFilters(previousFilters);
+        const cleanedFilters = cleanFilters(
+          previousFilters,
+          props?.defaultIndexPatternID,
+        );
         filterManager.setFilters([...cleanedFilters, ...filters]);
 
         props?.onFiltersUpdated &&
