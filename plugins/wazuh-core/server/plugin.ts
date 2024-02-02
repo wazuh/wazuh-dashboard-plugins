@@ -24,6 +24,7 @@ import { PLUGIN_SETTINGS } from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
 import { first } from 'rxjs/operators';
 import { WazuhCorePluginConfigType } from '.';
+import MigrationConfigFile from './start/tasks/config-file';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -136,8 +137,10 @@ export class WazuhCorePlugin
     };
   }
 
-  public async start(core: CoreStart): WazuhCorePluginStart {
+  public async start(core: CoreStart): Promise<WazuhCorePluginStart> {
     this.logger.debug('wazuhCore: Started');
+
+    setCore(core);
 
     this._internal.configurationStore.setSavedObjectRepository(
       core.savedObjects.createInternalRepository(),
@@ -145,7 +148,11 @@ export class WazuhCorePlugin
 
     await this.services.configuration.start();
 
-    setCore(core);
+    // Migrate the configuration file
+    MigrationConfigFile.start({
+      ...this.services,
+      logger: this.logger.get(MigrationConfigFile.name),
+    });
 
     return {
       ...this.services,
