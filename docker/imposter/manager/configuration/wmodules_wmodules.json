@@ -62,10 +62,7 @@
           {
             "vulnerability-detection": {
               "enabled": "yes",
-              "index-status": "yes",
-              "feed-update-interval": "60m",
-              "cti-url": "https://cti.wazuh.com/api/v1/catalog/contexts/vd_1.0.0/consumers/vd_4.8.0",
-              "clusterName": "wazuh"
+              "feed-update-interval": "60m"
             }
           },
           {

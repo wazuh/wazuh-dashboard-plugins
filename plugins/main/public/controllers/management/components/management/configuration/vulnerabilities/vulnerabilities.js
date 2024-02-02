@@ -28,10 +28,6 @@ const mainSettings = [
     render: renderValueYesThenEnabled,
   },
   {
-    field: 'index-status',
-    label: 'Enables indexing of vulnerability inventory data',
-  },
-  {
     field: 'feed-update-interval',
     label: 'Time interval for periodic feed updates',
   },
