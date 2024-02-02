@@ -442,7 +442,7 @@ export class SettingsController {
   }
 
   /**
-   * Get the hosts in the wazuh.yml
+   * Get the API hosts
    */
   async getHosts() {
     try {

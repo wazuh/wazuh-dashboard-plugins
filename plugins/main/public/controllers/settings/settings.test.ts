@@ -153,7 +153,7 @@ describe('Settings Controller', () => {
         ErrorHandler,
       );
       controller.getSettings = jest.fn().mockResolvedValue([]);
-      // mocking manager hosts - apiEntries from wazuh.yml
+      // mocking manager hosts - apiEntries
 
       controller.apiEntries = [
         {
