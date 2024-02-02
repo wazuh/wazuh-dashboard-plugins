@@ -21,7 +21,7 @@ import ButtonModuleExploreAgent from '../../../controllers/overview/components/o
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
-import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities'
+import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent, withModuleTabLoader } from '../hocs';
 
 const DashboardTab = {
@@ -151,17 +151,19 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        component: withModuleNotForAgent(DashboardVuls),
+        component: DashboardVuls,
+        buttons: [ButtonModuleExploreAgent],
       },
       {
         id: 'inventory',
         name: 'Inventory',
-        component: withModuleNotForAgent(InventoryVuls),
+        component: InventoryVuls,
+        buttons: [ButtonModuleExploreAgent],
       },
       EventsTab,
     ],
     buttons: ['settings'],
-    availableFor: ['manager'],
+    availableFor: ['manager', 'agent'],
   },
   mitre: {
     init: 'dashboard',
