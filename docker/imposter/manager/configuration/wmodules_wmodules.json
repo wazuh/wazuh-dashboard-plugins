@@ -31,8 +31,8 @@
               "disabled": "yes",
               "run_daemon": "yes",
               "add_labels": "yes",
-              "log_path": "/var/log/osquery/test.log",
-              "config_path": "/etc/osquery/test.conf"
+              "log_path": "/var/log/osquery/osqueryd.results.log",
+              "config_path": "/etc/osquery/osquery.conf"
             }
           },
           {
@@ -56,7 +56,7 @@
               "enabled": "yes",
               "scan_on_start": "yes",
               "skip_nfs": "yes",
-              "policies": ["/var/ossec/ruleset/sca/test.yml"]
+              "policies": ["/var/ossec/ruleset/sca/cis_ubuntu20-04.yml"]
             }
           },
           {
@@ -73,54 +73,6 @@
           {
             "wazuh_control": {
               "enabled": "yes"
-            }
-          },
-          {
-            "aws-s3": {
-              "interval": 1800,
-              "disabled": "no",
-              "run_on_start": "yes",
-              "skip_on_error": "no",
-              "buckets": [
-                {
-                  "name": "test",
-                  "aws_profile": "prod",
-                  "only_logs_after": "2020-MAY-01",
-                  "type": "cloudtrail",
-                  "remove_from_bucket": "no"
-                },
-                {
-                  "name": "test2",
-                  "aws_profile": "prod",
-                  "path": "guardduty",
-                  "only_logs_after": "2020-MAY-01",
-                  "type": "guardduty",
-                  "remove_from_bucket": "no"
-                },
-                {
-                  "name": "test3",
-                  "aws_profile": "prod",
-                  "path": "macie",
-                  "only_logs_after": "2020-MAY-01",
-                  "type": "custom",
-                  "remove_from_bucket": "no"
-                },
-                {
-                  "name": "test4",
-                  "aws_profile": "prod",
-                  "path": "vpc",
-                  "only_logs_after": "2020-MAY-01",
-                  "type": "vpcflow",
-                  "remove_from_bucket": "no"
-                }
-              ],
-              "services": [
-                {
-                  "type": "inspector",
-                  "aws_profile": "prod",
-                  "remove_log_streams": "no"
-                }
-              ]
             }
           },
           {
@@ -148,6 +100,6 @@
     "total_failed_items": 0,
     "failed_items": []
   },
-  "message": "Active configuration was successfully read in specified node",
+  "message": "Active configuration was successfully read",
   "error": 0
 }
