@@ -139,4 +139,14 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
     async (context, request, response) =>
       ctrl.deleteFile(context, request, response),
   );
+
+  // Get if the current user is an administrator
+  router.get(
+    {
+      path: '/utils/account/is-admin',
+      validate: false,
+    },
+    async (context, request, response) =>
+      ctrl.accountIsAdministrator(context, request, response),
+  );
 }

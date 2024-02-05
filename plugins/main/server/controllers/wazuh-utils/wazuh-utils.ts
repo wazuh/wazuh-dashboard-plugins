@@ -12,14 +12,11 @@
 
 // Require some libraries
 import { ErrorResponse } from '../../lib/error-response';
-import jwtDecode from 'jwt-decode';
-import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../../common/constants';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
-import { getCookieValueByName } from '../../lib/cookie';
 import fs from 'fs';
 import path from 'path';
 import { createDirectoryIfNotExists } from '../../lib/filesystem';
@@ -276,4 +273,34 @@ export class WazuhUtilsCtrl {
     },
     3023,
   );
+
+  /**
+   * Get if the current user is an administror
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object} Configuration File or ErrorResponse
+   */
+  async accountIsAdministrator(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory,
+  ) {
+    try {
+      await context.wazuh_core.dashboardSecurity.isAdministratorUser(
+        context,
+        request,
+      );
+      return response.ok({
+        body: {
+          is_admin: true,
+        },
+      });
+    } catch (error) {
+      return response.ok({
+        is_admin: false,
+        message: error.message,
+      });
+    }
+  }
 }

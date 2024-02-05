@@ -33,10 +33,10 @@ export class DashboardSecurity {
       this.securityPlatform ===
       WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY
     ) {
-      const response = await this.http.get('/api/v1/configuration/account');
-      // TODO: replace by roles
-      if (!response?.roles?.includes('all_access')) {
-        throw new Error(`No permissions: role [${'all_access'}]`);
+      const response = await this.http.get('/utils/account/is-admin');
+
+      if (!response?.is_admin) {
+        throw new Error(response.message);
       }
     }
   }
