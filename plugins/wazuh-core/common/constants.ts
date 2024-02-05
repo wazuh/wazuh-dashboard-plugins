@@ -1567,7 +1567,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           description: 'Port',
           type: EpluginSettingType.number,
           defaultValue: 55000,
-          defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
           isConfigurableFromSettings: true,
           options: {
             number: {
