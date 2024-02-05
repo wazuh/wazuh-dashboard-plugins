@@ -298,8 +298,10 @@ export class WazuhUtilsCtrl {
       });
     } catch (error) {
       return response.ok({
-        is_admin: false,
-        message: error.message,
+        body: {
+          is_admin: false,
+          message: error.message,
+        },
       });
     }
   }
