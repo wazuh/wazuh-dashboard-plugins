@@ -3,9 +3,10 @@
 The Wazuh Core plugin has the following settings to configure through the platform configuration
 file (`opensearch_dashboards.yml`):
 
-| setting                          | type   | default value     | description                                                   |
-| -------------------------------- | ------ | ----------------- | ------------------------------------------------------------- |
-| `wazuh_core.encryption.password` | string | `secretpassword!` | Define a password used to get some properties to encrypt data |
+| setting                                   | type   | default value     | description                                                   |
+| ----------------------------------------- | ------ | ----------------- | ------------------------------------------------------------- |
+| `wazuh_core.encryption.password`          | string | `secretpassword!` | Define a password used to get some properties to encrypt data |
+| `wazuh_core.security.administrator.roles` | string | ['all_access']    | Define the privilegid roles for the administrator users       |
 
 > :warning: Changing the `wazuh_core.encryption.password` in an environment with API host entries
 > configured previously, it will cause a problem.

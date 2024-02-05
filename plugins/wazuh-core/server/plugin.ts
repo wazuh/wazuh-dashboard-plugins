@@ -45,14 +45,17 @@ export class WazuhCorePlugin
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
 
-    this.services.dashboardSecurity = createDashboardSecurity(plugins);
-
     // Get the plugin configuration
     const config$ =
       this.initializerContext.config.create<WazuhCorePluginConfigType>();
     const config: WazuhCorePluginConfigType = await config$
       .pipe(first())
       .toPromise();
+
+    this.services.dashboardSecurity = createDashboardSecurity(
+      plugins,
+      config.security,
+    );
 
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-saved-object'),

@@ -8,6 +8,13 @@ import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../.
 
 export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
   platform: string = WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY;
+  constructor(
+    private config: {
+      administrator: {
+        roles: string[];
+      };
+    },
+  ) {}
 
   async getCurrentUser(
     request: OpenSearchDashboardsRequest,
@@ -42,9 +49,17 @@ export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
       request,
       context,
     );
-    if (!authContext.roles.includes('all_access')) {
+    if (
+      this.config.administrator.roles?.length &&
+      authContext.roles.every(
+        (userRole: string) =>
+          !this.config.administrator.roles.includes(userRole),
+      )
+    ) {
       throw new Error(
-        `User [${username}] has no permission: role [${'all_access'}]`,
+        `User [${username}] has no permission: one of roles: ${this.config.administrator.roles
+          .map(role => `[${role}]`)
+          .join(', ')}`,
       );
     }
   }
