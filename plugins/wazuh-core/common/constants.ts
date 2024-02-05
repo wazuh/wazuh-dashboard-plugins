@@ -473,10 +473,8 @@ export type TPluginSetting = {
   defaultValue: any;
   // Default value if it is not set. It has preference over `default`.
   defaultValueIfNotSet?: any;
-  // Configurable from the configuration file.
-  isConfigurableFromFile: boolean;
-  // Configurable from the UI (Settings/Configuration).
-  isConfigurableFromUI: boolean;
+  // Configurable from the App Settings app.
+  isConfigurableFromSettings: boolean;
   // Modify the setting requires running the plugin health check (frontend).
   requiresRunningHealthCheck?: boolean;
   // Modify the setting requires reloading the browser tab (frontend).
@@ -572,8 +570,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_SAMPLE_ALERT_PREFIX,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
@@ -610,8 +607,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -644,8 +640,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -678,8 +673,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -712,8 +706,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -746,8 +739,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -780,8 +772,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -814,8 +805,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -848,8 +838,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -882,8 +871,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -909,8 +897,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -942,8 +929,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_STATISTICS_DEFAULT_PREFIX,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
       SettingsValidator.isNotEmptyString,
@@ -980,8 +966,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.editor,
     defaultValue: [],
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       editor: {
         language: 'json',
@@ -1054,8 +1039,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       ],
     },
     defaultValue: WAZUH_STATISTICS_DEFAULT_CREATION,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validate: function (value) {
       return SettingsValidator.literal(
@@ -1082,8 +1066,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_STATISTICS_DEFAULT_NAME,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
@@ -1121,8 +1104,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     options: {
       number: {
@@ -1161,8 +1143,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     options: {
       number: {
@@ -1192,8 +1173,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRestartingPluginPlatform: true,
     // Workaround: this need to be defined in the frontend side and backend side because an optimization error in the frontend side related to some module can not be loaded.
     // validate: function (value: string) {
@@ -1218,8 +1198,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.switch,
     defaultValue: WAZUH_STATISTICS_DEFAULT_STATUS,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -1251,8 +1230,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresReloadingBrowserTab: true,
     options: {
       switch: {
@@ -1285,8 +1263,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.filepicker,
     defaultValue: '',
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       file: {
         type: 'image',
@@ -1336,8 +1313,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.CUSTOMIZATION,
     type: EpluginSettingType.filepicker,
     defaultValue: '',
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       file: {
         type: 'image',
@@ -1388,8 +1364,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.filepicker,
     defaultValue: '',
     defaultValueIfNotSet: REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       file: {
         type: 'image',
@@ -1438,8 +1413,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.textarea,
     defaultValue: '',
     defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: { maxRows: 2, maxLength: 50 },
     validate: function (value) {
       return SettingsValidator.multipleLinesString({
@@ -1465,8 +1439,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.textarea,
     defaultValue: '',
     defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: { maxRows: 3, maxLength: 40 },
     validate: function (value) {
       return SettingsValidator.multipleLinesString({
@@ -1492,8 +1465,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: '',
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     validate: SettingsValidator.hasNoSpaces,
     validateBackend: function (schema) {
       return schema.string({ validate: this.validate });
@@ -1513,8 +1485,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: '',
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: false,
+    isConfigurableFromSettings: false,
     validate: SettingsValidator.isNotEmptyString,
     validateBackend: function (schema) {
       return schema.string({ validate: this.validate });
@@ -1533,8 +1504,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
     defaultValue: false,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresReloadingBrowserTab: true,
     options: {
       switch: {
@@ -1575,8 +1545,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           description: 'API host identifier',
           type: EpluginSettingType.text,
           defaultValue: 'default',
-          isConfigurableFromFile: true,
-          isConfigurableFromUI: true,
+          isConfigurableFromSettings: true,
           validate: SettingsValidator.isNotEmptyString,
           validateBackend: function (schema) {
             return schema.string({ validate: this.validate });
@@ -1587,8 +1556,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           description: 'URL address',
           type: EpluginSettingType.text,
           defaultValue: 'https://localhost',
-          isConfigurableFromFile: true,
-          isConfigurableFromUI: true,
+          isConfigurableFromSettings: true,
           validate: SettingsValidator.isNotEmptyString,
           validateBackend: function (schema) {
             return schema.string({ validate: this.validate });
@@ -1600,8 +1568,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           type: EpluginSettingType.number,
           defaultValue: 55000,
           defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
-          isConfigurableFromFile: true,
-          isConfigurableFromUI: true,
+          isConfigurableFromSettings: true,
           options: {
             number: {
               min: 0,
@@ -1631,8 +1598,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           description: 'Username',
           type: EpluginSettingType.text,
           defaultValue: 'wazuh-wui',
-          isConfigurableFromFile: true,
-          isConfigurableFromUI: true,
+          isConfigurableFromSettings: true,
           validate: SettingsValidator.isNotEmptyString,
           validateBackend: function (schema) {
             return schema.string({ validate: this.validate });
@@ -1643,8 +1609,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           description: 'Password',
           type: EpluginSettingType.password,
           defaultValue: 'wazuh-wui',
-          isConfigurableFromFile: true,
-          isConfigurableFromUI: true,
+          isConfigurableFromSettings: true,
           validate: SettingsValidator.isNotEmptyString,
           validateBackend: function (schema) {
             return schema.string({ validate: this.validate });
@@ -1655,8 +1620,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           description: 'Use the authentication context.',
           type: EpluginSettingType.switch,
           defaultValue: false,
-          isConfigurableFromFile: true,
-          isConfigurableFromUI: true,
+          isConfigurableFromSettings: true,
           options: {
             switch: {
               values: {
@@ -1677,8 +1641,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    isConfigurableFromFile: false,
-    isConfigurableFromUI: false,
+    isConfigurableFromSettings: false,
     uiFormTransformChangedInputValue: function (
       value: boolean | string,
     ): boolean {
@@ -1704,8 +1667,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.editor,
     defaultValue: [],
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       editor: {
         language: 'json',
@@ -1786,8 +1748,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
     defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: false,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {
@@ -1820,8 +1781,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_ALERTS_PATTERN,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
@@ -1859,8 +1819,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.number,
     defaultValue: 20000,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     options: {
       number: {
         min: 1500,
@@ -1916,8 +1875,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       ],
     },
     defaultValue: WAZUH_MONITORING_DEFAULT_CREATION,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validate: function (value) {
       return SettingsValidator.literal(
@@ -1944,8 +1902,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.switch,
     defaultValue: WAZUH_MONITORING_DEFAULT_ENABLED,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRestartingPluginPlatform: true,
     options: {
       switch: {
@@ -1979,8 +1936,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_MONITORING_DEFAULT_FREQUENCY,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRestartingPluginPlatform: true,
     options: {
       number: {
@@ -2016,8 +1972,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_MONITORING_PATTERN,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validate: SettingsValidator.compose(
       SettingsValidator.isNotEmptyString,
@@ -2054,8 +2009,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     options: {
       number: {
@@ -2092,8 +2046,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.number,
     defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     options: {
       number: {
@@ -2129,8 +2082,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.VULNERABILITIES,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_VULNERABILITIES_PATTERN,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
+    isConfigurableFromSettings: true,
     requiresRunningHealthCheck: false,
     validate: SettingsValidator.compose(
       SettingsValidator.isNotEmptyString,

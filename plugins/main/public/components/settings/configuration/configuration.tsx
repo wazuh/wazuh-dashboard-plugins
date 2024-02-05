@@ -66,7 +66,7 @@ export type ISetting = {
 
 const transformPluginSettingsToFormFields = (configuration, pluginSettings) => {
   return Object.entries(pluginSettings)
-    .filter(([_, { isConfigurableFromUI }]) => isConfigurableFromUI)
+    .filter(([_, { isConfigurableFromSettings }]) => isConfigurableFromSettings)
     .reduce(
       (
         accum,
@@ -229,7 +229,7 @@ const WzConfigurationSettingsProvider = props => {
           const pluginSetting =
             getWazuhCorePlugin().configuration._settings.get(pluginSettingKey);
           if (
-            pluginSetting.isConfigurableFromFile &&
+            pluginSetting.isConfigurableFromSettings &&
             pluginSetting.type === EpluginSettingType.filepicker
           ) {
             accum.fileUpload = {
@@ -239,7 +239,7 @@ const WzConfigurationSettingsProvider = props => {
                 extension: path.extname(currentValue.name),
               },
             };
-          } else if (pluginSetting.isConfigurableFromFile) {
+          } else if (pluginSetting.isConfigurableFromSettings) {
             accum.saveOnConfigurationFile = {
               ...accum.saveOnConfigurationFile,
               [pluginSettingKey]: currentValue,

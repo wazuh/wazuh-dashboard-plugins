@@ -94,9 +94,7 @@ export type TConfigurationSetting = {
   // Default value if it is not set. It has preference over `default`.
   defaultValueIfNotSet?: any;
   // Configurable from the configuration file.
-  isConfigurableFromFile: boolean;
-  // Configurable from the UI (Settings/Configuration).
-  isConfigurableFromUI: boolean;
+  isConfigurableFromSettings: boolean;
   // Modify the setting requires running the plugin health check (frontend).
   requiresRunningHealthCheck?: boolean;
   // Modify the setting requires reloading the browser tab (frontend).

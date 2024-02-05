@@ -27,9 +27,9 @@ import {
 } from '@elastic/eui';
 import {
   EpluginSettingType,
-  TPluginSettingWithKey,
   UI_LOGGER_LEVELS,
 } from '../../../../../../../../common/constants';
+import { TPluginSettingWithKey } from '../../../../../../../../../wazuh-core/common/constants';
 import { webDocumentationLink } from '../../../../../../../../common/services/web_documentation';
 import classNames from 'classnames';
 import { InputForm } from '../../../../../../common/form';

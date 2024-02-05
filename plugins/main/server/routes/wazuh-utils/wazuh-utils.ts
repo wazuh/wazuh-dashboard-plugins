@@ -40,7 +40,10 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
           const validationSchema = Array.from(
             services.configuration._settings.entries(),
           )
-            .filter(([, { isConfigurableFromFile }]) => isConfigurableFromFile)
+            .filter(
+              ([, { isConfigurableFromSettings }]) =>
+                isConfigurableFromSettings,
+            )
             .reduce(
               (accum, [pluginSettingKey, pluginSettingConfiguration]) => ({
                 ...accum,
@@ -76,9 +79,9 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
           )
             // key parameter should be a plugin setting of `filepicker` type
             .filter(
-              ([, { isConfigurableFromFile, type }]) =>
+              ([, { isConfigurableFromSettings, type }]) =>
                 type === EpluginSettingType.filepicker &&
-                isConfigurableFromFile,
+                isConfigurableFromSettings,
             )
             .map(([pluginSettingKey]) => schema.literal(pluginSettingKey));
           try {
@@ -117,9 +120,9 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
           )
             // key parameter should be a plugin setting of `filepicker` type
             .filter(
-              ([, { isConfigurableFromFile, type }]) =>
+              ([, { isConfigurableFromSettings, type }]) =>
                 type === EpluginSettingType.filepicker &&
-                isConfigurableFromFile,
+                isConfigurableFromSettings,
             )
             .map(([pluginSettingKey]) => schema.literal(pluginSettingKey));
           try {

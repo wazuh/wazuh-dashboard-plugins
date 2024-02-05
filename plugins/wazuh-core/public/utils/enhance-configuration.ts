@@ -18,7 +18,9 @@ export function enhanceConfiguration(configuration) {
     return [
       ...new Set(
         Array.from(this._settings.entries())
-          .filter(([, { isConfigurableFromUI }]) => isConfigurableFromUI)
+          .filter(
+            ([, { isConfigurableFromSettings }]) => isConfigurableFromSettings,
+          )
           .map(([, { category }]) => category),
       ),
     ].map(categoryID => this._categories.get(String(categoryID)));
