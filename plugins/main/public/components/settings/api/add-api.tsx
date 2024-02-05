@@ -150,6 +150,15 @@ export const AddAPIHostForm = ({
   const passwordNotMatch =
     fields.password.value !== fields.password_confirm.value;
 
+  const disableApplyButton =
+    mode === 'EDIT'
+      ? Boolean(
+          Object.entries(fields).filter(
+            ({ changed, error }) => changed && error,
+          ),
+        ) || passwordNotMatch
+      : Boolean(Object.keys(errors).length) || passwordNotMatch;
+
   return (
     <div>
       {[
@@ -167,6 +176,14 @@ export const AddAPIHostForm = ({
             label={_meta.title}
             description={_meta.description}
             {...field}
+            // Ignore errors due to unchanged password due to empty value
+            error={
+              mode === 'EDIT' && ['password', 'password_confirm'].includes(key)
+                ? field.changed
+                  ? field.error
+                  : undefined
+                : field.error
+            }
           />
         );
       })}
@@ -178,11 +195,7 @@ export const AddAPIHostForm = ({
       )}
       <EuiFlexGroup>
         <EuiFlexItem grow={false}>
-          <EuiButton
-            disabled={Boolean(Object.keys(errors).length) || passwordNotMatch} // TODO: error when changing another field different to the passwords
-            fill
-            onClick={onSave}
-          >
+          <EuiButton disabled={disableApplyButton} fill onClick={onSave}>
             Apply
           </EuiButton>
         </EuiFlexItem>
