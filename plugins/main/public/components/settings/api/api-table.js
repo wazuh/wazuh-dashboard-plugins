@@ -122,7 +122,7 @@ export const ApiTable = compose(
     /**
      * Refresh the API entries
      */
-    async refresh({ selectAPIHostOnAvailable = false }) {
+    async refresh(options = { selectAPIHostOnAvailable: false }) {
       try {
         let status = 'complete';
         this.setState({ error: false });
@@ -143,7 +143,7 @@ export const ApiTable = compose(
             entries[idx].cluster_info = clusterInfo;
             //Updates the cluster info in the registry
             await this.props.updateClusterInfoInRegistry(id, clusterInfo);
-            if (selectAPIHostOnAvailable) {
+            if (options?.selectAPIHostOnAvailable) {
               this.props.setDefault(entry);
             }
           } catch (error) {
