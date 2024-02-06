@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Get an absolute path for script_home and use_node
+script=$0
+current_directory="$(cd "$(dirname "${script}")"; pwd)"
+script_home="${current_directory}"
+use_node_home="$(cd "${script_home}/../../bin"; pwd)"
+
+# use_node is located in `<WAZUH_DASHBOARD>/bin/use_node`
+exec ${use_node_home}/use_node "${script_home}/scripts/migrate-config-file.js" "${@}"
