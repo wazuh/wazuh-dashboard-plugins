@@ -167,7 +167,7 @@ export class WzGroupsOverview extends Component {
 
   async showGroupConfiguration(groupId) {
     const result = await GroupsHandler.getFileContent(
-      `/groups/${groupId}/files/agent.conf/xml`,
+      `/groups/${groupId}/files/agent.conf?raw=true`,
     );
 
     const file = {

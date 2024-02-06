@@ -394,11 +394,11 @@ resources:
 
   # Get a file in group
   - method: GET
-    path: /groups/{group_id}/files/{file_name}/json
+    path: /groups/{group_id}/files/{file_name}
 
   # Get a file in group
   - method: GET
-    path: /groups/{group_id}/files/{file_name}/xml
+    path: /groups/{group_id}/files/{file_name}?raw=true
 
   # ===================================================== #
   #   LISTS
