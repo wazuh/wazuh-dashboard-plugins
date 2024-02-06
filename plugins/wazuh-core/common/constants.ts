@@ -1466,7 +1466,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.text,
     defaultValue: '',
     isConfigurableFromSettings: true,
-    validate: SettingsValidator.hasNoSpaces,
+    validate: SettingsValidator.hasNoSpaces, // TODO: replace by the validator of Deploy new agent
     validateBackend: function (schema) {
       return schema.string({ validate: this.validate });
     },
