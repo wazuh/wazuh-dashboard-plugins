@@ -74,11 +74,12 @@ export class ConfigurationStore implements IConfigurationStore {
     }
   }
   private async storeSet(store: any) {
-    return await this.savedObjectRepository.create(this.type, store, {
+    const response = await this.savedObjectRepository.create(this.type, store, {
       id: this.type,
       overwrite: true,
       refresh: true,
     });
+    return response.attributes;
   }
   async setup(settings: { [key: string]: TConfigurationSetting }) {
     // Register the saved object
@@ -133,9 +134,9 @@ export class ConfigurationStore implements IConfigurationStore {
       this.logger.debug(
         `Updating saved object with ${JSON.stringify(newSettings)}`,
       );
-      const response = await this.storeSet(newSettings);
+      await this.storeSet(newSettings);
       this.logger.debug('Saved object was updated');
-      return response;
+      return settings;
     } catch (error) {
       this.logger.error(error.message);
       throw error;
@@ -147,9 +148,13 @@ export class ConfigurationStore implements IConfigurationStore {
       const updatedSettings = {
         ...stored,
       };
-      settings.forEach(setting => delete updatedSettings[setting]);
-      const response = await this.storeSet(updatedSettings);
-      return response;
+      const removedSettings = {};
+      settings.forEach(setting => {
+        delete updatedSettings[setting];
+        removedSettings[setting] = null;
+      });
+      await this.storeSet(updatedSettings);
+      return removedSettings;
     } catch (error) {
       this.logger.error(error.message);
       throw error;
