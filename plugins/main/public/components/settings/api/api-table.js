@@ -742,7 +742,7 @@ export const ApiTable = compose(
                       : {}),
                   }}
                 >
-                  Add new
+                  Add API host
                 </WzButtonOpenFlyout>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
