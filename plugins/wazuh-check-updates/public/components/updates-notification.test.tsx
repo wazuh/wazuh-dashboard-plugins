@@ -27,6 +27,11 @@ jest.mock('../plugin-services', () => ({
       },
     },
   }),
+  getWazuhCore: jest.fn().mockReturnValue({
+    hooks: {
+      useDockedSideNav: () => false,
+    },
+  }),
 }));
 
 jest.mock('react-use/lib/useObservable', () => () => {});

@@ -6,7 +6,7 @@ import {
   EuiProgress,
 } from '@elastic/eui';
 import { EndpointsSummary } from './endpoints-summary';
-import { endpointSumary } from '../../utils/applications';
+import { endpointSummary } from '../../utils/applications';
 import {
   withErrorBoundary,
   withReduxProvider,
@@ -23,7 +23,7 @@ import { useGetTotalAgents } from './hooks';
 export const MainEndpointsSummary = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
+  withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
 )(() => {
   const { isLoading, totalAgents, error } = useGetTotalAgents();
 
@@ -64,8 +64,8 @@ export const MainEndpointsSummary = compose(
             fill
             permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
             iconType='plusInCircle'
-            href={getCore().application.getUrlForApp(endpointSumary.id, {
-              path: `#${endpointSumary.redirectTo()}deploy`,
+            href={getCore().application.getUrlForApp(endpointSummary.id, {
+              path: `#${endpointSummary.redirectTo()}deploy`,
             })}
           >
             Deploy new agent

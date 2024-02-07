@@ -16,9 +16,11 @@ exports[`Check result component should render a Check result screen 1`] = `
   title="Check Test"
   validationService={[MockFunction]}
 >
-  <EuiDescriptionListTitle>
+  <EuiDescriptionListTitle
+    className="wz-health-check-result-waiting"
+  >
     <dt
-      className="euiDescriptionList__title"
+      className="euiDescriptionList__title wz-health-check-result-waiting"
     >
       Check Test
     </dt>
@@ -27,7 +29,9 @@ exports[`Check result component should render a Check result screen 1`] = `
     <dd
       className="euiDescriptionList__description"
     >
-      <p>
+      <p
+        className="wz-health-check-result-waiting"
+      >
         <ResultIcons
           initCheck={[Function]}
           result="waiting"
