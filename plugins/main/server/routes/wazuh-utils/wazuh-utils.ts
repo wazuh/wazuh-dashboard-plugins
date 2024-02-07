@@ -153,10 +153,10 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
   // Get if the current user is an administrator
   router.get(
     {
-      path: '/utils/account/is-admin',
+      path: '/utils/account',
       validate: false,
     },
     async (context, request, response) =>
-      ctrl.accountIsAdministrator(context, request, response),
+      ctrl.getPluginScopedAccount(context, request, response),
   );
 }

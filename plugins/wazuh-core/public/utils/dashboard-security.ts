@@ -33,10 +33,10 @@ export class DashboardSecurity {
       this.securityPlatform ===
       WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY
     ) {
-      const response = await this.http.get('/utils/account/is-admin');
+      const response = await this.http.get('/utils/account');
 
-      if (!response?.is_admin) {
-        throw new Error(response.message);
+      if (!response?.privileged) {
+        throw new Error(response.privileged_message);
       }
     }
   }

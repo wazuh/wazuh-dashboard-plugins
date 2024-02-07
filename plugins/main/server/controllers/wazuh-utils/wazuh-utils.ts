@@ -299,13 +299,13 @@ export class WazuhUtilsCtrl {
   );
 
   /**
-   * Get if the current user is an administror
+   * Get the plugin scoped account
    * @param {Object} context
    * @param {Object} request
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  async accountIsAdministrator(
+  async getPluginScopedAccount(
     context: RequestHandlerContext,
     request: KibanaRequest,
     response: KibanaResponseFactory,
@@ -317,14 +317,14 @@ export class WazuhUtilsCtrl {
       );
       return response.ok({
         body: {
-          is_admin: true,
+          privileged: true,
         },
       });
     } catch (error) {
       return response.ok({
         body: {
-          is_admin: false,
-          message: error.message,
+          privileged: false,
+          privileged_message: error.message,
         },
       });
     }
