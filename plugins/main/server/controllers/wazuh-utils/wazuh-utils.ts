@@ -65,6 +65,30 @@ export class WazuhUtilsCtrl {
   }
 
   /**
+   * Clear the configuration
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object}
+   */
+  clearConfiguration = routeDecoratorProtectedAdministrator(
+    async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
+      context.wazuh.logger.debug('Clearing configuration');
+      await context.wazuh_core.configuration.clear();
+      return response.ok({
+        body: {
+          message: 'Configuration was cleared',
+        },
+      });
+    },
+    3020,
+  );
+
+  /**
    * Update the configuration
    * @param {Object} context
    * @param {Object} request

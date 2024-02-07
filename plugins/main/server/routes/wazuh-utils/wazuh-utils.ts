@@ -140,6 +140,16 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
       ctrl.deleteFile(context, request, response),
   );
 
+  // Clear the configuration
+  router.post(
+    {
+      path: '/utils/configuration/clear',
+      validate: false,
+    },
+    async (context, request, response) =>
+      ctrl.clearConfiguration(context, request, response),
+  );
+
   // Get if the current user is an administrator
   router.get(
     {

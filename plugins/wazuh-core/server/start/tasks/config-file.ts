@@ -35,11 +35,23 @@ export default {
       );
 
       const configAsJSON = yml.load(content);
+
       logger.debug(
         `Loaded file [${configurationFileLocation}] content as JSON: ${JSON.stringify(
           configAsJSON,
         )}`,
       );
+
+      if (!Object.keys(configAsJSON).length) {
+        logger.warn(
+          `File [${configurationFileLocation}] has not defined settings. Skip.`,
+        );
+        return;
+      }
+
+      logger.debug('Clearing configuration');
+      await configuration.clear();
+      logger.info('Cleared configuration');
 
       if (configAsJSON.hosts) {
         logger.debug(

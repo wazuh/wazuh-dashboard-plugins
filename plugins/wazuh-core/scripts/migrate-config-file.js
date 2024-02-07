@@ -123,6 +123,26 @@ function readConfigFile(path) {
   return configAsJSON;
 }
 
+async function clearConfiguration() {
+  try {
+    const http = require('./lib/http');
+    cli.logger.debug('Clearing configuration');
+    const response = await http.client.post(
+      `${configuration.host}/utils/configuration/clear`,
+      {
+        rejectUnauthorized: false,
+        headers: {
+          'content-type': 'application/json',
+          'osd-xsrf': 'kibana',
+        },
+      },
+    );
+    cli.logger.debug('Cleared configuration');
+  } catch (error) {
+    cli.logger.error(error.message);
+  }
+}
+
 async function updateOtherSettings(configuration, settings) {
   try {
     const http = require('./lib/http');
@@ -207,6 +227,13 @@ async function main() {
     // Read the configuration file
     const configAsJSON = readConfigFile(configuration['config-file']);
 
+    if (!Object.keys(configAsJSON).length) {
+      cli.logger.warn('Config file has not defined settings.');
+      process.exit(1);
+    }
+
+    // Clear the configuration
+    await clearConfiguration();
     // Migrate the configuration
 
     // Separate the configurations
