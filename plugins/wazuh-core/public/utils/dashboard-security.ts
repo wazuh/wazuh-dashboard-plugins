@@ -35,8 +35,8 @@ export class DashboardSecurity {
     ) {
       const response = await this.http.get('/utils/account');
 
-      if (!response?.privileged) {
-        throw new Error(response.privileged_message);
+      if (!response?.administrator) {
+        throw new Error(response.administrator_message);
       }
     }
   }

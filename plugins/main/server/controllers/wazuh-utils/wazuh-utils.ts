@@ -317,14 +317,14 @@ export class WazuhUtilsCtrl {
       );
       return response.ok({
         body: {
-          privileged: true,
+          administrator: true,
         },
       });
     } catch (error) {
       return response.ok({
         body: {
-          privileged: false,
-          privileged_message: error.message,
+          administrator: false,
+          administrator_message: error.message,
         },
       });
     }
