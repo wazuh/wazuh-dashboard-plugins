@@ -56,7 +56,6 @@
     "viz_R8LMR6U6": {
       "type": "splunk.singlevalueradial",
       "options": {
-        "backgroundColor": "#ffffff",
         "majorColor": "#bf0561"
       },
       "dataSources": {

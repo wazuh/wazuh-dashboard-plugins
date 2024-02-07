@@ -841,7 +841,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Enable or disable the vulnerabilities index pattern health check when opening the app.',
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
-    defaultValue: true,
+    defaultValue: false,
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
     options: {

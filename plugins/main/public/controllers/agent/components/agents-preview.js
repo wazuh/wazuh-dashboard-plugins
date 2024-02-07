@@ -25,6 +25,7 @@ import {
   EuiLink,
   EuiProgress,
   EuiText,
+  EuiIconTip,
 } from '@elastic/eui';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -55,14 +56,14 @@ import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
-import { endpointSumary, itHygiene } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export const AgentsPreview = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
+  withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
@@ -329,7 +330,7 @@ export const AgentsPreview = compose(
                                   >
                                     <EuiLink
                                       href={getCore().application.getUrlForApp(
-                                        itHygiene.id,
+                                        endpointSummary.id,
                                         {
                                           path: `#/agents?tab=welcome&agent=${this.state.lastRegisteredAgent?.id}`,
                                         },
@@ -344,7 +345,7 @@ export const AgentsPreview = compose(
                               )
                             }
                             titleSize='s'
-                            description='Last registered agent'
+                            description='Last enrolled agent'
                             titleColor='primary'
                           />
                         </EuiFlexItem>
@@ -369,7 +370,7 @@ export const AgentsPreview = compose(
                                     >
                                       <EuiLink
                                         href={getCore().application.getUrlForApp(
-                                          itHygiene.id,
+                                          endpointSummary.id,
                                           {
                                             path: `#/agents?tab=welcome&agent=${this.state.agentMostActive?.id}`,
                                           },
@@ -384,7 +385,16 @@ export const AgentsPreview = compose(
                                 )
                               }
                               titleSize='s'
-                              description='Most active agent'
+                              description={
+                                <>
+                                  Most active agent{' '}
+                                  <EuiIconTip
+                                    type='iInCircle'
+                                    color='primary'
+                                    content='Agent with more alerts in the last 24 hours'
+                                  />
+                                </>
+                              }
                               titleColor='primary'
                             />
                           </EuiFlexItem>
