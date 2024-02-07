@@ -118,7 +118,6 @@ export const AgentsTableGlobalActions = ({
         <EditAgentsGroupsModal
           selectedAgents={selectedAgents}
           allAgentsSelected={allAgentsSelected}
-          allAgentsCount={allAgentsCount}
           filters={filters}
           reloadAgents={() => reloadAgents()}
           onClose={() => {

@@ -5,10 +5,15 @@ export const removeAgentsFromGroupService = async (
   agentIds: string[],
   group_id: string,
 ) =>
-  (await WzRequest.apiReq('DELETE', `/agents/group`, {
-    params: {
-      group_id,
-      agents_list: agentIds.join(','),
-      wait_for_complete: true,
+  (await WzRequest.apiReq(
+    'DELETE',
+    `/agents/group`,
+    {
+      params: {
+        group_id,
+        agents_list: agentIds.join(','),
+        wait_for_complete: true,
+      },
     },
-  })) as IApiResponse<string>;
+    { returnOriginalResponse: true },
+  )) as IApiResponse<string>;

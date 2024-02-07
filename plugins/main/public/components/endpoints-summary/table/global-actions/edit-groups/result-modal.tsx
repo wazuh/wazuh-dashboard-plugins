@@ -51,6 +51,8 @@ export const AgentsGlobalActionsResultModal = ({
   errorMessage = 'There have been some errors',
   onClose,
 }: AgentsGlobalActionsResultModalProps) => {
+  const isLoading = isLoadingAgents || isAppliyngChanges;
+
   const detailResultRenderer = (
     type: RESULT_TYPE,
     buttonContent: string,

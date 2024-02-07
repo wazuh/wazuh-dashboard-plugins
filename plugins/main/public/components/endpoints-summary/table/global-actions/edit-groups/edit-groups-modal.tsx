@@ -11,15 +11,14 @@ import {
   EuiFormRow,
   EuiComboBox,
   EuiText,
-  EuiDescriptionList,
-  EuiDescriptionListTitle,
-  EuiDescriptionListDescription,
   EuiLoadingSpinner,
-  EuiIcon,
   EuiCallOut,
   EuiSteps,
   EuiAccordion,
   EuiPanel,
+  EuiInMemoryTable,
+  EuiFlexGroup,
+  EuiFlexItem,
 } from '@elastic/eui';
 import { compose } from 'redux';
 import { withErrorBoundary, withReduxProvider } from '../../../../common/hocs';
@@ -28,19 +27,27 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { useGetGroups } from '../../../hooks';
 import {
-  addAgentToGroupService,
   addAgentsToGroupService,
   getAgentsService,
-  removeAgentFromGroupService,
   removeAgentsFromGroupService,
 } from '../../../services';
 import { Agent } from '../../../types';
-import { RESULT_TYPE, Result } from './result-modal';
+
+enum RESULT_TYPE {
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
+
+type GroupResult = {
+  group: string;
+  result: RESULT_TYPE;
+  message?: string;
+  agentIds?: string;
+};
 
 interface EditAgentsGroupsModalProps {
   selectedAgents: Agent[];
   allAgentsSelected: boolean;
-  allAgentsCount: number;
   filters: any;
   onClose: () => void;
   reloadAgents: () => void;
@@ -58,7 +65,6 @@ export const EditAgentsGroupsModal = compose(
   ({
     selectedAgents,
     allAgentsSelected,
-    allAgentsCount,
     filters,
     onClose,
     reloadAgents,
@@ -67,25 +73,26 @@ export const EditAgentsGroupsModal = compose(
     const [selectedGroups, setSelectedGroups] = useState<Option[]>([]);
     const [finalAgents, setFinalAgents] = useState<Agent[]>([]);
     const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
+    const [getAgentsError, setGetAgentsError] = useState();
     const [saveChangesStatus, setSaveChangesStatus] = useState('disabled');
     const [isResultVisible, setIsResultVisible] = useState(false);
-    const [results, setResults] = useState<Result[]>([]);
+    const [groupResults, setGroupResults] = useState<GroupResult[]>([]);
 
     const {
       groups,
       isLoading: isGroupsLoading,
-      error: errorGroups,
+      error: errorGetGroups,
     } = useGetGroups();
 
-    if (errorGroups) {
+    if (errorGetGroups) {
       const options = {
         context: `EditAgentsGroupsModal.useGetGroups`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
         error: {
-          error: errorGroups,
-          message: errorGroups.message || errorGroups,
+          error: errorGetGroups,
+          message: errorGetGroups.message || errorGetGroups,
           title: `Could not get groups`,
         },
       };
@@ -98,11 +105,29 @@ export const EditAgentsGroupsModal = compose(
         return selectedAgents;
       }
       try {
-        const { affected_items } = await getAgentsService(filters.q, 0);
+        let offset = 0;
+        const limit = 1000;
+        let allAffectedItems: Agent[] = [];
+        let totalAffectedItems;
+
+        do {
+          const { affected_items, total_affected_items } =
+            await getAgentsService(filters.q, limit, offset);
+
+          if (totalAffectedItems === undefined) {
+            totalAffectedItems = total_affected_items;
+          }
+
+          allAffectedItems = allAffectedItems.concat(affected_items);
+
+          offset += limit;
+        } while (offset < totalAffectedItems);
+
         setGetAgentsStatus('complete');
-        return affected_items;
+        return allAffectedItems;
       } catch (error) {
         setGetAgentsStatus('danger');
+        setGetAgentsError(error);
 
         const options = {
           context: `EditAgentsGroupsModal.handleOnSave`,
@@ -147,21 +172,29 @@ export const EditAgentsGroupsModal = compose(
             ? addAgentsToGroupService(agentsIds, group)
             : removeAgentsFromGroupService(agentsIds, group);
         return promise
-          .then(() =>
-            setResults(results => {
-              const newResult = {
-                type: RESULT_TYPE.SUCCESS,
+          .then(result => {
+            setGroupResults(results => {
+              const newGroupResult = {
                 group,
+                result: RESULT_TYPE.SUCCESS,
+                agents: result.data.data.affected_items.map(
+                  item => finalAgents.find(agent => agent.id === item) as Agent,
+                ),
               };
-              return [...results, newResult];
-            }),
-          )
-          .catch(error => {
-            setResults(results => {
+              return [...results, newGroupResult];
+            });
+          })
+          .catch((error: { message: string }) => {
+            setGroupResults(results => {
+              const match = error.message.match(/Affected ids: (.+)$/);
+              console.log(error.message, match);
+              const errorAgentIds = match ? match[1] : '';
+
               const newResult = {
-                type: RESULT_TYPE.ERROR,
                 group,
+                result: RESULT_TYPE.ERROR,
                 message: error.message,
+                agentIds: errorAgentIds,
               };
               return [...results, newResult];
             });
@@ -206,7 +239,7 @@ export const EditAgentsGroupsModal = compose(
             <EuiCallOut
               color='warning'
               iconType='alert'
-              title='The changes will be applied to the agents that match the filters set in the list'
+              title='The changes will be applied to all agents that match the filters set in the list'
             />
           </EuiFormRow>
         ) : (
@@ -236,54 +269,76 @@ export const EditAgentsGroupsModal = compose(
             title: 'Retrieve agents data',
             status: getAgentsStatus,
             children:
-              getAgentsStatus === 'loading' ? (
-                <EuiLoadingSpinner />
-              ) : getAgentsStatus === 'complete' ? (
+              getAgentsStatus === 'loading' ? null : getAgentsStatus ===
+                'complete' ? (
                 <EuiAccordion
                   id='agentsAccordion'
-                  buttonContent={`${finalAgents.length} agents`}
+                  buttonContent={`Agents details (${finalAgents.length})`}
                 >
-                  <EuiText>Agents detail</EuiText>
+                  <EuiInMemoryTable
+                    items={finalAgents}
+                    tableLayout='auto'
+                    columns={[
+                      {
+                        field: 'id',
+                        name: 'ID',
+                        align: 'left',
+                        sortable: true,
+                        truncateText: true,
+                      },
+                      {
+                        field: 'name',
+                        name: 'Name',
+                        align: 'left',
+                        sortable: true,
+                        truncateText: true,
+                      },
+                    ]}
+                    pagination={true}
+                    sorting={{
+                      sort: {
+                        field: 'id',
+                        direction: 'asc',
+                      },
+                    }}
+                  />
                 </EuiAccordion>
               ) : (
-                <EuiPanel color='danger'>
-                  <EuiAccordion
-                    id='agentsErrorAccordion'
-                    buttonContent='Could not get agents data'
-                  >
-                    <EuiText>Agents detail</EuiText>
-                  </EuiAccordion>
-                </EuiPanel>
+                <EuiCallOut
+                  color='danger'
+                  iconType='alert'
+                  title='Could not get agents data'
+                >
+                  <EuiText>{getAgentsError?.message}</EuiText>
+                </EuiCallOut>
               ),
           },
           {
             step: 2,
             title: addOrRemove === 'add' ? 'Add groups' : 'Remove groups',
             status: saveChangesStatus,
-            children: <EuiText>{`${finalAgents.length} agents`}</EuiText>,
+            children: (
+              <EuiFlexGroup direction='column'>
+                {groupResults.map(groupResult => (
+                  <EuiFlexItem key={groupResult.group}>
+                    {groupResult.result === RESULT_TYPE.ERROR ? (
+                      <EuiCallOut
+                        color='danger'
+                        iconType='alert'
+                        title={`Group "${groupResult.group}": ${groupResult.message}`}
+                      >
+                        <EuiText>{`Agents: ${groupResult.agentIds}`}</EuiText>
+                      </EuiCallOut>
+                    ) : (
+                      <EuiText>{groupResult.group}</EuiText>
+                    )}
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGroup>
+            ),
           },
         ]}
       />
-      // <EuiDescriptionList textStyle='reverse' align='center' type='column'>
-      //   <EuiDescriptionListTitle>
-      //     Retrieve agents{!isLoadingAgents ? `(${finalAgents.length})` : ''}
-      //   </EuiDescriptionListTitle>
-      //   <EuiDescriptionListDescription>
-      //     {isLoadingAgents ? (
-      //       <EuiLoadingSpinner />
-      //     ) : (
-      //       <EuiIcon type='check' color='success' />
-      //     )}
-      //   </EuiDescriptionListDescription>
-      //   <EuiDescriptionListTitle>Apply changes</EuiDescriptionListTitle>
-      //   <EuiDescriptionListDescription>
-      //     {isApplyingChanges ? (
-      //       <EuiLoadingSpinner />
-      //     ) : (
-      //       <EuiIcon type='check' color='success' />
-      //     )}
-      //   </EuiDescriptionListDescription>
-      // </EuiDescriptionList>
     );
 
     return (
