@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { getPlugins } from '../../../../../kibana-services';
+import { getPlugins, getWazuhCorePlugin } from '../../../../../kibana-services';
 import useSearchBarConfiguration from '../../search_bar/use_search_bar_configuration';
 import { IntlProvider } from 'react-intl';
 import {
@@ -54,6 +54,8 @@ const InventoryVulsComponent = () => {
   );
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+
+  const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
@@ -197,6 +199,7 @@ const InventoryVulsComponent = () => {
           results?.hits?.total > 0 ? (
             <EuiDataGrid
               {...dataGridProps}
+              className={sideNavDocked ? 'dataGridDockedNav' : ''}
               toolbarVisibility={{
                 additionalControls: (
                   <>
@@ -238,7 +241,7 @@ const InventoryVulsComponent = () => {
             <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
               <EuiFlyoutHeader>
                 <EuiTitle>
-                  <h2>Document Details</h2>
+                  <h2>Document details</h2>
                 </EuiTitle>
               </EuiFlyoutHeader>
               <EuiFlyoutBody>

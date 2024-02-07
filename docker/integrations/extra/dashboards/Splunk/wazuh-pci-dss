@@ -3,7 +3,6 @@
     "viz_9NIbkgTo": {
       "type": "splunk.bubble",
       "options": {
-        "backgroundColor": "#ffffff",
         "xAxisTitleText": "timestamp",
         "yAxisTitleText": "count"
       },

@@ -24,6 +24,7 @@ import {
   setWzCurrentAppID,
   setWazuhCheckUpdatesPlugin,
   setHeaderActionMenuMounter,
+  setWazuhCorePlugin,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -57,6 +58,10 @@ export class WazuhPlugin
   private innerAngularInitialized: boolean = false;
   private hideTelemetryBanner?: () => void;
   public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
+    // Hide the discover deprecation notice
+    // After opensearch version 2.11.0 this line may be deleted
+    localStorage.setItem('discover:deprecation-notice:show', 'false');
+
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState = {};
     try {
@@ -221,6 +226,7 @@ export class WazuhPlugin
     setOverlays(core.overlays);
     setErrorOrchestrator(ErrorOrchestratorService);
     setWazuhCheckUpdatesPlugin(plugins.wazuhCheckUpdates);
+    setWazuhCorePlugin(plugins.wazuhCore);
     return {};
   }
 }
