@@ -469,6 +469,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                     data-test-subj="tableHeaderCell_version_6"
                     role="columnheader"
                     scope="col"
+                    style="width:10%"
                   >
                     <button
                       class="euiTableHeaderButton"
@@ -989,6 +990,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                     data-test-subj="tableHeaderCell_version_3"
                     role="columnheader"
                     scope="col"
+                    style="width:10%"
                   >
                     <button
                       class="euiTableHeaderButton"
@@ -1605,6 +1607,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                     data-test-subj="tableHeaderCell_version_6"
                     role="columnheader"
                     scope="col"
+                    style="width:10%"
                   >
                     <button
                       class="euiTableHeaderButton"

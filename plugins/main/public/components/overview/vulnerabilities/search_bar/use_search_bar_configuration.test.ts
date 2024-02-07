@@ -16,6 +16,7 @@ import useSearchBar from './use_search_bar_configuration';
 import { getDataPlugin } from '../../../../kibana-services';
 import * as timeFilterHook from '../../../common/hooks/use-time-filter';
 import * as queryManagerHook from '../../../common/hooks/use-query';
+import { AppState } from '../../../../react-services/app-state';
 
 /**
  * Mocking Data Plugin
@@ -78,6 +79,9 @@ describe('[hook] useSearchBarConfiguration', () => {
 
   it('should return default app index pattern when not receiving a default index pattern', async () => {
     jest
+      .spyOn(AppState, 'getCurrentPattern')
+      .mockImplementation(() => 'default-index-pattern');
+    jest
       .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
       .mockResolvedValue(mockedDefaultIndexPatternData);
     jest
@@ -99,6 +103,12 @@ describe('[hook] useSearchBarConfiguration', () => {
       title: '',
     };
     jest
+      .spyOn(AppState, 'getCurrentPattern')
+      .mockImplementation(() => 'wazuh-alerts-*');
+    jest
+      .spyOn(AppState, 'setCurrentPattern')
+      .mockImplementation(jest.fn());
+    jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedIndexPatternData);
     const { result, waitForNextUpdate } = renderHook(() =>
@@ -117,6 +127,12 @@ describe('[hook] useSearchBarConfiguration', () => {
 
   it('should show an ERROR message and get the default app index pattern when not found the index pattern data by the ID received', async () => {
     const INDEX_NOT_FOUND_ERROR = new Error('Index Pattern not found');
+    jest
+      .spyOn(AppState, 'getCurrentPattern')
+      .mockImplementation(() => 'default-index-pattern');
+    jest
+      .spyOn(AppState, 'setCurrentPattern')
+      .mockImplementation(jest.fn());
     jest.spyOn(mockDataPlugin.indexPatterns, 'get').mockImplementation(() => {
       throw INDEX_NOT_FOUND_ERROR;
     });
@@ -160,6 +176,12 @@ describe('[hook] useSearchBarConfiguration', () => {
       },
     ];
     jest
+      .spyOn(AppState, 'getCurrentPattern')
+      .mockImplementation(() => 'default-index-pattern');
+    jest
+      .spyOn(AppState, 'setCurrentPattern')
+      .mockImplementation(jest.fn());
+    jest
       .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
       .mockResolvedValue(mockedDefaultIndexPatternData);
     jest
@@ -187,6 +209,12 @@ describe('[hook] useSearchBarConfiguration', () => {
       id: exampleIndexPatternId,
       title: '',
     };
+    jest
+      .spyOn(AppState, 'getCurrentPattern')
+      .mockImplementation(() => exampleIndexPatternId);
+    jest
+      .spyOn(AppState, 'setCurrentPattern')
+      .mockImplementation(jest.fn());
     jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedExampleIndexPatternData);
