@@ -45,6 +45,8 @@ export const [getWzCurrentAppID, setWzCurrentAppID] =
   createGetterSetter<NavigationPublicPluginStart>('WzCurrentAppID');
 export const [getWazuhCheckUpdatesPlugin, setWazuhCheckUpdatesPlugin] =
   createGetterSetter<WazuhCheckUpdatesPluginStart>('WazuhCheckUpdatesPlugin');
+export const [getWazuhCorePlugin, setWazuhCorePlugin] =
+  createGetterSetter<WazuhCheckUpdatesPluginStart>('WazuhCorePlugin');
 export const [getHeaderActionMenuMounter, setHeaderActionMenuMounter] =
   createGetterSetter<AppMountParameters['setHeaderActionMenu']>(
     'headerActionMenuMounter',

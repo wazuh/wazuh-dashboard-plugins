@@ -7,10 +7,15 @@ import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { getSavedObject, setSavedObject } from '../saved-object';
 import { getWazuhCore } from '../../plugin-services';
 
-export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<AvailableUpdates> => {
+export const getUpdates = async (
+  queryApi = false,
+  forceQuery = false,
+): Promise<AvailableUpdates> => {
   try {
-    if (!checkAvailableUpdates) {
-      const availableUpdates = (await getSavedObject(SAVED_OBJECT_UPDATES)) as AvailableUpdates;
+    if (!queryApi) {
+      const availableUpdates = (await getSavedObject(
+        SAVED_OBJECT_UPDATES,
+      )) as AvailableUpdates;
 
       return availableUpdates;
     }
@@ -21,13 +26,14 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
     } = getWazuhCore();
     const wazuhHostsController = new WazuhHostsCtrl();
 
-    const hosts: { id: string }[] = await wazuhHostsController.getHostsEntries();
+    const hosts: { id: string }[] =
+      await wazuhHostsController.getHostsEntries();
 
     const apisAvailableUpdates = await Promise.all(
-      hosts?.map(async (api) => {
+      hosts?.map(async api => {
         const data = {};
         const method = 'GET';
-        const path = '/manager/version/check?force_query=true';
+        const path = `/manager/version/check?force_query=${forceQuery}`;
         const options = {
           apiHostID: api.id,
           forceRefresh: true,
@@ -37,7 +43,7 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             method,
             path,
             data,
-            options
+            options,
           );
 
           const update = response.data.data as ResponseApiAvailableUpdates;
@@ -89,7 +95,7 @@ export const getUpdates = async (checkAvailableUpdates?: boolean): Promise<Avail
             error,
           };
         }
-      })
+      }),
     );
 
     const savedObject = {

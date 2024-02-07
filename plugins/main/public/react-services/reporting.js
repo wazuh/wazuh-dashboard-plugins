@@ -48,9 +48,10 @@ export class ReportingService {
   }
 
   removeAgentStatusVis(idArray) {
-    const monitoringEnabled = this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
+    const monitoringEnabled =
+      this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
     if (!monitoringEnabled) {
-      const visArray = idArray.filter((vis) => {
+      const visArray = idArray.filter(vis => {
         return vis !== 'Wazuh-App-Overview-General-Agents-status';
       });
       return visArray;
@@ -70,13 +71,17 @@ export class ReportingService {
 
       this.vis2png.clear();
 
-      const rawVisualizations = this.rawVisualizations.getList().filter(this.removeTableVis);
+      const rawVisualizations = this.rawVisualizations
+        .getList()
+        .filter(this.removeTableVis);
 
       let idArray = [];
       if (tab === 'general') {
-        idArray = this.removeAgentStatusVis(rawVisualizations.map((item) => item.id));
+        idArray = this.removeAgentStatusVis(
+          rawVisualizations.map(item => item.id),
+        );
       } else {
-        idArray = rawVisualizations.map((item) => item.id);
+        idArray = rawVisualizations.map(item => item.id);
       }
 
       const visualizationIDList = [];
@@ -88,7 +93,9 @@ export class ReportingService {
         }
       }
 
-      const appliedFilters = await this.visHandlers.getAppliedFilters(syscollectorFilters);
+      const appliedFilters = await this.visHandlers.getAppliedFilters(
+        syscollectorFilters,
+      );
       const dataplugin = await getDataPlugin();
       const serverSideQuery = dataplugin.query.getOpenSearchQuery();
       const array = await this.vis2png.checkArray(visualizationIDList);
@@ -106,12 +113,16 @@ export class ReportingService {
         section: agents ? 'agents' : 'overview',
         agents,
         browserTimezone,
-        indexPatternTitle: (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title,
-        apiId: JSON.parse(AppState.getCurrentAPI()).id
+        indexPatternTitle: (
+          await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
+        ).title,
+        apiId: JSON.parse(AppState.getCurrentAPI()).id,
       };
 
       const apiEndpoint =
-        tab === 'syscollector' ? `/reports/agents/${agents}/inventory` : `/reports/modules/${tab}`;
+        tab === 'syscollector'
+          ? `/reports/agents/${agents}/inventory`
+          : `/reports/modules/${tab}`;
       await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
@@ -120,8 +131,8 @@ export class ReportingService {
       this.showToast(
         'success',
         'Created report',
-        'Success. Go to Indexer/dashboard management > Reporting',
-        4000
+        'Success. Go to Dashboard management > Reporting',
+        4000,
       );
       return;
     } catch (error) {
@@ -152,13 +163,17 @@ export class ReportingService {
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
-        filters: [type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }],
+        filters: [
+          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name },
+        ],
         browserTimezone,
         components,
-        apiId: JSON.parse(AppState.getCurrentAPI()).id
+        apiId: JSON.parse(AppState.getCurrentAPI()).id,
       };
       const apiEndpoint =
-        type === 'agentConfig' ? `/reports/agents/${obj.id}` : `/reports/groups/${obj.name}`;
+        type === 'agentConfig'
+          ? `/reports/agents/${obj.id}`
+          : `/reports/groups/${obj.name}`;
       await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
@@ -167,8 +182,8 @@ export class ReportingService {
       this.showToast(
         'success',
         'Created report',
-        'Success. Go to Indexer/dashboard management > Reporting',
-        4000
+        'Success. Go to Dashboard management > Reporting',
+        4000,
       );
       return;
     } catch (error) {

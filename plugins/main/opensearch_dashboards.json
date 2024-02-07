@@ -19,7 +19,8 @@
     "opensearchDashboardsReact",
     "opensearchDashboardsUtils",
     "opensearchDashboardsLegacy",
-    "wazuhCheckUpdates"
+    "wazuhCheckUpdates",
+    "wazuhCore"
   ],
   "optionalPlugins": [
     "security",
