@@ -105,6 +105,16 @@ const cli = require('./lib/cli')(
         }
       },
     },
+    {
+      long: 'clear',
+      description: 'Clear the previous configuration',
+      parse: (parameter, input, { logger, option }) => {
+        logger.setLevel(0);
+        return {
+          [option.long]: true,
+        };
+      },
+    },
   ],
 );
 
@@ -233,7 +243,9 @@ async function main() {
     }
 
     // Clear the configuration
-    await clearConfiguration();
+    if (configuration['clear']) {
+      await clearConfiguration();
+    }
     // Migrate the configuration
 
     // Separate the configurations
