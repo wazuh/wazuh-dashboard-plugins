@@ -1,5 +1,6 @@
 import { PluginInitializerContext } from '../../../src/core/server';
 import {
+  WAZUH_CORE_CONFIGURATION_INSTANCE,
   WAZUH_CORE_ENCRYPTION_PASSWORD,
   WAZUH_CORE_SECURITY_ADMINISTRATOR_ROLES,
 } from '../common/constants';
@@ -14,14 +15,19 @@ export function plugin(initializerContext: PluginInitializerContext) {
 }
 
 const configSchema = schema.object({
-  encryption: schema.object({
-    password: schema.string({ defaultValue: WAZUH_CORE_ENCRYPTION_PASSWORD }),
-  }),
   security: schema.object({
     administrator: schema.object({
       roles: schema.arrayOf(schema.string(), {
         defaultValue: WAZUH_CORE_SECURITY_ADMINISTRATOR_ROLES,
       }),
+    }),
+  }),
+  configuration: schema.object({
+    instance: schema.string({
+      defaultValue: WAZUH_CORE_CONFIGURATION_INSTANCE,
+    }),
+    encryption_password: schema.string({
+      defaultValue: WAZUH_CORE_ENCRYPTION_PASSWORD,
     }),
   }),
 });

@@ -3,12 +3,13 @@
 The Wazuh Core plugin has the following settings to configure through the platform configuration
 file (`opensearch_dashboards.yml`):
 
-| setting                                   | type   | default value     | description                                                   |
-| ----------------------------------------- | ------ | ----------------- | ------------------------------------------------------------- |
-| `wazuh_core.encryption.password`          | string | `secretpassword!` | Define a password used to get some properties to encrypt data |
-| `wazuh_core.security.administrator.roles` | string | ['all_access']    | Define the privilegid roles for the administrator users       |
+| setting                                        | type   | default value     | description                                                   |
+| ---------------------------------------------- | ------ | ----------------- | ------------------------------------------------------------- |
+| `wazuh_core.configuration.encryption_password` | string | `secretpassword!` | Define a password used to get some properties to encrypt data |
+| `wazuh_core.configuration.instance`            | string | `wazuh-dashboard` | Define the instance of the configuration                      |
+| `wazuh_core.security.administrator.roles`      | string | ['all_access']    | Define the privilegid roles for the administrator users       |
 
-> :warning: Changing the `wazuh_core.encryption.password` in an environment with API host entries
+> :warning: Changing the `wazuh_core.configuration.encryption_password` in an environment with API host entries
 > configured previously, it will cause a problem.
 
 # Configuration of the Wazuh scoped plugins
@@ -21,7 +22,7 @@ This service is the way to manage the Wazuh scoped plugins configuration.
 These settings can be configured through the `Server Management` > `App Settings` application.
 
 This configuration is stored in a saved object in the backend side. Some sensitive data such as the
-related to the API host entries is encrypted using `wazuh_core.encryption.password`.
+related to the API host entries is encrypted using `wazuh_core.configuration.encryption_password`.
 
 ## Configure
 
@@ -120,3 +121,24 @@ It is possible manage the API host configuration through the platform API endpoi
 - `DELETE /hosts/apis/{id}`: delete the API host configuration
 
 These endpoints communicates with the saved object decrypt and encrypt the data.
+
+# Multiple instances of Wazuh dashboard
+
+If you want to run multiple instances of Wazuh dashboard with different configuration, it is
+possible through using a different configuration. This can be done through the
+`wazuh_core.configuration.instance` setting.
+
+For example, if you want to run 2 instances of Wazuh dashboard with different configurations,
+you can configure the `wazuh_core.configuration.instance` setting.
+
+```yml
+# opensearch_dashboards.yml of Wazuh dashboard instance 1
+wazuh_core.configuration.instance: wazuh-dashboard1
+```
+
+```yml
+# opensearch_dashboards.yml of Wazuh dashboard instance 1
+wazuh_core.configuration.instance: wazuh-dashboard2
+```
+
+This cause

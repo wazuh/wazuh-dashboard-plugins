@@ -6,15 +6,25 @@ import {
 } from '../../common/services/configuration';
 import { Encryption } from './encryption';
 
+interface IConfigurationStoreOptions {
+  instance: string;
+  encryption_password: string;
+}
 export class ConfigurationStore implements IConfigurationStore {
   private type = 'plugins-configuration';
   private savedObjectRepository: any;
   private configuration: IConfiguration;
   private encryption: any;
-  constructor(private logger: Logger, private savedObjects, options) {
+  private _config: IConfigurationStoreOptions;
+  constructor(
+    private logger: Logger,
+    private savedObjects,
+    options: IConfigurationStoreOptions,
+  ) {
     this.encryption = new Encryption(this.logger.get('encryption'), {
       password: options.encryption_password,
     });
+    this._config = options;
   }
   private getSavedObjectDefinition(settings: {
     [key: string]: TConfigurationSetting;
@@ -56,10 +66,12 @@ export class ConfigurationStore implements IConfigurationStore {
   }
   private async storeGet() {
     try {
-      this.logger.debug(`Fetching saved object [${this.type}:${this.type}]`);
+      this.logger.debug(
+        `Fetching saved object [${this.type}:${this._config.instance}]`,
+      );
       const response = await this.savedObjectRepository.get(
         this.type,
-        this.type,
+        this._config.instance,
       );
       this.logger.debug(
         `Fetched saved object response [${JSON.stringify(response)}]`,
@@ -75,7 +87,7 @@ export class ConfigurationStore implements IConfigurationStore {
   }
   private async storeSet(store: any) {
     const response = await this.savedObjectRepository.create(this.type, store, {
-      id: this.type,
+      id: this._config.instance,
       overwrite: true,
       refresh: true,
     });

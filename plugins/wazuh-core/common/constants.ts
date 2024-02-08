@@ -2189,3 +2189,5 @@ export const WAZUH_CORE_ENCRYPTION_PASSWORD = 'secretpassword!';
 
 // Security
 export const WAZUH_CORE_SECURITY_ADMINISTRATOR_ROLES = ['all_access'];
+
+export const WAZUH_CORE_CONFIGURATION_INSTANCE = 'wazuh-dashboard';
