@@ -93,6 +93,29 @@ export class ConfigurationStore implements IConfigurationStore {
     });
     return response.attributes;
   }
+  async savedObjectIsCreated() {
+    try {
+      this.logger.debug(
+        `Fetching saved object is created [${this.type}:${this._config.instance}]`,
+      );
+      const response = await this.savedObjectRepository.get(
+        this.type,
+        this._config.instance,
+      );
+      this.logger.debug(
+        `Fetched saved object  is created response [${JSON.stringify(
+          response,
+        )}]`,
+      );
+      return true;
+    } catch (error) {
+      // Saved object not found
+      if (error?.output?.payload?.statusCode === 404) {
+        return false;
+      }
+      throw error;
+    }
+  }
   async setup(settings: { [key: string]: TConfigurationSetting }) {
     // Register the saved object
     try {

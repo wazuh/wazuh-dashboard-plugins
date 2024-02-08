@@ -152,8 +152,9 @@ export class WazuhCorePlugin
     await this.services.configuration.start();
 
     // Migrate the configuration file
-    MigrationConfigFile.start({
+    await MigrationConfigFile.start({
       ...this.services,
+      configurationStore: this._internal.configurationStore,
       logger: this.logger.get(MigrationConfigFile.name),
     });
 
