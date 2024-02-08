@@ -39,6 +39,6 @@ class WzReporting extends Component {
 export default compose(
   withReduxProvider,
   withGlobalBreadcrumb(props => {
-    return [{ text: reporting.title }];
+    return [{ text: reporting.breadcrumbLabel }];
   }),
 )(WzReporting);

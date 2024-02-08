@@ -39,7 +39,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { AgentStatus } from '../../../../../components/agents/agent-status';
 import { WzRequest } from '../../../../../react-services';
-import { itHygiene } from '../../../../../utils/applications';
+import { endpointSummary } from '../../../../../utils/applications';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 
 class WzGroupAgentsTable extends Component {
@@ -121,7 +121,7 @@ class WzGroupAgentsTable extends Component {
                 iconType='eye'
                 onClick={async () => {
                   this.props.updateCurrentAgentData(item);
-                  getCore().application.navigateToApp(itHygiene.id, {
+                  getCore().application.navigateToApp(endpointSummary.id, {
                     path: `#/agents?agent=${item.id}`,
                   });
                 }}
