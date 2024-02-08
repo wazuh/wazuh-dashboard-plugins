@@ -54,7 +54,12 @@ export class ToolsController {
       this.load = false;
 
       const breadcrumb = [
-        { text: this.tab === 'devTools' ? devTools.title : rulesetTest.title },
+        {
+          text:
+            this.tab === 'devTools'
+              ? devTools.breadcrumbLabel
+              : rulesetTest.breadcrumbLabel,
+        },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
     } catch (error) {

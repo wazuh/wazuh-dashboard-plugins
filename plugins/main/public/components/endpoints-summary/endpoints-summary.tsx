@@ -37,7 +37,6 @@ import {
   withUserAuthorizationPrompt,
   withErrorBoundary,
 } from '../common/hocs';
-import { formatUIDate } from '../../../public/react-services/time-service';
 import { compose } from 'redux';
 import {
   UI_LOGGER_LEVELS,
@@ -50,7 +49,7 @@ import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
 } from '../../../common/services/wz_agent_status';
-import { endpointSumary, itHygiene } from '../../utils/applications';
+import { endpointSummary } from '../../utils/applications';
 import { ShareAgent } from '../../factories/share-agent';
 import { getCore } from '../../kibana-services';
 import './endpoints-summary.scss';
@@ -59,7 +58,7 @@ import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboar
 export const EndpointsSummary = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
+  withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
@@ -295,7 +294,7 @@ export const EndpointsSummary = compose(
                               >
                                 <EuiLink
                                   href={getCore().application.getUrlForApp(
-                                    itHygiene.id,
+                                    endpointSummary.id,
                                     {
                                       path: `#/agents?tab=welcome&agent=${this.state.lastRegisteredAgent?.id}`,
                                     },
@@ -310,7 +309,7 @@ export const EndpointsSummary = compose(
                           )
                         }
                         titleSize='s'
-                        description='Last registered agent'
+                        description='Last enrolled agent'
                         titleColor='primary'
                       />
                     </EuiFlexItem>
