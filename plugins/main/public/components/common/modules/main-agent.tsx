@@ -25,10 +25,10 @@ import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AgentInfo } from '../../common/welcome/agents-info';
-import { getAngularModule } from '../../../kibana-services';
+import { getAngularModule, getCore } from '../../../kibana-services';
 import { compose } from 'redux';
 import { withGlobalBreadcrumb } from '../hocs';
-import { itHygiene } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -226,11 +226,22 @@ export class MainModuleAgent extends Component {
 export default compose(
   withGlobalBreadcrumb(({ agent, section }) => {
     if (section === 'welcome') {
-      return [{ text: itHygiene.title }, { text: agent.id }];
+      return [
+        {
+          text: endpointSummary.breadcrumbLabel,
+          href: getCore().application.getUrlForApp(endpointSummary.id, {
+            path: `#/agents-preview`,
+          }),
+        },
+        { text: agent.id },
+      ];
     } else {
       return [
         {
-          text: itHygiene.title,
+          text: endpointSummary.breadcrumbLabel,
+          href: getCore().application.getUrlForApp(endpointSummary.id, {
+            path: `#/agents-preview`,
+          }),
         },
         { agent: agent },
         {

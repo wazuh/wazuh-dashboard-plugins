@@ -100,7 +100,7 @@ describe(`[endpoint] GET ${routes.checkUpdates}`, () => {
 
     mockedGetUpdates.mockImplementation(() => mockResponse);
     const response = await supertest(innerServer.listener)
-      .get(`${routes.checkUpdates}?checkAvailableUpdates=true`)
+      .get(`${routes.checkUpdates}?query_api=true`)
       .send(mockResponse)
       .expect(200);
 

@@ -184,12 +184,14 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        component: withModuleNotForAgent(DashboardVuls),
+        component: DashboardVuls,
+        buttons: [ButtonModuleExploreAgent],
       },
       {
         id: 'inventory',
         name: 'Inventory',
-        component: withModuleNotForAgent(InventoryVuls),
+        component: InventoryVuls,
+        buttons: [ButtonModuleExploreAgent],
       },
       {
         ...renderDiscoverTab(ALERTS_INDEX_PATTERN, vulnerabilitiesColumns),
@@ -202,7 +204,7 @@ export const ModulesDefaults = {
       },
     ],
     buttons: ['settings'],
-    availableFor: ['manager'],
+    availableFor: ['manager', 'agent'],
   },
   mitre: {
     init: 'dashboard',
