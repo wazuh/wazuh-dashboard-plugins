@@ -392,13 +392,16 @@ resources:
   - method: GET
     path: /groups/{group_id}/files
 
-  # Get a file in group
-  - method: GET
-    path: /groups/{group_id}/files/{file_name}
+  # # Get a file in group
+  # - method: GET
+  #   path: /groups/{group_id}/files/{file_name}
 
   # Get a file in group
   - method: GET
-    path: /groups/{group_id}/files/{file_name}?raw=true
+    path: /groups/{group_id}/files/{file_name}
+    response:
+      statusCode: 200
+      scriptFile: agents/group_files.js
 
   # ===================================================== #
   #   LISTS
