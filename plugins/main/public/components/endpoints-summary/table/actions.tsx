@@ -2,7 +2,7 @@ import React from 'react';
 import { EuiToolTip } from '@elastic/eui';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { getCore } from '../../../kibana-services';
-import { itHygiene } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
 import { WzElementPermissions } from '../../common/permissions/element';
 
 export const agentsTableActions = (
@@ -30,7 +30,7 @@ export const agentsTableActions = (
     isPrimary: true,
     enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     onClick: agent =>
-      getCore().application.navigateToApp(itHygiene.id, {
+      getCore().application.navigateToApp(endpointSummary.id, {
         path: `#/agents?tab=welcome&agent=${agent.id}`,
       }),
   },
@@ -52,7 +52,7 @@ export const agentsTableActions = (
     icon: 'wrench',
     type: 'icon',
     onClick: agent =>
-      getCore().application.navigateToApp(itHygiene.id, {
+      getCore().application.navigateToApp(endpointSummary.id, {
         path: `#/agents?tab=configuration&agent=${agent.id}`,
       }),
     enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,

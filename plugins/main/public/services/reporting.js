@@ -17,7 +17,13 @@ import { GenericRequest } from '../react-services/generic-request';
 import { ErrorHandler } from '../react-services/error-handler';
 
 export class ReportingService {
-  constructor($rootScope, vis2png, rawVisualizations, visHandlers, errorHandler) {
+  constructor(
+    $rootScope,
+    vis2png,
+    rawVisualizations,
+    visHandlers,
+    errorHandler,
+  ) {
     this.$rootScope = $rootScope;
     this.vis2png = vis2png;
     this.rawVisualizations = rawVisualizations;
@@ -32,9 +38,10 @@ export class ReportingService {
   }
 
   removeAgentStatusVis(idArray) {
-    const monitoringEnabled = this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
+    const monitoringEnabled =
+      this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
     if (!monitoringEnabled) {
-      const visArray = idArray.filter((vis) => {
+      const visArray = idArray.filter(vis => {
         return vis !== 'Wazuh-App-Overview-General-Agents-status';
       });
       return visArray;
@@ -45,7 +52,9 @@ export class ReportingService {
   async startVis2Png(tab, isAgents = false, syscollectorFilters = null) {
     try {
       if (this.vis2png.isWorking()) {
-        ErrorHandler.handle('Report in progress', 'Reporting', { warning: true });
+        ErrorHandler.handle('Report in progress', 'Reporting', {
+          warning: true,
+        });
         return;
       }
       this.$rootScope.reportBusy = true;
@@ -54,13 +63,17 @@ export class ReportingService {
 
       this.vis2png.clear();
 
-      const rawVisualizations = this.rawVisualizations.getList().filter(this.removeTableVis);
+      const rawVisualizations = this.rawVisualizations
+        .getList()
+        .filter(this.removeTableVis);
 
       let idArray = [];
       if (tab === 'general') {
-        idArray = this.removeAgentStatusVis(rawVisualizations.map((item) => item.id));
+        idArray = this.removeAgentStatusVis(
+          rawVisualizations.map(item => item.id),
+        );
       } else {
-        idArray = rawVisualizations.map((item) => item.id);
+        idArray = rawVisualizations.map(item => item.id);
       }
 
       for (const item of idArray) {
@@ -68,11 +81,14 @@ export class ReportingService {
         this.vis2png.assignHTMLItem(item, tmpHTMLElement);
       }
 
-      const appliedFilters = await this.visHandlers.getAppliedFilters(syscollectorFilters);
+      const appliedFilters = await this.visHandlers.getAppliedFilters(
+        syscollectorFilters,
+      );
 
       const array = await this.vis2png.checkArray(idArray);
-      const name = `wazuh-${isAgents ? 'agents' : 'overview'}-${tab}-${(Date.now() / 1000) | 0
-        }.pdf`;
+      const name = `wazuh-${isAgents ? 'agents' : 'overview'}-${tab}-${
+        (Date.now() / 1000) | 0
+      }.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 
@@ -95,7 +111,10 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      ErrorHandler.info('Success. Go to Indexer/dashboard management > Reporting', 'Reporting');
+      ErrorHandler.info(
+        'Success. Go to Dashboard management > Reporting',
+        'Reporting',
+      );
 
       return;
     } catch (error) {
@@ -111,7 +130,10 @@ export class ReportingService {
       this.$rootScope.reportStatus = 'Generating PDF document...';
       this.$rootScope.$applyAsync();
 
-      const docType = type === 'agentConfig' ? `wazuh-agent-${obj.id}` : `wazuh-group-${obj.name}`;
+      const docType =
+        type === 'agentConfig'
+          ? `wazuh-agent-${obj.id}`
+          : `wazuh-group-${obj.name}`;
 
       const name = `${docType}-configuration-${(Date.now() / 1000) | 0}.pdf`;
       const browserTimezone = moment.tz.guess(true);
@@ -119,7 +141,9 @@ export class ReportingService {
       const data = {
         array: [],
         name,
-        filters: [type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }],
+        filters: [
+          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name },
+        ],
         time: '',
         searchBar: '',
         tables: [],
@@ -133,7 +157,10 @@ export class ReportingService {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      ErrorHandler.info('Success. Go to Indexer/dashboard management > Reporting', 'Reporting');
+      ErrorHandler.info(
+        'Success. Go to Dashboard management > Reporting',
+        'Reporting',
+      );
 
       return;
     } catch (error) {
