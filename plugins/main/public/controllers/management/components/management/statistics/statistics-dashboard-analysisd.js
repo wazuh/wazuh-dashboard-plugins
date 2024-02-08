@@ -17,6 +17,7 @@ import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { useBuildStatisticsVisualizations } from './hooks';
 
 export function WzStatisticsAnalysisd({
+  isClusterMode,
   clusterNodeSelected,
   refreshVisualizations,
 }) {
@@ -35,7 +36,11 @@ export function WzStatisticsAnalysisd({
                 <div style={{ height: '343px' }}>
                   <WzReduxProvider>
                     <KibanaVis
-                      visID={'Wazuh-App-Statistics-Analysisd-Events-By-Node'}
+                      visID={
+                        isClusterMode
+                          ? 'Wazuh-App-Statistics-Analysisd-Events-By-Node'
+                          : 'Wazuh-App-Statistics-Analysisd-Events'
+                      }
                       tab={'statistics'}
                     ></KibanaVis>
                   </WzReduxProvider>
@@ -47,7 +52,7 @@ export function WzStatisticsAnalysisd({
         <EuiFlexItem>
           <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
-              <EuiFlexItem>Events Dropped</EuiFlexItem>
+              <EuiFlexItem>Events dropped</EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -55,7 +60,9 @@ export function WzStatisticsAnalysisd({
                   <WzReduxProvider>
                     <KibanaVis
                       visID={
-                        'Wazuh-App-Statistics-Analysisd-Events-Dropped-By-Node'
+                        isClusterMode
+                          ? 'Wazuh-App-Statistics-Analysisd-Events-Dropped-By-Node'
+                          : 'Wazuh-App-Statistics-Analysisd-Events-Dropped'
                       }
                       tab={'statistics'}
                     ></KibanaVis>
@@ -93,7 +100,7 @@ export function WzStatisticsAnalysisd({
         <EuiFlexItem>
           <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
-              <EuiFlexItem>Events Decoded summary</EuiFlexItem>
+              <EuiFlexItem>Events decoded summary</EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>

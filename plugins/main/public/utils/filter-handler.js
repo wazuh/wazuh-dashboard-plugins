@@ -27,15 +27,16 @@ export class FilterHandler {
         value: null,
         params: {
           query: null,
-          type: 'phrase'
-        }
+          type: 'phrase',
+        },
       },
       query: {
-        match: null
+        match: null,
       },
       $state: {
-        store: 'appState'
-      }
+        store: 'appState',
+        isImplicit: true,
+      },
     };
   }
 
@@ -47,8 +48,8 @@ export class FilterHandler {
     result.query.match = {
       'agent.id': {
         query: agent,
-        type: 'phrase'
-      }
+        type: 'phrase',
+      },
     };
     return result;
   }
@@ -61,8 +62,8 @@ export class FilterHandler {
     result.query.match = {
       'cluster.node': {
         query: node,
-        type: 'phrase'
-      }
+        type: 'phrase',
+      },
     };
     return result;
   }
@@ -75,8 +76,8 @@ export class FilterHandler {
     result.query.match = {
       'rule.groups': {
         query: group,
-        type: 'phrase'
-      }
+        type: 'phrase',
+      },
     };
     return result;
   }
@@ -90,8 +91,8 @@ export class FilterHandler {
     result.query.match = {
       'rule.id': {
         query: ruleId,
-        type: 'phrase'
-      }
+        type: 'phrase',
+      },
     };
     return result;
   }
@@ -105,14 +106,14 @@ export class FilterHandler {
       ? {
           'cluster.name': {
             query: manager,
-            type: 'phrase'
-          }
+            type: 'phrase',
+          },
         }
       : {
           'manager.name': {
             query: manager,
-            type: 'phrase'
-          }
+            type: 'phrase',
+          },
         };
     return result;
   }
@@ -123,7 +124,7 @@ export class FilterHandler {
     result.meta.value = 'exists';
     result.meta.key = 'rule.pci_dss';
     result.exists = {
-      field: 'rule.pci_dss'
+      field: 'rule.pci_dss',
     };
     delete result.query;
     return result;
@@ -135,7 +136,7 @@ export class FilterHandler {
     result.meta.value = 'exists';
     result.meta.key = 'rule.gdpr';
     result.exists = {
-      field: 'rule.gdpr'
+      field: 'rule.gdpr',
     };
     delete result.query;
     return result;
@@ -147,7 +148,7 @@ export class FilterHandler {
     result.meta.value = 'exists';
     result.meta.key = 'rule.hipaa';
     result.exists = {
-      field: 'rule.hipaa'
+      field: 'rule.hipaa',
     };
     delete result.query;
     return result;
@@ -159,7 +160,7 @@ export class FilterHandler {
     result.meta.value = 'exists';
     result.meta.key = 'rule.nist_800_53';
     result.exists = {
-      field: 'rule.nist_800_53'
+      field: 'rule.nist_800_53',
     };
     delete result.query;
     return result;
@@ -171,7 +172,7 @@ export class FilterHandler {
     result.meta.value = 'exists';
     result.meta.key = 'rule.tsc';
     result.exists = {
-      field: 'rule.tsc'
+      field: 'rule.tsc',
     };
     delete result.query;
     return result;
@@ -183,7 +184,7 @@ export class FilterHandler {
     result.meta.value = 'exists';
     result.meta.key = 'rule.mitre.id';
     result.exists = {
-      field: 'rule.mitre.id'
+      field: 'rule.mitre.id',
     };
     delete result.query;
     return result;

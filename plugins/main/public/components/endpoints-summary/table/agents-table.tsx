@@ -28,7 +28,7 @@ import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
 import { getCore } from '../../../kibana-services';
-import { itHygiene, endpointSumary } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
 import { EditAgentGroupsModal } from './edit-groups-modal';
 import { useUserPermissionsRequirements } from '../../common/hooks/useUserPermissions';
 import { connect } from 'react-redux';
@@ -170,6 +170,7 @@ export const AgentsTable = compose(
       sortable: true,
       show: true,
       searchable: true,
+      width: '10%',
     },
     {
       field: 'dateAdd',
@@ -252,7 +253,7 @@ export const AgentsTable = compose(
       return {
         onClick: ev => {
           props.updateCurrentAgentData(item);
-          getCore().application.navigateToApp(itHygiene.id, {
+          getCore().application.navigateToApp(endpointSummary.id, {
             path: `#/agents?tab=welcome&agent=${item.id}`,
           });
         },
@@ -272,8 +273,8 @@ export const AgentsTable = compose(
                 buttonType='empty'
                 permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
                 iconType='plusInCircle'
-                href={getCore().application.getUrlForApp(endpointSumary.id, {
-                  path: `#${endpointSumary.redirectTo()}deploy`,
+                href={getCore().application.getUrlForApp(endpointSummary.id, {
+                  path: `#${endpointSummary.redirectTo()}deploy`,
                 })}
               >
                 Deploy new agent
