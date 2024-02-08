@@ -15,6 +15,9 @@ export function plugin(initializerContext: PluginInitializerContext) {
 }
 
 const configSchema = schema.object({
+  instance: schema.string({
+    defaultValue: WAZUH_CORE_CONFIGURATION_INSTANCE,
+  }),
   security: schema.object({
     administrator: schema.object({
       roles: schema.arrayOf(schema.string(), {
@@ -23,9 +26,6 @@ const configSchema = schema.object({
     }),
   }),
   configuration: schema.object({
-    instance: schema.string({
-      defaultValue: WAZUH_CORE_CONFIGURATION_INSTANCE,
-    }),
     encryption_password: schema.string({
       defaultValue: WAZUH_CORE_ENCRYPTION_PASSWORD,
     }),

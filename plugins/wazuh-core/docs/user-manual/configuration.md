@@ -6,7 +6,7 @@ file (`opensearch_dashboards.yml`):
 | setting                                        | type   | default value     | description                                                   |
 | ---------------------------------------------- | ------ | ----------------- | ------------------------------------------------------------- |
 | `wazuh_core.configuration.encryption_password` | string | `secretpassword!` | Define a password used to get some properties to encrypt data |
-| `wazuh_core.configuration.instance`            | string | `wazuh-dashboard` | Define the instance of the configuration                      |
+| `wazuh_core.instance`                          | string | `wazuh-dashboard` | Define the instance of the configuration                      |
 | `wazuh_core.security.administrator.roles`      | string | ['all_access']    | Define the privilegid roles for the administrator users       |
 
 > :warning: Changing the `wazuh_core.configuration.encryption_password` in an environment with API host entries
@@ -126,19 +126,19 @@ These endpoints communicates with the saved object decrypt and encrypt the data.
 
 If you want to run multiple instances of Wazuh dashboard with different configuration, it is
 possible through using a different configuration. This can be done through the
-`wazuh_core.configuration.instance` setting.
+`wazuh_core.instance` setting.
 
 For example, if you want to run 2 instances of Wazuh dashboard with different configurations,
-you can configure the `wazuh_core.configuration.instance` setting.
+you can configure the `wazuh_core.instance` setting.
 
 ```yml
 # opensearch_dashboards.yml of Wazuh dashboard instance 1
-wazuh_core.configuration.instance: wazuh-dashboard1
+wazuh_core.instance: wazuh-dashboard1
 ```
 
 ```yml
 # opensearch_dashboards.yml of Wazuh dashboard instance 1
-wazuh_core.configuration.instance: wazuh-dashboard2
+wazuh_core.instance: wazuh-dashboard2
 ```
 
 This cause

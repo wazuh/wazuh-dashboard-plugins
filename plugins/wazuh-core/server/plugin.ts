@@ -60,7 +60,7 @@ export class WazuhCorePlugin
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-saved-object'),
       core.savedObjects,
-      config.configuration,
+      { ...config.configuration, instance: config.instance },
     );
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
