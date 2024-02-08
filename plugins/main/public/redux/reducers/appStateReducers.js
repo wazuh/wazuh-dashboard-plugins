@@ -26,6 +26,10 @@ const initialState = {
   withUserLogged: false,
   allowedAgents: [],
   logtestToken: '',
+  userAccount: {
+    administrator: false,
+    administrator_error_message: '',
+  },
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -61,6 +65,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       currentPlatform: action.currentPlatform,
+    };
+  }
+
+  if (action.type === 'UPDATE_USER_ACCOUNT') {
+    return {
+      ...state,
+      userAccount: action.userAccount,
     };
   }
 

@@ -66,6 +66,17 @@ export const updateCurrentPlatform = currentPlatform => {
 };
 
 /**
+ * Updates currentPlatform in the appState store
+ * @param currentPlatform
+ */
+export const updateUserAccount = currentPlatform => {
+  return {
+    type: 'UPDATE_USER_ACCOUNT',
+    userAccount,
+  };
+};
+
+/**
  * Updates currentAgentData in the appState store
  * @param data
  */
