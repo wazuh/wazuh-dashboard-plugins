@@ -3,12 +3,7 @@ import classNames from 'classnames';
 import { escapeRegExp } from 'lodash';
 import { i18n } from '@osd/i18n';
 import { FieldIcon } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiToolTip,
-  EuiExpression,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 const COLLAPSE_LINE_LENGTH = 350;
 const DOT_PREFIX_RE = /(.).+?\./g;
@@ -140,15 +135,9 @@ const DocViewer = (props: tDocViewerProps) => {
                           />
                         </EuiFlexItem>
                         <EuiFlexItem style={{ maxWidth: '25vw' }}>
-                          <EuiToolTip
-                            position='top'
-                            content={displayName}
-                            delay='long'
-                          >
-                            <span style={{ wordBreak: 'break-all' }}>
-                              <b>{displayName}</b>
-                            </span>
-                          </EuiToolTip>
+                          <span style={{ wordBreak: 'break-all' }}>
+                            <b>{displayName}</b>
+                          </span>
                         </EuiFlexItem>
                       </EuiFlexGroup>
                     </td>
