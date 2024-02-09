@@ -23,6 +23,7 @@ import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent, withModuleTabLoader } from '../hocs';
+import React from 'react';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -152,13 +153,29 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardVuls,
-        buttons: [ButtonModuleExploreAgent],
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         id: 'inventory',
         name: 'Inventory',
         component: InventoryVuls,
-        buttons: [ButtonModuleExploreAgent],
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       EventsTab,
     ],

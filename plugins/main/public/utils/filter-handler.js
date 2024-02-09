@@ -96,7 +96,12 @@ export class FilterHandler {
     };
     return result;
   }
-
+  /**
+   * This function takes two parameters, the isCluster parameter is a boolean thats defines if it uses cluster.name key or manager.name
+   * @param {*} manager
+   * @param {*} isCluster
+   * @returns
+   */
   managerQuery(manager, isCluster) {
     const result = this.base();
     result.meta.key = isCluster ? 'cluster.name' : 'manager.name';
