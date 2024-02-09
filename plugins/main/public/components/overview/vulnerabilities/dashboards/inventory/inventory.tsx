@@ -37,6 +37,11 @@ import { formatNumWithCommas } from '../../../../../kibana-integrations/discover
 import { useAppConfig } from '../../../../common/hooks';
 import { WAZUH_INDEX_TYPE_VULNERABILITIES } from '../../../../../../common/constants';
 import useCheckIndexFields from '../../common/hooks/useCheckIndexFields';
+import {
+  vulnerabilityIndexFiltersAdapter,
+  onUpdateAdapter,
+  restorePrevIndexFiltersAdapter,
+} from '../../common/vulnerability_detector_adapters';
 
 const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
@@ -44,6 +49,9 @@ const InventoryVulsComponent = () => {
     appConfig.data['vulnerabilities.pattern'];
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
+    onMount: vulnerabilityIndexFiltersAdapter,
+    onUpdate: onUpdateAdapter,
+    onUnMount: restorePrevIndexFiltersAdapter,
   });
   const { isLoading, filters, query, indexPatterns } = searchBarProps;
   const SearchBar = getPlugins().data.ui.SearchBar;

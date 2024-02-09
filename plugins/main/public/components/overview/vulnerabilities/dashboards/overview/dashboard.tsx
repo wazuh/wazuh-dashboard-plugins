@@ -13,6 +13,11 @@ import { DiscoverNoResults } from '../../common/components/no_results';
 import { WAZUH_INDEX_TYPE_VULNERABILITIES } from '../../../../../../common/constants';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
 import useCheckIndexFields from '../../common/hooks/useCheckIndexFields';
+import {
+  vulnerabilityIndexFiltersAdapter,
+  restorePrevIndexFiltersAdapter,
+  onUpdateAdapter,
+} from '../../common/vulnerability_detector_adapters';
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -29,6 +34,9 @@ const DashboardVulsComponent: React.FC = () => {
     appConfig.data['vulnerabilities.pattern'];
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
+    onMount: vulnerabilityIndexFiltersAdapter,
+    onUpdate: onUpdateAdapter,
+    onUnMount: restorePrevIndexFiltersAdapter,
   });
   const {
     isLoading: isLoadingSearchbar,
