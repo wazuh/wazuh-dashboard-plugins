@@ -82,7 +82,6 @@ const useSearchBarConfiguration = (
           previousFilters,
           prevStoragePattern ?? WAZUH_ALERTS_PATTERN,
         );
-        sessionStorage.removeItem(SESSION_STORAGE_FILTERS_NAME);
       }
     };
   }, []);
@@ -100,7 +99,7 @@ const useSearchBarConfiguration = (
   ): Filter | undefined => {
     const pinnedAgentByFilterManager = filters.find(
       (filter: Filter) =>
-        filter.meta.key === 'agent.id' && !!filter?.$state?.isImplicit,
+        filter?.meta?.key === 'agent.id' && !!filter?.$state?.isImplicit,
     );
     const url = window.location.href;
     const regex = new RegExp('agentId=' + '[^&]*');
@@ -152,21 +151,36 @@ const useSearchBarConfiguration = (
   const vulnerabilityIndexFiltersAdapter = async () => {
     const filterHandler = new FilterHandler(AppState.getCurrentPattern());
     const initialFilters: Filter[] = [];
+    const storagePreviousFilters = sessionStorage.getItem(
+      SESSION_STORAGE_FILTERS_NAME,
+    );
+    if (storagePreviousFilters) {
+      const previousFilters = JSON.parse(storagePreviousFilters);
+      const previousFiltersWithoutImplicitFilters = previousFilters.filter(
+        (filter: Filter) => !filter?.$state?.isImplicit,
+      );
+      previousFiltersWithoutImplicitFilters.forEach((filter: Filter) => {
+        initialFilters.push(filter);
+      });
+    }
+
     /**
       Add vulnerability module implicit filters
     */
     const isCluster = AppState.getClusterInfo().status == 'enabled';
-    initialFilters.push(
-      filterHandler.managerQuery(
-        isCluster
-          ? AppState.getClusterInfo().cluster
-          : AppState.getClusterInfo().manager,
-        true,
-        VULNERABILITY_CLUSTER_KEY, // Vulnerability module does not have manager.name in the index pattern template, only fixed wazuh.cluster.name
-      ),
+    const managerFilter = filterHandler.managerQuery(
+      isCluster
+        ? AppState.getClusterInfo().cluster
+        : AppState.getClusterInfo().manager,
+      true,
+      VULNERABILITY_CLUSTER_KEY, // Vulnerability module does not have manager.name in the index pattern template, only fixed wazuh.cluster.name
     );
+    initialFilters.push(managerFilter);
     // rule.groups is added so that the events tab can use it
-    initialFilters.push(filterHandler.ruleGroupQuery('vulnerability-detector'));
+    const ruleGroupsFilter = filterHandler.ruleGroupQuery(
+      'vulnerability-detector',
+    );
+    initialFilters.push(ruleGroupsFilter);
     const vulnerabilitiesFilters = initialFilters.map((filter: Filter) => {
       return {
         ...filter,
@@ -271,17 +285,6 @@ const useSearchBarConfiguration = (
   };
 
   /**
-   * Return filters from filters manager.
-   * Additionally solve the known issue with the auto loaded agent.id filters from the searchbar
-   * and filters those filters that are not related to the default index pattern
-   * @returns
-   */
-  const getFilters = () => {
-    /*  vulnerabilityIndexFiltersAdapter(); */
-    return filters;
-  };
-
-  /**
    * Return cleaned filters.
    * Clean the known issue with the auto loaded agent.id filters from the searchbar
    * and filters those filters that are not related to the default index pattern.
@@ -307,7 +310,7 @@ const useSearchBarConfiguration = (
   const searchBarProps: Partial<SearchBarProps> = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
-    filters: getFilters(),
+    filters: filters,
     query,
     timeHistory,
     dateRangeFrom: timeFilter.from,
@@ -329,19 +332,31 @@ const useSearchBarConfiguration = (
       );
       if (storagePreviousFilters) {
         const previousFilters = JSON.parse(storagePreviousFilters);
-        const cleanedPreviousFilters = cleanFilters(
-          previousFilters,
+        const previousImplicitFilters = previousFilters.filter(
+          (filter: Filter) => filter?.$state?.isImplicit,
+        );
+        const cleanedPreviousImplicitFilters = cleanFilters(
+          previousImplicitFilters,
           prevStoragePattern ?? WAZUH_ALERTS_PATTERN,
+        );
+        /* Normal filters added to storagePreviousFilters are added to keep them between dashboard and inventory tab */
+        const newFilters = filters.filter(
+          (filter: Filter) => !filter?.$state?.isImplicit,
+        );
+
+        sessionStorage.setItem(
+          SESSION_STORAGE_FILTERS_NAME,
+          JSON.stringify([...previousImplicitFilters, ...newFilters]),
         );
 
         filterManager.setFilters([
-          ...cleanedPreviousFilters,
+          ...cleanedPreviousImplicitFilters,
           ...cleanedFilters,
         ]);
 
         props?.onFiltersUpdated &&
           props?.onFiltersUpdated([
-            ...cleanedPreviousFilters,
+            ...cleanedPreviousImplicitFilters,
             ...cleanedFilters,
           ]);
       } else {
