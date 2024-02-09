@@ -19,6 +19,7 @@ import {
 } from '../../../common/hooks';
 import {
   AUTHORIZED_AGENTS,
+  VULNERABILITY_CLUSTER_KEY,
   WAZUH_ALERTS_PATTERN,
 } from '../../../../../common/constants';
 import { AppState } from '../../../../react-services/app-state';
@@ -160,7 +161,8 @@ const useSearchBarConfiguration = (
         isCluster
           ? AppState.getClusterInfo().cluster
           : AppState.getClusterInfo().manager,
-        true, // Vulnerability module does not have manager.name in the index pattern template, only cluster.name
+        true,
+        VULNERABILITY_CLUSTER_KEY, // Vulnerability module does not have manager.name in the index pattern template, only fixed wazuh.cluster.name
       ),
     );
     // rule.groups is added so that the events tab can use it
@@ -205,10 +207,22 @@ const useSearchBarConfiguration = (
     previousFilters: Filter[],
     toIndexPattern: string,
   ) => {
+    const filterHandler = new FilterHandler(AppState.getCurrentPattern());
     const cleanedFilters = cleanFilters(
       previousFilters,
       props?.defaultIndexPatternID,
+    ).filter(
+      (filter: Filter) => filter?.meta?.key !== VULNERABILITY_CLUSTER_KEY,
     );
+    const isCluster = AppState.getClusterInfo().status == 'enabled';
+    /* Restore original manager implicit filter */
+    const managerFilter = filterHandler.managerQuery(
+      isCluster
+        ? AppState.getClusterInfo().cluster
+        : AppState.getClusterInfo().manager,
+      true,
+    );
+    cleanedFilters.push(managerFilter);
     const implicitPinnedAgent = getImplicitPinnedAgent(
       previousFilters,
       toIndexPattern,
@@ -299,6 +313,9 @@ const useSearchBarConfiguration = (
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (filters: Filter[]) => {
+      const prevStoragePattern = sessionStorage.getItem(
+        SESSION_STORAGE_PREV_FILTER_NAME,
+      );
       const storagePreviousFilters = sessionStorage.getItem(
         SESSION_STORAGE_FILTERS_NAME,
       );
@@ -306,12 +323,15 @@ const useSearchBarConfiguration = (
        * If there are persisted filters, it is necessary to add them when
        * updating the filters in the filterManager
        */
-      const cleanedFilters = cleanFilters(filters, 'wazuh-alerts-*');
+      const cleanedFilters = cleanFilters(
+        filters,
+        prevStoragePattern ?? WAZUH_ALERTS_PATTERN,
+      );
       if (storagePreviousFilters) {
         const previousFilters = JSON.parse(storagePreviousFilters);
         const cleanedPreviousFilters = cleanFilters(
           previousFilters,
-          'wazuh-alerts-*',
+          prevStoragePattern ?? WAZUH_ALERTS_PATTERN,
         );
 
         filterManager.setFilters([

@@ -1,6 +1,7 @@
 import { getAngularModule, getDataPlugin } from '../../../kibana-services';
 import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
+import { VULNERABILITY_CLUSTER_KEY } from '../../../../common/constants';
 
 export class ModulesHelper {
   static async getDiscoverScope() {
@@ -155,6 +156,16 @@ If this case happens, the implicit filters are regenerated and the function is c
           ? AppState.getClusterInfo().cluster
           : AppState.getClusterInfo().manager,
         isCluster,
+      ),
+    );
+    /* Add vulnerability cluster implicit filter*/
+    filters.push(
+      filterHandler.managerQuery(
+        isCluster
+          ? AppState.getClusterInfo().cluster
+          : AppState.getClusterInfo().manager,
+        isCluster,
+        VULNERABILITY_CLUSTER_KEY,
       ),
     );
     filters.push(filterHandler.pciQuery());
