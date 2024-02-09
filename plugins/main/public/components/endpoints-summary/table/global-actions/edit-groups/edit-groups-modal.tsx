@@ -41,8 +41,16 @@ enum RESULT_TYPE {
 type GroupResult = {
   group: string;
   result: RESULT_TYPE;
-  message?: string;
-  agentIds?: string;
+  successAgents?: string[];
+  errorMessage?: string;
+  errorAgents?: {
+    error: {
+      code?: number;
+      message: string;
+      remediation?: string;
+    };
+    id: string[];
+  }[];
 };
 
 interface EditAgentsGroupsModalProps {
@@ -162,42 +170,60 @@ export const EditAgentsGroupsModal = compose(
 
       setSaveChangesStatus('loading');
 
-      const agentsIds = getArrayByProperty(agents, 'id');
+      const agentIds = getArrayByProperty(agents, 'id');
 
       const groups = getArrayByProperty(selectedGroups, 'label');
 
       const promises = groups.map(group => {
         const promise =
           addOrRemove === 'add'
-            ? addAgentsToGroupService(agentsIds, group)
-            : removeAgentsFromGroupService(agentsIds, group);
+            ? addAgentsToGroupService(agentIds, group)
+            : removeAgentsFromGroupService(agentIds, group);
         return promise
           .then(result => {
+            const { data, error, message } = result.data;
+            const { affected_items, failed_items } = data;
             setGroupResults(results => {
               const newGroupResult = {
                 group,
-                result: RESULT_TYPE.SUCCESS,
-                agents: result.data.data.affected_items.map(
-                  item => finalAgents.find(agent => agent.id === item) as Agent,
-                ),
+                result: error ? RESULT_TYPE.ERROR : RESULT_TYPE.SUCCESS,
+                successAgents: affected_items,
+                errorAgents: failed_items,
+                errorMessage: message,
               };
               return [...results, newGroupResult];
             });
           })
-          .catch((error: { message: string }) => {
+          .catch(error => {
             setGroupResults(results => {
-              const match = error.message.match(/Affected ids: (.+)$/);
-              console.log(error.message, match);
-              const errorAgentIds = match ? match[1] : '';
-
-              const newResult = {
+              const newResult: GroupResult = {
                 group,
                 result: RESULT_TYPE.ERROR,
-                message: error.message,
-                agentIds: errorAgentIds,
+                errorMessage: error.message,
+                errorAgents: [
+                  {
+                    error: { message: error.message },
+                    id: agentIds,
+                  },
+                ],
               };
               return [...results, newResult];
             });
+            const options = {
+              context: `EditAgentsGroupsModal.handleOnSave`,
+              level: UI_LOGGER_LEVELS.ERROR,
+              severity: UI_ERROR_SEVERITIES.BUSINESS,
+              store: true,
+              error: {
+                error,
+                message: error.message || error,
+                title:
+                  addOrRemove === 'add'
+                    ? `Could not add agents to group`
+                    : `Could not remove agents from group`,
+              },
+            };
+            getErrorOrchestrator().handleError(options);
           });
       });
 
@@ -325,9 +351,9 @@ export const EditAgentsGroupsModal = compose(
                       <EuiCallOut
                         color='danger'
                         iconType='alert'
-                        title={`Group "${groupResult.group}": ${groupResult.message}`}
+                        title={`Group "${groupResult.group}": ${groupResult.errorMessage}`}
                       >
-                        <EuiText>{`Agents: ${groupResult.agentIds}`}</EuiText>
+                        {/* <EuiText>{`Agents: ${groupResult.agentIds}`}</EuiText> */}
                       </EuiCallOut>
                     ) : (
                       <EuiText>{groupResult.group}</EuiText>
