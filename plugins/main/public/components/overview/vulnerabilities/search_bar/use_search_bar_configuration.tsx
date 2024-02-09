@@ -148,7 +148,7 @@ const useSearchBarConfiguration = (
    * Both when the component is mounted and unmounted, the index pattern is
    * updated so that the pin action adds the agent with the correct index pattern.
    */
-  const vulnerabilityIndexFiltersAdapter = async () => {
+  const vulnerabilityIndexFiltersAdapter = () => {
     const filterHandler = new FilterHandler(AppState.getCurrentPattern());
     const initialFilters: Filter[] = [];
     const storagePreviousFilters = sessionStorage.getItem(
@@ -209,11 +209,9 @@ const useSearchBarConfiguration = (
           return x.meta.key !== 'agent.id';
         });
       filtersWithoutNormalAgents.push(implicitPinnedAgent);
-      const discoverScope = await ModulesHelper.getDiscoverScope();
-      discoverScope.loadFilters(filtersWithoutNormalAgents, 'vuls');
+      filterManager.setFilters(filtersWithoutNormalAgents);
     } else {
-      const discoverScope = await ModulesHelper.getDiscoverScope();
-      discoverScope.loadFilters(vulnerabilitiesFiltersWithoutRuleGroup, 'vuls');
+      filterManager.setFilters(vulnerabilitiesFiltersWithoutRuleGroup);
     }
   };
 
@@ -259,7 +257,7 @@ const useSearchBarConfiguration = (
     setIsLoading(true);
     const indexPattern = await getIndexPattern(props?.defaultIndexPatternID);
     setIndexPatternSelected(indexPattern);
-    await vulnerabilityIndexFiltersAdapter();
+    vulnerabilityIndexFiltersAdapter();
     setIsLoading(false);
   };
 
