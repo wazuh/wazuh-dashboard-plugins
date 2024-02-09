@@ -28,6 +28,7 @@ import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
 import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
+import { office365Columns } from '../../overview/office-panel/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 
@@ -155,7 +156,15 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: withModuleNotForAgent(OfficePanel),
       },
-      { ...EventsTab, component: withModuleNotForAgent(Events) },
+      {
+        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
+        component: withModuleNotForAgent(() => (
+          <WazuhDiscover
+            indexPatternName={DEFAULT_INDEX_PATTERN}
+            tableColumns={office365Columns}
+          />
+        )),
+      },
     ],
     availableFor: ['manager'],
   },
