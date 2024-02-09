@@ -28,15 +28,19 @@ export class DashboardSecurity {
   }
   async start() {}
   async stop() {}
-  async isAdministrator() {
+  async fetchAccount() {
     if (
       this.securityPlatform ===
       WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY
     ) {
-      const response = await this.http.get('/utils/account');
-
-      if (!response?.administrator) {
-        throw new Error(response.administrator_message);
+      try {
+        this.logger.debug('Fetching the account');
+        const response = await this.http.get('/utils/account');
+        this.logger.debug(`Fetched account: ${JSON.stringify(response)}`);
+        return response;
+      } catch (error) {
+        this.logger.error(error.message);
+        throw error;
       }
     }
   }

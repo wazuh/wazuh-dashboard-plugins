@@ -18,22 +18,20 @@ import {
 
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import {
-  WAZUH_ROLE_ADMINISTRATOR_ID,
   WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
 } from '../../common/constants';
-import jwtDecode from 'jwt-decode';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
-import { getCookieValueByName } from '../lib/cookie';
 import {
   WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS,
   WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
 } from '../../common/constants';
 import { WAZUH_INDEXER_NAME } from '../../common/constants';
+import { routeDecoratorProtectedAdministrator } from './decorators';
 
 export class WazuhElasticCtrl {
   constructor() {}
@@ -669,119 +667,91 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {index: string, alerts: [...], count: number} or ErrorResponse
    */
-  async createSampleAlerts(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest<{ category: string }>,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    const sampleAlertsIndex = await this.buildSampleIndexByCategory(
-      context,
-      request.params.category,
-    );
+  createSampleAlerts = routeDecoratorProtectedAdministrator(
+    async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest<{ category: string }>,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
+      const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+        context,
+        request.params.category,
+      );
 
-    try {
-      // Check if user has administrator role in token
-      const token = getCookieValueByName(request.headers.cookie, 'wz-token');
-      if (!token) {
-        return ErrorResponse('No token provided', 401, 401, response);
-      }
-      const decodedToken = jwtDecode(token);
-      if (!decodedToken) {
-        return ErrorResponse('No permissions in token', 401, 401, response);
-      }
-      if (
-        !decodedToken.rbac_roles ||
-        !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)
-      ) {
-        return ErrorResponse('No administrator role', 401, 401, response);
-      }
-      // Check the provided token is valid
-      const apiHostID = getCookieValueByName(request.headers.cookie, 'wz-api');
-      if (!apiHostID) {
-        return ErrorResponse('No API id provided', 401, 401, response);
-      }
-      const responseTokenIsWorking =
-        await context.wazuh.api.client.asCurrentUser.request(
-          'GET',
-          `//`,
-          {},
-          { apiHostID },
-        );
-      if (responseTokenIsWorking.status !== 200) {
-        return ErrorResponse('Token is not valid', 500, 500, response);
-      }
-
-      const bulkPrefix = JSON.stringify({
-        index: {
-          _index: sampleAlertsIndex,
-        },
-      });
-      const alertGenerateParams = (request.body && request.body.params) || {};
-
-      const sampleAlerts = WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
-        request.params.category
-      ]
-        .map(typeAlert =>
-          generateAlerts(
-            { ...typeAlert, ...alertGenerateParams },
-            request.body.alerts ||
-              typeAlert.alerts ||
-              WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
-          ),
-        )
-        .flat();
-      const bulk = sampleAlerts
-        .map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}\n`)
-        .join('');
-
-      // Index alerts
-
-      // Check if wazuh sample alerts index exists
-      const existsSampleIndex =
-        await context.core.opensearch.client.asCurrentUser.indices.exists({
-          index: sampleAlertsIndex,
-        });
-      if (!existsSampleIndex.body) {
-        // Create wazuh sample alerts index
-
-        const configuration = {
-          settings: {
-            index: {
-              number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
-              number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
-            },
+      try {
+        const bulkPrefix = JSON.stringify({
+          index: {
+            _index: sampleAlertsIndex,
           },
-        };
-
-        await context.core.opensearch.client.asCurrentUser.indices.create({
-          index: sampleAlertsIndex,
-          body: configuration,
         });
-        context.wazuh.logger.info(`Index ${sampleAlertsIndex} created`);
+        const alertGenerateParams = (request.body && request.body.params) || {};
+
+        const sampleAlerts = WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
+          request.params.category
+        ]
+          .map(typeAlert =>
+            generateAlerts(
+              { ...typeAlert, ...alertGenerateParams },
+              request.body.alerts ||
+                typeAlert.alerts ||
+                WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
+            ),
+          )
+          .flat();
+        const bulk = sampleAlerts
+          .map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}\n`)
+          .join('');
+
+        // Index alerts
+
+        // Check if wazuh sample alerts index exists
+        const existsSampleIndex =
+          await context.core.opensearch.client.asCurrentUser.indices.exists({
+            index: sampleAlertsIndex,
+          });
+        if (!existsSampleIndex.body) {
+          // Create wazuh sample alerts index
+
+          const configuration = {
+            settings: {
+              index: {
+                number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
+                number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
+              },
+            },
+          };
+
+          await context.core.opensearch.client.asCurrentUser.indices.create({
+            index: sampleAlertsIndex,
+            body: configuration,
+          });
+          context.wazuh.logger.info(`Index ${sampleAlertsIndex} created`);
+        }
+
+        await context.core.opensearch.client.asCurrentUser.bulk({
+          index: sampleAlertsIndex,
+          body: bulk,
+        });
+        context.wazuh.logger.info(
+          `Added sample alerts to ${sampleAlertsIndex} index`,
+        );
+        return response.ok({
+          body: { index: sampleAlertsIndex, alertCount: sampleAlerts.length },
+        });
+      } catch (error) {
+        context.wazuh.logger.error(
+          `Error adding sample alerts to ${sampleAlertsIndex} index: ${
+            error.message || error
+          }`,
+        );
+
+        const [statusCode, errorMessage] = this.getErrorDetails(error);
+
+        return ErrorResponse(errorMessage || error, 1000, statusCode, response);
       }
-
-      await context.core.opensearch.client.asCurrentUser.bulk({
-        index: sampleAlertsIndex,
-        body: bulk,
-      });
-      context.wazuh.logger.info(
-        `Added sample alerts to ${sampleAlertsIndex} index`,
-      );
-      return response.ok({
-        body: { index: sampleAlertsIndex, alertCount: sampleAlerts.length },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(
-        `Error adding sample alerts to ${sampleAlertsIndex} index: ${
-          error.message || error
-        }`,
-      );
-
-      const [statusCode, errorMessage] = this.getErrorDetails(error);
-
-      return ErrorResponse(errorMessage || error, 1000, statusCode, response);
-    }
-  }
+    },
+    1000,
+  );
   /**
    * This deletes sample alerts
    * @param {*} context
@@ -789,83 +759,54 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {result: "deleted", index: string} or ErrorResponse
    */
-  async deleteSampleAlerts(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest<{ category: string }>,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    // Delete Wazuh sample alert index
-
-    const sampleAlertsIndex = await this.buildSampleIndexByCategory(
-      context,
-      request.params.category,
-    );
-
-    try {
-      // Check if user has administrator role in token
-      const token = getCookieValueByName(request.headers.cookie, 'wz-token');
-      if (!token) {
-        return ErrorResponse('No token provided', 401, 401, response);
-      }
-      const decodedToken = jwtDecode(token);
-      if (!decodedToken) {
-        return ErrorResponse('No permissions in token', 401, 401, response);
-      }
-      if (
-        !decodedToken.rbac_roles ||
-        !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)
-      ) {
-        return ErrorResponse('No administrator role', 401, 401, response);
-      }
-      // Check the provided token is valid
-      const apiHostID = getCookieValueByName(request.headers.cookie, 'wz-api');
-      if (!apiHostID) {
-        return ErrorResponse('No API id provided', 401, 401, response);
-      }
-      const responseTokenIsWorking =
-        await context.wazuh.api.client.asCurrentUser.request(
-          'GET',
-          `//`,
-          {},
-          { apiHostID },
-        );
-      if (responseTokenIsWorking.status !== 200) {
-        return ErrorResponse('Token is not valid', 500, 500, response);
-      }
-
-      // Check if Wazuh sample alerts index exists
-      const existsSampleIndex =
-        await context.core.opensearch.client.asCurrentUser.indices.exists({
-          index: sampleAlertsIndex,
-        });
-      if (existsSampleIndex.body) {
-        // Delete Wazuh sample alerts index
-        await context.core.opensearch.client.asCurrentUser.indices.delete({
-          index: sampleAlertsIndex,
-        });
-        context.wazuh.logger.info(`Deleted ${sampleAlertsIndex} index`);
-        return response.ok({
-          body: { result: 'deleted', index: sampleAlertsIndex },
-        });
-      } else {
-        return ErrorResponse(
-          `${sampleAlertsIndex} index doesn't exist`,
-          1000,
-          500,
-          response,
-        );
-      }
-    } catch (error) {
-      context.wazuh.logger.error(
-        `Error deleting sample alerts of ${sampleAlertsIndex} index: ${
-          error.message || error
-        }`,
+  deleteSampleAlerts = routeDecoratorProtectedAdministrator(
+    async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest<{ category: string }>,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
+      // Delete Wazuh sample alert index
+      const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+        context,
+        request.params.category,
       );
-      const [statusCode, errorMessage] = this.getErrorDetails(error);
 
-      return ErrorResponse(errorMessage || error, 1000, statusCode, response);
-    }
-  }
+      try {
+        // Check if Wazuh sample alerts index exists
+        const existsSampleIndex =
+          await context.core.opensearch.client.asCurrentUser.indices.exists({
+            index: sampleAlertsIndex,
+          });
+        if (existsSampleIndex.body) {
+          // Delete Wazuh sample alerts index
+          await context.core.opensearch.client.asCurrentUser.indices.delete({
+            index: sampleAlertsIndex,
+          });
+          context.wazuh.logger.info(`Deleted ${sampleAlertsIndex} index`);
+          return response.ok({
+            body: { result: 'deleted', index: sampleAlertsIndex },
+          });
+        } else {
+          return ErrorResponse(
+            `${sampleAlertsIndex} index doesn't exist`,
+            1000,
+            500,
+            response,
+          );
+        }
+      } catch (error) {
+        context.wazuh.logger.error(
+          `Error deleting sample alerts of ${sampleAlertsIndex} index: ${
+            error.message || error
+          }`,
+        );
+        const [statusCode, errorMessage] = this.getErrorDetails(error);
+
+        return ErrorResponse(errorMessage || error, 1000, statusCode, response);
+      }
+    },
+    1000,
+  );
 
   async alerts(
     context: RequestHandlerContext,

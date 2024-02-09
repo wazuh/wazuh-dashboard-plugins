@@ -58,10 +58,6 @@ export const WAZUH_FIM_PATTERN = 'wazuh-states-fim';
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
-// Permissions
-export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
-export const WAZUH_ROLE_ADMINISTRATOR_NAME = 'administrator';
-
 // Sample data
 export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-4.x-';
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;

@@ -17,7 +17,7 @@ export * from './use-query';
 export * from './use-time-filter';
 export * from './useWindowSize';
 export * from './useUserPermissions';
-export * from './useUserRoles';
+export * from './use-user-is-admin';
 export * from './useResfreshAngularDiscover';
 export * from './useAllowedAgents';
 export * from './useApiRequest';

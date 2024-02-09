@@ -43,7 +43,10 @@ import './factories';
 
 // Imports to update currentPlatform when app starts
 import store from './redux/store';
-import { updateCurrentPlatform } from './redux/actions/appStateActions';
+import {
+  updateCurrentPlatform,
+  updateUserAccount,
+} from './redux/actions/appStateActions';
 import { WzAuthentication, loadAppConfig } from './react-services';
 
 import {
@@ -81,6 +84,14 @@ app.run([
       .dashboardSecurity.fetchCurrentPlatform()
       .then(item => {
         store.dispatch(updateCurrentPlatform(item));
+      })
+      .catch(() => {});
+
+    // Set user account data in Redux when app starts.
+    getWazuhCorePlugin()
+      .dashboardSecurity.fetchAccount()
+      .then(response => {
+        store.dispatch(updateUserAccount(response));
       })
       .catch(() => {});
 

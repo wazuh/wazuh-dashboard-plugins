@@ -324,7 +324,7 @@ export class WazuhUtilsCtrl {
       return response.ok({
         body: {
           administrator: false,
-          administrator_message: error.message,
+          administrator_error_message: error.message,
         },
       });
     }

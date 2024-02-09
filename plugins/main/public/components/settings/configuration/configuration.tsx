@@ -32,7 +32,6 @@ import {
 import {
   EpluginSettingType,
   UI_LOGGER_LEVELS,
-  WAZUH_ROLE_ADMINISTRATOR_NAME,
 } from '../../../../common/constants';
 import { compose } from 'redux';
 import { Category } from './components/categories/components';
@@ -437,5 +436,6 @@ const WzConfigurationSettingsProvider = props => {
 export const WzConfigurationSettings = compose(
   withErrorBoundary,
   withReduxProvider,
-  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME]),
+  // TODO: add fetching of account data to update the administrator property
+  withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
 )(WzConfigurationSettingsProvider);

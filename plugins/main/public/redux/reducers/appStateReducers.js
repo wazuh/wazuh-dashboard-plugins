@@ -21,7 +21,6 @@ const initialState = {
   ),
   showExploreAgentModalGlobal: false,
   userPermissions: false,
-  userRoles: [],
   toastNotification: false,
   withUserLogged: false,
   allowedAgents: [],
@@ -90,13 +89,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       showExploreAgentModalGlobal: action.showExploreAgentModalGlobal,
-    };
-  }
-
-  if (action.type === 'UPDATE_USER_ROLES') {
-    return {
-      ...state,
-      userRoles: action.userRoles,
     };
   }
 

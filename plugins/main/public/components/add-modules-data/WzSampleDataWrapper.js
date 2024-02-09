@@ -29,7 +29,6 @@ import {
   withReduxProvider,
 } from '../../components/common/hocs';
 import { compose } from 'redux';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 
 export class WzSampleDataProvider extends Component {
   constructor(props) {
@@ -68,5 +67,6 @@ export class WzSampleDataProvider extends Component {
 export const WzSampleDataWrapper = compose(
   withErrorBoundary,
   withReduxProvider,
-  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME]),
+  // TODO: add fetching of account data to update the administrator property
+  withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
 )(WzSampleDataProvider);
