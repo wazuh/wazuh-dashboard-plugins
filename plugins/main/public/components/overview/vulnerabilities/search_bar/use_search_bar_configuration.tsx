@@ -220,7 +220,7 @@ const useSearchBarConfiguration = (
       isCluster
         ? AppState.getClusterInfo().cluster
         : AppState.getClusterInfo().manager,
-      true,
+      isCluster,
     );
     cleanedFilters.push(managerFilter);
     const implicitPinnedAgent = getImplicitPinnedAgent(
