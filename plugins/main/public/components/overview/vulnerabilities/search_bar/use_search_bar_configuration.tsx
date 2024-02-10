@@ -33,7 +33,7 @@ type tUseSearchBarCustomInputs = {
   onUpdate?: (filters: Filter[], filterManager: FilterManager) => void;
   onUnMount?: (
     previousFilters: Filter[],
-    toIndexPattern: string,
+    toIndexPattern: string | null,
     filterManager: FilterManager,
     defaultIndexPatternID: string,
   ) => void;
@@ -57,7 +57,7 @@ const useSearchBarConfiguration = (
   const SESSION_STORAGE_FILTERS_NAME = 'wazuh_persistent_searchbar_filters';
   const SESSION_STORAGE_PREV_FILTER_NAME = 'wazuh_persistent_current_filter';
   const filterManager = useFilterManager().filterManager as FilterManager;
-  const filters = filterManager.getFilters();
+  const filters = props?.filters ? props.filters : filterManager.getFilters();
   const [query, setQuery] = props?.query
     ? useState(props?.query)
     : useQueryManager();
@@ -101,6 +101,8 @@ const useSearchBarConfiguration = (
     setIndexPatternSelected(indexPattern);
     if (props?.onMount) {
       props.onMount(filterManager, props?.defaultIndexPatternID);
+    } else {
+      filterManager.setFilters(filters);
     }
     setIsLoading(false);
   };
