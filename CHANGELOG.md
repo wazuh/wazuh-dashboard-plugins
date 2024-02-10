@@ -16,7 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a redirection button to Endpoint Summary from IT Hygiene application [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 - Added information icon with tooltip on the most active agent in the endpoint summary view [#6364](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6364)
 - Added a dash with a tooltip in the server APIs table when the run as is disabled [#6354](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6354)
-- Add cluster filter by default in vulnerabilities dashboard and inventory tab [#6399](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6399)
+- Added cluster filter by default in vulnerabilities dashboard and inventory tab [#6399](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6399)
 
 ### Changed
 
