@@ -836,33 +836,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.boolean();
     },
   },
-  'checks.vulnerabilities.pattern': {
-    title: 'Vulnerabilities index pattern',
-    description:
-      'Enable or disable the vulnerabilities index pattern health check when opening the app.',
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: false,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
-    },
-  },
   'cron.prefix': {
     title: 'Cron prefix',
     description: 'Define the index prefix of predefined jobs.',

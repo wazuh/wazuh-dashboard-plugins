@@ -105,23 +105,6 @@ exports[`Health Check container should render a Health check screen 1`] = `
         title="Check statistics index pattern"
         validationService={[Function]}
       />
-      <CheckResult
-        awaitFor={Array []}
-        canRetry={true}
-        checksReady={Object {}}
-        cleanErrors={[Function]}
-        cleanWarnings={[Function]}
-        handleCheckReady={[Function]}
-        handleErrors={[Function]}
-        handleWarnings={[Function]}
-        isLoading={false}
-        key="health_check_check_vulnerabilities.pattern"
-        name="vulnerabilities.pattern"
-        shouldCheck={true}
-        showLogButton={false}
-        title="Check vulnerabilities index pattern"
-        validationService={[Function]}
-      />
     </EuiDescriptionList>
   </div>
   <EuiSpacer

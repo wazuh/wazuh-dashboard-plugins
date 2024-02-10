@@ -33,10 +33,8 @@ import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { getCore, getHttp, getWzCurrentAppID } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
-  NOT_TIME_FIELD_NAME_INDEX_PATTERN,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
-  WAZUH_INDEX_TYPE_VULNERABILITIES,
 } from '../../../../common/constants';
 
 import { compose } from 'redux';
@@ -88,19 +86,6 @@ const checks = {
       ),
     awaitFor: [],
     shouldCheck: true,
-    canRetry: true,
-  },
-  'vulnerabilities.pattern': {
-    title: 'Check vulnerabilities index pattern',
-    label: 'Vulnerabilities index pattern',
-    validator: appConfig =>
-      checkPatternSupportService(
-        appConfig.data['vulnerabilities.pattern'],
-        WAZUH_INDEX_TYPE_VULNERABILITIES,
-        NOT_TIME_FIELD_NAME_INDEX_PATTERN,
-      ),
-    awaitFor: [],
-    shouldCheck: false,
     canRetry: true,
   },
 };
