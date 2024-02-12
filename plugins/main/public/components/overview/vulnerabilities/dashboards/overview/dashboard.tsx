@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { SearchResponse } from '../../../../../../../../src/core/server';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getDashboardPanels } from './dashboard_panels';
@@ -13,6 +14,19 @@ import { DiscoverNoResults } from '../../common/components/no_results';
 import { WAZUH_INDEX_TYPE_VULNERABILITIES } from '../../../../../../common/constants';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
 import useCheckIndexFields from '../../common/hooks/useCheckIndexFields';
+import {
+  vulnerabilityIndexFiltersAdapter,
+  restorePrevIndexFiltersAdapter,
+  onUpdateAdapter,
+} from '../../common/vulnerability_detector_adapters';
+import { search } from '../inventory/inventory_service';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
+import {
+  ErrorFactory,
+  ErrorHandler,
+  HttpError,
+} from '../../../../../react-services/error-management';
+
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -29,29 +43,53 @@ const DashboardVulsComponent: React.FC = () => {
     appConfig.data['vulnerabilities.pattern'];
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
+    onMount: vulnerabilityIndexFiltersAdapter,
+    onUpdate: onUpdateAdapter,
+    onUnMount: restorePrevIndexFiltersAdapter,
   });
-  const {
-    isLoading: isLoadingSearchbar,
-    filters,
-    query,
-    indexPatterns,
-  } = searchBarProps;
+  const { isLoading, filters, query, indexPatterns } = searchBarProps;
 
-  const { isError, error, isSuccess, resultIndexData, isLoading } =
-    useCheckIndexFields(
-      VULNERABILITIES_INDEX_PATTERN_ID,
-      indexPatterns?.[0],
-      WAZUH_INDEX_TYPE_VULNERABILITIES,
-      filters,
-      query,
-    );
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+
+  const {
+    isError,
+    error,
+    isSuccess,
+    isLoading: isLoadingCheckIndex,
+  } = useCheckIndexFields(
+    VULNERABILITIES_INDEX_PATTERN_ID,
+    WAZUH_INDEX_TYPE_VULNERABILITIES,
+  );
+
+  useEffect(() => {
+    if (!isLoading && isSuccess) {
+      search({
+        indexPattern: indexPatterns?.[0] as IndexPattern,
+        filters,
+        query,
+      })
+        .then(results => {
+          setResults(results);
+          setIsSearching(false);
+        })
+        .catch(error => {
+          const searchError = ErrorFactory.create(HttpError, {
+            error,
+            message: 'Error fetching vulnerabilities',
+          });
+          ErrorHandler.handleError(searchError);
+          setIsSearching(false);
+        });
+    }
+  }, [JSON.stringify(searchBarProps), isLoadingCheckIndex]);
 
   return (
     <>
       <I18nProvider>
         <>
-          {isLoading || isLoadingSearchbar ? <LoadingSpinner /> : null}
-          {!isLoading && !isLoadingSearchbar ? (
+          {isLoading || isLoadingCheckIndex ? <LoadingSpinner /> : null}
+          {!isLoading && !isLoadingCheckIndex ? (
             <SearchBar
               appName='vulnerability-detector-searchbar'
               {...searchBarProps}
@@ -60,18 +98,18 @@ const DashboardVulsComponent: React.FC = () => {
               showQueryBar={true}
             />
           ) : null}
-          {!isLoadingSearchbar &&
+          {isSearching ? <LoadingSpinner /> : null}
+          {!isLoadingCheckIndex &&
           !isLoading &&
-          (isError ||
-            !resultIndexData ||
-            resultIndexData?.hits?.total === 0) ? (
+          !isSearching &&
+          (isError || results?.hits?.total === 0) ? (
             <DiscoverNoResults message={error?.message} />
           ) : null}
-          {!isLoadingSearchbar &&
+          {!isLoadingCheckIndex &&
           !isLoading &&
+          !isSearching &&
           isSuccess &&
-          resultIndexData &&
-          resultIndexData?.hits?.total !== 0 ? (
+          results?.hits?.total > 0 ? (
             <div className='vulnerability-dashboard-responsive'>
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer

@@ -37,6 +37,11 @@ import { formatNumWithCommas } from '../../../../../kibana-integrations/discover
 import { useAppConfig } from '../../../../common/hooks';
 import { WAZUH_INDEX_TYPE_VULNERABILITIES } from '../../../../../../common/constants';
 import useCheckIndexFields from '../../common/hooks/useCheckIndexFields';
+import {
+  vulnerabilityIndexFiltersAdapter,
+  onUpdateAdapter,
+  restorePrevIndexFiltersAdapter,
+} from '../../common/vulnerability_detector_adapters';
 
 const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
@@ -44,6 +49,9 @@ const InventoryVulsComponent = () => {
     appConfig.data['vulnerabilities.pattern'];
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
+    onMount: vulnerabilityIndexFiltersAdapter,
+    onUpdate: onUpdateAdapter,
+    onUnMount: restorePrevIndexFiltersAdapter,
   });
   const { isLoading, filters, query, indexPatterns } = searchBarProps;
   const SearchBar = getPlugins().data.ui.SearchBar;
@@ -99,14 +107,10 @@ const InventoryVulsComponent = () => {
     isError,
     error,
     isSuccess,
-    resultIndexData,
     isLoading: isLoadingCheckIndex,
   } = useCheckIndexFields(
     VULNERABILITIES_INDEX_PATTERN_ID,
-    indexPatterns?.[0],
     WAZUH_INDEX_TYPE_VULNERABILITIES,
-    filters,
-    query,
   );
 
   useEffect(() => {
@@ -186,14 +190,14 @@ const InventoryVulsComponent = () => {
             />
           )}
           {isSearching ? <LoadingSpinner /> : null}
-          {!isLoading &&
+          {!isLoadingCheckIndex &&
+          !isLoading &&
           !isSearching &&
-          (isError ||
-            results?.hits?.total === 0 ||
-            resultIndexData?.hits?.total === 0) ? (
+          (isError || results?.hits?.total === 0) ? (
             <DiscoverNoResults message={error?.message} />
           ) : null}
-          {!isLoading &&
+          {!isLoadingCheckIndex &&
+          !isLoading &&
           !isSearching &&
           isSuccess &&
           results?.hits?.total > 0 ? (

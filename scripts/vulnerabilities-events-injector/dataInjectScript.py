@@ -118,6 +118,12 @@ def generateRandomVulnerability():
     vulnerability['severity'] = random.choice(['Low','Medium','High','Critical'])
     return(vulnerability)
 
+def generateRandomWazuh():
+    wazuh = {}
+    wazuh['cluster'] = {'name':'wazuh.manager'}
+    wazuh['node'] = {'name':random.choice(['master','worker-01','worker-02','worker-03'])}
+    return(wazuh)
+
 def generateRandomData(number):
     for i in range(0, int(number)):
         yield{
@@ -131,6 +137,7 @@ def generateRandomData(number):
             'package':generateRandomPackage(),
             'tags':generateRandomTags(),
             'vulnerability':generateRandomVulnerability(),
+            'wazuh':generateRandomWazuh()
         }
 
 def verifyIndex(index,instance):
