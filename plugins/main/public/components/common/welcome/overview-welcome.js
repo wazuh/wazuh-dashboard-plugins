@@ -33,7 +33,7 @@ import { compose } from 'redux';
 import {
   Applications,
   Categories,
-  endpointSumary,
+  endpointSummary,
   overview,
 } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
@@ -66,7 +66,7 @@ export const OverviewWelcome = compose(
   withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(props => {
-    return [{ text: overview.title }];
+    return [{ text: overview.breadcrumbLabel }];
   }),
 )(
   class OverviewWelcome extends Component {
@@ -92,9 +92,9 @@ export const OverviewWelcome = compose(
                         ]}
                         iconType='plusInCircle'
                         href={getCore().application.getUrlForApp(
-                          endpointSumary.id,
+                          endpointSummary.id,
                           {
-                            path: `#${endpointSumary.redirectTo()}deploy`,
+                            path: `#${endpointSummary.redirectTo()}deploy`,
                           },
                         )}
                       >

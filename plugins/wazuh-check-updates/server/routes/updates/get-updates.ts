@@ -9,14 +9,16 @@ export const getUpdatesRoute = (router: IRouter) => {
       path: routes.checkUpdates,
       validate: {
         query: schema.object({
-          checkAvailableUpdates: schema.maybe(schema.string()),
+          query_api: schema.maybe(schema.string()),
+          force_query: schema.maybe(schema.string()),
         }),
       },
     },
     async (context, request, response) => {
       try {
         const updates = await getUpdates(
-          request.query?.checkAvailableUpdates === 'true',
+          request.query?.query_api === 'true',
+          request.query?.force_query === 'true',
         );
         return response.ok({
           body: updates,

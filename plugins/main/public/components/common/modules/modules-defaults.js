@@ -27,6 +27,7 @@ import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vu
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
+import { office365Columns } from '../../overview/office-panel/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 
@@ -151,7 +152,15 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: withModuleNotForAgent(OfficePanel),
       },
-      { ...EventsTab, component: withModuleNotForAgent(Events) },
+      {
+        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
+        component: withModuleNotForAgent(() => (
+          <WazuhDiscover
+            indexPatternName={DEFAULT_INDEX_PATTERN}
+            tableColumns={office365Columns}
+          />
+        )),
+      },
     ],
     availableFor: ['manager'],
   },
@@ -180,12 +189,14 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        component: withModuleNotForAgent(DashboardVuls),
+        component: DashboardVuls,
+        buttons: [ButtonModuleExploreAgent],
       },
       {
         id: 'inventory',
         name: 'Inventory',
-        component: withModuleNotForAgent(InventoryVuls),
+        component: InventoryVuls,
+        buttons: [ButtonModuleExploreAgent],
       },
       {
         ...renderDiscoverTab(ALERTS_INDEX_PATTERN, vulnerabilitiesColumns),
@@ -198,7 +209,7 @@ export const ModulesDefaults = {
       },
     ],
     buttons: ['settings'],
-    availableFor: ['manager'],
+    availableFor: ['manager', 'agent'],
   },
   mitre: {
     init: 'dashboard',
