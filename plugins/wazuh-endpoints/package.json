@@ -1,6 +1,6 @@
 {
   "name": "wazuh-endpoints",
-  "version": "4.9.0",
+  "version": "5.0.0",
   "revision": "00",
   "pluginPlatform": {
     "version": "2.11.0"
