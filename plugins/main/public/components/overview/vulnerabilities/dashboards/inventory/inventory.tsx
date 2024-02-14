@@ -42,6 +42,9 @@ import {
   onUpdateAdapter,
   restorePrevIndexFiltersAdapter,
 } from '../../common/vulnerability_detector_adapters';
+import { compose } from 'redux';
+import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
+import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 
 const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
@@ -178,6 +181,7 @@ const InventoryVulsComponent = () => {
         grow
       >
         <>
+          <ModuleEnabledCheck />
           {isLoading || isLoadingCheckIndex ? (
             <LoadingSpinner />
           ) : (
@@ -263,4 +267,7 @@ const InventoryVulsComponent = () => {
   );
 };
 
-export const InventoryVuls = withErrorBoundary(InventoryVulsComponent);
+export const InventoryVuls = compose(
+  withErrorBoundary,
+  withVulnerabilitiesStateDataSource,
+)(InventoryVulsComponent);

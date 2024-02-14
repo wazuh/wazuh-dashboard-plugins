@@ -26,6 +26,9 @@ import {
   ErrorHandler,
   HttpError,
 } from '../../../../../react-services/error-management';
+import { compose } from 'redux';
+import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
+import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 
 const plugins = getPlugins();
 
@@ -88,6 +91,7 @@ const DashboardVulsComponent: React.FC = () => {
     <>
       <I18nProvider>
         <>
+          <ModuleEnabledCheck />
           {isLoading || isLoadingCheckIndex ? <LoadingSpinner /> : null}
           {!isLoading && !isLoadingCheckIndex ? (
             <SearchBar
@@ -190,4 +194,7 @@ const DashboardVulsComponent: React.FC = () => {
   );
 };
 
-export const DashboardVuls = withErrorBoundary(DashboardVulsComponent);
+export const DashboardVuls = compose(
+  withErrorBoundary,
+  withVulnerabilitiesStateDataSource,
+)(DashboardVulsComponent);
