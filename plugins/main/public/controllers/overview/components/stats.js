@@ -57,7 +57,7 @@ export const Stats = withErrorBoundary(
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
       getCore().application.navigateToApp(endpointSummary.id, {
-        path: '#/agents-preview',
+        path: `#${endpointSummary.redirectTo()}`,
       });
     }
 
