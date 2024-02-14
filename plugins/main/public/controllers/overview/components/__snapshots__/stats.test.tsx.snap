@@ -34,12 +34,13 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
             <span
               class="euiToolTipAnchor"
             >
-              <span
-                class="statWithLink"
-                style="cursor: pointer;"
+              <button
+                class="euiLink euiLink--primary statWithLink"
+                style="font-weight: normal;"
+                type="button"
               >
                 -
-              </span>
+              </button>
             </span>
           </p>
         </div>
@@ -67,12 +68,13 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
             <span
               class="euiToolTipAnchor"
             >
-              <span
-                class="statWithLink"
-                style="cursor: pointer;"
+              <button
+                class="euiLink euiLink--primary statWithLink"
+                style="font-weight: normal;"
+                type="button"
               >
                 -
-              </span>
+              </button>
             </span>
           </p>
         </div>
