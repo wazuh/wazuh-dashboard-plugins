@@ -80,8 +80,8 @@ const DashboardVulsComponent: React.FC = () => {
       <I18nProvider>
         <>
           <ModuleEnabledCheck />
-          {isLoading  ? <LoadingSpinner /> : null}
-          {!isLoading && ? (
+          {isLoading ? <LoadingSpinner /> : null}
+          {!isLoading ? (
             <SearchBar
               appName='vulnerability-detector-searchbar'
               {...searchBarProps}
@@ -91,16 +91,10 @@ const DashboardVulsComponent: React.FC = () => {
             />
           ) : null}
           {isSearching ? <LoadingSpinner /> : null}
-          {
-          !isLoading &&
-          !isSearching &&
-          (results?.hits?.total === 0) ? (
+          {!isLoading && !isSearching && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
-          {
-          !isLoading &&
-          !isSearching &&
-          results?.hits?.total > 0 ? (
+          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
             <div className='vulnerability-dashboard-responsive'>
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer
