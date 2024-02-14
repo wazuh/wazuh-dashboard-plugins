@@ -26,9 +26,9 @@ async function checkVDIsEnabledCluster() {
     );
     const vdConfiguration =
       responseNodeWmodules.data.data?.affected_items?.[0]?.wmodules?.find(
-        ({ ['vulnerability-detector']: wmodule }) => wmodule,
+        ({ ['vulnerability-detection']: wmodule }) => wmodule,
       );
-    if (vdConfiguration?.['vulnerability-detector']?.enabled === 'yes') {
+    if (vdConfiguration?.['vulnerability-detection']?.enabled === 'yes') {
       return true;
     }
   }
@@ -44,9 +44,9 @@ async function checkVDIsEnabledManager() {
 
   const vdConfiguration =
     responseWmodules.data.data?.affected_items?.[0]?.wmodules?.find(
-      ({ ['vulnerability-detector']: wmodule }) => wmodule,
+      ({ ['vulnerability-detection']: wmodule }) => wmodule,
     );
-  return vdConfiguration?.['vulnerability-detector']?.enabled === 'yes';
+  return vdConfiguration?.['vulnerability-detection']?.enabled === 'yes';
 }
 
 export const ModuleEnabledCheck = () => {
