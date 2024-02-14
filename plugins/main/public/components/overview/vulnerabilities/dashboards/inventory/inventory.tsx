@@ -35,8 +35,6 @@ import { withErrorBoundary } from '../../../../common/hocs';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
 import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
 import { useAppConfig } from '../../../../common/hooks';
-import { WAZUH_INDEX_TYPE_VULNERABILITIES } from '../../../../../../common/constants';
-import useCheckIndexFields from '../../common/hooks/useCheckIndexFields';
 import {
   vulnerabilityIndexFiltersAdapter,
   onUpdateAdapter,
@@ -106,18 +104,8 @@ const InventoryVulsComponent = () => {
     indexPattern: indexPattern as IndexPattern,
   });
 
-  const {
-    isError,
-    error,
-    isSuccess,
-    isLoading: isLoadingCheckIndex,
-  } = useCheckIndexFields(
-    VULNERABILITIES_INDEX_PATTERN_ID,
-    WAZUH_INDEX_TYPE_VULNERABILITIES,
-  );
-
   useEffect(() => {
-    if (!isLoading && isSuccess) {
+    if (!isLoading) {
       setIndexPattern(indexPatterns?.[0] as IndexPattern);
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,
@@ -143,7 +131,6 @@ const InventoryVulsComponent = () => {
     JSON.stringify(searchBarProps),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
-    isLoadingCheckIndex,
   ]);
 
   const onClickExportResults = async () => {
@@ -182,7 +169,7 @@ const InventoryVulsComponent = () => {
       >
         <>
           <ModuleEnabledCheck />
-          {isLoading || isLoadingCheckIndex ? (
+          {isLoading ? (
             <LoadingSpinner />
           ) : (
             <SearchBar
@@ -194,17 +181,10 @@ const InventoryVulsComponent = () => {
             />
           )}
           {isSearching ? <LoadingSpinner /> : null}
-          {!isLoadingCheckIndex &&
-          !isLoading &&
-          !isSearching &&
-          (isError || results?.hits?.total === 0) ? (
-            <DiscoverNoResults message={error?.message} />
+          {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+            <DiscoverNoResults />
           ) : null}
-          {!isLoadingCheckIndex &&
-          !isLoading &&
-          !isSearching &&
-          isSuccess &&
-          results?.hits?.total > 0 ? (
+          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
             <EuiDataGrid
               {...dataGridProps}
               className={sideNavDocked ? 'dataGridDockedNav' : ''}
