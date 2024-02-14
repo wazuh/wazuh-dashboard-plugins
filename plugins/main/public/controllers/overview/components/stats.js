@@ -84,7 +84,7 @@ export const Stats = withErrorBoundary(
                     >
                       <EuiLink
                         className='statWithLink'
-                        style={{ fontWeight: 'normal' }}
+                        style={{ fontWeight: 'normal', color }}
                         onClick={onClick}
                       >
                         {typeof this.props[status] !== 'undefined'
