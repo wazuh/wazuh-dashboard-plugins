@@ -161,88 +161,90 @@ const InventoryVulsComponent = () => {
 
   return (
     <IntlProvider locale='en'>
-      <EuiPageTemplate
-        className='vulsInventoryContainer'
-        restrictWidth='100%'
-        fullHeight={true}
-        grow
-      >
-        <>
-          <ModuleEnabledCheck />
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <SearchBar
-              appName='inventory-vuls'
-              {...searchBarProps}
-              showDatePicker={false}
-              showQueryInput={true}
-              showQueryBar={true}
-            />
-          )}
-          {isSearching ? <LoadingSpinner /> : null}
-          {!isLoading && !isSearching && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
-          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-            <EuiDataGrid
-              {...dataGridProps}
-              className={sideNavDocked ? 'dataGridDockedNav' : ''}
-              toolbarVisibility={{
-                additionalControls: (
-                  <>
-                    <HitsCounter
-                      hits={results?.hits?.total}
-                      showResetButton={false}
-                      onResetQuery={() => {}}
-                      tooltip={
-                        results?.hits?.total &&
-                        results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                          ? {
-                              ariaLabel: 'Warning',
-                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                MAX_ENTRIES_PER_QUERY,
-                              )} hits.`,
-                              iconType: 'alert',
-                              position: 'top',
-                            }
-                          : undefined
-                      }
-                    />
-                    <EuiButtonEmpty
-                      disabled={results?.hits?.total === 0}
-                      size='xs'
-                      iconType='exportAction'
-                      color='primary'
-                      isLoading={isExporting}
-                      className='euiDataGrid__controlBtn'
-                      onClick={onClickExportResults}
-                    >
-                      Export Formated
-                    </EuiButtonEmpty>
-                  </>
-                ),
-              }}
-            />
-          ) : null}
-          {inspectedHit && (
-            <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-              <EuiFlyoutHeader>
-                <EuiTitle>
-                  <h2>Document details</h2>
-                </EuiTitle>
-              </EuiFlyoutHeader>
-              <EuiFlyoutBody>
-                <EuiFlexGroup direction='column'>
-                  <EuiFlexItem>
-                    <DocViewer {...docViewerProps} />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlyoutBody>
-            </EuiFlyout>
-          )}
-        </>
-      </EuiPageTemplate>
+      <>
+        <ModuleEnabledCheck />
+        <EuiPageTemplate
+          className='vulsInventoryContainer'
+          restrictWidth='100%'
+          fullHeight={true}
+          grow
+        >
+          <>
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : (
+              <SearchBar
+                appName='inventory-vuls'
+                {...searchBarProps}
+                showDatePicker={false}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            )}
+            {isSearching ? <LoadingSpinner /> : null}
+            {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+              <DiscoverNoResults />
+            ) : null}
+            {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+              <EuiDataGrid
+                {...dataGridProps}
+                className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                toolbarVisibility={{
+                  additionalControls: (
+                    <>
+                      <HitsCounter
+                        hits={results?.hits?.total}
+                        showResetButton={false}
+                        onResetQuery={() => {}}
+                        tooltip={
+                          results?.hits?.total &&
+                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                            ? {
+                                ariaLabel: 'Warning',
+                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                  MAX_ENTRIES_PER_QUERY,
+                                )} hits.`,
+                                iconType: 'alert',
+                                position: 'top',
+                              }
+                            : undefined
+                        }
+                      />
+                      <EuiButtonEmpty
+                        disabled={results?.hits?.total === 0}
+                        size='xs'
+                        iconType='exportAction'
+                        color='primary'
+                        isLoading={isExporting}
+                        className='euiDataGrid__controlBtn'
+                        onClick={onClickExportResults}
+                      >
+                        Export Formated
+                      </EuiButtonEmpty>
+                    </>
+                  ),
+                }}
+              />
+            ) : null}
+            {inspectedHit && (
+              <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+                <EuiFlyoutHeader>
+                  <EuiTitle>
+                    <h2>Document details</h2>
+                  </EuiTitle>
+                </EuiFlyoutHeader>
+                <EuiFlyoutBody>
+                  <EuiFlexGroup direction='column'>
+                    <EuiFlexItem>
+                      <DocViewer {...docViewerProps} />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiFlyoutBody>
+              </EuiFlyout>
+            )}
+          </>
+        </EuiPageTemplate>
+      </>
     </IntlProvider>
   );
 };
