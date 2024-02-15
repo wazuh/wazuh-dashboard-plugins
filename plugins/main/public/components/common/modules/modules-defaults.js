@@ -24,6 +24,7 @@ import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent } from '../hocs';
 import React from 'react';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -177,7 +178,7 @@ export const ModulesDefaults = {
           ),
         ],
       },
-      EventsTab,
+      { ...EventsTab, component: withVulnerabilitiesStateDataSource(Events) },
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
