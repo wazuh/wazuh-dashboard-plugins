@@ -2,11 +2,16 @@ import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withGuardAsync, withReduxProvider } from '../../../../common/hocs';
-import { getSavedObjects } from '../../../../../kibana-services';
+import {
+  getAngularModule,
+  getCore,
+  getSavedObjects,
+} from '../../../../../kibana-services';
 import { SavedObject } from '../../../../../react-services';
 import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/constants';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import { vulnerabilityDetection } from '../../../../../utils/applications';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
@@ -87,10 +92,18 @@ export async function validateVulnerabilitiesStateDataSources({
           },
         };
       }
+      /* WORKAROUND: Redirect to the root of Vulnerabilities Detection application that should
+        redirects to the Dashboard tab. We want to redirect to this view, because we need the
+        component is visible (visualizations) to ensure the process that defines the filters for the
+        Events tab is run when the Dashboard component is unmounted. This workaround solves a
+        problem in the Events tabs related there are no implicit filters when accessing if the HOC
+        that protect the view is passed.
+      */
+      getCore().application.navigateToApp(vulnerabilityDetection.id);
     }
     return {
       ok: false,
-      data: { message: `Index pattern [${indexPatternID}] was created` },
+      data: {},
     };
   } catch (error) {
     return {
