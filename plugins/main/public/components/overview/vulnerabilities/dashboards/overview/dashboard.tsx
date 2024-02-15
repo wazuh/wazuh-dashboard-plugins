@@ -11,9 +11,7 @@ import { getKPIsPanel } from './dashboard_panels_kpis';
 import { useAppConfig } from '../../../../common/hooks';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
-import { WAZUH_INDEX_TYPE_VULNERABILITIES } from '../../../../../../common/constants';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
-import useCheckIndexFields from '../../common/hooks/useCheckIndexFields';
 import {
   vulnerabilityIndexFiltersAdapter,
   restorePrevIndexFiltersAdapter,
@@ -26,6 +24,9 @@ import {
   ErrorHandler,
   HttpError,
 } from '../../../../../react-services/error-management';
+import { compose } from 'redux';
+import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
+import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 
 const plugins = getPlugins();
 
@@ -52,18 +53,8 @@ const DashboardVulsComponent: React.FC = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const {
-    isError,
-    error,
-    isSuccess,
-    isLoading: isLoadingCheckIndex,
-  } = useCheckIndexFields(
-    VULNERABILITIES_INDEX_PATTERN_ID,
-    WAZUH_INDEX_TYPE_VULNERABILITIES,
-  );
-
   useEffect(() => {
-    if (!isLoading && isSuccess) {
+    if (!isLoading) {
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,
         filters,
@@ -82,14 +73,15 @@ const DashboardVulsComponent: React.FC = () => {
           setIsSearching(false);
         });
     }
-  }, [JSON.stringify(searchBarProps), isLoadingCheckIndex]);
+  }, [JSON.stringify(searchBarProps)]);
 
   return (
     <>
       <I18nProvider>
         <>
-          {isLoading || isLoadingCheckIndex ? <LoadingSpinner /> : null}
-          {!isLoading && !isLoadingCheckIndex ? (
+          <ModuleEnabledCheck />
+          {isLoading ? <LoadingSpinner /> : null}
+          {!isLoading ? (
             <SearchBar
               appName='vulnerability-detector-searchbar'
               {...searchBarProps}
@@ -99,17 +91,10 @@ const DashboardVulsComponent: React.FC = () => {
             />
           ) : null}
           {isSearching ? <LoadingSpinner /> : null}
-          {!isLoadingCheckIndex &&
-          !isLoading &&
-          !isSearching &&
-          (isError || results?.hits?.total === 0) ? (
-            <DiscoverNoResults message={error?.message} />
+          {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+            <DiscoverNoResults />
           ) : null}
-          {!isLoadingCheckIndex &&
-          !isLoading &&
-          !isSearching &&
-          isSuccess &&
-          results?.hits?.total > 0 ? (
+          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
             <div className='vulnerability-dashboard-responsive'>
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer
@@ -190,4 +175,7 @@ const DashboardVulsComponent: React.FC = () => {
   );
 };
 
-export const DashboardVuls = withErrorBoundary(DashboardVulsComponent);
+export const DashboardVuls = compose(
+  withErrorBoundary,
+  withVulnerabilitiesStateDataSource,
+)(DashboardVulsComponent);
