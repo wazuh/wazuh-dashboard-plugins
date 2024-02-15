@@ -24,7 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Change the display order of tabs in all modules. [#6067](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6067)
 - Upgraded the `axios` dependency to `1.6.1` [#5062](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5062)
 - Changed the api configuration title in the Server APIs section. [#6373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6373)
-- Changed overview home top KPIs. [#6379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6379)
+- Changed overview home top KPIs. [#6379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6379) [#6408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6408)
 
 ### Fixed
 
@@ -44,7 +44,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed implicit filter close button in the search bar [#6346](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6346)
 - Fixed the help menu, to be consistent and avoid duplication [#6374](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6374)
 - Fixed the axis label visual bug from dashboards [#6378](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6378)
-- Fixed style and redirection problem in home page KPIs [#6408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6408)
 
 ### Removed
 
