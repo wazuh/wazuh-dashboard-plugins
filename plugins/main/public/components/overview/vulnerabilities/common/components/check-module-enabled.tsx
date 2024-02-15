@@ -100,7 +100,7 @@ export const ModuleEnabledCheck = () => {
         configure following the{' '}
         <EuiLink
           href={webDocumentationLink(
-            'user-manual/capabilities/vulnerability-detector/configuring-scans.html#configuring-vulnerability-detector.html',
+            'user-manual/capabilities/vulnerability-detection/configuring-scans.html#configuring-vulnerability-detection',
           )}
           external
           target='_blank'
