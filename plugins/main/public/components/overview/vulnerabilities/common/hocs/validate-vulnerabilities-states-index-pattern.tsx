@@ -12,6 +12,7 @@ import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/cons
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
+import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
@@ -163,5 +164,6 @@ export const withVulnerabilitiesStateDataSource = compose(
   withGuardAsync(
     validateVulnerabilitiesStateDataSources,
     ({ error, check }) => <PromptCheckIndex error={error} refresh={check} />,
+    () => <LoadingSpinnerDataSource />,
   ),
 );
