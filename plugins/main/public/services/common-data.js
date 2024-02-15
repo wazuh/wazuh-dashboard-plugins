@@ -14,7 +14,7 @@ import { GenericRequest } from '../react-services/generic-request';
 import { ShareAgent } from '../factories/share-agent';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
 import rison from 'rison-node';
-import { VULNERABILITY_CLUSTER_KEY } from '../../common/constants';
+import { VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from '../../common/constants';
 
 export class CommonData {
   /**
@@ -159,7 +159,11 @@ export class CommonData {
             ? AppState.getClusterInfo().cluster
             : AppState.getClusterInfo().manager,
           isCluster,
-          tab === 'vuls' ? VULNERABILITY_CLUSTER_KEY : undefined,
+          tab === 'vuls'
+            ? VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER[
+                AppState.getClusterInfo().status
+              ]
+            : undefined,
         ),
       );
       if (tab !== 'general' && tab !== 'welcome') {
