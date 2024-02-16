@@ -124,6 +124,7 @@ export function TableWithSearchBar<T>({
   const [refresh, setRefresh] = useState(Date.now());
 
   const isMounted = useRef(false);
+  const tableRef = useRef();
 
   const searchBarWQLOptions = useMemo(
     () => ({
@@ -169,6 +170,8 @@ export function TableWithSearchBar<T>({
       // Reset the page index when the endpoint or reload changes.
       // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
       updateRefresh();
+      //Reset the table selection in case is enabled
+      tableRef.current.setSelection([]);
     }
   }, [endpoint, reload]);
 
@@ -254,6 +257,7 @@ export function TableWithSearchBar<T>({
       />
       <EuiSpacer size='s' />
       <EuiBasicTable
+        ref={tableRef}
         columns={tableColumns.map(
           ({ searchable, show, composeField, ...rest }) => ({ ...rest }),
         )}

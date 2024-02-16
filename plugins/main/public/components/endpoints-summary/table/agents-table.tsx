@@ -96,6 +96,8 @@ export const AgentsTable = compose(
   }, []);
 
   const reloadAgents = async () => {
+    setSelectedItems([]);
+    setAllAgentsSelected(false);
     await setReloadTable(Date.now());
   };
 
@@ -152,7 +154,7 @@ export const AgentsTable = compose(
     ? agentList.totalItems
     : selectedItems.length;
 
-  const selectAllItemsRenderer = showSelectAllItems ? (
+  const selectedtemsRenderer = selectedItems.length ? (
     <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
       <EuiFlexItem grow={false}>
         <EuiCallOut
@@ -162,17 +164,19 @@ export const AgentsTable = compose(
           } selected`}
         />
       </EuiFlexItem>
-      <EuiFlexItem grow={false}>
-        <EuiButton
-          size='s'
-          onClick={handleOnClickSelectAllAgents}
-          color={!allAgentsSelected ? 'primary' : 'danger'}
-        >
-          {!allAgentsSelected
-            ? `Select all ${agentList.totalItems} agents`
-            : `Clear ${agentList.totalItems} agents selected`}
-        </EuiButton>
-      </EuiFlexItem>
+      {showSelectAllItems ? (
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            size='s'
+            onClick={handleOnClickSelectAllAgents}
+            color={!allAgentsSelected ? 'primary' : 'danger'}
+          >
+            {!allAgentsSelected
+              ? `Select all ${agentList.totalItems} agents`
+              : `Clear ${agentList.totalItems} agents selected`}
+          </EuiButton>
+        </EuiFlexItem>
+      ) : null}
     </EuiFlexGroup>
   ) : null;
 
@@ -185,7 +189,7 @@ export const AgentsTable = compose(
         <EuiFlexItem>
           <TableWzAPI
             title='Agents'
-            addOnTitle={selectAllItemsRenderer}
+            addOnTitle={selectedtemsRenderer}
             actionButtons={[
               <WzButtonPermissions
                 buttonType='empty'

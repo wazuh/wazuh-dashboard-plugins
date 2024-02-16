@@ -29,6 +29,7 @@ export const agentsTableActions = (
     icon: 'eye',
     type: 'icon',
     isPrimary: true,
+    color: 'primary',
     enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     onClick: agent =>
       getCore().application.navigateToApp(endpointSummary.id, {
