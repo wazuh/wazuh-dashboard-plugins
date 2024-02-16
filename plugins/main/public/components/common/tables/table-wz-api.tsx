@@ -178,28 +178,32 @@ export function TableWzAPI({
 
   const header = (
     <>
-      <EuiFlexGroup wrap alignItems='center'>
-        <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
-          {rest.title && (
-            <EuiTitle size='s'>
-              <h1>
-                {rest.title}{' '}
-                {isLoading ? (
-                  <EuiLoadingSpinner size='s' />
-                ) : (
-                  <span>({totalItems})</span>
-                )}
-              </h1>
-            </EuiTitle>
-          )}
-        </EuiFlexItem>
-        {rest.addOnTitle ? (
-          <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
-            {rest.addOnTitle}
-          </EuiFlexItem>
-        ) : null}
+      <EuiFlexGroup wrap alignItems='center' responsive={false}>
         <EuiFlexItem>
-          <EuiFlexGroup wrap justifyContent={'flexEnd'} alignItems={'center'}>
+          <EuiFlexGroup alignItems='center' responsive={false}>
+            <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
+              {rest.title && (
+                <EuiTitle size='s'>
+                  <h1>
+                    {rest.title}{' '}
+                    {isLoading ? (
+                      <EuiLoadingSpinner size='s' />
+                    ) : (
+                      <span>({totalItems})</span>
+                    )}
+                  </h1>
+                </EuiTitle>
+              )}
+            </EuiFlexItem>
+            {rest.addOnTitle ? (
+              <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
+                {rest.addOnTitle}
+              </EuiFlexItem>
+            ) : null}
+          </EuiFlexGroup>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiFlexGroup wrap alignItems={'center'} responsive={false}>
             {/* Render optional custom action button */}
             {renderActionButtons}
             {/* Render optional reload button */}

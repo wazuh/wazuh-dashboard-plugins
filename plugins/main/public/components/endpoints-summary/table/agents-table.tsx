@@ -153,7 +153,7 @@ export const AgentsTable = compose(
     : selectedItems.length;
 
   const selectAllItemsRenderer = showSelectAllItems ? (
-    <EuiFlexGroup alignItems='center' gutterSize='s'>
+    <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
       <EuiFlexItem grow={false}>
         <EuiCallOut
           size='s'
@@ -185,6 +185,7 @@ export const AgentsTable = compose(
         <EuiFlexItem>
           <TableWzAPI
             title='Agents'
+            addOnTitle={selectAllItemsRenderer}
             actionButtons={[
               <WzButtonPermissions
                 buttonType='empty'
@@ -379,7 +380,6 @@ export const AgentsTable = compose(
               selection,
               isSelectable: true,
             }}
-            addOnTitle={selectAllItemsRenderer}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
