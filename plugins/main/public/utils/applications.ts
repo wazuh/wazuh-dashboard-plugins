@@ -193,7 +193,7 @@ export const vulnerabilityDetection = {
   euiIconType: 'heartbeatApp',
   order: 301,
   showInOverviewApp: true,
-  showInAgentMenu: false,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=vuls&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id

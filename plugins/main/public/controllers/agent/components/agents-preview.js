@@ -391,7 +391,7 @@ export const AgentsPreview = compose(
                                   <EuiIconTip
                                     type='iInCircle'
                                     color='primary'
-                                    content='Agent with more alerts in the last 24 hours'
+                                    content='Highest alert count agent in the last 24 hours'
                                   />
                                 </>
                               }
