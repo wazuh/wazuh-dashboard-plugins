@@ -253,7 +253,7 @@ const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Endpoints name',
+            customLabel: 'Endpoint name',
           },
           schema: 'segment',
         },
