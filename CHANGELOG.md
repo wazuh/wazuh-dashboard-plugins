@@ -25,7 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Upgraded the `axios` dependency to `1.6.1` [#5062](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5062)
 - Changed the api configuration title in the Server APIs section. [#6373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6373)
 - Changed overview home top KPIs. [#6379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6379) [#6408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6408)
-- Changed most vulnerable endpoint label. [#6422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6422)
+- Changed most vulnerable endpoint label name. [#6422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6422)
 
 ### Fixed
 

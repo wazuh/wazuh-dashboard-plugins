@@ -128,9 +128,9 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
+const getVisStateEndpointsName = (indexPatternId: string) => {
   return {
-    id: 'most_vulnerable_endpoints_vulnerabilities',
+    id: 'endpoints_name_vulnerabilities',
     title: 'Endpoints name',
     type: 'horizontal_bar',
     params: {
@@ -245,7 +245,7 @@ const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'agent.id',
+            field: 'agent.name',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -453,7 +453,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '7',
-        savedVis: getVisStateTopVulnerabilitiesEndpoints(indexPatternId),
+        savedVis: getVisStateEndpointsName(indexPatternId),
       },
     },
     '8': {
