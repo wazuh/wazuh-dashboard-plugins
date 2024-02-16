@@ -128,10 +128,10 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
   };
 };
 
-const getVisStateEndpointsName = (indexPatternId: string) => {
+const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
   return {
-    id: 'endpoints_name_vulnerabilities',
-    title: 'Endpoints name',
+    id: 'most_vulnerable_endpoints_vulnerabilities',
+    title: 'Most vulnerable endpoints',
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
@@ -253,7 +253,7 @@ const getVisStateEndpointsName = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'agent.name',
+            customLabel: 'Enpoints name',
           },
           schema: 'segment',
         },
@@ -453,7 +453,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '7',
-        savedVis: getVisStateEndpointsName(indexPatternId),
+        savedVis: getVisStateTopVulnerabilitiesEndpoints(indexPatternId),
       },
     },
     '8': {
