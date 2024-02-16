@@ -19,7 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Moved the plugin menu to platform applications into the side menu [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840) [#6226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6226) [#6244](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6244)
+- Moved the plugin menu to platform applications into the side menu [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840) [#6226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6226) [#6244](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6244) [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176) [#6423](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6423)
 - Changed dashboards. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035)
 - Change the display order of tabs in all modules. [#6067](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6067)
 - Upgraded the `axios` dependency to `1.6.1` [#5062](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5062)
@@ -49,7 +49,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed the `disabled_roles` and `customization.logo.sidebar` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
 - Removed the ability to configure the visibility of modules and removed `extensions.*` settings [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840)
-- Removed the application menu in the IT Hygiene application [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 - Removed the implicit filter of WQL language of the search bar UI [#6174](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6174)
 - Removed notice of old Discover deprecation [#6341](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6341)
 - Removed compilation date field from the app [#6366](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6366)
