@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { escapeRegExp } from 'lodash';
 import { i18n } from '@osd/i18n';
 import { FieldIcon } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { EuiFlexGroup, EuiFlexItem, EuiToolTip } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 const COLLAPSE_LINE_LENGTH = 350;
 const DOT_PREFIX_RE = /(.).+?\./g;
@@ -134,15 +134,10 @@ const DocViewer = (props: tDocViewerProps) => {
                             {...fieldIconProps}
                           />
                         </EuiFlexItem>
-                        <EuiFlexItem className='eui-textTruncate'>
-                          <EuiToolTip
-                            position='top'
-                            content={displayName}
-                            delay='long'
-                            anchorClassName='eui-textTruncate'
-                          >
-                            <span>{displayName}</span>
-                          </EuiToolTip>
+                        <EuiFlexItem style={{ maxWidth: '25vw' }}>
+                          <span style={{ wordBreak: 'break-all' }}>
+                            <b>{displayName}</b>
+                          </span>
                         </EuiFlexItem>
                       </EuiFlexGroup>
                     </td>
@@ -156,7 +151,7 @@ const DocViewer = (props: tDocViewerProps) => {
                          */
                         // eslint-disable-next-line react/no-danger
                         dangerouslySetInnerHTML={{ __html: value as string }}
-                        style={{ overflowY: 'auto' }}
+                        style={{ overflowY: 'auto', wordBreak: 'break-all' }}
                       />
                     </td>
                   </tr>
