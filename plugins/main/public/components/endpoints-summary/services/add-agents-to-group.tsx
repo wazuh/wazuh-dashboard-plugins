@@ -5,10 +5,15 @@ export const addAgentsToGroupService = async (
   agentIds: string[],
   group_id: string,
 ) =>
-  (await WzRequest.apiReq('PUT', `/agents/group`, {
-    params: {
-      group_id,
-      agents_list: agentIds.join(','),
-      wait_for_complete: true,
+  (await WzRequest.apiReq(
+    'PUT',
+    `/agents/group`,
+    {
+      params: {
+        group_id,
+        agents_list: agentIds.join(','),
+        wait_for_complete: true,
+      },
     },
-  })) as IApiResponse<string>;
+    { returnOriginalResponse: true },
+  )) as IApiResponse<string>;
