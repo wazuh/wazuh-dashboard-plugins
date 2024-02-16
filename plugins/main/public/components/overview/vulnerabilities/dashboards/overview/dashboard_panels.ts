@@ -131,7 +131,7 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
 const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
-    title: 'Most vulnerable endpoints',
+    title: 'Endpoints name',
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
@@ -253,7 +253,7 @@ const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'package.path',
+            customLabel: 'agent.name',
           },
           schema: 'segment',
         },
