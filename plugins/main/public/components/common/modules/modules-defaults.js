@@ -37,6 +37,7 @@ import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
 import { nistColumns } from '../../overview/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/tsc/events/tsc-columns';
+import { githubColumns } from '../../overview/github-panel/events/github-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -187,7 +188,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: GitHubPanel,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
