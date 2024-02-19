@@ -60,12 +60,17 @@ export const AgentsTable = compose(
   withErrorBoundary,
   connect(null, mapDispatchToProps),
 )((props: AgentsTableProps) => {
-  const defaultFilters = {
-    default: { q: 'id!=000' },
-    ...(sessionStorage.getItem('wz-agents-overview-table-filter')
-      ? JSON.parse(sessionStorage.getItem('wz-agents-overview-table-filter'))
-      : {}),
-  };
+  const defaultFilters =
+    props.filters && Object.keys(props.filters).length
+      ? props.filters
+      : {
+          default: { q: 'id!=000' },
+          ...(sessionStorage.getItem('wz-agents-overview-table-filter')
+            ? JSON.parse(
+                sessionStorage.getItem('wz-agents-overview-table-filter'),
+              )
+            : {}),
+        };
   const [filters, setFilters] = useState(defaultFilters);
   const [reloadTable, setReloadTable] = useState(0);
   const [agent, setAgent] = useState<Agent>();
@@ -79,12 +84,6 @@ export const AgentsTable = compose(
   const [denyEditGroups] = useUserPermissionsRequirements([
     { action: 'group:modify_assignments', resource: 'group:id:*' },
   ]);
-
-  useEffect(() => {
-    if (props.filters && Object.keys(props.filters).length) {
-      setFilters(props.filters);
-    }
-  }, [props.filters]);
 
   useEffect(() => {
     //Unmount component
@@ -238,8 +237,7 @@ export const AgentsTable = compose(
             }}
             rowProps={getRowProps}
             filters={filters}
-            onFiltersChange={filters => {
-              setFilters(filters);
+            onFiltersChange={() => {
               setSelectedItems([]);
             }}
             onDataChange={data => setAgentList(data)}

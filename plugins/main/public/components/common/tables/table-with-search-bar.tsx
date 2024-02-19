@@ -170,8 +170,6 @@ export function TableWithSearchBar<T>({
       // Reset the page index when the endpoint or reload changes.
       // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
       updateRefresh();
-      //Reset the table selection in case is enabled
-      tableRef.current.setSelection([]);
     }
   }, [endpoint, reload]);
 
@@ -180,6 +178,10 @@ export function TableWithSearchBar<T>({
       (async () => {
         try {
           setLoading(true);
+
+          //Reset the table selection in case is enabled
+          tableRef.current.setSelection([]);
+
           const { items, totalItems } = await onSearch(
             endpoint,
             filters,
