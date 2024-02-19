@@ -32,6 +32,7 @@ import { amazonWebServicesColumns } from '../../overview/amazon-web-services/eve
 import { office365Columns } from '../../overview/office-panel/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
+import { githubColumns } from '../../overview/github-panel/events/github-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -182,7 +183,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: GitHubPanel,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
