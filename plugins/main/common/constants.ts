@@ -260,6 +260,7 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
 }
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
+export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER = 'exclude-server';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';

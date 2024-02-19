@@ -27,6 +27,7 @@ import {
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
+import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
 
 const plugins = getPlugins();
 
@@ -48,6 +49,12 @@ const DashboardVulsComponent: React.FC = () => {
     onUpdate: onUpdateAdapter,
     onUnMount: restorePrevIndexFiltersAdapter,
   });
+
+  const fetchFilters = DataSourceFilterManagerVulnerabilitiesStates.getFilters(
+    searchBarProps.filters,
+    VULNERABILITIES_INDEX_PATTERN_ID,
+  );
+
   const { isLoading, filters, query, indexPatterns } = searchBarProps;
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -57,7 +64,7 @@ const DashboardVulsComponent: React.FC = () => {
     if (!isLoading) {
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters,
+        filters: fetchFilters,
         query,
       })
         .then(results => {
@@ -73,7 +80,7 @@ const DashboardVulsComponent: React.FC = () => {
           setIsSearching(false);
         });
     }
-  }, [JSON.stringify(searchBarProps)]);
+  }, [JSON.stringify(searchBarProps), JSON.stringify(fetchFilters)]);
 
   return (
     <>
@@ -104,7 +111,7 @@ const DashboardVulsComponent: React.FC = () => {
                       VULNERABILITIES_INDEX_PATTERN_ID,
                     ),
                     isFullScreenMode: false,
-                    filters: searchBarProps.filters ?? [],
+                    filters: fetchFilters ?? [],
                     useMargins: false,
                     id: 'vulnerability-detector-dashboard-tab-filters',
                     timeRange: {
@@ -128,7 +135,7 @@ const DashboardVulsComponent: React.FC = () => {
                   viewMode: ViewMode.VIEW,
                   panels: getKPIsPanel(VULNERABILITIES_INDEX_PATTERN_ID),
                   isFullScreenMode: false,
-                  filters: searchBarProps.filters ?? [],
+                  filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'kpis-vulnerability-detector-dashboard-tab',
                   timeRange: {
@@ -150,7 +157,7 @@ const DashboardVulsComponent: React.FC = () => {
                   viewMode: ViewMode.VIEW,
                   panels: getDashboardPanels(VULNERABILITIES_INDEX_PATTERN_ID),
                   isFullScreenMode: false,
-                  filters: searchBarProps.filters ?? [],
+                  filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'vulnerability-detector-dashboard-tab',
                   timeRange: {
