@@ -39,7 +39,6 @@ import {
   getWazuhCorePlugin,
 } from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
-import { formatUIDate } from '../../../react-services/time-service';
 
 export const ApiTable = compose(
   withErrorBoundary,
@@ -49,24 +48,23 @@ export const ApiTable = compose(
     constructor(props) {
       super(props);
 
-      const { getAvailableUpdates } = getWazuhCheckUpdatesPlugin();
-
       this.state = {
         apiEntries: [],
         refreshingEntries: false,
         availableUpdates: {},
-        getAvailableUpdates,
         refreshingAvailableUpdates: true,
         apiAvailableUpdateDetails: undefined,
       };
     }
 
-    async getApisAvailableUpdates(forceUpdate = false) {
+    async getApisAvailableUpdates(queryApi = false, forceQuery = false) {
       try {
         this.setState({ refreshingAvailableUpdates: true });
-        const availableUpdates = await this.state.getAvailableUpdates(
-          forceUpdate,
-        );
+        const availableUpdates =
+          await getWazuhCheckUpdatesPlugin().getAvailableUpdates(
+            queryApi,
+            forceQuery,
+          );
         this.setState({ availableUpdates });
       } catch (error) {
         const options = {
@@ -77,8 +75,9 @@ export const ApiTable = compose(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error checking available updates: ${error.message || error
-              }`,
+            title: `Error checking available updates: ${
+              error.message || error
+            }`,
           },
         };
 
@@ -127,8 +126,8 @@ export const ApiTable = compose(
               typeof error === 'string'
                 ? error
                 : (error || {}).message ||
-                ((error || {}).data || {}).message ||
-                'Wazuh is not reachable';
+                  ((error || {}).data || {}).message ||
+                  'Wazuh is not reachable';
             const status = code === 3099 ? 'down' : 'unknown';
             entries[idx].status = { status, downReason };
             if (entries[idx].id === this.props.currentDefault) {
@@ -174,8 +173,8 @@ export const ApiTable = compose(
             typeof error === 'string'
               ? error
               : (error || {}).message ||
-              ((error || {}).data || {}).message ||
-              'Wazuh is not reachable';
+                ((error || {}).data || {}).message ||
+                'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
           throw error;
@@ -193,8 +192,9 @@ export const ApiTable = compose(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error checking manager connection: ${error.message || error
-              }`,
+            title: `Error checking manager connection: ${
+              error.message || error
+            }`,
           },
         };
 
@@ -375,7 +375,6 @@ export const ApiTable = compose(
                   <EuiFlexItem grow={false}>
                     <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
                       {content}
-
                     </EuiHealth>
                   </EuiFlexItem>
                   {!item ? (
@@ -465,7 +464,12 @@ export const ApiTable = compose(
                 <EuiIcon color='danger' type='alert' />
               </EuiToolTip>
             ) : (
-              ''
+              <EuiToolTip
+                position='top'
+                content='The configured API user does not use authentication context.'
+              >
+                <p>-</p>
+              </EuiToolTip>
             );
           },
         },
@@ -522,7 +526,7 @@ export const ApiTable = compose(
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle>
-                      <h2>API Configuration</h2>
+                      <h2>API Connections</h2>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -548,19 +552,19 @@ export const ApiTable = compose(
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   iconType='refresh'
-                  onClick={async () => await this.getApisAvailableUpdates(true)}
+                  onClick={async () =>
+                    await this.getApisAvailableUpdates(true, true)
+                  }
                 >
                   <span>
                     Check updates{' '}
                     <EuiToolTip
-                      title='Last check'
+                      title='Last dashboard check'
                       content={
                         this.state.availableUpdates?.last_check_date
-                          ? formatUIDate(
-                            new Date(
+                          ? getWazuhCorePlugin().utils.formatUIDate(
                               this.state.availableUpdates.last_check_date,
-                            ),
-                          )
+                            )
                           : '-'
                       }
                     >

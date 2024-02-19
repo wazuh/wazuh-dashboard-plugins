@@ -15,7 +15,7 @@ def generateRandomDate():
 def generateRandomAgent():
     agent={}
     agent['build'] = {'original':'build{}'.format(random.randint(0, 9999))}
-    agent['id'] = 'agent{}'.format(random.randint(0, 99))
+    agent['id'] = '00{}'.format(random.randint(1, 99))
     agent['name'] = 'Agent{}'.format(random.randint(0, 99))
     agent['version'] = 'v{}-stable'.format(random.randint(0, 9))
     agent['ephemeral_id'] = '{}'.format(random.randint(0, 99999))

@@ -6,7 +6,7 @@ const getVisStateFilter = (
   indexPatternId: string,
   title: string,
   label: string,
-  fieldName: string,
+  fieldName: string
 ) => {
   return {
     id,
@@ -20,6 +20,16 @@ const getVisStateFilter = (
       showPartialRows: false,
       showTotal: false,
       totalFunc: 'sum',
+    },
+    uiState: {
+      vis: {
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 75,
+          },
+        ],
+      },
     },
     data: {
       searchSource: {
@@ -69,11 +79,9 @@ const getVisStateFilter = (
 };
 
 export const getDashboardFilters = (
-  indexPatternId: string,
+  indexPatternId: string
 ): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
+  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
 } => {
   return {
     topPackageSelector: {
@@ -91,8 +99,8 @@ export const getDashboardFilters = (
           'topPackageSelector',
           indexPatternId,
           'Top packages vulnerabilities',
-          'Top 5 package names',
-          'package.name',
+          'Top 5 packages',
+          'package.name'
         ),
       },
     },
@@ -111,8 +119,8 @@ export const getDashboardFilters = (
           'topOSVulnerabilities',
           indexPatternId,
           'Top operating system vulnerabilities',
-          'Top 5 operating systems',
-          'host.os.full',
+          'Top 5 OS',
+          'host.os.full'
         ),
       },
     },
@@ -132,7 +140,7 @@ export const getDashboardFilters = (
           indexPatternId,
           'Agent filter',
           'Top 5 agents',
-          'agent.id',
+          'agent.id'
         ),
       },
     },
@@ -152,7 +160,7 @@ export const getDashboardFilters = (
           indexPatternId,
           'Top vulnerabilities',
           'Top 5 vulnerabilities',
-          'vulnerability.id',
+          'vulnerability.id'
         ),
       },
     },
