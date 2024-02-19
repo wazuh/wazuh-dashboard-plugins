@@ -28,6 +28,7 @@ import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
+import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
 import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
 import { office365Columns } from '../../overview/office-panel/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
@@ -109,7 +110,10 @@ export const ModulesDefaults = {
   },
   gcp: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, googleCloudColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   pm: {
