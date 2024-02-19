@@ -173,7 +173,6 @@ const InventoryVulsComponent = () => {
         <EuiPageTemplate
           className='vulsInventoryContainer'
           restrictWidth='100%'
-          fullHeight={true}
           grow
         >
           <>
