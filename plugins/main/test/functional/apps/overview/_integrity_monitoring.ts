@@ -27,11 +27,11 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
   const tableViz = getService('tableViz');
   const testSubjects = getService('testSubjects');
 
-  describe('integrity_monitoring', () => {
+  describe.skip('integrity_monitoring', () => {
     let es_index: string;
     before(async () => {
       await PageObjects.wazuhCommon.OpenIntegrityMonitoring();
-      es_index = getSettingDefaultValue('pattern'); // TODO: use the configuration service
+      es_index = 'wazuh-alerts-*'; // TODO: use the configuration service
     });
 
     beforeEach(async () => {

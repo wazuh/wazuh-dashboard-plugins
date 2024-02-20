@@ -69,8 +69,12 @@ const context = {
       get: jest.fn(),
       set: jest.fn(),
     },
+    dashboardSecurity: {
+      isAdministratorUser: jest.fn(),
+    },
   },
 };
+
 const enhanceWithContext = (fn: (...args: any[]) => any) =>
   fn.bind(null, context);
 let server, innerServer;
@@ -194,22 +198,22 @@ describe('[endpoint] PUT /utils/configuration', () => {
   const SettingsDefinitions = {
     'customization.enabled': {
       defaultValueIfNotSet: true,
-      isConfigurableFromFile: true,
+      isConfigurableFromSettings: true,
       validateBackend: schema => schema.boolean(),
     },
     'customization.logo.reports': {
       defaultValueIfNotSet: 'images/logo_reports.png',
-      isConfigurableFromFile: true,
+      isConfigurableFromSettings: true,
       validateBackend: schema => schema.boolean(),
     },
     'customization.reports.header': {
       defaultValueIfNotSet: 'Original header',
-      isConfigurableFromFile: true,
+      isConfigurableFromSettings: true,
       validateBackend: schema => schema.string(),
     },
     'customization.reports.footer': {
       defaultValueIfNotSet: 'Original footer',
-      isConfigurableFromFile: true,
+      isConfigurableFromSettings: true,
       validateBackend: schema => schema.string(),
     },
   };
@@ -294,6 +298,11 @@ describe('[endpoint] PUT /utils/configuration', () => {
           );
         },
       );
+
+      context.wazuh_core.dashboardSecurity.isAdministratorUser.mockImplementation(
+        () => ({ administrator: true }),
+      );
+
       // Set custom report header and footer
       if (typeof footer === 'string' || typeof header === 'string') {
         context.wazuh_core.configuration.set.mockReturnValueOnce(

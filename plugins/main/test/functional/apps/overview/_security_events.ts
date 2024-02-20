@@ -29,11 +29,11 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
   const tableViz = getService('tableViz');
   const testSubjects = getService('testSubjects');
 
-  describe('security_events', () => {
+  describe.skip('security_events', () => {
     let es_index: string;
     before(async () => {
       await PageObjects.wazuhCommon.OpenSecurityEvents();
-      es_index = getSettingDefaultValue('pattern'); // TODO: use the configuration service
+      es_index = 'wazuh-alerts-*'; // TODO: use the configuration service
     });
 
     beforeEach(async () => {

@@ -120,18 +120,18 @@ describe('[endpoint] PUT /utils/configuration', () => {
   beforeAll(() => {
     context.wazuh_core.configuration._settings = new Map();
     context.wazuh_core.configuration._settings.set('pattern', {
-      isConfigurableFromFile: true,
+      isConfigurableFromSettings: true,
       validateBackend: schema => schema.string(),
     });
     context.wazuh_core.configuration._settings.set('hosts', {
-      isConfigurableFromFile: true,
+      isConfigurableFromSettings: true,
     });
     context.wazuh_core.configuration._settings.set('timeout', {
-      isConfigurableFromFile: true,
+      isConfigurableFromSettings: true,
       validateBackend: schema => schema.number(),
     });
     context.wazuh_core.configuration._settings.set('cron.statistics.apis', {
-      isConfigurableFromFile: true,
+      isConfigurableFromSettings: true,
       validateBackend: schema => schema.arrayOf(schema.string()),
     });
   });
