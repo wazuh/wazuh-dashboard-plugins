@@ -81,12 +81,9 @@ export const AgentsTable = compose(
   ]);
 
   useEffect(() => {
-    //Unmount component
-    return () => {
-      if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
-        sessionStorage.removeItem('wz-agents-overview-table-filter');
-      }
-    };
+    if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
+      sessionStorage.removeItem('wz-agents-overview-table-filter');
+    }
   }, []);
 
   useEffect(() => {
@@ -214,7 +211,7 @@ export const AgentsTable = compose(
                     selectedAgents={selectedItems}
                     allAgentsSelected={allAgentsSelected}
                     allAgentsCount={agentList.totalItems}
-                    filters={filters}
+                    filters={filters?.q}
                     allowEditGroups={!denyEditGroups}
                     reloadAgents={() => reloadAgents()}
                   />

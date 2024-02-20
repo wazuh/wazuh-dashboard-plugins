@@ -110,26 +110,9 @@ export const EditAgentsGroupsModal = compose(
         return selectedAgents;
       }
       try {
-        let offset = 0;
-        const limit = 2;
-        let allAffectedItems: Agent[] = [];
-        let totalAffectedItems;
-
-        do {
-          const { affected_items, total_affected_items } =
-            await getAgentsService({ filters, limit, offset });
-
-          if (totalAffectedItems === undefined) {
-            totalAffectedItems = total_affected_items;
-          }
-
-          allAffectedItems = allAffectedItems.concat(affected_items);
-
-          offset += limit;
-        } while (offset < totalAffectedItems);
-
+        const { affected_items } = await getAgentsService({ filters });
         setGetAgentsStatus('complete');
-        return allAffectedItems;
+        return affected_items;
       } catch (error) {
         setGetAgentsStatus('danger');
         setGetAgentsError(error);

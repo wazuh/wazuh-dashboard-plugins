@@ -8,8 +8,6 @@ export const addAgentToGroupService = async ({
   agentId: string;
   groupId: string;
 }) =>
-  (await WzRequest.apiReq(
-    'PUT',
-    `/agents/${agentId}/group/${groupId}`,
-    {},
-  )) as IApiResponse<string>;
+  (await WzRequest.apiReq('PUT', `/agents/${agentId}/group/${groupId}`, {
+    wait_for_complete: true,
+  })) as IApiResponse<string>;

@@ -10,5 +10,6 @@ export const removeAgentFromGroupsService = async ({
   await WzRequest.apiReq('DELETE', `/agents/${agentId}/group`, {
     params: {
       groups_list: groupIds.join(','),
+      wait_for_complete: true,
     },
   });

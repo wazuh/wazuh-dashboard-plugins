@@ -49,7 +49,7 @@ export function TableWzAPI({
   actionButtons?:
     | ReactNode
     | ReactNode[]
-    | (({ filters }: { filters: string }) => ReactNode);
+    | (({ filters }: { filters }) => ReactNode);
   title?: string;
   addOnTitle?: ReactNode;
   description?: string;
@@ -98,7 +98,6 @@ export function TableWzAPI({
     sorting,
   ) {
     try {
-      console.log('onSearch', filters);
       const { pageIndex, pageSize } = pagination;
       const { field, direction } = sorting.sort;
       setIsLoading(true);
