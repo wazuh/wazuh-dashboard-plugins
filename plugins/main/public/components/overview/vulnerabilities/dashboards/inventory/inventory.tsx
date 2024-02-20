@@ -43,6 +43,7 @@ import {
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
+import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
 
 const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
@@ -54,6 +55,11 @@ const InventoryVulsComponent = () => {
     onUpdate: onUpdateAdapter,
     onUnMount: restorePrevIndexFiltersAdapter,
   });
+
+  const fetchFilters = DataSourceFilterManagerVulnerabilitiesStates.getFilters(
+    searchBarProps.filters,
+    VULNERABILITIES_INDEX_PATTERN_ID,
+  );
   const { isLoading, filters, query, indexPatterns } = searchBarProps;
   const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -109,7 +115,7 @@ const InventoryVulsComponent = () => {
       setIndexPattern(indexPatterns?.[0] as IndexPattern);
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters,
+        filters: fetchFilters,
         query,
         pagination,
         sorting,
@@ -131,12 +137,13 @@ const InventoryVulsComponent = () => {
     JSON.stringify(searchBarProps),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
+    JSON.stringify(fetchFilters),
   ]);
 
   const onClickExportResults = async () => {
     const params = {
       indexPattern: indexPatterns?.[0] as IndexPattern,
-      filters,
+      filters: fetchFilters,
       query,
       fields: columnVisibility.visibleColumns,
       pagination: {
@@ -166,7 +173,6 @@ const InventoryVulsComponent = () => {
         <EuiPageTemplate
           className='vulsInventoryContainer'
           restrictWidth='100%'
-          fullHeight={true}
           grow
         >
           <>
