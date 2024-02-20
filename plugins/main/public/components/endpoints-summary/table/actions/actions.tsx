@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiToolTip } from '@elastic/eui';
-import { endpointSummary } from '../../../utils/applications';
+import { endpointSummary } from '../../../../utils/applications';
 import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
 import { getCore } from '../../../../kibana-services';
 import { WzElementPermissions } from '../../../common/permissions/element';

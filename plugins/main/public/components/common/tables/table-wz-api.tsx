@@ -18,7 +18,6 @@ import {
   EuiFlexItem,
   EuiText,
   EuiButtonEmpty,
-  EuiSpacer,
   EuiToolTip,
   EuiIcon,
   EuiCheckboxGroup,
@@ -27,9 +26,6 @@ import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
-import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
-import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { useStateStorage } from '../hooks';
 
 /**
@@ -50,7 +46,10 @@ export function TableWzAPI({
   actionButtons,
   ...rest
 }: {
-  actionButtons?: ReactNode | ReactNode[];
+  actionButtons?:
+    | ReactNode
+    | ReactNode[]
+    | (({ filters }: { filters: string }) => ReactNode);
   title?: string;
   addOnTitle?: ReactNode;
   description?: string;
@@ -99,6 +98,7 @@ export function TableWzAPI({
     sorting,
   ) {
     try {
+      console.log('onSearch', filters);
       const { pageIndex, pageSize } = pagination;
       const { field, direction } = sorting.sort;
       setIsLoading(true);
@@ -143,19 +143,23 @@ export function TableWzAPI({
   },
   []);
 
-  const renderActionButtons = (
-    <>
-      {Array.isArray(actionButtons)
-        ? actionButtons.map((button, key) => (
-            <EuiFlexItem key={key} grow={false}>
-              {button}
-            </EuiFlexItem>
-          ))
-        : typeof actionButtons === 'object' && (
-            <EuiFlexItem grow={false}>{actionButtons}</EuiFlexItem>
-          )}
-    </>
-  );
+  const renderActionButtons = filters => {
+    if (Array.isArray(actionButtons)) {
+      return actionButtons.map((button, key) => (
+        <EuiFlexItem key={key} grow={false}>
+          {button}
+        </EuiFlexItem>
+      ));
+    }
+
+    if (typeof actionButtons === 'object') {
+      return <EuiFlexItem grow={false}>{actionButtons}</EuiFlexItem>;
+    }
+
+    if (typeof actionButtons === 'function') {
+      return actionButtons({ filters: getFilters(filters) });
+    }
+  };
 
   /**
    *  Generate a new reload footprint
@@ -205,7 +209,7 @@ export function TableWzAPI({
         <EuiFlexItem grow={false}>
           <EuiFlexGroup wrap alignItems={'center'} responsive={false}>
             {/* Render optional custom action button */}
-            {renderActionButtons}
+            {renderActionButtons(filters)}
             {/* Render optional reload button */}
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}

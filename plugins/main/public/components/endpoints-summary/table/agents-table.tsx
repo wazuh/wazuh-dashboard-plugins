@@ -60,17 +60,12 @@ export const AgentsTable = compose(
   withErrorBoundary,
   connect(null, mapDispatchToProps),
 )((props: AgentsTableProps) => {
-  const defaultFilters =
-    props.filters && Object.keys(props.filters).length
-      ? props.filters
-      : {
-          default: { q: 'id!=000' },
-          ...(sessionStorage.getItem('wz-agents-overview-table-filter')
-            ? JSON.parse(
-                sessionStorage.getItem('wz-agents-overview-table-filter'),
-              )
-            : {}),
-        };
+  const defaultFilters = {
+    default: { q: 'id!=000' },
+    ...(sessionStorage.getItem('wz-agents-overview-table-filter')
+      ? JSON.parse(sessionStorage.getItem('wz-agents-overview-table-filter'))
+      : {}),
+  };
   const [filters, setFilters] = useState(defaultFilters);
   const [reloadTable, setReloadTable] = useState(0);
   const [agent, setAgent] = useState<Agent>();
@@ -93,6 +88,12 @@ export const AgentsTable = compose(
       }
     };
   }, []);
+
+  useEffect(() => {
+    props.filters &&
+      Object.keys(props.filters).length &&
+      setFilters(props.filters);
+  }, [props.filters]);
 
   const reloadAgents = async () => {
     setSelectedItems([]);
@@ -189,26 +190,37 @@ export const AgentsTable = compose(
           <TableWzAPI
             title='Agents'
             addOnTitle={selectedtemsRenderer}
-            actionButtons={[
-              <WzButtonPermissions
-                buttonType='empty'
-                permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
-                iconType='plusInCircle'
-                href={getCore().application.getUrlForApp(endpointSummary.id, {
-                  path: `#${endpointSummary.redirectTo()}deploy`,
-                })}
-              >
-                Deploy new agent
-              </WzButtonPermissions>,
-              <AgentsTableGlobalActions
-                selectedAgents={selectedItems}
-                allAgentsSelected={allAgentsSelected}
-                allAgentsCount={agentList.totalItems}
-                filters={filters}
-                allowEditGroups={!denyEditGroups}
-                reloadAgents={() => reloadAgents()}
-              />,
-            ]}
+            actionButtons={({ filters }) => (
+              <>
+                <EuiFlexItem grow={false}>
+                  <WzButtonPermissions
+                    buttonType='empty'
+                    permissions={[
+                      { action: 'agent:create', resource: '*:*:*' },
+                    ]}
+                    iconType='plusInCircle'
+                    href={getCore().application.getUrlForApp(
+                      endpointSummary.id,
+                      {
+                        path: `#${endpointSummary.redirectTo()}deploy`,
+                      },
+                    )}
+                  >
+                    Deploy new agent
+                  </WzButtonPermissions>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <AgentsTableGlobalActions
+                    selectedAgents={selectedItems}
+                    allAgentsSelected={allAgentsSelected}
+                    allAgentsCount={agentList.totalItems}
+                    filters={filters}
+                    allowEditGroups={!denyEditGroups}
+                    reloadAgents={() => reloadAgents()}
+                  />
+                </EuiFlexItem>
+              </>
+            )}
             endpoint='/agents'
             tableColumns={agentsTableColumns(
               !denyEditGroups,
@@ -237,9 +249,6 @@ export const AgentsTable = compose(
             }}
             rowProps={getRowProps}
             filters={filters}
-            onFiltersChange={() => {
-              setSelectedItems([]);
-            }}
             onDataChange={data => setAgentList(data)}
             downloadCsv
             showReload
