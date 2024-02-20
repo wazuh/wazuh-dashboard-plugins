@@ -45,7 +45,6 @@ import {
   getWazuhCorePlugin,
 } from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
-import { formatUIDate } from '../../../react-services/time-service';
 import { AddAPIHostForm } from './add-api';
 import {
   WzButtonOpenFlyout,
@@ -62,24 +61,23 @@ export const ApiTable = compose(
     constructor(props) {
       super(props);
 
-      const { getAvailableUpdates } = getWazuhCheckUpdatesPlugin();
-
       this.state = {
         apiEntries: [],
         refreshingEntries: false,
         availableUpdates: {},
-        getAvailableUpdates,
         refreshingAvailableUpdates: true,
         apiAvailableUpdateDetails: undefined,
       };
     }
 
-    async getApisAvailableUpdates(forceUpdate = false) {
+    async getApisAvailableUpdates(queryApi = false, forceQuery = false) {
       try {
         this.setState({ refreshingAvailableUpdates: true });
-        const availableUpdates = await this.state.getAvailableUpdates(
-          forceUpdate,
-        );
+        const availableUpdates =
+          await getWazuhCheckUpdatesPlugin().getAvailableUpdates(
+            queryApi,
+            forceQuery,
+          );
         this.setState({ availableUpdates });
       } catch (error) {
         const options = {
@@ -505,7 +503,12 @@ export const ApiTable = compose(
                 <EuiIcon color='danger' type='alert' />
               </EuiToolTip>
             ) : (
-              ''
+              <EuiToolTip
+                position='top'
+                content='The configured API user does not use authentication context.'
+              >
+                <p>-</p>
+              </EuiToolTip>
             );
           },
         },
@@ -698,7 +701,7 @@ export const ApiTable = compose(
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle>
-                      <h2>API Configuration</h2>
+                      <h2>API Connections</h2>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -734,18 +737,18 @@ export const ApiTable = compose(
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   iconType='refresh'
-                  onClick={async () => await this.getApisAvailableUpdates(true)}
+                  onClick={async () =>
+                    await this.getApisAvailableUpdates(true, true)
+                  }
                 >
                   <span>
                     Check updates{' '}
                     <EuiToolTip
-                      title='Last check'
+                      title='Last dashboard check'
                       content={
                         this.state.availableUpdates?.last_check_date
-                          ? formatUIDate(
-                              new Date(
-                                this.state.availableUpdates.last_check_date,
-                              ),
+                          ? getWazuhCorePlugin().utils.formatUIDate(
+                              this.state.availableUpdates.last_check_date,
                             )
                           : '-'
                       }

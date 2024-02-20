@@ -422,7 +422,11 @@ export class WazuhElasticCtrl {
           const filter =
             bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON.replace(
               '"filter":[]',
-              '"filter":[{"match_phrase":{"apiName":"' + master_node + '"}}]',
+              `"filter":[{"bool":{"must":[{"match":{"apiName":"'${master_node}'"}}${
+                name && name !== 'all'
+                  ? `,{"match":{"nodeName":"'${name}'"}}`
+                  : ''
+              }]}}]`,
             );
 
           bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON =

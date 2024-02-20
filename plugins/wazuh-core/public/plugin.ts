@@ -1,6 +1,6 @@
 import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
-import { setCore, setUiSettings } from './plugin-services';
+import { setChrome, setCore, setUiSettings } from './plugin-services';
 import * as utils from './utils';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
@@ -9,10 +9,9 @@ import {
   PLUGIN_SETTINGS,
   PLUGIN_SETTINGS_CATEGORIES,
 } from '../common/constants';
-import { formatBytes } from '../common/services/file-size';
-import { formatLabelValuePair } from '../common/services/settings';
 import { DashboardSecurity } from './utils/dashboard-security';
 import { enhanceConfiguration } from './utils/enhance-configuration';
+import * as hooks from './hooks';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -57,6 +56,7 @@ export class WazuhCorePlugin
   }
 
   public start(core: CoreStart): WazuhCorePluginStart {
+    setChrome(core.chrome);
     setCore(core);
     setUiSettings(core.uiSettings);
 
@@ -64,6 +64,7 @@ export class WazuhCorePlugin
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
+      hooks,
     };
   }
 

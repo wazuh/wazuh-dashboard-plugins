@@ -49,12 +49,7 @@ import {
 } from './redux/actions/appStateActions';
 import { WzAuthentication, loadAppConfig } from './react-services';
 
-import {
-  getAngularModule,
-  getHttp,
-  getWazuhCorePlugin,
-} from './kibana-services';
-import { addHelpMenuToAppChrome } from './utils';
+import { getAngularModule, getWazuhCorePlugin } from './kibana-services';
 
 const app = getAngularModule();
 
@@ -116,9 +111,6 @@ app.run(function ($rootElement) {
       <react-component name="ToastNotificationsModal" props=""></react-component>
       <react-component name="WzUpdatesNotification" props=""></react-component>
     </div>`);
-
-  // Add plugin help links as extension to plugin platform help menu
-  addHelpMenuToAppChrome();
 
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
