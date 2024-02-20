@@ -27,9 +27,17 @@ import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vu
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
+import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
+import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
 import { office365Columns } from '../../overview/office-panel/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
+import { pciColumns } from '../../overview/pci/events/pci-columns';
+import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
+import { nistColumns } from '../../overview/nist/events/nist-columns';
+import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
+import { tscColumns } from '../../overview/tsc/events/tsc-columns';
+import { githubColumns } from '../../overview/github-panel/events/github-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -58,7 +66,7 @@ const EventsTab = {
   component: Events,
 };
 
-const RegulatoryComplianceTabs = [
+const RegulatoryComplianceTabs = columns => [
   DashboardTab,
   {
     id: 'inventory',
@@ -66,7 +74,7 @@ const RegulatoryComplianceTabs = [
     buttons: [ButtonModuleExploreAgent],
     component: ComplianceTable,
   },
-  EventsTab,
+  renderDiscoverTab(DEFAULT_INDEX_PATTERN, columns),
 ];
 
 export const ModulesDefaults = {
@@ -99,12 +107,18 @@ export const ModulesDefaults = {
   },
   aws: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, amazonWebServicesColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   gcp: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, googleCloudColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   pm: {
@@ -174,7 +188,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: GitHubPanel,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -253,27 +267,27 @@ export const ModulesDefaults = {
   },
   pci: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(pciColumns),
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(hipaaColumns),
     availableFor: ['manager', 'agent'],
   },
   nist: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(nistColumns),
     availableFor: ['manager', 'agent'],
   },
   gdpr: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(gdprColumns),
     availableFor: ['manager', 'agent'],
   },
   tsc: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(tscColumns),
     availableFor: ['manager', 'agent'],
   },
   syscollector: {
