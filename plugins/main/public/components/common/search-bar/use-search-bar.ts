@@ -8,11 +8,10 @@ import {
   IIndexPattern,
   IndexPatternsContract,
 } from '../../../../../../src/plugins/data/public';
-import { getDataPlugin } from '../../../kibana-services';
+import { getDataPlugin, getWazuhCorePlugin } from '../../../kibana-services';
 import { useFilterManager, useQueryManager, useTimeFilter } from '../hooks';
 import { AUTHORIZED_AGENTS } from '../../../../common/constants';
 import { AppState } from '../../../react-services/app-state';
-import { getSettingDefaultValue } from '../../../../common/services/settings';
 import { FilterStateStore } from '../../../../../../src/plugins/data/common';
 
 // Input - types
@@ -53,7 +52,8 @@ const useSearchBar = (props?: tUseSearchBarProps): tUserSearchBarResponse => {
 
   useEffect(() => {
     const prevPattern =
-      AppState.getCurrentPattern() || getSettingDefaultValue('pattern');
+      AppState.getCurrentPattern() ||
+      getWazuhCorePlugin().configuration.getSettingValue('pattern');
     if (filters && filters.length > 0) {
       sessionStorage.setItem(
         SESSION_STORAGE_FILTERS_NAME,
