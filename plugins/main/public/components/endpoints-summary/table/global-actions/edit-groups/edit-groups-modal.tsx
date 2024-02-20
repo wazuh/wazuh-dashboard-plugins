@@ -111,13 +111,13 @@ export const EditAgentsGroupsModal = compose(
       }
       try {
         let offset = 0;
-        const limit = 1000;
+        const limit = 2;
         let allAffectedItems: Agent[] = [];
         let totalAffectedItems;
 
         do {
           const { affected_items, total_affected_items } =
-            await getAgentsService(filters.q, limit, offset);
+            await getAgentsService({ filters, limit, offset });
 
           if (totalAffectedItems === undefined) {
             totalAffectedItems = total_affected_items;
@@ -174,8 +174,8 @@ export const EditAgentsGroupsModal = compose(
       const promises = groups.map(group => {
         const promise =
           addOrRemove === 'add'
-            ? addAgentsToGroupService(agentIds, group)
-            : removeAgentsFromGroupService(agentIds, group);
+            ? addAgentsToGroupService({ agentIds, groupId: group })
+            : removeAgentsFromGroupService({ agentIds, groupId: group });
         return promise
           .then(result => {
             const { data, error, message } = result.data;

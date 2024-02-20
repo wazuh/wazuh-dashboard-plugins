@@ -93,10 +93,15 @@ export const EditAgentGroupsModal = compose(
     try {
       addedGroups.length &&
         (await Promise.all(
-          addedGroups?.map(group => addAgentToGroupService(agent.id, group)),
+          addedGroups?.map(groupId =>
+            addAgentToGroupService({ agentId: agent.id, groupId }),
+          ),
         ));
       removedGroups.length &&
-        (await removeAgentFromGroupsService(agent.id, removedGroups));
+        (await removeAgentFromGroupsService({
+          agentId: agent.id,
+          groupIds: removedGroups,
+        }));
       showToast('success', 'Edit agent groups', 'Groups saved successfully');
       reloadAgents();
     } catch (error) {

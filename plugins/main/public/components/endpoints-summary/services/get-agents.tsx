@@ -2,11 +2,15 @@ import IApiResponse from '../../../react-services/interfaces/api-response.interf
 import { WzRequest } from '../../../react-services/wz-request';
 import { Agent } from '../types';
 
-export const getAgentsService = async (
-  filters: any,
-  limit?: number,
-  offset?: number,
-) => {
+export const getAgentsService = async ({
+  filters,
+  limit,
+  offset,
+}: {
+  filters: any;
+  limit?: number;
+  offset?: number;
+}) => {
   const {
     data: { data },
   } = (await WzRequest.apiReq('GET', '/agents', {
