@@ -13,7 +13,9 @@ export const getAgentsByGroup = async () => {
     }: any = await WzRequest.apiReq(
       'GET',
       '/agents/stats/distinct?fields=group',
-      {},
+      {
+        params: { q: 'id!=000' },
+      },
     );
     const groupedData: any[] = [];
     affected_items?.forEach((item: any) => {

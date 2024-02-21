@@ -13,7 +13,9 @@ export const getAgentsByOs = async () => {
     }: any = await WzRequest.apiReq(
       'GET',
       '/agents/stats/distinct?fields=os.platform',
-      {},
+      {
+        params: { q: 'id!=000' },
+      },
     );
     const groupedData: any[] = [];
     affected_items?.forEach((item: any, index: number) => {
