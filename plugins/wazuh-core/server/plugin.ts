@@ -52,10 +52,7 @@ export class WazuhCorePlugin
       .pipe(first())
       .toPromise();
 
-    this.services.dashboardSecurity = createDashboardSecurity(
-      plugins,
-      config.security,
-    );
+    this.services.dashboardSecurity = createDashboardSecurity(plugins);
 
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-saved-object'),

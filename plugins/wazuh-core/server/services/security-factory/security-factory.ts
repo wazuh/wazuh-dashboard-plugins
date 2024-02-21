@@ -25,11 +25,10 @@ export interface ISecurityFactory {
   ): Promise<void>;
 }
 
-export function createDashboardSecurity(
-  { securityDashboards }: PluginSetup,
-  config: any,
-): Promise<ISecurityFactory> {
+export function createDashboardSecurity({
+  securityDashboards,
+}: PluginSetup): Promise<ISecurityFactory> {
   return !!securityDashboards
-    ? new OpenSearchDashboardsSecurityFactory(config)
-    : new DefaultFactory(config);
+    ? new OpenSearchDashboardsSecurityFactory()
+    : new DefaultFactory();
 }

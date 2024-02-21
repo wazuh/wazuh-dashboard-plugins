@@ -3,11 +3,10 @@
 The Wazuh Core plugin has the following settings to configure through the platform configuration
 file (`opensearch_dashboards.yml`):
 
-| setting                                   | type   | default value          | description                                             |
-| ----------------------------------------- | ------ | ---------------------- | ------------------------------------------------------- |
-| `wazuh_core.configuration.encryption_key` | string | `secretencryptionkey!` | Define a key used encrypt some configuration values     |
-| `wazuh_core.instance`                     | string | `wazuh-dashboard`      | Define the instance of the configuration                |
-| `wazuh_core.security.administrator.roles` | string | ['all_access']         | Define the privilegid roles for the administrator users |
+| setting                                   | type   | default value          | description                                         |
+| ----------------------------------------- | ------ | ---------------------- | --------------------------------------------------- |
+| `wazuh_core.configuration.encryption_key` | string | `secretencryptionkey!` | Define a key used encrypt some configuration values |
+| `wazuh_core.instance`                     | string | `wazuh-dashboard`      | Define the instance of the configuration            |
 
 > :warning: Changing the `wazuh_core.configuration.encryption_key` in an environment with API host entries
 > configured previously, it will cause a problem.
@@ -124,12 +123,13 @@ These endpoints communicates with the saved object decrypt and encrypt the data.
 
 # Multiple instances of Wazuh dashboard
 
-If you want to run multiple instances of Wazuh dashboard with different configuration, it is
+If you want to run multiple instances of Wazuh dashboard with different or shared configuration, it is
 possible through using a different configuration. This can be done through the
 `wazuh_core.instance` setting.
 
-For example, if you want to run 2 instances of Wazuh dashboard with different configurations,
-you can configure the `wazuh_core.instance` setting.
+## Different configuration for each instance
+
+Define an unique value for `wazuh_core.instance` setting.
 
 ```yml
 # opensearch_dashboards.yml of Wazuh dashboard instance 1
@@ -141,4 +141,23 @@ wazuh_core.instance: wazuh-dashboard1
 wazuh_core.instance: wazuh-dashboard2
 ```
 
-This cause
+This causes the instances have the configuration independant of the another instance.
+
+## Shared configuraion
+
+Define an the same value in the instance you want to share the configuration.
+
+```yml
+# opensearch_dashboards.yml of Wazuh dashboard instance 1
+wazuh_core.instance: wazuh-dashboard
+```
+
+```yml
+# opensearch_dashboards.yml of Wazuh dashboard instance 1
+wazuh_core.instance: wazuh-dashboard
+```
+
+> Consider some settings requires to restart the server, so if you change some setting that needs
+> to restart the server, then you should restart each instance that is sharing the configuration if
+> you want to take effect. WARNING: some setting that needs the restart are related to the jobs,
+> if these are enabled in multiple instances could cause duplication of information.

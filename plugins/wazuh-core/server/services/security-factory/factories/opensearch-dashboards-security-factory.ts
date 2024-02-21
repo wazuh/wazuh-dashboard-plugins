@@ -8,13 +8,7 @@ import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../.
 
 export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
   platform: string = WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY;
-  constructor(
-    private config: {
-      administrator: {
-        roles: string[];
-      };
-    },
-  ) {}
+  constructor() {}
 
   async getCurrentUser(
     request: OpenSearchDashboardsRequest,
@@ -45,22 +39,12 @@ export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
   ) {
-    const { username, authContext } = await this.getCurrentUser(
-      request,
-      context,
-    );
-    if (
-      this.config.administrator.roles?.length &&
-      authContext.roles.every(
-        (userRole: string) =>
-          !this.config.administrator.roles.includes(userRole),
-      )
-    ) {
-      throw new Error(
-        `User [${username}] has no permission: one of roles: ${this.config.administrator.roles
-          .map(role => `[${role}]`)
-          .join(', ')}`,
-      );
+    const response = await context.security_plugin.esClient
+      .asScoped(request)
+      .callAsCurrentUser('opensearch_security.restapiinfo');
+
+    if (!response.has_api_access) {
+      throw new Error(`User has no permission for rest API access.`);
     }
   }
 }

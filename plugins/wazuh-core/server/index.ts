@@ -18,13 +18,6 @@ const configSchema = schema.object({
   instance: schema.string({
     defaultValue: WAZUH_CORE_CONFIGURATION_INSTANCE,
   }),
-  security: schema.object({
-    administrator: schema.object({
-      roles: schema.arrayOf(schema.string(), {
-        defaultValue: WAZUH_CORE_SECURITY_ADMINISTRATOR_ROLES,
-      }),
-    }),
-  }),
   configuration: schema.object({
     encryption_key: schema.string({
       defaultValue: WAZUH_CORE_ENCRYPTION_PASSWORD,
