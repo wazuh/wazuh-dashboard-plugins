@@ -38,7 +38,7 @@ import {
   validateAgentName,
 } from '../../utils/validations';
 import { compose } from 'redux';
-import { endpointSumary } from '../../../../../utils/applications';
+import { endpointSummary } from '../../../../../utils/applications';
 import { getCore } from '../../../../../kibana-services';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
@@ -46,7 +46,7 @@ export const RegisterAgent = compose(
   withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([
-    { text: endpointSumary.title, href: `#${endpointSumary.redirectTo()}` },
+    { text: endpointSummary.title, href: `#${endpointSummary.redirectTo()}` },
     { text: 'Deploy new agent' },
   ]),
   withUserAuthorizationPrompt([
@@ -184,9 +184,9 @@ export const RegisterAgent = compose(
                   <EuiButtonEmpty
                     size='s'
                     href={getCore().application.getUrlForApp(
-                      endpointSumary.id,
+                      endpointSummary.id,
                       {
-                        path: `#${endpointSumary.redirectTo()}`,
+                        path: `#${endpointSummary.redirectTo()}`,
                       },
                     )}
                     iconType='cross'
@@ -234,9 +234,9 @@ export const RegisterAgent = compose(
                       fill
                       color='primary'
                       href={getCore().application.getUrlForApp(
-                        endpointSumary.id,
+                        endpointSummary.id,
                         {
-                          path: `#${endpointSumary.redirectTo()}`,
+                          path: `#${endpointSummary.redirectTo()}`,
                         },
                       )}
                     >
