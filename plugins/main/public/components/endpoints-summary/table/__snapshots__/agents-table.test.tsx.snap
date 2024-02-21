@@ -271,132 +271,9 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         </span>
                       </span>
                     </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_3"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Group(s)
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os.name,os.version_4"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Operating system
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_node_name_5"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Cluster node
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_version_6"
-                    role="columnheader"
-                    scope="col"
-                    style="width:10%"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Version
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_config_status_7"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Synced
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    class="euiTableHeaderCell"
-                    role="columnheader"
-                    scope="col"
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <span
                       class="euiToolTipAnchor"
@@ -509,7 +386,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                           aria-label="Select all rows"
                           class="euiCheckbox__input"
                           disabled=""
-                          id="_selection_column-checkbox_i32ba25e1-d0f1-11ee-874e-991227b02dda"
+                          id="_selection_column-checkbox_i6be4eb31-d0fa-11ee-81c4-29d002524ab5"
                           type="checkbox"
                         />
                         <div
@@ -517,7 +394,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         />
                         <label
                           class="euiCheckbox__label"
-                          for="_selection_column-checkbox_i32ba25e1-d0f1-11ee-874e-991227b02dda"
+                          for="_selection_column-checkbox_i6be4eb31-d0fa-11ee-81c4-29d002524ab5"
                         >
                           Select all rows
                         </label>
@@ -590,7 +467,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                               class="euiCheckbox__input"
                               data-test-subj="checkboxSelectAll"
                               disabled=""
-                              id="_selection_column-checkbox_i32bae931-d0f1-11ee-874e-991227b02dda"
+                              id="_selection_column-checkbox_i6be5ae81-d0fa-11ee-81c4-29d002524ab5"
                               type="checkbox"
                             />
                             <div
@@ -760,6 +637,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         data-test-subj="tableHeaderCell_version_6"
                         role="columnheader"
                         scope="col"
+                        style="width:10%"
                       >
                         <button
                           class="euiTableHeaderButton"
@@ -1035,84 +913,9 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         </span>
                       </span>
                     </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_version_3"
-                    role="columnheader"
-                    scope="col"
-                    style="width:10%"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Version
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_status_4"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Status
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_config_status_5"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Synced
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    class="euiTableHeaderCell"
-                    role="columnheader"
-                    scope="col"
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <span
                       class="euiToolTipAnchor"
@@ -1233,7 +1036,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                           aria-label="Select all rows"
                           class="euiCheckbox__input"
                           disabled=""
-                          id="_selection_column-checkbox_i32caeec1-d0f1-11ee-874e-991227b02dda"
+                          id="_selection_column-checkbox_i6bf6ec91-d0fa-11ee-81c4-29d002524ab5"
                           type="checkbox"
                         />
                         <div
@@ -1241,7 +1044,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         />
                         <label
                           class="euiCheckbox__label"
-                          for="_selection_column-checkbox_i32caeec1-d0f1-11ee-874e-991227b02dda"
+                          for="_selection_column-checkbox_i6bf6ec91-d0fa-11ee-81c4-29d002524ab5"
                         >
                           Select all rows
                         </label>
@@ -1319,7 +1122,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                               class="euiCheckbox__input"
                               data-test-subj="checkboxSelectAll"
                               disabled=""
-                              id="_selection_column-checkbox_i32cb3ce1-d0f1-11ee-874e-991227b02dda"
+                              id="_selection_column-checkbox_i6bf73ab1-d0fa-11ee-81c4-29d002524ab5"
                               type="checkbox"
                             />
                             <div
@@ -1421,6 +1224,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         data-test-subj="tableHeaderCell_version_3"
                         role="columnheader"
                         scope="col"
+                        style="width:10%"
                       >
                         <button
                           class="euiTableHeaderButton"
@@ -1720,132 +1524,9 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         </span>
                       </span>
                     </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_3"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Group(s)
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os.name,os.version_4"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Operating system
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_node_name_5"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Cluster node
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_version_6"
-                    role="columnheader"
-                    scope="col"
-                    style="width:10%"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Version
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_status_7"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Status
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    class="euiTableHeaderCell"
-                    role="columnheader"
-                    scope="col"
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <span
                       class="euiToolTipAnchor"
@@ -1966,7 +1647,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                           aria-label="Select all rows"
                           class="euiCheckbox__input"
                           disabled=""
-                          id="_selection_column-checkbox_i32c60cc1-d0f1-11ee-874e-991227b02dda"
+                          id="_selection_column-checkbox_i6bf14741-d0fa-11ee-81c4-29d002524ab5"
                           type="checkbox"
                         />
                         <div
@@ -1974,7 +1655,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         />
                         <label
                           class="euiCheckbox__label"
-                          for="_selection_column-checkbox_i32c60cc1-d0f1-11ee-874e-991227b02dda"
+                          for="_selection_column-checkbox_i6bf14741-d0fa-11ee-81c4-29d002524ab5"
                         >
                           Select all rows
                         </label>
@@ -2052,7 +1733,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                               class="euiCheckbox__input"
                               data-test-subj="checkboxSelectAll"
                               disabled=""
-                              id="_selection_column-checkbox_i32c65ae1-d0f1-11ee-874e-991227b02dda"
+                              id="_selection_column-checkbox_i6bf1bc71-d0fa-11ee-81c4-29d002524ab5"
                               type="checkbox"
                             />
                             <div
@@ -2226,6 +1907,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         data-test-subj="tableHeaderCell_version_6"
                         role="columnheader"
                         scope="col"
+                        style="width:10%"
                       >
                         <button
                           class="euiTableHeaderButton"
