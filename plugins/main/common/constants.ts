@@ -54,6 +54,7 @@ export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 
 // Wazuh fim
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim';
+export const WAZUH_INDEX_TYPE_FIM = 'fim';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
