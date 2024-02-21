@@ -1,6 +1,6 @@
 {
   "id": "wazuh",
-  "version": "4.7.3-00",
+  "version": "4.7.3-01",
   "opensearchDashboardsVersion": "opensearchDashboards",
   "configPath": [
     "wazuh"
