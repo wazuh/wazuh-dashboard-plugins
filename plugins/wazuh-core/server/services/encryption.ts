@@ -11,16 +11,16 @@ export class Encryption {
   private salt: Uint8Array;
   private AUTH_TAG_BYTE_LEN: number = 16;
   private SALT_BYTE_LEN: number = 12;
-  constructor(logger: ILogger, options: { password: string }) {
-    if (!options.password) {
-      throw new Error('password must be defined');
+  constructor(logger: ILogger, options: { key: string }) {
+    if (!options.key) {
+      throw new Error('key must be defined');
     }
     this.algorithm = 'aes-256-gcm';
-    // This value is generated from the password
-    this.iv = this.getIV(options.password);
-    // This value is generated from the password
-    this.salt = this.getSalt(options.password);
-    this.key = this.getKeyFromPassword(options.password);
+    // This value is generated from the key
+    this.iv = this.getIV(options.key);
+    // This value is generated from the key
+    this.salt = this.getSalt(options.key);
+    this.key = this.getKeyFromKey(options.key);
   }
 
   /**
@@ -64,16 +64,16 @@ export class Encryption {
     return buffer.toString('utf8');
   }
 
-  private getKeyFromPassword(password: string) {
-    return crypto.scryptSync(password, this.salt, 32);
+  private getKeyFromKey(key: string) {
+    return crypto.scryptSync(key, this.salt, 32);
   }
 
-  private getSalt(password: string): Uint8Array {
-    return this.str2ArrayBuffer(password).slice(0, this.AUTH_TAG_BYTE_LEN);
+  private getSalt(key: string): Uint8Array {
+    return this.str2ArrayBuffer(key).slice(0, this.AUTH_TAG_BYTE_LEN);
   }
 
-  private getIV(password: string): Uint8Array {
-    return this.str2ArrayBuffer(password).slice(0, this.SALT_BYTE_LEN);
+  private getIV(key: string): Uint8Array {
+    return this.str2ArrayBuffer(key).slice(0, this.SALT_BYTE_LEN);
   }
 
   private str2ArrayBuffer(str) {

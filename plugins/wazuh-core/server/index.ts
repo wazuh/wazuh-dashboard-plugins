@@ -26,7 +26,7 @@ const configSchema = schema.object({
     }),
   }),
   configuration: schema.object({
-    encryption_password: schema.string({
+    encryption_key: schema.string({
       defaultValue: WAZUH_CORE_ENCRYPTION_PASSWORD,
     }),
   }),

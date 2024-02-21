@@ -3,13 +3,13 @@
 The Wazuh Core plugin has the following settings to configure through the platform configuration
 file (`opensearch_dashboards.yml`):
 
-| setting                                        | type   | default value     | description                                                   |
-| ---------------------------------------------- | ------ | ----------------- | ------------------------------------------------------------- |
-| `wazuh_core.configuration.encryption_password` | string | `secretpassword!` | Define a password used to get some properties to encrypt data |
-| `wazuh_core.instance`                          | string | `wazuh-dashboard` | Define the instance of the configuration                      |
-| `wazuh_core.security.administrator.roles`      | string | ['all_access']    | Define the privilegid roles for the administrator users       |
+| setting                                   | type   | default value          | description                                             |
+| ----------------------------------------- | ------ | ---------------------- | ------------------------------------------------------- |
+| `wazuh_core.configuration.encryption_key` | string | `secretencryptionkey!` | Define a key used encrypt some configuration values     |
+| `wazuh_core.instance`                     | string | `wazuh-dashboard`      | Define the instance of the configuration                |
+| `wazuh_core.security.administrator.roles` | string | ['all_access']         | Define the privilegid roles for the administrator users |
 
-> :warning: Changing the `wazuh_core.configuration.encryption_password` in an environment with API host entries
+> :warning: Changing the `wazuh_core.configuration.encryption_key` in an environment with API host entries
 > configured previously, it will cause a problem.
 
 # Configuration of the Wazuh scoped plugins
@@ -22,7 +22,7 @@ This service is the way to manage the Wazuh scoped plugins configuration.
 These settings can be configured through the `Server Management` > `App Settings` application.
 
 This configuration is stored in a saved object in the backend side. Some sensitive data such as the
-related to the API host entries is encrypted using `wazuh_core.configuration.encryption_password`.
+related to the API host entries is encrypted using `wazuh_core.configuration.encryption_key`.
 
 ## Configure
 
@@ -92,7 +92,7 @@ POST .kibana*/_delete_by_query
 # Configuration of the API host entries
 
 The API host entries data is stored in the same saved object where is located all the Wazuh scoped
-plugins configuration. This data is encrypted using the `wazuh_core.encryption.password` plugin
+plugins configuration. This data is encrypted using the `wazuh_core.configuration.encryption_key` plugin
 setting defined in the platform configuration.
 
 ## Configure

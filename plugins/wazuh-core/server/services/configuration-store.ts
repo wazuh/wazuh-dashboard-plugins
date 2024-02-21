@@ -8,7 +8,7 @@ import { Encryption } from './encryption';
 
 interface IConfigurationStoreOptions {
   instance: string;
-  encryption_password: string;
+  encryption_key: string;
 }
 export class ConfigurationStore implements IConfigurationStore {
   private type = 'plugins-configuration';
@@ -22,7 +22,7 @@ export class ConfigurationStore implements IConfigurationStore {
     options: IConfigurationStoreOptions,
   ) {
     this.encryption = new Encryption(this.logger.get('encryption'), {
-      password: options.encryption_password,
+      key: options.encryption_key,
     });
     this._config = options;
   }
