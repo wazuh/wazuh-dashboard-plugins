@@ -6,6 +6,7 @@ import { parseData, getFieldFormatted, parseColumns } from './data-grid-service'
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 
 const MAX_ENTRIES_PER_QUERY = 10000;
+const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 
 export type tDataGridColumn = {
     render?: (value: any) => string | React.ReactNode;
@@ -17,11 +18,12 @@ type tDataGridProps = {
     defaultColumns: tDataGridColumn[];
     DocViewInspectButton: ({ rowIndex }: EuiDataGridCellValueElementProps) => React.JSX.Element
     ariaLabelledBy: string;
+    pagination?: Partial<EuiDataGridProps['pagination']>;
 };
 
 
 export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
-    const { indexPattern, DocViewInspectButton, results, defaultColumns } = props;
+    const { indexPattern, DocViewInspectButton, results, defaultColumns, pagination: defaultPagination } = props;
     /** Columns **/
     const [columns, setColumns] = useState<tDataGridColumn[]>(defaultColumns);
     const [columnVisibility, setVisibility] = useState(() =>
@@ -40,7 +42,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     const [sortingColumns, setSortingColumns] = useState(defaultSorting);
     const onSort = (sortingColumns) => { setSortingColumns(sortingColumns) };
     /** Pagination **/
-    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
+    const [pagination, setPagination] = useState<EuiDataGridProps['pagination']>(defaultPagination || { pageIndex: 0, pageSize: 20, pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS });
     const onChangeItemsPerPage = useMemo(() => (pageSize) =>
         setPagination((pagination) => ({
             ...pagination,
@@ -95,7 +97,6 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         sorting: { columns: sortingColumns, onSort },
         pagination: {
             ...pagination,
-            pageSizeOptions: [20, 50, 100],
             onChangeItemsPerPage: onChangeItemsPerPage,
             onChangePage: onChangePage,
         }

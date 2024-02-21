@@ -1181,14 +1181,14 @@
                 "socket",
                 "syscheck",
                 "syslog_output",
+                "indexer",
                 "aws-s3",
                 "azure-logs",
                 "cis-cat",
                 "docker-listener",
                 "open-scap",
                 "osquery",
-                "syscollector",
-                "vulnerability-detector"
+                "syscollector"
               ]
             }
           },
@@ -4845,14 +4845,14 @@
                 "socket",
                 "syscheck",
                 "syslog_output",
+                "indexer",
                 "aws-s3",
                 "azure-logs",
                 "cis-cat",
                 "docker-listener",
                 "open-scap",
                 "osquery",
-                "syscollector",
-                "vulnerability-detector"
+                "syscollector"
               ]
             }
           },
@@ -5354,6 +5354,33 @@
           {
             "name": "wait_for_complete",
             "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/manager/version/check",
+        "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api.controllers.manager_controller.check_available_version",
+        "description": "Return if there is any available update",
+        "summary": "Check available updates",
+        "tags": [
+          "Manager"
+        ],
+        "query": [
+          {
+            "name": "force_query",
+            "description": "Force query to CTI service",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
             "schema": {
               "type": "boolean",
               "default": false
@@ -9213,288 +9240,6 @@
             }
           }
         ]
-      },
-      {
-        "name": "/vulnerability/:agent_id",
-        "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.get_vulnerability_agent",
-        "description": "Return the vulnerabilities of an agent",
-        "summary": "Get vulnerabilities",
-        "tags": [
-          "Vulnerability"
-        ],
-        "args": [
-          {
-            "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 3,
-              "description": "Agent ID",
-              "format": "numbers"
-            }
-          }
-        ],
-        "query": [
-          {
-            "name": "architecture",
-            "description": "Filter by architecture",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "cve",
-            "description": "Filter by CVE",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "distinct",
-            "description": "Look for distinct values.",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "limit",
-            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 500,
-              "minimum": 1,
-              "maximum": 100000
-            }
-          },
-          {
-            "name": "name",
-            "description": "Filter by name",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "offset",
-            "description": "First element to return in the collection",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0,
-              "minimum": 0
-            }
-          },
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "q",
-            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
-            "schema": {
-              "type": "string",
-              "format": "search"
-            }
-          },
-          {
-            "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "names"
-              }
-            }
-          },
-          {
-            "name": "severity",
-            "description": "Filter by CVE severity",
-            "schema": {
-              "type": "string",
-              "format": "names"
-            }
-          },
-          {
-            "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
-            "schema": {
-              "type": "string",
-              "format": "sort"
-            }
-          },
-          {
-            "name": "status",
-            "description": "Filter by CVE status",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "valid",
-                "pending",
-                "obsolete"
-              ]
-            }
-          },
-          {
-            "name": "type",
-            "description": "Filter by CVE type",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "os",
-                "package"
-              ]
-            }
-          },
-          {
-            "name": "version",
-            "description": "Filter by CVE version",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric_symbols"
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/vulnerability/:agent_id/last_scan",
-        "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.get_last_scan_agent",
-        "description": "Return when the last full and partial vulnerability scan of a specified agent ended.",
-        "summary": "Get last scan datetime",
-        "tags": [
-          "Vulnerability"
-        ],
-        "args": [
-          {
-            "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 3,
-              "description": "Agent ID",
-              "format": "numbers"
-            }
-          }
-        ],
-        "query": [
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/vulnerability/:agent_id/summary/:field",
-        "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.get_vulnerabilities_field_summary",
-        "description": "Return a summary of the vulnerabilities' field of an agent",
-        "summary": "Get agent vulnerabilities' field summary",
-        "tags": [
-          "Vulnerability"
-        ],
-        "args": [
-          {
-            "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 3,
-              "description": "Agent ID",
-              "format": "numbers"
-            }
-          },
-          {
-            "name": ":field",
-            "description": "Vulnerability inventory field",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "cve",
-                "name",
-                "version",
-                "architecture",
-                "detection_time",
-                "severity",
-                "cvss2_score",
-                "cvss3_score",
-                "external_references",
-                "type",
-                "status",
-                "condition",
-                "title",
-                "published",
-                "updated"
-              ]
-            }
-          }
-        ],
-        "query": [
-          {
-            "name": "limit",
-            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 500,
-              "minimum": 1,
-              "maximum": 100000
-            }
-          },
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
       }
     ]
   },
@@ -10975,33 +10720,6 @@
               }
             }
           },
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/vulnerability",
-        "documentation": "https://documentation.wazuh.com/4.8/user-manual/api/reference.html#operation/api.controllers.vulnerability_controller.run_vulnerability_scan",
-        "description": "Run a vulnerability detector scan in all nodes",
-        "summary": "Run vulnerability detector scan",
-        "tags": [
-          "Vulnerability"
-        ],
-        "query": [
           {
             "name": "pretty",
             "description": "Show results in human-readable format",

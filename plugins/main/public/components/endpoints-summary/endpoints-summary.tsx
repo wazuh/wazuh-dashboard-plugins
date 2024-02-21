@@ -33,7 +33,7 @@ import {
   withErrorBoundary,
 } from '../common/hocs';
 import { compose } from 'redux';
-import { endpointSumary, itHygiene } from '../../utils/applications';
+import { endpointSummary } from '../../utils/applications';
 import { ShareAgent } from '../../factories/share-agent';
 import './endpoints-summary.scss';
 import OutdatedAgentsCard from './dashboard/components/outdated-agents-card';
@@ -46,7 +46,7 @@ import { EndpointsSummaryDashboard } from './dashboard/endpoints-summary-dashboa
 export const EndpointsSummary = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
+  withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },

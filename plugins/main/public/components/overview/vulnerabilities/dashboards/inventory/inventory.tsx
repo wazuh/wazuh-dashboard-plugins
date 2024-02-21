@@ -18,7 +18,7 @@ import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
 import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
-import { getPlugins } from '../../../../../kibana-services';
+import { getPlugins, getWazuhCorePlugin } from '../../../../../kibana-services';
 import {
   ErrorHandler,
   ErrorFactory,
@@ -33,7 +33,7 @@ import DocViewer from '../../../../common/doc-viewer/doc-viewer';
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { useAppConfig } from '../../../../common/hooks';
 import { useDataGrid } from '../../../../common/data-grid/use-data-grid';
-import { useDocViewer } from '../../../../common/doc-viewer/use-doc-viewer';
+import { useDocViewer } from '../../../../common/doc-viewer/use-doc-viewer';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { search } from '../../../../common/search-bar/search-bar-service';
 import { exportSearchToCSV } from '../../../../common/data-grid/data-grid-service';
@@ -56,6 +56,8 @@ const InventoryVulsComponent = () => {
   );
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+
+  const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
@@ -198,7 +200,9 @@ const InventoryVulsComponent = () => {
           isSuccess &&
           results?.hits?.total > 0 ? (
             <EuiDataGrid
+              className={sideNavDocked ? 'dataGridDockedNav' : ''}
               {...dataGridProps}
+              className={sideNavDocked ? 'dataGridDockedNav' : ''}
               toolbarVisibility={{
                 additionalControls: (
                   <>
@@ -221,7 +225,10 @@ const InventoryVulsComponent = () => {
                       }
                     />
                     <EuiButtonEmpty
-                      disabled={results?.hits?.total === 0 || !columnVisibility?.visibleColumns?.length}
+                      disabled={
+                        results?.hits?.total === 0 ||
+                        !columnVisibility?.visibleColumns?.length
+                      }
                       size='xs'
                       iconType='exportAction'
                       color='primary'
@@ -240,7 +247,7 @@ const InventoryVulsComponent = () => {
             <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
               <EuiFlyoutHeader>
                 <EuiTitle>
-                  <h2>Document Details</h2>
+                  <h2>Document details</h2>
                 </EuiTitle>
               </EuiFlyoutHeader>
               <EuiFlyoutBody>

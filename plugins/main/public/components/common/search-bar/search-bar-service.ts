@@ -17,10 +17,14 @@ export interface SearchParams {
             direction: 'asc' | 'desc';
         }[];
     };
+    dateRange?: {
+        from: string;
+        to: string;
+    };
 }
 
 export const search = async (params: SearchParams): Promise<SearchResponse | void> => {
-    const { indexPattern, filters = [], query, pagination, sorting, fields } = params;
+    const { indexPattern, filters: defaultFilters = [], query, pagination, sorting, fields } = params;
     if(!indexPattern){
         return;
     }
@@ -31,6 +35,24 @@ export const search = async (params: SearchParams): Promise<SearchResponse | voi
         const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
         return { [column?.id || '']: sortDirection } as OpenSearchQuerySortValue;
     }) || [];
+    let filters = defaultFilters;
+
+    // check if dateRange is defined
+    if(params.dateRange && params.dateRange?.from && params.dateRange?.to){
+        const { from, to } = params.dateRange;
+        filters = [
+            ...filters,
+            {
+                range: {
+                    [indexPattern.timeFieldName || 'timestamp']: {
+                        gte: from,
+                        lte: to,
+                        format: 'strict_date_optional_time'
+                    }
+                }
+            }
+        ]
+    }
 
     const searchParams = searchSource
         .setParent(undefined)

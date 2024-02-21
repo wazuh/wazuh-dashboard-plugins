@@ -46,7 +46,8 @@ import {
   UI_LOGGER_LEVELS,
 } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { itHygiene } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
+import { getCore } from '../../../kibana-services';
 
 const tableColumns = [
   {
@@ -106,7 +107,10 @@ export const MainAgentStats = compose(
   withReduxProvider,
   withGlobalBreadcrumb(({ agent }) => [
     {
-      text: itHygiene.title,
+      text: endpointSummary.breadcrumbLabel,
+      href: getCore().application.getUrlForApp(endpointSummary.id, {
+        path: `#/agents-preview`,
+      }),
     },
     { agent },
     {
