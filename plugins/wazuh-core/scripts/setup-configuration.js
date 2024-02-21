@@ -1,6 +1,6 @@
-const cliName = 'migrate-config-file';
+const cliName = 'setup-configuration';
 const cliDescription =
-  'Migrate the configuration from the configuration file to the saved object. This requires the server is up.';
+  'Setup the configuration from the configuration file to the saved object. This requires the server is up.';
 
 const platformName = 'Wazuh dashboard';
 
@@ -26,9 +26,6 @@ const cli = require('./lib/cli')(
       parse: (parameter, input, { logger, option, help }) => {
         help();
         process.exit(0);
-        return {
-          [option.long]: true,
-        };
       },
     },
     {
