@@ -26,20 +26,12 @@ import {
 } from '../../../services';
 import { Agent } from '../../../types';
 import { EditAgentsGroupsModalResult } from './result';
+import { ErrorAgent } from '../../../services/paginated-agents-group';
 
 export enum RESULT_TYPE {
   SUCCESS = 'success',
   ERROR = 'error',
 }
-
-export type ErrorAgent = {
-  error: {
-    code?: number;
-    message: string;
-    remediation?: string;
-  };
-  id: string[];
-};
 
 export type GroupResult = {
   group: string;

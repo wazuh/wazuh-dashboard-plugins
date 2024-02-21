@@ -14,7 +14,7 @@ export const paginatedAgentsGroupService = async ({
   addOrRemove,
   agentIds,
   groupId,
-  pageSize = 2,
+  pageSize = 1000,
 }: {
   addOrRemove: 'add' | 'remove';
   agentIds: string[];
