@@ -223,7 +223,7 @@ export const EditAgentsGroupsModalResult = ({
                           paddingSize='m'
                           buttonContent={groupStatus({
                             status: RESULT_TYPE.ERROR,
-                            text: `${errorMessage} (${totalErrorAgents})`,
+                            text: `Failed agents (${totalErrorAgents})`,
                           })}
                         >
                           {errorsTable(errorAgents)}

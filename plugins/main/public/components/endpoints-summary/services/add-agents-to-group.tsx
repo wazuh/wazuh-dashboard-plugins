@@ -1,22 +1,9 @@
 import IApiResponse from '../../../react-services/interfaces/api-response.interface';
-import { WzRequest } from '../../../react-services/wz-request';
+import { paginatedAgentsGroupService } from './paginated-agents-group';
 
-export const addAgentsToGroupService = async ({
-  agentIds,
-  groupId,
-}: {
+export const addAgentsToGroupService = async (parameters: {
   agentIds: string[];
   groupId: string;
-}) =>
-  (await WzRequest.apiReq(
-    'PUT',
-    `/agents/group`,
-    {
-      params: {
-        group_id: groupId,
-        agents_list: agentIds.join(','),
-        wait_for_complete: true,
-      },
-    },
-    { returnOriginalResponse: true },
-  )) as IApiResponse<string>;
+  pageSize?: number;
+}): Promise<IApiResponse<string>> =>
+  await paginatedAgentsGroupService({ addOrRemove: 'add', ...parameters });
