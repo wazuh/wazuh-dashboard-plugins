@@ -5,6 +5,7 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { getColorPaletteByIndex } from './get-color-palette-by-index';
 
 export const getAgentsByGroup = async () => {
+  const DEFAULT_COUNT = 1;
   try {
     const {
       data: {
@@ -19,19 +20,13 @@ export const getAgentsByGroup = async () => {
     );
     const groupedData: any[] = [];
     affected_items?.forEach((item: any) => {
-      const itemGroupName = item?.group ?? 'Unknown';
-      const foundItem = groupedData.find(
-        (groupedItem: any) => groupedItem.label === itemGroupName,
-      );
-      if (foundItem) {
-        foundItem.value = foundItem.value + 1;
-      } else {
-        groupedData.push({
-          label: itemGroupName,
-          value: 1,
-          color: getColorPaletteByIndex(groupedData.length),
-        });
-      }
+      const itemGroupName = item?.group?.join(',') ?? 'Unknown';
+      const itemCount = item?.count ?? DEFAULT_COUNT;
+      groupedData.push({
+        label: itemGroupName,
+        value: itemCount,
+        color: getColorPaletteByIndex(groupedData.length),
+      });
     });
     return groupedData;
   } catch (error) {
