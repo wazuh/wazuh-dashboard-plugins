@@ -214,11 +214,11 @@ describe('[endpoint] PUT /utils/configuration', () => {
   // If any of the parameters is changed this variable should be updated with the new md5
   it.each`
     footer              | header                                 | responseStatusCode | expectedMD5                           | tab
-    ${null}             | ${null}                                | ${200}             | ${'301281824427c6ea8546fd14ee1aa5d8'} | ${'pm'}
-    ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'} | ${200}             | ${'c2adfd7ab05ae3ed1548abd3c8be8f7e'} | ${'general'}
-    ${''}               | ${''}                                  | ${200}             | ${'06726f42a4129dd47262ea7228939006'} | ${'fim'}
-    ${'Custom Footer'}  | ${null}                                | ${200}             | ${'1ea187181c307a4be5e90a38f614c42d'} | ${'aws'}
-    ${null}             | ${'Custom Header'}                     | ${200}             | ${'f2fc0804eb52ebca21291eb5a40dec35'} | ${'gcp'}
+    ${null}             | ${null}                                | ${200}             | ${'7f497384a622d116b260e14c7bd9d0dc'} | ${'pm'}
+    ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'} | ${200}             | ${'db832dc7cb2eb918d5e2df1f6cecb8b1'} | ${'general'}
+    ${''}               | ${''}                                  | ${200}             | ${'cb39c81684c5a9b19cbf5a38dc19061c'} | ${'fim'}
+    ${'Custom Footer'}  | ${null}                                | ${200}             | ${'11603a29c2b90979161c6e1b09cfe345'} | ${'aws'}
+    ${null}             | ${'Custom Header'}                     | ${200}             | ${'67d868e5655a1a7068f457348a8a35c8'} | ${'gcp'}
   `(
     `Set custom report header and footer - Verify PDF output`,
     async ({ footer, header, responseStatusCode, expectedMD5, tab }) => {
@@ -257,7 +257,6 @@ describe('[endpoint] PUT /utils/configuration', () => {
           .put('/utils/configuration')
           .send(configurationBody)
           .expect(responseStatusCode);
-        return;
         if (typeof footer == 'string') {
           expect(
             responseConfig.body?.data?.updatedConfiguration?.[
