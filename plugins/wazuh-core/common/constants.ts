@@ -2183,7 +2183,5 @@ export const SEARCH_BAR_DEBOUNCE_UPDATE_TIME = 400;
 // Plugin settings
 export const WAZUH_CORE_ENCRYPTION_PASSWORD = 'secretencryptionkey!';
 
-// Security
-export const WAZUH_CORE_SECURITY_ADMINISTRATOR_ROLES = ['all_access'];
-
+// Configuration backend service
 export const WAZUH_CORE_CONFIGURATION_INSTANCE = 'wazuh-dashboard';
