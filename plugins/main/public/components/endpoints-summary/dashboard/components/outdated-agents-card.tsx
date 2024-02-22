@@ -78,7 +78,11 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
           closePopover={onHideOutdatedAgents}
           anchorPosition='downLeft'
         >
-          <EuiButtonEmpty iconType='filter' onClick={handleClick}>
+          <EuiButtonEmpty
+            iconType='filter'
+            onClick={handleClick}
+            isDisabled={!(data?.length > 0)}
+          >
             Filter outdated agents
           </EuiButtonEmpty>
           <EuiPopoverFooter>
