@@ -347,9 +347,13 @@ describe('AgentsTable component', () => {
 
     // Set table id to avoid snapshot changes
 
-    const tableId = '__table_d1f8f8c3-1198-11ee-ab9b-75fc624fc672';
+    const tableId = '__table_d203a723-1198-11ee-ab9b-75fc624fc672';
+    const checkBoxSelectId =
+      '_selection_column-checkbox_i6bf14741-d0fa-11ee-81c4-29d002524ab5';
 
     wrapper.find('table')[0]['attribs']['id'] = tableId;
+    wrapper.find('.euiCheckbox__input')[0]['attribs']['id'] = checkBoxSelectId;
+    wrapper.find('.euiCheckbox__label')[0]['attribs']['for'] = checkBoxSelectId;
 
     expect(wrapper).toMatchSnapshot();
     expect(
@@ -375,9 +379,13 @@ describe('AgentsTable component', () => {
 
     // Set table id to avoid snapshot changes
 
-    const tableId = '__table_d1fddac1-1198-11ee-ab9b-75fc624fc672';
+    const tableId = '__table_d203a723-1198-11ee-ab9b-75fc624fc672';
+    const checkBoxSelectId =
+      '_selection_column-checkbox_i6bf14741-d0fa-11ee-81c4-29d002524ab5';
 
     wrapper.find('table')[0]['attribs']['id'] = tableId;
+    wrapper.find('.euiCheckbox__input')[0]['attribs']['id'] = checkBoxSelectId;
+    wrapper.find('.euiCheckbox__label')[0]['attribs']['for'] = checkBoxSelectId;
 
     expect(wrapper).toMatchSnapshot();
     expect(
@@ -408,8 +416,12 @@ describe('AgentsTable component', () => {
     // Set table id to avoid snapshot changes
 
     const tableId = '__table_d203a723-1198-11ee-ab9b-75fc624fc672';
+    const checkBoxSelectId =
+      '_selection_column-checkbox_i6bf14741-d0fa-11ee-81c4-29d002524ab5';
 
     wrapper.find('table')[0]['attribs']['id'] = tableId;
+    wrapper.find('.euiCheckbox__input')[0]['attribs']['id'] = checkBoxSelectId;
+    wrapper.find('.euiCheckbox__label')[0]['attribs']['for'] = checkBoxSelectId;
 
     expect(wrapper).toMatchSnapshot();
     expect(
