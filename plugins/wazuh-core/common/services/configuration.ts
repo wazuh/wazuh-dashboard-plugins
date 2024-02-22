@@ -146,7 +146,7 @@ export interface IConfigurationStore {
   stop: () => Promise<any>;
   get: (...settings: string[]) => Promise<TConfigurationSettings>;
   set: (settings: TConfigurationSettings) => Promise<any>;
-  clean: (...settings: string[]) => Promise<any>;
+  clear: (...settings: string[]) => Promise<any>;
   setConfiguration: (configuration: IConfiguration) => void;
 }
 
@@ -295,10 +295,10 @@ export class Configuration implements IConfiguration {
     if (settings) {
       this.logger.debug(`Clean settings: ${settings.join(', ')}`);
       const response = await this.store.clear(...settings);
-      this.logger.info('Settings were cleaned');
+      this.logger.info('Settings were cleared');
       return response;
     } else {
-      return await this.clear();
+      return await this.clear(...Array.from(this._settings.keys()));
     }
   }
 
