@@ -24,7 +24,12 @@ export const getGroupsService = async ({
         data: { affected_items, total_affected_items },
       },
     } = (await WzRequest.apiReq('GET', '/groups', {
-      params: { limit: queryLimit, offset: queryOffset, q: filters },
+      params: {
+        limit: queryLimit,
+        offset: queryOffset,
+        q: filters,
+        wait_for_complete: true,
+      },
     })) as IApiResponse<Group>;
 
     if (totalAffectedItems === undefined) {

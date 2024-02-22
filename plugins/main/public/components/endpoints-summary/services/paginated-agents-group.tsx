@@ -32,7 +32,6 @@ export const paginatedAgentsGroupService = async ({
 
   do {
     requestAgentIds = agentIds.slice(offset, offset + pageSize);
-    offset += pageSize;
 
     const {
       data: {
@@ -59,9 +58,12 @@ export const paginatedAgentsGroupService = async ({
     )) as IApiResponse<string>;
 
     error += responseError;
-    message = message.includes(responseMessage)
-      ? message
-      : message + ', ' + responseMessage;
+    message =
+      offset === 0
+        ? responseMessage
+        : message.includes(responseMessage)
+        ? message
+        : message + ', ' + responseMessage;
     totalAffectedItems += responseTotalAffectedItems;
     totalFailedItems += responseTotalFailedItems;
     allAffectedItems = [...allAffectedItems, ...responseAffectedItems];
@@ -88,6 +90,8 @@ export const paginatedAgentsGroupService = async ({
     });
 
     allFailedItems = [...mergeFailedItems, ...notExistFailedItems];
+
+    offset += pageSize;
   } while (offset < agentIds.length);
 
   return {

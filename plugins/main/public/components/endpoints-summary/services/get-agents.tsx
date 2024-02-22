@@ -24,7 +24,12 @@ export const getAgentsService = async ({
         data: { affected_items, total_affected_items },
       },
     } = (await WzRequest.apiReq('GET', '/agents', {
-      params: { limit: queryLimit, offset: queryOffset, q: filters },
+      params: {
+        limit: queryLimit,
+        offset: queryOffset,
+        q: filters,
+        wait_for_complete: true,
+      },
     })) as IApiResponse<Agent>;
 
     if (totalAffectedItems === undefined) {
