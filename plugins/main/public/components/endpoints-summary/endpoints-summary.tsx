@@ -114,16 +114,20 @@ export const EndpointsSummary = compose(
     }
 
     filterAgentByGroup(item: any) {
+      const groups: string = item?.label
+        ?.split(',')
+        .map((groupLabel: string) => `group=${groupLabel}`)
+        .join(';');
       this._isMount &&
         this.setState({
-          agentTableFilters: { q: `id!=000;group=${item.label}` },
+          agentTableFilters: { q: `id!=000;${groups}` },
         });
     }
 
     filterByOutdatedAgent(outdatedAgents: any) {
-      const ids: string[] = outdatedAgents
+      const ids: string = outdatedAgents
         .map((agent: any) => `id=${agent.id}`)
-        .join(' or ');
+        .join(',');
       this._isMount &&
         this.setState({
           agentTableFilters: { q: `id!=000;${ids}` },
