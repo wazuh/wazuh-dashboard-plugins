@@ -50,7 +50,7 @@ export class CacheTTL<T> {
   get(data: any, key?: string) {
     const cacheKey = this.getKey(data, key);
     this.logger.debug(`Get key: [${cacheKey}]`);
-    return this._cache.get(cacheKey);
+    return this._cache.get(cacheKey)?.value;
   }
   set(data: any, key?: string) {
     const cacheKey = this.getKey(data, key);
