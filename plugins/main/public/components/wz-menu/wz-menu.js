@@ -89,6 +89,7 @@ export const WzMenu = withWindowSize(
       );
       try {
         const APIlist = await this.loadApiList();
+        this.setState({ APIlist: APIlist });
         if (APIlist.length) {
           const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
           const filteredApi = APIlist.filter(api => api.id === apiId);
@@ -143,9 +144,7 @@ export const WzMenu = withWindowSize(
     loadApiList = async () => {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const APIlist = (result || {}).data || [];
-      if (APIlist.length) {
-        return APIlist;
-      }
+      return APIlist;
     };
 
     loadIndexPatternsList = async () => {
@@ -201,10 +200,6 @@ export const WzMenu = withWindowSize(
 
     async componentDidUpdate(prevProps) {
       let newState = {};
-      if (this.state.APIlist && !this.state.APIlist.length) {
-        const APIlist = await this.loadApiList();
-        newState = { ...newState, APIlist };
-      }
       const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
       const { currentAPI } = this.state;
       const currentTab = this.getCurrentTab();
@@ -375,7 +370,7 @@ export const WzMenu = withWindowSize(
       this.setState({
         menuOpened: false,
         hover: this.state.currentMenuTab,
-        ...(await this.loadApiList()),
+        APIList: await this.loadApiList(),
         ...(await this.loadIndexPatternsList()),
       });
     };
