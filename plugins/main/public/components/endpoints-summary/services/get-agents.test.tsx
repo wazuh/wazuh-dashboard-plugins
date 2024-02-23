@@ -1,4 +1,3 @@
-// Importa las funciones y tipos necesarios
 import { getAgentsService } from './get-agents';
 import { WzRequest } from '../../../react-services/wz-request';
 

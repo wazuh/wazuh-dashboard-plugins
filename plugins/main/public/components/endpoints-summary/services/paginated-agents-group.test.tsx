@@ -1,4 +1,3 @@
-// Importa las funciones y tipos necesarios
 import { paginatedAgentsGroupService } from './paginated-agents-group';
 import { WzRequest } from '../../../react-services/wz-request';
 
