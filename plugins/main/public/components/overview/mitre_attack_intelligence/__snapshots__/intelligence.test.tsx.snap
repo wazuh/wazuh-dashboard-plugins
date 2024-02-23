@@ -286,7 +286,11 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
                                     viewBox="0 0 16 16"
                                     width="16"
                                     xmlns="http://www.w3.org/2000/svg"
-                                  />
+                                  >
+                                    <path
+                                      d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                                    />
+                                  </svg>
                                   <span
                                     class="euiButtonEmpty__text"
                                   >
@@ -363,6 +367,25 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
                                   d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
                                 />
                               </svg>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          aria-live="polite"
+                          aria-sort="none"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_description_2"
+                          role="columnheader"
+                          scope="col"
+                        >
+                          <button
+                            class="euiTableHeaderButton"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
                               <span
                                 class="euiTableCellContent__text"
                               >
@@ -396,119 +419,6 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
                   </table>
                 </div>
               </div>
-              <table
-                class="euiTable euiTable--responsive"
-                id="htmlId"
-                tabindex="-1"
-              >
-                <caption
-                  class="euiScreenReaderOnly euiTableCaption"
-                />
-                <thead>
-                  <tr>
-                    <th
-                      class="euiTableHeaderCell"
-                      data-test-subj="tableHeaderCell_external_id_0"
-                      role="columnheader"
-                      scope="col"
-                      style="width:12%"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          ID
-                        </span>
-                      </span>
-                    </th>
-                    <th
-                      aria-live="polite"
-                      aria-sort="ascending"
-                      class="euiTableHeaderCell"
-                      data-test-subj="tableHeaderCell_name_1"
-                      role="columnheader"
-                      scope="col"
-                      style="width:30%"
-                    >
-                      <button
-                        class="euiTableHeaderButton euiTableHeaderButton-isSorted"
-                        data-test-subj="tableHeaderSortButton"
-                        type="button"
-                      >
-                        <span
-                          class="euiTableCellContent"
-                        >
-                          <span
-                            class="euiTableCellContent__text"
-                          >
-                            Name
-                          </span>
-                          <svg
-                            aria-hidden="true"
-                            class="euiIcon euiIcon--medium euiIcon-isLoading euiTableSortIcon"
-                            focusable="false"
-                            height="16"
-                            role="img"
-                            viewBox="0 0 16 16"
-                            width="16"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                            />
-                          </svg>
-                        </span>
-                      </button>
-                    </th>
-                    <th
-                      aria-live="polite"
-                      aria-sort="none"
-                      class="euiTableHeaderCell"
-                      data-test-subj="tableHeaderCell_description_2"
-                      role="columnheader"
-                      scope="col"
-                    >
-                      <button
-                        class="euiTableHeaderButton"
-                        data-test-subj="tableHeaderSortButton"
-                        type="button"
-                      >
-                        <span
-                          class="euiTableCellContent"
-                        >
-                          <span
-                            class="euiTableCellContent__text"
-                          >
-                            Description
-                          </span>
-                        </span>
-                      </button>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    class="euiTableRow"
-                  >
-                    <td
-                      class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                      colspan="3"
-                    >
-                      <div
-                        class="euiTableCellContent euiTableCellContent--alignCenter"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          No items found
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
