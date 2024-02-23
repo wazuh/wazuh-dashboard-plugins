@@ -52,7 +52,12 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
         <EuiStat
           className='wazuh-outdated-metric'
           title={
-            <EuiTextColor color={contentType}>{outdatedAgents}</EuiTextColor>
+            <EuiTextColor
+              data-testid='wazuh-endpoints-summary-outdated-agents-number'
+              color={contentType}
+            >
+              {outdatedAgents}
+            </EuiTextColor>
           }
           description={
             <EuiTextColor color={contentType}>
