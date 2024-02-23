@@ -20,7 +20,10 @@ import {
   ConfigurationStore,
 } from './services';
 import { Configuration } from '../common/services/configuration';
-import { PLUGIN_SETTINGS } from '../common/constants';
+import {
+  PLUGIN_SETTINGS,
+  WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
+} from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
 import { first } from 'rxjs/operators';
 import { WazuhCorePluginConfigType } from '.';
@@ -57,7 +60,11 @@ export class WazuhCorePlugin
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-saved-object'),
       core.savedObjects,
-      { ...config.configuration, instance: config.instance },
+      {
+        ...config.configuration,
+        instance: config.instance,
+        cache_seconds: WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
+      },
     );
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
