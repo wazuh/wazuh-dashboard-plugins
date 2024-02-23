@@ -1,5 +1,7 @@
 .chart-legend {
   width: 150px;
+  overflow: auto;
+  scrollbar-width: none;
 }
 
 .chart-legend > li {

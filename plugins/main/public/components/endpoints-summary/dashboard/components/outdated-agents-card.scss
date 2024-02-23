@@ -20,3 +20,7 @@
   width: 3.5rem;
   height: 3.5rem;
 }
+
+div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
+  scrollbar-width: none;
+}
