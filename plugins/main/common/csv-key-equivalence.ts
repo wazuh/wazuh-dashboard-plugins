@@ -120,5 +120,5 @@ export const KeyEquivalence: {[key: string]: string} = {
   reason: 'Reason',
   registerIP: 'Register IP',
   hotfix: 'Update code',
-  'scan.time': 'Registered by Wazuh at'
+  'scan.time': 'Registered at'
 };

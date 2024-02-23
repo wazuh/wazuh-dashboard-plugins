@@ -1641,7 +1641,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   },
   'wazuh.monitoring.pattern': {
     title: 'Index pattern',
-    description: 'Default index pattern to use for Wazuh monitoring.',
+    description: 'Default index pattern to use for monitoring.',
     category: SettingCategory.MONITORING,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_MONITORING_PATTERN,
