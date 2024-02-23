@@ -48,7 +48,6 @@ import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { WzAuthentication, loadAppConfig } from './react-services';
 
 import { getAngularModule, getHttp } from './kibana-services';
-import { addHelpMenuToAppChrome } from './utils';
 
 const app = getAngularModule();
 
@@ -78,7 +77,7 @@ app.run([
       .then(item => {
         store.dispatch(updateCurrentPlatform(item));
       })
-      .catch(() => {});
+      .catch(() => { });
 
     // Init the process of refreshing the user's token when app start.
     checkPluginVersion().finally(WzAuthentication.refresh);
@@ -102,8 +101,6 @@ app.run(function ($rootElement) {
       <react-component name="WzUpdatesNotification" props=""></react-component>
     </div>`);
 
-  // Add plugin help links as extension to plugin platform help menu
-  addHelpMenuToAppChrome();
 
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(

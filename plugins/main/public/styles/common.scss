@@ -1844,3 +1844,18 @@ iframe.width-changed {
 .wz-vertical-align-middle {
   vertical-align: middle !important;
 }
+
+/* Workaround to fix maximize embeddable dashboard */
+.wz-app .dshLayout-isMaximizedPanel {
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+/* OSD Data grid full screen with dock navigation left sidebar */
+
+.dataGridDockedNav {
+  &.euiDataGrid--fullScreen {
+    left: 320px;
+  }
+}

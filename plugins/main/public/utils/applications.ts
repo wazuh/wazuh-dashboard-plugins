@@ -25,13 +25,17 @@ Threat intelligence: 300
 Security operations: 400
 Cloud security: 500
 Server management: 600
-Dashboard/indexer management (added to Wazuh dashboard default categories): 9000
+Dashboard management: 700
+Indexer management (added to Wazuh dashboard default categories): 9000
 */
 
 export const overview = {
   category: 'wz-category-home',
   id: 'wz-home',
   title: i18n.translate('wz-app-home-title', {
+    defaultMessage: 'Overview',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-home-breadcrumbLabel', {
     defaultMessage: 'Overview',
   }),
   description: i18n.translate('wz-app-overview-description', {
@@ -51,6 +55,12 @@ export const fileIntegrityMonitoring = {
   title: i18n.translate('wz-app-file-integrity-monitoring-title', {
     defaultMessage: 'File Integrity Monitoring',
   }),
+  breadcrumbLabel: i18n.translate(
+    'wz-app-file-integrity-monitoring-breadcrumbLabel',
+    {
+      defaultMessage: 'File Integrity Monitoring',
+    },
+  ),
   description: i18n.translate('wz-app-file-integrity-monitoring-description', {
     defaultMessage:
       'Alerts related to file changes, including permissions, content, ownership, and attributes.',
@@ -67,11 +77,14 @@ export const fileIntegrityMonitoring = {
     }`,
 };
 
-export const endpointSumary = {
+export const endpointSummary = {
   category: 'wz-category-server-management',
   id: 'endpoints-summary',
   title: i18n.translate('wz-app-endpoints-summary-title', {
     defaultMessage: 'Endpoints Summary',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-endpoints-summary-breadcrumbLabel', {
+    defaultMessage: 'Endpoints',
   }),
   description: i18n.translate('wz-app-endpoints-summary-description', {
     defaultMessage: 'Summary of agents and their status.',
@@ -87,6 +100,9 @@ export const malwareDetection = {
   category: 'wz-category-endpoint-security',
   id: 'malware-detection',
   title: i18n.translate('wz-app-malware-detection-title', {
+    defaultMessage: 'Malware Detection',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-malware-detection-breadcrumbLabel', {
     defaultMessage: 'Malware Detection',
   }),
   description: i18n.translate('wz-app-malware-detection-description', {
@@ -111,6 +127,12 @@ export const configurationAssessment = {
   title: i18n.translate('wz-app-configuration-assessment-title', {
     defaultMessage: 'Configuration Assessment',
   }),
+  breadcrumbLabel: i18n.translate(
+    'wz-app-configuration-assessment-breadcrumbLabel',
+    {
+      defaultMessage: 'Configuration Assessment',
+    },
+  ),
   description: i18n.translate('wz-app-configuration-assessment-description', {
     defaultMessage:
       'Scan your assets as part of a configuration assessment audit.',
@@ -131,6 +153,9 @@ export const threatHunting = {
   category: 'wz-category-threat-intelligence',
   id: 'threat-hunting',
   title: i18n.translate('wz-app-threat-hunting-title', {
+    defaultMessage: 'Threat Hunting',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-threat-hunting-breadcrumbLabel', {
     defaultMessage: 'Threat Hunting',
   }),
   description: i18n.translate('wz-app-threat-hunting-description', {
@@ -155,6 +180,12 @@ export const vulnerabilityDetection = {
   title: i18n.translate('wz-app-vulnerability-detection-title', {
     defaultMessage: 'Vulnerability Detection',
   }),
+  breadcrumbLabel: i18n.translate(
+    'wz-app-vulnerability-detection-breadcrumbLabel',
+    {
+      defaultMessage: 'Vulnerability Detection',
+    },
+  ),
   description: i18n.translate('wz-app-vulnerability-detection-description', {
     defaultMessage:
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
@@ -162,7 +193,7 @@ export const vulnerabilityDetection = {
   euiIconType: 'heartbeatApp',
   order: 301,
   showInOverviewApp: true,
-  showInAgentMenu: true,
+  showInAgentMenu: false,
   redirectTo: () =>
     `/overview/?tab=vuls&tabView=panels${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -175,6 +206,9 @@ export const mitreAttack = {
   category: 'wz-category-threat-intelligence',
   id: 'mitre-attack',
   title: i18n.translate('wz-app-mitre-attack-title', {
+    defaultMessage: 'MITRE ATT&CK',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-mitre-attack-breadcrumbLabel', {
     defaultMessage: 'MITRE ATT&CK',
   }),
   description: i18n.translate('wz-app-mitre-attack-description', {
@@ -199,6 +233,9 @@ export const virustotal = {
   title: i18n.translate('wz-app-virustotal-title', {
     defaultMessage: 'Virustotal',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-virustotal-breadcrumbLabel', {
+    defaultMessage: 'Virustotal',
+  }),
   description: i18n.translate('wz-app-virustotal-description', {
     defaultMessage:
       'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.',
@@ -219,6 +256,9 @@ const pciDss = {
   category: 'wz-category-security-operations',
   id: 'pci-dss',
   title: i18n.translate('wz-app-pci-dss-title', {
+    defaultMessage: 'PCI DSS',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-pci-dss-breadcrumbLabel', {
     defaultMessage: 'PCI DSS',
   }),
   description: i18n.translate('wz-app-pci-dss-description', {
@@ -243,6 +283,9 @@ const hipaa = {
   title: i18n.translate('wz-app-hipaa-title', {
     defaultMessage: 'HIPAA',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-hipaa-breadcrumbLabel', {
+    defaultMessage: 'HIPAA',
+  }),
   description: i18n.translate('wz-app-hipaa-description', {
     defaultMessage:
       'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.',
@@ -263,6 +306,9 @@ const gdpr = {
   category: 'wz-category-security-operations',
   id: 'gdpr',
   title: i18n.translate('wz-app-gdpr-title', {
+    defaultMessage: 'GDPR',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-gdpr-breadcrumbLabel', {
     defaultMessage: 'GDPR',
   }),
   description: i18n.translate('wz-app-gdpr-description', {
@@ -287,6 +333,9 @@ const nist80053 = {
   title: i18n.translate('wz-app-nist-800-53-title', {
     defaultMessage: 'NIST 800-53',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-nist-800-53-breadcrumbLabel', {
+    defaultMessage: 'NIST 800-53',
+  }),
   description: i18n.translate('wz-app-nist-800-53-description', {
     defaultMessage:
       'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.',
@@ -309,6 +358,9 @@ const tsc = {
   title: i18n.translate('wz-app-tsc-title', {
     defaultMessage: 'TSC',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-tsc-breadcrumbLabel', {
+    defaultMessage: 'TSC',
+  }),
   description: i18n.translate('wz-app-tsc-description', {
     defaultMessage:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.',
@@ -325,34 +377,18 @@ const tsc = {
     }`,
 };
 
-export const itHygiene = {
-  category: 'wz-category-security-operations',
-  id: 'it-hygiene',
-  title: i18n.translate('wz-app-it-hygiene-title', {
-    defaultMessage: 'IT Hygiene',
-  }),
-  description: i18n.translate('wz-app-it-hygiene-description', {
-    defaultMessage:
-      'Applications, network configuration, open ports, and processes running on your monitored systems.',
-  }),
-  euiIconType: 'visualizeApp',
-  order: 405,
-  showInOverviewApp: true,
-  showInAgentMenu: false,
-  redirectTo: () =>
-    `/agents/?tab=welcome${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agent=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
 export const amazonWebServices = {
   category: 'wz-category-cloud-security',
   id: 'amazon-web-services',
   title: i18n.translate('wz-app-amazon-web-services-title', {
     defaultMessage: 'Amazon Web Services',
   }),
+  breadcrumbLabel: i18n.translate(
+    'wz-app-amazon-web-services-breadcrumbLabel',
+    {
+      defaultMessage: 'Amazon Web Services',
+    },
+  ),
   description: i18n.translate('wz-app-amazon-web-services-description', {
     defaultMessage:
       'Security events related to your Amazon AWS services, collected directly via AWS API.',
@@ -373,6 +409,9 @@ export const googleCloud = {
   category: 'wz-category-cloud-security',
   id: 'google-cloud',
   title: i18n.translate('wz-app-google-cloud-title', {
+    defaultMessage: 'Google Cloud',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-google-cloud-breadcrumbLabel', {
     defaultMessage: 'Google Cloud',
   }),
   description: i18n.translate('wz-app-google-cloud-description', {
@@ -397,6 +436,9 @@ export const github = {
   title: i18n.translate('wz-app-github-title', {
     defaultMessage: 'GitHub',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-github-breadcrumbLabel', {
+    defaultMessage: 'GitHub',
+  }),
   description: i18n.translate('wz-app-github-description', {
     defaultMessage:
       'Monitoring events from audit logs of your GitHub organizations.',
@@ -419,6 +461,9 @@ export const office365 = {
   title: i18n.translate('wz-app-office365-title', {
     defaultMessage: 'Office 365',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-office365-breadcrumbLabel', {
+    defaultMessage: 'Office 365',
+  }),
   description: i18n.translate('wz-app-office365-description', {
     defaultMessage: 'Security events related to your Office 365 services.',
   }),
@@ -438,6 +483,9 @@ export const docker = {
   category: 'wz-category-cloud-security',
   id: 'docker',
   title: i18n.translate('wz-app-docker-title', {
+    defaultMessage: 'Docker',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-docker-breadcrumbLabel', {
     defaultMessage: 'Docker',
   }),
   description: i18n.translate('wz-app-docker-description', {
@@ -462,6 +510,9 @@ export const rules = {
   title: i18n.translate('wz-app-rules-title', {
     defaultMessage: 'Rules',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-rules-breadcrumbLabel', {
+    defaultMessage: 'Rules',
+  }),
   description: i18n.translate('wz-app-rules-description', {
     defaultMessage: 'Manage your cluster rules.',
   }),
@@ -476,6 +527,9 @@ export const decoders = {
   category: 'wz-category-server-management',
   id: 'decoders',
   title: i18n.translate('wz-app-decoders-title', {
+    defaultMessage: 'Decoders',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-decoders-breadcrumbLabel', {
     defaultMessage: 'Decoders',
   }),
   description: i18n.translate('wz-app-decoders-description', {
@@ -494,6 +548,9 @@ export const cdbLists = {
   title: i18n.translate('wz-app-lists-title', {
     defaultMessage: 'CDB Lists',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-cdb-lists-breadcrumbLabel', {
+    defaultMessage: 'CDB Lists',
+  }),
   description: i18n.translate('wz-app-cdb-lists-description', {
     defaultMessage: 'Manage your cluster CDB list.',
   }),
@@ -508,6 +565,9 @@ export const endpointGroups = {
   category: 'wz-category-server-management',
   id: 'endpoint-groups',
   title: i18n.translate('wz-app-endpoint-groups-title', {
+    defaultMessage: 'Endpoint Groups',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-endpoint-groups-breadcrumbLabel', {
     defaultMessage: 'Endpoint Groups',
   }),
   description: i18n.translate('wz-app-endpoint-groups-description', {
@@ -526,6 +586,9 @@ export const serverStatus = {
   title: i18n.translate('wz-app-status-title', {
     defaultMessage: 'Status',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-server-status-breadcrumbLabel', {
+    defaultMessage: 'Status',
+  }),
   description: i18n.translate('wz-app-server-status-description', {
     defaultMessage: 'Manage your cluster status.',
   }),
@@ -540,6 +603,9 @@ export const cluster = {
   category: 'wz-category-server-management',
   id: 'cluster',
   title: i18n.translate('wz-app-cluster-title', {
+    defaultMessage: 'Cluster',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-cluster-breadcrumbLabel', {
     defaultMessage: 'Cluster',
   }),
   description: i18n.translate('wz-app-cluster-description', {
@@ -558,6 +624,9 @@ export const statistics = {
   title: i18n.translate('wz-app-statistics-title', {
     defaultMessage: 'Statistics',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-statistics-breadcrumbLabel', {
+    defaultMessage: 'Statistics',
+  }),
   description: i18n.translate('wz-app-statistics-description', {
     defaultMessage: 'Information about the enviroment.',
   }),
@@ -574,6 +643,9 @@ export const logs = {
   title: i18n.translate('wz-app-logs-title', {
     defaultMessage: 'Logs',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-logs-breadcrumbLabel', {
+    defaultMessage: 'Logs',
+  }),
   description: i18n.translate('wz-app-logs-description', {
     defaultMessage: 'Logs from your cluster.',
   }),
@@ -585,16 +657,19 @@ export const logs = {
 };
 
 export const reporting = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'reporting',
   title: i18n.translate('wz-app-reporting-title', {
+    defaultMessage: 'Reporting',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-reporting-breadcrumbLabel', {
     defaultMessage: 'Reporting',
   }),
   description: i18n.translate('wz-app-reporting-description', {
     defaultMessage: 'Check your stored reports.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8900,
+  order: 702,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=reporting',
@@ -604,6 +679,9 @@ export const settings = {
   category: 'wz-category-server-management',
   id: 'settings',
   title: i18n.translate('wz-app-settings-title', {
+    defaultMessage: 'Settings',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-settings-breadcrumbLabel', {
     defaultMessage: 'Settings',
   }),
   description: i18n.translate('wz-app-settings-description', {
@@ -622,6 +700,9 @@ export const devTools = {
   title: i18n.translate('wz-app-dev-tools-title', {
     defaultMessage: 'Dev Tools',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-dev-tools-breadcrumbLabel', {
+    defaultMessage: 'Dev Tools',
+  }),
   description: i18n.translate('wz-app-dev-tools-description', {
     defaultMessage: 'Test the API endpoints.',
   }),
@@ -636,6 +717,9 @@ export const rulesetTest = {
   category: 'wz-category-server-management',
   id: 'ruleset-test',
   title: i18n.translate('wz-app-ruleset-test-title', {
+    defaultMessage: 'Ruleset Test',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-ruleset-test-breadcrumbLabel', {
     defaultMessage: 'Ruleset Test',
   }),
   description: i18n.translate('wz-app-ruleset-test-description', {
@@ -654,6 +738,9 @@ export const security = {
   title: i18n.translate('wz-app-security-title', {
     defaultMessage: 'Security',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-security-breadcrumbLabel', {
+    defaultMessage: 'Security',
+  }),
   description: i18n.translate('wz-app-security-description', {
     defaultMessage:
       'Manage permissions to system resources based on the roles and policies.',
@@ -666,16 +753,19 @@ export const security = {
 };
 
 export const serverApis = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'server-apis',
   title: i18n.translate('wz-app-server-apis-title', {
+    defaultMessage: 'Server APIs',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-server-apis-breadcrumbLabel', {
     defaultMessage: 'Server APIs',
   }),
   description: i18n.translate('wz-app-server-apis-description', {
     defaultMessage: 'Manage and configure the API entries.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8901,
+  order: 703,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=api',
@@ -687,43 +777,52 @@ export const sampleData = {
   title: i18n.translate('wz-app-sample-data-title', {
     defaultMessage: 'Sample Data',
   }),
+  breadcrumbLabel: i18n.translate('wz-app-sample-data-breadcrumbLabel', {
+    defaultMessage: 'Sample Data',
+  }),
   description: i18n.translate('wz-app-sample-data-description', {
     defaultMessage: 'Add sample data with events to the modules.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8902,
+  order: 9040,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=sample_data',
 };
 
 export const appSettings = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'app-settings',
   title: i18n.translate('wz-app-settings-title', {
+    defaultMessage: 'App Settings',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-settings-breadcrumbLabel', {
     defaultMessage: 'App Settings',
   }),
   description: i18n.translate('wz-app-settings-description', {
     defaultMessage: 'Manage your cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8903,
+  order: 704,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=configuration',
 };
 
 const about = {
-  category: 'management',
+  category: 'wz-category-dashboard-management',
   id: 'about',
   title: i18n.translate('wz-app-about-title', {
+    defaultMessage: 'About',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-about-breadcrumbLabel', {
     defaultMessage: 'About',
   }),
   description: i18n.translate('wz-app-about-description', {
     defaultMessage: 'Show information about App Versions and community links.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 8905,
+  order: 706,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=about',
@@ -743,7 +842,6 @@ export const Applications = [
   gdpr,
   nist80053,
   tsc,
-  itHygiene,
   devTools,
   rulesetTest,
   security,
@@ -752,7 +850,7 @@ export const Applications = [
   github,
   office365,
   docker,
-  endpointSumary,
+  endpointSummary,
   rules,
   decoders,
   cdbLists,
@@ -829,8 +927,16 @@ export const Categories = [
     euiIconType: 'indexRollupApp',
   },
   {
+    id: 'wz-category-dashboard-management',
+    label: i18n.translate('wz-app-category-dashboard-management', {
+      defaultMessage: 'Dashboard management',
+    }),
+    order: 700,
+    euiIconType: 'dashboardApp',
+  },
+  {
     id: 'management',
-    label: 'Indexer/dashboard management',
+    label: 'Indexer management',
     order: 5e3,
     euiIconType: 'managementApp',
   },
