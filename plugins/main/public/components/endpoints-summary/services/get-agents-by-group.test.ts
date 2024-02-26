@@ -47,9 +47,8 @@ describe('Get agents by group', () => {
       },
     };
     const expectedGroupedData = [
-      { label: 'group1', value: 2, color: 'mockColor1' },
-      { label: 'group2', value: 1, color: 'mockColor2' },
-      { label: 'group1,group2', value: 4, color: 'mockColor3' },
+      { label: 'group1', value: 6, color: 'mockColor1' },
+      { label: 'group2', value: 5, color: 'mockColor2' },
     ];
 
     (WzRequest.apiReq as jest.Mock).mockResolvedValue(responseData);
