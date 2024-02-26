@@ -95,10 +95,6 @@ export class SettingsController {
       this.setComponentProps();
       // Loading data
       await this.getSettings();
-      const down = await this.checkApisStatus();
-      //Checks if all the API entries are down
-      this.apiIsDown =
-        down >= this.apiEntries.length && this.apiEntries.length > 0;
 
       await this.getAppInfo();
     } catch (error) {
@@ -129,11 +125,8 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry),
       getHosts: () => this.getHosts(),
       testApi: (entry, force) => ApiCheck.checkApi(entry, force),
-      showAddApiWithInitialError: error =>
-        this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
-      showApiIsDown: () => this.showApiIsDown(),
       copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
 
@@ -364,7 +357,6 @@ export class SettingsController {
       this.apiEntries[index].status = 'online';
       this.apiEntries[index].allow_run_as = data.data.allow_run_as;
       this.wzMisc.setApiIsDown(false);
-      this.apiIsDown = false;
       !silent && ErrorHandler.info('Connection success', 'Settings');
       this.$scope.$applyAsync();
     } catch (error) {
@@ -449,66 +441,8 @@ export class SettingsController {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
       this.apiEntries = this.apiTableProps.apiEntries = hosts;
-      if (!hosts.length) {
-        this.apiIsDown = false;
-        this.$scope.$applyAsync();
-      }
       return hosts;
     } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Shows the add API component
-   */
-  showApiIsDown() {
-    this.apiIsDown = true;
-    this.$scope.$applyAsync();
-  }
-
-  /**
-   * Closes the API is down component
-   */
-  closeApiIsDown() {
-    this.apiIsDown = false;
-    this.$scope.$applyAsync();
-  }
-
-  /**
-   * Shows the add api component with an initial error
-   */
-  showAddApiWithInitialError(error) {
-    this.apiEntries = [];
-    this.addingApi = true;
-    this.$scope.$applyAsync();
-  }
-
-  /**
-   * Refresh the API entries
-   */
-  async refreshApiEntries() {
-    try {
-      this.apiEntries = await this.getHosts();
-      const down = await this.checkApisStatus();
-      //Checks if all the API entries are down
-      this.apiIsDown =
-        down >= this.apiEntries.length && this.apiEntries.length > 0;
-      this.$scope.$applyAsync();
-      return this.apiEntries;
-    } catch (error) {
-      this.showAddApiWithInitialError(error);
-      const options = {
-        context: `${SettingsController.name}.refreshApiEntries`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
       return Promise.reject(error);
     }
   }

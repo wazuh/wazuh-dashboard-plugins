@@ -152,24 +152,13 @@ export const ApiTable = compose(
             }
           }
         }
-        if (numErr) {
-          if (numErr >= entries.length) this.props.showApiIsDown();
-        }
         this.setState({
           apiEntries: entries,
           status: status,
           refreshingEntries: false,
+          apiIsDown: numErr >= entries.length,
         });
-      } catch (error) {
-        if (
-          error &&
-          error.data &&
-          error.data.message &&
-          error.data.code === 2001
-        ) {
-          this.props.showAddApiWithInitialError(error);
-        }
-      }
+      } catch (error) {}
     }
 
     /**
@@ -770,7 +759,7 @@ export const ApiTable = compose(
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
-            {this.props.apiIsDown && calloutAPIisDown}
+            {this.state.apiIsDown && calloutAPIisDown}
             <EuiInMemoryTable
               itemId='id'
               items={items}
@@ -808,7 +797,5 @@ ApiTable.propTypes = {
   updateClusterInfoInRegistry: PropTypes.func,
   getHosts: PropTypes.func,
   testApi: PropTypes.func,
-  showAddApiWithInitialError: PropTypes.func,
-  showApiIsDown: PropTypes.func,
   copyToClipBoard: PropTypes.func,
 };
