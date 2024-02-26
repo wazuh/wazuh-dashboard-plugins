@@ -8,12 +8,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.9.0
 - Added AngularJS dependencies [#6145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6145)
+- Added a script and migration task to setup the configuration using a configuration file [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
+- Added the ability to manage the API hosts from the Server APIs [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 
 ### Changed
 
 - Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6288](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6288) [#6290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6290) [#6289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6289) [#6286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6286) [#6275](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6275) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6297](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6297) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6291](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287)
 - Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
 - Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
+- Changed as the configuration is defined and stored [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
+- Change the view of API is down and check connection to Server APIs application [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 
 ### Fixed
 
