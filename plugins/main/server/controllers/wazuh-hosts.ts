@@ -128,49 +128,21 @@ export class WazuhHostsCtrl {
       response: OpenSearchDashboardsResponseFactory,
     ) => {
       try {
-        // TODO: refactor to use manageHost service
         const { id: originalID } = request.params;
-        context.wazuh.logger.debug('Getting the API hosts');
-        const hosts = await context.wazuh_core.configuration.get('hosts');
-        context.wazuh.logger.debug(`API hosts data: ${JSON.stringify(hosts)}`);
+        context.wazuh.logger.debug(`Updating API host with ID [${originalID}]`);
 
-        let newHosts = [...hosts];
+        const responseSetHost = await context.wazuh_core.manageHosts.set(
+          originalID,
+          request.body,
+        );
+        console.log({ r });
 
-        const hostExistIndex = newHosts.findIndex(
-          ({ id }) => id === originalID,
-        );
-        if (hostExistIndex !== -1) {
-          context.wazuh.logger.debug(`API host with ID [${originalID}] found`);
-          context.wazuh.logger.debug(`Replacing API host ID [${originalID}]`);
-          // Exist
-          // Update the API host info
-          newHosts = newHosts.map((item, index) =>
-            index === hostExistIndex ? { ...item, ...request.body } : item,
-          );
-        } else {
-          context.wazuh.logger.debug(
-            `API host with ID [${originalID}] not found`,
-          );
-          // Not exist
-          // Add new host
-          context.wazuh.logger.debug(
-            `Adding new API host with ID [${request.body.id}]`,
-          );
-          newHosts.push(request.body);
-        }
-        context.wazuh.logger.debug(
-          `API hosts to save ${JSON.stringify(newHosts)}`,
-        );
-        await context.wazuh_core.configuration.set({
-          hosts: newHosts,
-        });
-        context.wazuh.logger.info('API hosts saved');
+        context.wazuh.logger.info(`Updated API host with ID [${originalID}]`);
+
         return response.ok({
           body: {
-            message: `API host with ID [${originalID}] was ${
-              hostExistIndex !== -1 ? 'updated' : 'created'
-            }`,
-            data: request.body,
+            message: `API host with ID [${originalID}] was updated`,
+            data: responseSetHost,
           },
         });
       } catch (error) {

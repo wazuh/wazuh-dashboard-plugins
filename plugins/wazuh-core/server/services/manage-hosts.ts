@@ -23,9 +23,11 @@ interface IAPIHost {
 }
 
 /**
- * This service manages the API hosts.
+ * This service manages the API connections.
  * Get API hosts configuration
- * Get API hosts entries (combine configuration and registry file)
+ * Get API host entries (combine configuration and registry file)
+ * Set API host
+ * Delete API host
  * Cache the allow_run_as value for API ID and username
  * Ability to get if the configured user is allowed to use run as
  */
@@ -70,8 +72,8 @@ export class ManageHosts {
   ): Promise<IAPIHost[] | IAPIHost> {
     try {
       hostID
-        ? this.logger.debug(`Getting host with ID [${hostID}]`)
-        : this.logger.debug('Getting hosts');
+        ? this.logger.debug(`Getting API connection with ID [${hostID}]`)
+        : this.logger.debug('Getting API connections');
       const hosts = await this.configuration.get('hosts');
       if (hostID) {
         const host = hosts.find(({ id }: { id: string }) => id === hostID);
@@ -81,7 +83,7 @@ export class ManageHosts {
             options.excludePassword ? ['password'] : undefined,
           );
         }
-        throw new Error(`Host with ID [${hostID}] not found`);
+        throw new Error(`API connection with ID [${hostID}] not found`);
       }
       return hosts.map(host =>
         this.filterAPIHostData(
@@ -95,61 +97,70 @@ export class ManageHosts {
     }
   }
 
-  async set(hostID: string, data) {
-    // TODO:
+  async set(hostID: string, data: IAPIHost) {
     try {
-      this.logger.debug(`Updating host with ID [${hostID}]`);
-      const host = await this.get();
-      hostID
-        ? this.logger.debug(`Getting host with ID [${hostID}]`)
-        : this.logger.debug('Getting hosts');
-      const hosts = await this.configuration.get('hosts');
-      if (hostID) {
-        const host = hosts.find(({ id }: { id: string }) => id === hostID);
-        if (host) {
-          return host;
-        }
-        throw new Error(`Host with ID [${hostID}] not found`);
+      const hosts = await this.get();
+      this.logger.debug(`API connections data: ${JSON.stringify(hosts)}`);
+
+      let updatedHosts = [...hosts];
+
+      const hostExistIndex = updatedHosts.findIndex(({ id }) => id === hostID);
+      if (hostExistIndex !== -1) {
+        this.logger.debug(`API connection with ID [${hostID}] found`);
+        this.logger.debug(`Replacing API connection ID [${hostID}]`);
+        // Exist
+        // Update the API connection info
+        updatedHosts = updatedHosts.map((item, index) =>
+          index === hostExistIndex ? { ...item, ...data } : item,
+        );
+      } else {
+        this.logger.debug(`API connection with ID [${hostID}] not found`);
+        // Not exist
+        // Add new host
+        this.logger.debug(`Adding new API connection with ID [${data.id}]`);
+        updatedHosts.push(data);
       }
-      return hosts;
+      this.logger.debug(
+        `API connections to save ${JSON.stringify(updatedHosts)}`,
+      );
+      await this.configuration.set({
+        hosts: updatedHosts,
+      });
+      this.logger.info(`API connection with ID [${hostID}] was updated`);
+      return data;
     } catch (error) {
       this.logger.error(error.message);
       throw error;
     }
   }
 
-  async updateByID(hostID: string) {
-    // TODO: use to update the fields
-  }
-
   /**
-   * Delete an API host entry by ID from configuration
+   * Delete an API connection entry by ID from configuration
    * @param hostID
    */
   async delete(hostID: string) {
     try {
-      this.logger.debug('Getting the API hosts');
       const hosts = (await this.get()) as IAPIHost[];
-      this.logger.debug(`API hosts data: ${JSON.stringify(hosts)}`);
+      this.logger.debug(`API connections data: ${JSON.stringify(hosts)}`);
 
       const newHosts = [...hosts];
 
       const hostExistIndex = newHosts.findIndex(({ id }) => id === hostID);
       if (hostExistIndex === -1) {
-        this.logger.debug(`API host with ID [${hostID}] not found`);
-        throw new Error(`API host with ID [${hostID}] was not found`);
+        this.logger.debug(`API connection with ID [${hostID}] not found`);
+        throw new Error(`API connection with ID [${hostID}] was not found`);
       }
-      this.logger.debug(`API host with ID [${hostID}] found`);
+      this.logger.debug(`API connection with ID [${hostID}] found`);
       // Exist
       // Remove host
-      this.logger.debug(`Removing API host with ID [${hostID}]`);
+      this.logger.debug(`Removing API connection with ID [${hostID}]`);
       newHosts.splice(hostExistIndex, 1);
 
-      this.logger.debug('Updating API hosts');
+      this.logger.debug('Updating API connections');
       await this.configuration.set({
         hosts: newHosts,
       });
-      this.logger.debug('Updated API hosts');
+      this.logger.debug('Updated API connections');
     } catch (error) {
       this.logger.error(error.message);
       throw error;
@@ -186,7 +197,7 @@ export class ManageHosts {
   private async joinHostRegistry(hosts: any, registry: any) {
     try {
       if (!Array.isArray(hosts)) {
-        throw new Error('API hosts is not a list');
+        throw new Error('API connections is not a list');
       }
 
       return await Promise.all(
