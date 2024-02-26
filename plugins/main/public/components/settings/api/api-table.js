@@ -530,7 +530,7 @@ export const ApiTable = compose(
                 />
               </EuiToolTip>
               <WzButtonPermissionsOpenFlyout
-                flyoutTitle={`Edit API host: ${item.id} `}
+                flyoutTitle={`Edit API connection: ${item.id} `}
                 flyoutBody={({ onClose }) => (
                   <AddAPIHostForm
                     initialValue={{
@@ -563,12 +563,12 @@ export const ApiTable = compose(
                 tooltip={{
                   content: 'Delete',
                 }}
-                modalTitle={`Do you want to delete the ${item.id} API host?`}
+                modalTitle={`Do you want to delete the ${item.id} API connection?`}
                 onConfirm={() => this.deleteAPIHost(item.id)}
                 modalProps={{ buttonColor: 'danger' }}
                 iconType='trash'
                 color='danger'
-                aria-label='Delete API host'
+                aria-label='Delete API connection'
               />
             </EuiFlexGroup>
           ),
@@ -697,7 +697,7 @@ export const ApiTable = compose(
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <WzButtonPermissionsOpenFlyout
-                  flyoutTitle='Add API host'
+                  flyoutTitle='Add API connection'
                   flyoutBody={({ onClose }) => (
                     <AddAPIHostForm
                       onSave={async () => {
@@ -712,7 +712,7 @@ export const ApiTable = compose(
                     iconType: 'plusInCircle',
                   }}
                 >
-                  Add API host
+                  Add API connection
                 </WzButtonPermissionsOpenFlyout>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
@@ -770,9 +770,7 @@ export const ApiTable = compose(
               loading={isLoading}
               tableLayout='auto'
               message={
-                !items.length
-                  ? 'No API hosts configured. Add a new one.'
-                  : undefined
+                !items.length ? 'No API connections. Add a new one.' : undefined
               }
             />
           </EuiPanel>
