@@ -11,6 +11,7 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import { useAsyncActionRunOnStart } from '../../hooks';
+import './visualizations.scss';
 
 export type VisualizationBasicProps = ChartDonutProps & {
   type: 'donut';
@@ -82,25 +83,17 @@ export const VisualizationBasic = ({
     );
   } else {
     const Chart = chartTypes[type];
-    const chartFlexStyle = {
-      alignItems: 'flex-end',
-      paddingRight: '1em',
-    };
-    const legendFlexStyle = {
-      height: '100%',
-      paddingLeft: '1em',
-    };
     visualization = (
       <EuiFlexGroup
-        responsive={false}
+        responsive={true}
         style={{ height: '100%' }}
         gutterSize='none'
       >
-        <EuiFlexItem style={chartFlexStyle}>
+        <EuiFlexItem className={'wazuh-visualization-chart'}>
           <Chart data={data} />
         </EuiFlexItem>
         {showLegend && (
-          <EuiFlexItem style={legendFlexStyle}>
+          <EuiFlexItem className={'wazuh-visualization-legend'}>
             <ChartLegend
               data={data.map(({ color, ...rest }) => ({
                 ...rest,
@@ -114,7 +107,11 @@ export const VisualizationBasic = ({
     );
   }
 
-  return <div style={{ width, height }}>{visualization}</div>;
+  return (
+    <div style={{ width, height }} className='wazuh-visualization-layout'>
+      {visualization}
+    </div>
+  );
 };
 
 type VisualizationBasicWidgetProps = VisualizationBasicProps & {

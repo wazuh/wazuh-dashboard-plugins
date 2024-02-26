@@ -1,7 +1,10 @@
 .chart-legend {
-  width: 150px;
+  width: 60vw;
   overflow: auto;
   scrollbar-width: none;
+  @media (min-width: 768px) {
+    width: 150px;
+  }
 }
 
 .chart-legend > li {
