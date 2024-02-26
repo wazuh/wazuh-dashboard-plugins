@@ -23,7 +23,16 @@ export function enhanceConfiguration(configuration) {
           )
           .map(([, { category }]) => category),
       ),
-    ].map(categoryID => this._categories.get(String(categoryID)));
+    ]
+      .map(categoryID => this._categories.get(String(categoryID)))
+      .sort((categoryA, categoryB) => {
+        if (categoryA.title > categoryB.title) {
+          return 1;
+        } else if (categoryA.title < categoryB.title) {
+          return -1;
+        }
+        return 0;
+      });
   };
 
   configuration.getSettingDescription = function (key: string) {
