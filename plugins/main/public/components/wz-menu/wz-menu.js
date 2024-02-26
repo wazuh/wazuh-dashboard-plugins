@@ -370,7 +370,7 @@ export const WzMenu = withWindowSize(
       this.setState({
         menuOpened: false,
         hover: this.state.currentMenuTab,
-        APIList: await this.loadApiList(),
+        ...{ APIlist: await this.loadApiList() },
         ...(await this.loadIndexPatternsList()),
       });
     };
