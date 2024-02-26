@@ -67,6 +67,5 @@ export class WzSampleDataProvider extends Component {
 export const WzSampleDataWrapper = compose(
   withErrorBoundary,
   withReduxProvider,
-  // TODO: add fetching of account data to update the administrator property
   withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
 )(WzSampleDataProvider);

@@ -130,7 +130,7 @@ export function enhanceFormFields(
                         {},
                       ),
                     );
-                    return cloneDeep(newstate); // TODO: set the new formField
+                    return cloneDeep(newstate);
                   });
                 },
               }

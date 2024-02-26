@@ -197,7 +197,6 @@ const WzConfigurationSettingsProvider = props => {
   );
 
   // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
-  // TODO: review
   const search = Query.execute(query.query || query, visibleSettings, [
     'description',
     'key',
@@ -209,7 +208,6 @@ const WzConfigurationSettingsProvider = props => {
     Array.from(getWazuhCorePlugin().configuration._categories.values()),
   );
 
-  // TODO: review
   const onSave = async () => {
     setLoading(true);
     try {
@@ -351,7 +349,6 @@ const WzConfigurationSettingsProvider = props => {
     }
   };
 
-  // TODO: review
   const onCancel = () => {
     formForEach((state, _, { fieldDefinition }) => {
       if (fieldDefinition?.options?.file) {
@@ -426,6 +423,5 @@ const WzConfigurationSettingsProvider = props => {
 export const WzConfigurationSettings = compose(
   withErrorBoundary,
   withReduxProvider,
-  // TODO: add fetching of account data to update the administrator property
   withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
 )(WzConfigurationSettingsProvider);

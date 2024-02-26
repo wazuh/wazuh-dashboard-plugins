@@ -239,36 +239,6 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * Checks one by one if the requesting user has enough privileges to use
-   * an index pattern from the list.
-   * @param {Array<Object>} list List of index patterns
-   * @param {Object} req
-   * @returns {Array<Object>} List of allowed index
-   */
-  async filterAllowedIndexPatternList(context, list, req) {
-    //TODO: review if necesary to delete
-    let finalList = [];
-    for (let item of list) {
-      let results = false,
-        forbidden = false;
-      try {
-        results = await context.core.opensearch.client.asCurrentUser.search({
-          index: item.title,
-        });
-      } catch (error) {
-        forbidden = true;
-      }
-      if (
-        (((results || {}).body || {}).hits || {}).total.value >= 1 ||
-        (!forbidden && (((results || {}).body || {}).hits || {}).total === 0)
-      ) {
-        finalList.push(item);
-      }
-    }
-    return finalList;
-  }
-
-  /**
    * Checks for minimum index pattern fields in a list of index patterns.
    * @param {Array<Object>} indexPatternList List of index patterns
    */

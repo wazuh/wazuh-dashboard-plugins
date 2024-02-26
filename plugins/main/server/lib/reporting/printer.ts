@@ -10,6 +10,7 @@ import {
 import * as TimSort from 'timsort';
 import { REPORTS_PRIMARY_COLOR } from '../../../common/constants';
 import { Logger } from 'opensearch-dashboards/server';
+import { IConfiguration } from '../../../../wazuh-core/common/services/configuration';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR,
@@ -128,8 +129,7 @@ const fonts = {
 export class ReportPrinter {
   private _content: any[];
   private _printer: PdfPrinter;
-  constructor(public logger: Logger, private configuration: any) {
-    // TODO: fix type
+  constructor(public logger: Logger, private configuration: IConfiguration) {
     this._printer = new PdfPrinter(fonts);
     this._content = [];
   }

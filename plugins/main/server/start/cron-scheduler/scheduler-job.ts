@@ -55,7 +55,9 @@ export class SchedulerJob {
   private async getApiObjects() {
     const { apis } = jobs[this.jobName];
     const hostsResponse: IApi[] =
-      await this.context.wazuh_core.manageHosts.getEntries(); // TODO: review if this need the password or exclude it
+      await this.context.wazuh_core.manageHosts.getEntries({
+        excludePassword: true,
+      });
     if (!hostsResponse.length)
       throw {
         error: 10001,

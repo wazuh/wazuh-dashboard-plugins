@@ -357,7 +357,9 @@ async function cronTask(context) {
         name: WAZUH_MONITORING_TEMPLATE_NAME,
       });
 
-    const apiHosts = await context.wazuh_core.manageHosts.getEntries(); // TODO: check if this needs the password or exclude them
+    const apiHosts = await context.wazuh_core.manageHosts.getEntries({
+      excludePassword: true,
+    });
 
     if (!apiHosts.length) {
       context.wazuh.logger.warn('There are no API host entries. Skip.');

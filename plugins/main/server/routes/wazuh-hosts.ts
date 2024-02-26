@@ -49,8 +49,11 @@ export function WazuhHostsRoutes(router: IRouter, services) {
       path: '/hosts/apis/{id}',
       validate: {
         params: schema.object({
-          // TODO: add validation using the setting validator
-          id: schema.string(),
+          id:
+            services.configuration._settings
+              .get('hosts')
+              ?.options?.arrayOf?.id?.validateBackend?.(schema) ??
+            schema.string(),
         }),
         body: (value, response) => {
           const settingHosts = services.configuration._settings.get('hosts');
@@ -89,8 +92,11 @@ export function WazuhHostsRoutes(router: IRouter, services) {
       path: '/hosts/apis/{id}',
       validate: {
         params: schema.object({
-          // TODO: add validation using the setting validator
-          id: schema.string(),
+          id:
+            services.configuration._settings
+              .get('hosts')
+              ?.options?.arrayOf?.id?.validateBackend?.(schema) ??
+            schema.string(),
         }),
       },
     },

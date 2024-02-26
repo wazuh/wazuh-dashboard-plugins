@@ -101,7 +101,6 @@ export class WazuhUtilsCtrl {
       request: OpenSearchDashboardsRequest,
       response: OpenSearchDashboardsResponseFactory,
     ) => {
-      // TODO: add validation of body
       let requiresRunningHealthCheck = false,
         requiresReloadingBrowserTab = false,
         requiresRestartingPluginPlatform = false;

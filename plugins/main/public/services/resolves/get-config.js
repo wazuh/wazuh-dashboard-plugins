@@ -14,7 +14,6 @@ import { getWazuhCorePlugin } from '../../kibana-services';
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
   try {
-    // TODO: this should get the default configuration instead of the current
     const defaultConfig = await getWazuhCorePlugin().configuration.get();
 
     try {
