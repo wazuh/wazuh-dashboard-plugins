@@ -27,7 +27,7 @@ export const getAgentsByOs = async () => {
         color: getColorPaletteByIndex(index),
       });
     });
-    return groupedData;
+    return groupedData.sort((a, b) => b.value - a.value).slice(0, 5);
   } catch (error) {
     const options = {
       context: `EndpointsSummary.getSummary`,
