@@ -52,7 +52,6 @@ export function WazuhHostsRoutes(router: IRouter, services) {
           // TODO: add validation using the setting validator
           id: schema.string(),
         }),
-        // body: schema.any(),
         body: (value, response) => {
           const settingHosts = services.configuration._settings.get('hosts');
 

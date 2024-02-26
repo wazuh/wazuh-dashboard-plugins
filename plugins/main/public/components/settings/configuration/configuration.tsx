@@ -88,16 +88,6 @@ const transformPluginSettingsToFormFields = (configuration, pluginSettings) => {
             ? {
                 type,
                 initialValue: configuration[key].map(config => config),
-                // TODO: remove
-                // [
-                // {
-                //   url: 'host',
-                //   port: 10000,
-                //   username: 'username',
-                //   password: 'password',
-                //   run_as: true,
-                // },
-                // ], // TODO
                 fields: transformPluginSettingsToFormFields(
                   configuration[key],
                   rest.options.arrayOf,

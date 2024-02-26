@@ -139,7 +139,6 @@ export function WazuhApiRoutes(router: IRouter) {
   );
 
   // Return app logos configuration
-  // TODO: this endpoint could not be used. This could be removed. Review.
   router.get(
     {
       path: '/api/logos',
