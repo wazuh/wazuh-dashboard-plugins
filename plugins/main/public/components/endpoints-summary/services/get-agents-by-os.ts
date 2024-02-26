@@ -20,7 +20,7 @@ export const getAgentsByOs = async () => {
     );
     const groupedData: any[] = [];
     affected_items?.forEach((item: any, index: number) => {
-      const itemOsName = item?.os?.platform ?? 'Unknown';
+      const itemOsName = item?.os?.platform ?? 'unknown';
       groupedData.push({
         label: itemOsName,
         value: item.count ?? DEFAULT_COUNT,

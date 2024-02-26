@@ -26,12 +26,12 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
         getInfo={getSummaryAgentsStatus}
       />
       <DonutCard
-        betaBadgeLabel='Agents by OS'
+        betaBadgeLabel='Top 5 agents by OS'
         onClickLabel={filterAgentByOS}
         getInfo={getAgentsByOs}
       />
       <DonutCard
-        betaBadgeLabel='Agents by Group'
+        betaBadgeLabel='Top 5 agents by Group'
         onClickLabel={filterAgentByGroup}
         getInfo={getAgentsByGroup}
       />

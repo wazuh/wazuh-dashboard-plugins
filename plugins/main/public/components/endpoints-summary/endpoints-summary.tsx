@@ -107,20 +107,24 @@ export const EndpointsSummary = compose(
     }
 
     filterAgentByOS(item: any) {
+      const query =
+        item.label === 'unknown'
+          ? 'id!=000;os.name=null'
+          : `id!=000;os.name~${item.label}`;
       this._isMount &&
         this.setState({
-          agentTableFilters: { q: `id!=000;os.name~${item.label}` },
+          agentTableFilters: { q: query },
         });
     }
 
     filterAgentByGroup(item: any) {
-      const groups: string = item?.label
-        ?.split(',')
-        .map((groupLabel: string) => `group=${groupLabel}`)
-        .join(';');
+      const query =
+        item.label === 'unknown'
+          ? 'id!=000;group=null'
+          : `id!=000;group=${item.label}`;
       this._isMount &&
         this.setState({
-          agentTableFilters: { q: `id!=000;${groups}` },
+          agentTableFilters: { q: query },
         });
     }
 
