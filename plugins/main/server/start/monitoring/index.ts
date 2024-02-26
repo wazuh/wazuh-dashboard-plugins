@@ -348,30 +348,6 @@ async function checkElasticsearchServer(context) {
 }
 
 /**
- * Get API configuration from elastic and callback to loadCredentials
- */
-async function getHostsConfiguration(context) {
-  try {
-    const hosts = await context.wazuh_core.manageHosts.getEntries(); // TODO: check if this needs the password or exclude them
-    if (hosts.length) {
-      return hosts;
-    }
-
-    context.wazuh.logger.debug('There are no API host entries yet');
-    return Promise.reject({
-      error: 'no credentials',
-      error_code: 1,
-    });
-  } catch (error) {
-    context.wazuh.logger.error(error.message || error);
-    return Promise.reject({
-      error: 'no API hosts',
-      error_code: 2,
-    });
-  }
-}
-
-/**
  * Task used by the cron job.
  */
 async function cronTask(context) {
@@ -381,7 +357,12 @@ async function cronTask(context) {
         name: WAZUH_MONITORING_TEMPLATE_NAME,
       });
 
-    const apiHosts = await getHostsConfiguration(context);
+    const apiHosts = await context.wazuh_core.manageHosts.getEntries(); // TODO: check if this needs the password or exclude them
+
+    if (!apiHosts.length) {
+      context.wazuh.logger.warn('There are no API host entries. Skip.');
+      return;
+    }
     const apiHostsUnique = (apiHosts || []).filter(
       (apiHost, index, self) =>
         index ===

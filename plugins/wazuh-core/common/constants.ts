@@ -1166,6 +1166,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Interval',
     description:
       'Define the frequency of task execution using cron schedule expressions.',
+    store: {
+      savedObject: {
+        mapping: {
+          type: 'text',
+        },
+      },
+    },
     category: SettingCategory.STATISTICS,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
