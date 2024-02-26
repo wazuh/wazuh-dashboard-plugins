@@ -152,11 +152,8 @@ export const AddAPIHostForm = ({
 
   const disableApplyButton =
     mode === 'EDIT'
-      ? Boolean(
-          Object.entries(fields).filter(
-            ({ changed, error }) => changed && error,
-          ),
-        ) || passwordNotMatch
+      ? Object.values(fields).some(({ changed, error }) => changed && error) ||
+        passwordNotMatch
       : Boolean(Object.keys(errors).length) || passwordNotMatch;
 
   return (
