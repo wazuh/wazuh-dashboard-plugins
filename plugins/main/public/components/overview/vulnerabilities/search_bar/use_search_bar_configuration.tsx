@@ -17,6 +17,7 @@ import {
   useQueryManager,
   useTimeFilter,
 } from '../../../common/hooks';
+import { AUTHORIZED_AGENTS } from '../../../../../common/constants';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
@@ -134,7 +135,9 @@ const useSearchBarConfiguration = (
   const searchBarProps: Partial<SearchBarProps> = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
-    filters: filters,
+    filters: filters.filter(
+      (filter: Filter) => filter?.meta?.controlledBy !== AUTHORIZED_AGENTS, // remove auto loaded agent.id filters
+    ),
     query,
     timeHistory,
     dateRangeFrom: timeFilter.from,
