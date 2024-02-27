@@ -599,14 +599,16 @@ export const ApiTable = compose(
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiCallOut
-              title='The API seems to be down'
+              title='The API connections could be down or inaccesible'
               iconType='alert'
               color='warning'
             >
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
                   <WzButtonOpenFlyout
-                    flyoutTitle={'The API seems to be down'}
+                    flyoutTitle={
+                      'The API connections could be down or inaccesible'
+                    }
                     flyoutBody={({ close }) => {
                       const steps = [
                         {
