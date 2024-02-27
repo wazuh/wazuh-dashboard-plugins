@@ -239,6 +239,14 @@
               }
             }
           },
+          "manager": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
           "node": {
             "properties": {
               "name": {
