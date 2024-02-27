@@ -184,11 +184,11 @@ export function mapFormFields(
       [key]:
         fieldDefinition.type === 'arrayOf'
           ? {
-              fields: value.fields.map((v, index) =>
+              fields: value.fields.map((valueField, index) =>
                 mapFormFields(
                   {
                     formDefinition,
-                    formState: v,
+                    formState: valueField,
                     pathFieldFormDefinition: [...pathField, 'fields'],
                     pathFormState: [
                       ...[...pathFormState, key],
