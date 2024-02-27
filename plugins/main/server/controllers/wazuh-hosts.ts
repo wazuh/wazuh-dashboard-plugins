@@ -135,7 +135,6 @@ export class WazuhHostsCtrl {
           originalID,
           request.body,
         );
-        console.log({ r });
 
         context.wazuh.logger.info(`Updated API host with ID [${originalID}]`);
 
