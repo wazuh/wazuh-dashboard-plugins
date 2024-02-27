@@ -138,13 +138,21 @@ const useSearchBarConfiguration = (
   const searchBarProps: Partial<SearchBarProps> = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
-    filters: filters.filter(
-      (filter: Filter) =>
-        ![
-          AUTHORIZED_AGENTS,
-          DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
-        ].includes(filter?.meta?.controlledBy), // remove auto loaded agent.id filters
-    ),
+    filters: filters
+      .filter(
+        (filter: Filter) =>
+          ![
+            AUTHORIZED_AGENTS,
+            DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
+          ].includes(filter?.meta?.controlledBy), // remove auto loaded agent.id filters
+      )
+      .sort((a: Filter, b: Filter) => {
+        return a?.$state?.isImplicit && !(a?.meta?.key === 'agent.id')
+          ? -1
+          : b?.$state?.isImplicit
+          ? 1
+          : -1;
+      }),
     query,
     timeHistory,
     dateRangeFrom: timeFilter.from,
