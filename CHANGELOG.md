@@ -45,6 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the help menu, to be consistent and avoid duplication [#6374](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6374)
 - Fixed the axis label visual bug from dashboards [#6378](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6378)
 - Fixed a error pop-up spawn in MITRE ATT&CK [#6431](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6431)
+- Fixed keeping filters between dashboard and inventory tab using visualizations call to actions in vulnerability module [#6448](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6448)
 
 ### Removed
 
