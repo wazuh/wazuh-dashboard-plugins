@@ -531,8 +531,9 @@ export const ApiTable = compose(
               </EuiToolTip>
               <WzButtonPermissionsOpenFlyout
                 flyoutTitle={`Edit API connection: ${item.id} `}
-                flyoutBody={({ onClose }) => (
+                flyoutBody={({ onClose, onUpdateCanClose }) => (
                   <AddAPIHostForm
+                    onUpdateCanClose={onUpdateCanClose}
                     initialValue={{
                       id: item.id,
                       url: item.url,
@@ -700,8 +701,9 @@ export const ApiTable = compose(
               <EuiFlexItem grow={false}>
                 <WzButtonPermissionsOpenFlyout
                   flyoutTitle='Add API connection'
-                  flyoutBody={({ onClose }) => (
+                  flyoutBody={({ onClose, onUpdateCanClose }) => (
                     <AddAPIHostForm
+                      onUpdateCanClose={onUpdateCanClose}
                       onSave={async () => {
                         onClose();
                         await this.refresh();

@@ -10,7 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -87,6 +87,7 @@ export const AddAPIHostForm = ({
   initialValue = {},
   apiId = '',
   onSave: onSaveProp,
+  onUpdateCanClose,
 }: IPropsAddAPIHostForm) => {
   const { fields, changed, errors } = useForm(
     transformPluginSettingsToFormFields(initialValue, {
@@ -102,6 +103,10 @@ export const AddAPIHostForm = ({
       },
     }),
   );
+
+  useEffect(() => {
+    onUpdateCanClose?.(!Boolean(Object.keys(changed).length));
+  }, [changed]);
 
   const mode = apiId ? 'EDIT' : 'CREATE';
 
