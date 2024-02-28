@@ -39,6 +39,8 @@ import { nistColumns } from '../../overview/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github-panel/events/github-columns';
+import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
+import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -241,13 +243,16 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainMitre,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, mitreAttackColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
   virustotal: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, virustotalColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   docker: {
