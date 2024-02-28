@@ -16,6 +16,7 @@ import {
   vulnerabilityIndexFiltersAdapter,
   restorePrevIndexFiltersAdapter,
   onUpdateAdapter,
+  updateFiltersStorage,
 } from '../../common/vulnerability_detector_adapters';
 import { search } from '../inventory/inventory_service';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
@@ -28,6 +29,7 @@ import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
+import { DashboardContainerInput } from '../../../../../../../../src/plugins/dashboard/public';
 
 const plugins = getPlugins();
 
@@ -50,12 +52,20 @@ const DashboardVulsComponent: React.FC = () => {
     onUnMount: restorePrevIndexFiltersAdapter,
   });
 
+  /* This function is responsible for updating the storage filters so that the
+  filters between dashboard and inventory added using visualizations call to actions.
+  Without this feature, filters added using visualizations call to actions are
+  not maintained between dashboard and inventory tabs */
+  const handleFilterByVisualization = (newInput: DashboardContainerInput) => {
+    updateFiltersStorage(newInput.filters);
+  };
+
   const fetchFilters = DataSourceFilterManagerVulnerabilitiesStates.getFilters(
     searchBarProps.filters,
     VULNERABILITIES_INDEX_PATTERN_ID,
   );
 
-  const { isLoading, filters, query, indexPatterns } = searchBarProps;
+  const { isLoading, query, indexPatterns } = searchBarProps;
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -128,6 +138,7 @@ const DashboardVulsComponent: React.FC = () => {
                     },
                     hidePanelTitles: true,
                   }}
+                  onInputUpdated={handleFilterByVisualization}
                 />
               </div>
               <DashboardByRenderer
@@ -151,6 +162,7 @@ const DashboardVulsComponent: React.FC = () => {
                   },
                   hidePanelTitles: true,
                 }}
+                onInputUpdated={handleFilterByVisualization}
               />
               <DashboardByRenderer
                 input={{
@@ -173,6 +185,7 @@ const DashboardVulsComponent: React.FC = () => {
                   },
                   hidePanelTitles: false,
                 }}
+                onInputUpdated={handleFilterByVisualization}
               />
             </div>
           ) : null}
