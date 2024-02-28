@@ -82,6 +82,7 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
           isOpen={showOutdatedAgents}
           closePopover={onHideOutdatedAgents}
           anchorPosition='downLeft'
+          panelStyle={{ overflowY: 'auto' }}
         >
           <EuiButtonEmpty
             iconType='filter'
