@@ -80,7 +80,6 @@ export const ApiTable = compose(
         refreshingEntries: false,
         availableUpdates: {},
         refreshingAvailableUpdates: true,
-        apiAvailableUpdateDetails: undefined,
       };
     }
 
@@ -546,18 +545,17 @@ export const ApiTable = compose(
                   ) : null}
                   {item === 'availableUpdates' ? (
                     <EuiFlexItem grow={false}>
-                      <EuiToolTip
-                        position='top'
-                        content={<p>View available updates</p>}
-                      >
-                        <EuiButtonIcon
-                          aria-label='Availabe updates'
-                          iconType='eye'
-                          onClick={() =>
-                            this.setState({ apiAvailableUpdateDetails: api })
-                          }
-                        />
-                      </EuiToolTip>
+                      <WzButtonOpenFlyout
+                        tooltip={{ content: 'View available updates' }}
+                        flyoutTitle={'Availabe updates'}
+                        flyoutBody={() => {
+                          return <AvailableUpdatesFlyout api={api} />;
+                        }}
+                        buttonProps={{
+                          buttonType: 'icon',
+                          iconType: 'eye',
+                        }}
+                      />
                     </EuiFlexItem>
                   ) : null}
                   {item === 'error' && api.error?.detail ? (
@@ -808,7 +806,7 @@ export const ApiTable = compose(
                           flyoutTitle={
                             'The API connections could be down or inaccesible'
                           }
-                          flyoutBody={({ close }) => {
+                          flyoutBody={() => {
                             const steps = [
                               {
                                 title: 'Check the API server service status',
@@ -900,13 +898,6 @@ export const ApiTable = compose(
               }
             />
           </EuiPanel>
-          <AvailableUpdatesFlyout
-            api={this.state.apiAvailableUpdateDetails}
-            isVisible={!!this.state.apiAvailableUpdateDetails}
-            onClose={() =>
-              this.setState({ apiAvailableUpdateDetails: undefined })
-            }
-          />
         </EuiPage>
       );
     }
