@@ -46,8 +46,6 @@ const DashboardTab = {
   buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
   component: Dashboard,
 };
-const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
-const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
 
 const renderDiscoverTab = (columns, indexPattern) => {
   return {
