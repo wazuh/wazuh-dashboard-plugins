@@ -11,5 +11,4 @@
  */
 
 export * from './dashboard';
-export * from './events';
 export * from './modules-helper.js';
