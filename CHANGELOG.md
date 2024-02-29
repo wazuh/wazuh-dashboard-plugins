@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.7.3
 
+### Fixed
+
+- Fixed CDB List import file feature [#6458](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6458)
+
 ## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 02
 
 ### Added
