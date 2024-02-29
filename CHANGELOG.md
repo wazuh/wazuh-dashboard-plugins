@@ -2,12 +2,14 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.9.0 - OpenSearch Dashboards 2.11.0 - Revision 00
+## Wazuh v4.9.0 - OpenSearch Dashboards 2.12.0 - Revision 00
 
 ### Added
 
 - Support for Wazuh 4.9.0
 - Added AngularJS dependencies [#6145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6145)
+- Added edit groups action to Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
+- Added global actions add agents to groups and remove agents from groups to Endpoints Summary [#6274](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6274)
 
 ### Changed
 
@@ -15,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
 - Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
 - Changed the usage of the endpoint GET /groups/{group_id}/files/{file_name} [#6385](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6385)
+- Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
 
 ### Fixed
 

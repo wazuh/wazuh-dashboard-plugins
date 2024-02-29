@@ -46,7 +46,10 @@ export const RegisterAgent = compose(
   withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([
-    { text: endpointSummary.title, href: `#${endpointSummary.redirectTo()}` },
+    {
+      text: endpointSummary.breadcrumbLabel,
+      href: `#${endpointSummary.redirectTo()}`,
+    },
     { text: 'Deploy new agent' },
   ]),
   withUserAuthorizationPrompt([
