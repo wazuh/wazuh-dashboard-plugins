@@ -11,8 +11,6 @@ function request(url, options, body) {
 
   let urlOptions = new URL(url);
 
-  console.log({ urlOptions, options, body });
-
   return new Promise((resolve, reject) => {
     const req = requestPackage.request(urlOptions, options, response => {
       let data = '';
