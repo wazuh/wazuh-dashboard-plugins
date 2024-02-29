@@ -97,36 +97,82 @@ export class ManageHosts {
     }
   }
 
-  async set(hostID: string, data: IAPIHost) {
+  private checkHostExistence(
+    hosts: IAPIHost[],
+    hostID: string,
+    { shouldExist }: { shouldExist?: boolean },
+  ) {
+    const hostExistIndex = hosts.findIndex(({ id }) => id === hostID);
+    if (shouldExist && hostExistIndex === -1) {
+      const message = `API connection with ID [${hostID}] was not found`;
+      this.logger.debug(message);
+      throw new Error(message);
+    } else if (!shouldExist && hostExistIndex !== -1) {
+      const message = `API connection with ID [${hostID}] was found`;
+      this.logger.debug(message);
+      throw new Error(message);
+    }
+    return hostExistIndex;
+  }
+
+  async create(hostID: string, data: IAPIHost) {
     try {
-      const hosts = await this.get();
-      this.logger.debug(`API connections data: ${JSON.stringify(hosts)}`);
+      const hosts = (await this.get()) as IAPIHost[];
 
       let updatedHosts = [...hosts];
 
-      const hostExistIndex = updatedHosts.findIndex(({ id }) => id === hostID);
-      if (hostExistIndex !== -1) {
-        this.logger.debug(`API connection with ID [${hostID}] found`);
-        this.logger.debug(`Replacing API connection ID [${hostID}]`);
-        // Exist
-        // Update the API connection info
-        updatedHosts = updatedHosts.map((item, index) =>
-          index === hostExistIndex ? { ...item, ...data } : item,
-        );
-      } else {
-        this.logger.debug(`API connection with ID [${hostID}] not found`);
-        // Not exist
-        // Add new host
-        this.logger.debug(`Adding new API connection with ID [${data.id}]`);
-        updatedHosts.push(data);
-      }
-      this.logger.debug(
-        `API connections to save ${JSON.stringify(updatedHosts)}`,
-      );
+      // Check if the API connection does not exist
+      this.checkHostExistence(updatedHosts, hostID, { shouldExist: false });
+
+      this.logger.debug(`Adding new API connection with ID [${data.id}]`);
+      updatedHosts.push(data);
+      this.logger.debug('Updating API connections');
       await this.configuration.set({
         hosts: updatedHosts,
       });
-      this.logger.info(`API connection with ID [${hostID}] was updated`);
+      this.logger.info(`API connection with ID [${hostID}] was created`);
+      return data;
+    } catch (error) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  }
+
+  async update(hostID: string, data: IAPIHost) {
+    try {
+      const hosts = (await this.get()) as IAPIHost[];
+
+      let updatedHosts = [...hosts];
+
+      // Check if the API connection exists
+      const updatedHostID = data?.id || hostID;
+      let hostExistIndex = this.checkHostExistence(
+        updatedHosts,
+        updatedHostID,
+        {
+          /* when the updatedHostID is the same than the original one, then should exist,
+          otherwise not */
+          shouldExist: updatedHostID === hostID,
+        },
+      );
+
+      this.logger.debug(`Replacing API connection ID [${hostID}]`);
+      // Update the API connection info
+      hostExistIndex =
+        hostExistIndex === -1
+          ? /* Get the index of the API connection with the original ID if does not find the updated
+          one */
+            hosts.findIndex(({ id }) => id === hostID)
+          : hostExistIndex;
+      updatedHosts = updatedHosts.map((item, index) =>
+        index === hostExistIndex ? { ...item, ...data } : item,
+      );
+
+      this.logger.debug('Updating API connections');
+      await this.configuration.set({
+        hosts: updatedHosts,
+      });
+      this.logger.info(`API connection with ID [${updatedHostID}] was updated`);
       return data;
     } catch (error) {
       this.logger.error(error.message);
@@ -141,26 +187,25 @@ export class ManageHosts {
   async delete(hostID: string) {
     try {
       const hosts = (await this.get()) as IAPIHost[];
-      this.logger.debug(`API connections data: ${JSON.stringify(hosts)}`);
 
-      const newHosts = [...hosts];
+      const updatedHosts = [...hosts];
 
-      const hostExistIndex = newHosts.findIndex(({ id }) => id === hostID);
-      if (hostExistIndex === -1) {
-        this.logger.debug(`API connection with ID [${hostID}] not found`);
-        throw new Error(`API connection with ID [${hostID}] was not found`);
-      }
+      // Check if the API connection exists
+      const hostExistIndex = this.checkHostExistence(updatedHosts, hostID, {
+        shouldExist: true,
+      });
+
       this.logger.debug(`API connection with ID [${hostID}] found`);
       // Exist
       // Remove host
       this.logger.debug(`Removing API connection with ID [${hostID}]`);
-      newHosts.splice(hostExistIndex, 1);
+      updatedHosts.splice(hostExistIndex, 1);
 
       this.logger.debug('Updating API connections');
       await this.configuration.set({
-        hosts: newHosts,
+        hosts: updatedHosts,
       });
-      this.logger.debug('Updated API connections');
+      this.logger.info(`API connection with ID [${hostID}] was removed`);
     } catch (error) {
       this.logger.error(error.message);
       throw error;

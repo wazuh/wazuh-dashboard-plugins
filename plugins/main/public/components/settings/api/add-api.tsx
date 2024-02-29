@@ -81,11 +81,15 @@ interface IPropsAddAPIHostForm {
     run_as?: string;
   };
   apiId: string;
+  mode: 'CREATE' | 'EDIT';
+  onSave: () => void;
+  onUpdateCanClose: (boolean) => void;
 }
 
 export const AddAPIHostForm = ({
   initialValue = {},
   apiId = '',
+  mode = 'CREATE',
   onSave: onSaveProp,
   onUpdateCanClose,
 }: IPropsAddAPIHostForm) => {
@@ -108,21 +112,19 @@ export const AddAPIHostForm = ({
     onUpdateCanClose?.(!Boolean(Object.keys(changed).length));
   }, [changed]);
 
-  const mode = apiId ? 'EDIT' : 'CREATE';
-
   const onSave = async () => {
     try {
-      const apiHostId = apiId || fields.id.value;
-      let saveFields = fields;
-      if (mode === 'EDIT') {
-        saveFields = Object.fromEntries(
-          Object.keys(changed).map(key => [key, fields[key]]),
-        );
-      }
+      const apiHostId = mode === 'CREATE' ? fields.id.value : apiId;
+      const saveFields =
+        mode === 'CREATE'
+          ? fields
+          : Object.fromEntries(
+              Object.keys(changed).map(key => [key, fields[key]]),
+            );
       const { password_confirm, ...rest } = saveFields;
 
       const response = await GenericRequest.request(
-        'PUT',
+        mode === 'CREATE' ? 'POST' : 'PUT',
         `/hosts/apis/${apiHostId}`,
         Object.entries(rest).reduce(
           (accum, [key, { value, transformChangedOutputValue }]) => ({
@@ -132,8 +134,8 @@ export const AddAPIHostForm = ({
           {},
         ),
       );
-      await onSaveProp();
       ErrorHandler.info(response.data.message);
+      onSaveProp && (await onSaveProp());
     } catch (error) {
       const options = {
         context: 'AddAPIHostForm.onSave',
@@ -144,7 +146,9 @@ export const AddAPIHostForm = ({
         error: {
           error: error,
           message: error.message || error,
-          title: `API host could not be updated due to ${error.message}`,
+          title: `API host could not be ${
+            mode === 'CREATE' ? 'created' : 'updated'
+          } due to ${error.message}`,
         },
       };
 

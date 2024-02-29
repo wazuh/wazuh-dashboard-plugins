@@ -121,6 +121,50 @@ export class WazuhHostsCtrl {
    * @param response
    * @returns
    */
+  createAPIHost = routeDecoratorProtectedAdministrator(
+    async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
+      try {
+        const { id } = request.params;
+        context.wazuh.logger.debug(`Creating API host with ID [${id}]`);
+
+        const responseSetHost = await context.wazuh_core.manageHosts.create(
+          id,
+          request.body,
+        );
+
+        context.wazuh.logger.info(`Created API host with ID [${id}]`);
+
+        return response.ok({
+          body: {
+            message: `API host with ID [${id}] was created`,
+            data: responseSetHost,
+          },
+        });
+      } catch (error) {
+        context.wazuh.logger.error(error.message || error);
+        return ErrorResponse(
+          `Could not create the API host entry ${error.message || error}`,
+          2014,
+          500,
+          response,
+        );
+      }
+    },
+    2014,
+  );
+
+  /**
+   * Create or update the API host data stored in the configuration.
+   * Allow partial updates.
+   * @param context
+   * @param request
+   * @param response
+   * @returns
+   */
   updateAPIHost = routeDecoratorProtectedAdministrator(
     async (
       context: RequestHandlerContext,
@@ -131,7 +175,7 @@ export class WazuhHostsCtrl {
         const { id: originalID } = request.params;
         context.wazuh.logger.debug(`Updating API host with ID [${originalID}]`);
 
-        const responseSetHost = await context.wazuh_core.manageHosts.set(
+        const responseSetHost = await context.wazuh_core.manageHosts.update(
           originalID,
           request.body,
         );
@@ -148,13 +192,13 @@ export class WazuhHostsCtrl {
         context.wazuh.logger.error(error.message || error);
         return ErrorResponse(
           `Could not update the API host entry ${error.message || error}`,
-          2014,
+          2015,
           500,
           response,
         );
       }
     },
-    2014,
+    2015,
   );
 
   /**
@@ -192,6 +236,6 @@ export class WazuhHostsCtrl {
         );
       }
     },
-    2015,
+    2016,
   );
 }

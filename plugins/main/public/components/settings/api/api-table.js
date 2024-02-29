@@ -651,6 +651,7 @@ export const ApiTable = compose(
                 flyoutTitle={`Edit API connection: ${item.id} `}
                 flyoutBody={({ onClose, onUpdateCanClose }) => (
                   <AddAPIHostForm
+                    mode='EDIT'
                     onUpdateCanClose={onUpdateCanClose}
                     initialValue={{
                       id: item.id,
@@ -732,6 +733,7 @@ export const ApiTable = compose(
                   flyoutTitle='Add API connection'
                   flyoutBody={({ onClose, onUpdateCanClose }) => (
                     <AddAPIHostForm
+                      mode='CREATE'
                       onUpdateCanClose={onUpdateCanClose}
                       onSave={async () => {
                         onClose();

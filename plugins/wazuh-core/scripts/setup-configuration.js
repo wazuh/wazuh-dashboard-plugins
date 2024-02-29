@@ -174,7 +174,7 @@ async function updateOtherSettings(configuration, settings) {
       );
     }
   } catch (error) {
-    cli.logger.error(error.message);
+    cli.logger.error(`Error updating the configurations: ${error.message}`);
   }
 }
 
@@ -189,7 +189,7 @@ async function updateHosts(configuration, hosts) {
     };
     cli.logger.info(`Updating API host [${host.id}]`);
     try {
-      const response = await http.client.put(
+      const response = await http.client.post(
         `${configuration.host}/hosts/apis/${host.id}`,
         {
           rejectUnauthorized: false,
@@ -204,7 +204,9 @@ async function updateHosts(configuration, hosts) {
 
       cli.logger.info(`Updated API host [${host.id}]`);
     } catch (error) {
-      cli.logger.error(error.message);
+      cli.logger.error(
+        `Error updating API host [${host.id}]: ${error.message}`,
+      );
     }
   }
 }
