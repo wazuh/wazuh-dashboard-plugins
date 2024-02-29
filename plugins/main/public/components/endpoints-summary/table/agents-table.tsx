@@ -54,6 +54,8 @@ const mapDispatchToProps = dispatch => ({
 interface AgentsTableProps {
   filters: any;
   updateCurrentAgentData: (agent) => void;
+  reloadTable?: number;
+  setReloadTable?: (newValue: number) => void;
 }
 
 export const AgentsTable = compose(
@@ -67,7 +69,6 @@ export const AgentsTable = compose(
       : {}),
   };
   const [filters, setFilters] = useState(defaultFilters);
-  const [reloadTable, setReloadTable] = useState(0);
   const [agent, setAgent] = useState<Agent>();
   const [agentList, setAgentList] = useState<{
     items: Agent[];
@@ -95,7 +96,9 @@ export const AgentsTable = compose(
   const reloadAgents = async () => {
     setSelectedItems([]);
     setAllAgentsSelected(false);
-    await setReloadTable(Date.now());
+    if (props.setReloadTable) {
+      props.setReloadTable(Date.now());
+    }
   };
 
   const onSelectionChange = (selectedItems: Agent[]) => {
@@ -227,7 +230,7 @@ export const AgentsTable = compose(
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
-            reload={reloadTable}
+            reload={props.reloadTable}
             mapResponseItem={item => {
               return {
                 ...item,

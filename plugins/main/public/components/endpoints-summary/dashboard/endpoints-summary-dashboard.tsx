@@ -10,6 +10,7 @@ interface EndpointsSummaryDashboardProps {
   filterAgentByOS: (data: any) => void;
   filterAgentByGroup: (data: any) => void;
   filterByOutdatedAgent: (data: any) => void;
+  reloadDashboard?: number;
 }
 
 export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
@@ -17,6 +18,7 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
   filterAgentByOS,
   filterAgentByGroup,
   filterByOutdatedAgent,
+  reloadDashboard,
 }) => {
   return (
     <div className='endpoints-summary-container-indicators'>
@@ -24,16 +26,19 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
         betaBadgeLabel='Agents by Status'
         onClickLabel={filterAgentByStatus}
         getInfo={getSummaryAgentsStatus}
+        reload={reloadDashboard}
       />
       <DonutCard
         betaBadgeLabel='Top 5 agents by OS'
         onClickLabel={filterAgentByOS}
         getInfo={getAgentsByOs}
+        reload={reloadDashboard}
       />
       <DonutCard
         betaBadgeLabel='Top 5 agents by Group'
         onClickLabel={filterAgentByGroup}
         getInfo={getAgentsByGroup}
+        reload={reloadDashboard}
       />
       <OutdatedAgentsCard onClick={filterByOutdatedAgent} />
     </div>

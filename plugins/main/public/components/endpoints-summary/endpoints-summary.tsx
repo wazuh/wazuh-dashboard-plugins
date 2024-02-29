@@ -12,13 +12,7 @@
  */
 
 import React, { Component } from 'react';
-import {
-  EuiPage,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiSpacer,
-  EuiFlexGrid,
-} from '@elastic/eui';
+import { EuiPage, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { AgentsTable } from './table/agents-table';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
@@ -36,11 +30,6 @@ import { compose } from 'redux';
 import { endpointSummary } from '../../utils/applications';
 import { ShareAgent } from '../../factories/share-agent';
 import './endpoints-summary.scss';
-import OutdatedAgentsCard from './dashboard/components/outdated-agents-card';
-import DonutCard from './dashboard/components/donut-card';
-import { getSummaryAgentsStatus } from './services/get-summary-agents-status';
-import { getAgentsByOs } from './services/get-agents-by-os';
-import { getAgentsByGroup } from './services/get-agents-by-group';
 import { EndpointsSummaryDashboard } from './dashboard/endpoints-summary-dashboard';
 
 export const EndpointsSummary = compose(
@@ -60,6 +49,7 @@ export const EndpointsSummary = compose(
       super();
       this.state = {
         agentTableFilters: {},
+        reload: 0,
       };
       this.wazuhConfig = new WazuhConfig();
       this.shareAgent = new ShareAgent();
@@ -68,6 +58,12 @@ export const EndpointsSummary = compose(
       this.filterAgentByGroup = this.filterAgentByGroup.bind(this);
       this.filterByOutdatedAgent = this.filterByOutdatedAgent.bind(this);
     }
+
+    setReload = (newValue: number) => {
+      this.setState({
+        reload: newValue,
+      });
+    };
 
     async componentDidMount() {
       this._isMount = true;
@@ -147,10 +143,15 @@ export const EndpointsSummary = compose(
               filterAgentByOS={this.filterAgentByOS}
               filterAgentByGroup={this.filterAgentByGroup}
               filterByOutdatedAgent={this.filterByOutdatedAgent}
+              reloadDashboard={this.state.reload}
             />
             <EuiSpacer size='m' />
             <WzReduxProvider>
-              <AgentsTable filters={this.state.agentTableFilters} />
+              <AgentsTable
+                filters={this.state.agentTableFilters}
+                reloadTable={this.state.reload}
+                setReloadTable={this.setReload}
+              />
             </WzReduxProvider>
           </EuiFlexItem>
         </EuiPage>
