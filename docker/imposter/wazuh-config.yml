@@ -392,10 +392,6 @@ resources:
   - method: GET
     path: /groups/{group_id}/files
 
-  # # Get a file in group
-  # - method: GET
-  #   path: /groups/{group_id}/files/{file_name}
-
   # Get a file in group
   - method: GET
     path: /groups/{group_id}/files/{file_name}
