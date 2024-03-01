@@ -302,7 +302,7 @@ export class WazuhUtilsCtrl {
    * @param {Object} context
    * @param {Object} request
    * @param {Object} response
-   * @returns {Object} Configuration File or ErrorResponse
+   * @returns {Object} Scoped user account or ErrorResponse
    */
   async getPluginScopedAccount(
     context: RequestHandlerContext,
