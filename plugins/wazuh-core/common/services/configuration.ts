@@ -292,7 +292,7 @@ export class Configuration implements IConfiguration {
    * @returns
    */
   async clear(...settings: string[]) {
-    if (settings) {
+    if (settings.length) {
       this.logger.debug(`Clean settings: ${settings.join(', ')}`);
       const response = await this.store.clear(...settings);
       this.logger.info('Settings were cleared');
@@ -308,7 +308,7 @@ export class Configuration implements IConfiguration {
    * @returns
    */
   async reset(...settings: string[]) {
-    if (settings) {
+    if (settings.length) {
       this.logger.debug(`Reset settings: ${settings.join(', ')}`);
       const updatedSettings = settings.reduce((accum, settingKey: string) => {
         return {
