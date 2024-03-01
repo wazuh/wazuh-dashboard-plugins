@@ -1,7 +1,5 @@
-import { tDataSource } from './data-source';
-
-export abstract class DataSourceFactory {
-    abstract getDataSources(): tDataSource[];
-    abstract createDataSources(): tDataSource[];
-    abstract validateDataSources(dataSources: tDataSource[]): boolean;
+import { tDataSource } from './index'
+export type tDataSourceFactory = {
+    create(item: tDataSource): tDataSource;
+    createAll(items: tDataSource[]): tDataSource[];
 }

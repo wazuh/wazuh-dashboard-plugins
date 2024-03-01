@@ -1,13 +1,12 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import DataSourceSelector from './data-source-selector';
+import PatternSelector from './pattern-selector';
 import '@testing-library/jest-dom/extend-expect';
 
-describe('DataSourceSelector', () => {
+describe('PatternSelector', () => {
 
     it('should render', () => {
-        // use react testing library
-        const { container } = render(<DataSourceSelector />);
+        const { container } = render(<PatternSelector />);
         expect(container).toBeInTheDocument();
     })
 

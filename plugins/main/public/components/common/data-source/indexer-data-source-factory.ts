@@ -1,15 +1,16 @@
-import { tDataSource } from "./data-source";
-import { DataSourceFactory } from "./data-source-factory";
-import { IndexerDataSource } from "./indexer-data-source";
-
-export class IndexerDataSourceFactory extends DataSourceFactory {
-    validateDataSources(dataSources: tDataSource[]): boolean {
-        throw new Error("Method not implemented.");
+import { tDataSourceFactory, IndexerDataSource } from './index'
+export class IndexerDataSourceFactory implements tDataSourceFactory {
+    
+    create(item: IndexerDataSource): IndexerDataSource {
+        if(!item){
+            throw new Error('Cannot create data source from null or undefined');
+        };
+        return new IndexerDataSource(item.id, item.title);
     }
-    createDataSources(): tDataSource[] {
-        throw new Error("Method not implemented.");
-    }
-    getDataSources(): tDataSource[] {
-        return [new IndexerDataSource('id','title')];
+    createAll(items: IndexerDataSource[]): IndexerDataSource[] {
+        if(!items){
+            throw new Error('Cannot create data source from null or undefined');
+        };
+        return items.map(item => this.create(item));
     }
 }

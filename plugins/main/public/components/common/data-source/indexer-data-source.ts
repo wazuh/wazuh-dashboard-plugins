@@ -51,8 +51,7 @@ static validateIndexPatterns(list) {
 */
 
 // get the valid list of index patterns patternHandler.getPatternList('api'); the flag is to difference between api or health-check
-
-
+import { getDataPlugin } from '../../../kibana-services';
 
 
 export class IndexerDataSource implements tDataSource {
@@ -61,5 +60,18 @@ export class IndexerDataSource implements tDataSource {
     constructor(id: string, title: string) {
         this.id = id;
         this.title = title;
+    }
+
+    async select(){
+        // select the current index pattern in the indexPatternService
+        const pattern = await getDataPlugin().indexPatterns.get(this.id);
+        console.log('pattern', pattern);
+        if(pattern){
+            await getDataPlugin().indexPatterns.updateSavedObject(pattern);
+            console.log('pattern default', await getDataPlugin().indexPatterns.getDefault());
+        }else{
+            throw new Error('Error selecting index pattern');
+        }
+
     }
 }
