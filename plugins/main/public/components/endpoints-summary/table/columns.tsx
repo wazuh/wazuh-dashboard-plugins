@@ -4,7 +4,7 @@ import { AgentSynced } from '../../agents/agent-synced';
 import { AgentStatus } from '../../agents/agent-status';
 import { formatUIDate } from '../../../react-services/time-service';
 import { GroupTruncate } from '../../common/util';
-import { EuiFlexGroup, EuiFlexItem, EuiIconTip } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiIconTip, EuiBadge } from '@elastic/eui';
 import { Agent } from '../types';
 
 // Columns with the property truncateText: true won't wrap the text
@@ -13,7 +13,9 @@ export const agentsTableColumns = (
   allowEditGroups: boolean,
   setAgent: (agents: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
+  setIsUpgradeModalVisible: (visible: boolean) => void,
   setFilters: (filters) => void,
+  outdatedAgents: Agent[],
 ) => [
   {
     field: 'id',
@@ -66,7 +68,18 @@ export const agentsTableColumns = (
     sortable: true,
     show: true,
     searchable: true,
-    width: '10%',
+    width: '100px',
+    render: (version, agent) => {
+      const isOutdated = !!outdatedAgents.find(
+        outdatedAgent => outdatedAgent.id === agent.id,
+      );
+      return (
+        <div>
+          <div>{version}</div>
+          {isOutdated ? <EuiBadge color='warning'>Outdated</EuiBadge> : null}
+        </div>
+      );
+    },
   },
   {
     field: 'dateAdd',
@@ -128,6 +141,8 @@ export const agentsTableColumns = (
       allowEditGroups,
       setAgent,
       setIsEditGroupsVisible,
+      setIsUpgradeModalVisible,
+      outdatedAgents,
     ),
   },
 ];
