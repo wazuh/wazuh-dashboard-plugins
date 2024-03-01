@@ -1,5 +1,16 @@
 #!/bin/sh
 
+# This script setup the configuration of the Wazuh plugins into a saved object through the
+# API endpoints provided by the plugins. The Wazuh dashboard server needs to be up.
+#
+# If the Wazuh dashboard has the security enabled, it is required to use an administrator user.
+#
+# Features:
+# - Update the settings.
+# - Create the API connections. If it already exist an API connection with the same ID, then this
+#   could not be created.
+# - Optionally, clear the current configuration through a script option.
+
 # Get an absolute path for script_home and use_node
 script=$0
 current_directory="$(cd "$(dirname "${script}")"; pwd)"

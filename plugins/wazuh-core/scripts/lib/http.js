@@ -5,8 +5,7 @@ function request(url, options, body) {
   } else if (url.startsWith('https:')) {
     requestPackage = require('https');
   } else {
-    console.error('URL should start with "http" or "https"');
-    process.exit(1);
+    throw new Error('URL should start with "http" or "https"');
   }
 
   let urlOptions = new URL(url);
@@ -22,7 +21,8 @@ function request(url, options, body) {
 
       // The whole response has been received. Print out the result
       response.on('end', () => {
-        resolve(data);
+        response.body = data;
+        resolve(response);
       });
 
       // Manage the error
@@ -43,8 +43,13 @@ function request(url, options, body) {
         options.headers['content-type'] === 'application/json'
       ) {
         payload = JSON.stringify(body);
+        req.write(payload);
+      } else if (typeof body.pipe === 'function') {
+        body.pipe(req);
+        return;
+      } else {
+        req.write(payload);
       }
-      req.write(payload);
     }
 
     req.end();

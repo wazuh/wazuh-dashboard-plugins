@@ -1,8 +1,19 @@
-const cliName = 'setup-configuration';
-const cliDescription =
-  'Setup the configuration from the configuration file to the saved object. This requires the server is up.';
+/**
+ * This script setup the configuration of the Wazuh plugins into a saved object through the
+ * API endpoints provided by the plugins. The Wazuh dashboard server needs to be up.
+ *
+ * If the Wazuh dashboard has the security enabled, it is required to use an administrator user.
+ *
+ * Features:
+ * - Update the settings.
+ * - Create API connection. If it already exist an API connection with the same ID, then this could
+ *   not be created.
+ * - Optionally, clear the current configuration through a script option.
+ */
 
 const platformName = 'Wazuh dashboard';
+const cliName = 'setup-configuration';
+const cliDescription = `Setup the configuration of the plugins into ${platformName} from a configuration file. This requires the ${platformName} server is up.`;
 
 // Create CLI
 const cli = require('./lib/cli')(
@@ -12,6 +23,7 @@ const cli = require('./lib/cli')(
   [
     {
       long: 'debug',
+      short: 'd',
       description: 'Enable debug in the logger.',
       parse: (parameter, input, { logger, option }) => {
         logger.setLevel(0);
@@ -22,6 +34,7 @@ const cli = require('./lib/cli')(
     },
     {
       long: 'help',
+      short: 'h',
       description: 'Display the help.',
       parse: (parameter, input, { logger, option, help }) => {
         help();
@@ -30,6 +43,7 @@ const cli = require('./lib/cli')(
     },
     {
       long: 'config-file',
+      short: 'f',
       description: 'Define the path to the configuration file.',
       help: '<file-path>',
       required: true,
@@ -49,6 +63,7 @@ const cli = require('./lib/cli')(
     },
     {
       long: 'host',
+      short: 'a',
       description: 'Define the host address.',
       help: '<url>',
       required: true,
@@ -67,7 +82,8 @@ const cli = require('./lib/cli')(
       },
     },
     {
-      long: 'user',
+      long: 'username',
+      short: 'u',
       description: 'Define the username.',
       help: '<username>',
       parse: (parameter, input, { logger, option }) => {
@@ -86,6 +102,7 @@ const cli = require('./lib/cli')(
     },
     {
       long: 'password',
+      short: 'p',
       description: 'Define the password.',
       help: '<password>',
       parse: (parameter, input, { logger, option }) => {
@@ -104,7 +121,8 @@ const cli = require('./lib/cli')(
     },
     {
       long: 'clear',
-      description: 'Clear the previous configuration',
+      short: 'c',
+      description: 'Clear the previous configuration.',
       parse: (parameter, input, { logger, option }) => {
         logger.setLevel(0);
         return {
@@ -130,23 +148,46 @@ function readConfigFile(path) {
   return configAsJSON;
 }
 
-async function clearConfiguration() {
+function getRequestOptions(configuration) {
+  return {
+    // Add optionally the auth credentials
+    ...(configuration.username && configuration.password
+      ? { auth: `${configuration.username}:${configuration.password}` }
+      : {}),
+    rejectUnauthorized: false,
+    headers: {
+      'content-type': 'application/json',
+      'osd-xsrf': 'kibana',
+    },
+  };
+}
+
+function validateResponseStatusCode(response) {
+  if (response.statusCode < 200 || response.statusCode > 200) {
+    const bodyJSON =
+      typeof response.body === 'string' && JSON.parse(response.body);
+    throw new Error(
+      (bodyJSON && bodyJSON.message) ||
+        `Request failed with status code [${response.statusCode}]`,
+    );
+  }
+  return response;
+}
+
+async function clearConfiguration(configuration) {
   try {
     const http = require('./lib/http');
     cli.logger.debug('Clearing configuration');
-    const response = await http.client.post(
-      `${configuration.host}/utils/configuration/clear`,
-      {
-        rejectUnauthorized: false,
-        headers: {
-          'content-type': 'application/json',
-          'osd-xsrf': 'kibana',
-        },
-      },
-    );
+    const response = await http.client
+      .post(
+        `${configuration.host}/utils/configuration/clear`,
+        getRequestOptions(configuration),
+      )
+      .then(validateResponseStatusCode);
     cli.logger.debug('Cleared configuration');
   } catch (error) {
-    cli.logger.error(error.message);
+    cli.logger.error(`Error clearing the configuration: ${error.message}`);
+    process.exit(1);
   }
 }
 
@@ -154,19 +195,15 @@ async function updateOtherSettings(configuration, settings) {
   try {
     const http = require('./lib/http');
     cli.logger.debug(`Updating other settings: ${JSON.stringify(settings)}`);
-    const response = await http.client.put(
-      `${configuration.host}/utils/configuration`,
-      {
-        rejectUnauthorized: false,
-        headers: {
-          'content-type': 'application/json',
-          'osd-xsrf': 'kibana',
-        },
-      },
-      settings,
-    );
-    cli.logger.info(`Updated settings: ${response}`);
-    const jsonResponse = JSON.parse(response);
+    const response = await http.client
+      .put(
+        `${configuration.host}/utils/configuration`,
+        getRequestOptions(configuration),
+        settings,
+      )
+      .then(validateResponseStatusCode);
+    cli.logger.info(`Updated settings: ${response.body}`);
+    const jsonResponse = JSON.parse(response.body);
 
     if (jsonResponse.requiresRestartingPluginPlatform) {
       cli.logger.warn(
@@ -189,18 +226,14 @@ async function updateHosts(configuration, hosts) {
     };
     cli.logger.info(`Updating API host [${host.id}]`);
     try {
-      const response = await http.client.post(
-        `${configuration.host}/hosts/apis/${host.id}`,
-        {
-          rejectUnauthorized: false,
-          headers: {
-            'content-type': 'application/json',
-            'osd-xsrf': 'kibana',
-          },
-        },
-        host,
-      );
-      cli.logger.debug(`Updated API host [${host.id}]: ${response}`);
+      const response = await http.client
+        .post(
+          `${configuration.host}/hosts/apis/${host.id}`,
+          getRequestOptions(configuration),
+          host,
+        )
+        .then(validateResponseStatusCode);
+      cli.logger.debug(`Updated API host [${host.id}]: ${response.body}`);
 
       cli.logger.info(`Updated API host [${host.id}]`);
     } catch (error) {
@@ -245,19 +278,25 @@ async function main() {
     if (configuration['clear']) {
       await clearConfiguration();
     }
-    // Migrate the configuration
 
     // Separate the configurations
     const { hosts, ...otherSettings } = configAsJSON;
 
-    if (otherSettings || hosts) {
+    const thereIsOtherSettings = Object.keys(otherSettings).length;
+
+    if (!thereIsOtherSettings && !hosts) {
       cli.logger.warn(
-        'This will be update the settings defined in the configuration file, but does not modify or reset the undefined settings.',
+        'There are not settings defined in the configuration file. Skip.',
       );
+      process.exit(1);
     }
 
     // Update the other settings
-    if (otherSettings) {
+    if (thereIsOtherSettings) {
+      !configuration['clear'] &&
+        cli.logger.warn(
+          'This will be update the current configuration with the defined settings in the configuration file, but does not modify already stored settings',
+        );
       const filesSettings = Object.keys(otherSettings).filter(key =>
         key.startsWith('customization.logo'),
       );
@@ -267,7 +306,7 @@ async function main() {
             .map(setting => `[${setting}]`)
             .join(
               ', ',
-            )}. The setting values will be updated but the file should be moved to the expected location path.`,
+            )}. The setting values will be updated but the file should be stored to the expected location path.`,
         );
       }
       await updateOtherSettings(configuration, otherSettings);
@@ -275,6 +314,10 @@ async function main() {
 
     // Update the hosts
     if (hosts) {
+      !configuration['clear'] &&
+        cli.logger.warn(
+          'This will try to add each defined host. If a host with the same ID already exist, it could not be updated.',
+        );
       await updateHosts(configuration, hosts);
     }
   } catch (error) {
