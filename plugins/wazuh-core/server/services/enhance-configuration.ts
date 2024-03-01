@@ -1,4 +1,6 @@
+import { PLUGIN_PLATFORM_NAME } from '../../common/constants';
 import { IConfiguration } from '../../common/services/configuration';
+import yml from 'js-yaml';
 
 /**
  * Returns the default value if not set when the setting is an empty string
@@ -23,6 +25,7 @@ export interface IConfigurationEnhanced extends IConfiguration {
     currentConfiguration: { [key: string]: any },
     settingKey: string,
   ): any;
+  importFile(fileContent: string | Buffer): any;
 }
 
 function getCustomizationSetting(
@@ -62,4 +65,86 @@ export function enhanceConfiguration(configuration: IConfiguration) {
 
     return getCustomizationSetting(this, currentConfiguration, settingKey);
   };
+
+  configuration.importFile = async function (file: string | Buffer) {
+    const fileContent = typeof file === 'string' ? file : file.toString();
+    this.logger.debug('Loading file content as JSON');
+    const configAsJSON = yml.load(fileContent);
+    this.logger.debug('Loaded file content as JSON');
+
+    const { hosts: configFileHosts, ...otherSettings } = configAsJSON;
+
+    // Transform hosts
+    const hosts = configFileHosts
+      ? Object.values(configFileHosts).map(item => {
+          const id = Object.keys(item)[0];
+          return {
+            ...item[id],
+            id: id,
+          };
+        })
+      : [];
+
+    const settingsFromFile = {
+      ...otherSettings,
+      ...(hosts.length ? { hosts } : {}),
+    };
+
+    const warnings: string[] = [];
+    // Filter the settings by the supported
+    const validSettings = Object.fromEntries(
+      Object.entries(settingsFromFile).filter(([key]) => {
+        if (this._settings.has(key)) {
+          return true;
+        } else {
+          warnings.push(`[${key}] is not supported. This is ignored.`);
+          return false;
+        }
+      }),
+    );
+
+    const thereIsOtherSettings = Object.keys(validSettings).length;
+
+    if (!thereIsOtherSettings) {
+      const message =
+        'There are no valid settings defined in the configuration file';
+      this.logger.debug(message);
+      return response.badRequest({
+        body: {
+          message,
+          ...(warnings.length ? { warnings } : {}),
+        },
+      });
+    }
+
+    this.logger.debug('Clearing configuration');
+    await this.clear();
+    this.logger.debug('Cleared configuration');
+
+    this.logger.debug('Storing configuration');
+    const responseSetConfig = await this.set(validSettings);
+    this.logger.debug('Stored configuration');
+
+    Object.entries(responseSetConfig?.requirements ?? {})
+      .filter(([_, value]) => value)
+      .forEach(([key]) => {
+        messagesRequirements?.[key] &&
+          warnings.push(
+            `The imported configuration requires: ${messagesRequirements[key]}`,
+          );
+      });
+
+    return {
+      message: 'Configuration file was imported',
+      data: responseSetConfig,
+      ...(warnings.length ? { warnings } : {}),
+    };
+  };
 }
+
+// TODO: try to move to common because these messages are displayed on the UI too
+const messagesRequirements = {
+  requiresReloadingBrowserTab: 'Reload the page to apply the changes',
+  requiresRunningHealthcheck: 'Run a health check to apply the changes.',
+  requiresRestartingPluginPlatform: `Restart ${PLUGIN_PLATFORM_NAME} to apply the changes`,
+};

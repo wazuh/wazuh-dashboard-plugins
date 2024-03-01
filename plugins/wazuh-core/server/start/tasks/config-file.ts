@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import yml from 'js-yaml';
 
 export default {
   name: 'migration-config-file',
@@ -47,49 +46,15 @@ export default {
       const content = fs.readFileSync(configurationFileLocation, 'utf8');
       logger.debug(`Read file [${configurationFileLocation}]`);
 
-      logger.debug(
-        `Loading file [${configurationFileLocation}] content as JSON`,
+      logger.debug(`Importing file [${configurationFileLocation}]`);
+      const responseImportFile = await configuration.importFile(content);
+      logger.info(`Imported file [${configurationFileLocation}]`);
+
+      responseImportFile?.warnings?.forEach?.((warning: string) =>
+        logger.warn(warning),
       );
-
-      const configAsJSON = yml.load(content);
-
-      logger.debug(
-        `Loaded file [${configurationFileLocation}] content as JSON: ${JSON.stringify(
-          configAsJSON,
-        )}`,
-      );
-
-      if (!Object.keys(configAsJSON).length) {
-        logger.warn(
-          `File [${configurationFileLocation}] has not defined settings. Skip.`,
-        );
-        return;
-      }
-
-      logger.debug('Clearing configuration');
-      await configuration.clear();
-      logger.info('Cleared configuration');
-
-      if (configAsJSON.hosts) {
-        logger.debug(
-          `Transforming hosts: ${JSON.stringify(configAsJSON.hosts)}`,
-        );
-        configAsJSON.hosts = configAsJSON.hosts.map(host => {
-          const id = Object.keys(host)[0];
-          const data = host[id];
-          data.id = id;
-          return data;
-        }, {});
-        logger.debug(
-          `Transformed hosts: ${JSON.stringify(configAsJSON.hosts)}`,
-        );
-      }
-
-      logger.debug('Setting configuration');
-      const result = await configuration.set(configAsJSON);
-      logger.info('Configuration was updated!');
     } catch (error) {
-      logger.error(error.message);
+      logger.error(`Error migrating the configuration file: ${error.message}`);
     }
   },
 };

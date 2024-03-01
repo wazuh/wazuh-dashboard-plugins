@@ -204,6 +204,20 @@ export class Configuration implements IConfiguration {
     }
   }
 
+  private checkRequirementsOnUpdatedSettings(settings: string[]) {
+    return {
+      requiresRunningHealthCheck: settings.some(
+        key => this._settings.get(key)?.requiresRunningHealthCheck,
+      ),
+      requiresReloadingBrowserTab: settings.some(
+        key => this._settings.get(key)?.requiresReloadingBrowserTab,
+      ),
+      requiresRestartingPluginPlatform: settings.some(
+        key => this._settings.get(key)?.requiresRestartingPluginPlatform,
+      ),
+    };
+  }
+
   /**
    * Get the value for a setting from a value or someone of the default values:
    * defaultValueIfNotSet or defaultValue
@@ -283,7 +297,13 @@ export class Configuration implements IConfiguration {
     if (validationErrors.length) {
       throw new Error(`Validation errors: ${validationErrors.join('\n')}`);
     }
-    return await this.store.set(settings);
+    const responseStore = await this.store.set(settings);
+    return {
+      requirements: this.checkRequirementsOnUpdatedSettings(
+        Object.keys(responseStore),
+      ),
+      update: responseStore,
+    };
   }
 
   /**
@@ -294,9 +314,14 @@ export class Configuration implements IConfiguration {
   async clear(...settings: string[]) {
     if (settings.length) {
       this.logger.debug(`Clean settings: ${settings.join(', ')}`);
-      const response = await this.store.clear(...settings);
+      const responseStore = await this.store.clear(...settings);
       this.logger.info('Settings were cleared');
-      return response;
+      return {
+        requirements: this.checkRequirementsOnUpdatedSettings(
+          Object.keys(responseStore),
+        ),
+        update: responseStore,
+      };
     } else {
       return await this.clear(...Array.from(this._settings.keys()));
     }
@@ -316,9 +341,14 @@ export class Configuration implements IConfiguration {
           [settingKey]: this.getSettingValue(settingKey),
         };
       }, {});
-      const response = await this.store.set(updatedSettings);
+      const responseStore = await this.store.set(updatedSettings);
       this.logger.info('Settings were reset');
-      return response;
+      return {
+        requirements: this.checkRequirementsOnUpdatedSettings(
+          Object.keys(responseStore),
+        ),
+        update: responseStore,
+      };
     } else {
       return await this.reset(...this._settings.keys());
     }
