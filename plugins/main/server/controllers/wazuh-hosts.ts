@@ -147,7 +147,7 @@ export class WazuhHostsCtrl {
       } catch (error) {
         context.wazuh.logger.error(error.message || error);
         return ErrorResponse(
-          `Could not create the API host entry ${error.message || error}`,
+          `Could not create the API host: ${error.message || error}`,
           2014,
           500,
           response,
@@ -191,7 +191,7 @@ export class WazuhHostsCtrl {
       } catch (error) {
         context.wazuh.logger.error(error.message || error);
         return ErrorResponse(
-          `Could not update the API host entry ${error.message || error}`,
+          `Could not update the API host: ${error.message || error}`,
           2015,
           500,
           response,
@@ -229,7 +229,7 @@ export class WazuhHostsCtrl {
       } catch (error) {
         context.wazuh.logger.error(error.message || error);
         return ErrorResponse(
-          `Could not remove the API host entry ${error.message || error}`,
+          `Could not remove the API host: ${error.message || error}`,
           2015,
           500,
           response,
