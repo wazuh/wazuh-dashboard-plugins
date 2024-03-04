@@ -12,7 +12,10 @@
 import { GenericRequest } from '../react-services/generic-request';
 import { AxiosResponse } from 'axios';
 import _ from 'lodash';
-import { version as appVersion, revision as appRevision } from '../../package.json';
+import {
+  version as appVersion,
+  revision as appRevision,
+} from '../../package.json';
 import { getCookies, getToasts } from '../kibana-services';
 import { ErrorToastOptions } from 'opensearch_dashboards/public';
 import React from 'react';
@@ -32,10 +35,8 @@ type TAppInfoResponse = {
 
 export const checkPluginVersion = async () => {
   try {
-    const response: AxiosResponse<TAppInfoResponse> = await GenericRequest.request(
-      'GET',
-      '/api/setup'
-    );
+    const response: AxiosResponse<TAppInfoResponse> =
+      await GenericRequest.request('GET', '/api/setup');
     const { revision, 'app-version': appRevision } = response.data.data;
     return checkClientAppVersion({ revision, 'app-version': appRevision });
   } catch (error) {
@@ -44,13 +45,18 @@ export const checkPluginVersion = async () => {
 };
 
 const checkClientAppVersion = (appInfo: TAppInfo) => {
-  if (appInfo['app-version'] !== appVersion || appInfo.revision !== appRevision) {
+  if (
+    appInfo['app-version'] !== appVersion ||
+    appInfo.revision !== appRevision
+  ) {
     const toastOptions: ErrorToastOptions = {
       title: `Conflict with the ${PLUGIN_APP_NAME} version`,
       toastLifeTimeMs: 50000,
       toastMessage: `The version of the ${PLUGIN_APP_NAME} in your browser does not correspond with the app version installed in ${PLUGIN_PLATFORM_NAME}. Please, clear your browser cache. For more info check the full error.`,
     };
-    const troubleshootingUrl = webDocumentationLink('user-manual/elasticsearch/troubleshooting.html');
+    const troubleshootingUrl = webDocumentationLink(
+      'user-manual/elasticsearch/troubleshooting.html',
+    );
     const message: ReactNode = (
       <>
         <p>
@@ -58,7 +64,8 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
           <b>
             {appVersion} - {appRevision}
           </b>{' '}
-          does not correspond with the version installed in {PLUGIN_PLATFORM_NAME}{' '}
+          does not correspond with the version installed in{' '}
+          {PLUGIN_PLATFORM_NAME}{' '}
           <b>
             {appInfo['app-version']} - {appInfo.revision}
           </b>
@@ -70,8 +77,8 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
           For more information check our troubleshooting section{' '}
           <a
             href={troubleshootingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            target='_blank'
+            rel='noopener noreferrer'
           >
             here.
           </a>
@@ -119,7 +126,7 @@ This message should not be displayed again.`;
     clearBrowserInfo(appInfo);
   } else {
     if (window.history.state == 'refreshed') {
-      window.history.replaceState('', 'wazuh');
+      window.history.replaceState('', 'wazuh'); // TODO: this seems to redirect to old plugin path
     }
     const storeAppInfo = localStorage.getItem('appInfo');
     !storeAppInfo && updateAppInfo(appInfo);
@@ -130,7 +137,7 @@ function clearBrowserInfo(appInfo: TAppInfo) {
   console.warn('Clearing browser cache');
   //remove cookies
   const cookies = getCookies().getAll();
-  Object.keys(cookies).forEach((cookie) => getCookies().remove(cookie));
+  Object.keys(cookies).forEach(cookie => getCookies().remove(cookie));
 
   //remove cache
   if (window.caches) {
