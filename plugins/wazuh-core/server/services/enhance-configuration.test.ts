@@ -46,7 +46,6 @@ describe('enhanceConfiguration', () => {
     'call to .getCustomizationSetting returns the expected value',
     async ({ enabledCustomization, customize, expectedSettingValue }) => {
       mockConfigurationStore.get.mockImplementation((...settings) => {
-        console.log({ settings });
         return Object.fromEntries(
           settings.map(key => {
             if (key === 'customization.enabled') {

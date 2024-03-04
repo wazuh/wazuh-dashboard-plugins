@@ -21,6 +21,7 @@ function createMockConfigurationStore() {
         ...this._config,
         ...settings,
       };
+      return settings || {};
     },
     get(...settings: string[]) {
       return Object.fromEntries(
@@ -34,6 +35,7 @@ function createMockConfigurationStore() {
         key =>
           typeof this._config[key] !== 'undefined' && delete this._config[key],
       );
+      return settings;
     },
   };
 }
