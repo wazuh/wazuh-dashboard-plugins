@@ -93,7 +93,6 @@ describe('[initialize] `wazuh-registry.json` not created', () => {
     expect(contentRegistry.name).toMatch('Wazuh dashboard');
     expect(contentRegistry['app-version']).toMatch(packageInfo.version);
     expect(contentRegistry['revision']).toMatch(packageInfo.revision);
-    expect(typeof contentRegistry.lastRestart).toBe('string');
     expect(Object.keys(contentRegistry.hosts)).toHaveLength(0);
   });
 });
@@ -106,14 +105,12 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         name: 'Wazuh dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
-        lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {},
       },
       after: {
         name: 'Wazuh dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
-        lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {},
       },
     },
@@ -122,14 +119,12 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         name: 'Wazuh dashboard',
         'app-version': '0.0.0',
         revision: '0',
-        lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {},
       },
       after: {
         name: 'Wazuh dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
-        lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {},
       },
     },
@@ -138,7 +133,6 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         name: 'Wazuh dashboard',
         'app-version': '0.0.0',
         revision: '0',
-        lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {
           default: {
             extensions: {
@@ -165,7 +159,6 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         name: 'Wazuh dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
-        lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {
           default: {},
         },
@@ -176,7 +169,6 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         name: 'Wazuh dashboard',
         'app-version': '0.0.0',
         revision: '0',
-        lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {
           default: {
             extensions: {
@@ -243,7 +235,6 @@ describe('[initialize] `wazuh-registry.json` created', () => {
         name: 'Wazuh dashboard',
         'app-version': packageInfo.version,
         revision: packageInfo.revision,
-        lastRestart: '2022-07-25T13:55:04.363Z',
         hosts: {
           default: {},
           custom: {},
@@ -295,7 +286,6 @@ describe('[initialize] `wazuh-registry.json` created', () => {
       expect(contentRegistryFile['revision']).toMatch(
         contentRegistryExpected.revision,
       );
-      expect(typeof contentRegistryFile.lastRestart).toBe('string');
       expect(Object.keys(contentRegistryFile.hosts)).toHaveLength(
         Object.keys(contentRegistryExpected.hosts).length,
       );

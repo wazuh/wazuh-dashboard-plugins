@@ -223,12 +223,11 @@ describe.skip('Wazuh API', () => {
               'name',
               'app-version',
               'revision',
-              'lastRestart',
               'hosts',
             ]),
           ).toBe(true);
           expect(
-            ['name', 'app-version', 'revision', 'lastRestart'].every(
+            ['name', 'app-version', 'revision'].every(
               key => typeof response.data.data[key] === 'string',
             ),
           ).toBe(true);

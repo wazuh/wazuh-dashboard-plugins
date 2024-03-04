@@ -47,12 +47,10 @@ export function jobInitializeRun(context) {
   // Save Wazuh App setup
   const saveConfiguration = async (hosts = {}) => {
     try {
-      const commonDate = new Date().toISOString();
       const configuration = {
         name: PLUGIN_APP_NAME,
         'app-version': packageJSON.version,
         revision: packageJSON.revision,
-        lastRestart: commonDate,
         hosts,
       };
       context.wazuh.logger.debug('Saving the configuration');
