@@ -12,7 +12,6 @@ import {
 } from '@elastic/eui';
 import './outdated-agents-card.scss';
 import { getOutdatedAgents } from '../../services/get-outdated-agents';
-import { useApiService } from '../../../common/hooks/useApiService';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { useService } from '../../../common/hooks/use-service';
 

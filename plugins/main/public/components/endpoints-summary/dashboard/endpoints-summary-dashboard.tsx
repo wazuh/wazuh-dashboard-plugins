@@ -40,7 +40,10 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
         getInfo={getAgentsByGroup}
         reload={reloadDashboard}
       />
-      <OutdatedAgentsCard onClick={filterByOutdatedAgent} />
+      <OutdatedAgentsCard
+        onClick={filterByOutdatedAgent}
+        reload={reloadDashboard}
+      />
     </div>
   );
 };
