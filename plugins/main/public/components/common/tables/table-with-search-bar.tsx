@@ -124,6 +124,7 @@ export function TableWithSearchBar<T>({
   const [refresh, setRefresh] = useState(Date.now());
 
   const isMounted = useRef(false);
+  const tableRef = useRef();
 
   const searchBarWQLOptions = useMemo(
     () => ({
@@ -177,6 +178,10 @@ export function TableWithSearchBar<T>({
       (async () => {
         try {
           setLoading(true);
+
+          //Reset the table selection in case is enabled
+          tableRef.current.setSelection([]);
+
           const { items, totalItems } = await onSearch(
             endpoint,
             filters,
@@ -254,6 +259,7 @@ export function TableWithSearchBar<T>({
       />
       <EuiSpacer size='s' />
       <EuiBasicTable
+        ref={tableRef}
         columns={tableColumns.map(
           ({ searchable, show, composeField, ...rest }) => ({ ...rest }),
         )}

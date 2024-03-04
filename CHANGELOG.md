@@ -8,8 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.9.0
 - Added AngularJS dependencies [#6145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6145)
-- Added a script and migration task to setup the configuration using a configuration file [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
+- Added a migration task to setup the configuration using a configuration file [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Added the ability to manage the API hosts from the Server APIs [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
+- Added edit groups action to Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
+- Added global actions add agents to groups and remove agents from groups to Endpoints Summary [#6274](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6274)
 
 ### Changed
 
@@ -18,6 +20,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
 - Changed as the configuration is defined and stored [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Change the view of API is down and check connection to Server APIs application [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
+- Changed the usage of the endpoint GET /groups/{group_id}/files/{file_name} [#6385](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6385)
+- Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
 
 ### Fixed
 

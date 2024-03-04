@@ -141,20 +141,41 @@ export class WzRequest {
     method,
     path,
     body,
-    options: { checkCurrentApiIsUp?: boolean } = { checkCurrentApiIsUp: true },
+    options: {
+      checkCurrentApiIsUp?: boolean;
+      returnOriginalResponse?: boolean;
+    } = { checkCurrentApiIsUp: true, returnOriginalResponse: false },
   ): Promise<IApiResponse<any>> {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
       }
+
+      const getGenericReqOptions = (options: {
+        checkCurrentApiIsUp?: boolean;
+        returnOriginalResponse?: boolean;
+      }) => {
+        const { returnOriginalResponse, ...restOptions } = options;
+        return restOptions;
+      };
+
+      const returnOriginalResponse = options?.returnOriginalResponse;
+      const optionsToGenericReq = returnOriginalResponse
+        ? getGenericReqOptions(options)
+        : options;
+
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
       const response = await this.genericReq(
         'POST',
         '/api/request',
         requestData,
-        options,
+        optionsToGenericReq,
       );
+
+      if (returnOriginalResponse) {
+        return response;
+      }
 
       const hasFailed =
         (((response || {}).data || {}).data || {}).total_failed_items || 0;
