@@ -20,7 +20,6 @@ import {
   PLUGIN_PLATFORM_NAME,
   PLUGIN_PLATFORM_INSTALLATION_USER_GROUP,
   PLUGIN_PLATFORM_INSTALLATION_USER,
-  PLUGIN_APP_NAME,
 } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
 import _ from 'lodash';
@@ -48,7 +47,6 @@ export function jobInitializeRun(context) {
   const saveConfiguration = async (hosts = {}) => {
     try {
       const configuration = {
-        name: PLUGIN_APP_NAME,
         'app-version': packageJSON.version,
         revision: packageJSON.revision,
         hosts,

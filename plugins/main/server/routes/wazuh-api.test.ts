@@ -198,7 +198,6 @@ describe.skip('Wazuh API', () => {
           expect(typeof response.data[0].endpoints[0]).toBe('object');
           expect(
             Object.keys(response.data[0].endpoints[0]).every(key => [
-              'name',
               'documentation',
               'description',
               'summary',
@@ -220,14 +219,13 @@ describe.skip('Wazuh API', () => {
           expect(typeof response.data.data).toBe('object');
           expect(
             Object.keys(response.data.data).every(key => [
-              'name',
               'app-version',
               'revision',
               'hosts',
             ]),
           ).toBe(true);
           expect(
-            ['name', 'app-version', 'revision'].every(
+            ['app-version', 'revision'].every(
               key => typeof response.data.data[key] === 'string',
             ),
           ).toBe(true);
