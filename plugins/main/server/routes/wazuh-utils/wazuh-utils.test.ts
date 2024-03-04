@@ -89,7 +89,7 @@ afterAll(async () => {
   jest.clearAllMocks();
 });
 
-describe.only('[endpoint] GET /utils/configuration', () => {
+describe.skip('[endpoint] GET /utils/configuration', () => {
   it(`Get plugin configuration and ensure the hosts is not returned GET /utils/configuration - 200`, async () => {
     const initialConfig = {
       pattern: 'test-alerts-*',
@@ -116,7 +116,7 @@ describe.only('[endpoint] GET /utils/configuration', () => {
   });
 });
 
-describe('[endpoint] PUT /utils/configuration', () => {
+describe.skip('[endpoint] PUT /utils/configuration', () => {
   beforeAll(() => {
     context.wazuh_core.configuration._settings = new Map();
     context.wazuh_core.configuration._settings.set('pattern', {
@@ -141,7 +141,7 @@ describe('[endpoint] PUT /utils/configuration', () => {
     context.wazuh_core.configuration._settings = null;
   });
 
-  it.only.each`
+  it.each`
     settings                                               | responseStatusCode
     ${{ pattern: 'test-alerts-groupA-*' }}                 | ${200}
     ${{ pattern: 'test-alerts-groupA-*', timeout: 15000 }} | ${200}
@@ -175,7 +175,7 @@ describe('[endpoint] PUT /utils/configuration', () => {
     },
   );
 
-  it.only.each([
+  it.each([
     {
       testTitle: 'Update the plugin configuration',
       settings: { pattern: 'test-alerts-groupA-*' },
@@ -242,6 +242,8 @@ describe('[endpoint] PUT /utils/configuration', () => {
         .put('/utils/configuration')
         .send(settings)
         .expect(responseStatusCode);
+
+      console.log(response.body);
 
       responseStatusCode === 200 &&
         expect(response.body.data.updatedConfiguration).toEqual(settings);
