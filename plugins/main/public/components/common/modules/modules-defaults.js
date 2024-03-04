@@ -13,7 +13,6 @@ import { Dashboard } from './dashboard';
 import { Events } from './events';
 import { MainFim } from '../../agents/fim';
 import { MainSca } from '../../agents/sca';
-import { MainVuls } from '../../agents/vuls';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
@@ -22,7 +21,10 @@ import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
-import { withModuleNotForAgent, withModuleTabLoader } from '../hocs';
+import { withModuleNotForAgent } from '../hocs';
+import React from 'react';
+import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -152,15 +154,31 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardVuls,
-        buttons: [ButtonModuleExploreAgent],
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         id: 'inventory',
         name: 'Inventory',
         component: InventoryVuls,
-        buttons: [ButtonModuleExploreAgent],
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
-      EventsTab,
+      { ...EventsTab, component: withVulnerabilitiesStateDataSource(Events) },
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],

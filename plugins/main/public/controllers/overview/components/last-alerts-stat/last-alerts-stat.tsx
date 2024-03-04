@@ -46,7 +46,10 @@ export function LastAlertsStat() {
             <EuiToolTip position='top' content={`See alerts`}>
               <EuiLink
                 className='statWithLink'
-                style={{ fontWeight: 'normal' }}
+                style={{
+                  fontWeight: 'normal',
+                  color: UI_COLOR_AGENT_STATUS.active,
+                }}
                 href={discoverLocation}
               >
                 {countLastAlerts ?? '-'}
