@@ -54,8 +54,7 @@ const mapDispatchToProps = dispatch => ({
 interface AgentsTableProps {
   filters: any;
   updateCurrentAgentData: (agent) => void;
-  reload?: number;
-  setReload?: (newValue: number) => void;
+  setExternalReload?: (newValue: number) => void;
 }
 
 export const AgentsTable = compose(
@@ -98,8 +97,8 @@ export const AgentsTable = compose(
     setSelectedItems([]);
     setAllAgentsSelected(false);
     setReloadTable(Date.now());
-    if (props.setReload) {
-      props.setReload(Date.now());
+    if (props.setExternalReload) {
+      props.setExternalReload(Date.now());
     }
   };
 
@@ -233,7 +232,7 @@ export const AgentsTable = compose(
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
             reload={reloadTable}
-            setReload={props.setReload}
+            setReload={props.setExternalReload}
             mapResponseItem={item => {
               return {
                 ...item,
