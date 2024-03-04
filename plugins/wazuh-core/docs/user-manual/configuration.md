@@ -48,7 +48,7 @@ can cause problems. It is not recommended to updating the encrypted settings usi
 
 #### Get the saved object
 
-The configuration is stored in a saved object of the type: `plugins-configuration`.
+The configuration is stored in a saved object of the type: `wazuh-dashboard-plugins-config`.
 
 To retrieve or backup the data, you can get the configuration doing a request to Wazuh indexer using
 cURL or Dev Tools plugin:
@@ -58,7 +58,7 @@ GET .kibana*/_search
 {
   "query": {
     "match": {
-      "type": "plugins-configuration"
+      "type": "wazuh-dashboard-plugins-config"
     }
   }
 }
@@ -82,7 +82,7 @@ POST .kibana*/_delete_by_query
 {
   "query": {
     "match": {
-      "type": "plugins-configuration"
+      "type": "wazuh-config"
     }
   }
 }

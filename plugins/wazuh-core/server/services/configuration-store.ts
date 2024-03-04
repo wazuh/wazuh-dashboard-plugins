@@ -18,7 +18,7 @@ interface IStoreGetOptions {
 }
 
 export class ConfigurationStore implements IConfigurationStore {
-  private type = 'plugins-configuration';
+  private type = 'wazuh-dashboard-plugins-config';
   private savedObjectRepository: any;
   private configuration: IConfiguration;
   private encryption: any;
