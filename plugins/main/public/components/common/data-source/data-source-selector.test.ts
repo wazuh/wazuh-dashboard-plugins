@@ -1,11 +1,11 @@
-import { DataSourceService } from './data-source-service';
+import { DataSourceSelector } from './pattern-data-source-selector';
 import { DataSourceRepository } from './data-source-repository';
 import { tDataSource } from './data-source';
 
-describe('DataSourceService', () => {
+describe('DataSourceSelector', () => {
     it('should return ERROR when the handler not receive a valid factory', () => {
         try {
-            new DataSourceService({} as any);
+            new DataSourceSelector({} as any);
         }catch(error){
             expect(error.message).toBe('Invalid data source factory');
         }
@@ -13,7 +13,7 @@ describe('DataSourceService', () => {
 
     it('should return ERROR when the handler not receive a factory', () => {
         try {
-            new DataSourceService(null as any);
+            new DataSourceSelector(null as any);
         }catch(error){
             expect(error.message).toBe('Data source factory is required');
         }
@@ -36,7 +36,7 @@ describe('DataSourceService', () => {
             
         }
 
-        const dataSourceService = new DataSourceService(new ExampleFactory());
+        const dataSourceService = new DataSourceSelector(new ExampleFactory());
         expect(dataSourceService).toBeTruthy();
     })
 })

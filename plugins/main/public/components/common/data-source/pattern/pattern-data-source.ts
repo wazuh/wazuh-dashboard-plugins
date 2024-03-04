@@ -51,10 +51,10 @@ static validateIndexPatterns(list) {
 */
 
 // get the valid list of index patterns patternHandler.getPatternList('api'); the flag is to difference between api or health-check
-import { getDataPlugin } from '../../../kibana-services';
+import { getDataPlugin } from '../../../../kibana-services';
 
 
-export class IndexerDataSource implements tDataSource {
+export class PatternDataSource implements tDataSource { 
     id: string;
     title: string;
     constructor(id: string, title: string) {
@@ -63,14 +63,20 @@ export class IndexerDataSource implements tDataSource {
     }
 
     async select(){
-        // select the current index pattern in the indexPatternService
-        const pattern = await getDataPlugin().indexPatterns.get(this.id);
-        console.log('pattern', pattern);
-        if(pattern){
-            await getDataPlugin().indexPatterns.updateSavedObject(pattern);
-            console.log('pattern default', await getDataPlugin().indexPatterns.getDefault());
-        }else{
-            throw new Error('Error selecting index pattern');
+        try {
+            const pattern = await getDataPlugin().indexPatterns.get(this.id);
+            if(pattern){
+                const fields = await getDataPlugin().indexPatterns.getFieldsForIndexPattern(
+                    pattern,
+                  );
+                const scripted = pattern.getScriptedFields().map(field => field.spec);
+                pattern.fields.replaceAll([...fields, ...scripted]);
+                await getDataPlugin().indexPatterns.updateSavedObject(pattern);
+            }else{
+                throw new Error('Error selecting index pattern: pattern not found');
+            }
+        }catch(error){
+            throw new Error(`Error selecting index pattern: ${error}`);
         }
 
     }

@@ -1,8 +1,8 @@
-import { IndexerDataSourceRepository } from ".";
+import { PatternDataSourceRepository } from "../pattern-data-source-repository";
 
 const ALERTS_REQUIRED_FIELDS = ['timestamp', 'rule.groups', 'manager.name', 'agent.id'];
 
-export class AlertsDataSourceRepository extends IndexerDataSourceRepository {
+export class AlertsDataSourceRepository extends PatternDataSourceRepository {
     constructor() {
         super();
     }
