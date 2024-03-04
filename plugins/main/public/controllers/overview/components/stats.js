@@ -18,6 +18,7 @@ import {
   EuiFlexGroup,
   EuiPage,
   EuiToolTip,
+  EuiLink,
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
@@ -56,7 +57,7 @@ export const Stats = withErrorBoundary(
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
       getCore().application.navigateToApp(endpointSummary.id, {
-        path: '#/agents-preview',
+        path: `#${endpointSummary.redirectTo()}`,
       });
     }
 
@@ -81,15 +82,15 @@ export const Stats = withErrorBoundary(
                       position='top'
                       content={`Go to ${label.toLowerCase()} agents`}
                     >
-                      <span
+                      <EuiLink
                         className='statWithLink'
-                        style={{ cursor: 'pointer' }}
+                        style={{ fontWeight: 'normal', color }}
                         onClick={onClick}
                       >
                         {typeof this.props[status] !== 'undefined'
                           ? this.props[status]
                           : '-'}
-                      </span>
+                      </EuiLink>
                     </EuiToolTip>
                   }
                   description={`${label} agents`}
