@@ -68,9 +68,9 @@ export function enhanceConfiguration(configuration: IConfiguration) {
 
   configuration.importFile = async function (file: string | Buffer) {
     const fileContent = typeof file === 'string' ? file : file.toString();
-    this.logger.debug('Loading file content as JSON');
+    this.logger.debug('Loading imported file content as JSON');
     const configAsJSON = yml.load(fileContent);
-    this.logger.debug('Loaded file content as JSON');
+    this.logger.debug('Loaded imported file content as JSON');
 
     const { hosts: configFileHosts, ...otherSettings } = configAsJSON;
 
@@ -117,13 +117,13 @@ export function enhanceConfiguration(configuration: IConfiguration) {
       });
     }
 
-    this.logger.debug('Clearing configuration');
+    this.logger.debug('Clearing configuration before importing the file');
     await this.clear();
-    this.logger.debug('Cleared configuration');
+    this.logger.info('Cleared configuration before importing the file');
 
-    this.logger.debug('Storing configuration');
+    this.logger.debug('Storing configuration from imported file');
     const responseSetConfig = await this.set(validSettings);
-    this.logger.debug('Stored configuration');
+    this.logger.info('Stored configuration from imported file');
 
     Object.entries(responseSetConfig?.requirements ?? {})
       .filter(([_, value]) => value)
@@ -145,6 +145,6 @@ export function enhanceConfiguration(configuration: IConfiguration) {
 // TODO: try to move to common because these messages are displayed on the UI too
 const messagesRequirements = {
   requiresReloadingBrowserTab: 'Reload the page to apply the changes',
-  requiresRunningHealthcheck: 'Run a health check to apply the changes.',
+  requiresRunningHealthCheck: 'Run a health check to apply the changes.',
   requiresRestartingPluginPlatform: `Restart ${PLUGIN_PLATFORM_NAME} to apply the changes`,
 };
