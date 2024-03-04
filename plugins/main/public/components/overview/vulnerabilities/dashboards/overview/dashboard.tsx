@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { SearchResponse } from '../../../../../../../../src/core/server';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getDashboardPanels } from './dashboard_panels';
@@ -10,9 +11,26 @@ import { getKPIsPanel } from './dashboard_panels_kpis';
 import { useAppConfig } from '../../../../common/hooks';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
-import { WAZUH_INDEX_TYPE_VULNERABILITIES } from '../../../../../../common/constants';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
-import useCheckIndexFields from '../../common/hooks/useCheckIndexFields';
+import {
+  vulnerabilityIndexFiltersAdapter,
+  restorePrevIndexFiltersAdapter,
+  onUpdateAdapter,
+  updateFiltersStorage,
+} from '../../common/vulnerability_detector_adapters';
+import { search } from '../inventory/inventory_service';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
+import {
+  ErrorFactory,
+  ErrorHandler,
+  HttpError,
+} from '../../../../../react-services/error-management';
+import { compose } from 'redux';
+import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
+import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
+import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
+import { DashboardContainerInput } from '../../../../../../../../src/plugins/dashboard/public';
+
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -29,29 +47,58 @@ const DashboardVulsComponent: React.FC = () => {
     appConfig.data['vulnerabilities.pattern'];
   const { searchBarProps } = useSearchBarConfiguration({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
+    onMount: vulnerabilityIndexFiltersAdapter,
+    onUpdate: onUpdateAdapter,
+    onUnMount: restorePrevIndexFiltersAdapter,
   });
-  const {
-    isLoading: isLoadingSearchbar,
-    filters,
-    query,
-    indexPatterns,
-  } = searchBarProps;
 
-  const { isError, error, isSuccess, resultIndexData, isLoading } =
-    useCheckIndexFields(
-      VULNERABILITIES_INDEX_PATTERN_ID,
-      indexPatterns?.[0],
-      WAZUH_INDEX_TYPE_VULNERABILITIES,
-      filters,
-      query,
-    );
+  /* This function is responsible for updating the storage filters so that the
+  filters between dashboard and inventory added using visualizations call to actions.
+  Without this feature, filters added using visualizations call to actions are
+  not maintained between dashboard and inventory tabs */
+  const handleFilterByVisualization = (newInput: DashboardContainerInput) => {
+    updateFiltersStorage(newInput.filters);
+  };
+
+  const fetchFilters = DataSourceFilterManagerVulnerabilitiesStates.getFilters(
+    searchBarProps.filters,
+    VULNERABILITIES_INDEX_PATTERN_ID,
+  );
+
+  const { isLoading, query, indexPatterns } = searchBarProps;
+
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+
+  useEffect(() => {
+    if (!isLoading) {
+      search({
+        indexPattern: indexPatterns?.[0] as IndexPattern,
+        filters: fetchFilters,
+        query,
+      })
+        .then(results => {
+          setResults(results);
+          setIsSearching(false);
+        })
+        .catch(error => {
+          const searchError = ErrorFactory.create(HttpError, {
+            error,
+            message: 'Error fetching vulnerabilities',
+          });
+          ErrorHandler.handleError(searchError);
+          setIsSearching(false);
+        });
+    }
+  }, [JSON.stringify(searchBarProps), JSON.stringify(fetchFilters)]);
 
   return (
     <>
       <I18nProvider>
         <>
-          {isLoading || isLoadingSearchbar ? <LoadingSpinner /> : null}
-          {!isLoading && !isLoadingSearchbar ? (
+          <ModuleEnabledCheck />
+          {isLoading ? <LoadingSpinner /> : null}
+          {!isLoading ? (
             <SearchBar
               appName='vulnerability-detector-searchbar'
               {...searchBarProps}
@@ -60,18 +107,11 @@ const DashboardVulsComponent: React.FC = () => {
               showQueryBar={true}
             />
           ) : null}
-          {!isLoadingSearchbar &&
-          !isLoading &&
-          (isError ||
-            !resultIndexData ||
-            resultIndexData?.hits?.total === 0) ? (
-            <DiscoverNoResults message={error?.message} />
+          {isSearching ? <LoadingSpinner /> : null}
+          {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+            <DiscoverNoResults />
           ) : null}
-          {!isLoadingSearchbar &&
-          !isLoading &&
-          isSuccess &&
-          resultIndexData &&
-          resultIndexData?.hits?.total !== 0 ? (
+          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
             <div className='vulnerability-dashboard-responsive'>
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer
@@ -81,7 +121,7 @@ const DashboardVulsComponent: React.FC = () => {
                       VULNERABILITIES_INDEX_PATTERN_ID,
                     ),
                     isFullScreenMode: false,
-                    filters: searchBarProps.filters ?? [],
+                    filters: fetchFilters ?? [],
                     useMargins: false,
                     id: 'vulnerability-detector-dashboard-tab-filters',
                     timeRange: {
@@ -98,6 +138,7 @@ const DashboardVulsComponent: React.FC = () => {
                     },
                     hidePanelTitles: true,
                   }}
+                  onInputUpdated={handleFilterByVisualization}
                 />
               </div>
               <DashboardByRenderer
@@ -105,7 +146,7 @@ const DashboardVulsComponent: React.FC = () => {
                   viewMode: ViewMode.VIEW,
                   panels: getKPIsPanel(VULNERABILITIES_INDEX_PATTERN_ID),
                   isFullScreenMode: false,
-                  filters: searchBarProps.filters ?? [],
+                  filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'kpis-vulnerability-detector-dashboard-tab',
                   timeRange: {
@@ -121,13 +162,14 @@ const DashboardVulsComponent: React.FC = () => {
                   },
                   hidePanelTitles: true,
                 }}
+                onInputUpdated={handleFilterByVisualization}
               />
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
                   panels: getDashboardPanels(VULNERABILITIES_INDEX_PATTERN_ID),
                   isFullScreenMode: false,
-                  filters: searchBarProps.filters ?? [],
+                  filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'vulnerability-detector-dashboard-tab',
                   timeRange: {
@@ -143,6 +185,7 @@ const DashboardVulsComponent: React.FC = () => {
                   },
                   hidePanelTitles: false,
                 }}
+                onInputUpdated={handleFilterByVisualization}
               />
             </div>
           ) : null}
@@ -152,4 +195,7 @@ const DashboardVulsComponent: React.FC = () => {
   );
 };
 
-export const DashboardVuls = withErrorBoundary(DashboardVulsComponent);
+export const DashboardVuls = compose(
+  withErrorBoundary,
+  withVulnerabilitiesStateDataSource,
+)(DashboardVulsComponent);
