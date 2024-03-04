@@ -104,16 +104,6 @@ export function WazuhApiRoutes(router: IRouter) {
       ctrl.getRequestList(context, request, response),
   );
 
-  // Useful to check cookie consistence
-  router.get(
-    {
-      path: '/api/timestamp',
-      validate: false,
-    },
-    async (context, request, response) =>
-      ctrl.getTimeStamp(context, request, response),
-  );
-
   // Return Wazuh Appsetup info
   router.get(
     {

@@ -1106,46 +1106,6 @@ export class WazuhApiCtrl {
   }
 
   /**
-   * This get the timestamp field
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} timestamp field or ErrorResponse
-   */
-  getTimeStamp(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const source = JSON.parse(
-        fs.readFileSync(context.wazuh_core.updateRegistry.file, 'utf8'),
-      );
-      if (source.installationDate && source.lastRestart) {
-        context.wazuh.logger.debug(
-          `Installation date: ${source.installationDate}. Last restart: ${source.lastRestart}`,
-        );
-        return response.ok({
-          body: {
-            installationDate: source.installationDate,
-            lastRestart: source.lastRestart,
-          },
-        });
-      } else {
-        throw new Error('Could not fetch wazuh-version registry');
-      }
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(
-        error.message || 'Could not fetch wazuh-version registry',
-        4001,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        response,
-      );
-    }
-  }
-
-  /**
    * This get the wazuh setup settings
    * @param {Object} context
    * @param {Object} request
