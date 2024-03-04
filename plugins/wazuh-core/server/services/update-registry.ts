@@ -53,21 +53,6 @@ export class UpdateRegistry {
   }
 
   /**
-   * Returns the cluster information associated to an API id
-   * @param {String} id
-   */
-  async getHostById(id) {
-    try {
-      if (!id) throw new Error('API id is missing');
-      const hosts = await this.getHosts();
-      return hosts.id || {};
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Writes the wazuh-registry.json
    * @param {Object} content
    */
@@ -87,42 +72,6 @@ export class UpdateRegistry {
   }
 
   /**
-   * Checks if the host exist in order to update the data, otherwise creates it
-   * @param {String} id
-   * @param {Object} hosts
-   */
-  checkHost(id, hosts) {
-    try {
-      return Object.keys(hosts).includes(id);
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Migrates the cluster information and extensions associated to an API id
-   * @param {String} id
-   * @param {Object} clusterInfo
-   * @param {Object} clusterExtensions
-   */
-  async migrateToRegistry(id, clusterInfo, clusterExtensions) {
-    try {
-      const content = await this.readContent();
-      if (!Object.keys(content).includes('hosts'))
-        Object.assign(content, { hosts: {} });
-      const info = { cluster_info: clusterInfo, extensions: clusterExtensions };
-      content.hosts[id] = info;
-      await this.writeContent(content);
-      this.logger.info(`API ${id} was properly migrated`);
-      return info;
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Updates the cluster-information or manager-information in the registry
    * @param {String} id
    * @param {Object} clusterInfo
@@ -135,24 +84,6 @@ export class UpdateRegistry {
       content.hosts[id].cluster_info = clusterInfo;
       await this.writeContent(content);
       this.logger.debug(`API ${id} information was properly updated`);
-      return id;
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Updates the cluster-information or manager-information in the registry
-   * @param {String} id
-   * @param {Object} clusterInfo
-   */
-  async updateAPIExtensions(id, extensions) {
-    try {
-      const content = await this.readContent();
-      if (content.hosts[id]) content.hosts[id].extensions = extensions;
-      await this.writeContent(content);
-      this.logger.info(`API ${id} extensions were properly updated`);
       return id;
     } catch (error) {
       this.logger.error(error.message || error);
@@ -194,41 +125,6 @@ export class UpdateRegistry {
       await this.removeHostEntries(diff);
     } catch (error) {
       this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Returns the token information associated to an API id
-   * @param {String} id
-   */
-  async getTokenById(id) {
-    try {
-      if (!id) throw new Error('API id is missing');
-      const hosts = await this.getHosts();
-      return hosts[id] ? hosts[id].token || null : null;
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Updates the token in the registry
-   * @param {String} id
-   * @param {String} token
-   */
-  async updateTokenByHost(id, token) {
-    try {
-      const content = await this.readContent();
-      // Checks if not exists in order to create
-      if (!content.hosts[id]) content.hosts[id] = {};
-      content.hosts[id].token = token;
-      await this.writeContent(content);
-      this.logger.info(`API ${id} information was properly updated`);
-      return id;
-    } catch (error) {
-      this.logger.debug(error.message || error);
       return Promise.reject(error);
     }
   }
