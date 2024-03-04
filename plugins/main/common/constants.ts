@@ -11,8 +11,6 @@
  */
 import path from 'path';
 import { version } from '../package.json';
-import { validate as validateNodeCronInterval } from 'node-cron';
-import { SettingsValidator } from '../common/services/settings-validator';
 
 // Plugin
 export const PLUGIN_VERSION = version;
@@ -379,73 +377,6 @@ export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =
 // Customization
 export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
 
-// Plugin settings
-export enum SettingCategory {
-  GENERAL,
-  HEALTH_CHECK,
-  MONITORING,
-  STATISTICS,
-  VULNERABILITIES,
-  SECURITY,
-  CUSTOMIZATION,
-}
-
-type TPluginSettingOptionsTextArea = {
-  maxRows?: number;
-  minRows?: number;
-  maxLength?: number;
-};
-
-type TPluginSettingOptionsSelect = {
-  select: { text: string; value: any }[];
-};
-
-type TPluginSettingOptionsEditor = {
-  editor: {
-    language: string;
-  };
-};
-
-type TPluginSettingOptionsFile = {
-  file: {
-    type: 'image';
-    extensions?: string[];
-    size?: {
-      maxBytes?: number;
-      minBytes?: number;
-    };
-    recommended?: {
-      dimensions?: {
-        width: number;
-        height: number;
-        unit: string;
-      };
-    };
-    store?: {
-      relativePathFileSystem: string;
-      filename: string;
-      resolveStaticURL: (filename: string) => string;
-    };
-  };
-};
-
-type TPluginSettingOptionsNumber = {
-  number: {
-    min?: number;
-    max?: number;
-    integer?: boolean;
-  };
-};
-
-type TPluginSettingOptionsSwitch = {
-  switch: {
-    values: {
-      disabled: { label?: string; value: any };
-      enabled: { label?: string; value: any };
-    };
-  };
-};
-
 export enum EpluginSettingType {
   text = 'text',
   textarea = 'textarea',
@@ -458,56 +389,6 @@ export enum EpluginSettingType {
   arrayOf = 'arrayOf',
   custom = 'custom',
 }
-
-export type TPluginSetting = {
-  // Define the text displayed in the UI.
-  title: string;
-  // Description.
-  description: string;
-  // Category.
-  category: SettingCategory;
-  // Type.
-  type: EpluginSettingType;
-  // Default value.
-  defaultValue: any;
-  // Default value if it is not set. It has preference over `default`.
-  defaultValueIfNotSet?: any;
-  // Configurable from the configuration file.
-  isConfigurableFromSettings: boolean;
-  // Configurable from the UI (Settings/Configuration).
-  isConfigurableFromUI: boolean;
-  // Modify the setting requires running the plugin health check (frontend).
-  requiresRunningHealthCheck?: boolean;
-  // Modify the setting requires reloading the browser tab (frontend).
-  requiresReloadingBrowserTab?: boolean;
-  // Modify the setting requires restarting the plugin platform to take effect.
-  requiresRestartingPluginPlatform?: boolean;
-  // Define options related to the `type`.
-  options?:
-    | TPluginSettingOptionsEditor
-    | TPluginSettingOptionsFile
-    | TPluginSettingOptionsNumber
-    | TPluginSettingOptionsSelect
-    | TPluginSettingOptionsSwitch
-    | TPluginSettingOptionsTextArea;
-  // Transform the input value. The result is saved in the form global state of Settings/Configuration
-  uiFormTransformChangedInputValue?: (value: any) => any;
-  // Transform the configuration value or default as initial value for the input in Settings/Configuration
-  uiFormTransformConfigurationValueToInputValue?: (value: any) => any;
-  // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
-  uiFormTransformInputValueToConfigurationValue?: (value: any) => any;
-  // Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error.
-  validate?: (value: any) => string | undefined;
-  // Validate function creator to validate the setting in the backend. It uses `schema` of the `@kbn/config-schema` package.
-  validateBackend?: (schema: any) => (value: unknown) => string | undefined;
-};
-
-export type TPluginSettingCategory = {
-  title: string;
-  description?: string;
-  documentationLink?: string;
-  renderOrder?: number;
-};
 
 export enum HTTP_STATUS_CODES {
   CONTINUE = 100,
