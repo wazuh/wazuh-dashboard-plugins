@@ -52,7 +52,6 @@ export function jobInitializeRun(context) {
         name: PLUGIN_APP_NAME,
         'app-version': packageJSON.version,
         revision: packageJSON.revision,
-        installationDate: commonDate,
         lastRestart: commonDate,
         hosts,
       };

@@ -223,19 +223,14 @@ describe.skip('Wazuh API', () => {
               'name',
               'app-version',
               'revision',
-              'installationDate',
               'lastRestart',
               'hosts',
             ]),
           ).toBe(true);
           expect(
-            [
-              'name',
-              'app-version',
-              'revision',
-              'installationDate',
-              'lastRestart',
-            ].every(key => typeof response.data.data[key] === 'string'),
+            ['name', 'app-version', 'revision', 'lastRestart'].every(
+              key => typeof response.data.data[key] === 'string',
+            ),
           ).toBe(true);
           expect(typeof response.data.data.hosts).toBe('object');
         })

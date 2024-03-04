@@ -18,7 +18,6 @@ import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
 import { HTTP_STATUS_CODES } from '../../common/constants';
 import { addJobToQueue } from '../start/queue';
-import fs from 'fs';
 import jwtDecode from 'jwt-decode';
 import {
   OpenSearchDashboardsRequest,
@@ -26,6 +25,10 @@ import {
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
+import {
+  version as pluginVersion,
+  revision as pluginRevision,
+} from '../../package.json';
 
 export class WazuhApiCtrl {
   constructor() {}
@@ -1118,13 +1121,13 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const source = JSON.parse(
-        fs.readFileSync(context.wazuh_core.updateRegistry.file, 'utf8'),
-      );
       return response.ok({
         body: {
           statusCode: HTTP_STATUS_CODES.OK,
-          data: !Object.values(source).length ? '' : source,
+          data: {
+            'app-version': pluginVersion,
+            revision: pluginRevision,
+          },
         },
       });
     } catch (error) {
