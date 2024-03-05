@@ -72,8 +72,8 @@ export const useGetUpgradeTasks = reload => {
     getInProgressIsLoading,
     totalInProgressTasks,
     getInProgressError,
-    totalErrorUpgradeTasks: 5,
     getErrorIsLoading,
+    totalErrorUpgradeTasks,
     getErrorTasksError,
   };
 };

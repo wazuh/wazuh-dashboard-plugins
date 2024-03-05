@@ -48,6 +48,9 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
+                  />
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <a
                       class="euiButtonEmpty euiButtonEmpty--primary"
@@ -562,7 +565,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         data-test-subj="tableHeaderCell_version_6"
                         role="columnheader"
                         scope="col"
-                        style="width:10%"
+                        style="width:100px"
                       >
                         <button
                           class="euiTableHeaderButton"
@@ -698,6 +701,9 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                 <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  />
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
@@ -1149,7 +1155,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         data-test-subj="tableHeaderCell_version_3"
                         role="columnheader"
                         scope="col"
-                        style="width:10%"
+                        style="width:100px"
                       >
                         <button
                           class="euiTableHeaderButton"
@@ -1309,6 +1315,9 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                 <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  />
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
@@ -1832,7 +1841,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         data-test-subj="tableHeaderCell_version_6"
                         role="columnheader"
                         scope="col"
-                        style="width:10%"
+                        style="width:100px"
                       >
                         <button
                           class="euiTableHeaderButton"
