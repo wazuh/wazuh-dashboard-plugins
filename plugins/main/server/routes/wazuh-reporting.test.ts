@@ -305,9 +305,9 @@ describe('[endpoint] PUT /utils/configuration', () => {
 
       // Set custom report header and footer
       if (typeof footer === 'string' || typeof header === 'string') {
-        context.wazuh_core.configuration.set.mockReturnValueOnce(
-          configurationBody,
-        );
+        context.wazuh_core.configuration.set.mockReturnValueOnce({
+          update: configurationBody,
+        });
         const responseConfig = await supertest(innerServer.listener)
           .put('/utils/configuration')
           .send(configurationBody)
