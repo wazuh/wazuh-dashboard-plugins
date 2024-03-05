@@ -91,7 +91,7 @@ export const AgentUpgradesTable = () => {
       tableInitialSortingField='last_update_time'
       tableInitialSortingDirection='desc'
       tablePageSizeOptions={[10, 25, 50, 100]}
-      filters={{ defaultFilters }}
+      filters={defaultFilters}
       searchTable
       searchBarWQL={{
         suggestions: {
