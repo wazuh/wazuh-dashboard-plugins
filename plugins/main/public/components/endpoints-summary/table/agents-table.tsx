@@ -44,6 +44,7 @@ import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
 import { getOutdatedAgents } from '../services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -230,6 +231,9 @@ export const AgentsTable = compose(
             addOnTitle={selectedtemsRenderer}
             actionButtons={({ filters }) => (
               <>
+                <EuiFlexItem grow={false}>
+                  <AgentUpgradesInProgress reload={reloadTable} />
+                </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   <WzButtonPermissions
                     buttonType='empty'

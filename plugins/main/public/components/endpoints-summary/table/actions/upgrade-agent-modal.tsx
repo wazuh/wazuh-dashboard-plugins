@@ -39,7 +39,7 @@ export const UpgradeAgentModal = compose(
 
     try {
       await upgradeAgentsService({ agentIds: [agent.id] });
-      showToast('success', 'Upgrade agent', 'Agent successfully upgraded');
+      showToast('success', 'Upgrade agent', 'Upgrade task in progress');
       reloadAgents();
     } catch (error) {
       const options = {
