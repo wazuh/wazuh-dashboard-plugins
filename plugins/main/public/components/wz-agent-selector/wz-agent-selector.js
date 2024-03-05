@@ -74,6 +74,10 @@ class WzAgentSelector extends Component {
         const agentFilters = currentAppliedFilters.filter(x => {
           return x.meta.key !== 'agent.id';
         });
+        const cookieCurrentPattern =
+          AppState.getCurrentPattern() || getSettingDefaultValue('pattern');
+        const currentPattern =
+          this.props?.moduleIndexPatternTitle ?? cookieCurrentPattern;
         const filter = {
           meta: {
             alias: null,
@@ -82,8 +86,7 @@ class WzAgentSelector extends Component {
             negate: false,
             params: { query: agentIdList[0] },
             type: 'phrase',
-            index:
-              AppState.getCurrentPattern() || getSettingDefaultValue('pattern'),
+            index: currentPattern,
           },
           query: {
             match: {

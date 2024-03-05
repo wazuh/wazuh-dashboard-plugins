@@ -25,7 +25,7 @@ export const MainEndpointsSummary = compose(
   withReduxProvider,
   withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
 )(() => {
-  const { isLoading, totalAgents, error } = useGetTotalAgents();
+  const { isLoading, totalAgents, error } = useGetTotalAgents('id!=000');
 
   if (error) {
     const options = {

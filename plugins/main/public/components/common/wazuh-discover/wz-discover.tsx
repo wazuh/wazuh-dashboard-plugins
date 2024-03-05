@@ -37,7 +37,7 @@ import useSearchBar from '../search-bar/use-search-bar';
 import { search } from '../search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
-import { useDockedSideNav } from '../hooks/useDockedSideNav';
+import { getWazuhCorePlugin } from '../../../kibana-services';
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
@@ -60,7 +60,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   );
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
-  const sideNavDocked = useDockedSideNav();
+  const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {

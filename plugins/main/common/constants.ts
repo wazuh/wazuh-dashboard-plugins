@@ -51,6 +51,10 @@ export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
+export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = {
+  enabled: 'wazuh.cluster.name',
+  disabled: 'wazuh.manager.name',
+};
 
 // Wazuh fim
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim';
@@ -230,6 +234,7 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
 }
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
+export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER = 'exclude-server';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
@@ -786,60 +791,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Set time filter to 24h',
     description:
       'Change the default value of the plugin platform timeFilter configuration.',
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
-    },
-  },
-  'checks.vulnerabilities.pattern': {
-    title: 'Vulnerabilities index pattern',
-    description:
-      'Enable or disable the vulnerabilities index pattern health check when opening the app.',
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: false,
-    isConfigurableFromFile: true,
-    isConfigurableFromUI: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
-    },
-  },
-  'checks.fim.pattern': {
-    title: 'Fim index pattern',
-    description:
-      'Enable or disable the fim index pattern health check when opening the app.',
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.switch,
     defaultValue: true,

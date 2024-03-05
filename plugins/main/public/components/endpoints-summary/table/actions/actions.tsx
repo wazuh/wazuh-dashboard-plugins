@@ -1,13 +1,14 @@
 import React from 'react';
 import { EuiToolTip } from '@elastic/eui';
-import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
-import { getCore } from '../../../kibana-services';
-import { endpointSummary } from '../../../utils/applications';
-import { WzElementPermissions } from '../../common/permissions/element';
+import { endpointSummary } from '../../../../utils/applications';
+import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
+import { getCore } from '../../../../kibana-services';
+import { WzElementPermissions } from '../../../common/permissions/element';
+import { Agent } from '../../types';
 
 export const agentsTableActions = (
   allowEditGroups: boolean,
-  setAgent: (agent) => void,
+  setAgent: (agent: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
 ) => [
   {
@@ -28,6 +29,7 @@ export const agentsTableActions = (
     icon: 'eye',
     type: 'icon',
     isPrimary: true,
+    color: 'primary',
     enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     onClick: agent =>
       getCore().application.navigateToApp(endpointSummary.id, {
@@ -71,11 +73,11 @@ export const agentsTableActions = (
     description: 'Edit groups',
     icon: 'pencil',
     type: 'icon',
-    onClick: agent => {
+    onClick: (agent: Agent) => {
       setAgent(agent);
       setIsEditGroupsVisible(true);
     },
     'data-test-subj': 'action-groups',
-    enabled: () => !allowEditGroups,
+    enabled: () => allowEditGroups,
   },
 ];
