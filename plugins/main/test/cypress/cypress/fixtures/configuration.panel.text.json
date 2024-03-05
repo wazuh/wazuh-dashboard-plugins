@@ -94,16 +94,6 @@
           "title": "Set time filter to 24h",
           "subTitle": "Change the default value of the Kibana timeFilter configuration",
           "label": "checks.timeFilter"
-        },
-        {
-          "title": "Vulnerabilities index pattern",
-          "subTitle": "Enable or disable the vulnerabilities index pattern health check when opening the app.",
-          "label": "checks.vulnerabilities.pattern"
-        },
-        {
-          "title": "Fim index pattern",
-          "subTitle": "Enable or disable the fim index pattern health check when opening the app.",
-          "label": "checks.fim.pattern"
         }
       ]
     },
