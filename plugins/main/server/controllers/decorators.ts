@@ -12,7 +12,7 @@ export function routeDecoratorProtectedAdministrator(
           request,
         );
       } catch (error) {
-        return ErrorResponse(error.message, 401, 401, response);
+        return ErrorResponse(error.message, 403, 403, response);
       }
       return await routeHandler(context, request, response);
     } catch (error) {
