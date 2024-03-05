@@ -12,16 +12,25 @@ import {
 } from '@elastic/eui';
 import './outdated-agents-card.scss';
 import { getOutdatedAgents } from '../../services/get-outdated-agents';
-import { useApiService } from '../../../common/hooks/useApiService';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import { useService } from '../../../common/hooks/use-service';
 
 interface OutdatedAgentsCardProps {
   onClick?: (status: any) => void;
+  reload?: number;
   [key: string]: any;
 }
 
-const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
-  const [loading, data] = useApiService<any>(getOutdatedAgents, undefined);
+const OutdatedAgentsCard = ({
+  onClick,
+  reload,
+  ...props
+}: OutdatedAgentsCardProps) => {
+  const { data, isLoading } = useService<any>(
+    getOutdatedAgents,
+    undefined,
+    reload,
+  );
   const outdatedAgents = data?.length;
   const contentType = outdatedAgents > 0 ? 'warning' : 'success';
   const contentIcon = outdatedAgents > 0 ? 'alert' : 'check';
@@ -65,7 +74,7 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
             </EuiTextColor>
           }
           titleColor='danger'
-          isLoading={loading}
+          isLoading={isLoading}
           titleSize='l'
           textAlign='center'
           reverse
