@@ -49,6 +49,10 @@ export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
+export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = {
+  enabled: 'wazuh.cluster.name',
+  disabled: 'wazuh.manager.name',
+};
 
 // Wazuh fim
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim';
@@ -220,6 +224,7 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
 }
 
 export const AUTHORIZED_AGENTS = 'authorized-agents';
+export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER = 'exclude-server';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';

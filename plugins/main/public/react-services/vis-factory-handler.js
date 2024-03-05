@@ -58,9 +58,13 @@ export class VisFactoryHandler {
    * @param {*} subtab
    * @param {*} localChange
    */
-  static async buildOverviewVisualizations(filterHandler, tab, subtab, fromDiscover = false) {
+  static async buildOverviewVisualizations(
+    filterHandler,
+    tab,
+    subtab,
+    fromDiscover = false,
+  ) {
     const rawVisualizations = new RawVisualizations();
-    //if(rawVisualizations.getType() !== 'general'){
     rawVisualizations.setType('general');
     const $injector = getAngularModule().$injector;
     const commonData = $injector.get('commonData');
@@ -68,18 +72,20 @@ export class VisFactoryHandler {
     try {
       const currentPattern = AppState.getCurrentPattern();
       // TODO change logic to read common/modules/module-defaults.js configuration
-      const data =
-        !['sca', 'vuls'].includes(tab)
-          ? await GenericRequest.request(
+      const data = !['sca', 'vuls'].includes(tab)
+        ? await GenericRequest.request(
             'GET',
-            `/elastic/visualizations/overview-${tab}/${currentPattern}`
+            `/elastic/visualizations/overview-${tab}/${currentPattern}`,
           )
-          : false;
+        : false;
       data && rawVisualizations.assignItems(data.data.raw);
-      if (!fromDiscover) {
+      /* For the vuls component only, it is not necessary to call the assignFilters method since it is handled by the same module due to its particular characteristics. Only the condition for vuls is added so as not to alter the rest. This functionality should be applied in a higher hierarchy in the future. */
+      if (tab !== 'vuls' && !fromDiscover) {
         commonData.assignFilters(filterHandler, tab);
       }
-      store.dispatch(updateVis({ update: true, raw: rawVisualizations.getList() }));
+      store.dispatch(
+        updateVis({ update: true, raw: rawVisualizations.getList() }),
+      );
     } catch (error) {
       throw error;
     }
@@ -93,7 +99,13 @@ export class VisFactoryHandler {
    * @param {*} localChange
    * @param {*} id
    */
-  static async buildAgentsVisualizations(filterHandler, tab, subtab, id, fromDiscover = false) {
+  static async buildAgentsVisualizations(
+    filterHandler,
+    tab,
+    subtab,
+    id,
+    fromDiscover = false,
+  ) {
     const rawVisualizations = new RawVisualizations();
     //  if (rawVisualizations.getType() !== 'agents') {
     rawVisualizations.setType('agents');
@@ -102,15 +114,15 @@ export class VisFactoryHandler {
 
     try {
       // TODO change logic to read common/modules/module-defaults.js configuration
-      const data =
-        (!['sca', 'office', 'vuls'].includes(tab))
-          ? await GenericRequest.request(
+      const data = !['sca', 'office', 'vuls'].includes(tab)
+        ? await GenericRequest.request(
             'GET',
-            `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
+            `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`,
           )
-          : false;
+        : false;
       data && rawVisualizations.assignItems(data.data.raw);
-      if (!fromDiscover) {
+      /* For the vuls component only, it is not necessary to call the assignFilters method since it is handled by the same module due to its particular characteristics. Only the condition for vuls is added so as not to alter the rest. This functionality should be applied in a higher hierarchy in the future. */
+      if (tab !== 'vuls' && !fromDiscover) {
         commonData.assignFilters(filterHandler, tab, id);
       }
       store.dispatch(updateVis({ update: true }));
