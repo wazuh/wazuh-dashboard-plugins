@@ -306,10 +306,6 @@ export class SettingsController {
       };
       getErrorOrchestrator().handleError(options);
     }
-    // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
-    await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {
-      entries: this.apiEntries,
-    });
     return;
   }
 

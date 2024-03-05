@@ -83,37 +83,6 @@ export class WazuhHostsCtrl {
   }
 
   /**
-   * Remove the orphan host entries in the registry
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   */
-  async removeOrphanEntries(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const { entries } = request.body;
-      context.wazuh.logger.debug('Cleaning registry file');
-      await context.wazuh_core.updateRegistry.removeOrphanEntries(entries);
-      return response.ok({
-        body: { statusCode: 200, message: 'ok' },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(
-        `Could not clean entries in the wazuh-registry.json due to ${
-          error.message || error
-        }`,
-        2013,
-        500,
-        response,
-      );
-    }
-  }
-
-  /**
    * Create or update the API host data stored in the configuration.
    * Allow partial updates.
    * @param context

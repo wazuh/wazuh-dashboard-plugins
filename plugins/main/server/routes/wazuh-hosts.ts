@@ -144,18 +144,4 @@ export function WazuhHostsRoutes(router: IRouter, services) {
     async (context, request, response) =>
       ctrl.deleteAPIHost(context, request, response),
   );
-
-  // Checks the orphan hosts in the registry in order to delete them
-  router.post(
-    {
-      path: '/hosts/remove-orphan-entries',
-      validate: {
-        body: schema.object({
-          entries: schema.arrayOf(schema.any()),
-        }),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.removeOrphanEntries(context, request, response),
-  );
 }
