@@ -30,8 +30,6 @@ jest.mock('../../../components/common/hooks', () => ({
       'checks.pattern': true,
       'checks.template': true,
       'checks.fields': true,
-      'checks.vulnerabilities.pattern': true,
-      'checks.fim.pattern': true,
     },
   }),
   useRootScope: () => ({}),

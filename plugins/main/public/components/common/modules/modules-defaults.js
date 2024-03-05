@@ -41,6 +41,8 @@ import { githubColumns } from '../../overview/github-panel/events/github-columns
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
+import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -194,17 +196,33 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardVuls,
-        buttons: [ButtonModuleExploreAgent],
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         id: 'inventory',
         name: 'Inventory',
         component: InventoryVuls,
-        buttons: [ButtonModuleExploreAgent],
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         ...renderDiscoverTab(ALERTS_INDEX_PATTERN, vulnerabilitiesColumns),
-        component: withModuleNotForAgent(() => (
+        component: withVulnerabilitiesStateDataSource(() => (
           <WazuhDiscover
             indexPatternName={DEFAULT_INDEX_PATTERN}
             tableColumns={vulnerabilitiesColumns}
