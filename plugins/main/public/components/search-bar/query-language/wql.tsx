@@ -343,11 +343,13 @@ function filterTokenValueSuggestion(
   suggestions: QLOptionSuggestionEntityItemTyped[],
 ) {
   return suggestions
-    .filter(({ label }: QLOptionSuggestionEntityItemTyped) => {
-      const re = getTokenValueRegularExpression();
-      return re.test(label);
-    })
-    .slice(0, SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT);
+    ? suggestions
+        .filter(({ label }: QLOptionSuggestionEntityItemTyped) => {
+          const re = getTokenValueRegularExpression();
+          return re.test(label);
+        })
+        .slice(0, SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT)
+    : [];
 }
 
 /**
