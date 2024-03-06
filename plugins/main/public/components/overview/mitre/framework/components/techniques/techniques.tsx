@@ -29,15 +29,15 @@ import {
 import { FlyoutTechnique } from './components/flyout-technique/';
 import { getElasticAlerts, IFilterParams } from '../../lib';
 import { ITactic } from '../../';
-import { withWindowSize } from '../../../../../components/common/hocs/withWindowSize';
-import { WzRequest } from '../../../../../react-services/wz-request';
-import { AppState } from '../../../../../react-services/app-state';
-import { WzFieldSearchDelay } from '../../../../common/search';
-import { getDataPlugin, getToasts } from '../../../../../kibana-services';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
-import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { getSettingDefaultValue } from '../../../../../../common/services/settings';
+import { withWindowSize } from '../../../../../../components/common/hocs/withWindowSize';
+import { WzRequest } from '../../../../../../react-services/wz-request';
+import { AppState } from '../../../../../../react-services/app-state';
+import { WzFieldSearchDelay } from '../../../../../common/search';
+import { getDataPlugin, getToasts } from '../../../../../../kibana-services';
+import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { getSettingDefaultValue } from '../../../../../../../common/services/settings';
 
 const MITRE_ATTACK = 'mitre-attack';
 

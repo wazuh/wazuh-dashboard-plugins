@@ -20,7 +20,7 @@ import { useTimeFilter } from '../../../hooks';
 import { useDispatch } from 'react-redux';
 import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { getAngularModule, getCore } from '../../../../../kibana-services';
-import { getIndexPattern } from '../../../../overview/mitre/lib';
+import { getIndexPattern } from '../../../../overview/mitre/framework/lib';
 import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
 import rison from 'rison-node';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';

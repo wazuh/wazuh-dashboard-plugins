@@ -1,4 +1,4 @@
-import { tDataGridColumn } from '../../../common/data-grid';
+import { tDataGridColumn } from '../../../../common/data-grid';
 
 export const mitreAttackColumns: tDataGridColumn[] = [
   {
