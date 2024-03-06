@@ -24,6 +24,7 @@ import { WazuhDiscover } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
+import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
@@ -79,7 +80,12 @@ export const ModulesDefaults = {
   general: {
     init: 'events',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardThreatHunting,
+      },
       renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
     ],
     availableFor: ['manager', 'agent'],
