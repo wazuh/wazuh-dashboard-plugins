@@ -125,8 +125,6 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry),
       getHosts: () => this.getHosts(),
       testApi: (entry, force) => ApiCheck.checkApi(entry, force),
-      updateClusterInfoInRegistry: (id, clusterInfo) =>
-        this.updateClusterInfoInRegistry(id, clusterInfo),
       copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
 
@@ -309,21 +307,6 @@ export class SettingsController {
     return;
   }
 
-  /**
-   * @param {String} id
-   * @param {Object} clusterInfo
-   */
-  async updateClusterInfoInRegistry(id, clusterInfo) {
-    try {
-      const url = `/hosts/update-hostname/${id}`;
-      await this.genericReq.request('PUT', url, {
-        cluster_info: clusterInfo,
-      });
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
   // Check manager connectivity
   async checkManager(item, isIndex, silent = false) {
     try {
@@ -347,7 +330,6 @@ export class SettingsController {
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry
-      await this.updateClusterInfoInRegistry(id, cluster_info);
       this.$scope.$emit('updateAPI', { cluster_info });
       this.apiEntries[index].cluster_info = cluster_info;
       this.apiEntries[index].status = 'online';

@@ -47,42 +47,6 @@ export class WazuhHostsCtrl {
   }
 
   /**
-   * This update an API hostname
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * Status response or ErrorResponse
-   */
-  async updateClusterInfo(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const { id } = request.params;
-      const { cluster_info } = request.body;
-      await context.wazuh_core.updateRegistry.updateClusterInfo(
-        id,
-        cluster_info,
-      );
-      context.wazuh.logger.info(`Server API host entry ${id} updated`);
-      return response.ok({
-        body: { statusCode: 200, message: 'ok' },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(
-        `Could not update data in wazuh-registry.json due to ${
-          error.message || error
-        }`,
-        2012,
-        500,
-        response,
-      );
-    }
-  }
-
-  /**
    * Create or update the API host data stored in the configuration.
    * Allow partial updates.
    * @param context

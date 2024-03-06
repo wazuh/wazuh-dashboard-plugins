@@ -26,23 +26,6 @@ export function WazuhHostsRoutes(router: IRouter, services) {
       ctrl.getHostsEntries(context, request, response),
   );
 
-  // Updates the cluster-info or manager-info
-  router.put(
-    {
-      path: '/hosts/update-hostname/{id}',
-      validate: {
-        params: schema.object({
-          id: schema.string(),
-        }),
-        body: schema.object({
-          cluster_info: schema.any(),
-        }),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.updateClusterInfo(context, request, response),
-  );
-
   // Create the API host entry
   router.post(
     {
