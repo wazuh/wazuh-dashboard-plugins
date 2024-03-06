@@ -26,6 +26,5 @@ export class PatternDataSource implements tDataSource {
         }catch(error){
             throw new Error(`Error selecting index pattern: ${error}`);
         }
-
     }
 }

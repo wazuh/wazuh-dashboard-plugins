@@ -42,6 +42,27 @@ export type tSavedObjectResponse = {
     }
 }
 
+export type tParsedIndexPattern = {
+    attributes: {
+        fields: string;
+        title: string;
+    };
+    title: string;
+    id: string;
+    migrationVersion: {
+        'index-pattern': string;
+    };
+    namespace: string[];
+    references: any[];
+    score: number;
+    type: string;
+    updated_at: string;
+    version: string;
+    _fields: any[];
+    //ToDo: make sure that the following properties are not required
+    select: () => Promise<void>
+}
+
 export class PatternDataSourceRepository implements DataSourceRepository {
     async get(id: string): Promise<tDataSource> {
         try {
@@ -76,9 +97,9 @@ export class PatternDataSourceRepository implements DataSourceRepository {
         }
     }
 
-    parseIndexPattern(indexPatternData): tDataSource {
+    parseIndexPattern(indexPatternData): tParsedIndexPattern {
         const title = ((indexPatternData || {}).attributes || {}).title;
-        const id = (indexPatternData || {}).id;
+        const id = (indexPatternData || {}).id;    
         return {
             ...indexPatternData,
             id: id,
@@ -96,11 +117,10 @@ export class PatternDataSourceRepository implements DataSourceRepository {
         AppState.setCurrentPattern(dataSource.id);
         return Promise.resolve();
     }
-    getDefault(): Promise<tDataSource> {
+    getDefault(): Promise<tDataSource | null> | tDataSource | null {
         const currentPattern = AppState.getCurrentPattern();
-        // the AppState returns the title
         if(!currentPattern){
-            throw new Error('No default pattern set');
+            return null;
         }
         return this.get(currentPattern);
     }
