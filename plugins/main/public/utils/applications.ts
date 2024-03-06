@@ -65,7 +65,7 @@ export const fileIntegrityMonitoring = {
     defaultMessage:
       'Alerts related to file changes, including permissions, content, ownership, and attributes.',
   }),
-  euiIconType: 'indexRollupApp',
+  euiIconType: 'sqlApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
   order: 202,
@@ -265,7 +265,7 @@ const pciDss = {
     defaultMessage:
       'Global security standard for entities that process, store, or transmit payment cardholder data.',
   }),
-  euiIconType: 'sqlApp',
+  euiIconType: 'visTagCloud',
   order: 400,
   showInOverviewApp: true,
   showInAgentMenu: true,
@@ -315,7 +315,7 @@ const gdpr = {
     defaultMessage:
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
   }),
-  euiIconType: 'sqlApp',
+  euiIconType: 'visBarVertical',
   order: 401,
   showInOverviewApp: true,
   showInAgentMenu: true,
