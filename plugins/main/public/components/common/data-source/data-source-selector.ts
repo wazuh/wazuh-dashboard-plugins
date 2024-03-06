@@ -48,10 +48,12 @@ export class DataSourceSelector {
 
 
     async selectDataSource(id: string): Promise<void> {
+        const currentSelectedDataSource = await this.getSelectedDataSource();
         const dataSource = await this.getDataSource(id);
-        if(!dataSource){
+        if (!dataSource) {
             throw new Error('Data source not found');
         }
+        dataSource.select();
         this.repository.setDefault(dataSource);
     }
 

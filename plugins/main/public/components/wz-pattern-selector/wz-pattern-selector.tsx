@@ -11,8 +11,12 @@ import {
     AlertsDataSourceRepository, 
     PatternDataSourceFactory } from '../common/data-source';
     
+type tWzPatternSelector = {
+    onChange?: (dataSource: tDataSource) => void;
+}
 
-const WzPatternSelector = () => {
+const WzPatternSelector = (props: tWzPatternSelector) => {
+    const { onChange } = props;
     const [dataSourceList, setDataSourceList] = useState<tDataSource[] | []>([]);
     const [selectedPattern, setSelectedPattern] = useState<tDataSource>();
     const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +44,8 @@ const WzPatternSelector = () => {
         try{
             // search in datasource list the selected index pattern
             await dataSourceSelector.selectDataSource(dataSourceId);
+            setSelectedPattern(await dataSourceSelector.getDataSource(dataSourceId));
+            onChange && onChange(selectedPattern);
         }catch(error){
             console.error(error);
         }
@@ -48,11 +54,11 @@ const WzPatternSelector = () => {
     return (
         <EuiFormRow>
             <EuiSelect
-                id='selectIndexPattern'
+                id='selectIndexPatternBar'
                 options={dataSourceList.map((item) => {
                     return { value: item.id, text: item.title };
                 })}
-                value={selectedPattern?.id}
+                value={selectedPattern?.id || dataSourceList[0]?.id }
                 onChange={selectDataSource}
                 aria-label='Index pattern selector'
             />

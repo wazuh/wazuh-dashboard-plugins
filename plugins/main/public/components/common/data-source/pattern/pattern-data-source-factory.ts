@@ -1,4 +1,4 @@
-import { tDataSourceFactory, PatternDataSource } from './index'
+import { tDataSourceFactory, PatternDataSource } from '../';
 export class PatternDataSourceFactory implements tDataSourceFactory {
     
     create(item: PatternDataSource): PatternDataSource {
