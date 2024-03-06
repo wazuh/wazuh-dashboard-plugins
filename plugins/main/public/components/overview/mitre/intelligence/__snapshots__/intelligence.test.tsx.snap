@@ -39,7 +39,7 @@ exports[`Module Mitre Att&ck intelligence container should render permissions pr
         This section requires the permission:
         <div>
           <div>
-            - 
+            -
             <strong>
               mitre:read
             </strong>
@@ -169,7 +169,7 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
                       <h1
                         class="euiTitle euiTitle--small"
                       >
-                        Groups 
+                        Groups
                         <span>
                           (0)
                         </span>

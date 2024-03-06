@@ -17,22 +17,24 @@ import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { MitreAttackResources } from './resources';
 import { ModuleMitreAttackIntelligenceLeftPanel } from './intelligence_left_panel';
 import { ModuleMitreAttackIntelligenceRightPanel } from './intelligence_right_panel';
-import { useAsyncAction } from '../../common/hooks';
-import { WzRequest } from '../../../react-services';
-import { PanelSplit } from '../../common/panels';
-import { withUserAuthorizationPrompt } from '../../common/hocs';
+import { useAsyncAction } from '../../../common/hooks';
+import { WzRequest } from '../../../../react-services';
+import { PanelSplit } from '../../../common/panels';
+import { withUserAuthorizationPrompt } from '../../../common/hocs';
 import { compose } from 'redux';
 
 export const ModuleMitreAttackIntelligence = compose(
-  withUserAuthorizationPrompt([{ action: 'mitre:read', resource: '*:*:*' }])
+  withUserAuthorizationPrompt([{ action: 'mitre:read', resource: '*:*:*' }]),
 )(() => {
-  const [selectedResource, setSelectedResource] = useState(MitreAttackResources[0].id);
+  const [selectedResource, setSelectedResource] = useState(
+    MitreAttackResources[0].id,
+  );
   const [searchTermAllResources, setSearchTermAllResources] = useState('');
   const searchTermAllResourcesLastSearch = useRef('');
   const [resourceFilters, setResourceFilters] = useState({});
   const searchTermAllResourcesUsed = useRef(false);
   const searchTermAllResourcesAction = useAsyncAction(
-    async (searchTerm) => {
+    async searchTerm => {
       selectedResource !== null && setSelectedResource(null);
       searchTermAllResourcesUsed.current = true;
       searchTermAllResourcesLastSearch.current = searchTerm;
@@ -40,21 +42,21 @@ export const ModuleMitreAttackIntelligence = compose(
       const fields = ['name', 'description', 'external_id'];
       return (
         await Promise.all(
-          MitreAttackResources.map(async (resource) => {
-            const response = await WzRequest.apiReq('GET', resource.apiEndpoint, {
-              params: {
-                ...(
-                  searchTerm
+          MitreAttackResources.map(async resource => {
+            const response = await WzRequest.apiReq(
+              'GET',
+              resource.apiEndpoint,
+              {
+                params: {
+                  ...(searchTerm
                     ? {
-                      q: fields
-                        .map(key => `${key}~${searchTerm}`)
-                        .join(',')
-                    }
-                    : {}
-                ),
-                limit: limitResults
-              }
-            });
+                        q: fields.map(key => `${key}~${searchTerm}`).join(','),
+                      }
+                    : {}),
+                  limit: limitResults,
+                },
+              },
+            );
             return {
               id: resource.id,
               name: resource.label,
@@ -66,25 +68,28 @@ export const ModuleMitreAttackIntelligence = compose(
                 response?.data?.data?.total_affected_items > limitResults &&
                 (() => {
                   setResourceFilters({
-                    ...(
-                      searchTermAllResourcesLastSearch.current
-                        ? {
+                    ...(searchTermAllResourcesLastSearch.current
+                      ? {
                           q: fields
-                            .map(key => `${key}~${searchTermAllResourcesLastSearch.current}`)
-                            .join(',')
+                            .map(
+                              key =>
+                                `${key}~${searchTermAllResourcesLastSearch.current}`,
+                            )
+                            .join(','),
                         }
-                        : {}
-                    )
-                  }
-                  );
+                      : {}),
+                  });
                   setSelectedResource(resource.id);
                 }),
             };
-          })
+          }),
         )
-      ).filter((searchTermAllResourcesResponse) => searchTermAllResourcesResponse.results.length);
+      ).filter(
+        searchTermAllResourcesResponse =>
+          searchTermAllResourcesResponse.results.length,
+      );
     },
-    [searchTermAllResources]
+    [searchTermAllResources],
   );
 
   useEffect(() => {
@@ -96,18 +101,19 @@ export const ModuleMitreAttackIntelligence = compose(
   }, []);
 
   const onSelectResource = useCallback(
-    (resourceID) => {
+    resourceID => {
       setResourceFilters({});
-      setSelectedResource((prevSelectedResource) =>
-        prevSelectedResource === resourceID && searchTermAllResourcesUsed.current
+      setSelectedResource(prevSelectedResource =>
+        prevSelectedResource === resourceID &&
+        searchTermAllResourcesUsed.current
           ? null
-          : resourceID
+          : resourceID,
       );
     },
-    [searchTermAllResourcesUsed.current]
+    [searchTermAllResourcesUsed.current],
   );
 
-  const onSearchTermAllResourcesChange = useCallback((searchTerm) => {
+  const onSearchTermAllResourcesChange = useCallback(searchTerm => {
     setSearchTermAllResources(searchTerm);
   }, []);
 
@@ -123,7 +129,9 @@ export const ModuleMitreAttackIntelligence = compose(
               selectedResource={selectedResource}
             />
           }
-          sideProps={{ style: { width: '15%', minWidth: 145, overflowX: 'hidden' } }}
+          sideProps={{
+            style: { width: '15%', minWidth: 145, overflowX: 'hidden' },
+          }}
           content={
             <ModuleMitreAttackIntelligenceRightPanel
               results={searchTermAllResourcesAction.data}
@@ -133,7 +141,11 @@ export const ModuleMitreAttackIntelligence = compose(
             />
           }
           contentProps={{
-            style: { maxHeight: 'calc(100vh - 255px)', overflowY: 'auto', overflowX: 'hidden' },
+            style: {
+              maxHeight: 'calc(100vh - 255px)',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+            },
           }}
         />
       </EuiFlexItem>
