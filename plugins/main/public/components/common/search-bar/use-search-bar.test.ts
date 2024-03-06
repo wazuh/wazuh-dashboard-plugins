@@ -161,6 +161,7 @@ describe('[hook] useSearchBarConfiguration', () => {
   });
 
   it('should return the same filters and apply them to the filter manager when are received by props', async () => {
+    const exampleIndexPatternId = 'wazuh-index-pattern';
     const defaultFilters: Filter[] = [
       {
         query: 'something to filter',
@@ -183,6 +184,7 @@ describe('[hook] useSearchBarConfiguration', () => {
       .mockReturnValue(defaultFilters);
     const { result, waitForNextUpdate } = renderHook(() =>
       useSearchBar({
+        defaultIndexPatternID: exampleIndexPatternId,
         filters: defaultFilters,
       }),
     );

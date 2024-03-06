@@ -39,8 +39,6 @@ describe('[settings] Input validation', () => {
     ${'checks.template'}                | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'checks.timeFilter'}              | ${true}                                                                | ${undefined}
     ${'checks.timeFilter'}              | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'checks.vulnerabilities.pattern'} | ${true}                                                                | ${undefined}
-    ${'checks.vulnerabilities.pattern'} | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'cron.prefix'}                    | ${'test'}                                                              | ${undefined}
     ${'cron.prefix'}                    | ${'test space'}                                                        | ${'No whitespaces allowed.'}
     ${'cron.prefix'}                    | ${''}                                                                  | ${'Value can not be empty.'}

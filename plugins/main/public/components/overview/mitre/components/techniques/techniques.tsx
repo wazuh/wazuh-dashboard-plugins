@@ -159,7 +159,7 @@ export const Techniques = withWindowSize(
           filters,
           aggs,
         );
-        const { buckets } = data.aggregations.techniques;
+        const buckets = data?.aggregations?.techniques?.buckets || [];
         this._isMount &&
           this.setState({ techniquesCount: buckets, loadingAlerts: false });
       } catch (error) {

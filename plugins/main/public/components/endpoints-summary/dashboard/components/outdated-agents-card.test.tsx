@@ -6,9 +6,9 @@ import { mount } from 'enzyme';
 import { EuiButtonEmpty, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
-jest.mock('../../../common/hooks/useApiService', () => ({
+jest.mock('../../../common/hooks/use-service', () => ({
   __esModule: true,
-  useApiService: jest.fn(),
+  useService: jest.fn(),
 }));
 
 describe('OutdatedAgentsCard', () => {
@@ -21,7 +21,7 @@ describe('OutdatedAgentsCard', () => {
 
   const mockLoading = false;
   const mockDataNoOutdatedAgents = [];
-  const useApiServiceMockNoOutdatedAgent = jest.fn(() => [mockLoading, mockDataNoOutdatedAgents]);
+  const useServiceMockNoOutdatedAgent = jest.fn(() => ({data: mockDataNoOutdatedAgents, isLoading: mockLoading}));
   const mockDataOutdatedAgents = [
     {
         version: "Wazuh v3.0.0",
@@ -34,12 +34,12 @@ describe('OutdatedAgentsCard', () => {
         name: "dmz002"
     }
 ];
-  const useApiServiceMockOutdatedAgent = jest.fn(() => [mockLoading, mockDataOutdatedAgents]);
+  const useServiceMockOutdatedAgent = jest.fn(() => ({data: mockDataOutdatedAgents, isLoading: mockLoading}));
   
   const handleClick = jest.fn();
 
   it('renders with not outdated agents', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockNoOutdatedAgent;  
+    require('../../../common/hooks/use-service').useService = useServiceMockNoOutdatedAgent;  
     
     await act(async () => {
       const { getByTestId } = render(
@@ -53,7 +53,7 @@ describe('OutdatedAgentsCard', () => {
   });
 
   it('renders with outdated agents', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockOutdatedAgent;  
+    require('../../../common/hooks/use-service').useService = useServiceMockOutdatedAgent;  
     
     await act(async () => {
       const { getByTestId } = render(
@@ -67,7 +67,7 @@ describe('OutdatedAgentsCard', () => {
   });
 
   it('renders popover on click with outdated agents', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockOutdatedAgent;
+    require('../../../common/hooks/use-service').useService = useServiceMockOutdatedAgent;
         
     const wrapper = await mount(
       <OutdatedAgentsCard onClick={handleClick} />,
@@ -83,7 +83,7 @@ describe('OutdatedAgentsCard', () => {
   });
 
   it('handles click with correct data', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockOutdatedAgent;
+    require('../../../common/hooks/use-service').useService = useServiceMockOutdatedAgent;
         
     const wrapper = await mount(
       <OutdatedAgentsCard onClick={handleClick} />,
@@ -103,7 +103,7 @@ describe('OutdatedAgentsCard', () => {
   });
 
   it('EuiButtonEmpty filter must be disabled when no data', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockNoOutdatedAgent;
+    require('../../../common/hooks/use-service').useService = useServiceMockNoOutdatedAgent;
         
     const wrapper = await mount(
       <OutdatedAgentsCard onClick={handleClick} />,
@@ -123,7 +123,7 @@ describe('OutdatedAgentsCard', () => {
     const documentationLink = webDocumentationLink(
       'upgrade-guide/wazuh-agent/index.html',
     );
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockNoOutdatedAgent;
+    require('../../../common/hooks/use-service').useService = useServiceMockNoOutdatedAgent;
         
     const wrapper = await mount(
       <OutdatedAgentsCard onClick={handleClick} />,
