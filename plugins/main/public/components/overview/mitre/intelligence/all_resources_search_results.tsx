@@ -19,45 +19,55 @@ import {
   EuiCallOut,
   EuiProgress,
   EuiSpacer,
-  EuiButton
+  EuiButton,
 } from '@elastic/eui';
 
-import { withGuard } from '../../../components/common/hocs';
+import { withGuard } from '../../../../components/common/hocs';
 
-const LoadingProgress = () => (
-  <EuiProgress color='primary' size='s'/>
-);
+const LoadingProgress = () => <EuiProgress color='primary' size='s' />;
 
-export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(({loading}) => loading, LoadingProgress)(({ results, onSelectResource }) => {
+export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
+  ({ loading }) => loading,
+  LoadingProgress,
+)(({ results, onSelectResource }) => {
   const thereAreResults = results && results.length > 0;
-  return thereAreResults
-  ? results.map(item => (
-    <EuiAccordion
-      key={`module_mitre_attack_intelligence_all_resources_search_results_${item.name}`}
-      style={{ textDecoration: 'none' }}
-      id=''
-      extraAction={item.loadMoreResults ? <EuiButton
-        onClick={item.loadMoreResults}
-        size='s'
-      >
-        See more results
-      </EuiButton> : undefined}
-      buttonContent={<span>{item.name} ({item.totalResults})</span>}
-      paddingSize='none'
-      initialIsOpen={true}
-    >
-      {item.results.map((result, resultIndex) => (
-        <EuiButtonEmpty
-          key={`module_mitre_attack_intelligence_all_resources_search_results_${item.name}_${resultIndex}`}
-          onClick={() => onSelectResource(result)}
-        >
-          {result[item.fieldName]}
-        </EuiButtonEmpty>
-      ))}
-    </EuiAccordion>
-  ), []).reduce((accum, cur) => [accum, <EuiSpacer size='m'/>, cur])
-  :  <EuiCallOut
-        title='No results found'
-        color='warning'
-      />
+  return thereAreResults ? (
+    results
+      .map(
+        item => (
+          <EuiAccordion
+            key={`module_mitre_attack_intelligence_all_resources_search_results_${item.name}`}
+            style={{ textDecoration: 'none' }}
+            id=''
+            extraAction={
+              item.loadMoreResults ? (
+                <EuiButton onClick={item.loadMoreResults} size='s'>
+                  See more results
+                </EuiButton>
+              ) : undefined
+            }
+            buttonContent={
+              <span>
+                {item.name} ({item.totalResults})
+              </span>
+            }
+            paddingSize='none'
+            initialIsOpen={true}
+          >
+            {item.results.map((result, resultIndex) => (
+              <EuiButtonEmpty
+                key={`module_mitre_attack_intelligence_all_resources_search_results_${item.name}_${resultIndex}`}
+                onClick={() => onSelectResource(result)}
+              >
+                {result[item.fieldName]}
+              </EuiButtonEmpty>
+            ))}
+          </EuiAccordion>
+        ),
+        [],
+      )
+      .reduce((accum, cur) => [accum, <EuiSpacer size='m' />, cur])
+  ) : (
+    <EuiCallOut title='No results found' color='warning' />
+  );
 });
