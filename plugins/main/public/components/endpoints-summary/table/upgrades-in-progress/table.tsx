@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiHealth } from '@elastic/eui';
+import { EuiHealth, EuiIconTip } from '@elastic/eui';
 import { TableWzAPI } from '../../../common/tables';
 import { formatUIDate } from '../../../../react-services/time-service';
 import {
@@ -8,7 +8,7 @@ import {
   UI_TASK_STATUS,
 } from '../../../../../common/constants';
 import { WzRequest } from '../../../../react-services/wz-request';
-import { get as getLodash } from 'lodash';
+import { get as getLodash, uniqBy as uniqByLodash } from 'lodash';
 
 export const AgentUpgradesTable = () => {
   const datetime = new Date();
@@ -17,13 +17,6 @@ export const AgentUpgradesTable = () => {
 
   const defaultFilters = {
     q: `last_update_time>${formattedDate}`,
-  };
-
-  const searchBarWQLOptions = {
-    implicitQuery: {
-      query: 'id!=000',
-      conjunction: ';',
-    },
   };
 
   return (
@@ -47,17 +40,37 @@ export const AgentUpgradesTable = () => {
         },
         {
           field: 'create_time',
-          name: 'Create',
+          name: (
+            <span>
+              Create{' '}
+              <EuiIconTip
+                content='This is not searchable through a search term.'
+                size='s'
+                color='subdued'
+                type='alert'
+              />
+            </span>
+          ),
           sortable: true,
-          searchable: true,
+          searchable: false,
           show: true,
           render: value => formatUIDate(value),
         },
         {
           field: 'last_update_time',
-          name: 'Last update',
+          name: (
+            <span>
+              Last update{' '}
+              <EuiIconTip
+                content='This is not searchable through a search term.'
+                size='s'
+                color='subdued'
+                type='alert'
+              />
+            </span>
+          ),
           sortable: true,
-          searchable: true,
+          searchable: false,
           show: true,
           render: value => formatUIDate(value),
         },
@@ -86,12 +99,16 @@ export const AgentUpgradesTable = () => {
           field: 'error_message',
           name: 'Error',
           show: true,
+          searchable: true,
         },
       ]}
       tableInitialSortingField='last_update_time'
       tableInitialSortingDirection='desc'
       tablePageSizeOptions={[10, 25, 50, 100]}
       filters={defaultFilters}
+      downloadCsv
+      showReload
+      showFieldSelector
       searchTable
       searchBarWQL={{
         suggestions: {
@@ -117,25 +134,28 @@ export const AgentUpgradesTable = () => {
                   return UI_TASK_STATUS.map(status => ({
                     label: status,
                   }));
-                case 'agent_id': {
-                  const response = await WzRequest.apiReq('GET', '/agents', {
-                    params: {
-                      distinct: true,
-                      limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
-                      select: 'id',
-                      sort: `+id`,
-                      ...(currentValue
-                        ? {
-                            q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}id~${currentValue}`,
-                          }
-                        : {
-                            q: `${searchBarWQLOptions.implicitQuery.query}`,
-                          }),
+                default: {
+                  const response = await WzRequest.apiReq(
+                    'GET',
+                    '/tasks/status',
+                    {
+                      params: {
+                        limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                        select: field,
+                        sort: `+${field}`,
+                        ...(currentValue
+                          ? {
+                              q: `${field}~${currentValue}`,
+                            }
+                          : {}),
+                      },
                     },
-                  });
-                  return response?.data?.data.affected_items.map(item => ({
-                    label: getLodash(item, 'id'),
-                  }));
+                  );
+                  const suggestionValues =
+                    response?.data?.data.affected_items.map(item => ({
+                      label: getLodash(item, field),
+                    }));
+                  return uniqByLodash(suggestionValues, 'label');
                 }
               }
             } catch (error) {

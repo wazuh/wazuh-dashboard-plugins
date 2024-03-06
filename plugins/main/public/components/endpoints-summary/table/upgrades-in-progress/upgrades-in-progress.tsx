@@ -5,7 +5,6 @@ import {
   EuiText,
   EuiModal,
   EuiModalHeader,
-  EuiModalHeaderTitle,
   EuiModalBody,
   EuiModalFooter,
   EuiButton,
@@ -142,11 +141,7 @@ export const AgentUpgradesInProgress = ({
       </EuiPanel>
       {isModalVisible ? (
         <EuiModal onClose={handleOnCloseModal} maxWidth={false}>
-          <EuiModalHeader>
-            <EuiModalHeaderTitle>
-              <h1>Upgrade agent tasks</h1>
-            </EuiModalHeaderTitle>
-          </EuiModalHeader>
+          <EuiModalHeader />
           <EuiModalBody>
             <AgentUpgradesTable />
           </EuiModalBody>
