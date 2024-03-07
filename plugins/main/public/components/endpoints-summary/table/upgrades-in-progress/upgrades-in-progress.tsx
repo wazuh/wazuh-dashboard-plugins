@@ -8,11 +8,11 @@ import {
   EuiModalBody,
   EuiModalFooter,
   EuiButton,
-  EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiToolTip,
   EuiIconTip,
+  EuiSpacer,
+  EuiButtonEmpty,
 } from '@elastic/eui';
 import { useGetUpgradeTasks } from '../../hooks';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -31,6 +31,8 @@ export const AgentUpgradesInProgress = ({
   const {
     totalInProgressTasks = 0,
     getInProgressError,
+    totalSuccessTasks,
+    getSuccessError,
     totalErrorUpgradeTasks = 0,
     getErrorTasksError,
   } = useGetUpgradeTasks(reload);
@@ -58,6 +60,21 @@ export const AgentUpgradesInProgress = ({
     getErrorOrchestrator().handleError(options);
   }
 
+  if (getSuccessError) {
+    const options = {
+      context: `AgentUpgradesInProgress.useGetUpgradeTasks`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      error: {
+        error: getSuccessError,
+        message: getSuccessError.message || getSuccessError,
+        title: `Could not get upgrade success tasks`,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
+  }
+
   if (getErrorTasksError) {
     const options = {
       context: `AgentUpgradesInProgress.useGetUpgradeTasks`,
@@ -75,67 +92,82 @@ export const AgentUpgradesInProgress = ({
 
   const handleOnCloseModal = () => setIsModalVisible(false);
 
-  return isUpgrading || totalErrorUpgradeTasks ? (
+  return isUpgrading || totalSuccessTasks || totalErrorUpgradeTasks ? (
     <>
-      <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
-        {totalInProgressTasks > 0 ? (
-          <EuiProgress
-            size='xs'
-            color={totalErrorUpgradeTasks ? 'danger' : 'primary'}
-            position='absolute'
-          />
-        ) : (
-          <EuiProgress
-            value={100}
-            max={100}
-            size='xs'
-            color={totalErrorUpgradeTasks ? 'danger' : 'success'}
-            position='absolute'
-          />
-        )}
+      <EuiPanel color='subdued'>
         <EuiFlexGroup gutterSize='s' alignItems='center'>
-          {isUpgrading ? (
+          <EuiFlexItem grow={false}>
+            <EuiText>Upgrade tasks</EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+              color='primary'
+              onClick={() => setIsModalVisible(true)}
+              iconType='eye'
+            >
+              Task details
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer size='s' />
+        <EuiFlexGroup gutterSize='s' alignItems='center'>
+          {totalInProgressTasks > 0 ? (
             <EuiFlexItem grow={false}>
-              <EuiText size='s'>
-                <b>{totalInProgressTasks}</b>
-                {`${
-                  totalInProgressTasks === 1 ? ' Upgrade' : ' Upgrades'
-                } in progress`}
-              </EuiText>
+              <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
+                <EuiProgress size='xs' color='warning' position='absolute' />
+                <EuiText size='s'>
+                  <b>{totalInProgressTasks}</b>
+                  {totalInProgressTasks === 1
+                    ? ' Upgrade task in progress'
+                    : ' Upgrade tasks in progress'}
+                </EuiText>
+              </EuiPanel>
             </EuiFlexItem>
           ) : null}
-          {isUpgrading && totalErrorUpgradeTasks ? (
-            <EuiFlexItem grow={false}>/</EuiFlexItem>
+          {totalSuccessTasks > 0 ? (
+            <EuiFlexItem grow={false}>
+              <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
+                <EuiProgress
+                  value={100}
+                  max={100}
+                  size='xs'
+                  color='success'
+                  position='absolute'
+                />
+                <span>
+                  <EuiText size='s'>
+                    <b>{totalSuccessTasks}</b>
+                    {totalSuccessTasks === 1
+                      ? ' Success upgrade task '
+                      : ' Success upgrade tasks '}
+                    <EuiIconTip content='Last 60 minutes' color='primary' />
+                  </EuiText>
+                </span>
+              </EuiPanel>
+            </EuiFlexItem>
           ) : null}
-          {totalErrorUpgradeTasks ? (
-            <EuiFlexGroup
-              gutterSize='s'
-              alignItems='center'
-              wrap={false}
-              responsive={false}
-            >
-              <EuiFlexItem grow={false}>
-                <EuiText size='s'>
-                  <b>{totalErrorUpgradeTasks}</b>
-                  {` Failed ${
-                    totalErrorUpgradeTasks === 1 ? 'upgrade' : 'upgrades'
-                  }`}
-                </EuiText>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiIconTip content='Last 60 minutes' color='primary' />
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiToolTip content={<p>Upgrade task details</p>}>
-                  <EuiButtonIcon
-                    color='primary'
-                    onClick={() => setIsModalVisible(true)}
-                    iconType='eye'
-                    aria-label='Details'
-                  />
-                </EuiToolTip>
-              </EuiFlexItem>
-            </EuiFlexGroup>
+          {totalErrorUpgradeTasks > 0 ? (
+            <EuiFlexItem grow={false}>
+              <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
+                <EuiProgress
+                  value={100}
+                  max={100}
+                  size='xs'
+                  color='danger'
+                  position='absolute'
+                />
+                <span>
+                  <EuiText size='s'>
+                    <b>{totalErrorUpgradeTasks}</b>
+                    {totalErrorUpgradeTasks === 1
+                      ? ' Failed upgrade task '
+                      : ' Failed upgrade tasks '}
+
+                    <EuiIconTip content='Last 60 minutes' color='primary' />
+                  </EuiText>
+                </span>
+              </EuiPanel>
+            </EuiFlexItem>
           ) : null}
         </EuiFlexGroup>
       </EuiPanel>

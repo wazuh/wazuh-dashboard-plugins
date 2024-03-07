@@ -4,7 +4,13 @@ import { AgentSynced } from '../../agents/agent-synced';
 import { AgentStatus } from '../../agents/agent-status';
 import { formatUIDate } from '../../../react-services/time-service';
 import { GroupTruncate } from '../../common/util';
-import { EuiFlexGroup, EuiFlexItem, EuiIconTip, EuiBadge } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiIconTip,
+  EuiHealth,
+  EuiToolTip,
+} from '@elastic/eui';
 import { Agent } from '../types';
 
 // Columns with the property truncateText: true won't wrap the text
@@ -74,10 +80,21 @@ export const agentsTableColumns = (
         outdatedAgent => outdatedAgent.id === agent.id,
       );
       return (
-        <div>
-          <div>{version}</div>
-          {isOutdated ? <EuiBadge color='warning'>Outdated</EuiBadge> : null}
-        </div>
+        <EuiFlexGroup
+          wrap={false}
+          responsive={false}
+          gutterSize='xs'
+          alignItems='center'
+        >
+          <EuiFlexItem grow={false}>{version}</EuiFlexItem>
+          {isOutdated ? (
+            <EuiFlexItem grow={false}>
+              <EuiToolTip content={<p>Outdated</p>}>
+                <EuiHealth className='wz-flex' color='danger'></EuiHealth>
+              </EuiToolTip>
+            </EuiFlexItem>
+          ) : null}
+        </EuiFlexGroup>
       );
     },
   },

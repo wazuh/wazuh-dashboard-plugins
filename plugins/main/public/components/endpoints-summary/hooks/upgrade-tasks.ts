@@ -2,21 +2,32 @@ import { useState, useEffect } from 'react';
 import { getTasks } from '../services';
 import { API_NAME_TASK_STATUS } from '../../../../common/constants';
 
+const beforeMinutes = 60;
+
 export const useGetUpgradeTasks = reload => {
   const [totalInProgressTasks, setTotalInProgressTasks] = useState<number>();
   const [getInProgressIsLoading, setGetInProgressIsLoading] = useState(true);
   const [getInProgressError, setGetInProgressError] = useState();
+
+  const [totalSuccessTasks, setTotalSuccessTasks] = useState<number>();
+  const [getSuccessIsLoading, setSuccessIsLoading] = useState(true);
+  const [getSuccessError, setGetSuccessError] = useState();
 
   const [totalErrorUpgradeTasks, setTotalErrorUpgradeTasks] =
     useState<number>();
   const [getErrorIsLoading, setErrorIsLoading] = useState(true);
   const [getErrorTasksError, setGetErrorTasksError] = useState();
 
+  const datetime = new Date();
+  datetime.setMinutes(datetime.getMinutes() - beforeMinutes);
+  const formattedDate = datetime.toISOString();
+  const timeFilter = `last_update_time>${formattedDate}`;
+
   const getUpgradesInProgress = async () => {
     try {
       setGetInProgressIsLoading(true);
       const { total_affected_items } = await getTasks({
-        status: 'In progress',
+        status: API_NAME_TASK_STATUS.IN_PROGRESS,
         command: 'upgrade',
         limit: 1,
       });
@@ -29,18 +40,32 @@ export const useGetUpgradeTasks = reload => {
     }
   };
 
+  const getUpgradesSuccess = async () => {
+    try {
+      setSuccessIsLoading(true);
+      const { total_affected_items } = await getTasks({
+        status: API_NAME_TASK_STATUS.DONE,
+        command: 'upgrade',
+        limit: 1,
+        q: timeFilter,
+      });
+      setTotalSuccessTasks(total_affected_items);
+      setGetSuccessError(undefined);
+    } catch (error: any) {
+      setGetSuccessError(error);
+    } finally {
+      setSuccessIsLoading(false);
+    }
+  };
+
   const getUpgradesError = async () => {
     try {
       setErrorIsLoading(true);
-      const datetime = new Date();
-      datetime.setMinutes(datetime.getMinutes() - 60);
-      const formattedDate = datetime.toISOString();
-
       const { total_affected_items } = await getTasks({
         status: API_NAME_TASK_STATUS.FAILED,
         command: 'upgrade',
         limit: 1,
-        q: `last_update_time>${formattedDate}`,
+        q: timeFilter,
       });
       setTotalErrorUpgradeTasks(total_affected_items);
       setGetErrorTasksError(undefined);
@@ -54,6 +79,7 @@ export const useGetUpgradeTasks = reload => {
   useEffect(() => {
     const fetchData = async () => {
       await getUpgradesInProgress();
+      await getUpgradesSuccess();
       await getUpgradesError();
 
       if (totalInProgressTasks === 0) {
@@ -72,6 +98,9 @@ export const useGetUpgradeTasks = reload => {
     getInProgressIsLoading,
     totalInProgressTasks,
     getInProgressError,
+    getSuccessIsLoading,
+    totalSuccessTasks,
+    getSuccessError,
     getErrorIsLoading,
     totalErrorUpgradeTasks,
     getErrorTasksError,

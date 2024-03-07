@@ -48,9 +48,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
-                  />
-                  <div
-                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <a
                       class="euiButtonEmpty euiButtonEmpty--primary"
@@ -227,6 +224,9 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
               </div>
             </div>
           </div>
+          <div
+            class="euiFlexItem"
+          />
           <div
             class="euiFlexItem"
           >
@@ -703,9 +703,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
-                  />
-                  <div
-                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <a
                       class="euiButtonEmpty euiButtonEmpty--primary"
@@ -888,6 +885,9 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
               </div>
             </div>
           </div>
+          <div
+            class="euiFlexItem"
+          />
           <div
             class="euiFlexItem"
           >
@@ -1317,9 +1317,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
-                  />
-                  <div
-                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <a
                       class="euiButtonEmpty euiButtonEmpty--primary"
@@ -1502,6 +1499,9 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
               </div>
             </div>
           </div>
+          <div
+            class="euiFlexItem"
+          />
           <div
             class="euiFlexItem"
           >

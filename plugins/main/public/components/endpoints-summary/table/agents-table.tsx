@@ -229,11 +229,9 @@ export const AgentsTable = compose(
           <TableWzAPI
             title='Agents'
             addOnTitle={selectedtemsRenderer}
+            extra={<AgentUpgradesInProgress reload={reloadTable} />}
             actionButtons={({ filters }) => (
               <>
-                <EuiFlexItem grow={false}>
-                  <AgentUpgradesInProgress reload={reloadTable} />
-                </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   <WzButtonPermissions
                     buttonType='empty'
