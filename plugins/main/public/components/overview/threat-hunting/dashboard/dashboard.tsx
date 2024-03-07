@@ -18,9 +18,9 @@ interface DashboardThreatHuntingProps {
   pinnedAgent: Filter;
 }
 
-export const DashboardThreatHunting: React.FC<
-  DashboardThreatHuntingProps
-> = props => {
+export const DashboardThreatHunting: React.FC<DashboardThreatHuntingProps> = ({
+  pinnedAgent,
+}) => {
   const TH_INDEX_PATTERN_ID = WAZUH_ALERTS_PATTERN;
 
   const { searchBarProps } = useSearchBar({
@@ -63,7 +63,7 @@ export const DashboardThreatHunting: React.FC<
       <DashboardByRenderer
         input={{
           viewMode: ViewMode.VIEW,
-          panels: getDashboardPanels(TH_INDEX_PATTERN_ID),
+          panels: getDashboardPanels(TH_INDEX_PATTERN_ID, !!pinnedAgent),
           isFullScreenMode: false,
           filters: searchBarProps.filters ?? [],
           useMargins: true,

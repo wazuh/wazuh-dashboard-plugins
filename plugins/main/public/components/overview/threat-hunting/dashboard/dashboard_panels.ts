@@ -149,6 +149,304 @@ const getVisStateTop10AlertLevelEvolution = (indexPatternId: string) => {
   };
 };
 
+const getVisStatePinnedAgentTop10AlertGroupsEvolution = (
+  indexPatternId: string,
+) => {
+  return {
+    id: 'Wazuh-App-Agents-General-Alert-groups-evolution',
+    title: 'Top 10 Alert groups evolution',
+    type: 'area',
+    params: {
+      type: 'area',
+      grid: {
+        categoryLines: true,
+        style: {
+          color: '#eee',
+        },
+        valueAxis: 'ValueAxis-1',
+      },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+          },
+          labels: {
+            show: true,
+            filter: true,
+            truncate: 100,
+          },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+            mode: 'normal',
+          },
+          labels: {
+            show: true,
+            rotate: 0,
+            filter: false,
+            truncate: 100,
+          },
+          title: {
+            text: 'Count',
+          },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'area',
+          mode: 'stacked',
+          data: {
+            label: 'Count',
+            id: '1',
+          },
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+          interpolate: 'cardinal',
+          valueAxis: 'ValueAxis-1',
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      thresholdLine: {
+        show: false,
+        value: 10,
+        width: 1,
+        style: 'full',
+        color: '#E7664C',
+      },
+      labels: {},
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {},
+          schema: 'metric',
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'rule.groups',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+          schema: 'group',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'date_histogram',
+          params: {
+            field: 'timestamp',
+            timeRange: {
+              from: 'now-1M',
+              to: 'now',
+            },
+            useNormalizedOpenSearchInterval: true,
+            scaleMetricValues: false,
+            interval: 'auto',
+            drop_partials: false,
+            min_doc_count: 1,
+            extended_bounds: {},
+          },
+          schema: 'segment',
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateTop5Alerts = (indexPatternId: string) => {
+  return {
+    id: 'Wazuh-App-Agents-General-Alerts',
+    title: 'Top 10 Alerts',
+    type: 'area',
+    params: {
+      type: 'area',
+      grid: {
+        categoryLines: true,
+        style: {
+          color: '#eee',
+        },
+        valueAxis: 'ValueAxis-1',
+      },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+          },
+          labels: {
+            show: true,
+            filter: true,
+            truncate: 100,
+          },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+            mode: 'normal',
+          },
+          labels: {
+            show: true,
+            rotate: 0,
+            filter: false,
+            truncate: 100,
+          },
+          title: {
+            text: 'Count',
+          },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'area',
+          mode: 'stacked',
+          data: {
+            label: 'Count',
+            id: '1',
+          },
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+          interpolate: 'cardinal',
+          valueAxis: 'ValueAxis-1',
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      thresholdLine: {
+        show: false,
+        value: 10,
+        width: 1,
+        style: 'full',
+        color: '#E7664C',
+      },
+      labels: {},
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {},
+          schema: 'metric',
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'rule.level',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+          schema: 'group',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'date_histogram',
+          params: {
+            field: 'timestamp',
+            timeRange: {
+              from: 'now-1M',
+              to: 'now',
+            },
+            useNormalizedOpenSearchInterval: true,
+            scaleMetricValues: false,
+            interval: 'auto',
+            drop_partials: false,
+            min_doc_count: 1,
+            extended_bounds: {},
+          },
+          schema: 'segment',
+        },
+      ],
+    },
+  };
+};
+
 const getVisStateTop10MITREATTACKS = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-General-Alerts-Top-Mitre',
@@ -381,12 +679,73 @@ const getVisStateAlertEvolutionTop5Agents = (indexPatternId: string) => {
 
 export const getDashboardPanels = (
   indexPatternId: string,
+  pinnedAgent?: boolean,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }
   >;
 } => {
-  return {
+  const pinnedAgentPanels = {
+    '5': {
+      gridData: {
+        w: 24,
+        h: 13,
+        x: 0,
+        y: 0,
+        i: '5',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '5',
+        savedVis:
+          getVisStatePinnedAgentTop10AlertGroupsEvolution(indexPatternId),
+      },
+    },
+    '6': {
+      gridData: {
+        w: 24,
+        h: 13,
+        x: 24,
+        y: 0,
+        i: '6',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '6',
+        savedVis: getVisStateTop5Alerts(indexPatternId),
+      },
+    },
+    '3': {
+      gridData: {
+        w: 15,
+        h: 12,
+        x: 0,
+        y: 13,
+        i: '3',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '3',
+        savedVis: getVisStateTop5Agents(indexPatternId),
+      },
+    },
+    '4': {
+      gridData: {
+        w: 33,
+        h: 12,
+        x: 15,
+        y: 13,
+        i: '4',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '4',
+        savedVis: getVisStateAlertEvolutionTop5Agents(indexPatternId),
+      },
+    },
+  };
+
+  const panels = {
     '1': {
       gridData: {
         w: 28,
@@ -444,4 +803,6 @@ export const getDashboardPanels = (
       },
     },
   };
+
+  return pinnedAgent ? pinnedAgentPanels : panels;
 };
