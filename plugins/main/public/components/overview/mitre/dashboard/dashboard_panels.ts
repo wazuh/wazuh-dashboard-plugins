@@ -552,7 +552,7 @@ const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
 const getVisStateTechniqueByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Attacks-By-Agent',
-    title: 'attack by agent',
+    title: 'Attack by agent',
     type: 'pie',
     params: {
       type: 'pie',
