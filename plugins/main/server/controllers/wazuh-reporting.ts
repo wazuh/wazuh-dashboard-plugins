@@ -10,9 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import path from 'path';
-import fs from 'fs';
 import { WAZUH_MODULES } from '../../common/wazuh-modules';
-import * as TimSort from 'timsort';
 import { ErrorResponse } from '../lib/error-response';
 import ProcessEquivalence from '../lib/process-state-equivalence';
 import { KeyEquivalence } from '../../common/csv-key-equivalence';
@@ -1329,128 +1327,6 @@ export class WazuhReportingCtrl {
       ({ params: { agentID } }) =>
         `wazuh-agent-inventory-${agentID}-${this.generateReportTimestamp()}.pdf`,
     );
-
-  /**
-   * Fetch the reports list
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Array<Object>} reports list or ErrorResponse
-   */
-  async getReports(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      context.wazuh.logger.debug('Fetching created reports');
-      const { hashUsername } = await context.wazuh.security.getCurrentUser(
-        request,
-        context,
-      );
-      createDataDirectoryIfNotExists();
-      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-      const userReportsDirectoryPath = path.join(
-        WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-        hashUsername,
-      );
-      createDirectoryIfNotExists(userReportsDirectoryPath);
-      context.wazuh.logger.debug(`Directory: ${userReportsDirectoryPath}`);
-
-      const sortReportsByDate = (a, b) =>
-        a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
-
-      const reports = fs.readdirSync(userReportsDirectoryPath).map(file => {
-        const stats = fs.statSync(userReportsDirectoryPath + '/' + file);
-        // Get the file creation time (bithtime). It returns the first value that is a truthy value of next file stats: birthtime, mtime, ctime and atime.
-        // This solves some OSs can have the bithtimeMs equal to 0 and returns the date like 1970-01-01
-        const birthTimeField = ['birthtime', 'mtime', 'ctime', 'atime'].find(
-          time => stats[`${time}Ms`],
-        );
-        return {
-          name: file,
-          size: stats.size,
-          date: stats[birthTimeField],
-        };
-      });
-      context.wazuh.logger.debug(
-        `Using TimSort for sorting ${reports.length} items`,
-      );
-      TimSort.sort(reports, sortReportsByDate);
-      context.wazuh.logger.debug(`Total reports: ${reports.length}`);
-      return response.ok({
-        body: { reports },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(error.message || error, 5031, 500, response);
-    }
-  }
-
-  /**
-   * Fetch specific report
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} report or ErrorResponse
-   */
-  getReportByName = this.checkReportsUserDirectoryIsValidRouteDecorator(
-    async (
-      context: RequestHandlerContext,
-      request: OpenSearchDashboardsRequest,
-      response: OpenSearchDashboardsResponseFactory,
-    ) => {
-      try {
-        context.wazuh.logger.debug(
-          `Getting ${context.wazuhEndpointParams.pathFilename} report`,
-        );
-        const reportFileBuffer = fs.readFileSync(
-          context.wazuhEndpointParams.pathFilename,
-        );
-        return response.ok({
-          headers: { 'Content-Type': 'application/pdf' },
-          body: reportFileBuffer,
-        });
-      } catch (error) {
-        context.wazuh.logger.error(error.message || error);
-        return ErrorResponse(error.message || error, 5030, 500, response);
-      }
-    },
-    request => request.params.name,
-  );
-
-  /**
-   * Delete specific report
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} status obj or ErrorResponse
-   */
-  deleteReportByName = this.checkReportsUserDirectoryIsValidRouteDecorator(
-    async (
-      context: RequestHandlerContext,
-      request: OpenSearchDashboardsRequest,
-      response: OpenSearchDashboardsResponseFactory,
-    ) => {
-      try {
-        context.wazuh.logger.debug(
-          `Deleting ${context.wazuhEndpointParams.pathFilename} report`,
-        );
-        fs.unlinkSync(context.wazuhEndpointParams.pathFilename);
-        context.wazuh.logger.info(
-          `${context.wazuhEndpointParams.pathFilename} report was deleted`,
-        );
-        return response.ok({
-          body: { error: 0 },
-        });
-      } catch (error) {
-        context.wazuh.logger.error(error.message || error);
-        return ErrorResponse(error.message || error, 5032, 500, response);
-      }
-    },
-    request => request.params.name,
-  );
 
   checkReportsUserDirectoryIsValidRouteDecorator(
     routeHandler,
