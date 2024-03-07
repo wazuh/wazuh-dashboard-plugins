@@ -6,6 +6,7 @@ import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
 import { getKPIsPanel } from './dashboard_panels_kpis';
+import { Filter } from '../../../../../../../src/plugins/data/common';
 
 const plugins = getPlugins();
 
@@ -13,7 +14,13 @@ const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-export const DashboardThreatHunting: React.FC = () => {
+interface DashboardThreatHuntingProps {
+  pinnedAgent: Filter;
+}
+
+export const DashboardThreatHunting: React.FC<
+  DashboardThreatHuntingProps
+> = props => {
   const TH_INDEX_PATTERN_ID = WAZUH_ALERTS_PATTERN;
 
   const { searchBarProps } = useSearchBar({
