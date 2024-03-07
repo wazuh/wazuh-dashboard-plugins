@@ -17,7 +17,6 @@ export const DashboardMITRE: React.FC = () => {
 
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: MITRE_INDEX_PATTERN_ID,
-    filters: [],
   });
 
   return (
@@ -26,7 +25,7 @@ export const DashboardMITRE: React.FC = () => {
         <SearchBar
           appName='mitre-searchbar'
           {...searchBarProps}
-          showDatePicker={false}
+          showDatePicker={true}
           showQueryInput={true}
           showQueryBar={true}
         />
