@@ -19,7 +19,6 @@ import WzDecoders from './decoders/main-decoders';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
 import WzLogs from './mg-logs/logs';
-import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
 import {
@@ -41,7 +40,6 @@ class WzManagementMain extends Component {
       <Fragment>
         {(section === 'groups' && <WzGroups {...this.props} />) ||
           (section === 'status' && <WzStatus />) ||
-          (section === 'reporting' && <WzReporting />) ||
           (section === 'statistics' && <WzStatistics />) ||
           (section === 'logs' && <WzLogs />) ||
           (section === 'configuration' && (

@@ -656,25 +656,6 @@ export const logs = {
   redirectTo: () => '/manager/?tab=logs',
 };
 
-export const reporting = {
-  category: 'wz-category-dashboard-management',
-  id: 'reporting',
-  title: i18n.translate('wz-app-reporting-title', {
-    defaultMessage: 'Reporting',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-reporting-breadcrumbLabel', {
-    defaultMessage: 'Reporting',
-  }),
-  description: i18n.translate('wz-app-reporting-description', {
-    defaultMessage: 'Check your stored Wazuh reports.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 702,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/manager/?tab=reporting',
-};
-
 export const settings = {
   category: 'wz-category-server-management',
   id: 'settings',
@@ -860,7 +841,6 @@ export const Applications = [
   statistics,
   logs,
   settings,
-  reporting,
   serverApis,
   sampleData,
   appSettings,
