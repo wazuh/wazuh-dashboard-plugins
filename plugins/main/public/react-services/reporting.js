@@ -22,6 +22,8 @@ import { getAngularModule, getDataPlugin, getToasts } from '../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
+import { exportResponseToFile } from './export-file';
+
 const app = getAngularModule();
 
 export class ReportingService {
@@ -123,18 +125,15 @@ export class ReportingService {
         tab === 'syscollector'
           ? `/reports/agents/${agents}/inventory`
           : `/reports/modules/${tab}`;
-      await WzRequest.genericReq('POST', apiEndpoint, data);
+      const response = await WzRequest.genericReq('POST', apiEndpoint, data, {
+        requestClientOptions: { responseType: 'blob' },
+      });
+
+      exportResponseToFile(response);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.showToast(
-        'success',
-        'Created report',
-        'Success. Go to Dashboard management > Reporting',
-        4000,
-      );
-      return;
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
@@ -174,18 +173,14 @@ export class ReportingService {
         type === 'agentConfig'
           ? `/reports/agents/${obj.id}`
           : `/reports/groups/${obj.name}`;
-      await WzRequest.genericReq('POST', apiEndpoint, data);
+      const response = await WzRequest.genericReq('POST', apiEndpoint, data, {
+        requestClientOptions: { responseType: 'blob' },
+      });
+      exportResponseToFile(response);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.showToast(
-        'success',
-        'Created report',
-        'Success. Go to Dashboard management > Reporting',
-        4000,
-      );
-      return;
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;

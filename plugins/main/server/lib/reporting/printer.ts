@@ -1,6 +1,6 @@
-import fs from 'fs';
 import path from 'path';
 import PdfPrinter from 'pdfmake/src/printer';
+import { Writable } from 'stream';
 import clockIconRaw from './clock-icon-raw';
 import filterIconRaw from './filter-icon-raw';
 import {
@@ -602,7 +602,7 @@ export class ReportPrinter {
     this.logger.debug('Time range and filters rendered');
   }
 
-  async print(reportPath: string) {
+  async print() {
     return new Promise((resolve, reject) => {
       try {
         const configuration = getConfiguration();
@@ -620,15 +620,22 @@ export class ReportPrinter {
           'customization.reports.footer',
         );
 
+        const buffers = [];
+        const pdfWritableStream = new Writable({
+          write(chunk, encoding, callback) {
+            buffers.push(chunk);
+            callback();
+          },
+        });
         const document = this._printer.createPdfKitDocument({
           ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }),
           content: this._content,
         });
 
         document.on('error', reject);
-        document.on('end', resolve);
+        document.on('end', () => resolve(Buffer.concat(buffers)));
 
-        document.pipe(fs.createWriteStream(reportPath));
+        document.pipe(pdfWritableStream);
         document.end();
       } catch (ex) {
         reject(ex);

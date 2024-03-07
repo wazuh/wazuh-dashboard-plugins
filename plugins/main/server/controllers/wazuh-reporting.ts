@@ -385,13 +385,15 @@ export class WazuhReportingCtrl {
           printer.addAgentsFilters(agentsFilter.agentsText);
         }
 
-        await printer.print(context.wazuhEndpointParams.pathFilename);
+        const buffer = await printer.print();
 
         return response.ok({
-          body: {
-            success: true,
-            message: `Report ${context.wazuhEndpointParams.filename} was created`,
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment;filename="${context.wazuhEndpointParams.filename}"`,
+            'Cache-Control': 'no-store,no-cache',
           },
+          body: buffer,
         });
       } catch (error) {
         return ErrorResponse(error.message || error, 5029, 500, response);
@@ -678,13 +680,15 @@ export class WazuhReportingCtrl {
           );
         }
 
-        await printer.print(context.wazuhEndpointParams.pathFilename);
+        const buffer = await printer.print();
 
         return response.ok({
-          body: {
-            success: true,
-            message: `Report ${context.wazuhEndpointParams.filename} was created`,
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment;filename="${context.wazuhEndpointParams.filename}"`,
+            'Cache-Control': 'no-store,no-cache',
           },
+          body: buffer,
         });
       } catch (error) {
         context.wazuh.logger.error(error.message || error);
@@ -1016,13 +1020,15 @@ export class WazuhReportingCtrl {
             }
           }
 
-          await printer.print(context.wazuhEndpointParams.pathFilename);
+          const buffer = await printer.print();
 
           return response.ok({
-            body: {
-              success: true,
-              message: `Report ${context.wazuhEndpointParams.filename} was created`,
+            headers: {
+              'Content-Type': 'application/pdf',
+              'Content-Disposition': `attachment;filename="${context.wazuhEndpointParams.filename}"`,
+              'Cache-Control': 'no-store,no-cache',
             },
+            body: buffer,
           });
         } catch (error) {
           context.wazuh.logger.debug(error.message || error);
@@ -1305,13 +1311,15 @@ export class WazuhReportingCtrl {
             .forEach(table => printer.addSimpleTable(table));
 
           // Print the document
-          await printer.print(context.wazuhEndpointParams.pathFilename);
+          const buffer = await printer.print();
 
           return response.ok({
-            body: {
-              success: true,
-              message: `Report ${context.wazuhEndpointParams.filename} was created`,
+            headers: {
+              'Content-Type': 'application/pdf',
+              'Content-Disposition': `attachment;filename="${context.wazuhEndpointParams.filename}"`,
+              'Cache-Control': 'no-store,no-cache',
             },
+            body: buffer,
           });
         } catch (error) {
           context.wazuh.logger.error(error.message || error);

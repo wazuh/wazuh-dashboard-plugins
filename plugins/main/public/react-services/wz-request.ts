@@ -36,10 +36,12 @@ export class WzRequest {
       shouldRetry?: boolean;
       checkCurrentApiIsUp?: boolean;
       overwriteHeaders?: any;
+      requestClientOptions?: any;
     } = {
       shouldRetry: true,
       checkCurrentApiIsUp: true,
       overwriteHeaders: {},
+      requestClientOptions: {},
     },
   ) {
     const shouldRetry =
@@ -53,6 +55,10 @@ export class WzRequest {
     const overwriteHeaders =
       typeof extraOptions.overwriteHeaders === 'object'
         ? extraOptions.overwriteHeaders
+        : {};
+    const requestClientOptions =
+      typeof extraOptions.requestClientOptions === 'object'
+        ? extraOptions.requestClientOptions
         : {};
     try {
       if (!method || !path) {
@@ -73,6 +79,7 @@ export class WzRequest {
         url: url,
         data: payload,
         timeout: timeout,
+        ...requestClientOptions,
       };
 
       const data = await request(options);
