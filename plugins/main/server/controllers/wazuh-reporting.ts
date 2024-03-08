@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import path from 'path';
 import { WAZUH_MODULES } from '../../common/wazuh-modules';
 import { ErrorResponse } from '../lib/error-response';
 import ProcessEquivalence from '../lib/process-state-equivalence';
@@ -26,15 +25,9 @@ import {
 } from '../lib/reporting/extended-information';
 import { ReportPrinter } from '../lib/reporting/printer';
 import {
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   AUTHORIZED_AGENTS,
   API_NAME_AGENT_STATUS,
 } from '../../common/constants';
-import {
-  createDirectoryIfNotExists,
-  createDataDirectoryIfNotExists,
-} from '../lib/filesystem';
 import { agentStatusLabelByAgentStatus } from '../../common/services/wz_agent_status';
 
 interface AgentsFilter {
