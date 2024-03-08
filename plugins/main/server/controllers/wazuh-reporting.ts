@@ -295,113 +295,102 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  createReportsModules = this.checkReportsUserDirectoryIsValidRouteDecorator(
-    async (
-      context: RequestHandlerContext,
-      request: OpenSearchDashboardsRequest,
-      response: OpenSearchDashboardsResponseFactory,
-    ) => {
-      try {
-        context.wazuh.logger.debug('Report started');
-        const {
-          array,
-          agents,
+  async createReportsModules(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      context.wazuh.logger.debug('Report started');
+      const {
+        array,
+        agents,
+        browserTimezone,
+        searchBar,
+        filters,
+        serverSideQuery,
+        time,
+        tables,
+        section,
+        indexPatternTitle,
+        apiId,
+      } = request.body;
+      const { moduleID } = request.params;
+      const { from, to } = time || {};
+      let additionalTables = [];
+      // Init
+      const printer = new ReportPrinter(
+        context.wazuh.logger.get('report-printer'),
+      );
+
+      await this.renderHeader(
+        context,
+        printer,
+        section,
+        moduleID,
+        agents,
+        apiId,
+      );
+
+      const [sanitizedFilters, agentsFilter] = filters
+        ? this.sanitizeKibanaFilters(context, filters, searchBar)
+        : [false, null];
+
+      if (time && sanitizedFilters) {
+        printer.addTimeRangeAndFilters(
+          from,
+          to,
+          sanitizedFilters,
           browserTimezone,
-          searchBar,
-          filters,
-          serverSideQuery,
-          time,
-          tables,
-          section,
-          indexPatternTitle,
-          apiId,
-        } = request.body;
-        const { moduleID } = request.params;
-        const { from, to } = time || {};
-        let additionalTables = [];
-        // Init
-        const printer = new ReportPrinter(
-          context.wazuh.logger.get('report-printer'),
         );
+      }
 
-        createDataDirectoryIfNotExists();
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(
-          path.join(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-            context.wazuhEndpointParams.hashUsername,
-          ),
-        );
-
-        await this.renderHeader(
+      if (time) {
+        additionalTables = await extendedInformation(
           context,
           printer,
           section,
           moduleID,
-          agents,
           apiId,
+          new Date(from).getTime(),
+          new Date(to).getTime(),
+          serverSideQuery,
+          agentsFilter,
+          indexPatternTitle,
+          agents,
         );
-
-        const [sanitizedFilters, agentsFilter] = filters
-          ? this.sanitizeKibanaFilters(context, filters, searchBar)
-          : [false, null];
-
-        if (time && sanitizedFilters) {
-          printer.addTimeRangeAndFilters(
-            from,
-            to,
-            sanitizedFilters,
-            browserTimezone,
-          );
-        }
-
-        if (time) {
-          additionalTables = await extendedInformation(
-            context,
-            printer,
-            section,
-            moduleID,
-            apiId,
-            new Date(from).getTime(),
-            new Date(to).getTime(),
-            serverSideQuery,
-            agentsFilter,
-            indexPatternTitle,
-            agents,
-          );
-        }
-
-        printer.addVisualizations(array, agents, moduleID);
-
-        if (tables) {
-          printer.addTables([...tables, ...(additionalTables || [])]);
-        }
-
-        //add authorized agents
-        if (agentsFilter?.agentsText) {
-          printer.addAgentsFilters(agentsFilter.agentsText);
-        }
-
-        const buffer = await printer.print();
-
-        return response.ok({
-          headers: {
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment;filename="${context.wazuhEndpointParams.filename}"`,
-            'Cache-Control': 'no-store,no-cache',
-          },
-          body: buffer,
-        });
-      } catch (error) {
-        return ErrorResponse(error.message || error, 5029, 500, response);
       }
-    },
-    ({ body: { agents }, params: { moduleID } }) =>
-      `wazuh-module-${
-        agents ? `agents-${agents}` : 'overview'
-      }-${moduleID}-${this.generateReportTimestamp()}.pdf`,
-  );
+
+      printer.addVisualizations(array, agents, moduleID);
+
+      if (tables) {
+        printer.addTables([...tables, ...(additionalTables || [])]);
+      }
+
+      //add authorized agents
+      if (agentsFilter?.agentsText) {
+        printer.addAgentsFilters(agentsFilter.agentsText);
+      }
+
+      const buffer = await printer.print();
+      const filename = `wazuh-module-${
+        request.body.agents
+          ? `agents-${request.body.agents.agents}`
+          : 'overview'
+      }-${request.params.moduleID}-${this.generateReportTimestamp()}.pdf`;
+
+      return response.ok({
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment;filename="${filename}"`,
+          'Cache-Control': 'no-store,no-cache',
+        },
+        body: buffer,
+      });
+    } catch (error) {
+      return ErrorResponse(error.message || error, 5029, 500, response);
+    }
+  }
 
   /**
    * Create a report for the groups
@@ -410,169 +399,135 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  createReportsGroups = this.checkReportsUserDirectoryIsValidRouteDecorator(
-    async (
-      context: RequestHandlerContext,
-      request: OpenSearchDashboardsRequest,
-      response: OpenSearchDashboardsResponseFactory,
-    ) => {
-      try {
-        context.wazuh.logger.debug('Report started');
-        const { components, apiId } = request.body;
-        const { groupID } = request.params;
-        // Init
-        const printer = new ReportPrinter(
-          context.wazuh.logger.get('report-printer'),
+  async createReportsGroups(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      context.wazuh.logger.debug('Report started');
+      const { components, apiId } = request.body;
+      const { groupID } = request.params;
+      // Init
+      const printer = new ReportPrinter(
+        context.wazuh.logger.get('report-printer'),
+      );
+
+      let tables = [];
+      const equivalences = {
+        localfile: 'Local files',
+        osquery: 'Osquery',
+        command: 'Command',
+        syscheck: 'Syscheck',
+        'open-scap': 'OpenSCAP',
+        'cis-cat': 'CIS-CAT',
+        syscollector: 'Syscollector',
+        rootcheck: 'Rootcheck',
+        labels: 'Labels',
+        sca: 'Security configuration assessment',
+      };
+      printer.addContent({
+        text: `Group ${groupID} configuration`,
+        style: 'h1',
+      });
+
+      // Group configuration
+      if (components['0']) {
+        const {
+          data: { data: configuration },
+        } = await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          `/groups/${groupID}/configuration`,
+          {},
+          { apiHostID: apiId },
         );
 
-        createDataDirectoryIfNotExists();
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(
-          path.join(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-            context.wazuhEndpointParams.hashUsername,
-          ),
-        );
-
-        let tables = [];
-        const equivalences = {
-          localfile: 'Local files',
-          osquery: 'Osquery',
-          command: 'Command',
-          syscheck: 'Syscheck',
-          'open-scap': 'OpenSCAP',
-          'cis-cat': 'CIS-CAT',
-          syscollector: 'Syscollector',
-          rootcheck: 'Rootcheck',
-          labels: 'Labels',
-          sca: 'Security configuration assessment',
-        };
-        printer.addContent({
-          text: `Group ${groupID} configuration`,
-          style: 'h1',
-        });
-
-        // Group configuration
-        if (components['0']) {
-          const {
-            data: { data: configuration },
-          } = await context.wazuh.api.client.asCurrentUser.request(
-            'GET',
-            `/groups/${groupID}/configuration`,
-            {},
-            { apiHostID: apiId },
-          );
-
-          if (
-            configuration.affected_items.length > 0 &&
-            Object.keys(configuration.affected_items[0].config).length
-          ) {
-            printer.addContent({
-              text: 'Configurations',
-              style: { fontSize: 14, color: '#000' },
-              margin: [0, 10, 0, 15],
-            });
-            const section = {
-              labels: [],
-              isGroupConfig: true,
-            };
-            for (let config of configuration.affected_items) {
-              let filterTitle = '';
-              let index = 0;
-              for (let filter of Object.keys(config.filters)) {
-                filterTitle = filterTitle.concat(
-                  `${filter}: ${config.filters[filter]}`,
-                );
-                if (index < Object.keys(config.filters).length - 1) {
-                  filterTitle = filterTitle.concat(' | ');
-                }
-                index++;
+        if (
+          configuration.affected_items.length > 0 &&
+          Object.keys(configuration.affected_items[0].config).length
+        ) {
+          printer.addContent({
+            text: 'Configurations',
+            style: { fontSize: 14, color: '#000' },
+            margin: [0, 10, 0, 15],
+          });
+          const section = {
+            labels: [],
+            isGroupConfig: true,
+          };
+          for (let config of configuration.affected_items) {
+            let filterTitle = '';
+            let index = 0;
+            for (let filter of Object.keys(config.filters)) {
+              filterTitle = filterTitle.concat(
+                `${filter}: ${config.filters[filter]}`,
+              );
+              if (index < Object.keys(config.filters).length - 1) {
+                filterTitle = filterTitle.concat(' | ');
               }
-              printer.addContent({
-                text: filterTitle,
-                style: 'h4',
-                margin: [0, 0, 0, 10],
-              });
-              let idx = 0;
-              section.tabs = [];
-              for (let _d of Object.keys(config.config)) {
-                for (let c of AgentConfiguration.configurations) {
-                  for (let s of c.sections) {
-                    section.opts = s.opts || {};
-                    for (let cn of s.config || []) {
-                      if (cn.configuration === _d) {
-                        section.labels = s.labels || [[]];
-                      }
+              index++;
+            }
+            printer.addContent({
+              text: filterTitle,
+              style: 'h4',
+              margin: [0, 0, 0, 10],
+            });
+            let idx = 0;
+            section.tabs = [];
+            for (let _d of Object.keys(config.config)) {
+              for (let c of AgentConfiguration.configurations) {
+                for (let s of c.sections) {
+                  section.opts = s.opts || {};
+                  for (let cn of s.config || []) {
+                    if (cn.configuration === _d) {
+                      section.labels = s.labels || [[]];
                     }
-                    for (let wo of s.wodle || []) {
-                      if (wo.name === _d) {
-                        section.labels = s.labels || [[]];
-                      }
+                  }
+                  for (let wo of s.wodle || []) {
+                    if (wo.name === _d) {
+                      section.labels = s.labels || [[]];
                     }
                   }
                 }
-                section.labels[0]['pack'] = 'Packs';
-                section.labels[0]['content'] = 'Evaluations';
-                section.labels[0]['7'] = 'Scan listening netwotk ports';
-                section.tabs.push(equivalences[_d]);
+              }
+              section.labels[0]['pack'] = 'Packs';
+              section.labels[0]['content'] = 'Evaluations';
+              section.labels[0]['7'] = 'Scan listening netwotk ports';
+              section.tabs.push(equivalences[_d]);
 
-                if (Array.isArray(config.config[_d])) {
-                  /* LOG COLLECTOR */
-                  if (_d === 'localfile') {
-                    let groups = [];
-                    config.config[_d].forEach(obj => {
-                      if (!groups[obj.logformat]) {
-                        groups[obj.logformat] = [];
-                      }
-                      groups[obj.logformat].push(obj);
-                    });
-                    Object.keys(groups).forEach(group => {
-                      let saveidx = 0;
-                      groups[group].forEach((x, i) => {
-                        if (
-                          Object.keys(x).length >
-                          Object.keys(groups[group][saveidx]).length
-                        ) {
-                          saveidx = i;
-                        }
-                      });
-                      const columns = Object.keys(groups[group][saveidx]);
-                      const rows = groups[group].map(x => {
-                        let row = [];
-                        columns.forEach(key => {
-                          row.push(
-                            typeof x[key] !== 'object'
-                              ? x[key]
-                              : Array.isArray(x[key])
-                              ? x[key].map(x => {
-                                  return x + '\n';
-                                })
-                              : JSON.stringify(x[key]),
-                          );
-                        });
-                        return row;
-                      });
-                      columns.forEach((col, i) => {
-                        columns[i] = col[0].toUpperCase() + col.slice(1);
-                      });
-                      tables.push({
-                        title: 'Local files',
-                        type: 'table',
-                        columns,
-                        rows,
-                      });
-                    });
-                  } else if (_d === 'labels') {
-                    const obj = config.config[_d][0].label;
-                    const columns = Object.keys(obj[0]);
-                    if (!columns.includes('hidden')) {
-                      columns.push('hidden');
+              if (Array.isArray(config.config[_d])) {
+                /* LOG COLLECTOR */
+                if (_d === 'localfile') {
+                  let groups = [];
+                  config.config[_d].forEach(obj => {
+                    if (!groups[obj.logformat]) {
+                      groups[obj.logformat] = [];
                     }
-                    const rows = obj.map(x => {
+                    groups[obj.logformat].push(obj);
+                  });
+                  Object.keys(groups).forEach(group => {
+                    let saveidx = 0;
+                    groups[group].forEach((x, i) => {
+                      if (
+                        Object.keys(x).length >
+                        Object.keys(groups[group][saveidx]).length
+                      ) {
+                        saveidx = i;
+                      }
+                    });
+                    const columns = Object.keys(groups[group][saveidx]);
+                    const rows = groups[group].map(x => {
                       let row = [];
                       columns.forEach(key => {
-                        row.push(x[key]);
+                        row.push(
+                          typeof x[key] !== 'object'
+                            ? x[key]
+                            : Array.isArray(x[key])
+                            ? x[key].map(x => {
+                                return x + '\n';
+                              })
+                            : JSON.stringify(x[key]),
+                        );
                       });
                       return row;
                     });
@@ -580,122 +535,447 @@ export class WazuhReportingCtrl {
                       columns[i] = col[0].toUpperCase() + col.slice(1);
                     });
                     tables.push({
-                      title: 'Labels',
+                      title: 'Local files',
                       type: 'table',
                       columns,
                       rows,
                     });
-                  } else {
-                    for (let _d2 of config.config[_d]) {
-                      tables.push(
-                        ...this.getConfigTables(context, _d2, section, idx),
-                      );
+                  });
+                } else if (_d === 'labels') {
+                  const obj = config.config[_d][0].label;
+                  const columns = Object.keys(obj[0]);
+                  if (!columns.includes('hidden')) {
+                    columns.push('hidden');
+                  }
+                  const rows = obj.map(x => {
+                    let row = [];
+                    columns.forEach(key => {
+                      row.push(x[key]);
+                    });
+                    return row;
+                  });
+                  columns.forEach((col, i) => {
+                    columns[i] = col[0].toUpperCase() + col.slice(1);
+                  });
+                  tables.push({
+                    title: 'Labels',
+                    type: 'table',
+                    columns,
+                    rows,
+                  });
+                } else {
+                  for (let _d2 of config.config[_d]) {
+                    tables.push(
+                      ...this.getConfigTables(context, _d2, section, idx),
+                    );
+                  }
+                }
+              } else {
+                /*INTEGRITY MONITORING MONITORED DIRECTORIES */
+                if (config.config[_d].directories) {
+                  const directories = config.config[_d].directories;
+                  delete config.config[_d].directories;
+                  tables.push(
+                    ...this.getConfigTables(
+                      context,
+                      config.config[_d],
+                      section,
+                      idx,
+                    ),
+                  );
+                  let diffOpts = [];
+                  Object.keys(section.opts).forEach(x => {
+                    diffOpts.push(x);
+                  });
+                  const columns = [
+                    '',
+                    ...diffOpts.filter(
+                      x => x !== 'check_all' && x !== 'check_sum',
+                    ),
+                  ];
+                  let rows = [];
+                  directories.forEach(x => {
+                    let row = [];
+                    row.push(x.path);
+                    columns.forEach(y => {
+                      if (y !== '') {
+                        y = y !== 'check_whodata' ? y : 'whodata';
+                        row.push(x[y] ? x[y] : 'no');
+                      }
+                    });
+                    row.push(x.recursion_level);
+                    rows.push(row);
+                  });
+                  columns.forEach((x, idx) => {
+                    columns[idx] = section.opts[x];
+                  });
+                  columns.push('RL');
+                  tables.push({
+                    title: 'Monitored directories',
+                    type: 'table',
+                    columns,
+                    rows,
+                  });
+                } else {
+                  tables.push(
+                    ...this.getConfigTables(
+                      context,
+                      config.config[_d],
+                      section,
+                      idx,
+                    ),
+                  );
+                }
+              }
+              for (const table of tables) {
+                printer.addConfigTables([table]);
+              }
+              idx++;
+              tables = [];
+            }
+            tables = [];
+          }
+        } else {
+          printer.addContent({
+            text: 'A configuration for this group has not yet been set up.',
+            style: { fontSize: 12, color: '#000' },
+            margin: [0, 10, 0, 15],
+          });
+        }
+      }
+
+      // Agents in group
+      if (components['1']) {
+        await this.renderHeader(
+          context,
+          printer,
+          'groupConfig',
+          groupID,
+          [],
+          apiId,
+        );
+      }
+
+      const buffer = await printer.print();
+      const filename = `wazuh-group-configuration-${
+        request.params.groupID
+      }-${this.generateReportTimestamp()}.pdf`;
+
+      return response.ok({
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment;filename="${filename}"`,
+          'Cache-Control': 'no-store,no-cache',
+        },
+        body: buffer,
+      });
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(error.message || error, 5029, 500, response);
+    }
+  }
+
+  /**
+   * Create a report for the agents
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {*} reports list or ErrorResponse
+   */
+  async createReportsAgentsConfiguration(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      context.wazuh.logger.debug('Report started');
+      const { components, apiId } = request.body;
+      const { agentID } = request.params;
+
+      const printer = new ReportPrinter(
+        context.wazuh.logger.get('report-printer'),
+      );
+
+      let wmodulesResponse = {};
+      let tables = [];
+      try {
+        wmodulesResponse = await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          `/agents/${agentID}/config/wmodules/wmodules`,
+          {},
+          { apiHostID: apiId },
+        );
+      } catch (error) {
+        context.wazuh.logger.debug(error.message || error);
+      }
+
+      await this.renderHeader(
+        context,
+        printer,
+        'agentConfig',
+        'agentConfig',
+        agentID,
+        apiId,
+      );
+
+      let idxComponent = 0;
+      for (let config of AgentConfiguration.configurations) {
+        let titleOfSection = false;
+        context.wazuh.logger.debug(
+          `Iterate over ${config.sections.length} configuration sections`,
+        );
+        for (let section of config.sections) {
+          let titleOfSubsection = false;
+          if (components[idxComponent] && (section.config || section.wodle)) {
+            let idx = 0;
+            const configs = (section.config || []).concat(section.wodle || []);
+            context.wazuh.logger.debug(
+              `Iterate over ${configs.length} configuration blocks`,
+            );
+            for (let conf of configs) {
+              let agentConfigResponse = {};
+              try {
+                if (!conf['name']) {
+                  agentConfigResponse =
+                    await context.wazuh.api.client.asCurrentUser.request(
+                      'GET',
+                      `/agents/${agentID}/config/${conf.component}/${conf.configuration}`,
+                      {},
+                      { apiHostID: apiId },
+                    );
+                } else {
+                  for (let wodle of wmodulesResponse.data.data['wmodules']) {
+                    if (Object.keys(wodle)[0] === conf['name']) {
+                      agentConfigResponse.data = {
+                        data: wodle,
+                      };
+                    }
+                  }
+                }
+
+                const agentConfig =
+                  agentConfigResponse &&
+                  agentConfigResponse.data &&
+                  agentConfigResponse.data.data;
+                if (!titleOfSection) {
+                  printer.addContent({
+                    text: config.title,
+                    style: 'h1',
+                    margin: [0, 0, 0, 15],
+                  });
+                  titleOfSection = true;
+                }
+                if (!titleOfSubsection) {
+                  printer.addContent({
+                    text: section.subtitle,
+                    style: 'h4',
+                  });
+                  printer.addContent({
+                    text: section.desc,
+                    style: { fontSize: 12, color: '#000' },
+                    margin: [0, 0, 0, 10],
+                  });
+                  titleOfSubsection = true;
+                }
+                if (agentConfig) {
+                  for (let agentConfigKey of Object.keys(agentConfig)) {
+                    if (Array.isArray(agentConfig[agentConfigKey])) {
+                      /* LOG COLLECTOR */
+                      if (conf.filterBy) {
+                        let groups = [];
+                        agentConfig[agentConfigKey].forEach(obj => {
+                          if (!groups[obj.logformat]) {
+                            groups[obj.logformat] = [];
+                          }
+                          groups[obj.logformat].push(obj);
+                        });
+                        Object.keys(groups).forEach(group => {
+                          let saveidx = 0;
+                          groups[group].forEach((x, i) => {
+                            if (
+                              Object.keys(x).length >
+                              Object.keys(groups[group][saveidx]).length
+                            ) {
+                              saveidx = i;
+                            }
+                          });
+                          const columns = Object.keys(groups[group][saveidx]);
+                          const rows = groups[group].map(x => {
+                            let row = [];
+                            columns.forEach(key => {
+                              row.push(
+                                typeof x[key] !== 'object'
+                                  ? x[key]
+                                  : Array.isArray(x[key])
+                                  ? x[key].map(x => {
+                                      return x + '\n';
+                                    })
+                                  : JSON.stringify(x[key]),
+                              );
+                            });
+                            return row;
+                          });
+                          columns.forEach((col, i) => {
+                            columns[i] = col[0].toUpperCase() + col.slice(1);
+                          });
+                          tables.push({
+                            title: section.labels[0][group],
+                            type: 'table',
+                            columns,
+                            rows,
+                          });
+                        });
+                      } else if (agentConfigKey.configuration !== 'socket') {
+                        tables.push(
+                          ...this.getConfigTables(
+                            context,
+                            agentConfig[agentConfigKey],
+                            section,
+                            idx,
+                          ),
+                        );
+                      } else {
+                        for (let _d2 of agentConfig[agentConfigKey]) {
+                          tables.push(
+                            ...this.getConfigTables(context, _d2, section, idx),
+                          );
+                        }
+                      }
+                    } else {
+                      /* INTEGRITY MONITORING MONITORED DIRECTORIES */
+                      if (conf.matrix) {
+                        const {
+                          directories,
+                          diff,
+                          synchronization,
+                          file_limit,
+                          ...rest
+                        } = agentConfig[agentConfigKey];
+                        tables.push(
+                          ...this.getConfigTables(context, rest, section, idx),
+                          ...(diff && diff.disk_quota
+                            ? this.getConfigTables(
+                                context,
+                                diff.disk_quota,
+                                { tabs: ['Disk quota'] },
+                                0,
+                              )
+                            : []),
+                          ...(diff && diff.file_size
+                            ? this.getConfigTables(
+                                context,
+                                diff.file_size,
+                                { tabs: ['File size'] },
+                                0,
+                              )
+                            : []),
+                          ...(synchronization
+                            ? this.getConfigTables(
+                                context,
+                                synchronization,
+                                { tabs: ['Synchronization'] },
+                                0,
+                              )
+                            : []),
+                          ...(file_limit
+                            ? this.getConfigTables(
+                                context,
+                                file_limit,
+                                { tabs: ['File limit'] },
+                                0,
+                              )
+                            : []),
+                        );
+                        let diffOpts = [];
+                        Object.keys(section.opts).forEach(x => {
+                          diffOpts.push(x);
+                        });
+                        const columns = [
+                          '',
+                          ...diffOpts.filter(
+                            x => x !== 'check_all' && x !== 'check_sum',
+                          ),
+                        ];
+                        let rows = [];
+                        directories.forEach(x => {
+                          let row = [];
+                          row.push(x.dir);
+                          columns.forEach(y => {
+                            if (y !== '') {
+                              row.push(x.opts.indexOf(y) > -1 ? 'yes' : 'no');
+                            }
+                          });
+                          row.push(x.recursion_level);
+                          rows.push(row);
+                        });
+                        columns.forEach((x, idx) => {
+                          columns[idx] = section.opts[x];
+                        });
+                        columns.push('RL');
+                        tables.push({
+                          title: 'Monitored directories',
+                          type: 'table',
+                          columns,
+                          rows,
+                        });
+                      } else {
+                        tables.push(
+                          ...this.getConfigTables(
+                            context,
+                            agentConfig[agentConfigKey],
+                            section,
+                            idx,
+                          ),
+                        );
+                      }
                     }
                   }
                 } else {
-                  /*INTEGRITY MONITORING MONITORED DIRECTORIES */
-                  if (config.config[_d].directories) {
-                    const directories = config.config[_d].directories;
-                    delete config.config[_d].directories;
-                    tables.push(
-                      ...this.getConfigTables(
-                        context,
-                        config.config[_d],
-                        section,
-                        idx,
-                      ),
-                    );
-                    let diffOpts = [];
-                    Object.keys(section.opts).forEach(x => {
-                      diffOpts.push(x);
-                    });
-                    const columns = [
-                      '',
-                      ...diffOpts.filter(
-                        x => x !== 'check_all' && x !== 'check_sum',
-                      ),
-                    ];
-                    let rows = [];
-                    directories.forEach(x => {
-                      let row = [];
-                      row.push(x.path);
-                      columns.forEach(y => {
-                        if (y !== '') {
-                          y = y !== 'check_whodata' ? y : 'whodata';
-                          row.push(x[y] ? x[y] : 'no');
-                        }
-                      });
-                      row.push(x.recursion_level);
-                      rows.push(row);
-                    });
-                    columns.forEach((x, idx) => {
-                      columns[idx] = section.opts[x];
-                    });
-                    columns.push('RL');
-                    tables.push({
-                      title: 'Monitored directories',
-                      type: 'table',
-                      columns,
-                      rows,
-                    });
-                  } else {
-                    tables.push(
-                      ...this.getConfigTables(
-                        context,
-                        config.config[_d],
-                        section,
-                        idx,
-                      ),
-                    );
-                  }
+                  // Print no configured module and link to the documentation
+                  printer.addContent({
+                    text: [
+                      'This module is not configured. Please take a look on how to configure it in ',
+                      {
+                        text: `${section.subtitle.toLowerCase()} configuration.`,
+                        link: section.docuLink,
+                        style: { fontSize: 12, color: '#1a0dab' },
+                      },
+                    ],
+                    margin: [0, 0, 0, 20],
+                  });
                 }
-                for (const table of tables) {
-                  printer.addConfigTables([table]);
-                }
-                idx++;
-                tables = [];
+              } catch (error) {
+                context.wazuh.logger.debug(error.message || error);
               }
-              tables = [];
+              idx++;
             }
-          } else {
-            printer.addContent({
-              text: 'A configuration for this group has not yet been set up.',
-              style: { fontSize: 12, color: '#000' },
-              margin: [0, 10, 0, 15],
-            });
+            for (const table of tables) {
+              printer.addConfigTables([table]);
+            }
           }
+          idxComponent++;
+          tables = [];
         }
-
-        // Agents in group
-        if (components['1']) {
-          await this.renderHeader(
-            context,
-            printer,
-            'groupConfig',
-            groupID,
-            [],
-            apiId,
-          );
-        }
-
-        const buffer = await printer.print();
-
-        return response.ok({
-          headers: {
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment;filename="${context.wazuhEndpointParams.filename}"`,
-            'Cache-Control': 'no-store,no-cache',
-          },
-          body: buffer,
-        });
-      } catch (error) {
-        context.wazuh.logger.error(error.message || error);
-        return ErrorResponse(error.message || error, 5029, 500, response);
       }
-    },
-    ({ params: { groupID } }) =>
-      `wazuh-group-configuration-${groupID}-${this.generateReportTimestamp()}.pdf`,
-  );
+
+      const buffer = await printer.print();
+      const filename = `wazuh-agent-configuration-${
+        request.params.agentID
+      }-${this.generateReportTimestamp()}.pdf`;
+
+      return response.ok({
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment;filename="${filename}"`,
+          'Cache-Control': 'no-store,no-cache',
+        },
+        body: buffer,
+      });
+    } catch (error) {
+      context.wazuh.logger.debug(error.message || error);
+      return ErrorResponse(error.message || error, 5029, 500, response);
+    }
+  }
 
   /**
    * Create a report for the agents
@@ -704,680 +984,270 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  createReportsAgentsConfiguration =
-    this.checkReportsUserDirectoryIsValidRouteDecorator(
-      async (
-        context: RequestHandlerContext,
-        request: OpenSearchDashboardsRequest,
-        response: OpenSearchDashboardsResponseFactory,
-      ) => {
+  async createReportsAgentsInventory(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      context.wazuh.logger.debug('Report started');
+      const {
+        searchBar,
+        filters,
+        time,
+        indexPatternTitle,
+        apiId,
+        serverSideQuery,
+      } = request.body;
+      const { agentID } = request.params;
+      const { from, to } = time || {};
+      // Init
+      const printer = new ReportPrinter(
+        context.wazuh.logger.get('report-printer'),
+      );
+
+      context.wazuh.logger.debug('Syscollector report');
+      const [sanitizedFilters, agentsFilter] = filters
+        ? this.sanitizeKibanaFilters(context, filters, searchBar)
+        : [false, null];
+
+      // Get the agent OS
+      let agentOs = '';
+      let isAgentWindows = false;
+      let isAgentLinux = false;
+      try {
+        const agentResponse =
+          await context.wazuh.api.client.asCurrentUser.request(
+            'GET',
+            `/agents?agents_list=${agentID}`,
+            {},
+            { apiHostID: apiId },
+          );
+        isAgentWindows =
+          agentResponse?.data?.data?.affected_items?.[0].os?.platform ===
+          'windows';
+        isAgentLinux =
+          agentResponse?.data?.data?.affected_items?.[0].os?.uname?.includes(
+            'Linux',
+          );
+        agentOs =
+          (isAgentWindows && 'windows') || (isAgentLinux && 'linux') || '';
+      } catch (error) {
+        context.wazuh.logger.debug(error.message || error);
+      }
+
+      // Add title
+      printer.addContentWithNewLine({
+        text: 'Inventory data report',
+        style: 'h1',
+      });
+
+      // Add table with the agent info
+      await buildAgentsTable(context, printer, [agentID], apiId);
+
+      // Get syscollector packages and processes
+      const agentRequestsInventory = [
+        {
+          endpoint: `/syscollector/${agentID}/packages`,
+          loggerMessage: `Fetching packages for agent ${agentID}`,
+          table: {
+            title: 'Packages',
+            columns:
+              agentOs === 'windows'
+                ? [
+                    { id: 'name', label: 'Name' },
+                    { id: 'architecture', label: 'Architecture' },
+                    { id: 'version', label: 'Version' },
+                    { id: 'vendor', label: 'Vendor' },
+                  ]
+                : [
+                    { id: 'name', label: 'Name' },
+                    { id: 'architecture', label: 'Architecture' },
+                    { id: 'version', label: 'Version' },
+                    { id: 'vendor', label: 'Vendor' },
+                    { id: 'description', label: 'Description' },
+                  ],
+          },
+        },
+        {
+          endpoint: `/syscollector/${agentID}/processes`,
+          loggerMessage: `Fetching processes for agent ${agentID}`,
+          table: {
+            title: 'Processes',
+            columns:
+              agentOs === 'windows'
+                ? [
+                    { id: 'name', label: 'Name' },
+                    { id: 'cmd', label: 'CMD' },
+                    { id: 'priority', label: 'Priority' },
+                    { id: 'nlwp', label: 'NLWP' },
+                  ]
+                : [
+                    { id: 'name', label: 'Name' },
+                    { id: 'euser', label: 'Effective user' },
+                    { id: 'nice', label: 'Priority' },
+                    { id: 'state', label: 'State' },
+                  ],
+          },
+          mapResponseItems: item =>
+            agentOs === 'windows'
+              ? item
+              : { ...item, state: ProcessEquivalence[item.state] },
+        },
+        {
+          endpoint: `/syscollector/${agentID}/ports`,
+          loggerMessage: `Fetching ports for agent ${agentID}`,
+          table: {
+            title: 'Network ports',
+            columns:
+              agentOs === 'windows'
+                ? [
+                    { id: 'local_port', label: 'Local port' },
+                    { id: 'local_ip', label: 'Local IP address' },
+                    { id: 'process', label: 'Process' },
+                    { id: 'state', label: 'State' },
+                    { id: 'protocol', label: 'Protocol' },
+                  ]
+                : agentOs === 'linux'
+                ? [
+                    { id: 'local_port', label: 'Local port' },
+                    { id: 'local_ip', label: 'Local IP address' },
+                    { id: 'process', label: 'Process' },
+                    { id: 'pid', label: 'PID' },
+                    { id: 'state', label: 'State' },
+                    { id: 'protocol', label: 'Protocol' },
+                  ]
+                : [
+                    { id: 'local_port', label: 'Local port' },
+                    { id: 'local_ip', label: 'Local IP address' },
+                    { id: 'state', label: 'State' },
+                    { id: 'protocol', label: 'Protocol' },
+                  ],
+          },
+          mapResponseItems: item => ({
+            ...item,
+            local_ip: item.local.ip,
+            local_port: item.local.port,
+          }),
+        },
+        {
+          endpoint: `/syscollector/${agentID}/netiface`,
+          loggerMessage: `Fetching netiface for agent ${agentID}`,
+          table: {
+            title: 'Network interfaces',
+            columns: [
+              { id: 'name', label: 'Name' },
+              { id: 'mac', label: 'Mac' },
+              { id: 'state', label: 'State' },
+              { id: 'mtu', label: 'MTU' },
+              { id: 'type', label: 'Type' },
+            ],
+          },
+        },
+        {
+          endpoint: `/syscollector/${agentID}/netaddr`,
+          loggerMessage: `Fetching netaddr for agent ${agentID}`,
+          table: {
+            title: 'Network settings',
+            columns: [
+              { id: 'iface', label: 'Interface' },
+              { id: 'address', label: 'Address' },
+              { id: 'netmask', label: 'Netmask' },
+              { id: 'proto', label: 'Protocol' },
+              { id: 'broadcast', label: 'Broadcast' },
+            ],
+          },
+        },
+      ];
+
+      agentOs === 'windows' &&
+        agentRequestsInventory.push({
+          endpoint: `/syscollector/${agentID}/hotfixes`,
+          loggerMessage: `Fetching hotfixes for agent ${agentID}`,
+          table: {
+            title: 'Windows updates',
+            columns: [{ id: 'hotfix', label: 'Update code' }],
+          },
+        });
+
+      const requestInventory = async agentRequestInventory => {
         try {
-          context.wazuh.logger.debug('Report started');
-          const { components, apiId } = request.body;
-          const { agentID } = request.params;
+          context.wazuh.logger.debug(agentRequestInventory.loggerMessage);
 
-          const printer = new ReportPrinter(
-            context.wazuh.logger.get('report-printer'),
-          );
-          createDataDirectoryIfNotExists();
-          createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-          createDirectoryIfNotExists(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-          );
-          createDirectoryIfNotExists(
-            path.join(
-              WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-              context.wazuhEndpointParams.hashUsername,
-            ),
-          );
-
-          let wmodulesResponse = {};
-          let tables = [];
-          try {
-            wmodulesResponse =
-              await context.wazuh.api.client.asCurrentUser.request(
-                'GET',
-                `/agents/${agentID}/config/wmodules/wmodules`,
-                {},
-                { apiHostID: apiId },
-              );
-          } catch (error) {
-            context.wazuh.logger.debug(error.message || error);
-          }
-
-          await this.renderHeader(
-            context,
-            printer,
-            'agentConfig',
-            'agentConfig',
-            agentID,
-            apiId,
-          );
-
-          let idxComponent = 0;
-          for (let config of AgentConfiguration.configurations) {
-            let titleOfSection = false;
-            context.wazuh.logger.debug(
-              `Iterate over ${config.sections.length} configuration sections`,
+          const inventoryResponse =
+            await context.wazuh.api.client.asCurrentUser.request(
+              'GET',
+              agentRequestInventory.endpoint,
+              {},
+              { apiHostID: apiId },
             );
-            for (let section of config.sections) {
-              let titleOfSubsection = false;
-              if (
-                components[idxComponent] &&
-                (section.config || section.wodle)
-              ) {
-                let idx = 0;
-                const configs = (section.config || []).concat(
-                  section.wodle || [],
-                );
-                context.wazuh.logger.debug(
-                  `Iterate over ${configs.length} configuration blocks`,
-                );
-                for (let conf of configs) {
-                  let agentConfigResponse = {};
-                  try {
-                    if (!conf['name']) {
-                      agentConfigResponse =
-                        await context.wazuh.api.client.asCurrentUser.request(
-                          'GET',
-                          `/agents/${agentID}/config/${conf.component}/${conf.configuration}`,
-                          {},
-                          { apiHostID: apiId },
-                        );
-                    } else {
-                      for (let wodle of wmodulesResponse.data.data[
-                        'wmodules'
-                      ]) {
-                        if (Object.keys(wodle)[0] === conf['name']) {
-                          agentConfigResponse.data = {
-                            data: wodle,
-                          };
-                        }
-                      }
-                    }
 
-                    const agentConfig =
-                      agentConfigResponse &&
-                      agentConfigResponse.data &&
-                      agentConfigResponse.data.data;
-                    if (!titleOfSection) {
-                      printer.addContent({
-                        text: config.title,
-                        style: 'h1',
-                        margin: [0, 0, 0, 15],
-                      });
-                      titleOfSection = true;
-                    }
-                    if (!titleOfSubsection) {
-                      printer.addContent({
-                        text: section.subtitle,
-                        style: 'h4',
-                      });
-                      printer.addContent({
-                        text: section.desc,
-                        style: { fontSize: 12, color: '#000' },
-                        margin: [0, 0, 0, 10],
-                      });
-                      titleOfSubsection = true;
-                    }
-                    if (agentConfig) {
-                      for (let agentConfigKey of Object.keys(agentConfig)) {
-                        if (Array.isArray(agentConfig[agentConfigKey])) {
-                          /* LOG COLLECTOR */
-                          if (conf.filterBy) {
-                            let groups = [];
-                            agentConfig[agentConfigKey].forEach(obj => {
-                              if (!groups[obj.logformat]) {
-                                groups[obj.logformat] = [];
-                              }
-                              groups[obj.logformat].push(obj);
-                            });
-                            Object.keys(groups).forEach(group => {
-                              let saveidx = 0;
-                              groups[group].forEach((x, i) => {
-                                if (
-                                  Object.keys(x).length >
-                                  Object.keys(groups[group][saveidx]).length
-                                ) {
-                                  saveidx = i;
-                                }
-                              });
-                              const columns = Object.keys(
-                                groups[group][saveidx],
-                              );
-                              const rows = groups[group].map(x => {
-                                let row = [];
-                                columns.forEach(key => {
-                                  row.push(
-                                    typeof x[key] !== 'object'
-                                      ? x[key]
-                                      : Array.isArray(x[key])
-                                      ? x[key].map(x => {
-                                          return x + '\n';
-                                        })
-                                      : JSON.stringify(x[key]),
-                                  );
-                                });
-                                return row;
-                              });
-                              columns.forEach((col, i) => {
-                                columns[i] =
-                                  col[0].toUpperCase() + col.slice(1);
-                              });
-                              tables.push({
-                                title: section.labels[0][group],
-                                type: 'table',
-                                columns,
-                                rows,
-                              });
-                            });
-                          } else if (
-                            agentConfigKey.configuration !== 'socket'
-                          ) {
-                            tables.push(
-                              ...this.getConfigTables(
-                                context,
-                                agentConfig[agentConfigKey],
-                                section,
-                                idx,
-                              ),
-                            );
-                          } else {
-                            for (let _d2 of agentConfig[agentConfigKey]) {
-                              tables.push(
-                                ...this.getConfigTables(
-                                  context,
-                                  _d2,
-                                  section,
-                                  idx,
-                                ),
-                              );
-                            }
-                          }
-                        } else {
-                          /* INTEGRITY MONITORING MONITORED DIRECTORIES */
-                          if (conf.matrix) {
-                            const {
-                              directories,
-                              diff,
-                              synchronization,
-                              file_limit,
-                              ...rest
-                            } = agentConfig[agentConfigKey];
-                            tables.push(
-                              ...this.getConfigTables(
-                                context,
-                                rest,
-                                section,
-                                idx,
-                              ),
-                              ...(diff && diff.disk_quota
-                                ? this.getConfigTables(
-                                    context,
-                                    diff.disk_quota,
-                                    { tabs: ['Disk quota'] },
-                                    0,
-                                  )
-                                : []),
-                              ...(diff && diff.file_size
-                                ? this.getConfigTables(
-                                    context,
-                                    diff.file_size,
-                                    { tabs: ['File size'] },
-                                    0,
-                                  )
-                                : []),
-                              ...(synchronization
-                                ? this.getConfigTables(
-                                    context,
-                                    synchronization,
-                                    { tabs: ['Synchronization'] },
-                                    0,
-                                  )
-                                : []),
-                              ...(file_limit
-                                ? this.getConfigTables(
-                                    context,
-                                    file_limit,
-                                    { tabs: ['File limit'] },
-                                    0,
-                                  )
-                                : []),
-                            );
-                            let diffOpts = [];
-                            Object.keys(section.opts).forEach(x => {
-                              diffOpts.push(x);
-                            });
-                            const columns = [
-                              '',
-                              ...diffOpts.filter(
-                                x => x !== 'check_all' && x !== 'check_sum',
-                              ),
-                            ];
-                            let rows = [];
-                            directories.forEach(x => {
-                              let row = [];
-                              row.push(x.dir);
-                              columns.forEach(y => {
-                                if (y !== '') {
-                                  row.push(
-                                    x.opts.indexOf(y) > -1 ? 'yes' : 'no',
-                                  );
-                                }
-                              });
-                              row.push(x.recursion_level);
-                              rows.push(row);
-                            });
-                            columns.forEach((x, idx) => {
-                              columns[idx] = section.opts[x];
-                            });
-                            columns.push('RL');
-                            tables.push({
-                              title: 'Monitored directories',
-                              type: 'table',
-                              columns,
-                              rows,
-                            });
-                          } else {
-                            tables.push(
-                              ...this.getConfigTables(
-                                context,
-                                agentConfig[agentConfigKey],
-                                section,
-                                idx,
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    } else {
-                      // Print no configured module and link to the documentation
-                      printer.addContent({
-                        text: [
-                          'This module is not configured. Please take a look on how to configure it in ',
-                          {
-                            text: `${section.subtitle.toLowerCase()} configuration.`,
-                            link: section.docuLink,
-                            style: { fontSize: 12, color: '#1a0dab' },
-                          },
-                        ],
-                        margin: [0, 0, 0, 20],
-                      });
-                    }
-                  } catch (error) {
-                    context.wazuh.logger.debug(error.message || error);
-                  }
-                  idx++;
-                }
-                for (const table of tables) {
-                  printer.addConfigTables([table]);
-                }
-              }
-              idxComponent++;
-              tables = [];
-            }
+          const inventory =
+            inventoryResponse &&
+            inventoryResponse.data &&
+            inventoryResponse.data.data &&
+            inventoryResponse.data.data.affected_items;
+          if (inventory) {
+            return {
+              ...agentRequestInventory.table,
+              items: agentRequestInventory.mapResponseItems
+                ? inventory.map(agentRequestInventory.mapResponseItems)
+                : inventory,
+            };
           }
-
-          const buffer = await printer.print();
-
-          return response.ok({
-            headers: {
-              'Content-Type': 'application/pdf',
-              'Content-Disposition': `attachment;filename="${context.wazuhEndpointParams.filename}"`,
-              'Cache-Control': 'no-store,no-cache',
-            },
-            body: buffer,
-          });
         } catch (error) {
           context.wazuh.logger.debug(error.message || error);
-          return ErrorResponse(error.message || error, 5029, 500, response);
         }
-      },
-      ({ params: { agentID } }) =>
-        `wazuh-agent-configuration-${agentID}-${this.generateReportTimestamp()}.pdf`,
-    );
+      };
 
-  /**
-   * Create a report for the agents
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {*} reports list or ErrorResponse
-   */
-  createReportsAgentsInventory =
-    this.checkReportsUserDirectoryIsValidRouteDecorator(
-      async (
-        context: RequestHandlerContext,
-        request: OpenSearchDashboardsRequest,
-        response: OpenSearchDashboardsResponseFactory,
-      ) => {
-        try {
-          context.wazuh.logger.debug('Report started');
-          const {
-            searchBar,
-            filters,
-            time,
-            indexPatternTitle,
-            apiId,
-            serverSideQuery,
-          } = request.body;
-          const { agentID } = request.params;
-          const { from, to } = time || {};
-          // Init
-          const printer = new ReportPrinter(
-            context.wazuh.logger.get('report-printer'),
-          );
-
-          const { hashUsername } = await context.wazuh.security.getCurrentUser(
-            request,
-            context,
-          );
-          createDataDirectoryIfNotExists();
-          createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-          createDirectoryIfNotExists(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-          );
-          createDirectoryIfNotExists(
-            path.join(
-              WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-              hashUsername,
-            ),
-          );
-
-          context.wazuh.logger.debug('Syscollector report');
-          const [sanitizedFilters, agentsFilter] = filters
-            ? this.sanitizeKibanaFilters(context, filters, searchBar)
-            : [false, null];
-
-          // Get the agent OS
-          let agentOs = '';
-          let isAgentWindows = false;
-          let isAgentLinux = false;
-          try {
-            const agentResponse =
-              await context.wazuh.api.client.asCurrentUser.request(
-                'GET',
-                `/agents?agents_list=${agentID}`,
-                {},
-                { apiHostID: apiId },
-              );
-            isAgentWindows =
-              agentResponse?.data?.data?.affected_items?.[0].os?.platform ===
-              'windows';
-            isAgentLinux =
-              agentResponse?.data?.data?.affected_items?.[0].os?.uname?.includes(
-                'Linux',
-              );
-            agentOs =
-              (isAgentWindows && 'windows') || (isAgentLinux && 'linux') || '';
-          } catch (error) {
-            context.wazuh.logger.debug(error.message || error);
-          }
-
-          // Add title
-          printer.addContentWithNewLine({
-            text: 'Inventory data report',
-            style: 'h1',
-          });
-
-          // Add table with the agent info
-          await buildAgentsTable(context, printer, [agentID], apiId);
-
-          // Get syscollector packages and processes
-          const agentRequestsInventory = [
-            {
-              endpoint: `/syscollector/${agentID}/packages`,
-              loggerMessage: `Fetching packages for agent ${agentID}`,
-              table: {
-                title: 'Packages',
-                columns:
-                  agentOs === 'windows'
-                    ? [
-                        { id: 'name', label: 'Name' },
-                        { id: 'architecture', label: 'Architecture' },
-                        { id: 'version', label: 'Version' },
-                        { id: 'vendor', label: 'Vendor' },
-                      ]
-                    : [
-                        { id: 'name', label: 'Name' },
-                        { id: 'architecture', label: 'Architecture' },
-                        { id: 'version', label: 'Version' },
-                        { id: 'vendor', label: 'Vendor' },
-                        { id: 'description', label: 'Description' },
-                      ],
-              },
+      if (time) {
+        // Add Vulnerability Detector filter to the Server Side Query
+        serverSideQuery?.bool?.must?.push?.({
+          match_phrase: {
+            'rule.groups': {
+              query: 'vulnerability-detector',
             },
-            {
-              endpoint: `/syscollector/${agentID}/processes`,
-              loggerMessage: `Fetching processes for agent ${agentID}`,
-              table: {
-                title: 'Processes',
-                columns:
-                  agentOs === 'windows'
-                    ? [
-                        { id: 'name', label: 'Name' },
-                        { id: 'cmd', label: 'CMD' },
-                        { id: 'priority', label: 'Priority' },
-                        { id: 'nlwp', label: 'NLWP' },
-                      ]
-                    : [
-                        { id: 'name', label: 'Name' },
-                        { id: 'euser', label: 'Effective user' },
-                        { id: 'nice', label: 'Priority' },
-                        { id: 'state', label: 'State' },
-                      ],
-              },
-              mapResponseItems: item =>
-                agentOs === 'windows'
-                  ? item
-                  : { ...item, state: ProcessEquivalence[item.state] },
-            },
-            {
-              endpoint: `/syscollector/${agentID}/ports`,
-              loggerMessage: `Fetching ports for agent ${agentID}`,
-              table: {
-                title: 'Network ports',
-                columns:
-                  agentOs === 'windows'
-                    ? [
-                        { id: 'local_port', label: 'Local port' },
-                        { id: 'local_ip', label: 'Local IP address' },
-                        { id: 'process', label: 'Process' },
-                        { id: 'state', label: 'State' },
-                        { id: 'protocol', label: 'Protocol' },
-                      ]
-                    : agentOs === 'linux'
-                    ? [
-                        { id: 'local_port', label: 'Local port' },
-                        { id: 'local_ip', label: 'Local IP address' },
-                        { id: 'process', label: 'Process' },
-                        { id: 'pid', label: 'PID' },
-                        { id: 'state', label: 'State' },
-                        { id: 'protocol', label: 'Protocol' },
-                      ]
-                    : [
-                        { id: 'local_port', label: 'Local port' },
-                        { id: 'local_ip', label: 'Local IP address' },
-                        { id: 'state', label: 'State' },
-                        { id: 'protocol', label: 'Protocol' },
-                      ],
-              },
-              mapResponseItems: item => ({
-                ...item,
-                local_ip: item.local.ip,
-                local_port: item.local.port,
-              }),
-            },
-            {
-              endpoint: `/syscollector/${agentID}/netiface`,
-              loggerMessage: `Fetching netiface for agent ${agentID}`,
-              table: {
-                title: 'Network interfaces',
-                columns: [
-                  { id: 'name', label: 'Name' },
-                  { id: 'mac', label: 'Mac' },
-                  { id: 'state', label: 'State' },
-                  { id: 'mtu', label: 'MTU' },
-                  { id: 'type', label: 'Type' },
-                ],
-              },
-            },
-            {
-              endpoint: `/syscollector/${agentID}/netaddr`,
-              loggerMessage: `Fetching netaddr for agent ${agentID}`,
-              table: {
-                title: 'Network settings',
-                columns: [
-                  { id: 'iface', label: 'Interface' },
-                  { id: 'address', label: 'Address' },
-                  { id: 'netmask', label: 'Netmask' },
-                  { id: 'proto', label: 'Protocol' },
-                  { id: 'broadcast', label: 'Broadcast' },
-                ],
-              },
-            },
-          ];
-
-          agentOs === 'windows' &&
-            agentRequestsInventory.push({
-              endpoint: `/syscollector/${agentID}/hotfixes`,
-              loggerMessage: `Fetching hotfixes for agent ${agentID}`,
-              table: {
-                title: 'Windows updates',
-                columns: [{ id: 'hotfix', label: 'Update code' }],
-              },
-            });
-
-          const requestInventory = async agentRequestInventory => {
-            try {
-              context.wazuh.logger.debug(agentRequestInventory.loggerMessage);
-
-              const inventoryResponse =
-                await context.wazuh.api.client.asCurrentUser.request(
-                  'GET',
-                  agentRequestInventory.endpoint,
-                  {},
-                  { apiHostID: apiId },
-                );
-
-              const inventory =
-                inventoryResponse &&
-                inventoryResponse.data &&
-                inventoryResponse.data.data &&
-                inventoryResponse.data.data.affected_items;
-              if (inventory) {
-                return {
-                  ...agentRequestInventory.table,
-                  items: agentRequestInventory.mapResponseItems
-                    ? inventory.map(agentRequestInventory.mapResponseItems)
-                    : inventory,
-                };
-              }
-            } catch (error) {
-              context.wazuh.logger.debug(error.message || error);
-            }
-          };
-
-          if (time) {
-            // Add Vulnerability Detector filter to the Server Side Query
-            serverSideQuery?.bool?.must?.push?.({
-              match_phrase: {
-                'rule.groups': {
-                  query: 'vulnerability-detector',
-                },
-              },
-            });
-
-            await extendedInformation(
-              context,
-              printer,
-              'agents',
-              'syscollector',
-              apiId,
-              from,
-              to,
-              serverSideQuery,
-              agentsFilter,
-              indexPatternTitle,
-              agentID,
-            );
-          }
-
-          // Add inventory tables
-          (await Promise.all(agentRequestsInventory.map(requestInventory)))
-            .filter(table => table)
-            .forEach(table => printer.addSimpleTable(table));
-
-          // Print the document
-          const buffer = await printer.print();
-
-          return response.ok({
-            headers: {
-              'Content-Type': 'application/pdf',
-              'Content-Disposition': `attachment;filename="${context.wazuhEndpointParams.filename}"`,
-              'Cache-Control': 'no-store,no-cache',
-            },
-            body: buffer,
-          });
-        } catch (error) {
-          context.wazuh.logger.error(error.message || error);
-          return ErrorResponse(error.message || error, 5029, 500, response);
-        }
-      },
-      ({ params: { agentID } }) =>
-        `wazuh-agent-inventory-${agentID}-${this.generateReportTimestamp()}.pdf`,
-    );
-
-  checkReportsUserDirectoryIsValidRouteDecorator(
-    routeHandler,
-    reportFileNameAccessor,
-  ) {
-    return async (
-      context: RequestHandlerContext,
-      request: OpenSearchDashboardsRequest,
-      response: OpenSearchDashboardsResponseFactory,
-    ) => {
-      try {
-        const { username, hashUsername } =
-          await context.wazuh.security.getCurrentUser(request, context);
-        const userReportsDirectoryPath = path.join(
-          WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-          hashUsername,
-        );
-        const filename = reportFileNameAccessor(request);
-        const pathFilename = path.join(userReportsDirectoryPath, filename);
-        context.wazuh.logger.debug(
-          `Checking the user ${username}(${hashUsername}) can do actions in the reports file: ${pathFilename}`,
-        );
-        if (
-          !pathFilename.startsWith(userReportsDirectoryPath) ||
-          pathFilename.includes('../')
-        ) {
-          context.wazuh.logger.warn(
-            `User ${username}(${hashUsername}) tried to access to a non user report file: ${pathFilename}`,
-          );
-          return response.badRequest({
-            body: {
-              message: '5040 - You shall not pass!',
-            },
-          });
-        }
-        context.wazuh.logger.debug(
-          'Checking the user can do actions in the reports file',
-        );
-        return await routeHandler.bind(this)(
-          {
-            ...context,
-            wazuhEndpointParams: { hashUsername, filename, pathFilename },
           },
-          request,
-          response,
+        });
+
+        await extendedInformation(
+          context,
+          printer,
+          'agents',
+          'syscollector',
+          apiId,
+          from,
+          to,
+          serverSideQuery,
+          agentsFilter,
+          indexPatternTitle,
+          agentID,
         );
-      } catch (error) {
-        context.wazuh.logger.error(error.message || error);
-        return ErrorResponse(error.message || error, 5040, 500, response);
       }
-    };
+
+      // Add inventory tables
+      (await Promise.all(agentRequestsInventory.map(requestInventory)))
+        .filter(table => table)
+        .forEach(table => printer.addSimpleTable(table));
+
+      // Print the document
+      const buffer = await printer.print();
+      const filename = `wazuh-agent-inventory-${
+        request.params.agentID
+      }-${this.generateReportTimestamp()}.pdf`;
+
+      return response.ok({
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment;filename="${filename}"`,
+          'Cache-Control': 'no-store,no-cache',
+        },
+        body: buffer,
+      });
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(error.message || error, 5029, 500, response);
+    }
   }
 
   private generateReportTimestamp() {
