@@ -374,9 +374,7 @@ export class WazuhReportingCtrl {
 
       const buffer = await printer.print();
       const filename = `wazuh-module-${
-        request.body.agents
-          ? `agents-${request.body.agents.agents}`
-          : 'overview'
+        request.body.agents ? `agents-${request.body.agents}` : 'overview'
       }-${request.params.moduleID}-${this.generateReportTimestamp()}.pdf`;
 
       return response.ok({
