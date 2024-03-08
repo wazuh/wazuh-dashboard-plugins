@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import audit from './overview-audit';
-import aws from './overview-aws';
 import gcp from './overview-gcp';
 import fim from './overview-fim';
 import general from './overview-general';
@@ -31,7 +30,6 @@ import github from './overview-github';
 
 export {
   audit,
-  aws,
   gcp,
   fim,
   general,
@@ -48,5 +46,5 @@ export {
   office,
   osquery,
   docker,
-  github
+  github,
 };
