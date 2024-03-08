@@ -11,6 +11,7 @@
  */
 import { Dashboard } from './dashboard';
 import { MainSca } from '../../agents/sca';
+import { DashboardAWS } from '../../overview/amazon-web-services/dashboards';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
@@ -106,7 +107,12 @@ export const ModulesDefaults = {
   aws: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardAWS,
+      },
       renderDiscoverTab(DEFAULT_INDEX_PATTERN, amazonWebServicesColumns),
     ],
     availableFor: ['manager', 'agent'],
