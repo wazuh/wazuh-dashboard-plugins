@@ -1,6 +1,8 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 
+/* Overview visualizations */
+
 const getVisStateTop10AlertLevelEvolution = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-General-Alert-level-evolution',
@@ -148,6 +150,241 @@ const getVisStateTop10AlertLevelEvolution = (indexPatternId: string) => {
     },
   };
 };
+
+const getVisStateTop5Agents = (indexPatternId: string) => {
+  return {
+    id: 'Wazuh-App-Overview-General-Top-5-agents',
+    title: 'Top 5 agents',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: {
+        show: false,
+        values: true,
+        last_level: true,
+        truncate: 100,
+      },
+    },
+    uiState: {
+      vis: { legendOpen: true },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'agent.name',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateTop10MITREATTACKS = (indexPatternId: string) => {
+  return {
+    id: 'Wazuh-App-Overview-General-Alerts-Top-Mitre',
+    title: 'Top 10 MITRE ATT&CKS',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: {
+        show: false,
+        values: true,
+        last_level: true,
+        truncate: 100,
+      },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.mitre.technique',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateAlertEvolutionTop5Agents = (indexPatternId: string) => {
+  return {
+    id: 'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents',
+    title: 'Alerts evolution - Top 5 agents',
+    type: 'histogram',
+    params: {
+      type: 'histogram',
+      grid: { categoryLines: false, style: { color: '#eee' } },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'histogram',
+          mode: 'stacked',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'agent.name',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+          },
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'date_histogram',
+          schema: 'segment',
+          params: {
+            field: 'timestamp',
+            interval: 'auto',
+            customInterval: '2h',
+            min_doc_count: 1,
+            extended_bounds: {},
+          },
+        },
+      ],
+    },
+  };
+};
+
+/* Agent visualizations */
 
 const getVisStatePinnedAgentTop10AlertGroupsEvolution = (
   indexPatternId: string,
@@ -299,10 +536,10 @@ const getVisStatePinnedAgentTop10AlertGroupsEvolution = (
   };
 };
 
-const getVisStateTop5Alerts = (indexPatternId: string) => {
+const getVisStateAlertsAgents = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Agents-General-Alerts',
-    title: 'Top 10 Alerts',
+    title: 'Alerts',
     type: 'area',
     params: {
       type: 'area',
@@ -447,10 +684,10 @@ const getVisStateTop5Alerts = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTop10MITREATTACKS = (indexPatternId: string) => {
+const getVisStateTop5AlertsAgents = (indexPatternId: string) => {
   return {
-    id: 'Wazuh-App-Overview-General-Alerts-Top-Mitre',
-    title: 'Top 10 MITRE ATT&CKS',
+    id: 'Wazuh-App-Agents-General-Top-5-alerts',
+    title: 'Top 5 alerts',
     type: 'pie',
     params: {
       type: 'pie',
@@ -465,6 +702,9 @@ const getVisStateTop10MITREATTACKS = (indexPatternId: string) => {
         truncate: 100,
       },
     },
+    uiState: {
+      vis: { legendOpen: true },
+    },
     data: {
       searchSource: {
         query: {
@@ -495,10 +735,10 @@ const getVisStateTop10MITREATTACKS = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'rule.mitre.technique',
-            orderBy: '1',
+            field: 'rule.description',
+            size: 5,
             order: 'desc',
-            size: 10,
+            orderBy: '1',
             otherBucket: false,
             otherBucketLabel: 'Other',
             missingBucket: false,
@@ -510,10 +750,10 @@ const getVisStateTop10MITREATTACKS = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTop5Agents = (indexPatternId: string) => {
+const getVisStateTop5RuleGroupsAgents = (indexPatternId: string) => {
   return {
-    id: 'Wazuh-App-Overview-General-Top-5-agents',
-    title: 'Top 5 agents',
+    id: 'Wazuh-App-Agents-General-Top-10-groups',
+    title: 'Top 5 rule groups',
     type: 'pie',
     params: {
       type: 'pie',
@@ -528,6 +768,9 @@ const getVisStateTop5Agents = (indexPatternId: string) => {
         truncate: 100,
       },
     },
+    uiState: {
+      vis: { legendOpen: true },
+    },
     data: {
       searchSource: {
         query: {
@@ -558,7 +801,7 @@ const getVisStateTop5Agents = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'rule.groups',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -573,55 +816,26 @@ const getVisStateTop5Agents = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAlertEvolutionTop5Agents = (indexPatternId: string) => {
+const getVisStateTop5PCIDSSRequirementsAgents = (indexPatternId: string) => {
   return {
-    id: 'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents',
-    title: 'Alerts evolution - Top 5 agents',
-    type: 'histogram',
+    id: 'Wazuh-App-Agents-General-Top-5-PCI-DSS-Requirements',
+    title: 'Top 5 PCI DSS Requirements',
+    type: 'pie',
     params: {
-      type: 'histogram',
-      grid: { categoryLines: false, style: { color: '#eee' } },
-      categoryAxes: [
-        {
-          id: 'CategoryAxis-1',
-          type: 'category',
-          position: 'bottom',
-          show: true,
-          style: {},
-          scale: { type: 'linear' },
-          labels: { show: true, filter: true, truncate: 100 },
-          title: {},
-        },
-      ],
-      valueAxes: [
-        {
-          id: 'ValueAxis-1',
-          name: 'LeftAxis-1',
-          type: 'value',
-          position: 'left',
-          show: true,
-          style: {},
-          scale: { type: 'linear', mode: 'normal' },
-          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
-        },
-      ],
-      seriesParams: [
-        {
-          show: 'true',
-          type: 'histogram',
-          mode: 'stacked',
-          data: { label: 'Count', id: '1' },
-          valueAxis: 'ValueAxis-1',
-          drawLinesBetweenPoints: true,
-          showCircles: true,
-        },
-      ],
+      type: 'pie',
       addTooltip: true,
       addLegend: true,
       legendPosition: 'right',
-      times: [],
-      addTimeMarker: false,
+      isDonut: true,
+      labels: {
+        show: false,
+        values: true,
+        last_level: true,
+        truncate: 100,
+      },
+    },
+    uiState: {
+      vis: { legendOpen: true },
     },
     data: {
       searchSource: {
@@ -648,34 +862,27 @@ const getVisStateAlertEvolutionTop5Agents = (indexPatternId: string) => {
           params: {},
         },
         {
-          id: '3',
+          id: '2',
           enabled: true,
           type: 'terms',
-          schema: 'group',
+          schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'rule.pci_dss',
             size: 5,
             order: 'desc',
             orderBy: '1',
-          },
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'date_histogram',
-          schema: 'segment',
-          params: {
-            field: 'timestamp',
-            interval: 'auto',
-            customInterval: '2h',
-            min_doc_count: 1,
-            extended_bounds: {},
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
           },
         },
       ],
     },
   };
 };
+
+/* Definitiion of panels */
 
 export const getDashboardPanels = (
   indexPatternId: string,
@@ -712,35 +919,49 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '6',
-        savedVis: getVisStateTop5Alerts(indexPatternId),
+        savedVis: getVisStateAlertsAgents(indexPatternId),
       },
     },
-    '3': {
+    '7': {
       gridData: {
-        w: 15,
-        h: 12,
+        w: 16,
+        h: 13,
         x: 0,
         y: 13,
-        i: '3',
+        i: '7',
       },
       type: 'visualization',
       explicitInput: {
-        id: '3',
-        savedVis: getVisStateTop5Agents(indexPatternId),
+        id: '7',
+        savedVis: getVisStateTop5AlertsAgents(indexPatternId),
       },
     },
-    '4': {
+    '8': {
       gridData: {
-        w: 33,
-        h: 12,
-        x: 15,
+        w: 16,
+        h: 13,
+        x: 16,
         y: 13,
-        i: '4',
+        i: '8',
       },
       type: 'visualization',
       explicitInput: {
-        id: '4',
-        savedVis: getVisStateAlertEvolutionTop5Agents(indexPatternId),
+        id: '8',
+        savedVis: getVisStateTop5RuleGroupsAgents(indexPatternId),
+      },
+    },
+    '9': {
+      gridData: {
+        w: 16,
+        h: 13,
+        x: 32,
+        y: 13,
+        i: '9',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '9',
+        savedVis: getVisStateTop5PCIDSSRequirementsAgents(indexPatternId),
       },
     },
   };

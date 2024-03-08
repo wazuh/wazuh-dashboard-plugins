@@ -21,6 +21,7 @@ interface DashboardThreatHuntingProps {
 export const DashboardThreatHunting: React.FC<DashboardThreatHuntingProps> = ({
   pinnedAgent,
 }) => {
+  /* TODO: Analyze whether to use the new index pattern handler https://github.com/wazuh/wazuh-dashboard-plugins/issues/6434 */
   const TH_INDEX_PATTERN_ID = WAZUH_ALERTS_PATTERN;
 
   const { searchBarProps } = useSearchBar({

@@ -9,33 +9,34 @@ const getVisStateTotal = (indexPatternId: string) => {
     params: {
       addTooltip: true,
       addLegend: false,
-      type: 'gauge',
-      gauge: {
-        verticalSplit: false,
-        autoExtend: false,
+      type: 'metric',
+      metric: {
         percentageMode: false,
-        gaugeType: 'Metric',
-        gaugeStyle: 'Full',
-        backStyle: 'Full',
-        orientation: 'vertical',
-        colorSchema: 'Green to Red',
-        gaugeColorMode: 'None',
-        useRange: false,
-        colorsRange: [{ from: 0, to: 100 }],
+        useRanges: false,
+        colorSchema: 'Greens',
+        metricColorMode: 'Labels',
+        colorsRange: [
+          {
+            from: 0,
+            to: 0,
+          },
+          {
+            from: 0,
+            to: 0,
+          },
+        ],
+        labels: {
+          show: true,
+        },
         invertColors: false,
-        labels: { show: true, color: 'black' },
-        scale: { show: false, labels: false, color: '#333', width: 2 },
-        type: 'simple',
         style: {
-          fontSize: 20,
+          bgFill: '#000',
           bgColor: false,
           labelColor: false,
           subText: '',
+          fontSize: 40,
         },
       },
-    },
-    uiState: {
-      vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
     },
     data: {
       searchSource: {
@@ -59,7 +60,7 @@ const getVisStateTotal = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           schema: 'metric',
-          params: { customLabel: 'Alerts' },
+          params: { customLabel: 'Total' },
         },
       ],
     },
@@ -74,33 +75,34 @@ const getVisStateLevel12Alerts = (indexPatternId: string) => {
     params: {
       addTooltip: true,
       addLegend: false,
-      type: 'gauge',
-      gauge: {
-        verticalSplit: false,
-        autoExtend: false,
+      type: 'metric',
+      metric: {
         percentageMode: false,
-        gaugeType: 'Metric',
-        gaugeStyle: 'Full',
-        backStyle: 'Full',
-        orientation: 'vertical',
-        colorSchema: 'Green to Red',
-        gaugeColorMode: 'None',
-        useRange: false,
-        colorsRange: [{ from: 0, to: 100 }],
+        useRanges: false,
+        colorSchema: 'Reds',
+        metricColorMode: 'Labels',
+        colorsRange: [
+          {
+            from: 0,
+            to: 0,
+          },
+          {
+            from: 0,
+            to: 0,
+          },
+        ],
+        labels: {
+          show: true,
+        },
         invertColors: false,
-        labels: { show: true, color: 'black' },
-        scale: { show: false, labels: false, color: '#333', width: 2 },
-        type: 'simple',
         style: {
-          fontSize: 20,
+          bgFill: '#000',
           bgColor: false,
           labelColor: false,
           subText: '',
+          fontSize: 40,
         },
       },
-    },
-    uiState: {
-      vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
     },
     data: {
       searchSource: {
@@ -164,33 +166,34 @@ const getVisStateAuthenticationFailure = (indexPatternId: string) => {
     params: {
       addTooltip: true,
       addLegend: false,
-      type: 'gauge',
-      gauge: {
-        verticalSplit: false,
-        autoExtend: false,
+      type: 'metric',
+      metric: {
         percentageMode: false,
-        gaugeType: 'Metric',
-        gaugeStyle: 'Full',
-        backStyle: 'Full',
-        orientation: 'vertical',
-        colorSchema: 'Green to Red',
-        gaugeColorMode: 'None',
-        useRange: false,
-        colorsRange: [{ from: 0, to: 100 }],
+        useRanges: false,
+        colorSchema: 'Reds',
+        metricColorMode: 'Labels',
+        colorsRange: [
+          {
+            from: 0,
+            to: 0,
+          },
+          {
+            from: 0,
+            to: 0,
+          },
+        ],
+        labels: {
+          show: true,
+        },
         invertColors: false,
-        labels: { show: true, color: 'black' },
-        scale: { show: false, labels: false, color: '#333', width: 2 },
-        type: 'simple',
         style: {
-          fontSize: 20,
+          bgFill: '#000',
           bgColor: false,
           labelColor: false,
           subText: '',
+          fontSize: 40,
         },
       },
-    },
-    uiState: {
-      vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
     },
     data: {
       searchSource: {
@@ -264,7 +267,7 @@ const getVisStateAuthenticationFailure = (indexPatternId: string) => {
   };
 };
 
-const getVisStateSeverityLow = (indexPatternId: string) => {
+const getVisStateAuthenticationSuccess = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-General-Authentication-success',
     title: 'Authentication success',
@@ -272,28 +275,32 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
     params: {
       addTooltip: true,
       addLegend: false,
-      type: 'gauge',
-      gauge: {
-        verticalSplit: false,
-        autoExtend: false,
+      type: 'metric',
+      metric: {
         percentageMode: false,
-        gaugeType: 'Metric',
-        gaugeStyle: 'Full',
-        backStyle: 'Full',
-        orientation: 'vertical',
-        colorSchema: 'Green to Red',
-        gaugeColorMode: 'None',
-        useRange: false,
-        colorsRange: [{ from: 0, to: 100 }],
+        useRanges: false,
+        colorSchema: 'Greens',
+        metricColorMode: 'Labels',
+        colorsRange: [
+          {
+            from: 0,
+            to: 0,
+          },
+          {
+            from: 0,
+            to: 0,
+          },
+        ],
+        labels: {
+          show: true,
+        },
         invertColors: false,
-        labels: { show: true, color: 'black' },
-        scale: { show: false, labels: false, color: '#333', width: 2 },
-        type: 'simple',
         style: {
-          fontSize: 20,
+          bgFill: '#000',
           bgColor: false,
           labelColor: false,
           subText: '',
+          fontSize: 40,
         },
       },
     },
@@ -417,7 +424,7 @@ export const getKPIsPanel = (
       type: 'visualization',
       explicitInput: {
         id: '4',
-        savedVis: getVisStateSeverityLow(indexPatternId),
+        savedVis: getVisStateAuthenticationSuccess(indexPatternId),
       },
     },
   };
