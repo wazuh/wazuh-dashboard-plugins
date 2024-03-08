@@ -638,12 +638,57 @@ const getVisStateTechniqueByAgent = (indexPatternId: string) => {
 
 export const getDashboardPanels = (
   indexPatternId: string,
+  pinnedAgent?: boolean,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }
   >;
 } => {
-  return {
+  const pinnedAgentPanels = {
+    '3': {
+      gridData: {
+        w: 16,
+        h: 12,
+        x: 0,
+        y: 12,
+        i: '3',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '3',
+        savedVis: getVisStateAttacksByTechnique(indexPatternId),
+      },
+    },
+    '4': {
+      gridData: {
+        w: 16,
+        h: 12,
+        x: 16,
+        y: 12,
+        i: '4',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '4',
+        savedVis: getVisStateTopTacticsByAgent(indexPatternId),
+      },
+    },
+    '5': {
+      gridData: {
+        w: 16,
+        h: 12,
+        x: 32,
+        y: 12,
+        i: '5',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '5',
+        savedVis: getVisStateTechniqueByAgent(indexPatternId),
+      },
+    },
+  };
+  const panels = {
     '1': {
       gridData: {
         w: 36,
@@ -715,4 +760,5 @@ export const getDashboardPanels = (
       },
     },
   };
+  return pinnedAgent ? pinnedAgentPanels : panels;
 };
