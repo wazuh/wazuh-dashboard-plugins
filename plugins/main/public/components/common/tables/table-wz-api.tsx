@@ -62,6 +62,7 @@ export function TableWzAPI({
   searchBarProps?: any;
   reload?: boolean;
   onDataChange?: Function;
+  setReload?: (newValue: number) => void;
 }) {
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({});
@@ -161,10 +162,13 @@ export function TableWzAPI({
   };
 
   /**
-   *  Generate a new reload footprint
+   *  Generate a new reload footprint and set reload to propagate refresh
    */
   const triggerReload = () => {
     setReloadFootprint(Date.now());
+    if (rest.setReload) {
+      rest.setReload(Date.now());
+    }
   };
 
   useEffect(() => {
