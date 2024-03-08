@@ -21,6 +21,9 @@ describe('useGetUpgradeTasks hook', () => {
       if (status === API_NAME_TASK_STATUS.IN_PROGRESS) {
         return { total_affected_items: 5 };
       }
+      if (status === API_NAME_TASK_STATUS.DONE) {
+        return { total_affected_items: 3 };
+      }
       return { total_affected_items: 2 };
     });
 
@@ -29,11 +32,15 @@ describe('useGetUpgradeTasks hook', () => {
     );
 
     expect(result.current.getInProgressIsLoading).toBe(true);
-    expect(result.current.totalInProgressTasks).toBeUndefined();
+    expect(result.current.totalInProgressTasks).toBe(0);
     expect(result.current.getInProgressError).toBeUndefined();
 
+    expect(result.current.getSuccessIsLoading).toBe(true);
+    expect(result.current.totalSuccessTasks).toBe(0);
+    expect(result.current.getSuccessError).toBeUndefined();
+
     expect(result.current.getErrorIsLoading).toBe(true);
-    expect(result.current.totalErrorUpgradeTasks).toBeUndefined();
+    expect(result.current.totalErrorUpgradeTasks).toBe(0);
     expect(result.current.getErrorTasksError).toBeUndefined();
 
     await waitForNextUpdate();
@@ -42,6 +49,12 @@ describe('useGetUpgradeTasks hook', () => {
     expect(result.current.getInProgressIsLoading).toBe(false);
     expect(result.current.totalInProgressTasks).toBe(5);
     expect(result.current.getInProgressError).toBeUndefined();
+
+    jest.advanceTimersByTime(500);
+
+    expect(result.current.getSuccessIsLoading).toBe(false);
+    expect(result.current.totalSuccessTasks).toBe(3);
+    expect(result.current.getSuccessError).toBeUndefined();
 
     jest.advanceTimersByTime(500);
 
@@ -59,7 +72,7 @@ describe('useGetUpgradeTasks hook', () => {
     await waitForNextUpdate();
     jest.advanceTimersByTime(500);
 
-    expect(clearInterval).toHaveBeenCalledTimes(2);
+    expect(clearInterval).toHaveBeenCalledTimes(1);
   });
 
   it('should handle error while fetching data', async () => {

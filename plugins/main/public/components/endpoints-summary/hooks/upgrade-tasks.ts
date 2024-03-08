@@ -4,17 +4,17 @@ import { API_NAME_TASK_STATUS } from '../../../../common/constants';
 
 const beforeMinutes = 60;
 
-export const useGetUpgradeTasks = reload => {
-  const [totalInProgressTasks, setTotalInProgressTasks] = useState<number>();
+export const useGetUpgradeTasks = (reload: any) => {
+  const [totalInProgressTasks, setTotalInProgressTasks] = useState<number>(0);
   const [getInProgressIsLoading, setGetInProgressIsLoading] = useState(true);
   const [getInProgressError, setGetInProgressError] = useState();
 
-  const [totalSuccessTasks, setTotalSuccessTasks] = useState<number>();
+  const [totalSuccessTasks, setTotalSuccessTasks] = useState<number>(0);
   const [getSuccessIsLoading, setSuccessIsLoading] = useState(true);
   const [getSuccessError, setGetSuccessError] = useState();
 
   const [totalErrorUpgradeTasks, setTotalErrorUpgradeTasks] =
-    useState<number>();
+    useState<number>(0);
   const [getErrorIsLoading, setErrorIsLoading] = useState(true);
   const [getErrorTasksError, setGetErrorTasksError] = useState();
 
@@ -76,20 +76,20 @@ export const useGetUpgradeTasks = reload => {
     }
   };
 
+  const fetchData = async () => {
+    await getUpgradesInProgress();
+    await getUpgradesSuccess();
+    await getUpgradesError();
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      await getUpgradesInProgress();
-      await getUpgradesSuccess();
-      await getUpgradesError();
-
-      if (totalInProgressTasks === 0) {
-        clearInterval(intervalId);
-      }
-    };
-
     fetchData();
 
-    const intervalId = setInterval(fetchData, 3000);
+    const intervalId = setInterval(getUpgradesInProgress, 3000);
+
+    if (totalInProgressTasks === 0) {
+      clearInterval(intervalId);
+    }
 
     return () => clearInterval(intervalId);
   }, [totalInProgressTasks, reload]);

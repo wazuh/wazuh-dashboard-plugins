@@ -65,6 +65,7 @@ const mapDispatchToProps = dispatch => ({
 interface AgentsTableProps {
   filters: any;
   updateCurrentAgentData: (agent) => void;
+  externalReload?: boolean;
   setExternalReload?: (newValue: number) => void;
 }
 
@@ -229,7 +230,7 @@ export const AgentsTable = compose(
           <TableWzAPI
             title='Agents'
             addOnTitle={selectedtemsRenderer}
-            extra={<AgentUpgradesInProgress reload={reloadTable} />}
+            extra={<AgentUpgradesInProgress reload={props.externalReload} />}
             actionButtons={({ filters }) => (
               <>
                 <EuiFlexItem grow={false}>
