@@ -1869,9 +1869,9 @@ iframe.width-changed {
 
 .wz-app {
   .euiPage {
-    background-color: #fafbfd;
+    background-color: transparent;
   }
   [name='OverviewWelcome'] .euiIcon--app .euiIcon__fillSecondary {
-    fill: #000000;
+    fill: #000000bb;
   }
 }
