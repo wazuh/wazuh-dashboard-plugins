@@ -146,6 +146,59 @@ export const visualizations = {
       },
     ],
   },
+  aws: {
+    rows: [
+      {
+        height: 250,
+        vis: [
+          {
+            title: 'Sources',
+            id: 'Wazuh-App-Overview-AWS-Top-sources',
+            width: 25,
+          },
+          {
+            title: 'Accounts',
+            id: 'Wazuh-App-Overview-AWS-Top-accounts',
+            width: 25,
+          },
+          {
+            title: 'S3 buckets',
+            id: 'Wazuh-App-Overview-AWS-Top-buckets',
+            width: 25,
+          },
+          {
+            title: 'Regions',
+            id: 'Wazuh-App-Overview-AWS-Top-regions',
+            width: 25,
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Events by source over time',
+            id: 'Wazuh-App-Overview-AWS-Events-by-source',
+            width: 50,
+          },
+          {
+            title: 'Events by S3 bucket over time',
+            id: 'Wazuh-App-Overview-AWS-Events-by-s3-bucket',
+            width: 50,
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Geolocation map',
+            id: 'Wazuh-App-Overview-AWS-geo',
+          },
+        ],
+      },
+    ],
+  },
   gcp: {
     rows: [
       {
