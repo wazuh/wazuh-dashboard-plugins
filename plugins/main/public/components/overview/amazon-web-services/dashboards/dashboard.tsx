@@ -17,7 +17,6 @@ export const DashboardAWS: React.FC = () => {
 
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: INDEX_PATTERN_ID,
-    filters: [],
   });
 
   return (
