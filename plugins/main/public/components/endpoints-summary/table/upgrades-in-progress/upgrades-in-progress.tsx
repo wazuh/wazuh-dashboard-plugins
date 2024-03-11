@@ -7,21 +7,26 @@ import {
   EuiFlexItem,
   EuiIconTip,
   EuiSpacer,
+  EuiButtonEmpty,
+  EuiButtonIcon,
 } from '@elastic/eui';
 import { useGetUpgradeTasks } from '../../hooks';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { AgentUpgradesTaskDetailsButton } from './taskDetailsButton';
 
 interface AgentUpgradesInProgress {
   reload: any;
+  setIsModalVisible: (isModalVisible: boolean) => void;
 }
 
 export const AgentUpgradesInProgress = ({
   reload,
+  setIsModalVisible,
 }: AgentUpgradesInProgress) => {
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [isPanelClosed, setIsPanelClosed] = useState(false);
+
   const {
     totalInProgressTasks,
     getInProgressError,
@@ -82,14 +87,42 @@ export const AgentUpgradesInProgress = ({
     getErrorOrchestrator().handleError(options);
   }
 
-  return isUpgrading || totalSuccessTasks || totalErrorUpgradeTasks ? (
+  return !isPanelClosed &&
+    (isUpgrading || totalSuccessTasks || totalErrorUpgradeTasks) ? (
     <EuiPanel color='subdued'>
-      <EuiFlexGroup gutterSize='s' alignItems='center'>
+      <EuiFlexGroup
+        gutterSize='s'
+        alignItems='flex-start'
+        justifyContent='space-between'
+        wrap={false}
+        responsive={false}
+      >
+        <EuiFlexGroup
+          gutterSize='s'
+          alignItems='center'
+          wrap={false}
+          responsive={false}
+        >
+          <EuiFlexItem grow={false}>
+            <EuiText>Upgrade tasks</EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+              color='primary'
+              onClick={() => setIsModalVisible(true)}
+              iconType='eye'
+            >
+              Task details
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiFlexItem grow={false}>
-          <EuiText>Upgrade tasks</EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <AgentUpgradesTaskDetailsButton />
+          <EuiButtonIcon
+            onClick={() => setIsPanelClosed(true)}
+            color='text'
+            iconType='cross'
+            aria-label='Close'
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='s' />
