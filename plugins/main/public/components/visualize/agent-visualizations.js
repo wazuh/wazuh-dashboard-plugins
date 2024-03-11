@@ -46,6 +46,59 @@ export const agentVisualizations = {
       },
     ],
   },
+  aws: {
+    rows: [
+      {
+        height: 250,
+        vis: [
+          {
+            title: 'Sources',
+            id: 'Wazuh-App-Agents-AWS-Top-sources',
+            width: 25,
+          },
+          {
+            title: 'Accounts',
+            id: 'Wazuh-App-Agents-AWS-Top-accounts',
+            width: 25,
+          },
+          {
+            title: 'S3 buckets',
+            id: 'Wazuh-App-Agents-AWS-Top-buckets',
+            width: 25,
+          },
+          {
+            title: 'Regions',
+            id: 'Wazuh-App-Agents-AWS-Top-regions',
+            width: 25,
+          },
+        ],
+      },
+      {
+        height: 300,
+        vis: [
+          {
+            title: 'Events by source over time',
+            id: 'Wazuh-App-Agents-AWS-Events-by-source',
+            width: 50,
+          },
+          {
+            title: 'Events by S3 bucket over time',
+            id: 'Wazuh-App-Agents-AWS-Events-by-s3-bucket',
+            width: 50,
+          },
+        ],
+      },
+      {
+        height: 570,
+        vis: [
+          {
+            title: 'Geolocation map',
+            id: 'Wazuh-App-Agents-AWS-geo',
+          },
+        ],
+      },
+    ],
+  },
   fim: {
     rows: [
       {

@@ -76,7 +76,7 @@ export class OverviewController {
 
     this.currentOverviewSectionProps = {
       switchTab: (tab, force) => this.switchTab(tab, force),
-      currentTab: this.tab,
+      currentTab: this.tab
     };
   }
 
@@ -94,6 +94,7 @@ export class OverviewController {
     this.visFactoryService.clearAll();
 
     this.wzMonitoringEnabled = false;
+
 
     this.init();
 
@@ -176,7 +177,7 @@ export class OverviewController {
           : this.isAgent && agentList.length > 1
           ? ` of ${agentList.length.toString()} agents`
           : false;
-      if (agentList && agentList.length && this.tab !== 'aws') {
+      if (agentList && agentList.length) {
         await this.visFactoryService.buildAgentsVisualizations(
           this.filterHandler,
           this.tab,
@@ -185,7 +186,7 @@ export class OverviewController {
           this.tabView === 'discover' || this.oldFilteredTab === this.tab,
         );
         this.oldFilteredTab = this.tab;
-      } else if (!agentList && this.tab !== 'welcome' && this.tab !== 'aws') {
+      } else if (!agentList && this.tab !== 'welcome') {
         if (!store.getState().appStateReducers.currentAgentData.id) {
           await this.visFactoryService.buildOverviewVisualizations(
             this.filterHandler,
