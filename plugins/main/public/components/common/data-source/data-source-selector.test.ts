@@ -122,7 +122,7 @@ describe('DataSourceSelector', () => {
     });
 
     it.skip('should return all data sources from the repository when the map is empty', () => {
-
+        
     })
 
     it('should return all data sources from the map when was loaded previously', () => {

@@ -44,6 +44,12 @@ import { getErrorOrchestrator } from '../../react-services/common-services';
 import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
 import WzPatternSelector from '../wz-pattern-selector/wz-pattern-selector';
+import {
+  DataSourceSelector,
+  PatternDataSource,
+  AlertsDataSourceRepository,
+  PatternDataSourceFactory
+} from '../common/data-source';
 
 const sections = {
   overview: 'overview',
@@ -73,6 +79,7 @@ export const WzMenu = withWindowSize(
         currentSelectedPattern: '',
         isManagementPopoverOpen: false,
         isOverviewPopoverOpen: false,
+        dataSourceSelector: new DataSourceSelector(new AlertsDataSourceRepository(), new PatternDataSourceFactory())
       };
       this.store = store;
       this.genericReq = GenericRequest;
@@ -541,7 +548,7 @@ export const WzMenu = withWindowSize(
           </EuiFlexItem>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
-              <WzPatternSelector onChange={this.onChangePattern} />
+              <WzPatternSelector onChange={this.onChangePattern} dataSourceSelector={this.state.dataSourceSelector}/>
             </div>
           </EuiFlexItem>
         </>
