@@ -306,7 +306,7 @@ const getVisStateEventsBySource = (indexPatternId: string) => {
       ],
       addTooltip: true,
       addLegend: true,
-      legendPosition: 'left',
+      legendPosition: 'right',
       times: [],
       addTimeMarker: false,
     },
