@@ -13,7 +13,6 @@ import GDPR from '../../integration-files/gdpr-requirements-pdfmake';
 import TSC from '../../integration-files/tsc-requirements-pdfmake';
 import { ReportPrinter } from './printer';
 import moment from 'moment';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
  * This build the agents table
@@ -146,7 +145,7 @@ export async function extendedInformation(
   to,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern'),
+  pattern,
   agent = null,
 ) {
   try {

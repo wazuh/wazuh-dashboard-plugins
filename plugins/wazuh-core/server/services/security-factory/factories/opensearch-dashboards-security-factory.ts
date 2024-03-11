@@ -8,6 +8,7 @@ import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../.
 
 export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
   platform: string = WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY;
+  constructor() {}
 
   async getCurrentUser(
     request: OpenSearchDashboardsRequest,
@@ -32,5 +33,18 @@ export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
 
   getUserName(authContext: any) {
     return authContext['user_name'];
+  }
+
+  async isAdministratorUser(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+  ) {
+    const response = await context.security_plugin.esClient
+      .asScoped(request)
+      .callAsCurrentUser('opensearch_security.restapiinfo');
+
+    if (!response.has_api_access) {
+      throw new Error(`User has no permission for rest API access.`);
+    }
   }
 }

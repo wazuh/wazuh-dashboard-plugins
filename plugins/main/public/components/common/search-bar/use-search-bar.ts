@@ -8,7 +8,7 @@ import {
   IIndexPattern,
   IndexPatternsContract,
 } from '../../../../../../src/plugins/data/public';
-import { getDataPlugin } from '../../../kibana-services';
+import { getDataPlugin, getWazuhCorePlugin } from '../../../kibana-services';
 import { useFilterManager, useQueryManager, useTimeFilter } from '../hooks';
 import {
   AUTHORIZED_AGENTS,

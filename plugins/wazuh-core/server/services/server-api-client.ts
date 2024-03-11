@@ -135,7 +135,7 @@ export class ServerAPIClient {
     data: any,
     { apiHostID, token }: APIInterceptorRequestOptions,
   ) {
-    const api = await this.manageHosts.getHostById(apiHostID);
+    const api = await this.manageHosts.get(apiHostID);
     const { body, params, headers, ...rest } = data;
     return {
       method: method,
@@ -160,7 +160,7 @@ export class ServerAPIClient {
     apiHostID: string,
     authContext?: any,
   ): Promise<string> {
-    const api: APIHost = await this.manageHosts.getHostById(apiHostID);
+    const api: APIHost = await this.manageHosts.get(apiHostID);
     const optionsRequest = {
       method: 'POST',
       headers: {
@@ -236,12 +236,8 @@ export class ServerAPIClient {
       return await this._request(method, path, data, { ...options, token });
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        try {
-          const token: string = await this._authenticate(options.apiHostID);
-          return await this._request(method, path, data, { ...options, token });
-        } catch (error) {
-          throw error;
-        }
+        const token: string = await this._authenticate(options.apiHostID);
+        return await this._request(method, path, data, { ...options, token });
       }
       throw error;
     }

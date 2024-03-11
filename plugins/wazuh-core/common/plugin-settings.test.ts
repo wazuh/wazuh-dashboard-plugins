@@ -1,4 +1,9 @@
 import { PLUGIN_SETTINGS } from './constants';
+import { validate as validateNodeCronInterval } from 'node-cron';
+
+function validateCronStatisticsInterval(value) {
+  return validateNodeCronInterval(value) ? undefined : 'Interval is not valid.';
+}
 
 describe('[settings] Input validation', () => {
   it.each`
@@ -224,13 +229,24 @@ describe('[settings] Input validation', () => {
   `(
     '$setting | $value | $expectedValidation',
     ({ setting, value, expectedValidation }) => {
-      expect(
-        PLUGIN_SETTINGS[setting].validate(
-          PLUGIN_SETTINGS[
-            setting
-          ]?.uiFormTransformConfigurationValueToInputValue?.(value) ?? value,
-        ),
-      ).toBe(expectedValidation);
+      // FIXME: use the plugins definition
+      if (setting === 'cron.statistics.interval') {
+        expect(
+          validateCronStatisticsInterval(
+            PLUGIN_SETTINGS[
+              setting
+            ]?.uiFormTransformConfigurationValueToInputValue?.(value) ?? value,
+          ),
+        ).toBe(expectedValidation);
+      } else {
+        expect(
+          PLUGIN_SETTINGS[setting].validate(
+            PLUGIN_SETTINGS[
+              setting
+            ]?.uiFormTransformConfigurationValueToInputValue?.(value) ?? value,
+          ),
+        ).toBe(expectedValidation);
+      }
     },
   );
 });

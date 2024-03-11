@@ -12,11 +12,9 @@
 
 import React, { Fragment } from 'react';
 import { useUserPermissionsRequirements } from '../hooks/useUserPermissions';
-import { useUserRolesRequirements } from '../hooks/useUserRoles';
-
 import { EuiToolTip, EuiSpacer } from '@elastic/eui';
-
 import { WzPermissionsFormatted } from './format';
+import { useUserPermissionsIsAdminRequirements } from '../hooks/use-user-is-admin';
 
 export interface IUserPermissionsObject {
   action: string;
@@ -25,11 +23,12 @@ export interface IUserPermissionsObject {
 export type TUserPermissionsFunction = (props: any) => TUserPermissions;
 export type TUserPermissions = (string | IUserPermissionsObject)[] | null;
 export type TUserRoles = string[] | null;
+export type TUserIsAdministrator = string | null;
 export type TUserRolesFunction = (props: any) => TUserRoles;
 
 export interface IWzElementPermissionsProps {
   permissions?: TUserPermissions | TUserPermissionsFunction;
-  roles?: TUserRoles | TUserRolesFunction;
+  administrator?: boolean;
   tooltip?: any;
   children: React.ReactElement;
   getAdditionalProps?: (disabled: boolean) => {
@@ -40,7 +39,7 @@ export interface IWzElementPermissionsProps {
 export const WzElementPermissions = ({
   children,
   permissions = null,
-  roles = null,
+  administrator = false,
   getAdditionalProps,
   tooltip,
   ...rest
@@ -48,15 +47,16 @@ export const WzElementPermissions = ({
   const [userPermissionRequirements] = useUserPermissionsRequirements(
     typeof permissions === 'function' ? permissions(rest) : permissions,
   );
-  const [userRolesRequirements] = useUserRolesRequirements(
-    typeof roles === 'function' ? roles(rest) : roles,
-  );
 
-  const isDisabledByRolesOrPermissions =
-    userRolesRequirements || userPermissionRequirements;
+  const [userRequireAdministratorRequirements] =
+    useUserPermissionsIsAdminRequirements();
+
+  const isDisabledByPermissions =
+    userPermissionRequirements ||
+    (administrator && userRequireAdministratorRequirements);
 
   const disabled = Boolean(
-    isDisabledByRolesOrPermissions || rest?.isDisabled || rest?.disabled,
+    isDisabledByPermissions || rest?.isDisabled || rest?.disabled,
   );
 
   const additionalProps = getAdditionalProps
@@ -67,7 +67,7 @@ export const WzElementPermissions = ({
     ...additionalProps,
   });
 
-  const contentTextRequirements = isDisabledByRolesOrPermissions && (
+  const contentTextRequirements = isDisabledByPermissions && (
     <Fragment>
       {userPermissionRequirements && (
         <div>
@@ -81,23 +81,18 @@ export const WzElementPermissions = ({
           {WzPermissionsFormatted(userPermissionRequirements)}
         </div>
       )}
-      {userPermissionRequirements && userRolesRequirements && (
+      {userPermissionRequirements && userRequireAdministratorRequirements && (
         <EuiSpacer size='s' />
       )}
-      {userRolesRequirements && (
+      {userRequireAdministratorRequirements && (
         <div>
-          Require{' '}
-          {userRolesRequirements
-            .map(role => (
-              <strong key={`empty-prompt-no-roles-${role}`}>{role}</strong>
-            ))
-            .reduce((prev, cur) => [prev, ', ', cur])}{' '}
-          {userRolesRequirements.length > 1 ? 'roles' : 'role'}
+          Require administrator privilegies:{' '}
+          {userRequireAdministratorRequirements}
         </div>
       )}
     </Fragment>
   );
-  return isDisabledByRolesOrPermissions ? (
+  return isDisabledByPermissions ? (
     <EuiToolTip {...tooltip} content={contentTextRequirements}>
       {childrenWithAdditionalProps}
     </EuiToolTip>
