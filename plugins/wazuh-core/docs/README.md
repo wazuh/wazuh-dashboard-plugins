@@ -7,14 +7,14 @@ through the plugin lifecycle methods.
 
 This plugin provides some core services:
 
-- CacheAPIUserAllowRunAs: caches the status of API host internal user allows the run as option
-- ManageHosts: manage the API host entries
+- Configuration: manages the plugins configuration
+- ManageHosts: manages the API host entries
+  - CacheAPIUserAllowRunAs: caches the status of API host internal user allows the run_as option
 - ServerAPIClient: communicates with the Wazuh server APIs
-- ServerAPIHostEntries: gets information about the API host entries
-- UpdateConfigurationFile: updates the configuration file
 - UpdateRegistry: updates the registry file
 
 ## Frontend
 
+- Configuration: manage the plugins configuration
 - Utils
 - Constants

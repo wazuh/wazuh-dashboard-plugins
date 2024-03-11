@@ -27,7 +27,6 @@ import {
 
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
-import { getPluginDataPath } from '../../../common/plugin';
 import { security } from '../../utils/applications';
 import { getWazuhCorePlugin } from '../../kibana-services';
 
@@ -129,22 +128,18 @@ export const WzSecurity = compose(
     let runAsWarningTxt = '';
     switch (allowRunAs) {
       case getWazuhCorePlugin().API_USER_STATUS_RUN_AS.HOST_DISABLED:
-        runAsWarningTxt = `For the role mapping to take effect, enable run_as in ${getPluginDataPath(
-          'config/wazuh.yml',
-        )} configuration file, restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
+        runAsWarningTxt = `For the role mapping to take effect, enable run_as in the API host configuration, restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
         break;
       case getWazuhCorePlugin().API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED:
         runAsWarningTxt =
-          'The role mapping has no effect because the current Wazuh API user has allow_run_as disabled.';
+          'The role mapping has no effect because the current API user has allow_run_as disabled.';
         break;
       case getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ALL_DISABLED:
-        runAsWarningTxt = `For the role mapping to take effect, enable run_as in ${getPluginDataPath(
-          'config/wazuh.yml',
-        )} configuration file and set the current Wazuh API user allow_run_as to true. Restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
+        runAsWarningTxt = `For the role mapping to take effect, enable run_as in the API host configuration and set the current API user allow_run_as to true. Restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
         break;
       default:
         runAsWarningTxt =
-          'The role mapping has no effect because the current Wazuh API user has run_as disabled.';
+          'The role mapping has no effect because the current API user has run_as disabled.';
         break;
     }
 

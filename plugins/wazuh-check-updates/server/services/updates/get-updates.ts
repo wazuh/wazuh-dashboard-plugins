@@ -23,10 +23,9 @@ export const getUpdates = async (
       return availableUpdates;
     }
 
-    const { serverAPIHostEntries, api: wazuhApiClient } = getWazuhCore();
+    const { manageHosts, api: wazuhApiClient } = getWazuhCore();
 
-    const hosts: { id: string }[] =
-      await serverAPIHostEntries.getHostsEntries();
+    const hosts: { id: string }[] = await manageHosts.get();
 
     const apisAvailableUpdates = await Promise.all(
       hosts?.map(async api => {

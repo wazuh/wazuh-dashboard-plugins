@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
  * Returns top 5 GDPR requirements
@@ -26,9 +25,8 @@ export const topGDPRRequirements = async (
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
-
   try {
     const base = {};
 
@@ -40,15 +38,15 @@ export const topGDPRRequirements = async (
           field: 'rule.gdpr',
           size: 5,
           order: {
-            _count: 'desc'
-          }
-        }
-      }
+            _count: 'desc',
+          },
+        },
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['2'];
 
@@ -56,7 +54,7 @@ export const topGDPRRequirements = async (
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Returns top 3 rules for specific GDPR requirement
@@ -74,9 +72,8 @@ export const getRulesByRequirement = async (
   filters,
   allowedAgentsFilter,
   requirement,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
-
   try {
     const base = {};
 
@@ -88,8 +85,8 @@ export const getRulesByRequirement = async (
           field: 'rule.description',
           size: 3,
           order: {
-            _count: 'desc'
-          }
+            _count: 'desc',
+          },
         },
         aggs: {
           '3': {
@@ -97,25 +94,25 @@ export const getRulesByRequirement = async (
               field: 'rule.id',
               size: 1,
               order: {
-                _count: 'desc'
-              }
-            }
-          }
-        }
-      }
+                _count: 'desc',
+              },
+            },
+          },
+        },
+      },
     });
 
     base.query.bool.filter.push({
       match_phrase: {
         'rule.gdpr': {
-          query: requirement
-        }
-      }
+          query: requirement,
+        },
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['2'];
     return buckets.reduce((accum, bucket) => {
@@ -128,11 +125,14 @@ export const getRulesByRequirement = async (
         !bucket.key
       ) {
         return accum;
-      };
-      accum.push({ ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key });
+      }
+      accum.push({
+        ruleID: bucket['3'].buckets[0].key,
+        ruleDescription: bucket.key,
+      });
       return accum;
     }, []);
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};

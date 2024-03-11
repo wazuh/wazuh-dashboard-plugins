@@ -8,6 +8,7 @@ import { InputFormFilePicker } from './input_filepicker';
 import { InputFormTextArea } from './input_text_area';
 import { EuiFlexGroup, EuiFlexItem, EuiFormRow } from '@elastic/eui';
 import { SettingTypes } from './types';
+import { InputFormPassword } from './input-password';
 
 export interface InputFormProps {
   type: SettingTypes;
@@ -93,5 +94,6 @@ const Input = {
   select: InputFormSelect,
   text: InputFormText,
   textarea: InputFormTextArea,
+  password: InputFormPassword,
   custom: ({ component, ...rest }) => component(rest),
 };

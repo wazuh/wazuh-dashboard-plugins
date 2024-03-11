@@ -11,17 +11,14 @@
  */
 import cron from 'node-cron';
 import { monitoringTemplate } from '../../integration-files/monitoring-template';
-import { getConfiguration } from '../../lib/get-configuration';
 import { parseCron } from '../../lib/parse-cron';
 import { indexDate } from '../../lib/index-date';
-import { buildIndexSettings } from '../../lib/build-index-settings';
 import {
   WAZUH_MONITORING_DEFAULT_CRON_FREQ,
   WAZUH_MONITORING_TEMPLATE_NAME,
 } from '../../../common/constants';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 import { delayAsPromise } from '../../../common/utils';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 let MONITORING_ENABLED,
   MONITORING_FREQUENCY,
@@ -30,41 +27,19 @@ let MONITORING_ENABLED,
   MONITORING_INDEX_PATTERN,
   MONITORING_INDEX_PREFIX;
 
-// Utils functions
-/**
- * Get the setting value from the configuration
- * @param setting
- * @param configuration
- * @param defaultValue
- */
-function getAppConfigurationSetting(
-  setting: string,
-  configuration: any,
-  defaultValue: any,
-) {
-  return typeof configuration[setting] !== 'undefined'
-    ? configuration[setting]
-    : defaultValue;
-}
-
 /**
  * Set the monitoring variables
  * @param context
  */
-function initMonitoringConfiguration(context) {
+async function initMonitoringConfiguration(context) {
   try {
     context.wazuh.logger.debug('Reading configuration');
-    const appConfig = getConfiguration();
+    const appConfig = await context.wazuh_core.configuration.get();
     MONITORING_ENABLED =
-      appConfig && typeof appConfig['wazuh.monitoring.enabled'] !== 'undefined'
-        ? appConfig['wazuh.monitoring.enabled'] &&
-          appConfig['wazuh.monitoring.enabled'] !== 'worker'
-        : getSettingDefaultValue('wazuh.monitoring.enabled');
-    MONITORING_FREQUENCY = getAppConfigurationSetting(
-      'wazuh.monitoring.frequency',
-      appConfig,
-      getSettingDefaultValue('wazuh.monitoring.frequency'),
-    );
+      (appConfig['wazuh.monitoring.enabled'] &&
+        appConfig['wazuh.monitoring.enabled'] !== 'worker') ||
+      appConfig['wazuh.monitoring.enabled'];
+    MONITORING_FREQUENCY = appConfig['wazuh.monitoring.frequency'];
     try {
       MONITORING_CRON_FREQ = parseCron(MONITORING_FREQUENCY);
     } catch (error) {
@@ -75,17 +50,10 @@ function initMonitoringConfiguration(context) {
       );
       MONITORING_CRON_FREQ = WAZUH_MONITORING_DEFAULT_CRON_FREQ;
     }
-    MONITORING_CREATION = getAppConfigurationSetting(
-      'wazuh.monitoring.creation',
-      appConfig,
-      getSettingDefaultValue('wazuh.monitoring.creation'),
-    );
+    MONITORING_CREATION = appConfig['wazuh.monitoring.creation'];
 
-    MONITORING_INDEX_PATTERN = getAppConfigurationSetting(
-      'wazuh.monitoring.pattern',
-      appConfig,
-      getSettingDefaultValue('wazuh.monitoring.pattern'),
-    );
+    MONITORING_INDEX_PATTERN = appConfig['wazuh.monitoring.pattern'];
+
     const lastCharIndexPattern =
       MONITORING_INDEX_PATTERN[MONITORING_INDEX_PATTERN.length - 1];
     if (lastCharIndexPattern !== '*') {
@@ -153,7 +121,7 @@ async function checkTemplate(context) {
     } catch (error) {
       // Init with the default index pattern
       monitoringTemplate.index_patterns = [
-        getSettingDefaultValue('wazuh.monitoring.pattern'),
+        await context.wazuh_core.configuration.get('wazuh.monitoring.pattern'),
       ];
     }
 
@@ -212,12 +180,19 @@ async function insertMonitoringDataElasticsearch(context, data) {
       }
 
       // Update the index configuration
-      const appConfig = getConfiguration();
-      const indexConfiguration = buildIndexSettings(
-        appConfig,
-        'wazuh.monitoring',
-        getSettingDefaultValue('wazuh.monitoring.shards'),
+      const appConfig = await context.wazuh_core.configuration.get(
+        'wazuh.monitoring.shards',
+        'wazuh.monitoring.replicas',
       );
+
+      const indexConfiguration = {
+        settings: {
+          index: {
+            number_of_shards: appConfig['wazuh.monitoring.shards'],
+            number_of_replicas: appConfig['wazuh.monitoring.replicas'],
+          },
+        },
+      };
 
       // To update the index settings with this client is required close the index, update the settings and open it
       // Number of shards is not dynamic so delete that setting if it's given
@@ -299,21 +274,16 @@ async function insertDataToIndex(
 async function createIndex(context, indexName: string) {
   try {
     if (!MONITORING_ENABLED) return;
-    const appConfig = getConfiguration();
+    const appConfig = await context.wazuh_core.configuration.get(
+      'wazuh.monitoring.shards',
+      'wazuh.monitoring.replicas',
+    );
 
     const IndexConfiguration = {
       settings: {
         index: {
-          number_of_shards: getAppConfigurationSetting(
-            'wazuh.monitoring.shards',
-            appConfig,
-            getSettingDefaultValue('wazuh.monitoring.shards'),
-          ),
-          number_of_replicas: getAppConfigurationSetting(
-            'wazuh.monitoring.replicas',
-            appConfig,
-            getSettingDefaultValue('wazuh.monitoring.replicas'),
-          ),
+          number_of_shards: appConfig['wazuh.monitoring.shards'],
+          number_of_replicas: appConfig['wazuh.monitoring.replicas'],
         },
       },
     };
@@ -378,31 +348,6 @@ async function checkElasticsearchServer(context) {
 }
 
 /**
- * Get API configuration from elastic and callback to loadCredentials
- */
-async function getHostsConfiguration(context) {
-  try {
-    const hosts =
-      await context.wazuh_core.serverAPIHostEntries.getHostsEntries();
-    if (hosts.length) {
-      return hosts;
-    }
-
-    context.wazuh.logger.debug('There are no API host entries yet');
-    return Promise.reject({
-      error: 'no credentials',
-      error_code: 1,
-    });
-  } catch (error) {
-    context.wazuh.logger.error(error.message || error);
-    return Promise.reject({
-      error: 'no API hosts',
-      error_code: 2,
-    });
-  }
-}
-
-/**
  * Task used by the cron job.
  */
 async function cronTask(context) {
@@ -412,7 +357,14 @@ async function cronTask(context) {
         name: WAZUH_MONITORING_TEMPLATE_NAME,
       });
 
-    const apiHosts = await getHostsConfiguration(context);
+    const apiHosts = await context.wazuh_core.manageHosts.getEntries({
+      excludePassword: true,
+    });
+
+    if (!apiHosts.length) {
+      context.wazuh.logger.warn('There are no API host entries. Skip.');
+      return;
+    }
     const apiHostsUnique = (apiHosts || []).filter(
       (apiHost, index, self) =>
         index ===
@@ -567,7 +519,7 @@ async function fetchAllAgentsFromApiHost(context, apiHost) {
 export async function jobMonitoringRun(context) {
   context.wazuh.logger.debug('Task:Monitoring initializing');
   // Init the monitoring variables
-  initMonitoringConfiguration(context);
+  await initMonitoringConfiguration(context);
   // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
   await checkPluginPlatformStatus(context);
   // // Run the cron job only it it's enabled
