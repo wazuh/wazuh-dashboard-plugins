@@ -25,7 +25,11 @@ import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AgentInfo } from '../../common/welcome/agents-info';
-import { getAngularModule, getCore } from '../../../kibana-services';
+import {
+  getAngularModule,
+  getCore,
+  getDataPlugin,
+} from '../../../kibana-services';
 import { compose } from 'redux';
 import { withGlobalBreadcrumb } from '../hocs';
 import { endpointSummary } from '../../../utils/applications';
@@ -46,7 +50,7 @@ export class MainModuleAgent extends Component {
   constructor(props) {
     super(props);
     this.reportingService = new ReportingService();
-    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
+    this.filterHandler = new FilterHandler(AppState.getCurrentPattern()); //
     this.state = {
       selectView: false,
       loadingReport: false,
@@ -70,14 +74,19 @@ export class MainModuleAgent extends Component {
         {}
       ).id || false;
     if (this.props.section === 'syscollector' && agent) {
-      syscollectorFilters.push(this.filterHandler.managerQuery(agent, true));
+      syscollectorFilters.push(this.filterHandler.managerQuery(agent, true)); // This could be adding a filter with a wrong index name when the selected index has different title and id. Currently the index property is not used in the report of the Inventory data.
       syscollectorFilters.push(this.filterHandler.agentQuery(agent));
     }
-    await this.reportingService.startVis2Png(
-      this.props.section,
-      agent,
-      syscollectorFilters.length ? syscollectorFilters : null,
-    );
+    await this.reportingService.startVis2Png(this.props.section, agent, {
+      filters: syscollectorFilters,
+      time: {
+        from: 'now-1d/d',
+        to: 'now',
+      },
+      indexPattern: await getDataPlugin().indexPatterns.get(
+        AppState.getCurrentPattern(),
+      ),
+    });
     this.setState({ loadingReport: false });
   }
 

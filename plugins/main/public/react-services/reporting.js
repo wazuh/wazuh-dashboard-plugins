@@ -83,12 +83,13 @@ export class ReportingService {
     return store.getState().reportingReducers?.dataSourceSearchContext;
   }
 
-  async startVis2Png(tab, agents = false, syscollectorFilters = null) {
+  async startVis2Png(tab, agents = false, searchContext = null) {
     try {
       this.$rootScope.reportBusy = true;
       this.$rootScope.reportStatus = 'Generating report...0%';
       this.$rootScope.$applyAsync();
-      const dataSourceContext = await this.getDataSourceSearchContext();
+      const dataSourceContext =
+        searchContext || (await this.getDataSourceSearchContext());
       const visualizations = await this.getVisualizationsFromDOM();
       const dataplugin = await getDataPlugin();
       const serverSideQuery = dataplugin.query.getOpenSearchQuery();
@@ -99,7 +100,7 @@ export class ReportingService {
         serverSideQuery, // Used for applying the same filters on the server side requests
         filters: dataSourceContext.filters,
         time: dataSourceContext.time,
-        searchBar: dataSourceContext.query?.query || '',
+        searchBar: dataSourceContext?.query?.query || '',
         tables: [], // TODO: check is this is used
         tab,
         section: agents ? 'agents' : 'overview',
