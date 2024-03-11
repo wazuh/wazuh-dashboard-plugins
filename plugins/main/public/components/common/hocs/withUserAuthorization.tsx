@@ -10,21 +10,43 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from "react";
-import { useUserPermissions, useUserPermissionsRequirements, useUserPermissionsPrivate } from '../hooks/useUserPermissions';
-import { useUserRoles, useUserRolesRequirements, useUserRolesPrivate } from '../hooks/useUserRoles';
+import React from 'react';
+import { useUserPermissionsRequirements } from '../hooks/useUserPermissions';
+import { useUserPermissionsIsAdminRequirements } from '../hooks/use-user-is-admin';
 import { WzEmptyPromptNoPermissions } from '../permissions/prompt';
 import { compose } from 'redux';
-import { withUserLogged } from './withUserLogged'
- //
- const withUserAuthorizationPromptChanged = (permissions = null, roles = null) => WrappedComponent => props => {
-  const [userPermissionRequirements, userPermissions] = useUserPermissionsRequirements(typeof permissions === 'function' ? permissions(props) : permissions);
-  const [userRolesRequirements, userRoles] = useUserRolesRequirements(typeof roles === 'function' ? roles(props) : roles);
+import { withUserLogged } from './withUserLogged';
+//
+const withUserAuthorizationPromptChanged =
+  (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
+  WrappedComponent =>
+  props => {
+    const [userPermissionRequirements, userPermissions] =
+      useUserPermissionsRequirements(
+        typeof permissions === 'function' ? permissions(props) : permissions,
+      );
+    const [_userPermissionIsAdminRequirements] =
+      useUserPermissionsIsAdminRequirements();
 
-  return (userPermissionRequirements || userRolesRequirements) ? <WzEmptyPromptNoPermissions permissions={userPermissionRequirements} roles={userRolesRequirements} /> : <WrappedComponent {...props} />;
-}
+    const userPermissionIsAdminRequirements =
+      othersPermissions?.isAdmininistrator
+        ? _userPermissionIsAdminRequirements
+        : null;
 
-export const withUserAuthorizationPrompt =  (permissions = null, roles = null) => WrappedComponent => compose(
-  withUserLogged,
-  withUserAuthorizationPromptChanged(permissions,roles)
-  )(WrappedComponent)
+    return userPermissionRequirements || userPermissionIsAdminRequirements ? (
+      <WzEmptyPromptNoPermissions
+        permissions={userPermissionRequirements}
+        administrator={userPermissionIsAdminRequirements}
+      />
+    ) : (
+      <WrappedComponent {...props} />
+    );
+  };
+
+export const withUserAuthorizationPrompt =
+  (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
+  WrappedComponent =>
+    compose(
+      withUserLogged,
+      withUserAuthorizationPromptChanged(permissions, othersPermissions),
+    )(WrappedComponent);

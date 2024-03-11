@@ -12,7 +12,6 @@
 export * from './withWindowSize';
 export * from './withPluginPlatformContext';
 export * from './withUserPermissions';
-export * from './withUserRoles';
 export * from './withUserAuthorization';
 export * from './withGlobalBreadcrumb';
 export * from './withReduxProvider';

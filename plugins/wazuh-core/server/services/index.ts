@@ -11,12 +11,10 @@
  */
 
 export * from './cache-api-user-has-run-as';
+export * from './configuration-store';
 export * from './cookie';
 export * from './filesystem';
-export * from './get-configuration';
 export * from './manage-hosts';
 export * from './security-factory';
 export * from './server-api-client';
-export * from './server-api-host-entries';
 export * from './update-registry';
-export * from './update-configuration-file';

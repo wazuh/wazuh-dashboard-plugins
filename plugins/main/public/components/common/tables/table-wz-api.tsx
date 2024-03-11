@@ -18,7 +18,6 @@ import {
   EuiFlexItem,
   EuiText,
   EuiButtonEmpty,
-  EuiSpacer,
   EuiToolTip,
   EuiIcon,
   EuiCheckboxGroup,
@@ -27,9 +26,6 @@ import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
-import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
-import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { useStateStorage } from '../hooks';
 
 /**
@@ -50,8 +46,12 @@ export function TableWzAPI({
   actionButtons,
   ...rest
 }: {
-  actionButtons?: ReactNode | ReactNode[];
+  actionButtons?:
+    | ReactNode
+    | ReactNode[]
+    | (({ filters }: { filters }) => ReactNode);
   title?: string;
+  addOnTitle?: ReactNode;
   description?: string;
   downloadCsv?: boolean | string;
   searchTable?: boolean;
@@ -61,14 +61,20 @@ export function TableWzAPI({
   showReload?: boolean;
   searchBarProps?: any;
   reload?: boolean;
+  onDataChange?: Function;
+  setReload?: (newValue: number) => void;
 }) {
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
   const onFiltersChange = filters =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
       : null;
+
+  const onDataChange = data =>
+    typeof rest.onDataChange === 'function' ? rest.onDataChange(data) : null;
 
   /**
    * Changing the reloadFootprint timestamp will trigger reloading the table
@@ -112,10 +118,15 @@ export function TableWzAPI({
       ).data;
       setIsLoading(false);
       setTotalItems(totalItems);
-      return {
+
+      const result = {
         items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
         totalItems,
       };
+
+      onDataChange(result);
+
+      return result;
     } catch (error) {
       setIsLoading(false);
       setTotalItems(0);
@@ -132,25 +143,32 @@ export function TableWzAPI({
   },
   []);
 
-  const renderActionButtons = (
-    <>
-      {Array.isArray(actionButtons)
-        ? actionButtons.map((button, key) => (
-            <EuiFlexItem key={key} grow={false}>
-              {button}
-            </EuiFlexItem>
-          ))
-        : typeof actionButtons === 'object' && (
-            <EuiFlexItem grow={false}>{actionButtons}</EuiFlexItem>
-          )}
-    </>
-  );
+  const renderActionButtons = filters => {
+    if (Array.isArray(actionButtons)) {
+      return actionButtons.map((button, key) => (
+        <EuiFlexItem key={key} grow={false}>
+          {button}
+        </EuiFlexItem>
+      ));
+    }
+
+    if (typeof actionButtons === 'object') {
+      return <EuiFlexItem grow={false}>{actionButtons}</EuiFlexItem>;
+    }
+
+    if (typeof actionButtons === 'function') {
+      return actionButtons({ filters: getFilters(filters) });
+    }
+  };
 
   /**
-   *  Generate a new reload footprint
+   *  Generate a new reload footprint and set reload to propagate refresh
    */
   const triggerReload = () => {
     setReloadFootprint(Date.now());
+    if (rest.setReload) {
+      rest.setReload(Date.now());
+    }
   };
 
   useEffect(() => {
@@ -167,28 +185,34 @@ export function TableWzAPI({
 
   const header = (
     <>
-      <EuiFlexGroup wrap>
-        <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
-          {rest.title && (
-            <EuiTitle size='s'>
-              <h1>
-                {rest.title}{' '}
-                {isLoading ? (
-                  <EuiLoadingSpinner size='s' />
-                ) : (
-                  <span>({totalItems})</span>
-                )}
-              </h1>
-            </EuiTitle>
-          )}
-          {rest.description && (
-            <EuiText color='subdued'>{rest.description}</EuiText>
-          )}
-        </EuiFlexItem>
+      <EuiFlexGroup wrap alignItems='center' responsive={false}>
         <EuiFlexItem>
-          <EuiFlexGroup wrap justifyContent={'flexEnd'} alignItems={'center'}>
+          <EuiFlexGroup alignItems='center' responsive={false}>
+            <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
+              {rest.title && (
+                <EuiTitle size='s'>
+                  <h1>
+                    {rest.title}{' '}
+                    {isLoading ? (
+                      <EuiLoadingSpinner size='s' />
+                    ) : (
+                      <span>({totalItems})</span>
+                    )}
+                  </h1>
+                </EuiTitle>
+              )}
+            </EuiFlexItem>
+            {rest.addOnTitle ? (
+              <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
+                {rest.addOnTitle}
+              </EuiFlexItem>
+            ) : null}
+          </EuiFlexGroup>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiFlexGroup wrap alignItems={'center'} responsive={false}>
             {/* Render optional custom action button */}
-            {renderActionButtons}
+            {renderActionButtons(filters)}
             {/* Render optional reload button */}
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}
@@ -266,11 +290,15 @@ export function TableWzAPI({
   );
 
   return (
-    <>
-      {header}
-      {rest.description && <EuiSpacer />}
-      {table}
-    </>
+    <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
+      <EuiFlexItem>{header}</EuiFlexItem>
+      {rest.description && (
+        <EuiFlexItem>
+          <EuiText color='subdued'>{rest.description}</EuiText>
+        </EuiFlexItem>
+      )}
+      <EuiFlexItem>{table}</EuiFlexItem>
+    </EuiFlexGroup>
   );
 }
 

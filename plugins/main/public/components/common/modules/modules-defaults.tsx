@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { Dashboard } from './dashboard';
-import { Events } from './events';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
@@ -39,6 +38,14 @@ import { nistColumns } from '../../overview/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github-panel/events/github-columns';
+import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
+import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
+import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
+import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+
+const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
+const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
 
 const DashboardTab = {
   id: 'dashboard',
@@ -56,13 +63,6 @@ const renderDiscoverTab = (columns, indexPattern) => {
       <WazuhDiscover defaultIndexPattern={indexPattern} tableColumns={columns} />
     ),
   };
-};
-
-const EventsTab = {
-  id: 'events',
-  name: 'Events',
-  buttons: [ButtonModuleExploreAgent],
-  component: Events,
 };
 
 const RegulatoryComplianceTabs = columns => [
@@ -120,14 +120,13 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
+  // This module is Malware Detection. Ref: https://github.com/wazuh/wazuh-dashboard-plugins/issues/5893
   pm: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
-    availableFor: ['manager', 'agent'],
-  },
-  audit: {
-    init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, malwareDetectionColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   sca: {
@@ -190,11 +189,6 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  ciscat: {
-    init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
-    availableFor: ['manager', 'agent'],
-  },
   vuls: {
     init: 'dashboard',
     tabs: [
@@ -202,17 +196,33 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardVuls,
-        buttons: [ButtonModuleExploreAgent],
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         id: 'inventory',
         name: 'Inventory',
         component: InventoryVuls,
-        buttons: [ButtonModuleExploreAgent],
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         ...renderDiscoverTab(vulnerabilitiesColumns),
-        component: withModuleNotForAgent(() => (
+        component: withVulnerabilitiesStateDataSource(() => (
           <WazuhDiscover
             tableColumns={vulnerabilitiesColumns}
           />
@@ -237,13 +247,16 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainMitre,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, mitreAttackColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
   virustotal: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, virustotalColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   docker: {
@@ -252,17 +265,6 @@ export const ModulesDefaults = {
       DashboardTab,
       renderDiscoverTab(dockerColumns),
     ],
-    availableFor: ['manager', 'agent'],
-  },
-
-  osquery: {
-    init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
-    availableFor: ['manager', 'agent'],
-  },
-  oscap: {
-    init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
     availableFor: ['manager', 'agent'],
   },
   pci: {
