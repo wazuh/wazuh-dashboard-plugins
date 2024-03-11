@@ -26,7 +26,7 @@ export const DashboardAWS: React.FC = () => {
         <SearchBar
           appName='aws-searchbar'
           {...searchBarProps}
-          showDatePicker={false}
+          showDatePicker={true}
           showQueryInput={true}
           showQueryBar={true}
         />
