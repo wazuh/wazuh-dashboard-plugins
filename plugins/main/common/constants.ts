@@ -366,6 +366,18 @@ export const AGENT_STATUS_CODE = [
   },
 ];
 
+export const API_NAME_TASK_STATUS = {
+  DONE: 'Done',
+  IN_PROGRESS: 'In progress',
+  FAILED: 'Failed',
+} as const;
+
+export const UI_TASK_STATUS = [
+  API_NAME_TASK_STATUS.DONE,
+  API_NAME_TASK_STATUS.IN_PROGRESS,
+  API_NAME_TASK_STATUS.FAILED,
+];
+
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
 
