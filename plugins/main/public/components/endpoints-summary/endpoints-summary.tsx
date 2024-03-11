@@ -149,6 +149,7 @@ export const EndpointsSummary = compose(
             <WzReduxProvider>
               <AgentsTable
                 filters={this.state.agentTableFilters}
+                externalReload={this.state.reload}
                 setExternalReload={this.setReload}
               />
             </WzReduxProvider>

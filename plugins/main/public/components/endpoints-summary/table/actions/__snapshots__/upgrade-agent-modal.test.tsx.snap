@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UpgradeAgentModal component should return the component 1`] = `
+<div
+  aria-hidden="true"
+  data-aria-hidden="true"
+/>
+`;
