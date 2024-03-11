@@ -23,6 +23,8 @@ import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 import { exportResponseToFile } from './export-file';
+import domtoimage from '../utils/dom-to-image';
+import store from '../redux/store';
 
 const app = getAngularModule();
 
@@ -61,63 +63,49 @@ export class ReportingService {
     return idArray;
   }
 
+  async getVisualizationsFromDOM() {
+    const domVisualizations = document.querySelectorAll('.visualization');
+    return await Promise.all(
+      Array.from(domVisualizations).map(async node => {
+        return {
+          element: await domtoimage.toPng(node),
+          width: node.clientWidth,
+          height: node.clientHeight,
+          title: node?.parentNode?.parentNode?.parentNode?.querySelector(
+            'figcaption > h2 > .embPanel__titleInner',
+          )?.textContent,
+        };
+      }),
+    );
+  }
+
+  async getDataSourceSearchContext() {
+    return store.getState().reportingReducers?.dataSourceSearchContext;
+  }
+
   async startVis2Png(tab, agents = false, syscollectorFilters = null) {
     try {
-      if (this.vis2png.isWorking()) {
-        this.showToast('danger', 'Error', 'Report in progress', 4000);
-        return;
-      }
       this.$rootScope.reportBusy = true;
       this.$rootScope.reportStatus = 'Generating report...0%';
       this.$rootScope.$applyAsync();
-
-      this.vis2png.clear();
-
-      const rawVisualizations = this.rawVisualizations
-        .getList()
-        .filter(this.removeTableVis);
-
-      let idArray = [];
-      if (tab === 'general') {
-        idArray = this.removeAgentStatusVis(
-          rawVisualizations.map(item => item.id),
-        );
-      } else {
-        idArray = rawVisualizations.map(item => item.id);
-      }
-
-      const visualizationIDList = [];
-      for (const item of idArray) {
-        const tmpHTMLElement = $(`#${item}`);
-        if (tmpHTMLElement[0]) {
-          this.vis2png.assignHTMLItem(item, tmpHTMLElement);
-          visualizationIDList.push(item);
-        }
-      }
-
-      const appliedFilters = await this.visHandlers.getAppliedFilters(
-        syscollectorFilters,
-      );
+      const dataSourceContext = await this.getDataSourceSearchContext();
+      const visualizations = await this.getVisualizationsFromDOM();
       const dataplugin = await getDataPlugin();
       const serverSideQuery = dataplugin.query.getOpenSearchQuery();
-      const array = await this.vis2png.checkArray(visualizationIDList);
-
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
-        array,
+        array: visualizations,
         serverSideQuery, // Used for applying the same filters on the server side requests
-        filters: appliedFilters.filters,
-        time: appliedFilters.time,
-        searchBar: appliedFilters.searchBar,
-        tables: appliedFilters.tables,
+        filters: dataSourceContext.filters,
+        time: dataSourceContext.time,
+        searchBar: dataSourceContext.query?.query || '',
+        tables: [], // TODO: check is this is used
         tab,
         section: agents ? 'agents' : 'overview',
         agents,
         browserTimezone,
-        indexPatternTitle: (
-          await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
-        ).title,
+        indexPatternTitle: dataSourceContext.indexPattern.title,
         apiId: JSON.parse(AppState.getCurrentAPI()).id,
       };
 

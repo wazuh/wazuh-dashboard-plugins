@@ -76,7 +76,7 @@ export class OverviewController {
 
     this.currentOverviewSectionProps = {
       switchTab: (tab, force) => this.switchTab(tab, force),
-      currentTab: this.tab
+      currentTab: this.tab,
     };
   }
 
@@ -95,13 +95,11 @@ export class OverviewController {
 
     this.wzMonitoringEnabled = false;
 
-
     this.init();
 
     this.$scope.getMainProps = resultState => {
       return {
         section: this.tab,
-        disabledReport: resultState !== 'ready',
         agentsSelectionProps: this.agentsSelectionProps,
         switchSubTab: subtab => this.switchSubtab(subtab),
       };
