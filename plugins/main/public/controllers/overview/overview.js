@@ -39,7 +39,6 @@ export class OverviewController {
    * @param {*} $rootScope
    * @param {*} errorHandler
    * @param {*} commonData
-   * @param {*} reportingService
    * @param {*} visFactoryService
    */
   constructor(
@@ -48,7 +47,6 @@ export class OverviewController {
     $rootScope,
     errorHandler,
     commonData,
-    reportingService,
     visFactoryService,
     $route,
   ) {
@@ -59,7 +57,6 @@ export class OverviewController {
     this.errorHandler = errorHandler;
     this.tabVisualizations = new TabVisualizations();
     this.commonData = commonData;
-    this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = new WazuhConfig();
     this.visFactoryService = VisFactoryHandler;
@@ -325,13 +322,6 @@ export class OverviewController {
       getErrorOrchestrator().handleError(options);
     }
     this.$scope.$applyAsync();
-  }
-
-  /**
-   * Transform a visualization into an image
-   */
-  startVis2Png() {
-    return this.reportingService.startVis2Png(this.tab);
   }
 
   /**
