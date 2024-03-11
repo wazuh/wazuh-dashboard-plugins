@@ -45,6 +45,7 @@ import { getOutdatedAgents } from '../services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
+import { AgentUpgradesTaskDetailsModal } from './upgradeTaskDetailsModal';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -93,7 +94,13 @@ export const AgentsTable = compose(
   const [denyEditGroups] = useUserPermissionsRequirements([
     { action: 'group:modify_assignments', resource: 'group:id:*' },
   ]);
+  const [denyUpgrade] = useUserPermissionsRequirements([
+    { action: 'agent:upgrade', resource: 'agent:id:*' },
+  ]);
   const [outdatedAgents, setOutdatedAgents] = useState<Agent[]>([]);
+
+  const [isUpgradeTasksModalVisible, setIsUpgradeTasksModalVisible] =
+    useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
@@ -230,41 +237,44 @@ export const AgentsTable = compose(
           <TableWzAPI
             title='Agents'
             addOnTitle={selectedtemsRenderer}
-            extra={<AgentUpgradesInProgress reload={props.externalReload} />}
+            extra={
+              <AgentUpgradesInProgress
+                reload={props.externalReload}
+                setIsModalVisible={setIsUpgradeTasksModalVisible}
+              />
+            }
             actionButtons={({ filters }) => (
-              <>
-                <EuiFlexItem grow={false}>
-                  <WzButtonPermissions
-                    buttonType='empty'
-                    permissions={[
-                      { action: 'agent:create', resource: '*:*:*' },
-                    ]}
-                    iconType='plusInCircle'
-                    href={getCore().application.getUrlForApp(
-                      endpointSummary.id,
-                      {
-                        path: `#${endpointSummary.redirectTo()}deploy`,
-                      },
-                    )}
-                  >
-                    Deploy new agent
-                  </WzButtonPermissions>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <AgentsTableGlobalActions
-                    selectedAgents={selectedItems}
-                    allAgentsSelected={allAgentsSelected}
-                    allAgentsCount={agentList.totalItems}
-                    filters={filters?.q}
-                    allowEditGroups={!denyEditGroups}
-                    reloadAgents={() => reloadAgents()}
-                  />
-                </EuiFlexItem>
-              </>
+              <EuiFlexItem grow={false}>
+                <WzButtonPermissions
+                  buttonType='empty'
+                  permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
+                  iconType='plusInCircle'
+                  href={getCore().application.getUrlForApp(endpointSummary.id, {
+                    path: `#${endpointSummary.redirectTo()}deploy`,
+                  })}
+                >
+                  Deploy new agent
+                </WzButtonPermissions>
+              </EuiFlexItem>
+            )}
+            postActionButtons={({ filters }) => (
+              <EuiFlexItem grow={false}>
+                <AgentsTableGlobalActions
+                  selectedAgents={selectedItems}
+                  allAgentsSelected={allAgentsSelected}
+                  allAgentsCount={agentList.totalItems}
+                  filters={filters?.q}
+                  allowEditGroups={!denyEditGroups}
+                  allowUpgrade={!denyUpgrade}
+                  reloadAgents={() => reloadAgents()}
+                  setIsUpgradeTasksModalVisible={setIsUpgradeTasksModalVisible}
+                />
+              </EuiFlexItem>
             )}
             endpoint='/agents'
             tableColumns={agentsTableColumns(
               !denyEditGroups,
+              !denyUpgrade,
               setAgent,
               setIsEditGroupsVisible,
               setIsUpgradeModalVisible,
@@ -464,6 +474,11 @@ export const AgentsTable = compose(
             setIsEditGroupsVisible(false);
             setAgent(undefined);
           }}
+        />
+      ) : null}
+      {isUpgradeTasksModalVisible ? (
+        <AgentUpgradesTaskDetailsModal
+          onClose={() => setIsUpgradeTasksModalVisible(false)}
         />
       ) : null}
     </div>
