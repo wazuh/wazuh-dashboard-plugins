@@ -3,11 +3,12 @@ import { tDataSourceFactory } from './data-source-factory';
 import { tDataSource } from "./data-source";
 
 export type tDataSourceSelector = {
+    existsDataSource: (id: string) => Promise<boolean>;
+    getFirstValidDataSource: () => Promise<tDataSource>;
     getAllDataSources: () => Promise<tDataSource[]>;
     getDataSource: (id: string) => Promise<tDataSource>;
     getSelectedDataSource: () => Promise<tDataSource>;
     selectDataSource: (id: string) => Promise<void>;
-    existsDataSource: (id: string) => Promise<boolean>;
 }
 
 
@@ -23,6 +24,11 @@ export class DataSourceSelector implements tDataSourceSelector {
             throw new Error('Data source factory is required');
         }
     }
+
+    /**
+     * Check if the data source exists in the repository.
+     * @param id 
+     */
     async existsDataSource(id: string): Promise<boolean> {
         try {
             if (!id) {
@@ -35,6 +41,32 @@ export class DataSourceSelector implements tDataSourceSelector {
         }
     }
 
+    /**
+     * Get the first valid data source from the repository.
+     * Loop through the data sources and return the first valid data source.
+     * Break the while when the valid data source is found
+     */
+    async getFirstValidDataSource(): Promise<tDataSource> {
+        const dataSources = await this.getAllDataSources();
+        if (dataSources.length === 0) {
+            throw new Error('No data sources found');
+        }
+        let index = 0;
+        do {
+            const dataSource = dataSources[index];
+            if (await this.existsDataSource(dataSource.id)) {
+                return dataSource;
+            }
+            index++;
+        } while (index < dataSources.length);
+        throw new Error('No valid data sources found');
+    }
+
+    /**
+     * Get all the data sources from the repository.
+     * When the map of the data sources is empty, get all the data sources from the repository.
+    */
+
     async getAllDataSources(): Promise<tDataSource[]> {
         if (this.dataSources.size === 0) {
             const dataSources = await this.factory.createAll(await this.repository.getAll());
@@ -45,6 +77,12 @@ export class DataSourceSelector implements tDataSourceSelector {
         return Array.from(this.dataSources.values());
     }
 
+    /**
+     * Get a data source by a received ID.
+     * When the map of the data sources is empty, get all the data sources from the repository.
+     * When the data source is not found, an error is thrown.
+     * @param id 
+     */
     async getDataSource(id: string): Promise<tDataSource> {
         // when the map of the data sources is empty, get all the data sources from the repository
         if (this.dataSources.size === 0) {
@@ -67,7 +105,6 @@ export class DataSourceSelector implements tDataSourceSelector {
         if (!id) {
             throw new Error('Error selecting data source. ID is required');
         }
-        const currentSelectedDataSource = await this.getSelectedDataSource();
         const dataSource = await this.getDataSource(id);
         if (!dataSource) {
             throw new Error('Data source not found');
@@ -76,44 +113,25 @@ export class DataSourceSelector implements tDataSourceSelector {
         await this.repository.setDefault(dataSource);
     }
 
-    async getDataSourceByIndex(id: string | null): Promise<tDataSource> {
-        if (!id) {
-            const dataSources = await this.getAllDataSources();
-            return dataSources[0];
-        }
-        return await this.getDataSource(id);
-    }
-
     /**
      * Get the selected data source from the repository.
+     * When the repository has a data source, return the selected data source.
+     * When the repository does not have a selected data source, return the first valid data source.
+     * When the repository throws an error, return the first valid data source.
      */
     async getSelectedDataSource(): Promise<tDataSource> {
         try {
             const defaultDataSource = await this.repository.getDefault();
-            // when the default data source is not found, return the first one of the map
             if (!defaultDataSource) {
-                // if the data source is not saved on the repository, return the first one
-                const firstDataSource = await this.getDataSourceByIndex(null);
-                await firstDataSource.select();
-                await this.repository.setDefault(firstDataSource);
-                return firstDataSource;
-            } else {
-                // if exists check if the data source is in the map
-                const dataSource = this.dataSources.get(defaultDataSource.id);
-                if (!dataSource) {
-                    const firstDataSource = await this.getDataSourceByIndex(null);
-                    await firstDataSource.select();
-                    await this.repository.setDefault(firstDataSource);
-                    return firstDataSource;
-                } else {
-                    return dataSource;
-                }
+                const validDataSource = await this.getFirstValidDataSource();
+                await this.selectDataSource(validDataSource.id);
+                return validDataSource;
             }
+            return defaultDataSource;
         } catch (error) {
-            const firstDataSource = await this.getDataSourceByIndex(null);
-            await firstDataSource.select();
-            await this.repository.setDefault(firstDataSource);
-            return firstDataSource;
+            const validateDataSource = await this.getFirstValidDataSource();
+            await this.selectDataSource(validateDataSource.id);
+            return validateDataSource;
         }
     }
 

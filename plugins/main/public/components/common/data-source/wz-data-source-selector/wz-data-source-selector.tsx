@@ -11,24 +11,25 @@ import {
     ErrorHandler,
     ErrorFactory,
     HttpError,
-} from '../../react-services/error-management';
+} from '../../../../react-services/error-management';
 
-type tWzPatternSelector = {
+type tWzDataSourceSelector = {
+    name: 'string'
     onChange?: (dataSource: tDataSource) => void;
     dataSourceSelector: tDataSourceSelector;
 }
 
-const WzPatternSelector = (props: tWzPatternSelector) => {
-    const { onChange, dataSourceSelector } = props;
+const WzDataSourceSelector = (props: tWzDataSourceSelector) => {
+    const { onChange, dataSourceSelector, name = 'data source' } = props;
     const [dataSourceList, setDataSourceList] = useState<tDataSource[] | []>([]);
     const [selectedPattern, setSelectedPattern] = useState<tDataSource>();
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        loadAlertsIndexPatterns();
+        loadDataSources();
     }, [])
 
-    async function loadAlertsIndexPatterns() {
+    async function loadDataSources() {
         setIsLoading(true);
         const dataSourcesList = await dataSourceSelector.getAllDataSources();
         const defaultIndexPattern = await dataSourceSelector.getSelectedDataSource();
@@ -46,7 +47,7 @@ const WzPatternSelector = (props: tWzPatternSelector) => {
         } catch (error) {
             const searchError = ErrorFactory.create(HttpError, {
                 error,
-                message: 'Error selecting index pattern',
+                message: `Error selecting the ${name.toLowerCase()} '${dataSourceId}`
             });
             ErrorHandler.handleError(searchError);
         }
@@ -60,10 +61,10 @@ const WzPatternSelector = (props: tWzPatternSelector) => {
                 })}
                 value={selectedPattern?.id || dataSourceList[0]?.id}
                 onChange={selectDataSource}
-                aria-label='Index pattern selector'
+                aria-label={`${name} selector`}
             />
         </EuiFormRow>
     );
 }
 
-export default WzPatternSelector;
+export default WzDataSourceSelector;

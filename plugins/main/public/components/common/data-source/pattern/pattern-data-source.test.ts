@@ -1,8 +1,22 @@
 import { PatternDataSource } from './pattern-data-source';
+import { getDataPlugin } from '../../../../kibana-services';
 
 jest.mock('../../../../kibana-services', () => ({
     ...(jest.requireActual('../../../../kibana-services') as object),
-    getDataPlugin: jest.fn(),
+    getDataPlugin: () => ({
+        // mock indexPatterns getter
+        indexPatterns: {
+            get: jest.fn().mockResolvedValue({
+                fields: {
+                    replaceAll: jest.fn(),
+                    map: jest.fn().mockReturnValue([]),
+                },
+                getScriptedFields: jest.fn().mockReturnValue([]),
+            }),
+            getFieldsForIndexPattern: jest.fn().mockResolvedValue([]),
+            updateSavedObject: jest.fn().mockResolvedValue({}),
+        },
+    }),
 }));
 
 describe('PatternDataSource', () => {
@@ -23,8 +37,11 @@ describe('PatternDataSource', () => {
 
     it.skip('should select the data source', async () => {
         const patternDataSource = new PatternDataSource('id', 'title');
-        const spy = jest.spyOn(patternDataSource, 'select');
-        //  mock getDataPlugin().indexPatterns.get 
-        
+        (getDataPlugin().indexPatterns.getFieldsForIndexPattern as jest.Mock).mockResolvedValue([]);
+        await patternDataSource.select();
+        expect(getDataPlugin().indexPatterns.get).toHaveBeenCalledWith('id');
+        expect(getDataPlugin().indexPatterns.getFieldsForIndexPattern).toHaveBeenCalledWith({});
+        expect(getDataPlugin().indexPatterns.updateSavedObject).toHaveBeenCalledWith({});
+
     });
 });
