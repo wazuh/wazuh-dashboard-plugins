@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { } from 'react';
+import React from 'react';
 import {
   EuiFlexItem,
   EuiPanel,
@@ -23,9 +23,13 @@ import {
   EuiSpacer,
   EuiToolTip,
   EuiButtonIcon,
+  EuiIconTip,
 } from '@elastic/eui';
-import { EuiIconTip } from '@elastic/eui';
-import { EpluginSettingType, TPluginSettingWithKey, UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
+import {
+  EpluginSettingType,
+  UI_LOGGER_LEVELS,
+} from '../../../../../../../../common/constants';
+import { TPluginSettingWithKey } from '../../../../../../../../../wazuh-core/common/constants';
 import { webDocumentationLink } from '../../../../../../../../common/services/web_documentation';
 import classNames from 'classnames';
 import { InputForm } from '../../../../../../common/form';
@@ -37,14 +41,19 @@ import { WzRequest } from '../../../../../../../react-services';
 import { updateAppConfig } from '../../../../../../../redux/actions/appConfigActions';
 import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
 import { WzButtonModalConfirm } from '../../../../../../common/buttons';
-import { toastRequiresReloadingBrowserTab, toastRequiresRestartingPluginPlatform, toastRequiresRunningHealthcheck, toastSuccessUpdateConfiguration } from '../show-toasts';
+import {
+  toastRequiresReloadingBrowserTab,
+  toastRequiresRestartingPluginPlatform,
+  toastRequiresRunningHealthcheck,
+  toastSuccessUpdateConfiguration,
+} from '../show-toasts';
 
 interface ICategoryProps {
-  title: string
-  description?: string
-  documentationLink?: string
-  items: TPluginSettingWithKey[]
-  currentConfiguration: { [field: string]: any }
+  title: string;
+  description?: string;
+  documentationLink?: string;
+  items: TPluginSettingWithKey[];
+  currentConfiguration: { [field: string]: any };
 }
 
 export const Category: React.FunctionComponent<ICategoryProps> = ({
@@ -52,40 +61,38 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
   currentConfiguration,
   description,
   documentationLink,
-  items
+  items,
 }) => {
   return (
     <EuiFlexItem>
-      <EuiPanel paddingSize="l">
+      <EuiPanel paddingSize='l'>
         <EuiText>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <h2>{title}{
-                documentationLink &&
-                <EuiToolTip
-                  position="right"
-                  content="Documentation">
-                  <>
-                    &nbsp;
-                    <EuiButtonIcon
-                      iconType="iInCircle"
-                      iconSize="l"
-                      aria-label="Help"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={webDocumentationLink(documentationLink)}
-                    ></EuiButtonIcon>
-                  </>
-                </EuiToolTip>
-              }
+              <h2>
+                {title}
+                {documentationLink && (
+                  <EuiToolTip position='right' content='Documentation'>
+                    <>
+                      &nbsp;
+                      <EuiButtonIcon
+                        iconType='iInCircle'
+                        iconSize='l'
+                        aria-label='Help'
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        href={webDocumentationLink(documentationLink)}
+                      ></EuiButtonIcon>
+                    </>
+                  </EuiToolTip>
+                )}
               </h2>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiText>
-        {
-          description &&
+        {description && (
           <>
-            <EuiText color="subdued">
+            <EuiText color='subdued'>
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <span>{description}</span>
@@ -94,9 +101,9 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
             </EuiText>
             <EuiSpacer />
           </>
-        }
+        )}
         <EuiForm>
-        {items.map((item, idx) => {
+          {items.map((item, idx) => {
             const isUpdated = item.changed && !item.error;
             return (
               <EuiDescribedFormGroup
@@ -104,90 +111,116 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
                 key={idx}
                 className={classNames('mgtAdvancedSettings__field', {
                   'mgtAdvancedSettings__field--unsaved': isUpdated,
-                  'mgtAdvancedSettings__field--invalid': item.error
+                  'mgtAdvancedSettings__field--invalid': item.error,
                 })}
                 title={
-                  <EuiTitle className="mgtAdvancedSettings__fieldTitle" size="s">
+                  <EuiTitle
+                    className='mgtAdvancedSettings__fieldTitle'
+                    size='s'
+                  >
                     <span>
                       {item.title}
                       {item.error && (
                         <EuiIconTip
-                        anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
-                        type='alert'
-                        color='danger'
-                        aria-label={item.key}
-                        content='Invalid' />
+                          anchorClassName='mgtAdvancedSettings__fieldTitleUnsavedIcon'
+                          type='alert'
+                          color='danger'
+                          aria-label={item.key}
+                          content='Invalid'
+                        />
                       )}
                       {isUpdated && (
                         <EuiIconTip
-                        anchorClassName="mgtAdvancedSettings__fieldTitleUnsavedIcon"
-                        type='dot'
-                        color='warning'
-                        aria-label={item.key}
-                        content='Unsaved' />
+                          anchorClassName='mgtAdvancedSettings__fieldTitleUnsavedIcon'
+                          type='dot'
+                          color='warning'
+                          aria-label={item.key}
+                          content='Unsaved'
+                        />
                       )}
                     </span>
-                  </EuiTitle>}
-                description={item.description} >
-                  <InputForm
-                    label={item.key}
-                    {...item}
-                    {...((item.type === EpluginSettingType.filepicker && currentConfiguration[item.key])
-                      ? {
-                          postInput: () => (
-                            <EuiFlexItem grow={false}>
-                              <InputFormFilePickerPreInput
-                                image={getHttp().basePath.prepend(getAssetURL(currentConfiguration[item.key]))}
-                                field={item}
-                              />
-                            </EuiFlexItem>
-                          )
-                        }
-                      : {}
-                    )}
-                  />
+                  </EuiTitle>
+                }
+                description={item.description}
+              >
+                <InputForm
+                  label={item.key}
+                  {...item}
+                  {...(item.type === EpluginSettingType.filepicker &&
+                  currentConfiguration[item.key]
+                    ? {
+                        postInput: () => (
+                          <EuiFlexItem grow={false}>
+                            <InputFormFilePickerPreInput
+                              image={getHttp().basePath.prepend(
+                                getAssetURL(currentConfiguration[item.key]),
+                              )}
+                              field={item}
+                            />
+                          </EuiFlexItem>
+                        ),
+                      }
+                    : {})}
+                />
               </EuiDescribedFormGroup>
-            )
+            );
           })}
         </EuiForm>
       </EuiPanel>
     </EuiFlexItem>
-  )
+  );
 };
 
-const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}) => {
+const InputFormFilePickerPreInput = ({
+  image,
+  field,
+}: {
+  image: string;
+  field: any;
+}) => {
   const dispatch = useDispatch();
 
   return (
     <>
-      <EuiFlexGroup alignItems="center" responsive={false}>
+      <EuiFlexGroup alignItems='center' responsive={false}>
         <EuiFlexItem grow={false}>
           <img
             src={image}
-            alt="Custom logo"
-            style={{maxWidth: '40px', maxHeight: '40px', width: '100%'}}
+            alt='Custom logo'
+            style={{ maxWidth: '40px', maxHeight: '40px', width: '100%' }}
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <WzButtonModalConfirm
-            buttonType="icon"
+            buttonType='icon'
             tooltip={{
               content: 'Delete file',
               position: 'top',
             }}
             modalTitle={`Do you want to delete the ${field.key} file?`}
             onConfirm={async () => {
-              try{
-                const response = await WzRequest.genericReq('DELETE', `/utils/configuration/files/${field.key}`);
-                dispatch(updateAppConfig(response.data.data.updatedConfiguration));
+              try {
+                const response = await WzRequest.genericReq(
+                  'DELETE',
+                  `/utils/configuration/files/${field.key}`,
+                );
+                dispatch(
+                  updateAppConfig(response.data.data.updatedConfiguration),
+                );
 
                 // Show the toasts if necessary
-                const { requiresRunningHealthCheck, requiresReloadingBrowserTab, requiresRestartingPluginPlatform } = response.data.data;
+                const {
+                  requiresRunningHealthCheck,
+                  requiresReloadingBrowserTab,
+                  requiresRestartingPluginPlatform,
+                } = response.data.data;
                 requiresRunningHealthCheck && toastRequiresRunningHealthcheck();
-                requiresReloadingBrowserTab&& toastRequiresReloadingBrowserTab();
-                requiresRestartingPluginPlatform && toastRequiresRestartingPluginPlatform();
+                requiresReloadingBrowserTab &&
+                  toastRequiresReloadingBrowserTab();
+                requiresRestartingPluginPlatform &&
+                  toastRequiresRestartingPluginPlatform();
                 toastSuccessUpdateConfiguration();
-              }catch(error){
+              } catch (error) {
                 const options = {
                   context: `${InputFormFilePickerPreInput.name}.confirmDeleteFile`,
                   level: UI_LOGGER_LEVELS.ERROR,
@@ -203,9 +236,9 @@ const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}
               }
             }}
             modalProps={{ buttonColor: 'danger' }}
-            iconType="trash"
-            color="danger"
-            aria-label="Delete file"
+            iconType='trash'
+            color='danger'
+            aria-label='Delete file'
           />
         </EuiFlexItem>
       </EuiFlexGroup>

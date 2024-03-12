@@ -15,12 +15,13 @@ import { visualizations } from '../../../components/visualize/visualizations';
 import PropTypes from 'prop-types';
 import { EuiFlexGroup, EuiFlexItem, EuiStat } from '@elastic/eui';
 import { connect } from 'react-redux';
-import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plugins/data/common';
+import {
+  buildPhrasesFilter,
+  buildRangeFilter,
+} from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
 import { AppState } from '../../../react-services/app-state';
-import { getDataPlugin } from '../../../kibana-services';
-import { getSettingDefaultValue } from '../../../../common/services/settings';
-
+import { getDataPlugin, getWazuhCorePlugin } from '../../../kibana-services';
 
 class AlertsStats extends Component {
   constructor(props) {
@@ -38,39 +39,49 @@ class AlertsStats extends Component {
       });
     }
     this.setState({
-      items: nextProps.items
+      items: nextProps.items,
     });
   }
 
   async componentDidMount() {
     const indexPattern = await getIndexPattern();
-    this.setState({indexPattern: indexPattern})
+    this.setState({ indexPattern: indexPattern });
   }
 
   buildStats() {
     const stats = (this.state.items || []).map((item, index) => {
       const title = typeof item.value !== 'undefined' ? item.value : '-';
       let auxFunction;
-      switch(item.description) {
+      switch (item.description) {
         case 'Level 12 or above alerts':
-            auxFunction = () => this.filterLevel()
+          auxFunction = () => this.filterLevel();
           break;
         case 'Authentication failure':
-            auxFunction = () => this.filterAuthenticationFailure()
+          auxFunction = () => this.filterAuthenticationFailure();
           break;
         case 'Authentication success':
-          auxFunction = () => this.filterAuthenticationSuccess()
+          auxFunction = () => this.filterAuthenticationSuccess();
           break;
         default:
-          auxFunction = () => {}
+          auxFunction = () => {};
       }
       return (
         <EuiFlexItem key={`${item.description}${title}`}>
           <EuiStat
-            title={<span className={index !== 0 && this.props.tab === 'general' ? 'cursor-pointer' : 'cursor-default' }>{title}</span>}
+            title={
+              <span
+                className={
+                  index !== 0 && this.props.tab === 'general'
+                    ? 'cursor-pointer'
+                    : 'cursor-default'
+                }
+              >
+                {title}
+              </span>
+            }
             description={item.description}
             titleColor={item.color || 'primary'}
-            textAlign="center"
+            textAlign='center'
             onClick={() => item.value !== '-' && auxFunction()}
           />
         </EuiFlexItem>
@@ -84,44 +95,62 @@ class AlertsStats extends Component {
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
     const newFilter = {
-      "meta": {
-        "disabled": false,
-        "key": filter.key,
-        "params": { "query": filter.value },
-        "type": "phrase",
-        "negate": filter.negate || false,
-        "index": AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
+      meta: {
+        disabled: false,
+        key: filter.key,
+        params: { query: filter.value },
+        type: 'phrase',
+        negate: filter.negate || false,
+        index:
+          AppState.getCurrentPattern() ||
+          getWazuhCorePlugin().configuration.getSettingValue('pattern'),
       },
-      "query": { "match_phrase": matchPhrase },
-      "$state": { "store": "appState" }
-    }
+      query: { match_phrase: matchPhrase },
+      $state: { store: 'appState' },
+    };
     filterManager.addFilters([newFilter]);
   }
 
   filterLevel() {
     const { indexPattern } = this.state;
     const { filterManager } = getDataPlugin().query;
-    const valuesArray = {gte: 12, lt: null};
+    const valuesArray = { gte: 12, lt: null };
     const filters = {
-      ...buildRangeFilter({ name: "rule.level", type: "integer" }, valuesArray, indexPattern),
-      "$state": { "store": "appState" }
-    }
+      ...buildRangeFilter(
+        { name: 'rule.level', type: 'integer' },
+        valuesArray,
+        indexPattern,
+      ),
+      $state: { store: 'appState' },
+    };
     filterManager.addFilters(filters);
   }
 
   filterAuthenticationFailure() {
     const { indexPattern } = this.state;
     const { filterManager } = getDataPlugin().query;
-    const valuesArray = ["win_authentication_failed", "authentication_failed", "authentication_failures"];
+    const valuesArray = [
+      'win_authentication_failed',
+      'authentication_failed',
+      'authentication_failures',
+    ];
     const filters = {
-      ...buildPhrasesFilter({ name: "rule.groups", type: "string" }, valuesArray, indexPattern),
-      "$state": { "store": "appState" }
-    }
+      ...buildPhrasesFilter(
+        { name: 'rule.groups', type: 'string' },
+        valuesArray,
+        indexPattern,
+      ),
+      $state: { store: 'appState' },
+    };
     filterManager.addFilters(filters);
   }
 
   filterAuthenticationSuccess() {
-    this.addFilter({key: 'rule.groups', value: "authentication_success", negate: false} );
+    this.addFilter({
+      key: 'rule.groups',
+      value: 'authentication_success',
+      negate: false,
+    });
   }
 
   render() {
@@ -140,7 +169,7 @@ class AlertsStats extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.visualizationsReducers
+    state: state.visualizationsReducers,
   };
 };
 
@@ -148,5 +177,5 @@ export default connect(mapStateToProps)(AlertsStats);
 
 AlertsStats.propTypes = {
   items: PropTypes.array,
-  tab: PropTypes.string
+  tab: PropTypes.string,
 };

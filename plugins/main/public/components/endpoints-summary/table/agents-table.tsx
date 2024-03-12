@@ -25,6 +25,7 @@ import {
   UI_ORDER_AGENT_STATUS,
   AGENT_SYNCED_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+  UI_LOGGER_LEVELS,
 } from '../../../../common/constants';
 import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -39,12 +40,22 @@ import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import { agentsTableColumns } from './columns';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { Agent } from '../types';
+import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
+import { getOutdatedAgents } from '../services';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
 
 const searchBarWQLOptions = {
   implicitQuery: {
     query: 'id!=000',
     conjunction: ';',
   },
+};
+
+type AgentList = {
+  items: Agent[];
+  totalItems: number;
 };
 
 const mapDispatchToProps = dispatch => ({
@@ -54,6 +65,7 @@ const mapDispatchToProps = dispatch => ({
 interface AgentsTableProps {
   filters: any;
   updateCurrentAgentData: (agent) => void;
+  externalReload?: boolean;
   setExternalReload?: (newValue: number) => void;
 }
 
@@ -70,16 +82,18 @@ export const AgentsTable = compose(
   const [filters, setFilters] = useState(defaultFilters);
   const [agent, setAgent] = useState<Agent>();
   const [reloadTable, setReloadTable] = useState(0);
-  const [agentList, setAgentList] = useState<{
-    items: Agent[];
-    totalItems: number;
-  }>({ items: [], totalItems: 0 });
+  const [agentList, setAgentList] = useState<AgentList>({
+    items: [],
+    totalItems: 0,
+  });
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
+  const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
   const [denyEditGroups] = useUserPermissionsRequirements([
     { action: 'group:modify_assignments', resource: 'group:id:*' },
   ]);
+  const [outdatedAgents, setOutdatedAgents] = useState<Agent[]>([]);
 
   useEffect(() => {
     if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
@@ -146,6 +160,31 @@ export const AgentsTable = compose(
     setAllAgentsSelected(true);
   };
 
+  const handleOnDataChange = async (data: AgentList) => {
+    setAgentList(data);
+
+    const agentIds = data?.items?.map(agent => agent.id);
+
+    try {
+      const outdatedAgents = await getOutdatedAgents(agentIds);
+      setOutdatedAgents(outdatedAgents);
+    } catch (error) {
+      setOutdatedAgents([]);
+      const options = {
+        context: `AgentsTable.getOutdatedAgents`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error,
+          message: error.message || error,
+          title: `Could not get outdated agents`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+  };
+
   const showSelectAllItems =
     (selectedItems.length === agentList.items?.length &&
       selectedItems.length < agentList.totalItems) ||
@@ -191,6 +230,7 @@ export const AgentsTable = compose(
           <TableWzAPI
             title='Agents'
             addOnTitle={selectedtemsRenderer}
+            extra={<AgentUpgradesInProgress reload={props.externalReload} />}
             actionButtons={({ filters }) => (
               <>
                 <EuiFlexItem grow={false}>
@@ -227,7 +267,9 @@ export const AgentsTable = compose(
               !denyEditGroups,
               setAgent,
               setIsEditGroupsVisible,
+              setIsUpgradeModalVisible,
               setFilters,
+              outdatedAgents,
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
@@ -251,7 +293,7 @@ export const AgentsTable = compose(
             }}
             rowProps={getRowProps}
             filters={filters}
-            onDataChange={data => setAgentList(data)}
+            onDataChange={handleOnDataChange}
             downloadCsv
             showReload
             showFieldSelector
@@ -404,8 +446,18 @@ export const AgentsTable = compose(
   return (
     <div>
       <EuiPanel paddingSize='m'>{table}</EuiPanel>
-      {isEditGroupsVisible ? (
+      {isEditGroupsVisible && agent ? (
         <EditAgentGroupsModal
+          agent={agent}
+          reloadAgents={() => reloadAgents()}
+          onClose={() => {
+            setIsEditGroupsVisible(false);
+            setAgent(undefined);
+          }}
+        />
+      ) : null}
+      {isUpgradeModalVisible && agent ? (
+        <UpgradeAgentModal
           agent={agent}
           reloadAgents={() => reloadAgents()}
           onClose={() => {

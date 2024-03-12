@@ -314,6 +314,7 @@ export class WazuhReportingCtrl {
       // Init
       const printer = new ReportPrinter(
         context.wazuh.logger.get('report-printer'),
+        context.wazuh_core.configuration,
       );
 
       await this.renderHeader(
@@ -349,7 +350,8 @@ export class WazuhReportingCtrl {
           new Date(to).getTime(),
           serverSideQuery,
           agentsFilter,
-          indexPatternTitle,
+          indexPatternTitle ||
+            context.wazuh_core.configuration.getSettingValue('pattern'),
           agents,
         );
       }
@@ -402,6 +404,7 @@ export class WazuhReportingCtrl {
       // Init
       const printer = new ReportPrinter(
         context.wazuh.logger.get('report-printer'),
+        context.wazuh_core.configuration,
       );
 
       let tables = [];
@@ -685,6 +688,7 @@ export class WazuhReportingCtrl {
 
       const printer = new ReportPrinter(
         context.wazuh.logger.get('report-printer'),
+        context.wazuh_core.configuration,
       );
 
       let wmodulesResponse = {};
@@ -995,6 +999,7 @@ export class WazuhReportingCtrl {
       // Init
       const printer = new ReportPrinter(
         context.wazuh.logger.get('report-printer'),
+        context.wazuh_core.configuration,
       );
 
       context.wazuh.logger.debug('Syscollector report');

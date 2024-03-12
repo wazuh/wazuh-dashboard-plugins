@@ -16,7 +16,6 @@ import { WAZUH_MODULES } from '../../../common/wazuh-modules';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { WzRequest } from '../../react-services/wz-request';
-import { ErrorHandler } from '../../react-services/error-handler';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import {
   updateCurrentTab,
@@ -26,10 +25,9 @@ import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
-import { getDataPlugin } from '../../kibana-services';
+import { getDataPlugin, getWazuhCorePlugin } from '../../kibana-services';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 export class OverviewController {
   /**
@@ -362,7 +360,8 @@ export class OverviewController {
    */
   addMitrefilter(id) {
     const filter = `{"meta":{ "index": ${
-      AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
+      AppState.getCurrentPattern() ||
+      getWazuhCorePlugin().configuration.getSettingValue('pattern')
     }},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
   }

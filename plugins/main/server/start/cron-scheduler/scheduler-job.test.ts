@@ -115,8 +115,8 @@ describe('SchedulerJob', () => {
       api: { client: [Object] },
     },
     wazuh_core: {
-      serverAPIHostEntries: {
-        getHostsEntries: jest.fn(),
+      manageHosts: {
+        getEntries: jest.fn(),
       },
     },
   };
@@ -137,9 +137,7 @@ describe('SchedulerJob', () => {
   });
 
   it('should get API object when no specified the `apis` parameter on the job object', async () => {
-    mockContext.wazuh_core.serverAPIHostEntries.getHostsEntries.mockResolvedValue(
-      oneApi,
-    );
+    mockContext.wazuh_core.manageHosts.getEntries.mockResolvedValue(oneApi);
 
     const apis: IApi[] = await schedulerJob.getApiObjects();
     expect(apis).not.toBeUndefined();
@@ -148,9 +146,7 @@ describe('SchedulerJob', () => {
   });
 
   it('should get all API objects when no specified the `apis` parameter on the job object', async () => {
-    mockContext.wazuh_core.serverAPIHostEntries.getHostsEntries.mockResolvedValue(
-      twoApi,
-    );
+    mockContext.wazuh_core.manageHosts.getEntries.mockResolvedValue(twoApi);
     const apis: IApi[] = await schedulerJob.getApiObjects();
 
     expect(apis).not.toBeUndefined();
@@ -159,9 +155,7 @@ describe('SchedulerJob', () => {
   });
 
   it('should get one of two API object when specified the id in `apis` parameter on the job object', async () => {
-    mockContext.wazuh_core.serverAPIHostEntries.getHostsEntries.mockResolvedValue(
-      twoApi,
-    );
+    mockContext.wazuh_core.manageHosts.getEntries.mockResolvedValue(twoApi);
     jobs[schedulerJob.jobName] = {
       ...jobs[schedulerJob.jobName],
       apis: ['internal'],
@@ -175,9 +169,7 @@ describe('SchedulerJob', () => {
   });
 
   it('should get two of three API object when specified the id in `apis` parameter on the job object', async () => {
-    mockContext.wazuh_core.serverAPIHostEntries.getHostsEntries.mockResolvedValue(
-      threeApi,
-    );
+    mockContext.wazuh_core.manageHosts.getEntries.mockResolvedValue(threeApi);
     const selectedApis = ['internal', 'external'];
     jobs[schedulerJob.jobName] = {
       ...jobs[schedulerJob.jobName],
@@ -194,19 +186,15 @@ describe('SchedulerJob', () => {
   });
 
   it('should throw an exception when no get APIs', async () => {
-    mockContext.wazuh_core.serverAPIHostEntries.getHostsEntries.mockResolvedValue(
-      [],
-    );
+    mockContext.wazuh_core.manageHosts.getEntries.mockResolvedValue([]);
     await expect(schedulerJob.getApiObjects()).rejects.toEqual({
       error: 10001,
-      message: 'No Wazuh host configured in wazuh.yml',
+      message: 'No API host configured in configuration',
     });
   });
 
   it('should throw an exception when no match API', async () => {
-    mockContext.wazuh_core.serverAPIHostEntries.getHostsEntries.mockResolvedValue(
-      threeApi,
-    );
+    mockContext.wazuh_core.manageHosts.getEntries.mockResolvedValue(threeApi);
     jobs[schedulerJob.jobName] = {
       ...jobs[schedulerJob.jobName],
       apis: ['unkown'],
