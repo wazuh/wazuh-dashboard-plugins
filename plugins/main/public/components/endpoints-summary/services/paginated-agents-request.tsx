@@ -10,15 +10,17 @@ export type ErrorAgent = {
   id: string[];
 };
 
-export const paginatedAgentsGroupService = async ({
-  addOrRemove,
+export const paginatedAgentsRequestService = async ({
+  method,
+  url,
   agentIds,
   groupId,
   pageSize = 1000,
 }: {
-  addOrRemove: 'add' | 'remove';
+  method: 'PUT' | 'DELETE';
+  url: string;
   agentIds: string[];
-  groupId: string;
+  groupId?: string;
   pageSize?: number;
 }): Promise<IApiResponse<string>> => {
   let offset = 0;
@@ -45,11 +47,11 @@ export const paginatedAgentsGroupService = async ({
         message: responseMessage,
       },
     } = (await WzRequest.apiReq(
-      addOrRemove === 'add' ? 'PUT' : 'DELETE',
-      `/agents/group`,
+      method,
+      url,
       {
         params: {
-          group_id: groupId,
+          ...(groupId ? { group_id: groupId } : {}),
           agents_list: requestAgentIds.join(','),
           wait_for_complete: true,
         },

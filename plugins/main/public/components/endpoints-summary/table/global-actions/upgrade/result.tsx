@@ -11,15 +11,21 @@ import {
   EuiLoadingSpinner,
   EuiSpacer,
 } from '@elastic/eui';
-import { Agent } from '../../../types';
-import { RESULT_TYPE, Result } from './upgrade-modal';
+import { Agent, ResponseUpgradeAgents } from '../../../types';
+import { Result } from './upgrade-modal';
+import { ErrorAgent } from '../../../services/paginated-agents-request';
+
+export enum RESULT_TYPE {
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
 
 interface UpgradeAgentsModalResultProps {
   finalAgents: Agent[];
   getAgentsStatus: string;
   getAgentsError?: Error;
   saveChangesStatus: string;
-  results: Result[];
+  result?: Result;
 }
 
 export const UpgradeAgentsModalResult = ({
@@ -27,8 +33,10 @@ export const UpgradeAgentsModalResult = ({
   getAgentsStatus,
   getAgentsError,
   saveChangesStatus,
-  results,
+  result = {},
 }: UpgradeAgentsModalResultProps) => {
+  const { successAgents, errorAgents, totalErrorAgents } = result;
+
   const agentsTable = (agents: Agent[]) => (
     <EuiInMemoryTable
       items={agents}
@@ -36,7 +44,7 @@ export const UpgradeAgentsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'ID',
+          name: 'Id',
           align: 'left',
           sortable: true,
         },
@@ -57,7 +65,47 @@ export const UpgradeAgentsModalResult = ({
     />
   );
 
-  const errorsTable = (errors = []) => (
+  const tasksTable = (tasks: ResponseUpgradeAgents[]) => (
+    <EuiInMemoryTable
+      items={tasks}
+      tableLayout='auto'
+      columns={[
+        {
+          field: 'agent',
+          name: 'Agent id',
+          align: 'left',
+          sortable: true,
+        },
+        {
+          field: 'name',
+          name: 'Name',
+          align: 'left',
+          sortable: true,
+          render: (field, task) => {
+            const agent = finalAgents.find(
+              finalAgent => finalAgent.id === task.agent,
+            ) as Agent;
+            return agent.name;
+          },
+        },
+        {
+          field: 'task_id',
+          name: 'task id',
+          align: 'left',
+          sortable: true,
+        },
+      ]}
+      pagination={tasks.length > 10}
+      sorting={{
+        sort: {
+          field: 'agent',
+          direction: 'asc',
+        },
+      }}
+    />
+  );
+
+  const errorsTable = (errors: ErrorAgent[] = []) => (
     <EuiInMemoryTable
       items={errors}
       tableLayout='auto'
@@ -67,6 +115,7 @@ export const UpgradeAgentsModalResult = ({
           name: 'Code',
           align: 'left',
           sortable: true,
+          width: '100px',
         },
         {
           field: 'error.message',
@@ -91,12 +140,8 @@ export const UpgradeAgentsModalResult = ({
     />
   );
 
-  const groupStatus = (options: {
-    isLoading?: boolean;
-    status: RESULT_TYPE;
-    text: string;
-  }) => {
-    const { isLoading, status, text } = options;
+  const resultStatus = (options: { status: RESULT_TYPE; text: string }) => {
+    const { status, text } = options;
 
     return (
       <EuiFlexGroup
@@ -106,14 +151,10 @@ export const UpgradeAgentsModalResult = ({
         gutterSize='s'
       >
         <EuiFlexItem grow={false}>
-          {isLoading ? (
-            <EuiLoadingSpinner size='m' />
-          ) : (
-            <EuiIcon
-              type={status === RESULT_TYPE.SUCCESS ? 'check' : 'alert'}
-              color={status === RESULT_TYPE.SUCCESS ? 'success' : 'danger'}
-            />
-          )}
+          <EuiIcon
+            type={status === RESULT_TYPE.SUCCESS ? 'check' : 'alert'}
+            color={status === RESULT_TYPE.SUCCESS ? 'success' : 'danger'}
+          />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText color={status === RESULT_TYPE.ERROR ? 'danger' : undefined}>
@@ -159,98 +200,59 @@ export const UpgradeAgentsModalResult = ({
           children:
             getAgentsStatus === 'complete' ? (
               <EuiFlexGroup direction='column'>
-                {/* {groups.map(group => {
-                  const groupResult = groupResults.find(
-                    groupResult => groupResult.group === group,
-                  );
-                  const isLoading = !groupResult;
-
-                  if (isLoading)
-                    return (
-                      <EuiFlexItem key={group}>
-                        {groupStatus({
-                          isLoading,
-                          status: RESULT_TYPE.SUCCESS,
-                          text: group,
-                        })}
+                {saveChangesStatus === 'loading' ? (
+                  <EuiFlexItem key='upgrade-tasks-loading'>
+                    <EuiFlexGroup
+                      alignItems='center'
+                      responsive={false}
+                      wrap={false}
+                      gutterSize='s'
+                    >
+                      <EuiFlexItem grow={false}>
+                        <EuiLoadingSpinner size='m' />
                       </EuiFlexItem>
-                    );
-
-                  const {
-                    result,
-                    successAgents,
-                    errorAgents,
-                    errorMessage,
-                    totalErrorAgents,
-                  } = groupResult;
-
-                  if (result === RESULT_TYPE.SUCCESS)
-                    return (
-                      <EuiFlexItem key={group}>
+                      <EuiFlexItem grow={false}>
+                        <EuiText>Creating upgrade agent tasks</EuiText>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                ) : (
+                  <>
+                    {successAgents?.length ? (
+                      <EuiFlexItem key='upgrade-tasks-success'>
                         <EuiAccordion
-                          id={`${group}Accordion`}
+                          id={`$successAccordion`}
                           arrowDisplay='none'
                           paddingSize='m'
-                          buttonContent={groupStatus({
+                          buttonContent={resultStatus({
                             status: RESULT_TYPE.SUCCESS,
-                            text: `${group} (${finalAgents.length})`,
+                            text: `Upgrade agent tasks created (${successAgents.length})`,
                           })}
                         >
-                          {agentsTable(finalAgents)}
+                          {tasksTable(successAgents)}
                         </EuiAccordion>
                       </EuiFlexItem>
-                    );
-
-                  return (
-                    <EuiFlexItem key={group}>
-                      <EuiAccordion
-                        id={`${group}Accordion`}
-                        arrowDisplay='none'
-                        paddingSize='m'
-                        initialIsOpen={true}
-                        buttonContent={groupStatus({
-                          status: RESULT_TYPE.ERROR,
-                          text: group,
-                        })}
-                      >
+                    ) : null}
+                    {successAgents?.length && errorAgents?.length ? (
+                      <EuiSpacer size='s' />
+                    ) : null}
+                    {totalErrorAgents ? (
+                      <EuiFlexItem key='upgrade-tasks-success'>
                         <EuiAccordion
-                          id={`${group}Accordion`}
+                          id={`$successAccordion`}
                           arrowDisplay='none'
                           paddingSize='m'
-                          buttonContent={groupStatus({
+                          buttonContent={resultStatus({
                             status: RESULT_TYPE.ERROR,
-                            text: `Failed agents (${totalErrorAgents})`,
+                            text: `Upgrade agent tasks not created (${totalErrorAgents})`,
                           })}
                         >
                           {errorsTable(errorAgents)}
                         </EuiAccordion>
-                        {successAgents?.length ? (
-                          <>
-                            <EuiSpacer size='s' />
-                            <EuiAccordion
-                              id={`${group}Accordion`}
-                              arrowDisplay='none'
-                              paddingSize='m'
-                              buttonContent={groupStatus({
-                                status: RESULT_TYPE.SUCCESS,
-                                text: `Success agents (${successAgents?.length})`,
-                              })}
-                            >
-                              {agentsTable(
-                                successAgents.map(
-                                  agentId =>
-                                    finalAgents.find(
-                                      finalAgent => finalAgent.id === agentId,
-                                    ) as Agent,
-                                ),
-                              )}
-                            </EuiAccordion>
-                          </>
-                        ) : null}
-                      </EuiAccordion>
-                    </EuiFlexItem>
-                  );
-                })} */}
+                      </EuiFlexItem>
+                    ) : null}
+                  </>
+                )}
               </EuiFlexGroup>
             ) : null,
         },

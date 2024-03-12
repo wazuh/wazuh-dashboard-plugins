@@ -18,19 +18,12 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { getAgentsService, upgradeAgentsService } from '../../../services';
-import { Agent } from '../../../types';
+import { Agent, ResponseUpgradeAgents } from '../../../types';
 import { ErrorAgent } from '../../../services/paginated-agents-group';
 import { UpgradeAgentsModalResult } from './result';
 
-export enum RESULT_TYPE {
-  SUCCESS = 'success',
-  ERROR = 'error',
-}
-
 export type Result = {
-  group: string;
-  result: RESULT_TYPE;
-  successAgents?: string[];
+  successAgents?: ResponseUpgradeAgents[];
   errorMessage?: string;
   totalErrorAgents?: number;
   errorAgents?: ErrorAgent[];
@@ -42,6 +35,7 @@ interface UpgradeAgentsModalProps {
   filters: any;
   onClose: () => void;
   reloadAgents: () => void;
+  setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const UpgradeAgentsModal = compose(
@@ -54,13 +48,14 @@ export const UpgradeAgentsModal = compose(
     filters,
     onClose,
     reloadAgents,
+    setIsUpgradePanelClosed,
   }: UpgradeAgentsModalProps) => {
     const [finalAgents, setFinalAgents] = useState<Agent[]>([]);
     const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
     const [getAgentsError, setGetAgentsError] = useState();
     const [saveChangesStatus, setSaveChangesStatus] = useState('disabled');
     const [isResultVisible, setIsResultVisible] = useState(false);
-    const [results, setResults] = useState<Result[]>([]);
+    const [result, setResult] = useState<Result>();
 
     const getAgents = async () => {
       if (!allAgentsSelected) {
@@ -114,9 +109,37 @@ export const UpgradeAgentsModal = compose(
       const agentIds = getArrayByProperty(agents, 'id');
 
       try {
-        await upgradeAgentsService({ agentIds });
+        const response = await upgradeAgentsService({ agentIds });
+
+        const { data, message } = response.data;
+        const {
+          affected_items,
+          failed_items,
+          total_affected_items,
+          total_failed_items,
+        } = data;
+        setResult({
+          successAgents: affected_items,
+          errorAgents: failed_items,
+          errorMessage: message,
+          totalErrorAgents: total_failed_items,
+        });
+
+        if (total_affected_items) {
+          setIsUpgradePanelClosed(false);
+        }
+
         setSaveChangesStatus('complete');
       } catch (error) {
+        setResult({
+          errorMessage: error.message,
+          errorAgents: [
+            {
+              error: { message: error.message },
+              id: agentIds,
+            },
+          ],
+        });
         setSaveChangesStatus('danger');
         const options = {
           context: `UpgradeAgentsModal.handleOnSave`,
@@ -167,7 +190,7 @@ export const UpgradeAgentsModal = compose(
               getAgentsStatus={getAgentsStatus}
               getAgentsError={getAgentsError}
               saveChangesStatus={saveChangesStatus}
-              results={results}
+              result={result}
             />
           )}
         </EuiModalBody>
