@@ -33,7 +33,6 @@ import {
   jobMonitoringRun,
   jobSchedulerRun,
   jobQueueRun,
-  jobMigrationTasksRun,
 } from './start';
 import { first } from 'rxjs/operators';
 
@@ -126,17 +125,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       core,
       wazuh: {
         logger: this.logger.get('initialize'),
-        api: plugins.wazuhCore.api,
-      },
-      wazuh_core: plugins.wazuhCore,
-      server: contextServer,
-    });
-
-    // Migration tasks
-    jobMigrationTasksRun({
-      core,
-      wazuh: {
-        logger: this.logger.get('migration-task'),
         api: plugins.wazuhCore.api,
       },
       wazuh_core: plugins.wazuhCore,

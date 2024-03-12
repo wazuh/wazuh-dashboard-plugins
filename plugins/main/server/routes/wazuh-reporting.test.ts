@@ -7,21 +7,7 @@ import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
 import { WazuhUtilsRoutes } from './wazuh-utils';
 import { WazuhReportingRoutes } from './wazuh-reporting';
-import { WazuhUtilsCtrl } from '../controllers/wazuh-utils/wazuh-utils';
 import md5 from 'md5';
-import path from 'path';
-import {
-  createDataDirectoryIfNotExists,
-  createDirectoryIfNotExists,
-} from '../lib/filesystem';
-import {
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-  WAZUH_DATA_ABSOLUTE_PATH,
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-} from '../../common/constants';
-import { execSync } from 'child_process';
-import fs from 'fs';
 
 jest.mock('../lib/reporting/extended-information', () => ({
   extendedInformation: jest.fn(),
@@ -81,12 +67,6 @@ let server, innerServer;
 
 // BEFORE ALL
 beforeAll(async () => {
-  // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  createDataDirectoryIfNotExists();
-
-  // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
-  createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
-
   // Create server
   const config = {
     name: 'plugin_platform',
@@ -134,64 +114,6 @@ afterAll(async () => {
 
   // Clear all mocks
   jest.clearAllMocks();
-
-  // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
-});
-
-describe('[endpoint] GET /reports', () => {
-  const directories = [
-    { username: 'admin', files: 0 },
-    { username: '../../etc', files: 1 },
-  ];
-  beforeAll(() => {
-    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-    createDataDirectoryIfNotExists();
-
-    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-    createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-
-    // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
-    createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-
-    // Create directories and file/s within directory.
-    directories.forEach(({ username, files }) => {
-      const hashUsername = md5(username);
-      createDirectoryIfNotExists(
-        path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername),
-      );
-      if (files) {
-        Array.from(Array(files).keys()).forEach(indexFile => {
-          fs.closeSync(
-            fs.openSync(
-              path.join(
-                WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-                hashUsername,
-                `report_${indexFile}.pdf`,
-              ),
-              'w',
-            ),
-          );
-        });
-      }
-    });
-  });
-
-  afterAll(async () => {
-    // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-    execSync(`rm -rf ${WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH}`);
-  });
-
-  it.each(directories)(
-    'get reports of $username. status response: $responseStatus',
-    async ({ username, files }) => {
-      const response = await supertest(innerServer.listener)
-        .get(`/reports`)
-        .set('x-test-username', username)
-        .expect(200);
-      expect(response.body.reports).toHaveLength(files);
-    },
-  );
 });
 
 describe('[endpoint] PUT /utils/configuration', () => {
@@ -322,15 +244,10 @@ describe('[endpoint] PUT /utils/configuration', () => {
       const responseReport = await supertest(innerServer.listener)
         .post(`/reports/modules/${tab}`)
         .set('x-test-username', USER_NAME)
-        .send(reportBody);
-      // .expect(200);
+        .send(reportBody)
+        .expect(200);
 
-      const fileName =
-        responseReport.body?.message.match(/([A-Z-0-9]*\.pdf)/gi)[0];
-      const userPath = md5(USER_NAME);
-      const reportPath = `${WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH}/${userPath}/${fileName}`;
-      const PDFbuffer = fs.readFileSync(reportPath);
-      const PDFcontent = PDFbuffer.toString('utf8');
+      const PDFcontent = responseReport.body.toString('utf8');
       const content = PDFcontent.replace(
         /\[<[a-z0-9].+> <[a-z0-9].+>\]/gi,
         '',
