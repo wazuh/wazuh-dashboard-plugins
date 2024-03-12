@@ -20,6 +20,7 @@ export interface AgentsTableGlobalActionsProps {
   allowUpgrade: boolean;
   reloadAgents: () => void;
   setIsUpgradeTasksModalVisible: (isModalVisible: boolean) => void;
+  setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const AgentsTableGlobalActions = ({
@@ -31,6 +32,7 @@ export const AgentsTableGlobalActions = ({
   allowUpgrade,
   reloadAgents,
   setIsUpgradeTasksModalVisible,
+  setIsUpgradePanelClosed,
 }: AgentsTableGlobalActionsProps) => {
   const [isPopoverOpen, setPopover] = useState(false);
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
@@ -183,6 +185,7 @@ export const AgentsTableGlobalActions = ({
           onClose={() => {
             setIsUpgradeAgentsVisible(false);
           }}
+          setIsUpgradePanelClosed={setIsUpgradePanelClosed}
         />
       ) : null}
     </>

@@ -98,9 +98,9 @@ export const AgentsTable = compose(
     { action: 'agent:upgrade', resource: 'agent:id:*' },
   ]);
   const [outdatedAgents, setOutdatedAgents] = useState<Agent[]>([]);
-
   const [isUpgradeTasksModalVisible, setIsUpgradeTasksModalVisible] =
     useState(false);
+  const [isUpgradePanelClosed, setIsUpgradePanelClosed] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
@@ -241,6 +241,8 @@ export const AgentsTable = compose(
               <AgentUpgradesInProgress
                 reload={props.externalReload}
                 setIsModalVisible={setIsUpgradeTasksModalVisible}
+                isPanelClosed={isUpgradePanelClosed}
+                setIsPanelClosed={setIsUpgradePanelClosed}
               />
             }
             actionButtons={({ filters }) => (
@@ -268,6 +270,7 @@ export const AgentsTable = compose(
                   allowUpgrade={!denyUpgrade}
                   reloadAgents={() => reloadAgents()}
                   setIsUpgradeTasksModalVisible={setIsUpgradeTasksModalVisible}
+                  setIsUpgradePanelClosed={setIsUpgradePanelClosed}
                 />
               </EuiFlexItem>
             )}

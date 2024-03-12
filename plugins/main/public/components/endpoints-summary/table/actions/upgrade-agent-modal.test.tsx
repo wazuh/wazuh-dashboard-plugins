@@ -40,7 +40,7 @@ describe('UpgradeAgentModal component', () => {
   });
 
   test('should send to upgrade', async () => {
-    const { getByText, getByRole } = render(
+    const { getByRole } = render(
       <UpgradeAgentModal
         agent={{
           id: '001',

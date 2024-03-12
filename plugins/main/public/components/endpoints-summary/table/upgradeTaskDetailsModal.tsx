@@ -48,6 +48,7 @@ export const AgentUpgradesTaskDetailsModal = ({
               sortable: true,
               searchable: true,
               show: true,
+              width: '100px',
             },
             {
               field: 'agent_id',
@@ -55,6 +56,7 @@ export const AgentUpgradesTaskDetailsModal = ({
               sortable: true,
               searchable: true,
               show: true,
+              width: '100px',
             },
             {
               field: 'create_time',
@@ -69,6 +71,7 @@ export const AgentUpgradesTaskDetailsModal = ({
                   />
                 </span>
               ),
+              width: '230px',
               sortable: true,
               searchable: false,
               show: true,
@@ -87,6 +90,7 @@ export const AgentUpgradesTaskDetailsModal = ({
                   />
                 </span>
               ),
+              width: '230px',
               sortable: true,
               searchable: false,
               show: true,
@@ -95,7 +99,7 @@ export const AgentUpgradesTaskDetailsModal = ({
             {
               field: 'status',
               name: 'Status',
-              width: '100px',
+              width: '120px',
               sortable: true,
               searchable: true,
               show: true,
@@ -200,9 +204,6 @@ export const AgentUpgradesTaskDetailsModal = ({
                 }
               },
             },
-          }}
-          tableProps={{
-            tableLayout: 'auto',
           }}
         />
       </EuiModalBody>

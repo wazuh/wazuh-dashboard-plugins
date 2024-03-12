@@ -18,14 +18,17 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 interface AgentUpgradesInProgress {
   reload: any;
   setIsModalVisible: (isModalVisible: boolean) => void;
+  isPanelClosed: boolean;
+  setIsPanelClosed: (isPanelClosed: boolean) => void;
 }
 
 export const AgentUpgradesInProgress = ({
   reload,
   setIsModalVisible,
+  isPanelClosed,
+  setIsPanelClosed,
 }: AgentUpgradesInProgress) => {
   const [isUpgrading, setIsUpgrading] = useState(false);
-  const [isPanelClosed, setIsPanelClosed] = useState(false);
 
   const {
     totalInProgressTasks,

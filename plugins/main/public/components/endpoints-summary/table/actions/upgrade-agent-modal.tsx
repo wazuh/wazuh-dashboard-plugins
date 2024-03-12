@@ -55,7 +55,6 @@ export const UpgradeAgentModal = compose(
       };
       getErrorOrchestrator().handleError(options);
     } finally {
-      setIsLoading(false);
       onClose();
     }
   };
