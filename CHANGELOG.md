@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a migration task to setup the configuration using a configuration file [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Added the ability to manage the API hosts from the Server APIs [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Added edit groups action to Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
+- Added upgrade agent action to Endpoints Summary [#6476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6476)
 - Added global actions add agents to groups and remove agents from groups to Endpoints Summary [#6274](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6274)
 - Added propagation of updates from the table to dashboard visualizations in Endpoints summary [#6460](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6460)
 
