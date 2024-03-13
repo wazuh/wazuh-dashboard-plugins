@@ -36,12 +36,12 @@ describe('AgentUpgradesInProgress component', () => {
 
     const inProgressValue = getByText('5');
     expect(inProgressValue).toBeInTheDocument();
-    const inProgressText = getByText('Upgrade tasks in progress');
+    const inProgressText = getByText('In progress');
     expect(inProgressText).toBeInTheDocument();
 
     const failedValue = getByText('2');
     expect(failedValue).toBeInTheDocument();
-    const failedText = getByText('Failed upgrade tasks');
+    const failedText = getByText('Failed');
     expect(failedText).toBeInTheDocument();
   });
 

@@ -100,7 +100,7 @@ exports[`AgentUpgradesInProgress component should return the component 1`] = `
             <b>
               5
             </b>
-             Upgrade tasks in progress
+             In progress
           </div>
         </div>
       </div>
@@ -124,7 +124,7 @@ exports[`AgentUpgradesInProgress component should return the component 1`] = `
               <b>
                 2
               </b>
-               Failed upgrade tasks 
+               Failed 
               <span
                 class="euiToolTipAnchor"
               >
