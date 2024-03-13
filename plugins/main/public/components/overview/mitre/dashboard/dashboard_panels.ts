@@ -170,7 +170,7 @@ const getVisStateTopTactics = (indexPatternId: string) => {
       addTooltip: true,
       addLegend: true,
       legendPosition: 'right',
-      isDonut: false,
+      isDonut: true,
       labels: {
         show: false,
         values: true,
@@ -394,7 +394,7 @@ const getVisStateAttacksByTechnique = (indexPatternId: string) => {
 const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent',
-    title: 'Top tactics by agent - vertical',
+    title: 'Top tactics by agent',
     type: 'area',
     params: {
       addLegend: true,
@@ -644,7 +644,36 @@ export const getDashboardPanels = (
     EmbeddableInput & { [k: string]: unknown }
   >;
 } => {
+  //There is currently no difference between the panels that are rendered with or without an agent, but in light of future changes, it has been decided to keep this structure.
   const pinnedAgentPanels = {
+    '1': {
+      gridData: {
+        w: 36,
+        h: 12,
+        x: 0,
+        y: 0,
+        i: '1',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '1',
+        savedVis: getVisStateAlertsEvolution(indexPatternId),
+      },
+    },
+    '2': {
+      gridData: {
+        w: 12,
+        h: 12,
+        x: 36,
+        y: 0,
+        i: '2',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '2',
+        savedVis: getVisStateTopTactics(indexPatternId),
+      },
+    },
     '3': {
       gridData: {
         w: 16,
