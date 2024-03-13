@@ -60,7 +60,7 @@ const getVisStateTotal = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           schema: 'metric',
-          params: { customLabel: 'Total' },
+          params: { customLabel: '- Total -' },
         },
       ],
     },
@@ -110,32 +110,7 @@ const getVisStateLevel12Alerts = (indexPatternId: string) => {
           language: 'kuery',
           query: '',
         },
-        filter: [
-          {
-            $state: {
-              store: 'appState',
-            },
-            meta: {
-              alias: null,
-              disabled: false,
-              index: 'wazuh-alerts',
-              key: 'rule.level',
-              negate: false,
-              params: {
-                gte: 12,
-                lt: null,
-              },
-              type: 'range',
-              value: '12 to +∞',
-            },
-            range: {
-              'rule.level': {
-                gte: 12,
-                lt: null,
-              },
-            },
-          },
-        ],
+        filter: [],
         index: indexPatternId,
       },
       references: [
@@ -151,7 +126,24 @@ const getVisStateLevel12Alerts = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           schema: 'metric',
-          params: { customLabel: 'Level 12 or above alerts' },
+          params: { customLabel: ' ' },
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: 'rule.level >= 12',
+                  language: 'kuery',
+                },
+                label: '- Level 12 or above alerts',
+              },
+            ],
+          },
+          schema: 'group',
         },
       ],
     },
@@ -201,50 +193,7 @@ const getVisStateAuthenticationFailure = (indexPatternId: string) => {
           language: 'kuery',
           query: '',
         },
-        filter: [
-          {
-            meta: {
-              index: 'wazuh-alerts',
-              type: 'phrases',
-              key: 'rule.groups',
-              value:
-                'win_authentication_failed, authentication_failed, authentication_failures',
-              params: [
-                'win_authentication_failed',
-                'authentication_failed',
-                'authentication_failures',
-              ],
-              negate: false,
-              disabled: false,
-              alias: null,
-            },
-            query: {
-              bool: {
-                should: [
-                  {
-                    match_phrase: {
-                      'rule.groups': 'win_authentication_failed',
-                    },
-                  },
-                  {
-                    match_phrase: {
-                      'rule.groups': 'authentication_failed',
-                    },
-                  },
-                  {
-                    match_phrase: {
-                      'rule.groups': 'authentication_failures',
-                    },
-                  },
-                ],
-                minimum_should_match: 1,
-              },
-            },
-            $state: {
-              store: 'appState',
-            },
-          },
-        ],
+        filter: [],
         index: indexPatternId,
       },
       references: [
@@ -260,7 +209,25 @@ const getVisStateAuthenticationFailure = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           schema: 'metric',
-          params: { customLabel: 'Authentication failure' },
+          params: { customLabel: ' ' },
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query:
+                    'rule.groups: "win_authentication_failed" OR rule.groups: "authentication_failed" OR rule.groups: "authentication_failures"',
+                  language: 'kuery',
+                },
+                label: '- Authentication failure',
+              },
+            ],
+          },
+          schema: 'group',
         },
       ],
     },
@@ -313,34 +280,7 @@ const getVisStateAuthenticationSuccess = (indexPatternId: string) => {
           language: 'kuery',
           query: '',
         },
-        filter: [
-          {
-            meta: {
-              index: 'wazuh-alerts',
-              negate: false,
-              disabled: false,
-              alias: null,
-              type: 'phrase',
-              key: 'rule.groups',
-              value: 'authentication_success',
-              params: {
-                query: 'authentication_success',
-                type: 'phrase',
-              },
-            },
-            query: {
-              match: {
-                'rule.groups': {
-                  query: 'authentication_success',
-                  type: 'phrase',
-                },
-              },
-            },
-            $state: {
-              store: 'appState',
-            },
-          },
-        ],
+        filter: [],
         index: indexPatternId,
       },
       references: [
@@ -356,7 +296,24 @@ const getVisStateAuthenticationSuccess = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           schema: 'metric',
-          params: { customLabel: 'Authentication success' },
+          params: { customLabel: ' ' },
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: 'rule.groups: "authentication_success"',
+                  language: 'kuery',
+                },
+                label: '- Authentication success',
+              },
+            ],
+          },
+          schema: 'group',
         },
       ],
     },

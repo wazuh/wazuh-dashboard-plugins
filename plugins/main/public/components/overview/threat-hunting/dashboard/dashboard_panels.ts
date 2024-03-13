@@ -1,6 +1,8 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 
+/* WARNING: The panel id must be unique including general and agents visualizations. Otherwise, the visualizations will not refresh when we pin an agent, because they are cached by id */
+
 /* Overview visualizations */
 
 const getVisStateTop10AlertLevelEvolution = (indexPatternId: string) => {
