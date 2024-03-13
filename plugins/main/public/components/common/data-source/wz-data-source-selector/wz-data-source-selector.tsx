@@ -14,7 +14,7 @@ import {
 } from '../../../../react-services/error-management';
 
 type tWzDataSourceSelector = {
-    name: 'string'
+    name: 'string';
     onChange?: (dataSource: tDataSource) => void;
     dataSourceSelector: tDataSourceSelector;
 }
@@ -59,9 +59,9 @@ const WzDataSourceSelector = (props: tWzDataSourceSelector) => {
                 options={dataSourceList.map((item) => {
                     return { value: item.id, text: item.title };
                 })}
-                value={selectedPattern?.id || dataSourceList[0]?.id}
+                value={selectedPattern?.id}
                 onChange={selectDataSource}
-                aria-label={`${name} selector`}
+                aria-label={name}
             />
         </EuiFormRow>
     );

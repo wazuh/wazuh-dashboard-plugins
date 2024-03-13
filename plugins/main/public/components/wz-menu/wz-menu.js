@@ -45,11 +45,12 @@ import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboar
 import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
 import {
   DataSourceSelector,
-  WzDataSourceSelector,
   PatternDataSource,
   AlertsDataSourceRepository,
   PatternDataSourceFactory
 } from '../common/data-source';
+
+import WzDataSourceSelector from '../common/data-source/wz-data-source-selector/wz-data-source-selector';
 
 const sections = {
   overview: 'overview',
