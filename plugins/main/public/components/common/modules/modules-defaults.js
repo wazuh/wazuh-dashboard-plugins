@@ -43,6 +43,7 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { DashboardGDPR } from '../../overview/gdpr/dashboards/dashboard';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -285,7 +286,22 @@ export const ModulesDefaults = {
   },
   gdpr: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(gdprColumns),
+    tabs: [
+      DashboardTab,
+      {
+        id: 'dashboard2',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardGDPR || withPinnedAgent(DashboardGDPR), // TODO: use withPinnedAgent
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: ComplianceTable,
+      },
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, gdprColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   tsc: {
