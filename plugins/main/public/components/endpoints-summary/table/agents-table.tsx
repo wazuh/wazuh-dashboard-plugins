@@ -45,7 +45,7 @@ import { getOutdatedAgents } from '../services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
-import { AgentUpgradesTaskDetailsModal } from './upgradeTaskDetailsModal';
+import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
 
 const searchBarWQLOptions = {
   implicitQuery: {
