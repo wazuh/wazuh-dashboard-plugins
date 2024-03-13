@@ -477,6 +477,7 @@ export const AgentsTable = compose(
             setIsEditGroupsVisible(false);
             setAgent(undefined);
           }}
+          setIsUpgradePanelClosed={setIsUpgradePanelClosed}
         />
       ) : null}
       {isUpgradeTasksModalVisible ? (
