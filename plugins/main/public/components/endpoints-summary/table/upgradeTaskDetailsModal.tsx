@@ -122,6 +122,7 @@ export const AgentUpgradesTaskDetailsModal = ({
               name: 'Error',
               show: true,
               searchable: true,
+              width: '250px',
             },
           ]}
           tableInitialSortingField='last_update_time'
@@ -205,6 +206,7 @@ export const AgentUpgradesTaskDetailsModal = ({
               },
             },
           }}
+          tableProps={{ tableLayout: 'auto' }}
         />
       </EuiModalBody>
       <EuiModalFooter>

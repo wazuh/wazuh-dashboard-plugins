@@ -24,7 +24,12 @@ describe('AgentUpgradesInProgress component', () => {
     });
 
     const { container, getByText } = render(
-      <AgentUpgradesInProgress reload={0} />,
+      <AgentUpgradesInProgress
+        reload={0}
+        setIsModalVisible={() => {}}
+        isPanelClosed={false}
+        setIsPanelClosed={() => {}}
+      />,
     );
 
     expect(container).toMatchSnapshot();
@@ -41,17 +46,20 @@ describe('AgentUpgradesInProgress component', () => {
   });
 
   test('should show upgrade tasks modal', async () => {
-    const { getByRole, getByText } = render(
-      <AgentUpgradesInProgress reload={0} />,
+    const { getByRole } = render(
+      <AgentUpgradesInProgress
+        reload={0}
+        setIsModalVisible={() => {}}
+        isPanelClosed={false}
+        setIsPanelClosed={() => {}}
+      />,
     );
 
-    const openModalButton = getByRole('button');
+    const openModalButton = getByRole('button', { name: 'Task details' });
     expect(openModalButton).toBeInTheDocument();
 
     act(() => {
       fireEvent.click(openModalButton);
     });
-
-    await waitFor(() => expect(getByRole('table')).toBeInTheDocument());
   });
 });
