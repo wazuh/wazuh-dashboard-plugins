@@ -95,8 +95,7 @@ export const AgentUpgradesInProgress = ({
     <EuiPanel color='subdued'>
       <EuiFlexGroup
         gutterSize='s'
-        alignItems='flex-start'
-        justifyContent='space-between'
+        alignItems='flexStart'
         wrap={false}
         responsive={false}
       >

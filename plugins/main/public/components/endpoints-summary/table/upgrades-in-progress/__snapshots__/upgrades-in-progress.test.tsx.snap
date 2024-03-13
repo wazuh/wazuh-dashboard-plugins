@@ -6,7 +6,7 @@ exports[`AgentUpgradesInProgress component should return the component 1`] = `
     class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--subdued euiPanel--noShadow euiPanel--noBorder"
   >
     <div
-      class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionRow"
+      class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--alignItemsFlexStart euiFlexGroup--directionRow"
     >
       <div
         class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
