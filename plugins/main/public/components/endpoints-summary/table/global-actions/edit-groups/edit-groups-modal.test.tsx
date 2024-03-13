@@ -21,11 +21,6 @@ jest.mock('../../../../../react-services/common-services', () => ({
   }),
 }));
 
-// jest.mock('../../../../common/hocs', () => ({
-//   withErrorBoundary: () => {},
-//   withReduxProvider: () => {},
-// }));
-
 describe('EditAgentsGroupsModal component', () => {
   test('should return the component with save disabled', async () => {
     (useGetGroups as jest.Mock).mockReturnValue({

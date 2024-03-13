@@ -13,66 +13,75 @@ interface UpgradeAgentModalProps {
   agent: Agent;
   onClose: () => void;
   reloadAgents: () => void;
+  setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const UpgradeAgentModal = compose(
   withErrorBoundary,
   withReduxProvider,
-)(({ agent, onClose, reloadAgents }: UpgradeAgentModalProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const showToast = (
-    color: string,
-    title: string = '',
-    text: string = '',
-    time: number = 3000,
-  ) => {
-    getToasts().add({
-      color: color,
-      title: title,
-      text: text,
-      toastLifeTimeMs: time,
-    });
-  };
+)(
+  ({
+    agent,
+    onClose,
+    reloadAgents,
+    setIsUpgradePanelClosed,
+  }: UpgradeAgentModalProps) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const showToast = (
+      color: string,
+      title: string = '',
+      text: string = '',
+      time: number = 3000,
+    ) => {
+      getToasts().add({
+        color: color,
+        title: title,
+        text: text,
+        toastLifeTimeMs: time,
+      });
+    };
 
-  const handleOnSave = async () => {
-    setIsLoading(true);
+    const handleOnSave = async () => {
+      setIsLoading(true);
 
-    try {
-      await upgradeAgentsService({ agentIds: [agent.id] });
-      showToast('success', 'Upgrade agent', 'Upgrade task in progress');
-      reloadAgents();
-    } catch (error) {
-      const options = {
-        context: `UpgradeAgentModal.handleOnSave`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error,
-          message: error.message || error,
-          title: `Could not upgrade agent`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    } finally {
-      onClose();
-    }
-  };
+      try {
+        await upgradeAgentsService({ agentIds: [agent.id] });
+        showToast('success', 'Upgrade agent', 'Upgrade task in progress');
+        reloadAgents();
+        setIsUpgradePanelClosed(false);
+      } catch (error) {
+        const options = {
+          context: `UpgradeAgentModal.handleOnSave`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error,
+            message: error.message || error,
+            title: `Could not upgrade agent`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      } finally {
+        onClose();
+      }
+    };
 
-  return (
-    <EuiConfirmModal
-      title='Upgrade agent'
-      onCancel={onClose}
-      onConfirm={handleOnSave}
-      cancelButtonText='Cancel'
-      confirmButtonText='Upgrade'
-      onClose={onClose}
-      onClick={ev => {
-        ev.stopPropagation();
-      }}
-      isLoading={isLoading}
-    >
-      <p>{`Upgrade agent ${agent?.name}?`}</p>
-    </EuiConfirmModal>
-  );
-});
+    return (
+      <EuiConfirmModal
+        title='Upgrade agent'
+        onCancel={onClose}
+        onConfirm={handleOnSave}
+        cancelButtonText='Cancel'
+        confirmButtonText='Upgrade'
+        onClose={onClose}
+        onClick={ev => {
+          ev.stopPropagation();
+        }}
+        isLoading={isLoading}
+      >
+        <p>{`Upgrade agent ${agent?.name}?`}</p>
+      </EuiConfirmModal>
+    );
+  },
+);
