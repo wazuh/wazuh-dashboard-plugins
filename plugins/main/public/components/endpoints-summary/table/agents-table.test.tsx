@@ -296,8 +296,10 @@ jest.mock('../../../redux/reducers/appStateReducers', () => ({
 
 const permissionsStore = {
   appStateReducers: {
+    userAccount: {
+      administrator: true,
+    },
     withUserLogged: true,
-    userRoles: ['administrator'],
     userPermissions: {
       'agent:create': { '*:*:*': 'allow' },
       rbac_mode: 'black',

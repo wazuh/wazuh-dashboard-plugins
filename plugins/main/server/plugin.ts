@@ -106,7 +106,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     // Routes
     const router = core.http.createRouter();
-    setupRoutes(router);
+    setupRoutes(router, plugins.wazuhCore);
 
     return {};
   }

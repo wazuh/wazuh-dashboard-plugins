@@ -44,6 +44,9 @@ const getFilters = filters => {
 
 export function TableWzAPI({
   actionButtons,
+  addOnTitle,
+  extra,
+  setReload,
   ...rest
 }: {
   actionButtons?:
@@ -53,6 +56,7 @@ export function TableWzAPI({
   title?: string;
   addOnTitle?: ReactNode;
   description?: string;
+  extra?: ReactNode;
   downloadCsv?: boolean | string;
   searchTable?: boolean;
   endpoint: string;
@@ -166,8 +170,8 @@ export function TableWzAPI({
    */
   const triggerReload = () => {
     setReloadFootprint(Date.now());
-    if (rest.setReload) {
-      rest.setReload(Date.now());
+    if (setReload) {
+      setReload(Date.now());
     }
   };
 
@@ -202,9 +206,9 @@ export function TableWzAPI({
                 </EuiTitle>
               )}
             </EuiFlexItem>
-            {rest.addOnTitle ? (
+            {addOnTitle ? (
               <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
-                {rest.addOnTitle}
+                {addOnTitle}
               </EuiFlexItem>
             ) : null}
           </EuiFlexGroup>
@@ -297,6 +301,7 @@ export function TableWzAPI({
           <EuiText color='subdued'>{rest.description}</EuiText>
         </EuiFlexItem>
       )}
+      {extra ? <EuiFlexItem>{extra}</EuiFlexItem> : null}
       <EuiFlexItem>{table}</EuiFlexItem>
     </EuiFlexGroup>
   );

@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
  * Returns top 5 rootkits found along all agents
@@ -26,8 +25,8 @@ export const top5RootkitsDetected = async (
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern'),
-  size = 5
+  pattern,
+  size = 5,
 ) => {
   try {
     const base = {};
@@ -40,21 +39,21 @@ export const top5RootkitsDetected = async (
           field: 'data.title',
           size: size,
           order: {
-            _count: 'desc'
-          }
-        }
-      }
+            _count: 'desc',
+          },
+        },
+      },
     });
 
     base.query?.bool?.must?.push({
       query_string: {
-        query: '"rootkit" AND "detected"'
-      }
+        query: '"rootkit" AND "detected"',
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['2'];
     const mapped = buckets.map(item => item.key);
@@ -62,13 +61,13 @@ export const top5RootkitsDetected = async (
 
     for (const item of mapped) {
       result.push(item.split("'")[1].split("'")[0]);
-    };
+    }
 
     return result.filter((item, pos) => result.indexOf(item) === pos);
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Returns the number of agents that have one or more hidden processes
@@ -84,7 +83,7 @@ export const agentsWithHiddenPids = async (
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
   try {
     const base = {};
@@ -94,21 +93,21 @@ export const agentsWithHiddenPids = async (
     Object.assign(base.aggs, {
       '1': {
         cardinality: {
-          field: 'agent.id'
-        }
-      }
+          field: 'agent.id',
+        },
+      },
     });
 
     base.query?.bool?.must?.push({
       query_string: {
-        query: '"process" AND "hidden"'
-      }
+        query: '"process" AND "hidden"',
+      },
     });
 
     // "aggregations": { "1": { "value": 1 } }
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
 
     return response.body &&
@@ -120,7 +119,7 @@ export const agentsWithHiddenPids = async (
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Returns the number of agents that have one or more hidden ports
@@ -136,7 +135,7 @@ export const agentsWithHiddenPorts = async (
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
   try {
     const base = {};
@@ -146,21 +145,21 @@ export const agentsWithHiddenPorts = async (
     Object.assign(base.aggs, {
       '1': {
         cardinality: {
-          field: 'agent.id'
-        }
-      }
+          field: 'agent.id',
+        },
+      },
     });
 
     base.query?.bool?.must?.push({
       query_string: {
-        query: '"port" AND "hidden"'
-      }
+        query: '"port" AND "hidden"',
+      },
     });
 
     // "aggregations": { "1": { "value": 1 } }
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
 
     return response.body &&
@@ -172,4 +171,4 @@ export const agentsWithHiddenPorts = async (
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};

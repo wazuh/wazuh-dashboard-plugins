@@ -10,24 +10,22 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
-
-  /**
-   * Returns top 3 dangerous agents
-   * @param {*} context Endpoint context
-   * @param {Number} gte Timestamp (ms) from
-   * @param {Number} lte Timestamp (ms) to
-   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
-   * @returns {Array<String>}
-   */
+/**
+ * Returns top 3 dangerous agents
+ * @param {*} context Endpoint context
+ * @param {Number} gte Timestamp (ms) from
+ * @param {Number} lte Timestamp (ms) to
+ * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+ * @returns {Array<String>}
+ */
 export const top3agents = async (
   context,
   gte,
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
   try {
     const base = {};
@@ -40,24 +38,24 @@ export const top3agents = async (
           field: 'agent.id',
           size: 3,
           order: {
-            _count: 'desc'
-          }
-        }
-      }
+            _count: 'desc',
+          },
+        },
+      },
     });
 
     base.query.bool.must.push({
       range: {
         'rule.level': {
           gte: 7,
-          lt: 16
-        }
-      }
+          lt: 16,
+        },
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['2'];
 
@@ -65,22 +63,22 @@ export const top3agents = async (
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
-  /**
-   * Returns top 3 rules
-   * @param {Number} gte Timestamp (ms) from
-   * @param {Number} lte Timestamp (ms) to
-   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
-   * @returns {Array<String>}
-   */
+/**
+ * Returns top 3 rules
+ * @param {Number} gte Timestamp (ms) from
+ * @param {Number} lte Timestamp (ms) to
+ * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+ * @returns {Array<String>}
+ */
 export const top3Rules = async (
   context,
   gte,
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
   try {
     const base = {};
@@ -93,8 +91,8 @@ export const top3Rules = async (
           field: 'rule.description',
           size: 3,
           order: {
-            _count: 'desc'
-          }
+            _count: 'desc',
+          },
         },
         aggs: {
           '3': {
@@ -102,17 +100,17 @@ export const top3Rules = async (
               field: 'rule.id',
               size: 1,
               order: {
-                _count: 'desc'
-              }
-            }
-          }
-        }
-      }
+                _count: 'desc',
+              },
+            },
+          },
+        },
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['2'];
     return buckets.reduce((accum, bucket) => {
@@ -125,14 +123,17 @@ export const top3Rules = async (
         !bucket.key
       ) {
         return accum;
-      };
-      accum.push({ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key});
+      }
+      accum.push({
+        ruleID: bucket['3'].buckets[0].key,
+        ruleDescription: bucket.key,
+      });
       return accum;
     }, []);
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 export const lastTenDeletedFiles = async (
   context,
@@ -140,7 +141,7 @@ export const lastTenDeletedFiles = async (
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
   try {
     const base = {};
@@ -153,30 +154,30 @@ export const lastTenDeletedFiles = async (
           field: 'syscheck.path',
           size: 10,
           order: {
-            '1': 'desc'
-          }
+            '1': 'desc',
+          },
         },
         aggs: {
           '1': {
             max: {
-              field: 'timestamp'
-            }
-          }
-        }
-      }
+              field: 'timestamp',
+            },
+          },
+        },
+      },
     });
 
     base.query.bool.must.push({
       match_phrase: {
         'syscheck.event': {
-          query: 'deleted'
-        }
-      }
+          query: 'deleted',
+        },
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['2'];
 
@@ -186,7 +187,7 @@ export const lastTenDeletedFiles = async (
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 export const lastTenModifiedFiles = async (
   context,
@@ -194,7 +195,7 @@ export const lastTenModifiedFiles = async (
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
   try {
     const base = {};
@@ -207,30 +208,30 @@ export const lastTenModifiedFiles = async (
           field: 'syscheck.path',
           size: 10,
           order: {
-            '1': 'desc'
-          }
+            '1': 'desc',
+          },
         },
         aggs: {
           '1': {
             max: {
-              field: 'timestamp'
-            }
-          }
-        }
-      }
+              field: 'timestamp',
+            },
+          },
+        },
+      },
     });
 
     base.query.bool.must.push({
       match_phrase: {
         'syscheck.event': {
-          query: 'modified'
-        }
-      }
+          query: 'modified',
+        },
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['2'];
 
@@ -240,4 +241,4 @@ export const lastTenModifiedFiles = async (
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
