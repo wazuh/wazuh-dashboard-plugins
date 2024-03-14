@@ -1,9 +1,9 @@
 import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
 
-// Visualization ID: Wazuh-App-Overview-NIST-Agents
 const getVisStateMostActiveAgents = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-NIST-Agents',
     title: 'Most active agents',
     type: 'pie',
     params: {
@@ -89,9 +89,9 @@ const getVisStateMostActiveAgents = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-NIST-Requirements-over-time
 const getVisStateRequirementsOverTime = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-NIST-Requirements-over-time',
     title: 'Top 10 requirements over time',
     type: 'histogram',
     params: {
@@ -242,9 +242,9 @@ const getVisStateRequirementsOverTime = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-NIST-requirements-by-agents
 const getVisStateRequirementsByAgents = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-NIST-requirements-by-agents',
     title: 'Requirements distribution by agent',
     type: 'area',
     params: {
@@ -395,9 +395,9 @@ const getVisStateRequirementsByAgents = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-NIST-Requirements-Agents-heatmap
 const getVisStateRequirementsAgentsHeatmap = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-NIST-Requirements-Agents-heatmap',
     title: 'Alerts volume by agent',
     type: 'heatmap',
     params: {
@@ -545,9 +545,9 @@ const getVisStateRequirementsAgentsHeatmap = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-NIST-Metrics
 const getVisStateMetrics = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-NIST-Metrics',
     title: 'Stats',
     type: 'metric',
     params: {
@@ -625,9 +625,9 @@ const getVisStateMetrics = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-NIST-Top-10-requirements
 const getVisStateTopRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-NIST-Top-10-requirements',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {
@@ -713,9 +713,9 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-NIST-Stats
 const getVisStateAgentStats = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-NIST-Stats',
     title: 'Stats',
     type: 'metric',
     params: {
@@ -790,9 +790,9 @@ const getVisStateAgentStats = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-NIST-top-10-requirements
 const getVisStateAgentTopRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-NIST-top-10-requirements',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {
@@ -863,9 +863,9 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-NIST-Requirement-by-level
 const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-NIST-Requirement-by-level',
     title: 'Requirements distributed by level',
     type: 'histogram',
     params: {
@@ -1016,9 +1016,9 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-NIST-Requirements-stacked-overtime
 const getVisStateAgentRequirementsOverTime = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime',
     title: 'Requirements over time',
     type: 'histogram',
     params: {
