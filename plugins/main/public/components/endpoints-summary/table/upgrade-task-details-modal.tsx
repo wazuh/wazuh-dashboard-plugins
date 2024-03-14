@@ -6,6 +6,7 @@ import {
   API_NAME_TASK_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
   UI_TASK_STATUS,
+  UI_TASK_STATUS_COLORS,
 } from '../../../../common/constants';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash, uniqBy as uniqByLodash } from 'lodash';
@@ -104,15 +105,7 @@ export const AgentUpgradesTaskDetailsModal = ({
               searchable: true,
               show: true,
               render: value => (
-                <EuiHealth
-                  color={
-                    value === API_NAME_TASK_STATUS.DONE
-                      ? 'success'
-                      : value === API_NAME_TASK_STATUS.IN_PROGRESS
-                      ? 'warning'
-                      : 'danger'
-                  }
-                >
+                <EuiHealth color={UI_TASK_STATUS_COLORS[value]}>
                   {value}
                 </EuiHealth>
               ),
@@ -123,6 +116,12 @@ export const AgentUpgradesTaskDetailsModal = ({
               show: true,
               searchable: true,
               width: '250px',
+              render: (value, task) => {
+                if (task.status === API_NAME_TASK_STATUS.TIMEOUT) {
+                  return 'Upgrade task has appears to be done but the notification has never reached the manager';
+                }
+                return value;
+              },
             },
           ]}
           tableInitialSortingField='last_update_time'
