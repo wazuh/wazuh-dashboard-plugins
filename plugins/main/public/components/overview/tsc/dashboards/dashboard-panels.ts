@@ -1,9 +1,9 @@
 import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
 
-// Visualization ID: Wazuh-App-gTSC-requirements
 const getVisStateRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-gTSC-requirements',
     title: 'TSC requirements',
     type: 'line',
     params: {
@@ -159,9 +159,9 @@ const getVisStateRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-gTSC-Agents
 const getVisStateTopAgentsByAlertsCount = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-TSC-Agents',
     title: 'Top 10 agents by alerts number',
     type: 'pie',
     params: {
@@ -213,9 +213,9 @@ const getVisStateTopAgentsByAlertsCount = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-gTSC-Requirements-over-time
 const getVisStateTopRequirementsOverTime = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-TSC-Requirements-over-time',
     title: 'Top requirements over time',
     type: 'area',
     params: {
@@ -331,9 +331,9 @@ const getVisStateTopRequirementsOverTime = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-gTSC-Requirements-Agents-heatmap
 const getVisStateRequirementsAgentsHeatmap = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap',
     title: 'Last alerts',
     type: 'heatmap',
     params: {
@@ -443,9 +443,9 @@ const getVisStateRequirementsAgentsHeatmap = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-gTSC-Requirements-by-agent
 const getVisStateRequirementsByAgent = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-TSC-Requirements-by-agent',
     title: 'Requirements by agent',
     type: 'histogram',
     params: {
@@ -625,9 +625,9 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-TSC-Groups
 const getVisStateAgentTopRuleGroups = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-TSC-Groups',
     title: 'Top 5 rule groups',
     type: 'pie',
     params: {
@@ -673,9 +673,9 @@ const getVisStateAgentTopRuleGroups = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-TSC-Rule
 const getVisStateAgentTopRuleDescription = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-TSC-Rule',
     title: 'Top 5 rules',
     type: 'pie',
     params: {
@@ -721,9 +721,9 @@ const getVisStateAgentTopRuleDescription = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-TSC-Requirement
 const getVisStateAgentTopRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-TSC-Requirement',
     title: 'Top 5 TSC requirements',
     type: 'pie',
     params: {
@@ -764,9 +764,9 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-TSC-Requirements
 const getVisStateAgentRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-TSC-Requirements',
     title: 'TSC Requirements',
     type: 'histogram',
     params: {
@@ -864,9 +864,9 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-TSC-Rule-level-distribution
 const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-TSC-Rule-level-distribution',
     title: 'Rule level distribution',
     type: 'pie',
     params: {
