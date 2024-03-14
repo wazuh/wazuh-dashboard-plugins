@@ -34,6 +34,7 @@ export const useGetUpgradeTasks = (reload: any) => {
       setTotalInProgressTasks(total_affected_items);
       setGetInProgressError(undefined);
     } catch (error: any) {
+      console.log({ error });
       setGetInProgressError(error);
     } finally {
       setGetInProgressIsLoading(false);

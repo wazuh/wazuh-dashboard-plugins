@@ -97,6 +97,10 @@ export const AgentsTable = compose(
   const [denyUpgrade] = useUserPermissionsRequirements([
     { action: 'agent:upgrade', resource: 'agent:id:*' },
   ]);
+  const [denyGetTasks] = useUserPermissionsRequirements([
+    { action: 'task:status', resource: '*:*:*' },
+  ]);
+
   const [outdatedAgents, setOutdatedAgents] = useState<Agent[]>([]);
   const [isUpgradeTasksModalVisible, setIsUpgradeTasksModalVisible] =
     useState(false);
@@ -243,6 +247,7 @@ export const AgentsTable = compose(
                 setIsModalVisible={setIsUpgradeTasksModalVisible}
                 isPanelClosed={isUpgradePanelClosed}
                 setIsPanelClosed={setIsUpgradePanelClosed}
+                allowGetTasks={!denyGetTasks}
               />
             }
             actionButtons={({ filters }) => (
@@ -268,6 +273,7 @@ export const AgentsTable = compose(
                   filters={filters?.q}
                   allowEditGroups={!denyEditGroups}
                   allowUpgrade={!denyUpgrade}
+                  allowGetTasks={!denyGetTasks}
                   reloadAgents={() => reloadAgents()}
                   setIsUpgradeTasksModalVisible={setIsUpgradeTasksModalVisible}
                   setIsUpgradePanelClosed={setIsUpgradePanelClosed}

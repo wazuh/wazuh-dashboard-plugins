@@ -29,6 +29,7 @@ describe('AgentUpgradesInProgress component', () => {
         setIsModalVisible={() => {}}
         isPanelClosed={false}
         setIsPanelClosed={() => {}}
+        allowGetTasks={true}
       />,
     );
 
@@ -52,6 +53,7 @@ describe('AgentUpgradesInProgress component', () => {
         setIsModalVisible={() => {}}
         isPanelClosed={false}
         setIsPanelClosed={() => {}}
+        allowGetTasks={true}
       />,
     );
 
