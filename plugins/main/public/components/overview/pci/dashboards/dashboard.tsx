@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { SearchResponse } from '../../../../../../../src/core/server';
 import { getPlugins } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { getDashboardPanels } from './dashboard_panels';
+import { getDashboardPanels } from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import './styles.scss';
-import { useAppConfig } from '../../../common/hooks';
 import { withErrorBoundary } from '../../../common/hocs';
-import { DiscoverNoResults } from '../common/components/no_results';
-import { LoadingSpinner } from '../common/components/loading_spinner';
+import { DiscoverNoResults } from '../common/components/no-results';
+import { LoadingSpinner } from '../common/components/loading-spinner';
 import { search } from '../../../common/search-bar/search-bar-service';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import {
