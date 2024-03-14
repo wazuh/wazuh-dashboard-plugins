@@ -43,6 +43,7 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -290,7 +291,21 @@ export const ModulesDefaults = {
   },
   tsc: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(tscColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardTSC || withPinnedAgent(DashboardTSC), // TODO: use withPinnedAgent
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: ComplianceTable,
+      },
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, tscColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   syscollector: {
