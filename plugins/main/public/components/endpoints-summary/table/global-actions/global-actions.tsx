@@ -18,6 +18,7 @@ export interface AgentsTableGlobalActionsProps {
   filters: any;
   allowEditGroups: boolean;
   allowUpgrade: boolean;
+  allowGetTasks: boolean;
   reloadAgents: () => void;
   setIsUpgradeTasksModalVisible: (isModalVisible: boolean) => void;
   setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
@@ -30,6 +31,7 @@ export const AgentsTableGlobalActions = ({
   filters,
   allowEditGroups,
   allowUpgrade,
+  allowGetTasks,
   reloadAgents,
   setIsUpgradeTasksModalVisible,
   setIsUpgradePanelClosed,
@@ -146,6 +148,7 @@ export const AgentsTableGlobalActions = ({
           </EuiContextMenuItem>
           <EuiContextMenuItem
             icon='eye'
+            disabled={!allowGetTasks}
             onClick={() => {
               closePopover();
               setIsUpgradeTasksModalVisible(true);
@@ -154,8 +157,8 @@ export const AgentsTableGlobalActions = ({
             <WzElementPermissions
               permissions={[
                 {
-                  action: 'group:modify_assignments',
-                  resource: 'group:id:*',
+                  action: 'task:status',
+                  resource: '*:*:*',
                 },
               ]}
             >

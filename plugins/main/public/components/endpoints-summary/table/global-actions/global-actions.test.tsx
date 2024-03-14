@@ -21,6 +21,7 @@ describe('AgentsTableGlobalActions component', () => {
         setIsUpgradeTasksModalVisible={() => {}}
         setIsUpgradePanelClosed={() => {}}
         allowUpgrade={true}
+        allowGetTasks={true}
       />,
     );
 
@@ -42,6 +43,7 @@ describe('AgentsTableGlobalActions component', () => {
         setIsUpgradeTasksModalVisible={() => {}}
         setIsUpgradePanelClosed={() => {}}
         allowUpgrade={true}
+        allowGetTasks={true}
       />,
     );
 
