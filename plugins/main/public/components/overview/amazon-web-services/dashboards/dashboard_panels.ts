@@ -1145,212 +1145,213 @@ const getVisStateAgentGeolocationMap = (indexPatternId: string) => {
 
 export const getDashboardPanels = (
   indexPatternId: string,
+  isPinnedAgent: boolean,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }
   >;
 } => {
   const overviewDashboardPanels = {
-    '6': {
+    g1: {
       gridData: {
         w: 12,
         h: 9,
         x: 0,
         y: 0,
-        i: '6',
+        i: 'g1',
       },
       type: 'visualization',
       explicitInput: {
-        id: '6',
+        id: 'g1',
         savedVis: getVisStateTopSources(indexPatternId),
       },
     },
-    '7': {
+    g2: {
       gridData: {
         w: 12,
         h: 9,
         x: 12,
         y: 0,
-        i: '7',
+        i: 'g2',
       },
       type: 'visualization',
       explicitInput: {
-        id: '7',
+        id: 'g2',
         savedVis: getVisStateTopAccounts(indexPatternId),
       },
     },
-    '8': {
+    g3: {
       gridData: {
         w: 12,
         h: 9,
         x: 24,
         y: 0,
-        i: '8',
+        i: 'g3',
       },
       type: 'visualization',
       explicitInput: {
-        id: '8',
+        id: 'g3',
         savedVis: getVisStateTopBuckets(indexPatternId),
       },
     },
-    '9': {
+    g4: {
       gridData: {
         w: 12,
         h: 9,
         x: 36,
         y: 0,
-        i: '9',
+        i: 'g4',
       },
       type: 'visualization',
       explicitInput: {
-        id: '9',
+        id: 'g4',
         savedVis: getVisStateRegions(indexPatternId),
       },
     },
-    '10': {
+    g5: {
       gridData: {
         w: 24,
         h: 12,
         x: 0,
         y: 9,
-        i: '10',
+        i: 'g5',
       },
       type: 'visualization',
       explicitInput: {
-        id: '10',
+        id: 'g5',
         savedVis: getVisStateEventsBySource(indexPatternId),
       },
     },
-    '11': {
+    g6: {
       gridData: {
         w: 24,
         h: 12,
         x: 24,
         y: 9,
-        i: '11',
+        i: 'g6',
       },
       type: 'visualization',
       explicitInput: {
-        id: '11',
+        id: 'g6',
         savedVis: getVisStateEventsByBucket(indexPatternId),
       },
     },
-    '12': {
+    g7: {
       gridData: {
         w: 48,
         h: 20,
         x: 0,
         y: 21,
-        i: '12',
+        i: 'g7',
       },
       type: 'visualization',
       explicitInput: {
-        id: '12',
+        id: 'g7',
         savedVis: getVisStateGeolocationMap(indexPatternId),
       },
     },
   };
 
   const agentDashboardPanels = {
-    '13': {
+    a1: {
       gridData: {
         w: 12,
         h: 9,
         x: 0,
         y: 0,
-        i: '6',
+        i: 'a1',
       },
       type: 'visualization',
       explicitInput: {
-        id: '6',
+        id: 'a1',
         savedVis: getVisStateAgentTopSources(indexPatternId),
       },
     },
-    '14': {
+    a2: {
       gridData: {
         w: 12,
         h: 9,
         x: 12,
         y: 0,
-        i: '7',
+        i: 'a2',
       },
       type: 'visualization',
       explicitInput: {
-        id: '7',
+        id: 'a2',
         savedVis: getVisStateAgentTopAccounts(indexPatternId),
       },
     },
-    '15': {
+    a3: {
       gridData: {
         w: 12,
         h: 9,
         x: 24,
         y: 0,
-        i: '8',
+        i: 'a3',
       },
       type: 'visualization',
       explicitInput: {
-        id: '8',
+        id: 'a3',
         savedVis: getVisStateAgentTopBuckets(indexPatternId),
       },
     },
-    '16': {
+    a4: {
       gridData: {
         w: 12,
         h: 9,
         x: 36,
         y: 0,
-        i: '9',
+        i: 'a4',
       },
       type: 'visualization',
       explicitInput: {
-        id: '9',
+        id: 'a4',
         savedVis: getVisStateAgentRegions(indexPatternId),
       },
     },
-    '17': {
+    a5: {
       gridData: {
         w: 24,
         h: 12,
         x: 0,
         y: 9,
-        i: '10',
+        i: 'a5',
       },
       type: 'visualization',
       explicitInput: {
-        id: '10',
+        id: 'a5',
         savedVis: getVisStateAgentEventsBySource(indexPatternId),
       },
     },
-    '18': {
+    a6: {
       gridData: {
         w: 24,
         h: 12,
         x: 24,
         y: 9,
-        i: '11',
+        i: 'a6',
       },
       type: 'visualization',
       explicitInput: {
-        id: '11',
+        id: 'a6',
         savedVis: getVisStateAgentEventsByBucket(indexPatternId),
       },
     },
-    '19': {
+    a7: {
       gridData: {
         w: 48,
         h: 20,
         x: 0,
         y: 21,
-        i: '12',
+        i: 'a7',
       },
       type: 'visualization',
       explicitInput: {
-        id: '12',
+        id: 'a7',
         savedVis: getVisStateAgentGeolocationMap(indexPatternId),
       },
     },
   };
 
-  return overviewDashboardPanels;
+  return isPinnedAgent ? agentDashboardPanels : overviewDashboardPanels;
 };

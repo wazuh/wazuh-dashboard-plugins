@@ -111,7 +111,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardAWS,
+        component: DashboardAWS || withPinnedAgent(DashboardAWS), // TODO: use withPinnedAgent
       },
       renderDiscoverTab(DEFAULT_INDEX_PATTERN, amazonWebServicesColumns),
     ],
