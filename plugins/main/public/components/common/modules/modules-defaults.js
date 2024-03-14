@@ -43,6 +43,7 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -280,7 +281,21 @@ export const ModulesDefaults = {
   },
   nist: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(nistColumns),
+    tabs: [
+      {
+        id: 'dashboard2',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardNIST80053 || withPinnedAgent(DashboardNIST80053), // TODO: use withPinnedAgent
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: ComplianceTable,
+      },
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, nistColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   gdpr: {
