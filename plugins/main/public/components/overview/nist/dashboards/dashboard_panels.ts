@@ -1320,146 +1320,146 @@ export const getDashboardPanels = (
   >;
 } => {
   const overviewDashboard = {
-    '10': {
+    g1: {
       gridData: {
         w: 11,
         h: 14,
         x: 0,
         y: 0,
-        i: '10',
+        i: 'g1',
       },
       type: 'visualization',
       explicitInput: {
-        id: '10',
+        id: 'g1',
         savedVis: getVisStateMostActiveAgents(indexPatternId),
       },
     },
-    '11': {
+    g2: {
       gridData: {
         w: 24,
         h: 14,
         x: 11,
         y: 0,
-        i: '11',
+        i: 'g2',
       },
       type: 'visualization',
       explicitInput: {
-        id: '11',
+        id: 'g2',
         savedVis: getVisStateRequirementsOverTime(indexPatternId),
       },
     },
-    '12': {
+    g3: {
       gridData: {
         w: 13,
         h: 14,
         x: 35,
         y: 0,
-        i: '12',
+        i: 'g3',
       },
       type: 'visualization',
       explicitInput: {
-        id: '12',
+        id: 'g3',
         savedVis: getVisStateRequirementsByAgents(indexPatternId),
       },
     },
-    '20': {
+    g4: {
       gridData: {
         w: 24,
         h: 12,
         x: 0,
         y: 14,
-        i: '20',
+        i: 'g4',
       },
       type: 'visualization',
       explicitInput: {
-        id: '20',
+        id: 'g4',
         savedVis: getVisStateRequirementsAgentsHeatmap(indexPatternId),
       },
     },
-    '21': {
+    g5: {
       gridData: {
         w: 11,
         h: 12,
         x: 24,
         y: 14,
-        i: '21',
+        i: 'g5',
       },
       type: 'visualization',
       explicitInput: {
-        id: '21',
+        id: 'g5',
         savedVis: getVisStateMetrics(indexPatternId),
       },
     },
-    '22': {
+    g6: {
       gridData: {
         w: 13,
         h: 12,
         x: 35,
         y: 14,
-        i: '22',
+        i: 'g6',
       },
       type: 'visualization',
       explicitInput: {
-        id: '22',
+        id: 'g6',
         savedVis: getVisStateTopRequirements(indexPatternId),
       },
     },
   };
 
   const agentDashboard = {
-    '10': {
+    a1: {
       gridData: {
         w: 12,
         h: 11,
         x: 0,
         y: 0,
-        i: '10',
+        i: 'a1',
       },
       type: 'visualization',
       explicitInput: {
-        id: '10',
+        id: 'a1',
         savedVis: getVisStateAgentStats(indexPatternId),
       },
     },
-    '11': {
+    a2: {
       gridData: {
         w: 12,
         h: 11,
         x: 12,
         y: 0,
-        i: '11',
+        i: 'a2',
       },
       type: 'visualization',
       explicitInput: {
-        id: '11',
+        id: 'a2',
         savedVis: getVisStateAgentTopRequirements(indexPatternId),
       },
     },
-    '12': {
+    a3: {
       gridData: {
         w: 24,
         h: 11,
         x: 24,
         y: 0,
-        i: '12',
+        i: 'a3',
       },
       type: 'visualization',
       explicitInput: {
-        id: '12',
+        id: 'a3',
         savedVis: getVisStateAgentRuleLevelDistribution(indexPatternId),
       },
     },
-    '20': {
+    a4: {
       gridData: {
         w: 48,
         h: 11,
         x: 0,
         y: 11,
-        i: '20',
+        i: 'a4',
       },
       type: 'visualization',
       explicitInput: {
-        id: '20',
+        id: 'a4',
         savedVis: getVisStateAgentRequirementsOverTime(indexPatternId),
       },
     },
