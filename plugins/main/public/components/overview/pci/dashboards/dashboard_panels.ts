@@ -1,9 +1,9 @@
 import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
 
-// Visualization ID: Wazuh-App-Overview-PCI-DSS-requirements
 const getVisStateTopRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-PCI-DSS-requirements',
     title: 'Top 10 PCI DSS requirements',
     type: 'line',
     params: {
@@ -150,9 +150,9 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-PCI-DSS-Agents
 const getVisStateTopAgentsByCount = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-PCI-DSS-Agents',
     title: 'Top 10 agents by alerts count',
     type: 'pie',
     params: {
@@ -204,9 +204,9 @@ const getVisStateTopAgentsByCount = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-PCI-DSS-Requirements-over-time
 const getVisStateRequirementsOverTime = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
     title: 'Top requirements over time',
     type: 'area',
     params: {
@@ -329,9 +329,9 @@ const getVisStateRequirementsOverTime = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap
 const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
     title: 'Last alerts',
     type: 'heatmap',
     params: {
@@ -441,9 +441,9 @@ const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-PCI-DSS-Requirements-by-agent
 const getVisStateRequirementsByAgent = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
     title: 'Requirements by agent',
     type: 'histogram',
     params: {
@@ -590,9 +590,9 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-PCI-Groups
 const getVisStateAgentTopRuleGroups = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-PCI-Groups',
     title: 'Top 5 rule groups',
     type: 'pie',
     params: {
@@ -638,9 +638,9 @@ const getVisStateAgentTopRuleGroups = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-PCI-Rule
 const getVisStateAgentTopRules = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-PCI-Rule',
     title: 'Top 5 rules',
     type: 'pie',
     params: {
@@ -686,9 +686,9 @@ const getVisStateAgentTopRules = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-PCI-Requirement
 const getVisStateAgentTopRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-PCI-Requirement',
     title: 'Top 5 PCI DSS requirements',
     type: 'pie',
     params: {
@@ -734,9 +734,9 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-PCI-Requirements
 const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-PCI-Requirements',
     title: 'PCI DSS requirements',
     type: 'histogram',
     params: {
@@ -834,9 +834,9 @@ const getVisStateAgentTopRequirementsCount = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-PCI-Rule-level-distribution
 const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-PCI-Rule-level-distribution',
     title: 'Rule level distribution',
     type: 'pie',
     params: {
