@@ -1467,174 +1467,174 @@ export const getDashboardPanels = (
   >;
 } => {
   const overviewDashboard = {
-    '10': {
+    g1: {
       gridData: {
         w: 24,
         h: 20,
         x: 0,
         y: 0,
-        i: '10',
+        i: 'g1',
       },
       type: 'visualization',
       explicitInput: {
-        id: '10',
+        id: 'g1',
         savedVis: getVisStateAlertsVolumeByAgent(indexPatternId),
       },
     },
-    '110': {
+    g2: {
       gridData: {
         w: 12,
         h: 10,
         x: 24,
         y: 0,
-        i: '110',
+        i: 'g2',
       },
       type: 'visualization',
       explicitInput: {
-        id: '110',
+        id: 'g2',
         savedVis: getVisStateTagsCloud(indexPatternId),
       },
     },
-    '111': {
+    g3: {
       gridData: {
         w: 12,
         h: 10,
         x: 36,
         y: 0,
-        i: '112',
+        i: 'g3',
       },
       type: 'visualization',
       explicitInput: {
-        id: '111',
+        id: 'g3',
         savedVis: getVisStateTopRequirements(indexPatternId),
       },
     },
-    '112': {
+    g4: {
       gridData: {
         w: 12,
         h: 10,
         x: 24,
         y: 10,
-        i: '111',
+        i: 'g4',
       },
       type: 'visualization',
       explicitInput: {
-        id: '112',
+        id: 'g4',
         savedVis: getVisStateMostActiveAgents(indexPatternId),
       },
     },
-    '113': {
+    g5: {
       gridData: {
         w: 12,
         h: 10,
         x: 36,
         y: 10,
-        i: '113',
+        i: 'g5',
       },
       type: 'visualization',
       explicitInput: {
-        id: '113',
+        id: 'g5',
         savedVis: getVisStateStats(indexPatternId),
       },
     },
-    '20': {
+    g6: {
       gridData: {
         w: 24,
         h: 14,
         x: 0,
         y: 20,
-        i: '20',
+        i: 'g6',
       },
       type: 'visualization',
       explicitInput: {
-        id: '20',
+        id: 'g6',
         savedVis: getVisStateRequirementsOverTime2(indexPatternId),
       },
     },
-    '21': {
+    g7: {
       gridData: {
         w: 24,
         h: 14,
         x: 24,
         y: 20,
-        i: '21',
+        i: 'g7',
       },
       type: 'visualization',
       explicitInput: {
-        id: '21',
+        id: 'g7',
         savedVis: getVisStateRequirementDistributionByAgent(indexPatternId),
       },
     },
   };
 
   const agentDashboard = {
-    '10': {
+    a1: {
       gridData: {
         w: 24,
         h: 11,
         x: 0,
         y: 0,
-        i: '10',
+        i: 'a1',
       },
       type: 'visualization',
       explicitInput: {
-        id: '10',
+        id: 'a1',
         savedVis: getVisStateAgentRequirementsOvertime(indexPatternId),
       },
     },
-    '11': {
+    a2: {
       gridData: {
         w: 24,
         h: 11,
         x: 24,
         y: 0,
-        i: '11',
+        i: 'a2',
       },
       type: 'visualization',
       explicitInput: {
-        id: '11',
+        id: 'a2',
         savedVis: getVisStateAgentTopRequirements(indexPatternId),
       },
     },
-    '20': {
+    a3: {
       gridData: {
         w: 24,
         h: 11,
         x: 0,
         y: 11,
-        i: '20',
+        i: 'a3',
       },
       type: 'visualization',
       explicitInput: {
-        id: '20',
+        id: 'a3',
         savedVis: getVisStateAgentRequirements(indexPatternId),
       },
     },
-    '210': {
+    a4: {
       gridData: {
         w: 12,
         h: 11,
         x: 24,
         y: 11,
-        i: '210',
+        i: 'a4',
       },
       type: 'visualization',
       explicitInput: {
-        id: '210',
+        id: 'a4',
         savedVis: getVisStateAgentRuleLevelDistribution(indexPatternId),
       },
     },
-    '211': {
+    a5: {
       gridData: {
         w: 12,
         h: 11,
         x: 36,
         y: 11,
-        i: '211',
+        i: 'a5',
       },
       type: 'visualization',
       explicitInput: {
-        id: '211',
+        id: 'a5',
         savedVis: getVisStateAgentCommonAlerts(indexPatternId),
       },
     },
