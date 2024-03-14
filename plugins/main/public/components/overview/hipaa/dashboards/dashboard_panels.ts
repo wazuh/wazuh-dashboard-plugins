@@ -1,0 +1,1643 @@
+import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
+import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
+
+// Visualization ID: Wazuh-App-Overview-HIPAA-Heatmap
+const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
+  return {
+    title: 'Alerts volume by agent',
+    type: 'heatmap',
+    params: {
+      type: 'heatmap',
+      addTooltip: true,
+      addLegend: true,
+      enableHover: false,
+      legendPosition: 'right',
+      times: [],
+      colorsNumber: 10,
+      colorSchema: 'Greens',
+      setColorRange: false,
+      colorsRange: [],
+      invertColors: false,
+      percentageMode: false,
+      valueAxes: [
+        {
+          show: false,
+          id: 'ValueAxis-1',
+          type: 'value',
+          scale: { type: 'linear', defaultYExtents: false },
+          labels: {
+            show: false,
+            rotate: 0,
+            overwriteColor: false,
+            color: 'black',
+          },
+        },
+      ],
+      dimensions: {
+        x: {
+          accessor: 0,
+          format: {
+            id: 'terms',
+            params: {
+              id: 'string',
+              otherBucketLabel: 'Other',
+              missingBucketLabel: 'Missing',
+            },
+          },
+          params: {},
+          aggType: 'terms',
+        },
+        y: [
+          {
+            accessor: 2,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+        series: [
+          {
+            accessor: 1,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+    },
+    uiState: {
+      vis: {
+        defaultColors: {
+          '0 - 260': 'rgb(247,252,245)',
+          '260 - 520': 'rgb(233,247,228)',
+          '520 - 780': 'rgb(211,238,205)',
+          '780 - 1,040': 'rgb(184,227,177)',
+          '1,040 - 1,300': 'rgb(152,213,148)',
+          '1,300 - 1,560': 'rgb(116,196,118)',
+          '1,560 - 1,820': 'rgb(75,176,98)',
+          '1,820 - 2,080': 'rgb(47,152,79)',
+          '2,080 - 2,340': 'rgb(21,127,59)',
+          '2,340 - 2,600': 'rgb(0,100,40)',
+        },
+        legendOpen: true,
+      },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'agent.id',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Agent ID',
+          },
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Requirement',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Overview-HIPAA-Tag-cloud
+const getVisStateTagsCloud = (indexPatternId: string) => {
+  return {
+    title: 'Most common alerts',
+    type: 'tagcloud',
+    params: {
+      scale: 'linear',
+      orientation: 'single',
+      minFontSize: 10,
+      maxFontSize: 30,
+      showLabel: false,
+      metric: {
+        type: 'vis_dimension',
+        accessor: 1,
+        format: { id: 'string', params: {} },
+      },
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Requirement',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Overview-HIPAA-Top-10-requirements
+const getVisStateTopRequirements = (indexPatternId: string) => {
+  return {
+    title: 'Top 10 requirements',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: { show: false, values: true, last_level: true, truncate: 100 },
+      dimensions: {
+        metric: {
+          accessor: 1,
+          format: { id: 'number' },
+          params: {},
+          aggType: 'count',
+        },
+        buckets: [
+          {
+            accessor: 0,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Overview-HIPAA-Top-10-agents
+const getVisStateMostActiveAgents = (indexPatternId: string) => {
+  return {
+    title: 'Most active agents',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: { show: false, values: true, last_level: true, truncate: 100 },
+      dimensions: {
+        metric: {
+          accessor: 1,
+          format: { id: 'number' },
+          params: {},
+          aggType: 'count',
+        },
+        buckets: [
+          {
+            accessor: 0,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'agent.name',
+            customLabel: 'Agent',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Overview-HIPAA-Metrics
+const getVisStateStats = (indexPatternId: string) => {
+  return {
+    title: 'Stats',
+    type: 'metric',
+    params: {
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        colorsRange: [{ type: 'range', from: 0, to: 10000 }],
+        labels: { show: true },
+        invertColors: false,
+        style: {
+          bgFill: '#000',
+          bgColor: false,
+          labelColor: false,
+          subText: '',
+          fontSize: 20,
+        },
+      },
+      dimensions: {
+        metrics: [
+          {
+            type: 'vis_dimension',
+            accessor: 0,
+            format: { id: 'number', params: {} },
+          },
+          {
+            type: 'vis_dimension',
+            accessor: 1,
+            format: { id: 'number', params: {} },
+          },
+        ],
+      },
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: { customLabel: 'Total alerts' },
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'max',
+          schema: 'metric',
+          params: {
+            field: 'rule.level',
+            customLabel: 'Max rule level detected',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Overview-HIPAA-Top-requirements-over-time
+const getVisStateRequirementsOverTime2 = (indexPatternId: string) => {
+  return {
+    title: 'Requirements evolution over time',
+    type: 'histogram',
+    params: {
+      type: 'histogram',
+      grid: { categoryLines: true, valueAxis: 'ValueAxis-1' },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'histogram',
+          mode: 'stacked',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      labels: { show: false },
+      dimensions: {
+        x: {
+          accessor: 0,
+          format: { id: 'date', params: { pattern: 'YYYY-MM-DD HH:mm' } },
+          params: {
+            date: true,
+            interval: 'auto',
+            format: 'YYYY-MM-DD HH:mm',
+            bounds: {
+              min: '2019-08-15T12:25:29.501Z',
+              max: '2019-08-22T12:25:29.501Z',
+            },
+          },
+          aggType: 'date_histogram',
+        },
+        y: [
+          {
+            accessor: 2,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+        series: [
+          {
+            accessor: 1,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'date_histogram',
+          schema: 'segment',
+          params: {
+            field: 'timestamp',
+            timeRange: { from: 'now-7d', to: 'now' },
+            useNormalizedEsInterval: true,
+            interval: 'auto',
+            drop_partials: false,
+            min_doc_count: 1,
+            extended_bounds: {},
+          },
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Overview-HIPAA-Top-10-requirements-over-time-by-agent
+const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
+  return {
+    title: 'Requirements distribution by agent',
+    type: 'histogram',
+    params: {
+      type: 'histogram',
+      grid: { categoryLines: true, valueAxis: 'ValueAxis-1' },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'histogram',
+          mode: 'stacked',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      labels: { show: false },
+      dimensions: {
+        x: {
+          accessor: 0,
+          format: { id: 'date', params: { pattern: 'YYYY-MM-DD HH:mm' } },
+          params: {
+            date: true,
+            interval: 'auto',
+            format: 'YYYY-MM-DD HH:mm',
+            bounds: {
+              min: '2019-08-15T12:25:44.851Z',
+              max: '2019-08-22T12:25:44.851Z',
+            },
+          },
+          aggType: 'date_histogram',
+        },
+        y: [
+          {
+            accessor: 2,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+        series: [
+          {
+            accessor: 1,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'agent.name',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Overview-GDPR-Requirements-by-agent
+const getVisStateRequirementsByAgent = (indexPatternId: string) => {
+  return {
+    title: 'Requirements by agent',
+    type: 'histogram',
+    params: {
+      type: 'histogram',
+      grid: { categoryLines: false, style: { color: '#eee' } },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100, rotate: 0 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'histogram',
+          mode: 'stacked',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      radiusRatio: 51,
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.gdpr',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+            customLabel: 'GDPR Requirements',
+          },
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'agent.name',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Agents-HIPAA-Requirements-Stacked-Overtime
+const getVisStateAgentRequirementsOvertime = (indexPatternId: string) => {
+  return {
+    title: 'Requirements over time',
+    type: 'histogram',
+    params: {
+      type: 'histogram',
+      grid: { categoryLines: false },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'histogram',
+          mode: 'stacked',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      labels: { show: false },
+      dimensions: {
+        x: {
+          accessor: 0,
+          format: { id: 'date', params: { pattern: 'YYYY-MM-DD HH:mm' } },
+          params: {
+            date: true,
+            interval: 'PT1H',
+            format: 'YYYY-MM-DD HH:mm',
+            bounds: {
+              min: '2019-08-19T09:19:10.911Z',
+              max: '2019-08-23T09:19:10.911Z',
+            },
+          },
+          aggType: 'date_histogram',
+        },
+        y: [
+          {
+            accessor: 1,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+      },
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Requirement',
+          },
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'date_histogram',
+          schema: 'segment',
+          params: {
+            field: 'timestamp',
+            timeRange: { from: 'now-4d', to: 'now' },
+            useNormalizedEsInterval: true,
+            interval: 'auto',
+            drop_partials: false,
+            min_doc_count: 1,
+            extended_bounds: {},
+            customLabel: 'Timestampt',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Agents-HIPAA-top-10
+const getVisStateAgentTopRequirements = (indexPatternId: string) => {
+  return {
+    title: 'Top 10 requirements',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: {
+        show: false,
+        values: true,
+        last_level: true,
+        truncate: 100,
+      },
+      dimensions: {
+        metric: {
+          accessor: 1,
+          format: { id: 'number' },
+          params: {},
+          aggType: 'count',
+        },
+        buckets: [
+          {
+            accessor: 0,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Requirement',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Agents-HIPAA-Burbles
+const getVisStateAgentRequirements = (indexPatternId: string) => {
+  return {
+    title: 'HIPAA requirements',
+    type: 'line',
+    params: {
+      type: 'line',
+      grid: { categoryLines: true, valueAxis: 'ValueAxis-1' },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'line',
+          mode: 'normal',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: false,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      dimensions: {
+        x: {
+          accessor: 0,
+          format: { id: 'date', params: { pattern: 'YYYY-MM-DD HH:mm' } },
+          params: {
+            date: true,
+            interval: 'PT12H',
+            format: 'YYYY-MM-DD HH:mm',
+            bounds: {
+              min: '2019-07-24T10:27:37.970Z',
+              max: '2019-08-23T10:27:37.970Z',
+            },
+          },
+          aggType: 'date_histogram',
+        },
+        y: [
+          {
+            accessor: 2,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+        z: [
+          {
+            accessor: 3,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+        series: [
+          {
+            accessor: 1,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+      radiusRatio: 20,
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Requirement',
+          },
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'date_histogram',
+          schema: 'segment',
+          params: {
+            field: 'timestamp',
+            timeRange: { from: 'now-30d', to: 'now' },
+            useNormalizedEsInterval: true,
+            interval: 'auto',
+            drop_partials: false,
+            min_doc_count: 1,
+            extended_bounds: {},
+            customLabel: 'Timestampt',
+          },
+        },
+        {
+          id: '4',
+          enabled: true,
+          type: 'count',
+          schema: 'radius',
+          params: {},
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Agents-HIPAA-Distributed-By-Level
+const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
+  return {
+    title: 'Requirements distribution by level',
+    type: 'histogram',
+    params: {
+      type: 'histogram',
+      grid: { categoryLines: true, valueAxis: 'ValueAxis-1' },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'histogram',
+          mode: 'stacked',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      labels: { show: false },
+      dimensions: {
+        x: {
+          accessor: 0,
+          format: {
+            id: 'terms',
+            params: {
+              id: 'string',
+              otherBucketLabel: 'Other',
+              missingBucketLabel: 'Missing',
+            },
+          },
+          params: {},
+          aggType: 'terms',
+        },
+        y: [
+          {
+            accessor: 2,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+        series: [
+          {
+            accessor: 1,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'number',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+      orderBucketsBySum: true,
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Requirement',
+          },
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.level',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Level',
+          },
+        },
+      ],
+    },
+  };
+};
+
+// Visualization ID: Wazuh-App-Agents-HIPAA-Most-Common
+const getVisStateAgentCommonAlerts = (indexPatternId: string) => {
+  return {
+    title: 'Most common alerts',
+    type: 'tagcloud',
+    params: {
+      scale: 'linear',
+      orientation: 'single',
+      minFontSize: 15,
+      maxFontSize: 25,
+      showLabel: true,
+      metric: {
+        type: 'vis_dimension',
+        accessor: 1,
+        format: { id: 'string', params: {} },
+      },
+      bucket: {
+        type: 'vis_dimension',
+        accessor: 0,
+        format: {
+          id: 'terms',
+          params: {
+            id: 'string',
+            otherBucketLabel: 'Other',
+            missingBucketLabel: 'Missing',
+          },
+        },
+      },
+    },
+    uiState: {},
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.hipaa',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Requirement',
+          },
+        },
+      ],
+    },
+  };
+};
+
+export const getDashboardPanels = (
+  indexPatternId: string,
+  isPinnedAgent: boolean,
+): {
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
+} => {
+  const overviewDashboard = {
+    '10': {
+      gridData: {
+        w: 24,
+        h: 20,
+        x: 0,
+        y: 0,
+        i: '10',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '10',
+        savedVis: getVisStateAlertsVolumeByAgent(indexPatternId),
+      },
+    },
+    '110': {
+      gridData: {
+        w: 12,
+        h: 10,
+        x: 24,
+        y: 0,
+        i: '110',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '110',
+        savedVis: getVisStateTagsCloud(indexPatternId),
+      },
+    },
+    '111': {
+      gridData: {
+        w: 12,
+        h: 10,
+        x: 36,
+        y: 0,
+        i: '112',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '111',
+        savedVis: getVisStateTopRequirements(indexPatternId),
+      },
+    },
+    '112': {
+      gridData: {
+        w: 12,
+        h: 10,
+        x: 24,
+        y: 10,
+        i: '111',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '112',
+        savedVis: getVisStateMostActiveAgents(indexPatternId),
+      },
+    },
+    '113': {
+      gridData: {
+        w: 12,
+        h: 10,
+        x: 36,
+        y: 10,
+        i: '113',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '113',
+        savedVis: getVisStateStats(indexPatternId),
+      },
+    },
+    '20': {
+      gridData: {
+        w: 24,
+        h: 14,
+        x: 0,
+        y: 20,
+        i: '20',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '20',
+        savedVis: getVisStateRequirementsOverTime2(indexPatternId),
+      },
+    },
+    '21': {
+      gridData: {
+        w: 24,
+        h: 14,
+        x: 24,
+        y: 20,
+        i: '21',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '21',
+        savedVis: getVisStateRequirementDistributionByAgent(indexPatternId),
+      },
+    },
+  };
+
+  const agentDashboard = {
+    '10': {
+      gridData: {
+        w: 24,
+        h: 11,
+        x: 0,
+        y: 0,
+        i: '10',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '10',
+        savedVis: getVisStateAgentRequirementsOvertime(indexPatternId),
+      },
+    },
+    '11': {
+      gridData: {
+        w: 24,
+        h: 11,
+        x: 24,
+        y: 0,
+        i: '11',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '11',
+        savedVis: getVisStateAgentTopRequirements(indexPatternId),
+      },
+    },
+    '20': {
+      gridData: {
+        w: 24,
+        h: 11,
+        x: 0,
+        y: 11,
+        i: '20',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '20',
+        savedVis: getVisStateAgentRequirements(indexPatternId),
+      },
+    },
+    '210': {
+      gridData: {
+        w: 12,
+        h: 11,
+        x: 24,
+        y: 11,
+        i: '210',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '210',
+        savedVis: getVisStateAgentRuleLevelDistribution(indexPatternId),
+      },
+    },
+    '211': {
+      gridData: {
+        w: 12,
+        h: 11,
+        x: 36,
+        y: 11,
+        i: '211',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '211',
+        savedVis: getVisStateAgentCommonAlerts(indexPatternId),
+      },
+    },
+  };
+  return isPinnedAgent ? agentDashboard : overviewDashboard;
+};
