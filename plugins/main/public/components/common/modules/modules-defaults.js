@@ -43,6 +43,7 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -123,7 +124,15 @@ export const ModulesDefaults = {
   pm: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component:
+          DashboardMalwareDetection ||
+          withPinnedAgent(DashboardMalwareDetection), // TODO: use withPinnedAgent
+      },
+      ,
       renderDiscoverTab(DEFAULT_INDEX_PATTERN, malwareDetectionColumns),
     ],
     availableFor: ['manager', 'agent'],
