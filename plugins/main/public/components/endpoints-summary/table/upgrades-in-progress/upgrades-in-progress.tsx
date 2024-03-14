@@ -92,8 +92,10 @@ export const AgentUpgradesInProgress = ({
     getErrorOrchestrator().handleError(options);
   }
 
-  return !isPanelClosed &&
-    (isUpgrading || totalSuccessTasks || totalErrorUpgradeTasks) ? (
+  const showTasks = isUpgrading || totalSuccessTasks || totalErrorUpgradeTasks;
+  if (isPanelClosed || !showTasks) return null;
+
+  return (
     <EuiPanel color='subdued'>
       <EuiFlexGroup
         gutterSize='s'
@@ -184,5 +186,5 @@ export const AgentUpgradesInProgress = ({
         ) : null}
       </EuiFlexGroup>
     </EuiPanel>
-  ) : null;
+  );
 };
