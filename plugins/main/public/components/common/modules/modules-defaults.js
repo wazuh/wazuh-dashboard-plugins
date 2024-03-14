@@ -66,12 +66,7 @@ const renderDiscoverTab = (indexName = DEFAULT_INDEX_PATTERN, columns) => {
 };
 
 const RegulatoryComplianceTabs = columns => [
-  {
-    id: 'dashboard',
-    name: 'Dashboard',
-    buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-    component: DashboardPCIDSS || withPinnedAgent(DashboardPCIDSS), // TODO: use withPinnedAgent
-  },
+  DashboardTab,
   {
     id: 'inventory',
     name: 'Controls',
@@ -276,7 +271,22 @@ export const ModulesDefaults = {
   },
   pci: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(pciColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardPCIDSS || withPinnedAgent(DashboardPCIDSS), // TODO: use withPinnedAgent
+        // component: () => <div>HELLO</div>,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: ComplianceTable,
+      },
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, pciColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
