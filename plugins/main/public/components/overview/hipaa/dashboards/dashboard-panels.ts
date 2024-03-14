@@ -1,9 +1,9 @@
 import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
 
-// Visualization ID: Wazuh-App-Overview-HIPAA-Heatmap
 const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-HIPAA-Heatmap',
     title: 'Alerts volume by agent',
     type: 'heatmap',
     params: {
@@ -146,9 +146,9 @@ const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-HIPAA-Tag-cloud
 const getVisStateTagsCloud = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-HIPAA-Tag-cloud',
     title: 'Most common alerts',
     type: 'tagcloud',
     params: {
@@ -204,9 +204,9 @@ const getVisStateTagsCloud = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-HIPAA-Top-10-requirements
 const getVisStateTopRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-HIPAA-Top-10-requirements',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {
@@ -280,9 +280,9 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-HIPAA-Top-10-agents
 const getVisStateMostActiveAgents = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-HIPAA-Top-10-agents',
     title: 'Most active agents',
     type: 'pie',
     params: {
@@ -357,9 +357,9 @@ const getVisStateMostActiveAgents = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-HIPAA-Metrics
 const getVisStateStats = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-HIPAA-Metrics',
     title: 'Stats',
     type: 'metric',
     params: {
@@ -437,9 +437,9 @@ const getVisStateStats = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-HIPAA-Top-requirements-over-time
 const getVisStateRequirementsOverTime2 = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-HIPAA-Top-requirements-over-time',
     title: 'Requirements evolution over time',
     type: 'histogram',
     params: {
@@ -582,9 +582,9 @@ const getVisStateRequirementsOverTime2 = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-HIPAA-Top-10-requirements-over-time-by-agent
 const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Overview-HIPAA-Top-10-requirements-over-time-by-agent',
     title: 'Requirements distribution by agent',
     type: 'histogram',
     params: {
@@ -728,115 +728,9 @@ const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Overview-GDPR-Requirements-by-agent
-const getVisStateRequirementsByAgent = (indexPatternId: string) => {
-  return {
-    title: 'Requirements by agent',
-    type: 'histogram',
-    params: {
-      type: 'histogram',
-      grid: { categoryLines: false, style: { color: '#eee' } },
-      categoryAxes: [
-        {
-          id: 'CategoryAxis-1',
-          type: 'category',
-          position: 'bottom',
-          show: true,
-          style: {},
-          scale: { type: 'linear' },
-          labels: { show: true, filter: true, truncate: 100, rotate: 0 },
-          title: {},
-        },
-      ],
-      valueAxes: [
-        {
-          id: 'ValueAxis-1',
-          name: 'LeftAxis-1',
-          type: 'value',
-          position: 'left',
-          show: true,
-          style: {},
-          scale: { type: 'linear', mode: 'normal' },
-          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
-        },
-      ],
-      seriesParams: [
-        {
-          show: 'true',
-          type: 'histogram',
-          mode: 'stacked',
-          data: { label: 'Count', id: '1' },
-          valueAxis: 'ValueAxis-1',
-          drawLinesBetweenPoints: true,
-          showCircles: true,
-        },
-      ],
-      addTooltip: true,
-      addLegend: true,
-      legendPosition: 'right',
-      times: [],
-      addTimeMarker: false,
-      radiusRatio: 51,
-    },
-    uiState: {},
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          schema: 'metric',
-          params: {},
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'terms',
-          schema: 'segment',
-          params: {
-            field: 'rule.gdpr',
-            size: 5,
-            order: 'desc',
-            orderBy: '1',
-            customLabel: 'GDPR Requirements',
-          },
-        },
-        {
-          id: '3',
-          enabled: true,
-          type: 'terms',
-          schema: 'group',
-          params: {
-            field: 'agent.name',
-            size: 5,
-            order: 'desc',
-            orderBy: '1',
-          },
-        },
-      ],
-    },
-  };
-};
-
-// Visualization ID: Wazuh-App-Agents-HIPAA-Requirements-Stacked-Overtime
 const getVisStateAgentRequirementsOvertime = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-HIPAA-Requirements-Stacked-Overtime',
     title: 'Requirements over time',
     type: 'histogram',
     params: {
@@ -972,9 +866,9 @@ const getVisStateAgentRequirementsOvertime = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-HIPAA-top-10
 const getVisStateAgentTopRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-HIPAA-top-10',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {
@@ -1060,9 +954,9 @@ const getVisStateAgentTopRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-HIPAA-Burbles
 const getVisStateAgentRequirements = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-HIPAA-Bubbles',
     title: 'HIPAA requirements',
     type: 'line',
     params: {
@@ -1228,9 +1122,9 @@ const getVisStateAgentRequirements = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-HIPAA-Distributed-By-Level
 const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-HIPAA-Distributed-By-Level',
     title: 'Requirements distribution by level',
     type: 'histogram',
     params: {
@@ -1382,9 +1276,9 @@ const getVisStateAgentRuleLevelDistribution = (indexPatternId: string) => {
   };
 };
 
-// Visualization ID: Wazuh-App-Agents-HIPAA-Most-Common
 const getVisStateAgentCommonAlerts = (indexPatternId: string) => {
   return {
+    id: 'Wazuh-App-Agents-HIPAA-Most-Common',
     title: 'Most common alerts',
     type: 'tagcloud',
     params: {
