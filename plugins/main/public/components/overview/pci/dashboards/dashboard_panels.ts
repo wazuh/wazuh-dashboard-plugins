@@ -886,146 +886,146 @@ export const getDashboardPanels = (
   >;
 } => {
   const overviewDashboard = {
-    '10': {
+    g1: {
       gridData: {
         w: 24,
         h: 14,
         x: 0,
         y: 0,
-        i: '10',
+        i: 'g1',
       },
       type: 'visualization',
       explicitInput: {
-        id: '10',
+        id: 'g1',
         savedVis: getVisStateTopRequirements(indexPatternId),
       },
     },
-    '11': {
+    g2: {
       gridData: {
         w: 24,
         h: 14,
         x: 24,
         y: 0,
-        i: '11',
+        i: 'g2',
       },
       type: 'visualization',
       explicitInput: {
-        id: '11',
+        id: 'g2',
         savedVis: getVisStateTopAgentsByCount(indexPatternId),
       },
     },
-    '20': {
+    g3: {
       gridData: {
         w: 48,
         h: 11,
         x: 0,
         y: 14,
-        i: '20',
+        i: 'g3',
       },
       type: 'visualization',
       explicitInput: {
-        id: '20',
+        id: 'g3',
         savedVis: getVisStateRequirementsOverTime(indexPatternId),
       },
     },
-    '30': {
+    g4: {
       gridData: {
         w: 48,
         h: 19,
         x: 0,
         y: 25,
-        i: '30',
+        i: 'g4',
       },
       type: 'visualization',
       explicitInput: {
-        id: '30',
+        id: 'g4',
         savedVis: getVisStateRequirementsHeatmap(indexPatternId),
       },
     },
-    '40': {
+    g5: {
       gridData: {
         w: 48,
         h: 9,
         x: 0,
         y: 43,
-        i: '40',
+        i: 'g5',
       },
       type: 'visualization',
       explicitInput: {
-        id: '40',
+        id: 'g5',
         savedVis: getVisStateRequirementsByAgent(indexPatternId),
       },
     },
   };
 
   const agentDashboard = {
-    '10': {
+    a1: {
       gridData: {
         w: 16,
         h: 11,
         x: 0,
         y: 0,
-        i: '10',
+        i: 'a1',
       },
       type: 'visualization',
       explicitInput: {
-        id: '10',
+        id: 'a1',
         savedVis: getVisStateTopRuleGroups(indexPatternId),
       },
     },
-    '11': {
+    a2: {
       gridData: {
         w: 16,
         h: 11,
         x: 16,
         y: 0,
-        i: '11',
+        i: 'a2',
       },
       type: 'visualization',
       explicitInput: {
-        id: '11',
+        id: 'a2',
         savedVis: getVisStateTopRules(indexPatternId),
       },
     },
-    '12': {
+    a3: {
       gridData: {
         w: 16,
         h: 11,
         x: 32,
         y: 0,
-        i: '12',
+        i: 'a3',
       },
       type: 'visualization',
       explicitInput: {
-        id: '12',
+        id: 'a3',
         savedVis: getVisStateAgentTopRequirements(indexPatternId),
       },
     },
-    '20': {
+    a4: {
       gridData: {
         w: 35,
         h: 11,
         x: 0,
         y: 11,
-        i: '20',
+        i: 'a4',
       },
       type: 'visualization',
       explicitInput: {
-        id: '20',
+        id: 'a4',
         savedVis: getVisStateAgentTopRequirementsCount(indexPatternId),
       },
     },
-    '21': {
+    a5: {
       gridData: {
         w: 13,
         h: 11,
         x: 35,
         y: 11,
-        i: '21',
+        i: 'a5',
       },
       type: 'visualization',
       explicitInput: {
-        id: '21',
+        id: 'a5',
         savedVis: getVisStateAgentRuleLevelDistribution(indexPatternId),
       },
     },
