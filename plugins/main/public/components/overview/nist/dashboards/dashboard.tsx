@@ -87,7 +87,7 @@ const DashboardNIST80053Component: React.FC = ({ pinnedAgent }) => {
             <SearchBar
               appName='nist-searchbar'
               {...searchBarProps}
-              showDatePicker={false}
+              showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
             />
