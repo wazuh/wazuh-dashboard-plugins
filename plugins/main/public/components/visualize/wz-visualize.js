@@ -337,7 +337,7 @@ export const WzVisualize = compose(
                         className='embPanel__header'
                       >
                         <h2 className='embPanel__title wz-headline-title'>
-                          Security Alerts
+                          Security Alerts table
                         </h2>
                         <EuiButtonIcon
                           color='text'
