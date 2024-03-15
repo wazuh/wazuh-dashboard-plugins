@@ -1099,6 +1099,201 @@ const getVisStateAgentUsersWithMoreAlerts = (indexPatternId: string) => {
   };
 };
 
+const getVisStateMetricOrganizationsCount = (indexPatternId: string) => {
+  return {
+    id: 'Wazuh-GitHub-Metric-Organizations-Count',
+    title: '',
+    type: 'metric',
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        colorsRange: [
+          {
+            from: 0,
+            to: 0,
+          },
+        ],
+        labels: {
+          show: true,
+        },
+        invertColors: false,
+        style: {
+          bgFill: '#000',
+          bgColor: false,
+          labelColor: false,
+          subText: '',
+          fontSize: 40,
+        },
+      },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'cardinality',
+          params: {
+            field: 'data.github.org',
+            customLabel: 'Organizations',
+          },
+          schema: 'metric',
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateMetricRepositoriesCount = (indexPatternId: string) => {
+  return {
+    id: 'Wazuh-GitHub-Metric-Repositories-Count',
+    title: '',
+    type: 'metric',
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        colorsRange: [
+          {
+            from: 0,
+            to: 0,
+          },
+        ],
+        labels: {
+          show: true,
+        },
+        invertColors: false,
+        style: {
+          bgFill: '#000',
+          bgColor: false,
+          labelColor: false,
+          subText: '',
+          fontSize: 40,
+        },
+      },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'cardinality',
+          params: {
+            field: 'data.github.repo',
+            customLabel: 'Repositories',
+          },
+          schema: 'metric',
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateMetricActorsCount = (indexPatternId: string) => {
+  return {
+    id: 'Wazuh-GitHub-Metric-Actors-Count',
+    title: '',
+    type: 'metric',
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        colorsRange: [
+          {
+            from: 0,
+            to: 0,
+          },
+        ],
+        labels: {
+          show: true,
+        },
+        invertColors: false,
+        style: {
+          bgFill: '#000',
+          bgColor: false,
+          labelColor: false,
+          subText: '',
+          fontSize: 40,
+        },
+      },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'cardinality',
+          params: {
+            field: 'data.github.actor',
+            customLabel: 'Actors',
+          },
+          schema: 'metric',
+        },
+      ],
+    },
+  };
+};
+
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent: boolean,
@@ -1108,59 +1303,101 @@ export const getDashboardPanels = (
   >;
 } => {
   const overviewDashboard = {
+    g0: {
+      gridData: {
+        w: 16,
+        h: 6,
+        x: 0,
+        y: 0,
+        i: 'g0',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'g0',
+        savedVis: getVisStateMetricOrganizationsCount(indexPatternId),
+      },
+    },
     g1: {
       gridData: {
-        w: 29,
-        h: 13,
-        x: 0,
+        w: 16,
+        h: 6,
+        x: 16,
         y: 0,
         i: 'g1',
       },
       type: 'visualization',
       explicitInput: {
         id: 'g1',
-        savedVis: getVisStateAlertsEvolutionByOrganization(indexPatternId),
+        savedVis: getVisStateMetricRepositoriesCount(indexPatternId),
       },
     },
     g2: {
       gridData: {
-        w: 19,
-        h: 13,
-        x: 29,
+        w: 16,
+        h: 6,
+        x: 32,
         y: 0,
         i: 'g2',
       },
       type: 'visualization',
       explicitInput: {
         id: 'g2',
-        savedVis: getVisStateTopOrganizationsByAlertCount(indexPatternId),
+        savedVis: getVisStateMetricActorsCount(indexPatternId),
       },
     },
     g3: {
       gridData: {
-        w: 19,
+        w: 29,
         h: 13,
         x: 0,
-        y: 13,
+        y: 6,
         i: 'g3',
       },
       type: 'visualization',
       explicitInput: {
         id: 'g3',
-        savedVis: getVisStateActionTypeByOrganization(indexPatternId),
+        savedVis: getVisStateAlertsEvolutionByOrganization(indexPatternId),
       },
     },
     g4: {
       gridData: {
-        w: 29,
+        w: 19,
         h: 13,
-        x: 19,
-        y: 13,
+        x: 29,
+        y: 6,
         i: 'g4',
       },
       type: 'visualization',
       explicitInput: {
         id: 'g4',
+        savedVis: getVisStateTopOrganizationsByAlertCount(indexPatternId),
+      },
+    },
+    g5: {
+      gridData: {
+        w: 19,
+        h: 13,
+        x: 0,
+        y: 19,
+        i: 'g5',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'g5',
+        savedVis: getVisStateActionTypeByOrganization(indexPatternId),
+      },
+    },
+    g6: {
+      gridData: {
+        w: 29,
+        h: 13,
+        x: 19,
+        y: 19,
+        i: 'g6',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'g6',
         savedVis: getVisStateUsersWithMoreAlerts(indexPatternId),
       },
     },
@@ -1169,8 +1406,8 @@ export const getDashboardPanels = (
   const agentDashboard = {
     a1: {
       gridData: {
-        w: 29,
-        h: 13,
+        w: 16,
+        h: 6,
         x: 0,
         y: 0,
         i: 'a1',
@@ -1178,48 +1415,90 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a1',
-        savedVis: getVisStateAgentAlertsEvolutionByOrganization(indexPatternId),
+        savedVis: getVisStateMetricOrganizationsCount(indexPatternId),
       },
     },
     a2: {
       gridData: {
-        w: 19,
-        h: 13,
-        x: 29,
+        w: 16,
+        h: 6,
+        x: 16,
         y: 0,
         i: 'a2',
       },
       type: 'visualization',
       explicitInput: {
         id: 'a2',
-        savedVis: getVisStateAgentTopOrganizationsByAlertCount(indexPatternId),
+        savedVis: getVisStateMetricRepositoriesCount(indexPatternId),
       },
     },
     a3: {
       gridData: {
-        w: 19,
-        h: 13,
-        x: 0,
-        y: 13,
+        w: 16,
+        h: 6,
+        x: 32,
+        y: 0,
         i: 'a3',
       },
       type: 'visualization',
       explicitInput: {
         id: 'a3',
-        savedVis: getVisStateAgentActionTypeByOrganization(indexPatternId),
+        savedVis: getVisStateMetricActorsCount(indexPatternId),
       },
     },
     a4: {
       gridData: {
         w: 29,
         h: 13,
-        x: 19,
-        y: 13,
+        x: 0,
+        y: 0,
         i: 'a4',
       },
       type: 'visualization',
       explicitInput: {
         id: 'a4',
+        savedVis: getVisStateAgentAlertsEvolutionByOrganization(indexPatternId),
+      },
+    },
+    a5: {
+      gridData: {
+        w: 19,
+        h: 13,
+        x: 29,
+        y: 0,
+        i: 'a5',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'a5',
+        savedVis: getVisStateAgentTopOrganizationsByAlertCount(indexPatternId),
+      },
+    },
+    a6: {
+      gridData: {
+        w: 19,
+        h: 13,
+        x: 0,
+        y: 13,
+        i: 'a6',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'a6',
+        savedVis: getVisStateAgentActionTypeByOrganization(indexPatternId),
+      },
+    },
+    a7: {
+      gridData: {
+        w: 29,
+        h: 13,
+        x: 19,
+        y: 13,
+        i: 'a7',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'a7',
         savedVis: getVisStateAgentUsersWithMoreAlerts(indexPatternId),
       },
     },
