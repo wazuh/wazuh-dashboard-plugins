@@ -19,8 +19,8 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { getAgentsService, upgradeAgentsService } from '../../../services';
 import { Agent, ResponseUpgradeAgents } from '../../../types';
-import { ErrorAgent } from '../../../services/paginated-agents-group';
 import { UpgradeAgentsModalResult } from './result';
+import { ErrorAgent } from '../../../services/paginated-agents-request';
 
 export type Result = {
   successAgents?: ResponseUpgradeAgents[];

@@ -1,10 +1,10 @@
 import React from 'react';
-import { render, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { UpgradeAgentModal } from './upgrade-agent-modal';
 
 jest.mock('../../services', () => ({
-  upgradeAgentsService: jest.fn(),
+  upgradeAgentService: jest.fn(),
 }));
 
 jest.mock('../../../../react-services/common-services', () => ({
