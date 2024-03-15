@@ -81,7 +81,7 @@ const DashboardGoogleCloudComponent: React.FC = ({ pinnedAgent }) => {
             <SearchBar
               appName='pci-dss-searchbar'
               {...searchBarProps}
-              showDatePicker={false}
+              showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
             />
