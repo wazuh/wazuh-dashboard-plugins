@@ -22,7 +22,7 @@ export const paginatedAgentsRequestService = async ({
   agentIds: string[];
   groupId?: string;
   pageSize?: number;
-}): Promise<IApiResponse<string>> => {
+}): Promise<IApiResponse<any>> => {
   let offset = 0;
   let requestAgentIds: string[] = [];
   let allAffectedItems: string[] = [];
