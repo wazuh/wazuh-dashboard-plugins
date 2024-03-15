@@ -16,6 +16,10 @@ import {
   EuiModalBody,
   EuiModalFooter,
   EuiButton,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiToolTip,
+  EuiButtonIcon,
 } from '@elastic/eui';
 
 interface AgentUpgradesTaskDetailsModalProps {
@@ -100,14 +104,36 @@ export const AgentUpgradesTaskDetailsModal = ({
             {
               field: 'status',
               name: 'Status',
-              width: '120px',
+              width: '130px',
               sortable: true,
               searchable: true,
               show: true,
               render: value => (
-                <EuiHealth color={UI_TASK_STATUS_COLORS[value]}>
-                  {value}
-                </EuiHealth>
+                <EuiFlexGroup
+                  alignItems='center'
+                  gutterSize='xs'
+                  responsive={false}
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiHealth color={UI_TASK_STATUS_COLORS[value]}>
+                      {value}
+                    </EuiHealth>
+                  </EuiFlexItem>
+                  {value === API_NAME_TASK_STATUS.TIMEOUT ? (
+                    <EuiFlexItem grow={false}>
+                      <EuiToolTip
+                        position='top'
+                        content='Upgrade task has appears to be done but the notification has never reached the manager'
+                      >
+                        <EuiButtonIcon
+                          color='primary'
+                          iconType='questionInCircle'
+                          aria-label='Info about the error'
+                        />
+                      </EuiToolTip>
+                    </EuiFlexItem>
+                  ) : null}
+                </EuiFlexGroup>
               ),
             },
             {
@@ -116,12 +142,6 @@ export const AgentUpgradesTaskDetailsModal = ({
               show: true,
               searchable: true,
               width: '250px',
-              render: (value, task) => {
-                if (task.status === API_NAME_TASK_STATUS.TIMEOUT) {
-                  return 'Upgrade task has appears to be done but the notification has never reached the manager';
-                }
-                return value;
-              },
             },
           ]}
           tableInitialSortingField='last_update_time'
