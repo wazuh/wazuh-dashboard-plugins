@@ -43,6 +43,7 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { DashboardDocker } from '../../overview/docker/dashboards';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -263,7 +264,12 @@ export const ModulesDefaults = {
   docker: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardDocker || withPinnedAgent(DashboardDocker), // TODO: use withPinnedAgent
+      },
       renderDiscoverTab(DEFAULT_INDEX_PATTERN, dockerColumns),
     ],
     availableFor: ['manager', 'agent'],
