@@ -70,7 +70,7 @@ const DashboardTSCComponent: React.FC = ({ pinnedAgent }) => {
         .catch(error => {
           const searchError = ErrorFactory.create(HttpError, {
             error,
-            message: 'Error fetching vulnerabilities',
+            message: 'Error fetching alerts',
           });
           ErrorHandler.handleError(searchError);
           setIsSearching(false);
@@ -85,9 +85,9 @@ const DashboardTSCComponent: React.FC = ({ pinnedAgent }) => {
           {isLoading ? <LoadingSpinner /> : null}
           {!isLoading ? (
             <SearchBar
-              appName='pci-dss-searchbar'
+              appName='tsc-searchbar'
               {...searchBarProps}
-              showDatePicker={false}
+              showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
             />
@@ -98,7 +98,7 @@ const DashboardTSCComponent: React.FC = ({ pinnedAgent }) => {
             <DiscoverNoResults />
           ) : null}
           {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-            <div className='pci-dss-dashboard-responsive'>
+            <div className='tsc-dashboard-responsive'>
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
@@ -109,13 +109,13 @@ const DashboardTSCComponent: React.FC = ({ pinnedAgent }) => {
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
                   useMargins: true,
-                  id: 'vulnerability-detector-dashboard-tab',
+                  id: 'tsc-dashboard-tab',
                   timeRange: {
                     from: searchBarProps.dateRangeFrom,
                     to: searchBarProps.dateRangeTo,
                   },
-                  title: 'Vulnerability detector dashboard',
-                  description: 'Dashboard of the Vulnerability detector',
+                  title: 'TSC detector dashboard',
+                  description: 'Dashboard of the TSC',
                   query: searchBarProps.query,
                   refreshConfig: {
                     pause: false,
