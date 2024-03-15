@@ -2,6 +2,8 @@ import { getAngularModule, getDataPlugin } from '../../../kibana-services';
 import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from '../../../../common/constants';
+import { useFilterManager } from '../hooks';
+import { FilterStateStore } from '../../../../../../src/plugins/data/common';
 
 export class ModulesHelper {
   static async getDiscoverScope() {
@@ -181,5 +183,60 @@ If this case happens, the implicit filters are regenerated and the function is c
     });
 
     return filters;
+  }
+
+  /**
+   *
+   * @param {string} indexPattern - Index pattern id being used
+   * @param {Filter[] | undefined} filters - (Optional) Filter Array in which to search if a pinned agent exists
+   * @returns
+   */
+  static getImplicitPinnedAgent(indexPattern, filters = []) {
+    const filterManager = useFilterManager().filterManager;
+    const initialFilters =
+      filters?.length > 0 ? filters : filterManager.getFilters();
+    const pinnedAgentByFilterManager = initialFilters.find(
+      filter =>
+        filter?.meta?.key === 'agent.id' && !!filter?.$state?.isImplicit,
+    );
+    const url = window.location.href;
+    const regex = new RegExp('agentId=' + '[^&]*');
+    const match = url.match(regex);
+    const isPinnedAgentByUrl = match && match[0];
+    if (pinnedAgentByFilterManager && isPinnedAgentByUrl) {
+      return {
+        ...pinnedAgentByFilterManager,
+        meta: {
+          ...pinnedAgentByFilterManager.meta,
+          index: indexPattern,
+        },
+        $state: { store: FilterStateStore.APP_STATE, isImplicit: true },
+      };
+    }
+
+    if (isPinnedAgentByUrl) {
+      const agentId = match[0].split('=')[1];
+      return {
+        meta: {
+          alias: null,
+          disabled: false,
+          key: 'agent.id',
+          negate: false,
+          params: { query: agentId },
+          type: 'phrase',
+          index: indexPattern,
+        },
+        query: {
+          match: {
+            'agent.id': {
+              query: agentId,
+              type: 'phrase',
+            },
+          },
+        },
+        $state: { store: 'appState', isImplicit: true },
+      };
+    }
+    return undefined;
   }
 }
