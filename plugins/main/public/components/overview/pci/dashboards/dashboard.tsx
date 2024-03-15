@@ -70,7 +70,7 @@ const DashboardPCIDSSComponent: React.FC = ({ pinnedAgent }) => {
         .catch(error => {
           const searchError = ErrorFactory.create(HttpError, {
             error,
-            message: 'Error fetching vulnerabilities',
+            message: 'Error fetching alerts',
           });
           ErrorHandler.handleError(searchError);
           setIsSearching(false);
@@ -87,7 +87,7 @@ const DashboardPCIDSSComponent: React.FC = ({ pinnedAgent }) => {
             <SearchBar
               appName='pci-dss-searchbar'
               {...searchBarProps}
-              showDatePicker={false}
+              showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
             />
@@ -109,13 +109,13 @@ const DashboardPCIDSSComponent: React.FC = ({ pinnedAgent }) => {
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
                   useMargins: true,
-                  id: 'vulnerability-detector-dashboard-tab',
+                  id: 'pci-dss-dashboard-tab',
                   timeRange: {
                     from: searchBarProps.dateRangeFrom,
                     to: searchBarProps.dateRangeTo,
                   },
-                  title: 'Vulnerability detector dashboard',
-                  description: 'Dashboard of the Vulnerability detector',
+                  title: 'PCI DSS dashboard',
+                  description: 'Dashboard of the PCI DSS',
                   query: searchBarProps.query,
                   refreshConfig: {
                     pause: false,
