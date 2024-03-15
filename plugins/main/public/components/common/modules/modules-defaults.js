@@ -132,7 +132,6 @@ export const ModulesDefaults = {
           DashboardMalwareDetection ||
           withPinnedAgent(DashboardMalwareDetection), // TODO: use withPinnedAgent
       },
-      ,
       renderDiscoverTab(DEFAULT_INDEX_PATTERN, malwareDetectionColumns),
     ],
     availableFor: ['manager', 'agent'],
