@@ -114,7 +114,7 @@ const DashboardTSCComponent: React.FC = ({ pinnedAgent }) => {
                     from: searchBarProps.dateRangeFrom,
                     to: searchBarProps.dateRangeTo,
                   },
-                  title: 'TSC detector dashboard',
+                  title: 'TSC dashboard',
                   description: 'Dashboard of the TSC',
                   query: searchBarProps.query,
                   refreshConfig: {
