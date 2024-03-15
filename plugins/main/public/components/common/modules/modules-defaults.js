@@ -37,7 +37,7 @@ import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
 import { nistColumns } from '../../overview/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/tsc/events/tsc-columns';
-import { githubColumns } from '../../overview/github-panel/events/github-columns';
+import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
