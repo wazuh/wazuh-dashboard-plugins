@@ -43,6 +43,7 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { DashboardGitHub } from '../../overview/github/dashboards/dashboard';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -179,6 +180,12 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       DashboardTab,
+      {
+        id: 'dashboard2',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardGitHub || withPinnedAgent(DashboardGitHub), // TODO: use withPinnedAgent
+      },
       {
         id: 'inventory',
         name: 'Panel',
