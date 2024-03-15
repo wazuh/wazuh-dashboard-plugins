@@ -17,7 +17,7 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
-import { GitHubPanel } from '../../overview/github-panel';
+import { GitHubPanel } from '../../overview/github/panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent } from '../hocs';
 import { WazuhDiscover } from '../wazuh-discover/wz-discover';

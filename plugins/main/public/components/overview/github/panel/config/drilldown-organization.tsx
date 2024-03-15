@@ -11,9 +11,9 @@
  */
 
 import React from 'react';
-import { VisCard } from '../../../common/modules/panel/';
-import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
-import { SecurityAlerts } from '../../../visualize/components';
+import { VisCard } from '../../../../common/modules/panel/';
+import { EuiFlexItem, EuiPanel } from '@elastic/eui';
+import { SecurityAlerts } from '../../../../visualize/components';
 
 export const DrilldownConfigOrganization = {
   rows: [
@@ -22,20 +22,32 @@ export const DrilldownConfigOrganization = {
       columns: [
         {
           width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-GitHub-Top-Ten-Actions" tab="github" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-GitHub-Top-Ten-Actions'
+              tab='github'
+              {...props}
+            />
           ),
         },
         {
           width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-GitHub-Top-Ten-Repositories" tab="github" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-GitHub-Top-Ten-Repositories'
+              tab='github'
+              {...props}
+            />
           ),
         },
         {
           width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-GitHub-Top-Ten-Actors" tab="github" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-GitHub-Top-Ten-Actors'
+              tab='github'
+              {...props}
+            />
           ),
         },
       ],
@@ -45,14 +57,22 @@ export const DrilldownConfigOrganization = {
       columns: [
         {
           width: 50,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-GitHub-Countries" tab="github" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-GitHub-Countries'
+              tab='github'
+              {...props}
+            />
           ),
         },
         {
           width: 50,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-GitHub-Alert-Level-Evolution" tab="github" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-GitHub-Alert-Level-Evolution'
+              tab='github'
+              {...props}
+            />
           ),
         },
       ],
@@ -68,7 +88,7 @@ export const DrilldownConfigOrganization = {
                   initialColumns={[
                     { field: 'icon' },
                     { field: 'timestamp' },
-                    { field: 'rule.description' },                    
+                    { field: 'rule.description' },
                     { field: 'data.github.repo', label: 'Repository' },
                     { field: 'data.github.actor', label: 'Actor' },
                     { field: 'data.github.action', label: 'Action' },
