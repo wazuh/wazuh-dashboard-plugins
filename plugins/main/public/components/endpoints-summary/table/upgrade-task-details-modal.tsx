@@ -1,5 +1,4 @@
 import React from 'react';
-import { EuiHealth, EuiIconTip } from '@elastic/eui';
 import { TableWzAPI } from '../../common/tables';
 import { formatUIDate } from '../../../react-services/time-service';
 import {
@@ -18,8 +17,8 @@ import {
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiToolTip,
-  EuiButtonIcon,
+  EuiHealth,
+  EuiIconTip,
 } from '@elastic/eui';
 
 interface AgentUpgradesTaskDetailsModalProps {
@@ -121,16 +120,10 @@ export const AgentUpgradesTaskDetailsModal = ({
                   </EuiFlexItem>
                   {value === API_NAME_TASK_STATUS.TIMEOUT ? (
                     <EuiFlexItem grow={false}>
-                      <EuiToolTip
-                        position='top'
+                      <EuiIconTip
                         content='Upgrade task has appears to be done but the notification has never reached the manager'
-                      >
-                        <EuiButtonIcon
-                          color='primary'
-                          iconType='questionInCircle'
-                          aria-label='Info about the error'
-                        />
-                      </EuiToolTip>
+                        color='primary'
+                      />
                     </EuiFlexItem>
                   ) : null}
                 </EuiFlexGroup>
