@@ -283,7 +283,7 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       {
-        id: 'dashboard2',
+        id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
         component: DashboardNIST80053 || withPinnedAgent(DashboardNIST80053), // TODO: use withPinnedAgent

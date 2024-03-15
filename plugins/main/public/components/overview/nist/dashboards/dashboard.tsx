@@ -70,7 +70,7 @@ const DashboardNIST80053Component: React.FC = ({ pinnedAgent }) => {
         .catch(error => {
           const searchError = ErrorFactory.create(HttpError, {
             error,
-            message: 'Error fetching vulnerabilities',
+            message: 'Error fetching alerts',
           });
           ErrorHandler.handleError(searchError);
           setIsSearching(false);
@@ -85,7 +85,7 @@ const DashboardNIST80053Component: React.FC = ({ pinnedAgent }) => {
           {isLoading ? <LoadingSpinner /> : null}
           {!isLoading ? (
             <SearchBar
-              appName='pci-dss-searchbar'
+              appName='nist-searchbar'
               {...searchBarProps}
               showDatePicker={false}
               showQueryInput={true}
@@ -98,7 +98,7 @@ const DashboardNIST80053Component: React.FC = ({ pinnedAgent }) => {
             <DiscoverNoResults />
           ) : null}
           {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-            <div className='pci-dss-dashboard-responsive'>
+            <div className='nist-dashboard-responsive'>
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
@@ -109,13 +109,13 @@ const DashboardNIST80053Component: React.FC = ({ pinnedAgent }) => {
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
                   useMargins: true,
-                  id: 'vulnerability-detector-dashboard-tab',
+                  id: 'nist-dashboard-tab',
                   timeRange: {
                     from: searchBarProps.dateRangeFrom,
                     to: searchBarProps.dateRangeTo,
                   },
-                  title: 'Vulnerability detector dashboard',
-                  description: 'Dashboard of the Vulnerability detector',
+                  title: 'NIST 800-53 dashboard',
+                  description: 'Dashboard of the NIST 800-53',
                   query: searchBarProps.query,
                   refreshConfig: {
                     pause: false,
