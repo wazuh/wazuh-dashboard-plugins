@@ -70,7 +70,7 @@ const DashboardGitHubComponent: React.FC = ({ pinnedAgent }) => {
         .catch(error => {
           const searchError = ErrorFactory.create(HttpError, {
             error,
-            message: 'Error fetching vulnerabilities',
+            message: 'Error fetching alerts',
           });
           ErrorHandler.handleError(searchError);
           setIsSearching(false);
@@ -85,9 +85,9 @@ const DashboardGitHubComponent: React.FC = ({ pinnedAgent }) => {
           {isLoading ? <LoadingSpinner /> : null}
           {!isLoading ? (
             <SearchBar
-              appName='pci-dss-searchbar'
+              appName='github-searchbar'
               {...searchBarProps}
-              showDatePicker={false}
+              showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
             />
@@ -98,7 +98,7 @@ const DashboardGitHubComponent: React.FC = ({ pinnedAgent }) => {
             <DiscoverNoResults />
           ) : null}
           {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-            <div className='pci-dss-dashboard-responsive'>
+            <div className='github-dashboard-responsive'>
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
@@ -109,13 +109,13 @@ const DashboardGitHubComponent: React.FC = ({ pinnedAgent }) => {
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
                   useMargins: true,
-                  id: 'vulnerability-detector-dashboard-tab',
+                  id: 'github-dashboard-tab',
                   timeRange: {
                     from: searchBarProps.dateRangeFrom,
                     to: searchBarProps.dateRangeTo,
                   },
-                  title: 'Vulnerability detector dashboard',
-                  description: 'Dashboard of the Vulnerability detector',
+                  title: 'GitHub dashboard',
+                  description: 'Dashboard of the GitHub',
                   query: searchBarProps.query,
                   refreshConfig: {
                     pause: false,
