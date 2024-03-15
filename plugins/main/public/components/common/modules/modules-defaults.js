@@ -43,6 +43,7 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -275,7 +276,21 @@ export const ModulesDefaults = {
   },
   hipaa: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(hipaaColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardHIPAA || withPinnedAgent(DashboardHIPAA), // TODO: use withPinnedAgent
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: ComplianceTable,
+      },
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, hipaaColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   nist: {
