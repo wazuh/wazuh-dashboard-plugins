@@ -237,9 +237,9 @@ export const UpgradeAgentsModalResult = ({
                       <EuiSpacer size='s' />
                     ) : null}
                     {totalErrorAgents ? (
-                      <EuiFlexItem key='upgrade-tasks-success'>
+                      <EuiFlexItem key='upgrade-tasks-error'>
                         <EuiAccordion
-                          id={`$successAccordion`}
+                          id={`$errorAccordion`}
                           arrowDisplay='none'
                           paddingSize='m'
                           buttonContent={resultStatus({

@@ -131,7 +131,7 @@ export const AgentUpgradesInProgress = ({
               <EuiProgress size='xs' color='warning' position='absolute' />
               <EuiText size='s'>
                 <b>{totalInProgressTasks}</b>
-                {' In progress'}
+                {` ${API_NAME_TASK_STATUS.IN_PROGRESS}`}
               </EuiText>
             </EuiPanel>
           </EuiFlexItem>
@@ -149,7 +149,7 @@ export const AgentUpgradesInProgress = ({
               <span>
                 <EuiText size='s'>
                   <b>{totalSuccessTasks}</b>
-                  {' Success '}
+                  {` ${API_NAME_TASK_STATUS.DONE} `}
                   <EuiIconTip content='Last 60 minutes' color='primary' />
                 </EuiText>
               </span>
@@ -169,7 +169,7 @@ export const AgentUpgradesInProgress = ({
               <span>
                 <EuiText size='s'>
                   <b>{totalErrorUpgradeTasks}</b>
-                  {' Failed '}
+                  {` ${API_NAME_TASK_STATUS.FAILED} `}
                   <EuiIconTip content='Last 60 minutes' color='primary' />
                 </EuiText>
               </span>
@@ -189,7 +189,7 @@ export const AgentUpgradesInProgress = ({
               <span>
                 <EuiText size='s'>
                   <b>{totalTimeoutUpgradeTasks}</b>
-                  {' Timeout '}
+                  {` ${API_NAME_TASK_STATUS.TIMEOUT} `}
                   <EuiIconTip content='Last 60 minutes' color='primary' />
                 </EuiText>
               </span>
