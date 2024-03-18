@@ -185,7 +185,7 @@ export const EndpointsSummary = compose(
                 setExternalReload={this.setReload}
                 showOnlyOutdated={this.state.showOnlyOutdatedAgents}
                 setShowOnlyOutdated={this.setShowOnlyOutdatedAgents}
-                outdated={this.state.outdatedAgents}
+                totalOtdated={this.state.outdatedAgents}
               />
             </WzReduxProvider>
           </EuiFlexItem>

@@ -336,13 +336,9 @@ describe('AgentsTable component', () => {
       <Provider store={store}>
         <AgentsTable
           filters={[]}
-          removeFilters={() => jest.fn()}
-          wzReq={WzRequest.apiReq}
-          addingNewAgent={() => jest.fn()}
-          downloadCsv={() => jest.fn()}
-          clickAction={() => jest.fn()}
-          formatUIDate={date => jest.fn()}
-          reload={() => jest.fn()}
+          showOnlyOutdated={false}
+          setShowOnlyOutdated={() => jest.fn()}
+          totalOtdated={0}
         />
       </Provider>,
     );
@@ -373,13 +369,9 @@ describe('AgentsTable component', () => {
       <Provider store={store}>
         <AgentsTable
           filters={[]}
-          removeFilters={() => jest.fn()}
-          wzReq={WzRequest.apiReq}
-          addingNewAgent={() => jest.fn()}
-          downloadCsv={() => jest.fn()}
-          clickAction={() => jest.fn()}
-          formatUIDate={date => jest.fn()}
-          reload={() => jest.fn()}
+          showOnlyOutdated={false}
+          setShowOnlyOutdated={() => jest.fn()}
+          totalOtdated={0}
         />
       </Provider>,
     );
@@ -414,13 +406,9 @@ describe('AgentsTable component', () => {
       <Provider store={store}>
         <AgentsTable
           filters={[]}
-          removeFilters={() => jest.fn()}
-          wzReq={WzRequest.apiReq}
-          addingNewAgent={() => jest.fn()}
-          downloadCsv={() => jest.fn()}
-          clickAction={() => jest.fn()}
-          formatUIDate={date => jest.fn()}
-          reload={() => jest.fn()}
+          showOnlyOutdated={false}
+          setShowOnlyOutdated={() => jest.fn()}
+          totalOtdated={0}
         />
       </Provider>,
     );

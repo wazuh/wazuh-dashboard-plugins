@@ -52,10 +52,10 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         >
                           <button
                             aria-checked="false"
-                            aria-labelledby="i19569be3-e543-11ee-90e6-23a294870d48"
+                            aria-labelledby="ib8073bd3-e545-11ee-8dfe-673b170c7773"
                             class="euiSwitch__button"
                             disabled=""
-                            id="i19569be1-e543-11ee-90e6-23a294870d48"
+                            id="ib8073bd1-e545-11ee-8dfe-673b170c7773"
                             role="switch"
                             type="button"
                           >
@@ -101,7 +101,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                           </button>
                           <span
                             class="euiSwitch__label"
-                            id="i19569be3-e543-11ee-90e6-23a294870d48"
+                            id="ib8073bd3-e545-11ee-8dfe-673b170c7773"
                           >
                             Show only outdated
                           </span>
@@ -782,10 +782,10 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         >
                           <button
                             aria-checked="false"
-                            aria-labelledby="i196f05e3-e543-11ee-90e6-23a294870d48"
+                            aria-labelledby="ib8212c73-e545-11ee-8dfe-673b170c7773"
                             class="euiSwitch__button"
                             disabled=""
-                            id="i196f05e1-e543-11ee-90e6-23a294870d48"
+                            id="ib8212c71-e545-11ee-8dfe-673b170c7773"
                             role="switch"
                             type="button"
                           >
@@ -832,7 +832,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                           </button>
                           <span
                             class="euiSwitch__label"
-                            id="i196f05e3-e543-11ee-90e6-23a294870d48"
+                            id="ib8212c73-e545-11ee-8dfe-673b170c7773"
                           >
                             Show only outdated
                           </span>
@@ -1472,10 +1472,10 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         >
                           <button
                             aria-checked="false"
-                            aria-labelledby="i1968eb63-e543-11ee-90e6-23a294870d48"
+                            aria-labelledby="ib81a9cc3-e545-11ee-8dfe-673b170c7773"
                             class="euiSwitch__button"
                             disabled=""
-                            id="i1968eb61-e543-11ee-90e6-23a294870d48"
+                            id="ib81a9cc1-e545-11ee-8dfe-673b170c7773"
                             role="switch"
                             type="button"
                           >
@@ -1522,7 +1522,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                           </button>
                           <span
                             class="euiSwitch__label"
-                            id="i1968eb63-e543-11ee-90e6-23a294870d48"
+                            id="ib81a9cc3-e545-11ee-8dfe-673b170c7773"
                           >
                             Show only outdated
                           </span>

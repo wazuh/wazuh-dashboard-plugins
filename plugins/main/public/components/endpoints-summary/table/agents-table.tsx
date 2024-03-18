@@ -70,7 +70,7 @@ interface AgentsTableProps {
   externalReload?: boolean;
   showOnlyOutdated: boolean;
   setShowOnlyOutdated: (newValue: boolean) => void;
-  outdated?: number;
+  totalOutdated?: number;
   setExternalReload?: (newValue: number) => void;
 }
 
@@ -244,7 +244,7 @@ export const AgentsTable = compose(
         <EuiSwitch
           label='Show only outdated'
           checked={props.showOnlyOutdated}
-          disabled={!props.outdated}
+          disabled={!props.totalOutdated}
           onChange={() => props.setShowOnlyOutdated(!props.showOnlyOutdated)}
         />
       </EuiFlexItem>
