@@ -16,7 +16,7 @@ import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intel
 import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
-import { OfficePanel } from '../../overview/office-panel';
+import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent } from '../hocs';
@@ -29,7 +29,7 @@ import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
 import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
-import { office365Columns } from '../../overview/office-panel/events/office-365-columns';
+import { office365Columns } from '../../overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 import { pciColumns } from '../../overview/pci/events/pci-columns';
