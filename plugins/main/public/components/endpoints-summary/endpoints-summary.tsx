@@ -140,7 +140,7 @@ export const EndpointsSummary = compose(
 
     filterAgentByOS(item: any) {
       const query =
-        item.label === 'unknown'
+        item.label === 'N/A'
           ? 'id!=000;os.name=null'
           : `id!=000;os.name~${item.label}`;
       this._isMount &&
@@ -151,7 +151,7 @@ export const EndpointsSummary = compose(
 
     filterAgentByGroup(item: any) {
       const query =
-        item.label === 'unknown'
+        item.label === 'N/A'
           ? 'id!=000;group=null'
           : `id!=000;group=${item.label}`;
       this._isMount &&
