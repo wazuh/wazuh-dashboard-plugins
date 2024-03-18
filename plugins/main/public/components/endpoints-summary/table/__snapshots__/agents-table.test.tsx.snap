@@ -52,10 +52,10 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         >
                           <button
                             aria-checked="false"
-                            aria-labelledby="ic1399843-e547-11ee-ac6e-71376e7e3fc5"
+                            aria-labelledby="_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
                             class="euiSwitch__button"
                             disabled=""
-                            id="ic1399841-e547-11ee-ac6e-71376e7e3fc5"
+                            id="_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
                             role="switch"
                             type="button"
                           >
@@ -101,7 +101,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                           </button>
                           <span
                             class="euiSwitch__label"
-                            id="ic1399843-e547-11ee-ac6e-71376e7e3fc5"
+                            id="_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
                           >
                             Show only outdated
                           </span>
@@ -782,10 +782,10 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         >
                           <button
                             aria-checked="false"
-                            aria-labelledby="ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
+                            aria-labelledby="_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
                             class="euiSwitch__button"
                             disabled=""
-                            id="ic14ef501-e547-11ee-ac6e-71376e7e3fc5"
+                            id="_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
                             role="switch"
                             type="button"
                           >
@@ -832,7 +832,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                           </button>
                           <span
                             class="euiSwitch__label"
-                            id="ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
+                            id="_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
                           >
                             Show only outdated
                           </span>
@@ -1472,10 +1472,10 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         >
                           <button
                             aria-checked="false"
-                            aria-labelledby="ic1494fb3-e547-11ee-ac6e-71376e7e3fc5"
+                            aria-labelledby="_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
                             class="euiSwitch__button"
                             disabled=""
-                            id="ic1494fb1-e547-11ee-ac6e-71376e7e3fc5"
+                            id="_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
                             role="switch"
                             type="button"
                           >
@@ -1522,7 +1522,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                           </button>
                           <span
                             class="euiSwitch__label"
-                            id="ic1494fb3-e547-11ee-ac6e-71376e7e3fc5"
+                            id="_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5"
                           >
                             Show only outdated
                           </span>
