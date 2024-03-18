@@ -338,7 +338,7 @@ describe('AgentsTable component', () => {
           filters={[]}
           showOnlyOutdated={false}
           setShowOnlyOutdated={() => jest.fn()}
-          totalOtdated={0}
+          totalOutdated={0}
         />
       </Provider>,
     );
@@ -371,7 +371,7 @@ describe('AgentsTable component', () => {
           filters={[]}
           showOnlyOutdated={false}
           setShowOnlyOutdated={() => jest.fn()}
-          totalOtdated={0}
+          totalOutdated={0}
         />
       </Provider>,
     );
@@ -408,7 +408,7 @@ describe('AgentsTable component', () => {
           filters={[]}
           showOnlyOutdated={false}
           setShowOnlyOutdated={() => jest.fn()}
-          totalOtdated={0}
+          totalOutdated={0}
         />
       </Provider>,
     );
