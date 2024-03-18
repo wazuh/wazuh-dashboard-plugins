@@ -27,7 +27,7 @@ import { SampleDataWarning } from '../../../visualize/components';
 export const MainPanel = ({
   sidePanelChildren,
   moduleConfig = {},
-  filterDrillDownValue = () => {},
+  filterDrillDownValue = (value: any) => {},
 }) => {
   const [viewId, setViewId] = useState('main');
   const [selectedFilter, setSelectedFilter] = useState({

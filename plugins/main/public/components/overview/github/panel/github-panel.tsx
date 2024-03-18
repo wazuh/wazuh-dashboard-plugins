@@ -34,7 +34,6 @@ export const GitHubPanel = withErrorBoundary(() => {
       />
       <MainPanel
         moduleConfig={ModuleConfig}
-        tab={'github'}
         filterDrillDownValue={filterDrillDownValue}
         sidePanelChildren={<ModuleConfiguration />}
       />
