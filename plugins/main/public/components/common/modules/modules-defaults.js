@@ -25,6 +25,7 @@ import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
+import { DashboardOffice365 } from '../../overview/office/dashboard';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -43,6 +44,7 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { withPinnedAgent } from '../hocs/withPinnedAgent';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -155,7 +157,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: withModuleNotForAgent(Dashboard),
+        component: withPinnedAgent(DashboardOffice365),
       },
       {
         id: 'inventory',

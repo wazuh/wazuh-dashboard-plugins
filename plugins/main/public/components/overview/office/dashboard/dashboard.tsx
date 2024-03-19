@@ -17,6 +17,7 @@ import {
 } from '../../../../react-services/error-management';
 import { compose } from 'redux';
 import { SampleDataWarning } from '../../../visualize/components';
+import { getKPIsPanel } from './dashboard_panels_kpis';
 
 const plugins = getPlugins();
 
@@ -93,6 +94,28 @@ const DashboardOffice365Component: React.FC = () => {
           {!isLoading && !isSearching && results?.hits?.total > 0 ? (
             <div className='office-365-dashboard-responsive'>
               <SampleDataWarning />
+              <DashboardByRenderer
+                input={{
+                  viewMode: ViewMode.VIEW,
+                  panels: getKPIsPanel(ALERTS_INDEX_PATTERN_ID),
+                  isFullScreenMode: false,
+                  filters: searchBarProps.filters ?? [],
+                  useMargins: true,
+                  id: 'kpis-th-dashboard-tab',
+                  timeRange: {
+                    from: searchBarProps.dateRangeFrom,
+                    to: searchBarProps.dateRangeTo,
+                  },
+                  title: 'KPIs Office 365 dashboard',
+                  description: 'KPIs Dashboard of the Office 365',
+                  query: searchBarProps.query,
+                  refreshConfig: {
+                    pause: false,
+                    value: 15,
+                  },
+                  hidePanelTitles: true,
+                }}
+              />
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
