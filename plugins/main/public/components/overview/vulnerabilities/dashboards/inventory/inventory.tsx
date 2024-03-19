@@ -47,16 +47,47 @@ import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-v
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
 
+import { 
+  DataSourceSelector, 
+  VulnerabilitiesDataSourceRepository, 
+  PatternDataSourceFactory,
+  DataSourceFilterManager, 
+  AlertsDataSourceRepository} from '../../../../common/data-source';
+import { 
+  VulnerabilitiesDataSourceFactory,
+} from '../../../../common/data-source/pattern/vulnerabilities';
+
+
 const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
   const VULNERABILITIES_INDEX_PATTERN_ID =
     appConfig.data['vulnerabilities.pattern'];
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
-    onMount: vulnerabilityIndexFiltersAdapter,
-    onUpdate: onUpdateAdapter,
-    onUnMount: restorePrevIndexFiltersAdapter,
+    //onMount: vulnerabilityIndexFiltersAdapter,
+    //onUpdate: onUpdateAdapter,
+    //onUnMount: restorePrevIndexFiltersAdapter,
   });
+
+  useEffect(() => {
+    console.log('on mount');
+  }, [])
+
+  const initDataSource = async () => {
+    if(!searchBarProps.dateRangeFrom || !searchBarProps.dateRangeTo){
+      return;
+    }
+    const factory = new VulnerabilitiesDataSourceFactory();
+    const repository = new VulnerabilitiesDataSourceRepository();
+
+    const dataSources = await factory.createAll(await repository.getAll());
+    const dataSource = dataSources[0];
+
+    const filterManager = new DataSourceFilterManager(dataSource, searchBarProps.filters);
+    console.log('INVENTORY filters', filterManager.getFilters());
+    console.log('INVENTORY fixed filters', filterManager.getFixedFilters());
+    console.log('INVENTORY fetch filters', filterManager.getFetchFilters());
+  }
 
   const fetchFilters = DataSourceFilterManagerVulnerabilitiesStates.getFilters(
     searchBarProps.filters,
@@ -114,6 +145,7 @@ const InventoryVulsComponent = () => {
 
   useEffect(() => {
     if (!isLoading) {
+      initDataSource();
       setIndexPattern(indexPatterns?.[0] as IndexPattern);
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,

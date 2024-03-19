@@ -31,6 +31,16 @@ import { ModuleEnabledCheck } from '../../common/components/check-module-enabled
 import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
 import { DashboardContainerInput } from '../../../../../../../../src/plugins/dashboard/public';
 
+import { 
+  DataSourceSelector, 
+  VulnerabilitiesDataSourceRepository, 
+  PatternDataSourceFactory,
+  DataSourceFilterManager, 
+  AlertsDataSourceRepository} from '../../../../common/data-source';
+import { 
+  VulnerabilitiesDataSourceFactory,
+} from '../../../../common/data-source/pattern/vulnerabilities';
+
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -47,10 +57,27 @@ const DashboardVulsComponent: React.FC = () => {
     appConfig.data['vulnerabilities.pattern'];
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
-    onMount: vulnerabilityIndexFiltersAdapter,
+    /*onMount: vulnerabilityIndexFiltersAdapter,
     onUpdate: onUpdateAdapter,
-    onUnMount: restorePrevIndexFiltersAdapter,
+    onUnMount: restorePrevIndexFiltersAdapter,*/
   });
+
+  const initDataSource = async () => {
+    if(!searchBarProps.dateRangeFrom || !searchBarProps.dateRangeTo){
+      return;
+    }
+    const factory = new VulnerabilitiesDataSourceFactory();
+    const repository = new VulnerabilitiesDataSourceRepository();
+
+    const dataSources = await factory.createAll(await repository.getAll());
+    const dataSource = dataSources[0];
+
+    const filterManager = new DataSourceFilterManager(dataSource, searchBarProps.filters);
+    console.log('DASHBOARD filters', filterManager.getFilters());
+    console.log('DASHBOARD fixed filters', filterManager.getFixedFilters());
+    console.log('DASHBOARD fetch filters', filterManager.getFetchFilters());
+  }
+
 
   /* This function is responsible for updating the storage filters so that the
   filters between dashboard and inventory added using visualizations call to actions.
@@ -70,8 +97,11 @@ const DashboardVulsComponent: React.FC = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
+  
+
   useEffect(() => {
     if (!isLoading) {
+      initDataSource();
       search({
         indexPattern: indexPatterns?.[0] as IndexPattern,
         filters: fetchFilters,
