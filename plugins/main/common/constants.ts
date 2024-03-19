@@ -370,13 +370,22 @@ export const API_NAME_TASK_STATUS = {
   DONE: 'Done',
   IN_PROGRESS: 'In progress',
   FAILED: 'Failed',
+  TIMEOUT: 'Timeout',
 } as const;
 
 export const UI_TASK_STATUS = [
   API_NAME_TASK_STATUS.DONE,
   API_NAME_TASK_STATUS.IN_PROGRESS,
   API_NAME_TASK_STATUS.FAILED,
+  API_NAME_TASK_STATUS.TIMEOUT,
 ];
+
+export const UI_TASK_STATUS_COLORS = {
+  [API_NAME_TASK_STATUS.DONE]: 'success',
+  [API_NAME_TASK_STATUS.IN_PROGRESS]: 'warning',
+  [API_NAME_TASK_STATUS.FAILED]: 'danger',
+  [API_NAME_TASK_STATUS.TIMEOUT]: 'subdued',
+};
 
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';

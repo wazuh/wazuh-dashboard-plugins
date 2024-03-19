@@ -18,68 +18,83 @@ export const useGetUpgradeTasks = (reload: any) => {
   const [getErrorIsLoading, setErrorIsLoading] = useState(true);
   const [getErrorTasksError, setGetErrorTasksError] = useState();
 
+  const [totalTimeoutUpgradeTasks, setTotalTimeoutUpgradeTasks] =
+    useState<number>(0);
+  const [getTimeoutIsLoading, setTimeoutIsLoading] = useState(true);
+  const [getTimeoutError, setGetTimeoutError] = useState();
+
   const datetime = new Date();
   datetime.setMinutes(datetime.getMinutes() - beforeMinutes);
   const formattedDate = datetime.toISOString();
   const timeFilter = `last_update_time>${formattedDate}`;
 
-  const getUpgradesInProgress = async () => {
+  const getUpgradeStatus = async (
+    status: string,
+    setIsLoading: (isLoading: boolean) => void,
+    setTotalTasks: (totalTasks: number) => void,
+    setError: (error) => void,
+    q?: string,
+  ) => {
     try {
-      setGetInProgressIsLoading(true);
+      setIsLoading(true);
       const { total_affected_items } = await getTasks({
-        status: API_NAME_TASK_STATUS.IN_PROGRESS,
+        status,
         command: 'upgrade',
         limit: 1,
+        q,
       });
-      setTotalInProgressTasks(total_affected_items);
-      setGetInProgressError(undefined);
+      setTotalTasks(total_affected_items);
+      setError(undefined);
     } catch (error: any) {
-      setGetInProgressError(error);
+      setError(error);
     } finally {
-      setGetInProgressIsLoading(false);
+      setIsLoading(false);
     }
   };
 
+  const getUpgradesInProgress = async () =>
+    await getUpgradeStatus(
+      API_NAME_TASK_STATUS.IN_PROGRESS,
+      setGetInProgressIsLoading,
+      setTotalInProgressTasks,
+      setGetInProgressError,
+    );
+
   const getUpgradesSuccess = async () => {
-    try {
-      setSuccessIsLoading(true);
-      const { total_affected_items } = await getTasks({
-        status: API_NAME_TASK_STATUS.DONE,
-        command: 'upgrade',
-        limit: 1,
-        q: timeFilter,
-      });
-      setTotalSuccessTasks(total_affected_items);
-      setGetSuccessError(undefined);
-    } catch (error: any) {
-      setGetSuccessError(error);
-    } finally {
-      setSuccessIsLoading(false);
-    }
+    await getUpgradeStatus(
+      API_NAME_TASK_STATUS.DONE,
+      setSuccessIsLoading,
+      setTotalSuccessTasks,
+      setGetSuccessError,
+      timeFilter,
+    );
   };
 
   const getUpgradesError = async () => {
-    try {
-      setErrorIsLoading(true);
-      const { total_affected_items } = await getTasks({
-        status: API_NAME_TASK_STATUS.FAILED,
-        command: 'upgrade',
-        limit: 1,
-        q: timeFilter,
-      });
-      setTotalErrorUpgradeTasks(total_affected_items);
-      setGetErrorTasksError(undefined);
-    } catch (error: any) {
-      setGetErrorTasksError(error);
-    } finally {
-      setErrorIsLoading(false);
-    }
+    await getUpgradeStatus(
+      API_NAME_TASK_STATUS.FAILED,
+      setErrorIsLoading,
+      setTotalErrorUpgradeTasks,
+      setGetErrorTasksError,
+      timeFilter,
+    );
+  };
+
+  const getUpgradeTimeout = async () => {
+    await getUpgradeStatus(
+      API_NAME_TASK_STATUS.TIMEOUT,
+      setTimeoutIsLoading,
+      setTotalTimeoutUpgradeTasks,
+      setGetTimeoutError,
+      timeFilter,
+    );
   };
 
   const fetchData = async () => {
     await getUpgradesInProgress();
     await getUpgradesSuccess();
     await getUpgradesError();
+    await getUpgradeTimeout();
   };
 
   useEffect(() => {
@@ -104,5 +119,8 @@ export const useGetUpgradeTasks = (reload: any) => {
     getErrorIsLoading,
     totalErrorUpgradeTasks,
     getErrorTasksError,
+    getTimeoutIsLoading,
+    totalTimeoutUpgradeTasks,
+    getTimeoutError,
   };
 };
