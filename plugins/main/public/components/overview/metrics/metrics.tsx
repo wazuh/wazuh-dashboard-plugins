@@ -20,7 +20,7 @@ import {
 } from '../../../../../../src/plugins/data/common';
 
 //@ts-ignore
-import { getElasticAlerts, getIndexPattern } from '../mitre/lib';
+import { getElasticAlerts, getIndexPattern } from '../mitre/framework/lib';
 import { ModulesHelper } from '../../common/modules/modules-helper';
 import { getDataPlugin } from '../../../kibana-services';
 import { withAllowedAgents } from '../../common/hocs/withAllowedAgents';

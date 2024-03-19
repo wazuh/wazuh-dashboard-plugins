@@ -21,7 +21,7 @@ import {
   EuiLoadingChart,
   EuiEmptyPrompt,
 } from '@elastic/eui';
-import { FlyoutTechnique } from '../../../../overview/mitre/components/techniques/components/flyout-technique';
+import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
 import { getMitreCount } from './lib';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';

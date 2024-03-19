@@ -12,14 +12,19 @@
  */
 
 import React from 'react';
-import { WzFieldSearchDelay } from '../../../components/common/search';
+import { WzFieldSearchDelay } from '../../../../components/common/search';
 import { MitreAttackResources } from './resources';
-import { ModuleMitreAttackIntelligenceResourceButton } from './resource_button'
+import { ModuleMitreAttackIntelligenceResourceButton } from './resource_button';
 
-export const ModuleMitreAttackIntelligenceLeftPanel = ({onSelectResource, selectedResource, onSearchTermAllResourcesChange, onSearchTermAllResourcesSearch}) => {
+export const ModuleMitreAttackIntelligenceLeftPanel = ({
+  onSelectResource,
+  selectedResource,
+  onSearchTermAllResourcesChange,
+  onSearchTermAllResourcesSearch,
+}) => {
   return (
     <>
-      <div style={{padding: 10}}>
+      <div style={{ padding: 10 }}>
         <WzFieldSearchDelay
           delay={1000}
           fullWidth
@@ -40,5 +45,5 @@ export const ModuleMitreAttackIntelligenceLeftPanel = ({onSelectResource, select
         </ModuleMitreAttackIntelligenceResourceButton>
       ))}
     </>
-  )
+  );
 };

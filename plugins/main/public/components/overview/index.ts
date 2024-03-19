@@ -1,1 +1,1 @@
-export { Mitre } from './mitre';
+export { Mitre } from './mitre/framework';

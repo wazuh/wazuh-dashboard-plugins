@@ -19,13 +19,13 @@ import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 
 jest.mock(
-  '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  '../../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
   }),
 );
 
-jest.mock('../../../react-services', () => ({
+jest.mock('../../../../react-services', () => ({
   WzRequest: () => ({
     apiReq: (method: string, path: string, params: any) => {
       return {
