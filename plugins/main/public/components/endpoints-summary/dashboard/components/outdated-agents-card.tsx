@@ -54,7 +54,7 @@ const OutdatedAgentsCard = ({
               <small>{outdatedAgents === 1 ? 'Agent' : 'Agents'}</small>
             </EuiTextColor>
           }
-          titleColor='warning'
+          titleColor='subdued'
           isLoading={isLoading}
           titleSize='l'
           textAlign='center'

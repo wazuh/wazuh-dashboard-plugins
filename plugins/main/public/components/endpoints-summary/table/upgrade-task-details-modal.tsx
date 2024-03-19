@@ -64,17 +64,7 @@ export const AgentUpgradesTaskDetailsModal = ({
             },
             {
               field: 'create_time',
-              name: (
-                <span>
-                  Create{' '}
-                  <EuiIconTip
-                    content='This is not searchable through a search term.'
-                    size='s'
-                    color='subdued'
-                    type='alert'
-                  />
-                </span>
-              ),
+              name: 'Create',
               width: '230px',
               sortable: true,
               searchable: false,
@@ -83,17 +73,7 @@ export const AgentUpgradesTaskDetailsModal = ({
             },
             {
               field: 'last_update_time',
-              name: (
-                <span>
-                  Last update{' '}
-                  <EuiIconTip
-                    content='This is not searchable through a search term.'
-                    size='s'
-                    color='subdued'
-                    type='alert'
-                  />
-                </span>
-              ),
+              name: 'Last update',
               width: '230px',
               sortable: true,
               searchable: false,
