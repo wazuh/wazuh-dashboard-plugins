@@ -1,6 +1,5 @@
-'use strict';
 /*
- * Wazuh app - Office 365 Drilldown IP field Config.
+ * Wazuh app - Office 365 Drilldown Operations field Config.
  *
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
@@ -13,33 +12,31 @@
  */
 
 import React from 'react';
-import { VisCard } from '../../../common/modules/panel';
+import { VisCard } from '../../../../common/modules/panel';
 import { EuiFlexItem, EuiPanel } from '@elastic/eui';
-import { SecurityAlerts } from '../../../visualize/components';
+import { SecurityAlerts } from '../../../../visualize/components';
 
-export const drilldownIPConfig = {
+export const drilldownOperationsConfig = {
   rows: [
     {
       height: 400,
       columns: [
         {
-          width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Metric-Stats" tab="office" {...props} />
-          ),
-        },
-        {
-          width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Top-Events-Pie" tab="office" {...props} />
-          ),
-        },
-        {
           width: 40,
-          component: (props) => (
+          component: props => (
             <VisCard
-              id={'Wazuh-App-Overview-Office-User-Operation-Level-Table'}
-              tab="office"
+              id='Wazuh-App-Overview-Office-Top-Users'
+              tab='office'
+              {...props}
+            />
+          ),
+        },
+        {
+          width: 60,
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-Office-Country-Tag-Cloud'
+              tab='office'
               {...props}
             />
           ),
@@ -51,10 +48,10 @@ export const drilldownIPConfig = {
       columns: [
         {
           width: 100,
-          component: (props) => (
+          component: props => (
             <VisCard
-              id="Wazuh-App-Overview-Office-Alerts-Evolution-By-User"
-              tab="office"
+              id='Wazuh-App-Overview-Office-Alerts-Evolution-By-UserID'
+              tab='office'
               {...props}
             />
           ),
@@ -74,7 +71,10 @@ export const drilldownIPConfig = {
                     { field: 'timestamp' },
                     { field: 'rule.description', label: 'Description' },
                     { field: 'data.office365.UserId', label: 'User ID' },
-                    { field: 'data.office365.Operation', label: 'Operation' },
+                    {
+                      field: 'data.office365.ClientIP',
+                      label: 'Client IP address',
+                    },
                     { field: 'rule.level', label: 'Level' },
                     { field: 'rule.id', label: 'Rule ID' },
                   ]}

@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { VisConfigLayout } from '../../../common/modules/panel';
+import { VisConfigLayout } from '../../../../common/modules/panel';
 
 export const OfficeBody = ({ changeView, toggleFilter, rows = [] }) => {
   const rowClickHandler = (field, value) => {
