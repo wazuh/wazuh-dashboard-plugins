@@ -169,8 +169,8 @@ export const WzMenu = withWindowSize(
               ),
           ));
 
-        // Abort if we have disabled the pattern selector
-        if (!AppState.getPatternSelector()) return;
+        // When not exists patterns, not show the selector
+        if(list.length === 1) return;
 
         let filtered = false;
         // If there is no current pattern, fetch it
@@ -293,9 +293,6 @@ export const WzMenu = withWindowSize(
                 indexPattern.title,
               ),
           ));
-
-        // Abort if we have disabled the pattern selector
-        if (!AppState.getPatternSelector()) return;
 
         let filtered = false;
         // If there is no current pattern, fetch it
@@ -462,20 +459,6 @@ export const WzMenu = withWindowSize(
       agentFilters.map(x => {
         filterManager.removeFilter(x);
       });
-    }
-
-    thereAreSelectors() {
-      return (
-        (AppState.getAPISelector() &&
-          this.state.currentAPI &&
-          this.state.APIlist &&
-          this.state.APIlist.length > 1) ||
-        !this.state.currentAPI ||
-        (AppState.getPatternSelector() &&
-          this.state.theresPattern &&
-          this.state.patternList &&
-          this.state.patternList.length > 1)
-      );
     }
 
     getApiSelectorComponent() {
