@@ -44,7 +44,7 @@ export const UpgradeAgentsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'ID',
+          name: 'Id',
           align: 'left',
           sortable: true,
         },
@@ -55,7 +55,7 @@ export const UpgradeAgentsModalResult = ({
           sortable: true,
         },
       ]}
-      pagination={agents.length > 10}
+      pagination={true}
       sorting={{
         sort: {
           field: 'id',
@@ -72,7 +72,7 @@ export const UpgradeAgentsModalResult = ({
       columns={[
         {
           field: 'agent',
-          name: 'Agent ID',
+          name: 'Agent id',
           align: 'left',
           sortable: true,
         },
@@ -90,12 +90,12 @@ export const UpgradeAgentsModalResult = ({
         },
         {
           field: 'task_id',
-          name: 'Task ID',
+          name: 'task id',
           align: 'left',
           sortable: true,
         },
       ]}
-      pagination={tasks.length > 10}
+      pagination={true}
       sorting={{
         sort: {
           field: 'agent',
@@ -131,12 +131,12 @@ export const UpgradeAgentsModalResult = ({
         },
         {
           field: 'id',
-          name: 'Agent IDs',
+          name: 'Agent Ids',
           align: 'left',
           render: ids => ids.join(', '),
         },
       ]}
-      pagination={errors.length > 10}
+      pagination={true}
     />
   );
 
