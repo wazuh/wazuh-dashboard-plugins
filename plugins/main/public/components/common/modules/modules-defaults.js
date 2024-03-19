@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { Dashboard } from './dashboard';
-import { Events } from './events';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
@@ -27,8 +26,23 @@ import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vu
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
+import { dockerColumns } from '../../overview/docker/events/docker-columns';
+import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
+import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
+import { office365Columns } from '../../overview/office-panel/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
+import { pciColumns } from '../../overview/pci/events/pci-columns';
+import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
+import { nistColumns } from '../../overview/nist/events/nist-columns';
+import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
+import { tscColumns } from '../../overview/tsc/events/tsc-columns';
+import { githubColumns } from '../../overview/github-panel/events/github-columns';
+import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
+import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
+import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
+import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -50,14 +64,7 @@ const renderDiscoverTab = (indexName = DEFAULT_INDEX_PATTERN, columns) => {
   };
 };
 
-const EventsTab = {
-  id: 'events',
-  name: 'Events',
-  buttons: [ButtonModuleExploreAgent],
-  component: Events,
-};
-
-const RegulatoryComplianceTabs = [
+const RegulatoryComplianceTabs = columns => [
   DashboardTab,
   {
     id: 'inventory',
@@ -65,7 +72,7 @@ const RegulatoryComplianceTabs = [
     buttons: [ButtonModuleExploreAgent],
     component: ComplianceTable,
   },
-  EventsTab,
+  renderDiscoverTab(DEFAULT_INDEX_PATTERN, columns),
 ];
 
 export const ModulesDefaults = {
@@ -98,22 +105,27 @@ export const ModulesDefaults = {
   },
   aws: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, amazonWebServicesColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   gcp: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, googleCloudColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
+  // This module is Malware Detection. Ref: https://github.com/wazuh/wazuh-dashboard-plugins/issues/5893
   pm: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
-    availableFor: ['manager', 'agent'],
-  },
-  audit: {
-    init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, malwareDetectionColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   sca: {
@@ -151,7 +163,15 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: withModuleNotForAgent(OfficePanel),
       },
-      { ...EventsTab, component: withModuleNotForAgent(Events) },
+      {
+        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
+        component: withModuleNotForAgent(() => (
+          <WazuhDiscover
+            indexPatternName={DEFAULT_INDEX_PATTERN}
+            tableColumns={office365Columns}
+          />
+        )),
+      },
     ],
     availableFor: ['manager'],
   },
@@ -165,13 +185,8 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: GitHubPanel,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
     ],
-    availableFor: ['manager', 'agent'],
-  },
-  ciscat: {
-    init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
     availableFor: ['manager', 'agent'],
   },
   vuls: {
@@ -180,16 +195,34 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        component: withModuleNotForAgent(DashboardVuls),
+        component: DashboardVuls,
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         id: 'inventory',
         name: 'Inventory',
-        component: withModuleNotForAgent(InventoryVuls),
+        component: InventoryVuls,
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         ...renderDiscoverTab(ALERTS_INDEX_PATTERN, vulnerabilitiesColumns),
-        component: withModuleNotForAgent(() => (
+        component: withVulnerabilitiesStateDataSource(() => (
           <WazuhDiscover
             indexPatternName={DEFAULT_INDEX_PATTERN}
             tableColumns={vulnerabilitiesColumns}
@@ -198,7 +231,7 @@ export const ModulesDefaults = {
       },
     ],
     buttons: ['settings'],
-    availableFor: ['manager'],
+    availableFor: ['manager', 'agent'],
   },
   mitre: {
     init: 'dashboard',
@@ -215,54 +248,49 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainMitre,
       },
-      EventsTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, mitreAttackColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
   virustotal: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, virustotalColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   docker: {
     init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
-    availableFor: ['manager', 'agent'],
-  },
-
-  osquery: {
-    init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
-    availableFor: ['manager', 'agent'],
-  },
-  oscap: {
-    init: 'dashboard',
-    tabs: [DashboardTab, EventsTab],
+    tabs: [
+      DashboardTab,
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, dockerColumns),
+    ],
     availableFor: ['manager', 'agent'],
   },
   pci: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(pciColumns),
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(hipaaColumns),
     availableFor: ['manager', 'agent'],
   },
   nist: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(nistColumns),
     availableFor: ['manager', 'agent'],
   },
   gdpr: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(gdprColumns),
     availableFor: ['manager', 'agent'],
   },
   tsc: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs,
+    tabs: RegulatoryComplianceTabs(tscColumns),
     availableFor: ['manager', 'agent'],
   },
   syscollector: {

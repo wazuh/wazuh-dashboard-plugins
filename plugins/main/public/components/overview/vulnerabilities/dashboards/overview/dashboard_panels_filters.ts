@@ -21,6 +21,16 @@ const getVisStateFilter = (
       showTotal: false,
       totalFunc: 'sum',
     },
+    uiState: {
+      vis: {
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 75,
+          },
+        ],
+      },
+    },
     data: {
       searchSource: {
         query: {
@@ -91,7 +101,7 @@ export const getDashboardFilters = (
           'topPackageSelector',
           indexPatternId,
           'Top packages vulnerabilities',
-          'Top 5 package names',
+          'Top 5 packages',
           'package.name',
         ),
       },
@@ -111,7 +121,7 @@ export const getDashboardFilters = (
           'topOSVulnerabilities',
           indexPatternId,
           'Top operating system vulnerabilities',
-          'Top 5 operating systems',
+          'Top 5 OS',
           'host.os.full',
         ),
       },
@@ -132,7 +142,7 @@ export const getDashboardFilters = (
           indexPatternId,
           'Agent filter',
           'Top 5 agents',
-          'agent.id',
+          'agent.name',
         ),
       },
     },

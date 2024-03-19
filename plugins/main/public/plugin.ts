@@ -26,6 +26,7 @@ import {
   setHeaderActionMenuMounter,
   setWazuhCorePlugin,
 } from './kibana-services';
+import { validate as validateNodeCronInterval } from 'node-cron';
 import {
   AppPluginStartDependencies,
   WazuhSetup,
@@ -61,6 +62,10 @@ export class WazuhPlugin
     core: CoreSetup,
     plugins: WazuhSetupPlugins,
   ): Promise<WazuhSetup> {
+    // Hide the discover deprecation notice
+    // After opensearch version 2.11.0 this line may be deleted
+    localStorage.setItem('discover:deprecation-notice:show', 'false');
+
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState = {};
     try {
@@ -128,6 +133,23 @@ export class WazuhPlugin
         order,
         mount: async (params: AppMountParameters) => {
           try {
+            /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
+            There is an optimization error of the frontend side source code due to some modules can
+            not be loaded
+            */
+            const setting = plugins.wazuhCore.configuration._settings.get(
+              'cron.statistics.interval',
+            );
+            !setting.validate &&
+              (setting.validate = function (value: string) {
+                return validateNodeCronInterval(value)
+                  ? undefined
+                  : 'Interval is not valid.';
+              });
+            !setting.validateBackend &&
+              (setting.validateBackend = function (schema) {
+                return schema.string({ validate: this.validate });
+              });
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
             setWzCurrentAppID(id);

@@ -1,8 +1,58 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AvailableUpdatesFlyout component should return the AvailableUpdatesFlyout component 1`] = `
-<div
-  aria-hidden="true"
-  data-aria-hidden="true"
-/>
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          API ID
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          api id
+        </dd>
+      </dl>
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <dl
+        class="euiDescriptionList euiDescriptionList--row"
+      >
+        <dt
+          class="euiDescriptionList__title"
+        >
+          Version
+        </dt>
+        <dd
+          class="euiDescriptionList__description"
+        >
+          4.3.1
+        </dd>
+      </dl>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+  <div>
+    Update detail
+  </div>
+  <div>
+    Update detail
+  </div>
+  <div>
+    Update detail
+  </div>
+</div>
 `;

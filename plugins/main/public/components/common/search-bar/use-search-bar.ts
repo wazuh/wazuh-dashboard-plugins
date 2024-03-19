@@ -8,10 +8,12 @@ import {
   IIndexPattern,
   IndexPatternsContract,
 } from '../../../../../../src/plugins/data/public';
-import { getDataPlugin } from '../../../kibana-services';
-
+import { getDataPlugin, getWazuhCorePlugin } from '../../../kibana-services';
 import { useFilterManager, useQueryManager, useTimeFilter } from '../hooks';
-import { AUTHORIZED_AGENTS } from '../../../../common/constants';
+import {
+  AUTHORIZED_AGENTS,
+  DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
+} from '../../../../common/constants';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
@@ -20,6 +22,17 @@ type tUseSearchBarCustomInputs = {
   onQuerySubmitted?: (
     payload: { dateRange: TimeRange; query?: Query },
     isUpdate?: boolean,
+  ) => void;
+  onMount?: (
+    filterManager: FilterManager,
+    defaultIndexPatternID: string,
+  ) => void;
+  onUpdate?: (filters: Filter[], filterManager: FilterManager) => void;
+  onUnMount?: (
+    previousFilters: Filter[],
+    toIndexPattern: string | null,
+    filterManager: FilterManager,
+    defaultIndexPatternID: string,
   ) => void;
 };
 type tUseSearchBarProps = Partial<SearchBarProps> & tUseSearchBarCustomInputs;
@@ -34,13 +47,14 @@ type tUserSearchBarResponse = {
  * @param props
  * @returns
  */
-const useSearchBar = (
+const useSearchBarConfiguration = (
   props?: tUseSearchBarProps,
 ): tUserSearchBarResponse => {
   // dependencies
   const SESSION_STORAGE_FILTERS_NAME = 'wazuh_persistent_searchbar_filters';
+  const SESSION_STORAGE_PREV_FILTER_NAME = 'wazuh_persistent_current_filter';
   const filterManager = useFilterManager().filterManager as FilterManager;
-  const { filters } = useFilterManager();
+  const filters = props?.filters ? props.filters : filterManager.getFilters();
   const [query, setQuery] = props?.query
     ? useState(props?.query)
     : useQueryManager();
@@ -51,25 +65,26 @@ const useSearchBar = (
     useState<IIndexPattern>();
 
   useEffect(() => {
-    if (filters && filters.length > 0) {
-      sessionStorage.setItem(
-        SESSION_STORAGE_FILTERS_NAME,
-        JSON.stringify(filters),
-      );
-    }
     initSearchBar();
-    /**
-     * When the component is disassembled, the original filters that arrived
-     * when the component was assembled are added.
-     */
     return () => {
+      /* Upon unmount, the previous filters are restored */
+      const prevStoragePattern = sessionStorage.getItem(
+        SESSION_STORAGE_PREV_FILTER_NAME,
+      );
+      sessionStorage.removeItem(SESSION_STORAGE_PREV_FILTER_NAME);
       const storagePreviousFilters = sessionStorage.getItem(
         SESSION_STORAGE_FILTERS_NAME,
       );
       if (storagePreviousFilters) {
         const previousFilters = JSON.parse(storagePreviousFilters);
-        const cleanedFilters = cleanFilters(previousFilters);
-        filterManager.setFilters(cleanedFilters);
+        if (props?.onUnMount) {
+          props.onUnMount(
+            previousFilters,
+            prevStoragePattern,
+            filterManager,
+            props?.defaultIndexPatternID,
+          );
+        }
       }
     };
   }, []);
@@ -81,8 +96,11 @@ const useSearchBar = (
     setIsLoading(true);
     const indexPattern = await getIndexPattern(props?.defaultIndexPatternID);
     setIndexPatternSelected(indexPattern);
-    const initialFilters = props?.filters ?? filters;
-    filterManager.setFilters(initialFilters);
+    if (props?.onMount) {
+      props.onMount(filterManager, props?.defaultIndexPatternID);
+    } else {
+      filterManager.setFilters(filters);
+    }
     setIsLoading(false);
   };
 
@@ -108,61 +126,33 @@ const useSearchBar = (
   };
 
   /**
-   * Return filters from filters manager.
-   * Additionally solve the known issue with the auto loaded agent.id filters from the searchbar
-   * and filters those filters that are not related to the default index pattern
-   * @returns
-   */
-  const getFilters = () => {
-    const originalFilters = filterManager ? filterManager.getFilters() : [];
-    return originalFilters.filter(
-      (filter: Filter) =>
-        filter?.meta?.controlledBy !== AUTHORIZED_AGENTS && // remove auto loaded agent.id filters
-        filter?.meta?.index === props?.defaultIndexPatternID,
-    );
-  };
-
-  /**
-   * Return cleaned filters.
-   * Clean the known issue with the auto loaded agent.id filters from the searchbar
-   * and filters those filters that are not related to the default index pattern
-   * @param previousFilters
-   * @returns
-   */
-  const cleanFilters = (previousFilters: Filter[]) => {
-    return previousFilters.filter(
-      (filter: Filter) =>
-        filter?.meta?.controlledBy !== AUTHORIZED_AGENTS &&
-        filter?.meta?.index !== props?.defaultIndexPatternID,
-    );
-  };
-
-  /**
    * Search bar properties necessary to render and initialize the osd search bar component
    */
   const searchBarProps: Partial<SearchBarProps> = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
-    filters: getFilters(),
+    filters: filters
+      .filter(
+        (filter: Filter) =>
+          ![
+            AUTHORIZED_AGENTS,
+            DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
+          ].includes(filter?.meta?.controlledBy), // remove auto loaded agent.id filters
+      )
+      .sort((a: Filter, b: Filter) => {
+        return a?.$state?.isImplicit && !(a?.meta?.key === 'agent.id')
+          ? -1
+          : b?.$state?.isImplicit
+          ? 1
+          : -1;
+      }),
     query,
     timeHistory,
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (filters: Filter[]) => {
-      const storagePreviousFilters = sessionStorage.getItem(
-        SESSION_STORAGE_FILTERS_NAME,
-      );
-      /**
-       * If there are persisted filters, it is necessary to add them when
-       * updating the filters in the filterManager
-       */
-      if (storagePreviousFilters) {
-        const previousFilters = JSON.parse(storagePreviousFilters);
-        const cleanedFilters = cleanFilters(previousFilters);
-        filterManager.setFilters([...cleanedFilters, ...filters]);
-
-        props?.onFiltersUpdated &&
-          props?.onFiltersUpdated([...cleanedFilters, ...filters]);
+      if (props?.onUpdate) {
+        props.onUpdate(filters, filterManager, props?.onFiltersUpdated);
       } else {
         filterManager.setFilters(filters);
         props?.onFiltersUpdated && props?.onFiltersUpdated(filters);
@@ -179,7 +169,7 @@ const useSearchBar = (
       props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
     },
     // its necessary to use saved queries. if not, the load saved query not work
-    useDefaultBehaviors: true 
+    useDefaultBehaviors: true,
   };
 
   return {
@@ -187,4 +177,4 @@ const useSearchBar = (
   };
 };
 
-export default useSearchBar;
+export default useSearchBarConfiguration;

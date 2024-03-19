@@ -42,13 +42,14 @@ import './controllers';
 import './factories';
 
 // Imports to update currentPlatform when app starts
-import { checkCurrentSecurityPlatform } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
-import { updateCurrentPlatform } from './redux/actions/appStateActions';
+import {
+  updateCurrentPlatform,
+  updateUserAccount,
+} from './redux/actions/appStateActions';
 import { WzAuthentication, loadAppConfig } from './react-services';
 
-import { getAngularModule, getHttp } from './kibana-services';
-import { addHelpMenuToAppChrome } from './utils';
+import { getAngularModule, getWazuhCorePlugin } from './kibana-services';
 
 const app = getAngularModule();
 
@@ -74,9 +75,18 @@ app.run([
     app.$injector = _$injector;
 
     // Set currentSecurity platform in Redux when app starts.
-    checkCurrentSecurityPlatform()
+    getWazuhCorePlugin()
+      .dashboardSecurity.fetchCurrentPlatform()
       .then(item => {
         store.dispatch(updateCurrentPlatform(item));
+      })
+      .catch(() => {});
+
+    // Set user account data in Redux when app starts.
+    getWazuhCorePlugin()
+      .dashboardSecurity.fetchAccount()
+      .then(response => {
+        store.dispatch(updateUserAccount(response));
       })
       .catch(() => {});
 
@@ -101,9 +111,6 @@ app.run(function ($rootElement) {
       <react-component name="ToastNotificationsModal" props=""></react-component>
       <react-component name="WzUpdatesNotification" props=""></react-component>
     </div>`);
-
-  // Add plugin help links as extension to plugin platform help menu
-  addHelpMenuToAppChrome();
 
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(

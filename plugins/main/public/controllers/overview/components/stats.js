@@ -18,15 +18,17 @@ import {
   EuiFlexGroup,
   EuiPage,
   EuiToolTip,
+  EuiLink,
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
-import { UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
+import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import {
   agentStatusLabelByAgentStatus,
   agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
 import { getCore } from '../../../kibana-services';
-import { endpointSumary } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
+import { LastAlertsStat } from './last-alerts-stat';
 
 export const Stats = withErrorBoundary(
   class Stats extends Component {
@@ -34,15 +36,14 @@ export const Stats = withErrorBoundary(
       super(props);
 
       this.state = {};
-      this.agentStatus = ['total', ...UI_ORDER_AGENT_STATUS].map(status => ({
+      this.agentStatus = [
+        API_NAME_AGENT_STATUS.ACTIVE,
+        API_NAME_AGENT_STATUS.DISCONNECTED,
+      ].map(status => ({
         status,
-        label:
-          status !== 'total' ? agentStatusLabelByAgentStatus(status) : 'Total',
-        onClick: () => this.goToAgents(status !== 'total' ? status : null),
-        color:
-          status !== 'total'
-            ? agentStatusColorByAgentStatus(status)
-            : 'primary',
+        label: agentStatusLabelByAgentStatus(status),
+        onClick: () => this.goToAgents(status),
+        color: agentStatusColorByAgentStatus(status),
       }));
     }
 
@@ -55,8 +56,8 @@ export const Stats = withErrorBoundary(
       } else if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
-      getCore().application.navigateToApp(endpointSumary.id, {
-        path: '#/agents-preview',
+      getCore().application.navigateToApp(endpointSummary.id, {
+        path: `#${endpointSummary.redirectTo()}`,
       });
     }
 
@@ -81,15 +82,15 @@ export const Stats = withErrorBoundary(
                       position='top'
                       content={`Go to ${label.toLowerCase()} agents`}
                     >
-                      <span
+                      <EuiLink
                         className='statWithLink'
-                        style={{ cursor: 'pointer' }}
+                        style={{ fontWeight: 'normal', color }}
                         onClick={onClick}
                       >
                         {typeof this.props[status] !== 'undefined'
                           ? this.props[status]
                           : '-'}
-                      </span>
+                      </EuiLink>
                     </EuiToolTip>
                   }
                   description={`${label} agents`}
@@ -98,6 +99,7 @@ export const Stats = withErrorBoundary(
                 />
               </EuiFlexItem>
             ))}
+            <LastAlertsStat />
             <EuiFlexItem />
           </EuiFlexGroup>
         </EuiPage>
@@ -107,9 +109,6 @@ export const Stats = withErrorBoundary(
 );
 
 Stats.propTypes = {
-  total: PropTypes.any,
   active: PropTypes.any,
   disconnected: PropTypes.any,
-  pending: PropTypes.any,
-  never_connected: PropTypes.any,
 };

@@ -22,7 +22,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 jest.mock('../../../react-services', () => ({
@@ -51,8 +51,10 @@ describe('Module Mitre Att&ck intelligence container', () => {
   it('should render the component if has permissions', () => {
     const store = mockStore({
       appStateReducers: {
+        userAccount: {
+          administrator: true,
+        },
         withUserLogged: true,
-        userRoles: ['administrator'],
         userPermissions: {
           'mitre:read': { '*:*:*': 'allow' },
         },
@@ -61,7 +63,7 @@ describe('Module Mitre Att&ck intelligence container', () => {
     const component = render(
       <Provider store={store}>
         <ModuleMitreAttackIntelligence />
-      </Provider>
+      </Provider>,
     );
     expect(component).toMatchSnapshot();
   });
@@ -69,8 +71,10 @@ describe('Module Mitre Att&ck intelligence container', () => {
   it('should render permissions prompt when no has permissions', () => {
     const store = mockStore({
       appStateReducers: {
+        userAccount: {
+          administrator: true,
+        },
         withUserLogged: true,
-        userRoles: ['administrator'],
         userPermissions: {
           'mitre:read': { '*:*:*': 'deny' },
         },
@@ -79,7 +83,7 @@ describe('Module Mitre Att&ck intelligence container', () => {
     const component = render(
       <Provider store={store}>
         <ModuleMitreAttackIntelligence />
-      </Provider>
+      </Provider>,
     );
     expect(component).toMatchSnapshot();
   });

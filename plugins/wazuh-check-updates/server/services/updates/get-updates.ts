@@ -11,10 +11,11 @@ import {
 } from '../../plugin-services';
 
 export const getUpdates = async (
-  checkAvailableUpdates?: boolean,
+  queryApi = false,
+  forceQuery = false,
 ): Promise<AvailableUpdates> => {
   try {
-    if (!checkAvailableUpdates) {
+    if (!queryApi) {
       const availableUpdates = (await getSavedObject(
         SAVED_OBJECT_UPDATES,
       )) as AvailableUpdates;
@@ -22,16 +23,15 @@ export const getUpdates = async (
       return availableUpdates;
     }
 
-    const { serverAPIHostEntries, api: wazuhApiClient } = getWazuhCore();
+    const { manageHosts, api: wazuhApiClient } = getWazuhCore();
 
-    const hosts: { id: string }[] =
-      await serverAPIHostEntries.getHostsEntries();
+    const hosts: { id: string }[] = await manageHosts.get();
 
     const apisAvailableUpdates = await Promise.all(
       hosts?.map(async api => {
         const data = {};
         const method = 'GET';
-        const path = '/manager/version/check?force_query=true';
+        const path = `/manager/version/check?force_query=${forceQuery}`;
         const options = {
           apiHostID: api.id,
           forceRefresh: true,

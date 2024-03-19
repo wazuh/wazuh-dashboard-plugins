@@ -11,7 +11,6 @@
  */
 
 import { Reducer } from 'redux';
-import { getSettingsDefault } from '../../../common/services/settings';
 import { AppConfigState, ResolverAction } from '../types';
 
 const initialState: AppConfigState = {
@@ -19,6 +18,7 @@ const initialState: AppConfigState = {
   isReady: false,
   hasError: false,
   data: {
+    // TODO: this should use the configuration service
     'vulnerabilities.pattern': 'wazuh-states-vulnerabilities',
     'fim.pattern': 'wazuh-states-fim',
   },

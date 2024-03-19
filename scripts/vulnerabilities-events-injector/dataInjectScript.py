@@ -15,7 +15,7 @@ def generateRandomDate():
 def generateRandomAgent():
     agent={}
     agent['build'] = {'original':'build{}'.format(random.randint(0, 9999))}
-    agent['id'] = 'agent{}'.format(random.randint(0, 99))
+    agent['id'] = '00{}'.format(random.randint(1, 99))
     agent['name'] = 'Agent{}'.format(random.randint(0, 99))
     agent['version'] = 'v{}-stable'.format(random.randint(0, 9))
     agent['ephemeral_id'] = '{}'.format(random.randint(0, 99999))
@@ -85,7 +85,6 @@ def generateRandomPackage():
     package['checksum'] = 'checksum{}'.format(random.randint(0, 9999))
     package['description'] = 'description{}'.format(random.randint(0, 9999))
     package['install_scope'] = random.choice(['user','system'])
-    package['install_time'] = generateRandomDate()
     package['license'] = 'license{}'.format(random.randint(0, 9))
     package['name'] = 'name{}'.format(random.randint(0, 99))
     package['path'] = '/path/to/package{}'.format(random.randint(0, 99))
@@ -118,19 +117,23 @@ def generateRandomVulnerability():
     vulnerability['severity'] = random.choice(['Low','Medium','High','Critical'])
     return(vulnerability)
 
+def generateRandomWazuh():
+    wazuh = {}
+    wazuh['cluster'] = {'name':random.choice(['wazuh.manager', 'wazuh']), 'node':random.choice(['master','worker-01','worker-02','worker-03'])}
+    return(wazuh)
+
 def generateRandomData(number):
     for i in range(0, int(number)):
         yield{
             '@timestamp':generateRandomDate(),
             'agent':generateRandomAgent(),
             'ecs':{'version':'1.7.0'},
-            'event':generateRandomEvent(),
             'host':generateRandomHost(),
-            'labels':generateRandomLabels(),
             'message':'message{}'.format(random.randint(0, 99999)),
             'package':generateRandomPackage(),
             'tags':generateRandomTags(),
             'vulnerability':generateRandomVulnerability(),
+            'wazuh':generateRandomWazuh()
         }
 
 def verifyIndex(index,instance):
@@ -172,14 +175,34 @@ def verifySettings():
         print('\nDIS_Settings.json not found. Continuing without it.')
 
     if not verified:
-        ip = input("\nEnter the IP of your Indexer: \n")
-        port = input("\nEnter the port of your Indexer: \n")
-        index = input("\nEnter the index name: \n")
+        ip = input("\nEnter the IP of your Indexer [default=0.0.0.0]: \n")
+        if ip == '':
+            ip = '0.0.0.0'
+
+        port = input("\nEnter the port of your Indexer [default=9200]: \n")
+        if port == '':
+            port = '9200'
+
+        index = input("\nEnter the index name [default=wazuh-states-vulnerabilities]: \n")
+        if index == '':
+            index = 'wazuh-states-vulnerabilities'
+
         url = 'https://{}:{}/{}/_doc'.format(ip, port, index)
-        username = input("\nUsername: \n")
-        password = input("\nPassword: \n")
+
+        username = input("\nUsername [default=admin]: \n")
+        if username == '':
+            username = 'admin'
+
+        password = input("\nPassword [default=admin]: \n")
+        if password == '':
+            password = 'admin'
+
         config = {'ip':ip,'port':port,'index':index,'username':username,'password':password}
-        store = input("\nDo you want to store these settings for future use? (y/n) \n")
+
+        store = input("\nDo you want to store these settings for future use? (y/n) [default=n] \n")
+        if store == '':
+            store = 'n'
+
         while store != 'y' and store != 'n':
             store = input("\nInvalid option.\n Do you want to store these settings for future use? (y/n) \n")
         if store == 'y':
@@ -206,10 +229,15 @@ def injectEvents(generator):
 
 
 def main():
-    action = input("Do you want to inject data or save it to a file? (i/s) \n")
+    action = input("Do you want to inject data or save it to a file? (i/s) [default=i]\n")
+    if action == '':
+        action = 'i'
+
     while(action != 'i' and action != 's'):
         action = input("\nInvalid option.\n Do you want to inject data or save it to a file? (i/s) \n")
-    number = input("\nHow many events do you want to generate? \n")
+    number = input("\nHow many events do you want to generate? [default=100]\n")
+    if number == '':
+        number = '100'
     while(not number.isdigit()):
         number = input("Invalid option.\n How many events do you want to generate? \n")
     data = generateRandomData(number)

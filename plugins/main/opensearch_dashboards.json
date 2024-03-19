@@ -2,9 +2,7 @@
   "id": "wazuh",
   "version": "4.9.0-00",
   "opensearchDashboardsVersion": "opensearchDashboards",
-  "configPath": [
-    "wazuh"
-  ],
+  "configPath": ["wazuh"],
   "requiredPlugins": [
     "navigation",
     "data",
@@ -20,8 +18,7 @@
     "opensearchDashboardsUtils",
     "opensearchDashboardsLegacy",
     "wazuhCheckUpdates",
-    "wazuhCore",
-    "wazuhEndpoints"
+    "wazuhCore"
   ],
   "optionalPlugins": [
     "security",

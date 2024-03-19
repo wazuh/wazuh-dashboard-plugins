@@ -18,7 +18,8 @@ import {
 } from '../../common/hocs';
 import { SyscollectorInventory } from './inventory';
 import { compose } from 'redux';
-import { itHygiene } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
+import { getCore } from '../../../kibana-services';
 
 export const MainSyscollector = compose(
   withReduxProvider,
@@ -26,7 +27,10 @@ export const MainSyscollector = compose(
   withGlobalBreadcrumb(({ agent }) => {
     return [
       {
-        text: itHygiene.title,
+        text: endpointSummary.breadcrumbLabel,
+        href: getCore().application.getUrlForApp(endpointSummary.id, {
+          path: `#/agents-preview`,
+        }),
       },
       { agent },
       {
