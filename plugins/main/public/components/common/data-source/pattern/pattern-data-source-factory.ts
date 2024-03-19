@@ -1,13 +1,13 @@
-import { tDataSourceFactory, PatternDataSource } from '../';
-export class PatternDataSourceFactory implements tDataSourceFactory {
+import { tDataSourceFactory, PatternDataSource, tDataSource, tParsedIndexPattern } from '../';
+export class PatternDataSourceFactory implements tDataSourceFactory<tParsedIndexPattern, PatternDataSource>{
     
-    create(item: PatternDataSource): PatternDataSource {
+    create(item: tParsedIndexPattern): PatternDataSource {
         if(!item){
             throw new Error('Cannot create data source from null or undefined');
         };
         return new PatternDataSource(item.id, item.title);
     }
-    createAll(items: PatternDataSource[]): PatternDataSource[] {
+    createAll(items: tParsedIndexPattern[]): PatternDataSource[] {
         if(!items){
             throw new Error('Cannot create data source from null or undefined');
         };

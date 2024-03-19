@@ -1,5 +1,4 @@
-import { tDataSource } from './index'
-export type tDataSourceFactory = {
-    create(item: tDataSource): tDataSource;
-    createAll(items: tDataSource[]): tDataSource[];
+export type tDataSourceFactory<T,K> = {
+    create(item: T): Promise<K> | K;
+    createAll(items: T[]): Promise<K[]> | K[];
 }

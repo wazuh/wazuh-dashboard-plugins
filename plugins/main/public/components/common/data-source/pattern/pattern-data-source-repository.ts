@@ -59,12 +59,10 @@ export type tParsedIndexPattern = {
     updated_at: string;
     version: string;
     _fields: any[];
-    //ToDo: make sure that the following properties are not required
-    select: () => Promise<void>
 }
 
-export class PatternDataSourceRepository implements DataSourceRepository {
-    async get(id: string): Promise<tDataSource> {
+export class PatternDataSourceRepository implements DataSourceRepository<tParsedIndexPattern, PatternDataSource>{
+    async get(id: string): Promise<tParsedIndexPattern> {
         try {
             const savedObjectResponse = await GenericRequest.request(
                 'GET',
@@ -84,7 +82,7 @@ export class PatternDataSourceRepository implements DataSourceRepository {
             throw new Error(`Error getting index pattern: ${error.message}`);
         }
     }
-    async getAll(): Promise<tDataSource[]> {
+    async getAll(): Promise<tParsedIndexPattern[]> {
         try {
             const savedObjects = await GenericRequest.request(
                 'GET',
@@ -110,14 +108,14 @@ export class PatternDataSourceRepository implements DataSourceRepository {
         };
     }
     
-    setDefault(dataSource: tDataSource): Promise<void> {
+    setDefault(dataSource: PatternDataSource): Promise<void> {
         if(!dataSource){
             throw new Error('Index pattern is required');
         }
         AppState.setCurrentPattern(dataSource.id);
         return Promise.resolve();
     }
-    getDefault(): Promise<tDataSource | null> | tDataSource | null {
+    getDefault(): Promise<tParsedIndexPattern> | tParsedIndexPattern | null {
         const currentPattern = AppState.getCurrentPattern();
         if(!currentPattern){
             return null;
