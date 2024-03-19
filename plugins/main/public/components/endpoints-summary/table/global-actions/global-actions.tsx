@@ -190,6 +190,48 @@ export const AgentsTableGlobalActions = ({
               <span>Upgrade task details</span>
             </WzElementPermissions>
           </EuiContextMenuItem>
+          <EuiHorizontalRule margin='xs' />
+          <EuiContextMenuItem
+            icon='package'
+            disabled={!selectedAgents?.length || !allowUpgrade}
+            onClick={() => {
+              closePopover();
+              setIsUpgradeAgentsVisible(true);
+            }}
+          >
+            <WzElementPermissions
+              permissions={[
+                {
+                  action: 'agent:upgrade',
+                  resource: 'agent:id:*',
+                },
+              ]}
+            >
+              <span>
+                Upgrade agents
+                {totalAgents ? ` (${totalAgents})` : ''}
+              </span>
+            </WzElementPermissions>
+          </EuiContextMenuItem>
+          <EuiContextMenuItem
+            icon='eye'
+            disabled={!allowGetTasks}
+            onClick={() => {
+              closePopover();
+              setIsUpgradeTasksModalVisible(true);
+            }}
+          >
+            <WzElementPermissions
+              permissions={[
+                {
+                  action: 'task:status',
+                  resource: '*:*:*',
+                },
+              ]}
+            >
+              <span>Upgrade task details</span>
+            </WzElementPermissions>
+          </EuiContextMenuItem>
         </EuiContextMenuPanel>
       </EuiPopover>
       {isEditGroupsVisible ? (

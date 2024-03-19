@@ -41,7 +41,7 @@ export const EditAgentsGroupsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'ID',
+          name: 'Id',
           align: 'left',
           sortable: true,
         },
