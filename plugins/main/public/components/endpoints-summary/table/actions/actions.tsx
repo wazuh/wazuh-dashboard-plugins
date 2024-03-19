@@ -10,6 +10,8 @@ export const agentsTableActions = (
   allowEditGroups: boolean,
   setAgent: (agent: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
+  setIsUpgradeModalVisible: (visible: boolean) => void,
+  outdatedAgents: Agent[],
 ) => [
   {
     name: agent => {
@@ -79,5 +81,50 @@ export const agentsTableActions = (
     },
     'data-test-subj': 'action-groups',
     enabled: () => allowEditGroups,
+  },
+  {
+    name: agent => {
+      const name = <span>Upgrade</span>;
+
+      const isOutdated = !!outdatedAgents.find(
+        outdatedAgent => outdatedAgent.id === agent.id,
+      );
+
+      if (agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated) {
+        return (
+          <WzElementPermissions
+            permissions={[{ action: 'agent:upgrade', resource: 'agent:id:*' }]}
+          >
+            {name}
+          </WzElementPermissions>
+        );
+      }
+
+      return (
+        <EuiToolTip
+          content={
+            agent.status !== API_NAME_AGENT_STATUS.ACTIVE
+              ? 'Agent is not active'
+              : 'Agent is up to date'
+          }
+        >
+          {name}
+        </EuiToolTip>
+      );
+    },
+    description: 'Upgrade',
+    icon: 'package',
+    type: 'icon',
+    onClick: agent => {
+      setAgent(agent);
+      setIsUpgradeModalVisible(true);
+    },
+    'data-test-subj': 'action-upgrade',
+    enabled: agent => {
+      const isOutdated = !!outdatedAgents.find(
+        outdatedAgent => outdatedAgent.id === agent.id,
+      );
+      return agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated;
+    },
   },
 ];

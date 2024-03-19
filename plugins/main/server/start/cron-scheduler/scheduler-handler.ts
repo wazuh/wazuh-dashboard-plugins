@@ -1,11 +1,9 @@
 import { jobs, SchedulerJob } from './index';
 import { configuredJobs } from './configured-jobs';
-import { getConfiguration } from '../../lib/get-configuration';
 import cron from 'node-cron';
 import { WAZUH_STATISTICS_TEMPLATE_NAME } from '../../../common/constants';
 import { statisticsTemplate } from '../../integration-files/statistics-template';
 import { delayAsPromise } from '../../../common/utils';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 const schedulerJobs = [];
 
@@ -48,12 +46,11 @@ const checkElasticsearchServer = async function (context) {
  */
 const checkTemplate = async function (context) {
   try {
-    const appConfig = await getConfiguration();
-    const prefixTemplateName =
-      appConfig['cron.prefix'] || getSettingDefaultValue('cron.prefix');
+    const appConfig = await context.wazuh_core.configuration.get();
+
+    const prefixTemplateName = appConfig['cron.prefix'];
     const statisticsIndicesTemplateName =
-      appConfig['cron.statistics.index.name'] ||
-      getSettingDefaultValue('cron.statistics.index.name');
+      appConfig['cron.statistics.index.name'];
     const pattern = `${prefixTemplateName}-${statisticsIndicesTemplateName}-*`;
 
     try {
@@ -104,7 +101,8 @@ const checkTemplate = async function (context) {
 export async function jobSchedulerRun(context) {
   // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
   await checkPluginPlatformStatus(context);
-  for (const job in configuredJobs({})) {
+  const jobs = await configuredJobs(context, {});
+  for (const job in jobs) {
     const schedulerJob: SchedulerJob = new SchedulerJob(job, context);
     schedulerJobs.push(schedulerJob);
     const task = cron.schedule(jobs[job].interval, () => schedulerJob.run());

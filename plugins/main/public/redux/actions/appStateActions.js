@@ -66,6 +66,17 @@ export const updateCurrentPlatform = currentPlatform => {
 };
 
 /**
+ * Updates currentPlatform in the appState store
+ * @param currentPlatform
+ */
+export const updateUserAccount = userAccount => {
+  return {
+    type: 'UPDATE_USER_ACCOUNT',
+    userAccount,
+  };
+};
+
+/**
  * Updates currentAgentData in the appState store
  * @param data
  */
@@ -84,17 +95,6 @@ export const showExploreAgentModalGlobal = shouldShow => {
   return {
     type: 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL',
     showExploreAgentModalGlobal: shouldShow,
-  };
-};
-
-/**
- * Updates userRoles in the appState store
- * @param userRoles
- */
-export const updateUserRoles = userRoles => {
-  return {
-    type: 'UPDATE_USER_ROLES',
-    userRoles,
   };
 };
 

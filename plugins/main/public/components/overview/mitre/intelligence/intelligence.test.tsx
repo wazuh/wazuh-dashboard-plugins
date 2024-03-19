@@ -51,8 +51,10 @@ describe('Module Mitre Att&ck intelligence container', () => {
   it('should render the component if has permissions', () => {
     const store = mockStore({
       appStateReducers: {
+        userAccount: {
+          administrator: true,
+        },
         withUserLogged: true,
-        userRoles: ['administrator'],
         userPermissions: {
           'mitre:read': { '*:*:*': 'allow' },
         },
@@ -69,8 +71,10 @@ describe('Module Mitre Att&ck intelligence container', () => {
   it('should render permissions prompt when no has permissions', () => {
     const store = mockStore({
       appStateReducers: {
+        userAccount: {
+          administrator: true,
+        },
         withUserLogged: true,
-        userRoles: ['administrator'],
         userPermissions: {
           'mitre:read': { '*:*:*': 'deny' },
         },
