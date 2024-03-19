@@ -657,6 +657,7 @@ export const ApiTable = compose(
                       id: item.id,
                       url: item.url,
                       port: item.port,
+                      run_as: item.run_as,
                       username: item.username,
                       password: '',
                       password_confirm: '',

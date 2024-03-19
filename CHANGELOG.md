@@ -9,10 +9,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.9.0
 - Added AngularJS dependencies [#6145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6145)
 - Added a migration task to setup the configuration using a configuration file [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
-- Added the ability to manage the API hosts from the Server APIs [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
-- Added edit groups action to Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
-- Added upgrade agent action to Endpoints Summary [#6476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6476)
-- Added global actions add agents to groups and remove agents from groups to Endpoints Summary [#6274](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6274)
+- Added the ability to manage the API hosts from the Server APIs [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337) [#6519](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6519)
+- Added edit agent groups and upgrade agents actions to Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250) [#6476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6476) [#6274](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6274) [#6501](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6501)
 - Added propagation of updates from the table to dashboard visualizations in Endpoints summary [#6460](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6460)
 - Handle index pattern selector on new discover [#6499](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6499)
 

@@ -33,7 +33,7 @@ exports[`AgentsTableGlobalActions component should return the component 1`] = `
           <span
             class="euiButtonEmpty__text"
           >
-            Add/Remove groups
+            More
           </span>
         </span>
       </button>
