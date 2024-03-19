@@ -12,9 +12,9 @@
  */
 
 import React from 'react';
-import { VisCard } from '../../../common/modules/panel';
+import { VisCard } from '../../../../common/modules/panel';
 import { EuiFlexItem, EuiPanel } from '@elastic/eui';
-import { SecurityAlerts } from '../../../visualize/components';
+import { SecurityAlerts } from '../../../../visualize/components';
 
 export const drilldownRulesConfig = {
   rows: [
@@ -23,20 +23,32 @@ export const drilldownRulesConfig = {
       columns: [
         {
           width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Top-Operations" tab="office" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-Office-Top-Operations'
+              tab='office'
+              {...props}
+            />
           ),
         },
         {
           width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Top-Users" tab="office" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-Office-Top-Users'
+              tab='office'
+              {...props}
+            />
           ),
         },
         {
           width: 40,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Country-Tag-Cloud" tab="office" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-Office-Country-Tag-Cloud'
+              tab='office'
+              {...props}
+            />
           ),
         },
       ],
@@ -46,10 +58,10 @@ export const drilldownRulesConfig = {
       columns: [
         {
           width: 100,
-          component: (props) => (
+          component: props => (
             <VisCard
-              id="Wazuh-App-Overview-Office-Alerts-Evolution-By-UserID"
-              tab="office"
+              id='Wazuh-App-Overview-Office-Alerts-Evolution-By-UserID'
+              tab='office'
               {...props}
             />
           ),
@@ -69,7 +81,10 @@ export const drilldownRulesConfig = {
                     { field: 'timestamp' },
                     { field: 'rule.description', label: 'Description' },
                     { field: 'data.office365.UserId', label: 'User ID' },
-                    { field: 'data.office365.ClientIP', label: 'Client IP address' },
+                    {
+                      field: 'data.office365.ClientIP',
+                      label: 'Client IP address',
+                    },
                     { field: 'data.office365.Operation', label: 'Operation' },
                     { field: 'rule.level', label: 'Level' },
                     { field: 'rule.id', label: 'Rule ID' },
