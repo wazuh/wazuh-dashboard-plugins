@@ -346,7 +346,7 @@ export const AgentsTable = compose(
                       label: 'dateAdd',
                       description: 'filter by registration date',
                     },
-                    { label: 'id', description: 'filter by id' },
+                    { label: 'id', description: 'filter by ID' },
                     { label: 'ip', description: 'filter by IP address' },
                     { label: 'group', description: 'filter by group' },
                     {
