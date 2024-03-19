@@ -16,6 +16,13 @@ import {
 import { LoadingSpinner } from '../../vulnerabilities/common/components/loading_spinner';
 import { DiscoverNoResults } from '../components/no_results';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
+import {
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiSelect,
+  EuiSpacer,
+  EuiCallOut,
+} from '@elastic/eui';
 import './statistics_dashboard.scss';
 
 const plugins = getPlugins();
@@ -25,11 +32,15 @@ const SearchBar = getPlugins().data.ui.SearchBar;
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 interface DashboardStatisticsProps {
-  isClusterMode: boolean;
+  clusterNodes: any[];
+  clusterNodeSelected: any;
+  onSelectNode: any;
 }
 
 const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
-  isClusterMode,
+  clusterNodes,
+  clusterNodeSelected,
+  onSelectNode,
 }) => {
   /* TODO: Analyze whether to use the new index pattern handler https://github.com/wazuh/wazuh-dashboard-plugins/issues/6434
   Replace WAZUH_ALERTS_PATTERN with appState.getCurrentPattern... */
@@ -71,15 +82,36 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
       <I18nProvider>
         {isLoading ? <LoadingSpinner /> : null}
         {!isLoading ? (
-          <SearchBar
-            appName='listener-engine-statistics-searchbar'
-            {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={false}
-            showQueryBar={true}
-          />
+          <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
+            {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
+              <EuiFlexItem grow={false}>
+                <EuiSelect
+                  id='selectNode'
+                  options={clusterNodes}
+                  value={clusterNodeSelected}
+                  onChange={onSelectNode}
+                  aria-label='Select node'
+                />
+              </EuiFlexItem>
+            )}
+            <SearchBar
+              appName='listener-engine-statistics-searchbar'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={false}
+              showQueryBar={true}
+              showFilterBar={false}
+            />
+          </EuiFlexGroup>
         ) : null}
+        <EuiSpacer size={'m'} />
         {isSearching ? <LoadingSpinner /> : null}
+        <EuiCallOut
+          title={
+            'Remoted statistics are cumulative, this means that the information shown is since the data exists.'
+          }
+          iconType='iInCircle'
+        />
         {!isLoading && !isSearching && results?.hits?.total === 0 ? (
           <DiscoverNoResults />
         ) : null}

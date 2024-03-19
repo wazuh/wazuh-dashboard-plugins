@@ -46,6 +46,8 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
 import { getCore } from '../../../../../kibana-services';
 import { appSettings, statistics } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { DashboardListenerEngineStatistics } from '../../../../../components/overview/server-management-statistics/dashboards/dashboard_listener_engine';
+import { DashboardAnalysisEngineStatistics } from '../../../../../components/overview/server-management-statistics/dashboards/dashboard_analysis_engine';
 
 const wzConfig = new WazuhConfig();
 
@@ -188,32 +190,6 @@ export class WzStatisticsOverview extends Component {
               </EuiFlexGroup>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty
-                iconType='refresh'
-                onClick={this.refreshVisualizations}
-              >
-                Refresh
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-            {!!(
-              this.state.clusterNodes &&
-              this.state.clusterNodes.length &&
-              this.state.clusterNodeSelected
-            ) && (
-              <EuiFlexItem grow={false}>
-                <EuiSelect
-                  id='selectNode'
-                  options={this.state.clusterNodes}
-                  value={this.state.clusterNodeSelected}
-                  onChange={this.onSelectNode}
-                  aria-label='Select node'
-                />
-              </EuiFlexItem>
-            )}
-            <EuiFlexItem grow={false}>
-              <WzDatePicker condensed={true} onTimeChange={() => {}} />
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>
                 <EuiButtonEmpty
                   href={getCore().application.getUrlForApp(appSettings.id, {
@@ -245,33 +221,21 @@ export class WzStatisticsOverview extends Component {
               {this.state.selectedTabId === 'remoted' &&
                 !this.state.loadingNode && (
                   <div>
-                    <EuiSpacer size={'m'} />
-                    <EuiCallOut
-                      title={this.info[this.state.selectedTabId]}
-                      iconType='iInCircle'
-                    />
-                    <EuiSpacer size={'m'} />
-                    <WzStatisticsRemoted
+                    <DashboardListenerEngineStatistics
+                      clusterNodes={this.state.clusterNodes}
                       clusterNodeSelected={this.state.clusterNodeSelected}
-                      refreshVisualizations={this.state.refreshVisualizations}
+                      onSelectNode={this.onSelectNode}
                     />
                   </div>
                 )}
               {this.state.selectedTabId === 'analysisd' &&
                 !this.state.loadingNode && (
-                  <div>
-                    <EuiSpacer size={'m'} />
-                    <EuiCallOut
-                      title={this.info[this.state.selectedTabId]}
-                      iconType='iInCircle'
-                    />
-                    <EuiSpacer size={'m'} />
-                    <WzStatisticsAnalysisd
-                      isClusterMode={this.state.isClusterMode}
-                      clusterNodeSelected={this.state.clusterNodeSelected}
-                      refreshVisualizations={this.state.refreshVisualizations}
-                    />
-                  </div>
+                  <DashboardAnalysisEngineStatistics
+                    isClusterMode={this.state.isClusterMode}
+                    clusterNodes={this.state.clusterNodes}
+                    clusterNodeSelected={this.state.clusterNodeSelected}
+                    onSelectNode={this.onSelectNode}
+                  />
                 )}
             </>
           }
