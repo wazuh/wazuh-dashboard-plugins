@@ -41,7 +41,7 @@ export const EditAgentsGroupsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'Id',
+          name: 'ID',
           align: 'left',
           sortable: true,
         },
@@ -88,7 +88,7 @@ export const EditAgentsGroupsModalResult = ({
         },
         {
           field: 'id',
-          name: 'Agent Ids',
+          name: 'Agent IDs',
           align: 'left',
           render: ids => ids.join(', '),
         },
