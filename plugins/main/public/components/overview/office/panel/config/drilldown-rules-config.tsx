@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Office 365 Drilldown Operations field Config.
+ * Wazuh app - Office 365 Drilldown Rules field Config.
  *
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
@@ -12,25 +12,43 @@
  */
 
 import React from 'react';
-import { VisCard } from '../../../common/modules/panel';
+import { VisCard } from '../../../../common/modules/panel';
 import { EuiFlexItem, EuiPanel } from '@elastic/eui';
-import { SecurityAlerts } from '../../../visualize/components';
+import { SecurityAlerts } from '../../../../visualize/components';
 
-export const drilldownOperationsConfig = {
+export const drilldownRulesConfig = {
   rows: [
     {
       height: 400,
       columns: [
         {
-          width: 40,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Top-Users" tab="office" {...props} />
+          width: 30,
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-Office-Top-Operations'
+              tab='office'
+              {...props}
+            />
           ),
         },
         {
-          width: 60,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Country-Tag-Cloud" tab="office" {...props} />
+          width: 30,
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-Office-Top-Users'
+              tab='office'
+              {...props}
+            />
+          ),
+        },
+        {
+          width: 40,
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-Office-Country-Tag-Cloud'
+              tab='office'
+              {...props}
+            />
           ),
         },
       ],
@@ -40,10 +58,10 @@ export const drilldownOperationsConfig = {
       columns: [
         {
           width: 100,
-          component: (props) => (
+          component: props => (
             <VisCard
-              id="Wazuh-App-Overview-Office-Alerts-Evolution-By-UserID"
-              tab="office"
+              id='Wazuh-App-Overview-Office-Alerts-Evolution-By-UserID'
+              tab='office'
               {...props}
             />
           ),
@@ -63,7 +81,11 @@ export const drilldownOperationsConfig = {
                     { field: 'timestamp' },
                     { field: 'rule.description', label: 'Description' },
                     { field: 'data.office365.UserId', label: 'User ID' },
-                    { field: 'data.office365.ClientIP', label: 'Client IP address' },
+                    {
+                      field: 'data.office365.ClientIP',
+                      label: 'Client IP address',
+                    },
+                    { field: 'data.office365.Operation', label: 'Operation' },
                     { field: 'rule.level', label: 'Level' },
                     { field: 'rule.id', label: 'Rule ID' },
                   ]}
