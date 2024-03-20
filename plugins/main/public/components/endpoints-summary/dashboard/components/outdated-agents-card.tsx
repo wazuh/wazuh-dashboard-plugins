@@ -70,10 +70,10 @@ const OutdatedAgentsCard = ({
           }
           description={
             <EuiTextColor color={contentType}>
-              <small>Agents</small>
+              <small>{outdatedAgents === 1 ? 'Agent' : 'Agents'}</small>
             </EuiTextColor>
           }
-          titleColor='danger'
+          titleColor='warning'
           isLoading={isLoading}
           titleSize='l'
           textAlign='center'
