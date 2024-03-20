@@ -11,15 +11,13 @@
  */
 
 import React from 'react';
-import { EuiFlexGroup} from '@elastic/eui';
-import { VisConfigLayout } from '../../../common/modules/panel';
+import { VisConfigLayout } from '../../../../common/modules/panel';
 
 export const Main = ({ changeView, toggleFilter, rows = [] }) => {
-
   const rowClickHandler = (field, value) => {
     toggleFilter(field, value);
     changeView(field);
-  }
+  };
 
-  return <VisConfigLayout rows={rows} rowClickHandler={rowClickHandler}/>
-}
+  return <VisConfigLayout rows={rows} rowClickHandler={rowClickHandler} />;
+};

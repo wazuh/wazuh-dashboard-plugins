@@ -17,7 +17,7 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
-import { GitHubPanel } from '../../overview/github-panel';
+import { GitHubPanel } from '../../overview/github/panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent } from '../hocs';
 import { WazuhDiscover } from '../wazuh-discover/wz-discover';
@@ -37,12 +37,13 @@ import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
 import { nistColumns } from '../../overview/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/tsc/events/tsc-columns';
-import { githubColumns } from '../../overview/github-panel/events/github-columns';
+import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { DashboardGitHub } from '../../overview/github/dashboards/dashboard';
 
 const DashboardTab = {
   id: 'dashboard',
@@ -179,6 +180,12 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       DashboardTab,
+      {
+        id: 'dashboard2',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardGitHub || withPinnedAgent(DashboardGitHub), // TODO: use withPinnedAgent
+      },
       {
         id: 'inventory',
         name: 'Panel',
