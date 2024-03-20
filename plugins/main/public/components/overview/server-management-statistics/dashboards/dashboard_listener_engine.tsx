@@ -50,99 +50,63 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
     defaultIndexPatternID: STATISTICS_INDEX_PATTERN_ID,
   });
 
-  const { isLoading, query, indexPatterns } = searchBarProps;
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-
-  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
-
-  useEffect(() => {
-    if (!isLoading) {
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters: searchBarProps.filters ?? [],
-        query,
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching results',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
-    }
-  }, [JSON.stringify(searchBarProps)]);
-
   return (
     <>
       <I18nProvider>
-        {isLoading ? <LoadingSpinner /> : null}
-        {!isLoading ? (
-          <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
-            {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
-              <EuiFlexItem grow={false}>
-                <EuiSelect
-                  id='selectNode'
-                  options={clusterNodes}
-                  value={clusterNodeSelected}
-                  onChange={onSelectNode}
-                  aria-label='Select node'
-                />
-              </EuiFlexItem>
-            )}
-            <SearchBar
-              appName='listener-engine-statistics-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={false}
-              showQueryBar={true}
-              showFilterBar={false}
-            />
-          </EuiFlexGroup>
-        ) : null}
+        <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
+          {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
+            <EuiFlexItem grow={false}>
+              <EuiSelect
+                id='selectNode'
+                options={clusterNodes}
+                value={clusterNodeSelected}
+                onChange={onSelectNode}
+                aria-label='Select node'
+              />
+            </EuiFlexItem>
+          )}
+          <SearchBar
+            appName='listener-engine-statistics-searchbar'
+            {...searchBarProps}
+            showDatePicker={true}
+            showQueryInput={false}
+            showQueryBar={true}
+            showFilterBar={false}
+          />
+        </EuiFlexGroup>
         <EuiSpacer size={'m'} />
-        {isSearching ? <LoadingSpinner /> : null}
         <EuiCallOut
           title={
             'Remoted statistics are cumulative, this means that the information shown is since the data exists.'
           }
           iconType='iInCircle'
         />
-        {!isLoading && !isSearching && results?.hits?.total === 0 ? (
-          <DiscoverNoResults />
-        ) : null}
-        {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-          <div className='server-management-statistics-dashboard-responsive'>
-            <DashboardByRenderer
-              input={{
-                viewMode: ViewMode.VIEW,
-                panels: getDashboardPanelsListenerEngine(
-                  STATISTICS_INDEX_PATTERN_ID,
-                ),
-                isFullScreenMode: false,
-                filters: [],
-                useMargins: true,
-                id: 'listener-engine-statistics-dashboard',
-                timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
-                },
-                title: 'Listener Engine Statistics dashboard',
-                description: 'Dashboard of the Listener Engine Statistics',
-                query: searchBarProps.query,
-                refreshConfig: {
-                  pause: false,
-                  value: 15,
-                },
-                hidePanelTitles: false,
-              }}
-            />
-          </div>
-        ) : null}
+        <div className='server-management-statistics-dashboard-responsive'>
+          <DashboardByRenderer
+            input={{
+              viewMode: ViewMode.VIEW,
+              panels: getDashboardPanelsListenerEngine(
+                STATISTICS_INDEX_PATTERN_ID,
+              ),
+              isFullScreenMode: false,
+              filters: [],
+              useMargins: true,
+              id: 'listener-engine-statistics-dashboard',
+              timeRange: {
+                from: searchBarProps.dateRangeFrom,
+                to: searchBarProps.dateRangeTo,
+              },
+              title: 'Listener Engine Statistics dashboard',
+              description: 'Dashboard of the Listener Engine Statistics',
+              query: searchBarProps.query,
+              refreshConfig: {
+                pause: false,
+                value: 15,
+              },
+              hidePanelTitles: false,
+            }}
+          />
+        </div>
       </I18nProvider>
     </>
   );
