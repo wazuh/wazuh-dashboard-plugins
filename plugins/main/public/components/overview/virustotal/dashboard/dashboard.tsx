@@ -68,8 +68,8 @@ const DashboardVT: React.FC<DashboardVTProps> = ({ pinnedAgent }) => {
   }, [JSON.stringify(searchBarProps)]);
 
   return (
-    <>
-      <I18nProvider>
+    <I18nProvider>
+      <>
         {isLoading ? <LoadingSpinner /> : null}
         {!isLoading ? (
           <SearchBar
@@ -135,8 +135,8 @@ const DashboardVT: React.FC<DashboardVTProps> = ({ pinnedAgent }) => {
             />
           </div>
         ) : null}
-      </I18nProvider>
-    </>
+      </>
+    </I18nProvider>
   );
 };
 
