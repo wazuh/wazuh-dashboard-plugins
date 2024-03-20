@@ -214,6 +214,7 @@ export const ApiTable = compose(
         const clusterInfo = data.data || {};
         APIconnection.status = 'online';
         APIconnection.cluster_info = clusterInfo;
+        APIconnection.allow_run_as = clusterInfo.allow_run_as;
         if (options?.selectAPIHostOnAvailable) {
           this.setDefault(entry);
         }
