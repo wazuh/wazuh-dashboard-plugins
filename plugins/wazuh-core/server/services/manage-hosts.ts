@@ -217,9 +217,6 @@ export class ManageHosts {
       await this.configuration.set({
         hosts: updatedHosts,
       });
-      const host = (await this.get(hostID, {
-        excludePassword: true,
-      })) as IAPIHost;
       this.deleteRegistryByHost(hostID);
       this.logger.info(`API connection with ID [${hostID}] was removed`);
     } catch (error) {
