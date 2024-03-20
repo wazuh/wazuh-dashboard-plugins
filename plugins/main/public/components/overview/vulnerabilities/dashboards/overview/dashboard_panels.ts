@@ -401,7 +401,8 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
           enabled: true,
           type: 'date_histogram',
           params: {
-            field: '@timestamp',
+            field: 'wazuh.published_at',
+            customLabel: 'Published at',
             timeRange: {
               from: 'now-24h',
               to: 'now',
