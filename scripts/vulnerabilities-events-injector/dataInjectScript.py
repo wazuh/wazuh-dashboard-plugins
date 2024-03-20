@@ -120,12 +120,13 @@ def generateRandomVulnerability():
 def generateRandomWazuh():
     wazuh = {}
     wazuh['cluster'] = {'name':random.choice(['wazuh.manager', 'wazuh']), 'node':random.choice(['master','worker-01','worker-02','worker-03'])}
+    wazuh['published_at'] = generateRandomDate()
+    wazuh['detected_at'] = generateRandomDate()
     return(wazuh)
 
 def generateRandomData(number):
     for i in range(0, int(number)):
         yield{
-            '@timestamp':generateRandomDate(),
             'agent':generateRandomAgent(),
             'ecs':{'version':'1.7.0'},
             'host':generateRandomHost(),
