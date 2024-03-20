@@ -1,19 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { getPlugins } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { SearchResponse } from '../../../../../../../src/core/server';
-import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import { WAZUH_STATISTICS_PATTERN } from '../../../../../common/constants';
-import { search } from '../../../common/search-bar/search-bar-service';
-import {
-  ErrorFactory,
-  ErrorHandler,
-  HttpError,
-} from '../../../../react-services/error-management';
-import { LoadingSpinner } from '../../vulnerabilities/common/components/loading_spinner';
-import { DiscoverNoResults } from '../components/no_results';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import { getDashboardPanelsAnalysisEngine } from './dashboard_panels_analysis_engine';
 import {
@@ -48,106 +38,96 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
   Replace WAZUH_ALERTS_PATTERN with appState.getCurrentPattern... */
   const STATISTICS_INDEX_PATTERN_ID = WAZUH_STATISTICS_PATTERN;
 
+  const selectedNodeFilter = {
+    meta: {
+      removable: false,
+      index: STATISTICS_INDEX_PATTERN_ID,
+      negate: false,
+      disabled: false,
+      alias: null,
+      type: 'phrase',
+      key: null,
+      value: null,
+      params: {
+        query: null,
+        type: 'phrase',
+      },
+    },
+    query: {
+      match: {
+        nodeName: clusterNodeSelected,
+      },
+    },
+    $state: {
+      store: 'appState',
+    },
+  };
+
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: STATISTICS_INDEX_PATTERN_ID,
+    filters: clusterNodeSelected !== 'all' ? [selectedNodeFilter] : [],
   });
 
-  const { isLoading, query, indexPatterns } = searchBarProps;
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-
-  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
-
-  useEffect(() => {
-    if (!isLoading) {
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters: searchBarProps.filters ?? [],
-        query,
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching results',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
-    }
-  }, [JSON.stringify(searchBarProps)]);
-
   return (
-    <>
-      <I18nProvider>
-        {isLoading ? <LoadingSpinner /> : null}
-        {!isLoading ? (
-          <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
-            {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
-              <EuiFlexItem grow={false}>
-                <EuiSelect
-                  id='selectNode'
-                  options={clusterNodes}
-                  value={clusterNodeSelected}
-                  onChange={onSelectNode}
-                  aria-label='Select node'
-                />
-              </EuiFlexItem>
-            )}
-            <SearchBar
-              appName='analysis-engine-statistics-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={false}
-              showQueryBar={true}
-              showFilterBar={false}
-            />
-          </EuiFlexGroup>
-        ) : null}
+    <I18nProvider>
+      <>
+        <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
+          {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
+            <EuiFlexItem grow={false}>
+              <EuiSelect
+                id='selectNode'
+                options={clusterNodes}
+                value={clusterNodeSelected}
+                onChange={onSelectNode}
+                aria-label='Select node'
+              />
+            </EuiFlexItem>
+          )}
+          <SearchBar
+            appName='analysis-engine-statistics-searchbar'
+            {...searchBarProps}
+            showDatePicker={true}
+            showQueryInput={false}
+            showQueryBar={true}
+            showFilterBar={false}
+          />
+        </EuiFlexGroup>
         <EuiSpacer size={'m'} />
-        {isSearching ? <LoadingSpinner /> : null}
         <EuiCallOut
           title={
             'Remoted statistics are cumulative, this means that the information shown is since the data exists.'
           }
           iconType='iInCircle'
         />
-        {!isLoading && !isSearching && results?.hits?.total === 0 ? (
-          <DiscoverNoResults />
-        ) : null}
-        {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-          <div className='server-management-statistics-dashboard-responsive'>
-            <DashboardByRenderer
-              input={{
-                viewMode: ViewMode.VIEW,
-                panels: getDashboardPanelsAnalysisEngine(
-                  STATISTICS_INDEX_PATTERN_ID,
-                  isClusterMode,
-                ),
-                isFullScreenMode: false,
-                filters: [],
-                useMargins: true,
-                id: 'analysis-engine-statistics-dashboard',
-                timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
-                },
-                title: 'Analysis Engine Statistics dashboard',
-                description: 'Dashboard of the Analysis Engine Statistics',
-                query: searchBarProps.query,
-                refreshConfig: {
-                  pause: false,
-                  value: 15,
-                },
-                hidePanelTitles: false,
-              }}
-            />
-          </div>
-        ) : null}
-      </I18nProvider>
-    </>
+        <div className='server-management-statistics-dashboard-responsive'>
+          <DashboardByRenderer
+            input={{
+              viewMode: ViewMode.VIEW,
+              panels: getDashboardPanelsAnalysisEngine(
+                STATISTICS_INDEX_PATTERN_ID,
+                isClusterMode,
+              ),
+              isFullScreenMode: false,
+              filters: searchBarProps.filters ?? [],
+              useMargins: true,
+              id: 'analysis-engine-statistics-dashboard',
+              timeRange: {
+                from: searchBarProps.dateRangeFrom,
+                to: searchBarProps.dateRangeTo,
+              },
+              title: 'Analysis Engine Statistics dashboard',
+              description: 'Dashboard of the Analysis Engine Statistics',
+              query: searchBarProps.query,
+              refreshConfig: {
+                pause: false,
+                value: 15,
+              },
+              hidePanelTitles: false,
+            }}
+          />
+        </div>
+      </>
+    </I18nProvider>
   );
 };
 

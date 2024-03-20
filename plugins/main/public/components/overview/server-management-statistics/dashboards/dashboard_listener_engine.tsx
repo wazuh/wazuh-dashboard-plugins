@@ -1,20 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { getPlugins } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { SearchResponse } from '../../../../../../../src/core/server';
-import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import { getDashboardPanelsListenerEngine } from './dashboard_panels_listener_engine';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import { WAZUH_STATISTICS_PATTERN } from '../../../../../common/constants';
-import { search } from '../../../common/search-bar/search-bar-service';
-import {
-  ErrorFactory,
-  ErrorHandler,
-  HttpError,
-} from '../../../../react-services/error-management';
-import { LoadingSpinner } from '../../vulnerabilities/common/components/loading_spinner';
-import { DiscoverNoResults } from '../components/no_results';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import {
   EuiFlexItem,
@@ -46,13 +36,39 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
   Replace WAZUH_ALERTS_PATTERN with appState.getCurrentPattern... */
   const STATISTICS_INDEX_PATTERN_ID = WAZUH_STATISTICS_PATTERN;
 
+  const selectedNodeFilter = {
+    meta: {
+      removable: false,
+      index: STATISTICS_INDEX_PATTERN_ID,
+      negate: false,
+      disabled: false,
+      alias: null,
+      type: 'phrase',
+      key: null,
+      value: null,
+      params: {
+        query: null,
+        type: 'phrase',
+      },
+    },
+    query: {
+      match: {
+        nodeName: clusterNodeSelected,
+      },
+    },
+    $state: {
+      store: 'appState',
+    },
+  };
+
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: STATISTICS_INDEX_PATTERN_ID,
+    filters: clusterNodeSelected !== 'all' ? [selectedNodeFilter] : [],
   });
 
   return (
-    <>
-      <I18nProvider>
+    <I18nProvider>
+      <>
         <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
           {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
             <EuiFlexItem grow={false}>
@@ -89,7 +105,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
                 STATISTICS_INDEX_PATTERN_ID,
               ),
               isFullScreenMode: false,
-              filters: [],
+              filters: searchBarProps.filters ?? [],
               useMargins: true,
               id: 'listener-engine-statistics-dashboard',
               timeRange: {
@@ -107,8 +123,8 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
             }}
           />
         </div>
-      </I18nProvider>
-    </>
+      </>
+    </I18nProvider>
   );
 };
 
