@@ -95,13 +95,6 @@ describe('getUpdates function', () => {
   test('should return available updates from api', async () => {
     mockedSetSavedObject.mockImplementation(() => ({}));
     mockedGetWazuhCore.mockImplementation(() => ({
-      controllers: {
-        WazuhHostsCtrl: jest.fn().mockImplementation(() => ({
-          getHostsEntries: jest
-            .fn()
-            .mockImplementation(() => [{ id: 'api id' }]),
-        })),
-      },
       api: {
         client: {
           asInternalUser: {
@@ -128,8 +121,8 @@ describe('getUpdates function', () => {
           },
         },
       },
-      serverAPIHostEntries: {
-        getHostsEntries: jest.fn(() => [{ id: 'api id' }]),
+      manageHosts: {
+        get: jest.fn(() => [{ id: 'api id' }]),
       },
     }));
     mockedGetWazuhCheckUpdatesServices.mockImplementation(() => ({

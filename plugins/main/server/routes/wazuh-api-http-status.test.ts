@@ -6,18 +6,7 @@ import { loggingSystemMock } from '../../../../src/core/server/logging/logging_s
 import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
 import { WazuhApiRoutes } from './wazuh-api';
-import {
-  createDataDirectoryIfNotExists,
-  createDirectoryIfNotExists,
-} from '../lib/filesystem';
-import {
-  HTTP_STATUS_CODES,
-  WAZUH_DATA_ABSOLUTE_PATH,
-  WAZUH_DATA_CONFIG_APP_PATH,
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-} from '../../common/constants';
-import { execSync } from 'child_process';
-import fs from 'fs';
+import { HTTP_STATUS_CODES } from '../../common/constants';
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
@@ -35,7 +24,7 @@ const context = {
   },
   wazuh_core: {
     manageHosts: {
-      getHostById: jest.fn(id => {
+      get: jest.fn(id => {
         return {
           id,
           url: 'https://localhost',
@@ -45,14 +34,14 @@ const context = {
           run_as: false,
         };
       }),
-    },
-    cacheAPIUserAllowRunAs: {
-      set: jest.fn(),
-      API_USER_STATUS_RUN_AS: {
-        ALL_DISABLED: 0,
-        USER_NOT_ALLOWED: 1,
-        HOST_DISABLED: 2,
-        ENABLED: 3,
+      cacheAPIUserAllowRunAs: {
+        set: jest.fn(),
+        API_USER_STATUS_RUN_AS: {
+          ALL_DISABLED: 0,
+          USER_NOT_ALLOWED: 1,
+          HOST_DISABLED: 2,
+          ENABLED: 3,
+        },
       },
     },
   },
@@ -63,11 +52,6 @@ const enhanceWithContext = (fn: (...args: any[]) => any) =>
 let server, innerServer;
 
 beforeAll(async () => {
-  // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  createDataDirectoryIfNotExists();
-  // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
-  createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
-
   // Create server
   const config = {
     name: 'plugin_platform',
@@ -106,33 +90,9 @@ afterAll(async () => {
 
   // Clear all mocks
   jest.clearAllMocks();
-
-  // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
 });
 
 describe('[endpoint] GET /api/check-api', () => {
-  beforeAll(() => {
-    // Create the configuration file with custom content
-    const fileContent = `---
-pattern: test-alerts-*
-hosts:
-  - default:
-      url: https://localhost
-      port: 55000
-      username: wazuh-wui
-      password: wazuh-wui
-      run_as: false
-`;
-
-    fs.writeFileSync(WAZUH_DATA_CONFIG_APP_PATH, fileContent, 'utf8');
-  });
-
-  afterAll(() => {
-    // Remove the configuration file
-    fs.unlinkSync(WAZUH_DATA_CONFIG_APP_PATH);
-  });
-
   it.each`
     apiId        | statusCode
     ${'default'} | ${HTTP_STATUS_CODES.SERVICE_UNAVAILABLE}

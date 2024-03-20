@@ -2,8 +2,7 @@ import React from 'react';
 import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import ReportingHandler from './reporting-handler';
 import moment from 'moment-timezone';
-import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../../../../common/constants';
+import { WzButton } from '../../../../../../components/common/buttons';
 import { getHttp, getUiSettings } from '../../../../../../kibana-services';
 import { formatUIDate } from '../../../../../../react-services/time-service';
 export default class ReportingColums {
@@ -17,7 +16,7 @@ export default class ReportingColums {
           field: 'name',
           name: 'File',
           align: 'left',
-          sortable: true
+          sortable: true,
         },
         {
           field: 'size',
@@ -26,14 +25,14 @@ export default class ReportingColums {
             const fixedSize = size / 1024;
             return `${fixedSize.toFixed(2)}KB`;
           },
-          sortable: true
+          sortable: true,
         },
         {
           field: 'date',
           name: 'Created',
           render: value => formatUIDate(value),
-          sortable: true
-        }
+          sortable: true,
+        },
       ];
       this.columns.push({
         name: 'Actions',
@@ -41,31 +40,30 @@ export default class ReportingColums {
         render: item => {
           return (
             <div>
-              <EuiToolTip position="top" content={`Download report`}>
+              <EuiToolTip position='top' content={`Download report`}>
                 <EuiButtonIcon
-                  aria-label="Dowload report"
-                  iconType="importAction"
+                  aria-label='Dowload report'
+                  iconType='importAction'
                   onClick={() => this.goReport(item.name)}
-                  color="primary"
+                  color='primary'
                 />
               </EuiToolTip>
 
-              <WzButtonPermissions
+              <WzButton
                 buttonType='icon'
-                roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
-                aria-label="Delete report"
-                iconType="trash"
-                tooltip={{position: 'top', content: 'Delete report'}}
+                aria-label='Delete report'
+                iconType='trash'
+                tooltip={{ position: 'top', content: 'Delete report' }}
                 onClick={async () => {
                   this.tableProps.updateListItemsForRemove([item]);
                   this.tableProps.updateShowModal(true);
                 }}
-                color="danger"
+                color='danger'
                 isDisabled={item.name === 'default'}
               />
             </div>
           );
-        }
+        },
       });
     };
 

@@ -1,9 +1,8 @@
 import { useState, useRef } from 'react';
-import { isEqual } from 'lodash';
+import { isEqual, get, set, cloneDeep } from 'lodash';
 import { EpluginSettingType } from '../../../../common/constants';
 import {
   CustomSettingType,
-  EnhancedFields,
   FormConfiguration,
   SettingTypes,
   UseFormReturn,
@@ -36,100 +35,256 @@ const getValueFromEventType: IgetValueFromEventType = {
   [EpluginSettingType.text]: (event: any) => event.target.value,
   [EpluginSettingType.textarea]: (event: any) => event.target.value,
   [EpluginSettingType.number]: (event: any) => event.target.value,
+  [EpluginSettingType.password]: (event: any) => event.target.value,
   custom: (event: any) => event.target.value,
   default: (event: any) => event.target.value,
 };
 
+export function getFormFields(fields) {
+  return Object.entries(fields).reduce(
+    (accum, [fieldKey, fieldConfiguration]) => {
+      return {
+        ...accum,
+        [fieldKey]: {
+          ...(fieldConfiguration.type === 'arrayOf'
+            ? {
+                fields: fieldConfiguration.initialValue.map(item =>
+                  getFormFields(
+                    Object.entries(fieldConfiguration.fields).reduce(
+                      (accum, [key]) => ({
+                        ...accum,
+                        [key]: {
+                          initialValue: item[key],
+                          currentValue: item[key],
+                          defaultValue: fieldConfiguration?.defaultValue,
+                        },
+                      }),
+                      {},
+                    ),
+                  ),
+                ),
+              }
+            : {
+                currentValue: fieldConfiguration.initialValue,
+                initialValue: fieldConfiguration.initialValue,
+                defaultValue: fieldConfiguration?.defaultValue,
+              }),
+        },
+      };
+    },
+    {},
+  );
+}
+
+export function enhanceFormFields(
+  formFields,
+  {
+    fields,
+    references,
+    setState,
+    pathFieldParent = [],
+    pathFormFieldParent = [],
+  },
+) {
+  return Object.entries(formFields).reduce(
+    (accum, [fieldKey, { currentValue: value, ...restFieldState }]) => {
+      // Define the path to fields object
+      const pathField = [...pathFieldParent, fieldKey];
+      // Define the path to the form fields object
+      const pathFormField = [...pathFormFieldParent, fieldKey];
+      // Get the field form the fields
+      const field = get(fields, pathField);
+
+      return {
+        ...accum,
+        [fieldKey]: {
+          ...(field.type === 'arrayOf'
+            ? {
+                type: field.type,
+                fields: (() => {
+                  return restFieldState.fields.map((fieldState, index) =>
+                    enhanceFormFields(fieldState, {
+                      fields,
+                      references,
+                      setState,
+                      pathFieldParent: [...pathField, 'fields'],
+                      pathFormFieldParent: [...pathFormField, 'fields', index],
+                    }),
+                  );
+                })(),
+                addNewItem: () => {
+                  setState(state => {
+                    const _state = get(state, [...pathField, 'fields']);
+                    const newstate = set(
+                      state,
+                      [...pathField, 'fields', _state.length],
+                      Object.entries(field.fields).reduce(
+                        (accum, [key, { defaultValue }]) => ({
+                          ...accum,
+                          [key]: {
+                            currentValue: cloneDeep(defaultValue),
+                            initialValue: cloneDeep(defaultValue),
+                            defaultValue: cloneDeep(defaultValue),
+                          },
+                        }),
+                        {},
+                      ),
+                    );
+                    return cloneDeep(newstate);
+                  });
+                },
+              }
+            : {
+                ...field,
+                ...restFieldState,
+                type: field.type,
+                value,
+                changed: !isEqual(restFieldState.initialValue, value),
+                error: field?.validate?.(value),
+                setInputRef: (reference: any) => {
+                  set(references, pathFormField, reference);
+                },
+                inputRef: get(references, pathFormField),
+                onChange: (event: any) => {
+                  const inputValue = getValueFromEvent(event, field.type);
+                  const currentValue =
+                    field?.transformChangedInputValue?.(inputValue) ??
+                    inputValue;
+                  setState(state => {
+                    const newState = set(
+                      cloneDeep(state),
+                      [...pathFormField, 'currentValue'],
+                      currentValue,
+                    );
+                    return newState;
+                  });
+                },
+              }),
+        },
+      };
+    },
+    {},
+  );
+}
+
+export function mapFormFields(
+  {
+    formDefinition,
+    formState,
+    pathFieldFormDefinition = [],
+    pathFormState = [],
+  },
+  callbackFormField,
+) {
+  return Object.entries(formState).reduce((accum, [key, value]) => {
+    const pathField = [...pathFieldFormDefinition, key];
+    const fieldDefinition = get(formDefinition, pathField);
+    return {
+      ...accum,
+      [key]:
+        fieldDefinition.type === 'arrayOf'
+          ? {
+              fields: value.fields.map((valueField, index) =>
+                mapFormFields(
+                  {
+                    formDefinition,
+                    formState: valueField,
+                    pathFieldFormDefinition: [...pathField, 'fields'],
+                    pathFormState: [
+                      ...[...pathFormState, key],
+                      'fields',
+                      index,
+                    ],
+                  },
+                  callbackFormField,
+                ),
+              ),
+            }
+          : callbackFormField?.(value, key, {
+              formDefinition,
+              formState,
+              pathFieldFormDefinition,
+              pathFormState: [...pathFormState, key],
+              fieldDefinition,
+            }),
+    };
+  }, {});
+}
+
 export const useForm = (fields: FormConfiguration): UseFormReturn => {
   const [formFields, setFormFields] = useState<{
     [key: string]: { currentValue: any; initialValue: any };
-  }>(
-    Object.entries(fields).reduce(
-      (accum, [fieldKey, fieldConfiguration]) => ({
-        ...accum,
-        [fieldKey]: {
-          currentValue: fieldConfiguration.initialValue,
-          initialValue: fieldConfiguration.initialValue,
-        },
-      }),
-      {},
-    ),
-  );
+  }>(getFormFields(fields));
 
   const fieldRefs = useRef<{ [key: string]: any }>({});
 
-  const enhanceFields = Object.entries(formFields).reduce(
-    (accum, [fieldKey, { currentValue: value, ...restFieldState }]) => ({
-      ...accum,
-      [fieldKey]: {
-        ...fields[fieldKey],
-        ...restFieldState,
-        type: fields[fieldKey].type,
-        value,
-        changed: !isEqual(restFieldState.initialValue, value),
-        error: fields[fieldKey]?.validate?.(value),
-        setInputRef: (reference: any) => {
-          fieldRefs.current[fieldKey] = reference;
-        },
-        inputRef: fieldRefs.current[fieldKey],
-        onChange: (event: any) => {
-          const inputValue = getValueFromEvent(event, fields[fieldKey].type);
-          const currentValue =
-            fields[fieldKey]?.transformChangedInputValue?.(inputValue) ??
-            inputValue;
-          setFormFields(state => ({
-            ...state,
-            [fieldKey]: {
-              ...state[fieldKey],
-              currentValue,
-            },
-          }));
-        },
+  const enhanceFields = enhanceFormFields(formFields, {
+    fields,
+    references: fieldRefs.current,
+    setState: setFormFields,
+    pathFieldParent: [],
+    pathFormFieldParent: [],
+  });
+
+  const { changed, errors } = (() => {
+    const result = {
+      changed: {},
+      errors: {},
+    };
+    mapFormFields(
+      {
+        formDefinition: fields,
+        formState: enhanceFields,
+        pathFieldFormDefinition: [],
+        pathFormState: [],
       },
-    }),
-    {},
-  );
-
-  const changed = Object.fromEntries(
-    Object.entries(enhanceFields as EnhancedFields)
-      .filter(([, { changed }]) => changed)
-      .map(([fieldKey, { value }]) => [
-        fieldKey,
-        fields[fieldKey]?.transformChangedOutputValue?.(value) ?? value,
-      ]),
-  );
-
-  const errors = Object.fromEntries(
-    Object.entries(enhanceFields as EnhancedFields)
-      .filter(([, { error }]) => error)
-      .map(([fieldKey, { error }]) => [fieldKey, error]),
-  );
+      ({ changed, error, value }, _, { pathFormState, fieldDefinition }) => {
+        changed &&
+          (result.changed[pathFormState] =
+            fieldDefinition?.transformChangedOutputValue?.(value) ?? value);
+        error && (result.errors[pathFormState] = error);
+      },
+    );
+    return result;
+  })();
 
   function undoChanges() {
     setFormFields(state =>
-      Object.fromEntries(
-        Object.entries(state).map(([fieldKey, fieldConfiguration]) => [
-          fieldKey,
-          {
-            ...fieldConfiguration,
-            currentValue: fieldConfiguration.initialValue,
-          },
-        ]),
+      mapFormFields(
+        {
+          formDefinition: fields,
+          formState: state,
+          pathFieldFormDefinition: [],
+          pathFormState: [],
+        },
+        state => ({ ...state, currentValue: state.initialValue }),
       ),
     );
   }
 
   function doChanges() {
     setFormFields(state =>
-      Object.fromEntries(
-        Object.entries(state).map(([fieldKey, fieldConfiguration]) => [
-          fieldKey,
-          {
-            ...fieldConfiguration,
-            initialValue: fieldConfiguration.currentValue,
-          },
-        ]),
+      mapFormFields(
+        {
+          formDefinition: fields,
+          formState: state,
+          pathFieldFormDefinition: [],
+          pathFormState: [],
+        },
+        state => ({ ...state, initialValue: state.currentValue }),
       ),
+    );
+  }
+
+  function forEach(callback) {
+    return mapFormFields(
+      {
+        formDefinition: fields,
+        formState: enhanceFields,
+        pathFieldFormDefinition: [],
+        pathFormState: [],
+      },
+      callback,
     );
   }
 
@@ -139,5 +294,6 @@ export const useForm = (fields: FormConfiguration): UseFormReturn => {
     errors,
     undoChanges,
     doChanges,
+    forEach,
   };
 };

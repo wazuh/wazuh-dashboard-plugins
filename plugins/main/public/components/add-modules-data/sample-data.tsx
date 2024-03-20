@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { WzButtonPermissions } from '../../components/common/permissions/button';
 
 import {
@@ -25,8 +25,6 @@ import {
 import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
 import { AppState } from '../../react-services/app-state';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
-
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
@@ -286,7 +284,7 @@ export default class WzSampleData extends Component {
                 {(exists && (
                   <WzButtonPermissions
                     color='danger'
-                    roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
+                    administrator
                     onClick={() => this.removeSampleData(category)}
                   >
                     {(removeDataLoading && 'Removing data') || 'Remove data'}
@@ -294,7 +292,7 @@ export default class WzSampleData extends Component {
                 )) || (
                   <WzButtonPermissions
                     isLoading={addDataLoading}
-                    roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
+                    administrator
                     onClick={() => this.addSampleData(category)}
                   >
                     {(addDataLoading && 'Adding data') || 'Add data'}

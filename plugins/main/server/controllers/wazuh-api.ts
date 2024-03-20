@@ -17,7 +17,6 @@ import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
 import { HTTP_STATUS_CODES } from '../../common/constants';
-import { getCustomizationSetting } from '../../common/services/settings';
 import { addJobToQueue } from '../start/queue';
 import fs from 'fs';
 import jwtDecode from 'jwt-decode';
@@ -27,7 +26,6 @@ import {
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
-import { getConfiguration } from '../lib/get-configuration';
 
 export class WazuhApiCtrl {
   constructor() {}
@@ -75,8 +73,11 @@ export class WazuhApiCtrl {
       }
       let token;
       if (
-        (await context.wazuh_core.cacheAPIUserAllowRunAs.canUse(idHost)) ===
-        context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS.ENABLED
+        (await context.wazuh_core.manageHosts.cacheAPIUserAllowRunAs.canUse(
+          idHost,
+        )) ===
+        context.wazuh_core.manageHosts.cacheAPIUserAllowRunAs
+          .API_USER_STATUS_RUN_AS.ENABLED
       ) {
         token = await context.wazuh.api.client.asCurrentUser.authenticate(
           idHost,
@@ -129,17 +130,16 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      // Get config from wazuh.yml
+      // Get config from configuration
       const id = request.body.id;
       context.wazuh.logger.debug(`Getting server API host by ID: ${id}`);
-      const api = await context.wazuh_core.manageHosts.getHostById(id);
+      const apiHostData = await context.wazuh_core.manageHosts.get(id, {
+        excludePassword: true,
+      });
+      const api = { ...apiHostData };
       context.wazuh.logger.debug(
         `Server API host data: ${JSON.stringify(api)}`,
       );
-      // Check Manage Hosts
-      if (!Object.keys(api).length) {
-        throw new Error('Could not find server API entry in the configuration');
-      }
 
       context.wazuh.logger.debug(`${id} exists`);
 
@@ -237,15 +237,10 @@ export class WazuhApiCtrl {
               api.cluster_info,
             );
 
-            // Hide Wazuh API secret, username, password
-            const copied = { ...api };
-            copied.secret = '****';
-            copied.password = '****';
-
             return response.ok({
               body: {
                 statusCode: HTTP_STATUS_CODES.OK,
-                data: copied,
+                data: api,
                 idChanged: request.body.idChanged || null,
               },
             });
@@ -275,10 +270,10 @@ export class WazuhApiCtrl {
         });
       } else {
         try {
-          const apis = await context.wazuh_core.manageHosts.getHosts();
+          const apis = await context.wazuh_core.manageHosts.get();
           for (const api of apis) {
             try {
-              const id = Object.keys(api)[0];
+              const { id } = api;
 
               const responseManagerInfo =
                 await context.wazuh.api.client.asInternalUser.request(
@@ -371,9 +366,9 @@ export class WazuhApiCtrl {
       // if (notValid) return ErrorResponse(notValid, 3003, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, response);
       context.wazuh.logger.debug(`${request.body.id} is valid`);
       // Check if a Wazuh API id is given (already stored API)
-      const data = await context.wazuh_core.manageHosts.getHostById(
-        request.body.id,
-      );
+      const data = await context.wazuh_core.manageHosts.get(request.body.id, {
+        excludePassword: true,
+      });
       if (data) {
         apiAvailable = data;
       } else {
@@ -436,8 +431,8 @@ export class WazuhApiCtrl {
 
           // Check the run_as for the API user and update it
           let apiUserAllowRunAs =
-            context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
-              .ALL_DISABLED;
+            context.wazuh_core.manageHosts.cacheAPIUserAllowRunAs
+              .API_USER_STATUS_RUN_AS.ALL_DISABLED;
           const responseApiUserAllowRunAs =
             await context.wazuh.api.client.asInternalUser.request(
               'GET',
@@ -453,25 +448,25 @@ export class WazuhApiCtrl {
             if (allow_run_as && apiAvailable && apiAvailable.run_as)
               // HOST AND USER ENABLED
               apiUserAllowRunAs =
-                context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
-                  .ENABLED;
+                context.wazuh_core.manageHosts.cacheAPIUserAllowRunAs
+                  .API_USER_STATUS_RUN_AS.ENABLED;
             else if (!allow_run_as && apiAvailable && apiAvailable.run_as)
               // HOST ENABLED AND USER DISABLED
               apiUserAllowRunAs =
-                context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
-                  .USER_NOT_ALLOWED;
+                context.wazuh_core.manageHosts.cacheAPIUserAllowRunAs
+                  .API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED;
             else if (allow_run_as && (!apiAvailable || !apiAvailable.run_as))
               // USER ENABLED AND HOST DISABLED
               apiUserAllowRunAs =
-                context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
-                  .HOST_DISABLED;
+                context.wazuh_core.manageHosts.cacheAPIUserAllowRunAs
+                  .API_USER_STATUS_RUN_AS.HOST_DISABLED;
             else if (!allow_run_as && (!apiAvailable || !apiAvailable.run_as))
               // HOST AND USER DISABLED
               apiUserAllowRunAs =
-                context.wazuh_core.cacheAPIUserAllowRunAs.API_USER_STATUS_RUN_AS
-                  .ALL_DISABLED;
+                context.wazuh_core.manageHosts.cacheAPIUserAllowRunAs
+                  .API_USER_STATUS_RUN_AS.ALL_DISABLED;
           }
-          context.wazuh_core.cacheAPIUserAllowRunAs.set(
+          context.wazuh_core.manageHosts.cacheAPIUserAllowRunAs.set(
             request.body.id,
             apiAvailable.username,
             apiUserAllowRunAs,
@@ -665,12 +660,12 @@ export class WazuhApiCtrl {
   async makeRequest(context, method, path, data, id, response) {
     const devTools = !!(data || {}).devTools;
     try {
-      const api = await context.wazuh_core.manageHosts.getHostById(id);
-      if (devTools) {
-        delete data.devTools;
-      }
-
-      if (!Object.keys(api).length) {
+      let api;
+      try {
+        api = await context.wazuh_core.manageHosts.get(id, {
+          excludePassword: true,
+        });
+      } catch (error) {
         context.wazuh.logger.error('Could not get host credentials');
         //Can not get credentials from wazuh-hosts
         return ErrorResponse(
@@ -679,6 +674,10 @@ export class WazuhApiCtrl {
           HTTP_STATUS_CODES.NOT_FOUND,
           response,
         );
+      }
+
+      if (devTools) {
+        delete data.devTools;
       }
 
       if (!data) {
@@ -1258,16 +1257,18 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const configuration = getConfiguration();
       const APP_LOGO = 'customization.logo.app';
       const HEALTHCHECK_LOGO = 'customization.logo.healthcheck';
 
       const logos = {
-        [APP_LOGO]: getCustomizationSetting(configuration, APP_LOGO),
-        [HEALTHCHECK_LOGO]: getCustomizationSetting(
-          configuration,
-          HEALTHCHECK_LOGO,
-        ),
+        [APP_LOGO]:
+          await context.wazuh_core.configuration.getCustomizationSetting(
+            APP_LOGO,
+          ),
+        [HEALTHCHECK_LOGO]:
+          await context.wazuh_core.configuration.getCustomizationSetting(
+            HEALTHCHECK_LOGO,
+          ),
       };
 
       return response.ok({

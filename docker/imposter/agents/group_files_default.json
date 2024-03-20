@@ -1,0 +1,27 @@
+{
+  "data": {
+    "vars": "None",
+    "controls": [
+      {
+        "name": "CIS - Testing against the CIS Debian Linux Benchmark v1.",
+        "cis": [],
+        "pci": [],
+        "condition": "all required",
+        "reference": "CIS_Debian_Benchmark_v1.0pdf",
+        "checks": [
+          "f:/etc/debian_version;",
+          "f:/proc/sys/kernel/ostype -> Linux;"
+        ]
+      },
+      {
+        "name": "CIS - Debian Linux - 1.4 - Robust partition scheme - /tmp is not on its own partition",
+        "cis": [],
+        "pci": [],
+        "condition": "any",
+        "reference": "https://benchmarks.cisecurity.org/tools2/linux/CIS_Debian_Benchmark_v1.0.pdf",
+        "checks": ["f:/etc/fstab -> !r:/tmp;"]
+      }
+    ]
+  },
+  "error": 0
+}

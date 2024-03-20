@@ -62,10 +62,6 @@ function mockContextCreator(loggerLevel: string) {
   return ctx;
 }
 
-jest.mock('../../lib/get-configuration', () => ({
-  getConfiguration: () => ({ pattern: 'wazuh-alerts-*' }),
-}));
-
 beforeAll(() => {
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
   createDataDirectoryIfNotExists();
