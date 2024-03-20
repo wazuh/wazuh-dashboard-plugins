@@ -180,7 +180,7 @@ export class ManageHosts {
       await this.configuration.set({
         hosts: updatedHosts,
       });
-      const host = (await this.get(hostID, {
+      const host = (await this.get(updatedHostID, {
         excludePassword: true,
       })) as IAPIHost;
       this.getRegistryDataByHost(host);
