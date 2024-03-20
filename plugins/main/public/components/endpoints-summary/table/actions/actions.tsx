@@ -8,6 +8,7 @@ import { Agent } from '../../types';
 
 export const agentsTableActions = (
   allowEditGroups: boolean,
+  allowUpgrade: boolean,
   setAgent: (agent: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
   setIsUpgradeModalVisible: (visible: boolean) => void,
@@ -124,7 +125,11 @@ export const agentsTableActions = (
       const isOutdated = !!outdatedAgents.find(
         outdatedAgent => outdatedAgent.id === agent.id,
       );
-      return agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated;
+      return (
+        allowUpgrade &&
+        agent.status === API_NAME_AGENT_STATUS.ACTIVE &&
+        isOutdated
+      );
     },
   },
 ];

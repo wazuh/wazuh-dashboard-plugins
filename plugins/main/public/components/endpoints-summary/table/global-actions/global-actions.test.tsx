@@ -18,12 +18,16 @@ describe('AgentsTableGlobalActions component', () => {
         filters={{}}
         allowEditGroups={true}
         reloadAgents={() => {}}
+        setIsUpgradeTasksModalVisible={() => {}}
+        setIsUpgradePanelClosed={() => {}}
+        allowUpgrade={true}
+        allowGetTasks={true}
       />,
     );
 
     expect(container).toMatchSnapshot();
 
-    const option = getByText('Add/Remove groups');
+    const option = getByText('More');
     expect(option).toBeInTheDocument();
   });
 
@@ -36,10 +40,14 @@ describe('AgentsTableGlobalActions component', () => {
         filters={{}}
         allowEditGroups={true}
         reloadAgents={() => {}}
+        setIsUpgradeTasksModalVisible={() => {}}
+        setIsUpgradePanelClosed={() => {}}
+        allowUpgrade={true}
+        allowGetTasks={true}
       />,
     );
 
-    const option = getByText('Add/Remove groups');
+    const option = getByText('More');
     expect(option).toBeInTheDocument();
 
     act(() => {

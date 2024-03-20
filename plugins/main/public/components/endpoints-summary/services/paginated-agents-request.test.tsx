@@ -1,4 +1,4 @@
-import { paginatedAgentsGroupService } from './paginated-agents-group';
+import { paginatedAgentsRequestService } from './paginated-agents-request';
 import { WzRequest } from '../../../react-services/wz-request';
 
 jest.mock('../../../react-services/wz-request', () => ({
@@ -7,7 +7,7 @@ jest.mock('../../../react-services/wz-request', () => ({
   },
 }));
 
-describe('paginatedAgentsGroupService', () => {
+describe('paginatedAgentsRequestService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -46,13 +46,14 @@ describe('paginatedAgentsGroupService', () => {
     );
 
     const params = {
-      addOrRemove: 'add' as any,
+      method: 'PUT' as any,
+      url: '/agents/group',
       agentIds: ['agent1', 'agent2', 'agent3'],
       groupId: 'group1',
       pageSize: 2,
     };
 
-    const result = await paginatedAgentsGroupService(params);
+    const result = await paginatedAgentsRequestService(params);
 
     expect(WzRequest.apiReq).toHaveBeenCalledWith(
       'PUT',
@@ -146,13 +147,14 @@ describe('paginatedAgentsGroupService', () => {
     );
 
     const params = {
-      addOrRemove: 'add' as any,
+      method: 'PUT' as any,
+      url: '/agents/group',
       agentIds: ['agent1', 'agent2', 'agent3'],
       groupId: 'group1',
       pageSize: 2,
     };
 
-    const result = await paginatedAgentsGroupService(params);
+    const result = await paginatedAgentsRequestService(params);
 
     expect(WzRequest.apiReq).toHaveBeenCalledWith(
       'PUT',
