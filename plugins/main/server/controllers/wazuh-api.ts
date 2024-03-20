@@ -84,7 +84,6 @@ export class WazuhApiCtrl {
           idHost,
         );
       }
-      console.log('HELLO2');
 
       let textSecure = '';
       if (context.wazuh.server.info.protocol === 'https') {
