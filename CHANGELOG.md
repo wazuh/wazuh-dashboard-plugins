@@ -23,6 +23,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Change the view of API is down and check connection to Server APIs application [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Changed the usage of the endpoint GET /groups/{group_id}/files/{file_name} [#6385](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6385)
 - Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
+- Remove AngularJS controllers and views of Tools and Dev Tools [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
 
 ### Fixed
 
