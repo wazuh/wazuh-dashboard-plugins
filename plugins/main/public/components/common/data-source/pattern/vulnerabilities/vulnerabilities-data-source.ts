@@ -37,7 +37,7 @@ export class VulnerabilitiesDataSource extends PatternDataSource {
     getRuleGroupsFilter() {
         return [{
             meta: {
-                //removable: false, // not exists in the original type - removed to preserve the original type
+                removable: false, // used to hide the close icon in the filter
                 index: this.id,
                 negate: false,
                 disabled: false,
@@ -70,7 +70,5 @@ export class VulnerabilitiesDataSource extends PatternDataSource {
             ...this.getClusterManagerFilters(),
         ]
     }
-    
-
 
 }

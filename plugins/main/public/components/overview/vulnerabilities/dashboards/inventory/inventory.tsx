@@ -46,7 +46,7 @@ import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 
-import { VulnerabilitiesDataSourceRepository, VulnerabilitiesDataSourceFactory } from '../../../../common/data-source';
+import { VulnerabilitiesDataSourceRepository, VulnerabilitiesDataSourceFactory, tFilter, tParsedIndexPattern, PatternDataSource } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { FilterManager } from '../../../../../../../../src/plugins/data/public';
 
@@ -54,7 +54,7 @@ const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
   const VULNERABILITIES_INDEX_PATTERN_ID =
     appConfig.data['vulnerabilities.pattern'];
-  const filterManager = useFilterManager().filterManager as FilterManager;  
+  const filterManager = useFilterManager().filterManager as FilterManager;
   const {
     dataSource,
     filters: defaultFilters,
@@ -62,24 +62,22 @@ const InventoryVulsComponent = () => {
     setFilters,
     isLoading: isDataSourceLoading,
     fetchData,
-  } = useDataSource({
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     filters: filterManager.getFilters(),
     factory: new VulnerabilitiesDataSourceFactory(),
     repository: new VulnerabilitiesDataSourceRepository()
   });
 
   useEffect(() => {
-    if(!isDataSourceLoading) {
-      console.log('default filters', defaultFilters);
-      console.log('filters manager filters', filterManager.getFilters());
+    if (!isDataSourceLoading) {
       filterManager.setFilters(defaultFilters);
     }
   }, [isDataSourceLoading])
-  
+
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
   });
-  const { isLoading, filters: searchBarFilters , query, indexPatterns } = searchBarProps;
+  const { isLoading, filters: searchBarFilters, query } = searchBarProps;
 
   const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -133,7 +131,7 @@ const InventoryVulsComponent = () => {
 
   const onClickExportResults = async () => {
     const params = {
-      indexPattern: indexPatterns?.[0] as IndexPattern,
+      indexPattern: indexPattern as IndexPattern,
       filters: fetchFilters,
       query,
       fields: columnVisibility.visibleColumns,
@@ -157,37 +155,37 @@ const InventoryVulsComponent = () => {
     }
   };
 
-
   useEffect(() => {
     if (!isLoading) {
-      setIndexPattern(indexPatterns?.[0]);
-      setIsSearching(true);
-      fetchData(
-        {
-          query,
-          pagination,
-          sorting,
-        }
-      )
-        .then(results => {
-          console.log('results', results);
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching vulnerabilities',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
+      setFilters(searchBarFilters as tFilter[]);
     }
   }, [
-    JSON.stringify(searchBarProps), 
+    JSON.stringify(searchBarFilters)
+  ]);
+
+  useEffect(() => {
+    if (isLoading || isDataSourceLoading) {
+      return;
+    }
+    setIndexPattern(dataSource?.indexPattern);
+    fetchData({ query, pagination, sorting })
+      .then(results => {
+        console.log('results', results);
+        setResults(results);
+      })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching vulnerabilities',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
-  ]);
+  ])
 
   return (
     <IntlProvider locale='en'>
@@ -210,11 +208,10 @@ const InventoryVulsComponent = () => {
                 showQueryBar={true}
               />
             )}
-            {isSearching ? <LoadingSpinner /> : null}
-            {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+            {!isLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
             ) : null}
-            {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+            {!isLoading && results?.hits?.total > 0 ? (
               <EuiDataGrid
                 {...dataGridProps}
                 className={sideNavDocked ? 'dataGridDockedNav' : ''}
@@ -224,18 +221,18 @@ const InventoryVulsComponent = () => {
                       <HitsCounter
                         hits={results?.hits?.total}
                         showResetButton={false}
-                        onResetQuery={() => {}}
+                        onResetQuery={() => { }}
                         tooltip={
                           results?.hits?.total &&
-                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
                             ? {
-                                ariaLabel: 'Warning',
-                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits.`,
-                                iconType: 'alert',
-                                position: 'top',
-                              }
+                              ariaLabel: 'Warning',
+                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                MAX_ENTRIES_PER_QUERY,
+                              )} hits.`,
+                              iconType: 'alert',
+                              position: 'top',
+                            }
                             : undefined
                         }
                       />

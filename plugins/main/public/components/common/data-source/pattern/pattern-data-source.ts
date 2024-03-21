@@ -1,6 +1,6 @@
 import { tDataSource, tSearchParams, tFilter } from "../index";
 import { getDataPlugin } from '../../../../kibana-services';
-import { Filter, IndexPatternsContract, OpenSearchQuerySortValue } from "../../../../../../../src/plugins/data/public";
+import { Filter, IndexPatternsContract, IndexPattern } from "../../../../../../../src/plugins/data/public";
 import { search } from '../../search-bar/search-bar-service';
 
 export class PatternDataSource implements tDataSource { 
@@ -8,18 +8,21 @@ export class PatternDataSource implements tDataSource {
     title: string;
     fields: any[];
     patternService: IndexPatternsContract;
+    indexPattern: IndexPattern;
     defaultFixedFilters: tFilter[];
 
     constructor(id: string, title: string) {
         this.id = id;
         this.title = title;
     }
+    setFilters: (filters: Filter[]) => void | Promise<void>;
 
     /**
      * Initialize the data source
      */
     async init(){
         this.patternService = await getDataPlugin().indexPatterns;
+        this.indexPattern = await this.patternService.get(this.id);
     }
 
     getFilters(){
@@ -30,8 +33,12 @@ export class PatternDataSource implements tDataSource {
         return this.fields;
     }
 
-    getFixedFilters():Filter[]{
+    getFixedFilters(): tFilter[]{
         // return all filters
+        return [];
+    }
+
+    getFetchFilters(): tFilter[]{
         return [];
     }
 
@@ -61,8 +68,7 @@ export class PatternDataSource implements tDataSource {
         }
     
         try {
-            const results = await search(
-                {
+            const results = await search({
                     indexPattern,
                     filters: defaultFilters,
                     query,
@@ -77,11 +83,6 @@ export class PatternDataSource implements tDataSource {
             throw new Error(`Error fetching data: ${error}`);
         }
         
-    }
-
-
-    getFetchFilters(){
-        return [];
     }
 
 }

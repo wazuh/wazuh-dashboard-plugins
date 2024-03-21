@@ -8,5 +8,6 @@ export type tDataSource = {
     setFilters: (filters: tFilter[]) => Promise<void> | void;
     getFields: () => Promise<any[]> | any[];
     getFixedFilters: () => tFilter[];
+    getFetchFilters: () => tFilter[];
     fetch: (params: tSearchParams) => Promise<any>;
 }

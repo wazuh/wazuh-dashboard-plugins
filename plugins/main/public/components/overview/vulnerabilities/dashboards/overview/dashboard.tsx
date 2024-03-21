@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
@@ -13,14 +13,6 @@ import { withErrorBoundary } from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
 import {
-  vulnerabilityIndexFiltersAdapter,
-  restorePrevIndexFiltersAdapter,
-  onUpdateAdapter,
-  updateFiltersStorage,
-} from '../../common/vulnerability_detector_adapters';
-import { search } from '../../../../common/search-bar/search-bar-service';
-import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
-import {
   ErrorFactory,
   ErrorHandler,
   HttpError,
@@ -28,17 +20,19 @@ import {
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
-import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
-import { DashboardContainerInput } from '../../../../../../../../src/plugins/dashboard/public';
 
-import { VulnerabilitiesDataSourceRepository, VulnerabilitiesDataSourceFactory } from '../../../../common/data-source';
+import {
+  VulnerabilitiesDataSourceRepository,
+  VulnerabilitiesDataSourceFactory,
+  PatternDataSource,
+  tFilter,
+  tParsedIndexPattern
+} from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { FilterManager } from '../../../../../../../../src/plugins/data/public';
 
 const plugins = getPlugins();
-
 const SearchBar = getPlugins().data.ui.SearchBar;
-
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 /* The vulnerabilities dashboard is made up of 3 dashboards because the filters need
@@ -49,7 +43,7 @@ const DashboardVulsComponent: React.FC = () => {
   const appConfig = useAppConfig();
   const VULNERABILITIES_INDEX_PATTERN_ID =
     appConfig.data['vulnerabilities.pattern'];
-  const filterManager = useFilterManager().filterManager as FilterManager;  
+  const filterManager = useFilterManager().filterManager as FilterManager;
   const {
     dataSource,
     filters: defaultFilters,
@@ -57,14 +51,14 @@ const DashboardVulsComponent: React.FC = () => {
     setFilters,
     isLoading: isDataSourceLoading,
     fetchData,
-  } = useDataSource({
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     filters: filterManager.getFilters(),
     factory: new VulnerabilitiesDataSourceFactory(),
     repository: new VulnerabilitiesDataSourceRepository()
   });
 
   useEffect(() => {
-    if(!isDataSourceLoading) {
+    if (!isDataSourceLoading) {
       filterManager.setFilters(defaultFilters);
     }
   }, [isDataSourceLoading])
@@ -72,34 +66,37 @@ const DashboardVulsComponent: React.FC = () => {
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
   });
-  const { isLoading, query, indexPatterns } = searchBarProps;
 
-  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const { isLoading, query, filters: searchBarFilters } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
   useEffect(() => {
     if (!isLoading) {
-      setIsSearching(true);
-      fetchData(
-        {
-          query,
-        }
-      )
-        .then(results => {
-          console.log('results', results);
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching vulnerabilities',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
+      setFilters(searchBarFilters as tFilter[]);
     }
-  }, [JSON.stringify(searchBarProps), JSON.stringify(fetchFilters)]);
+  }, [
+    JSON.stringify(searchBarFilters)
+  ]);
+
+  useEffect(() => {
+    if (isLoading || isDataSourceLoading) {
+      return;
+    }
+    fetchData({ query }).then(results => {
+        console.log('results', results);
+        setResults(results);
+      })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching vulnerabilities',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query)
+  ])
 
   return (
     <>
@@ -116,11 +113,10 @@ const DashboardVulsComponent: React.FC = () => {
               showQueryBar={true}
             />
           ) : null}
-          {isSearching ? <LoadingSpinner /> : null}
-          {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+          {!isLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
-          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+          {!isLoading && results?.hits?.total > 0 ? (
             <div className='vulnerability-dashboard-responsive'>
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer

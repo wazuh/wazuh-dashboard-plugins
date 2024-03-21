@@ -127,7 +127,8 @@ export class DataSourceSelector implements tDataSourceSelector {
                 await this.selectDataSource(validDataSource.id);
                 return validDataSource;
             }
-            return defaultDataSource;
+            
+            return await this.getDataSource(defaultDataSource.id);
         } catch (error) {
             const validateDataSource = await this.getFirstValidDataSource();
             await this.selectDataSource(validateDataSource.id);

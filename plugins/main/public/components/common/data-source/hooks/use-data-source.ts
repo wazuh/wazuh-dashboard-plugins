@@ -14,9 +14,9 @@ type tUseDataSourceProps<T, K> = {
     repository: DataSourceRepository<T, K>;
 }
 
-type tUseDataSourceLoadedReturns = {
+type tUseDataSourceLoadedReturns<K> = {
     isLoading: boolean;
-    dataSource: tDataSource;
+    dataSource: K;
     filters: tFilter[];
     fetchFilters: tFilter[];
     fixedFilters: tFilter[];
@@ -34,7 +34,7 @@ type tUseDataSourceNotLoadedReturns = {
     setFilters: (filters: tFilter[]) => void;
 }
 
-export function useDataSource<T, K>(props: tUseDataSourceProps<T, K>): tUseDataSourceLoadedReturns | tUseDataSourceNotLoadedReturns {
+export function useDataSource<T, K>(props: tUseDataSourceProps<T, K>): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
     const { filters: defaultFilters = [], factory, repository } = props;
 
     if (!factory || !repository) {
@@ -70,7 +70,7 @@ export function useDataSource<T, K>(props: tUseDataSourceProps<T, K>): tUseDataS
     const init = async () => {
         setIsLoading(true);
         const selector = new DataSourceSelector(repository, factory);
-        const dataSource = await selector.getFirstValidDataSource();
+        const dataSource = await selector.getSelectedDataSource();
         if (!dataSource) {
             throw new Error('No valid data source found');
         }

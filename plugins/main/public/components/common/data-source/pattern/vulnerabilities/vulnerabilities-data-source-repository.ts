@@ -33,4 +33,12 @@ export class VulnerabilitiesDataSourceRepository extends PatternDataSourceReposi
         return false;
     }
 
+    getDefault(){
+        return null;
+    }
+
+    setDefault(dataSource: tDataSource){
+        return null;
+    }
+
 }

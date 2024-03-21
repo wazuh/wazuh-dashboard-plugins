@@ -2,37 +2,7 @@ import { tDataSource } from "./data-source";
 import { tFilter, tSearchParams } from "./search-params-builder";
 import store from '../../../redux/store';
 import { getFilterExcludeManager, getFilterAllowedAgents } from '../../../react-services/data-sources/vulnerabilities-states';
-import { DATA_SOURCE_FILTER_CONTROLLER_PINNED_AGENT } from "../../../../common/constants";
-
-
-type FiltersStateRepository = {
-  getAllowAgents: () => string[];
-  getExcludeManager: () => boolean;
-  getPinnedAgent: () => object;
-}
-
-
-/**
- * Use case
- * 
- * - The data source filter manager receives the filters from the filter manager
- * - When the filters received only store the filters that was added by the user. 
- *  Not have the property isImplicit ($state.isImplicit) defined or not have the meta.controlledBy property defined
- *  Also, when the meta.index is not the same as the dataSource.id
- * 
- * - Then add the fixedFilters and concatenate with the user filters
- */
-
-
-/**
- * Get the filters from the filter manager
- * 
- * - filter the filters that was added by the user
- * - check if agent is pinned (check in session storage or redux store if is possible wz-shared-selected-agent)
- * 
- * Add filters only necessary to fetch the data from the data source
- * - 
- */
+import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from "../../../../common/constants";
 
 export type tDataSourceFilterManager = {
   fetch: () => Promise<any>;
@@ -69,7 +39,7 @@ export class DataSourceFilterManager implements tDataSourceFilterManager {
   }
 
   setFilters(filters: tFilter[]) {
-    this.filters = this.filterUserFilters(filters);
+    this.filters = this.filterUserFilters(filters) || [];
   }
 
   /**
@@ -167,6 +137,7 @@ export class DataSourceFilterManager implements tDataSourceFilterManager {
     if (!agentId) return [];
     return [{
       meta: {
+        removable: false, // used to hide the close icon in the filter
         alias: null,
         disabled: false,
         key: 'agent.id',
@@ -174,7 +145,7 @@ export class DataSourceFilterManager implements tDataSourceFilterManager {
         params: { query: agentId },
         type: 'phrase',
         index: this.dataSource.id,
-        controlledBy: DATA_SOURCE_FILTER_CONTROLLER_PINNED_AGENT
+        controlledBy: DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT
       },
       query: {
         match: {
