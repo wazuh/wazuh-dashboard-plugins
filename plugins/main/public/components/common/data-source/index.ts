@@ -6,3 +6,4 @@ export * from './data-source-filter-manager';
 export * from './pattern';
 export * from './search-params-builder';
 export * from './hooks';
+export * from './pattern';

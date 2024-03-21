@@ -84,6 +84,4 @@ export class PatternDataSource implements tDataSource {
         return [];
     }
 
-
-
 }
