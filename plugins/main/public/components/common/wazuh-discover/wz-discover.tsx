@@ -43,6 +43,15 @@ const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 import { withErrorBoundary } from '../hocs';
+import { useFilterManager } from '../hooks';
+import { FilterManager } from '../../../../../../src/plugins/data/public';
+import { 
+  useDataSource, 
+  tParsedIndexPattern, 
+  PatternDataSource, 
+  AlertsDataSourceRepository,
+  PatternDataSourceFactory
+} from '../data-source';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -63,6 +72,26 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
   const [indexPatternTitle, setIndexPatternTitle] = useState<string>('');
+
+  const filterManager = useFilterManager().filterManager as FilterManager;
+  const {
+    dataSource,
+    filters: defaultFilters,
+    fetchFilters,
+    setFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    filters: filterManager.getFilters(),
+    factory: new PatternDataSourceFactory(),
+    repository: new AlertsDataSourceRepository()
+  });
+
+  useEffect(() => {
+    if (!isDataSourceLoading) {
+      filterManager.setFilters(defaultFilters);
+    }
+  }, [isDataSourceLoading])
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
@@ -92,9 +121,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   });
   const {
     isLoading,
-    filters,
+    filters: searchBarFilters,
     query,
-    indexPatterns,
     dateRangeFrom,
     dateRangeTo,
   } = searchBarProps;
@@ -119,6 +147,40 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     indexPattern: indexPattern as IndexPattern,
   });
 
+
+  useEffect(() => {
+    if (!isLoading) {
+      setFilters(searchBarFilters as tFilter[]);
+    }
+  }, [
+    JSON.stringify(searchBarFilters)
+  ]);
+
+  useEffect(() => {
+    if (isLoading || isDataSourceLoading) {
+      return;
+    }
+    setIndexPattern(dataSource?.indexPattern);
+    fetchData({ query, pagination, sorting })
+      .then(results => {
+        console.log('results', results);
+        setResults(results);
+      })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching vulnerabilities',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(pagination),
+    JSON.stringify(sorting),
+  ])
+
+
   const currentIndexPattern = useIndexPattern();
 
   useEffect(() => {
@@ -128,39 +190,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     }
   }, [currentIndexPattern])
 
-  useEffect(() => {
-    if (!isLoading && indexPattern) {
-      setIsSearching(true);
-      search({
-        indexPattern: indexPattern as IndexPattern,
-        filters,
-        query,
-        pagination,
-        sorting,
-        dateRange: {
-          from: dateRangeFrom,
-          to: dateRangeTo,
-        },
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching data',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
-    }
-  }, [
-    JSON.stringify(searchBarProps),
-    JSON.stringify(pagination),
-    JSON.stringify(sorting),
-  ]);
-
   const timeField = indexPattern?.timeFieldName
     ? indexPattern.timeFieldName
     : undefined;
@@ -168,7 +197,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const onClickExportResults = async () => {
     const params = {
       indexPattern: indexPattern as IndexPattern,
-      filters,
+      fetchFilters,
       query,
       fields: columnVisibility.visibleColumns,
       pagination: {
@@ -200,7 +229,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         grow
       >
         <>
-          {isLoading ? (
+          {isLoading || isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
             <SearchBar
@@ -225,7 +254,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     <DashboardByRenderer
                       input={histogramChartInput(
                         indexPatternTitle,
-                        filters,
+                        fetchFilters,
                         query,
                         dateRangeFrom,
                         dateRangeTo,
