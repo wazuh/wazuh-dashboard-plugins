@@ -8,7 +8,7 @@ import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { getDashboardFilters } from './dashboard_panels_filters';
 import './vulnerability_detector_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
-import { useAppConfig } from '../../../../common/hooks';
+import { useAppConfig, useFilterManager } from '../../../../common/hooks';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
@@ -31,15 +31,9 @@ import { ModuleEnabledCheck } from '../../common/components/check-module-enabled
 import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
 import { DashboardContainerInput } from '../../../../../../../../src/plugins/dashboard/public';
 
-import { 
-  DataSourceSelector, 
-  VulnerabilitiesDataSourceRepository, 
-  PatternDataSourceFactory,
-  DataSourceFilterManager, 
-  AlertsDataSourceRepository} from '../../../../common/data-source';
-import { 
-  VulnerabilitiesDataSourceFactory,
-} from '../../../../common/data-source/pattern/vulnerabilities';
+import { VulnerabilitiesDataSourceRepository, VulnerabilitiesDataSourceFactory } from '../../../../common/data-source';
+import { useDataSource } from '../../../../common/data-source/hooks';
+import { FilterManager } from '../../../../../../../../src/plugins/data/public';
 
 const plugins = getPlugins();
 
@@ -55,59 +49,44 @@ const DashboardVulsComponent: React.FC = () => {
   const appConfig = useAppConfig();
   const VULNERABILITIES_INDEX_PATTERN_ID =
     appConfig.data['vulnerabilities.pattern'];
-  const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
-    /*onMount: vulnerabilityIndexFiltersAdapter,
-    onUpdate: onUpdateAdapter,
-    onUnMount: restorePrevIndexFiltersAdapter,*/
+  const filterManager = useFilterManager().filterManager as FilterManager;  
+  const {
+    dataSource,
+    filters: defaultFilters,
+    fetchFilters,
+    setFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+  } = useDataSource({
+    filters: filterManager.getFilters(),
+    factory: new VulnerabilitiesDataSourceFactory(),
+    repository: new VulnerabilitiesDataSourceRepository()
   });
 
-  const initDataSource = async () => {
-    if(!searchBarProps.dateRangeFrom || !searchBarProps.dateRangeTo){
-      return;
+  useEffect(() => {
+    if(!isDataSourceLoading) {
+      filterManager.setFilters(defaultFilters);
     }
-    const factory = new VulnerabilitiesDataSourceFactory();
-    const repository = new VulnerabilitiesDataSourceRepository();
+  }, [isDataSourceLoading])
 
-    const dataSources = await factory.createAll(await repository.getAll());
-    const dataSource = dataSources[0];
-
-    const filterManager = new DataSourceFilterManager(dataSource, searchBarProps.filters);
-    console.log('DASHBOARD filters', filterManager.getFilters());
-    console.log('DASHBOARD fixed filters', filterManager.getFixedFilters());
-    console.log('DASHBOARD fetch filters', filterManager.getFetchFilters());
-  }
-
-
-  /* This function is responsible for updating the storage filters so that the
-  filters between dashboard and inventory added using visualizations call to actions.
-  Without this feature, filters added using visualizations call to actions are
-  not maintained between dashboard and inventory tabs */
-  const handleFilterByVisualization = (newInput: DashboardContainerInput) => {
-    updateFiltersStorage(newInput.filters);
-  };
-
-  const fetchFilters = DataSourceFilterManagerVulnerabilitiesStates.getFilters(
-    searchBarProps.filters,
-    VULNERABILITIES_INDEX_PATTERN_ID,
-  );
-
+  const { searchBarProps } = useSearchBar({
+    defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
+  });
   const { isLoading, query, indexPatterns } = searchBarProps;
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  
-
   useEffect(() => {
     if (!isLoading) {
-      initDataSource();
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters: fetchFilters,
-        query,
-      })
+      setIsSearching(true);
+      fetchData(
+        {
+          query,
+        }
+      )
         .then(results => {
+          console.log('results', results);
           setResults(results);
           setIsSearching(false);
         })
@@ -168,7 +147,6 @@ const DashboardVulsComponent: React.FC = () => {
                     },
                     hidePanelTitles: true,
                   }}
-                  onInputUpdated={handleFilterByVisualization}
                 />
               </div>
               <DashboardByRenderer
@@ -192,7 +170,6 @@ const DashboardVulsComponent: React.FC = () => {
                   },
                   hidePanelTitles: true,
                 }}
-                onInputUpdated={handleFilterByVisualization}
               />
               <DashboardByRenderer
                 input={{
@@ -215,7 +192,6 @@ const DashboardVulsComponent: React.FC = () => {
                   },
                   hidePanelTitles: false,
                 }}
-                onInputUpdated={handleFilterByVisualization}
               />
             </div>
           ) : null}

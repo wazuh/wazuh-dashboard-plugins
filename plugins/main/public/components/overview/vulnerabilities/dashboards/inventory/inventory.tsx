@@ -31,7 +31,7 @@ import { LoadingSpinner } from '../../common/components/loading_spinner';
 // common components/hooks
 import DocViewer from '../../../../common/doc-viewer/doc-viewer';
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
-import { useAppConfig } from '../../../../common/hooks';
+import { useAppConfig, useFilterManager } from '../../../../common/hooks';
 import { useDataGrid } from '../../../../common/data-grid/use-data-grid';
 import { useDocViewer } from '../../../../common/doc-viewer/use-doc-viewer';
 import { withErrorBoundary } from '../../../../common/hocs';
@@ -45,55 +45,42 @@ import {
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
-import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
 
-import { 
-  DataSourceSelector, 
-  VulnerabilitiesDataSourceRepository, 
-  PatternDataSourceFactory,
-  DataSourceFilterManager, 
-  AlertsDataSourceRepository} from '../../../../common/data-source';
-import { 
-  VulnerabilitiesDataSourceFactory,
-} from '../../../../common/data-source/pattern/vulnerabilities';
-
+import { VulnerabilitiesDataSourceRepository, VulnerabilitiesDataSourceFactory } from '../../../../common/data-source';
+import { useDataSource } from '../../../../common/data-source/hooks';
+import { FilterManager } from '../../../../../../../../src/plugins/data/public';
 
 const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
   const VULNERABILITIES_INDEX_PATTERN_ID =
     appConfig.data['vulnerabilities.pattern'];
-  const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
-    //onMount: vulnerabilityIndexFiltersAdapter,
-    //onUpdate: onUpdateAdapter,
-    //onUnMount: restorePrevIndexFiltersAdapter,
+  const filterManager = useFilterManager().filterManager as FilterManager;  
+  const {
+    dataSource,
+    filters: defaultFilters,
+    fetchFilters,
+    setFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+  } = useDataSource({
+    filters: filterManager.getFilters(),
+    factory: new VulnerabilitiesDataSourceFactory(),
+    repository: new VulnerabilitiesDataSourceRepository()
   });
 
   useEffect(() => {
-    console.log('on mount');
-  }, [])
-
-  const initDataSource = async () => {
-    if(!searchBarProps.dateRangeFrom || !searchBarProps.dateRangeTo){
-      return;
+    if(!isDataSourceLoading) {
+      console.log('default filters', defaultFilters);
+      console.log('filters manager filters', filterManager.getFilters());
+      filterManager.setFilters(defaultFilters);
     }
-    const factory = new VulnerabilitiesDataSourceFactory();
-    const repository = new VulnerabilitiesDataSourceRepository();
+  }, [isDataSourceLoading])
+  
+  const { searchBarProps } = useSearchBar({
+    defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
+  });
+  const { isLoading, filters: searchBarFilters , query, indexPatterns } = searchBarProps;
 
-    const dataSources = await factory.createAll(await repository.getAll());
-    const dataSource = dataSources[0];
-
-    const filterManager = new DataSourceFilterManager(dataSource, searchBarProps.filters);
-    console.log('INVENTORY filters', filterManager.getFilters());
-    console.log('INVENTORY fixed filters', filterManager.getFixedFilters());
-    console.log('INVENTORY fetch filters', filterManager.getFetchFilters());
-  }
-
-  const fetchFilters = DataSourceFilterManagerVulnerabilitiesStates.getFilters(
-    searchBarProps.filters,
-    VULNERABILITIES_INDEX_PATTERN_ID,
-  );
-  const { isLoading, filters, query, indexPatterns } = searchBarProps;
   const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
@@ -143,36 +130,6 @@ const InventoryVulsComponent = () => {
     indexPattern: indexPattern as IndexPattern,
   });
 
-  useEffect(() => {
-    if (!isLoading) {
-      initDataSource();
-      setIndexPattern(indexPatterns?.[0] as IndexPattern);
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters: fetchFilters,
-        query,
-        pagination,
-        sorting,
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching vulnerabilities',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
-    }
-  }, [
-    JSON.stringify(searchBarProps),
-    JSON.stringify(pagination),
-    JSON.stringify(sorting),
-    JSON.stringify(fetchFilters),
-  ]);
 
   const onClickExportResults = async () => {
     const params = {
@@ -200,6 +157,38 @@ const InventoryVulsComponent = () => {
     }
   };
 
+
+  useEffect(() => {
+    if (!isLoading) {
+      setIndexPattern(indexPatterns?.[0]);
+      setIsSearching(true);
+      fetchData(
+        {
+          query,
+          pagination,
+          sorting,
+        }
+      )
+        .then(results => {
+          console.log('results', results);
+          setResults(results);
+          setIsSearching(false);
+        })
+        .catch(error => {
+          const searchError = ErrorFactory.create(HttpError, {
+            error,
+            message: 'Error fetching vulnerabilities',
+          });
+          ErrorHandler.handleError(searchError);
+          setIsSearching(false);
+        });
+    }
+  }, [
+    JSON.stringify(searchBarProps), 
+    JSON.stringify(pagination),
+    JSON.stringify(sorting),
+  ]);
+
   return (
     <IntlProvider locale='en'>
       <>
@@ -210,7 +199,7 @@ const InventoryVulsComponent = () => {
           grow
         >
           <>
-            {isLoading ? (
+            {isLoading || isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
               <SearchBar
