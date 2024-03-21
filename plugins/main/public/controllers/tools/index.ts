@@ -9,15 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ToolsController } from './tools';
 import { getAngularModule } from '../../kibana-services';
 import { Logtest } from '../../directives/wz-logtest/components/logtest';
-import { DevToolsController } from '../dev-tools/dev-tools';
+
+import { ToolsRouter } from '../../components/tools/tools-router';
 
 const app = getAngularModule();
 
 Logtest.displayName = 'Logtest';
-app
-  .controller('devToolsController', DevToolsController)
-  .controller('toolsController', ToolsController)
-  .value('Logtest', Logtest);
+app.value('ToolsRouter', ToolsRouter).value('Logtest', Logtest);
