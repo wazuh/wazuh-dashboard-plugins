@@ -1,32 +1,9 @@
 import { tDataSource } from "./data-source";
-import { tFilter } from "./search-params-builder";
-import { AppState } from '../../../react-services/app-state';
-import { FilterHandler } from '../../../utils/filter-handler';
+import { tFilter, tSearchParams } from "./search-params-builder";
 import store from '../../../redux/store';
 import { getFilterExcludeManager, getFilterAllowedAgents } from '../../../react-services/data-sources/vulnerabilities-states';
+import { DATA_SOURCE_FILTER_CONTROLLER_PINNED_AGENT } from "../../../../common/constants";
 
-const baseFixedFilter = {
-  meta: {
-    index: null,
-    negate: false,
-    disabled: false,
-    alias: null,
-    type: 'phrase',
-    key: null,
-    value: null,
-    params: {
-      query: null,
-      type: 'phrase',
-    },
-  },
-  query: {
-    match: null,
-  },
-  $state: {
-    store: 'appState',
-    isImplicit: true,
-  },
-};
 
 type FiltersStateRepository = {
   getAllowAgents: () => string[];
@@ -57,23 +34,37 @@ type FiltersStateRepository = {
  * - 
  */
 
-export class DataSourceFilterManager {
+export type tDataSourceFilterManager = {
+  fetch: () => Promise<any>;
+  setFilters: (filters: tFilter[]) => void;
+  getFixedFilters: () => tFilter[];
+  getFilters: () => tFilter[];
+  getFetchFilters: () => tFilter[];
+  addMetaDataInFilter: (filter: tFilter) => tFilter;
+  // global filters
+  getPinnedAgentFilter: () => tFilter[];
+  getExcludeManagerFilter: () => tFilter[];
+  getAllowAgentsFilter: () => tFilter[];
+}
+
+export class DataSourceFilterManager implements tDataSourceFilterManager {
 
   constructor(private dataSource: tDataSource, private filters: tFilter[] = []) {
-    if(!dataSource) {
+    if (!dataSource) {
       throw new Error('Data source is required');
     }
     this.dataSource = dataSource;
-    this.filters = this.filterUserFilters(filters);
+    this.filters = filters.length ? this.filterUserFilters(filters) : [];
   }
 
   /**
    * Get the filters necessary to fetch the data from the data source
    * @returns 
    */
-  fetch() {
+  fetch(params: Omit<tSearchParams, 'filters'> = {}): Promise<any> {
     return this.dataSource.fetch({
-      filters: this.getFetchFilters()
+      ...params,
+      filters: this.getFetchFilters(),
     });
   }
 
@@ -90,11 +81,18 @@ export class DataSourceFilterManager {
    * 
    */
   private filterUserFilters(filters: tFilter[]) {
-    return filters.filter(
-      filter => !(filter.$state['isImplicit'] || !filter.meta?.controlledBy || filter.meta?.index !== this.dataSource.id)
-    );
+    if (!filters) return [];
+    return this.removeRepeatedFilters(filters.filter(
+      filter => !(filter?.$state?.['isImplicit'] || filter.meta?.controlledBy || filter.meta?.index !== this.dataSource.id)
+    ));
   }
 
+  /**
+   * Return the fixed filters. The fixed filters are filters that cannot be removed by the user.
+   * The filters for the specific data source are defined in the data source.
+   * Also, exists fixed filters that are defined in the data source filter manager (globally).
+   * @returns 
+   */
   getFixedFilters(): tFilter[] {
     const fixedFilters = this.dataSource.getFixedFilters();
     const pinnedAgent = this.getPinnedAgentFilter();
@@ -105,10 +103,15 @@ export class DataSourceFilterManager {
     ].map(filter => this.addMetaDataInFilter(filter));
   }
 
+  /**
+   * Return the filters that was added by the user and the fixed filters.
+   * This can be use to show the filters in the UI (For instance: SearchBar)
+   * @returns 
+   */
   getFilters() {
     return [
+      ...this.getFixedFilters(),
       ...this.filters,
-      ...this.getFixedFilters()
     ]
   }
 
@@ -117,68 +120,92 @@ export class DataSourceFilterManager {
    * @returns 
    */
   getFetchFilters(): tFilter[] {
-      const filters = this.getFilters();
-      const excludeManager = this.getExcludeManagerFilter();
-      const allowedAgents = this.getAllowAgentsFilter();
+    const filters = this.getFilters();
+    const excludeManager = this.getExcludeManagerFilter();
+    const allowedAgents = this.getAllowAgentsFilter();
 
-      return [
-        ...filters,
-        ...allowedAgents,
-        ...excludeManager
-      ].map(filter => this.addMetaDataInFilter(filter));
-    
+    return [
+      ...filters,
+      ...allowedAgents,
+      ...excludeManager
+    ].map(filter => this.addMetaDataInFilter(filter));
+
+  }
+
+  /**
+   * Remove filter repeated filters in query property
+   * @param filter 
+   * @returns 
+   */
+  
+  removeRepeatedFilters(filters: tFilter) {
+    if (!filters) return filters;
+    const query = filters.query;
+    if (!query) return filters;
+    const keys = Object.keys(query);
+    if (keys.length === 1) {
+      const key = keys[0];
+      if (query[key].query) {
+        query[key].query = Array.isArray(query[key].query) ? Array.from(new Set(query[key].query)) : query[key].query;
+      }
+    }
+    return filters;
   }
 
   addMetaDataInFilter(filter: tFilter) {
-    filter.meta.controlledBy = 'data-source-filter-manager';
+    //check is necessary add the controlled by here or add in the data source
+    //filter.meta.controlledBy = 'data-source-filter-manager';
     //filter.meta.index = this.dataSource.id;
     return filter;
   }
 
+  /**
+   * Returns the filter when the an agent is pinned (saved in the session storage or redux store)
+   */
   getPinnedAgentFilter(): tFilter[] {
-      const agentId = store.getState().appStateReducers?.currentAgentData?.id;
-      if(!agentId) return [];
-      return [{
-        meta: {
-          alias: null,
-          disabled: false,
-          key: 'agent.id',
-          negate: false,
-          params: { query: agentId },
-          type: 'phrase',
-          index: this.dataSource.id,
-          controlledBy: 'wazuh'
-        },
-        query: {
-          match: {
-            'agent.id': {
-              query: agentId,
-              type: 'phrase',
-            },
+    const agentId = store.getState().appStateReducers?.currentAgentData?.id;
+    if (!agentId) return [];
+    return [{
+      meta: {
+        alias: null,
+        disabled: false,
+        key: 'agent.id',
+        negate: false,
+        params: { query: agentId },
+        type: 'phrase',
+        index: this.dataSource.id,
+        controlledBy: DATA_SOURCE_FILTER_CONTROLLER_PINNED_AGENT
+      },
+      query: {
+        match: {
+          'agent.id': {
+            query: agentId,
+            type: 'phrase',
           },
         },
-        $state: { 
-          store: 'appState' // check appStore is not assignable, why is stored here?
-        },
-      } as tFilter]
+      },
+      $state: {
+        store: 'appState' // check appStore is not assignable, why is stored here?
+      },
+    } as tFilter]
   }
 
   /**
-   * Add the filter to exclude the data related to servers (managers) due to the setting hideManagerAlerts is enabled
+   * Return the filter to exclude the data related to servers (managers) due to the setting hideManagerAlerts is enabled
    */
-  getExcludeManagerFilter(): tFilter[]  {
-    return store.getState().appConfig?.data?.hideManagerAlerts ? 
-      [getFilterExcludeManager(this.dataSource.title)  as tFilter] : [];
+  getExcludeManagerFilter(): tFilter[] {
+    return store.getState().appConfig?.data?.hideManagerAlerts ?
+      [getFilterExcludeManager(this.dataSource.title) as tFilter] : [];
   }
 
   /**
-   * Add the allowed agents related to the user permissions to read data from agents in the
+   * Return the allowed agents related to the user permissions to read data from agents in the
     API server
    */
   getAllowAgentsFilter(): tFilter[] {
-    const allowedAgents = store.getState().appStateReducers?.allowedAgents;
+    const allowedAgents = store.getState().appStateReducers?.allowedAgents || [];
     return allowedAgents.lenght > 0 ?
-      [getFilterAllowedAgents(allowedAgents,this.dataSource.title) as tFilter] : []
+      [getFilterAllowedAgents(allowedAgents, this.dataSource.title) as tFilter] : []
   }
 
 }

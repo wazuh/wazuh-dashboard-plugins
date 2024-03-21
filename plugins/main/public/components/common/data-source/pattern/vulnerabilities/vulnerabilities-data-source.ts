@@ -3,7 +3,7 @@ import { PatternDataSource } from '../pattern-data-source';
 
 import { AppState } from '../../../../../react-services/app-state';
 import { FilterHandler } from '../../../../../utils/filter-handler';
-import { VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from '../../../../../../common/constants';
+import { VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER, DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../../../../../../common/constants';
 
 const VULNERABILITIES_GROUP_KEY = 'rules.group';
 const VULNERABILITIES_GROUP_VALUE = 'vulnerability-detector';
@@ -13,6 +13,7 @@ export class VulnerabilitiesDataSource extends PatternDataSource {
     constructor(id: string, title: string) {
         super(id, title);
     }
+
     getClusterManagerFilters() {
         const filterHandler = new FilterHandler();
         const isCluster = AppState.getClusterInfo().status == 'enabled';
@@ -25,11 +26,16 @@ export class VulnerabilitiesDataSource extends PatternDataSource {
             AppState.getClusterInfo().status
             ],
         );
-        return managerFilter;
+        managerFilter.meta.index = this.id;
+        managerFilter.meta.controlledBy = DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER;
+        managerFilter.$state = {
+            store: 'appState'
+        }
+        return [managerFilter] as tFilter[];
     }
 
     getRuleGroupsFilter() {
-        return {
+        return [{
             meta: {
                 //removable: false, // not exists in the original type - removed to preserve the original type
                 index: this.id,
@@ -56,15 +62,15 @@ export class VulnerabilitiesDataSource extends PatternDataSource {
             $state: {
                 store: 'appState',
             },
-        };
+        } as tFilter];
     }
 
     getFixedFilters(): tFilter[] {
         return [
-            ...[this.getClusterManagerFilters()],
-            this.getRuleGroupsFilter()
+            ...this.getClusterManagerFilters(),
         ]
     }
+    
 
 
 }

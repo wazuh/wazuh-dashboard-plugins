@@ -33,12 +33,4 @@ export class VulnerabilitiesDataSourceRepository extends PatternDataSourceReposi
         return false;
     }
 
-    async getDefault(): Promise<tParsedIndexPattern> | tParsedIndexPattern | null {
-        throw new Error('Method not implemented')
-    }
-
-    async setDefault(dataSource: tDataSource): Promise<void> {
-        throw new Error('Method not implemented')
-    }
-
 }

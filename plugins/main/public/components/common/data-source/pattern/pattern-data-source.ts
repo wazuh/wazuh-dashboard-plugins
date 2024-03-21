@@ -1,7 +1,7 @@
 import { tDataSource, tSearchParams, tFilter } from "../index";
 import { getDataPlugin } from '../../../../kibana-services';
 import { Filter, IndexPatternsContract, OpenSearchQuerySortValue } from "../../../../../../../src/plugins/data/public";
-
+import { search } from '../../search-bar/search-bar-service';
 
 export class PatternDataSource implements tDataSource { 
     id: string;
@@ -59,53 +59,31 @@ export class PatternDataSource implements tDataSource {
         if(!indexPattern){
             return;
         }
-        const data = getDataPlugin();
-        const searchSource = await data.search.searchSource.create();
-        const fromField = (pagination?.pageIndex || 0) * (pagination?.pageSize || 100);
-        const sortOrder: OpenSearchQuerySortValue[] = sorting?.columns.map((column) => {
-            const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
-            return { [column?.id || '']: sortDirection } as OpenSearchQuerySortValue;
-        }) || [];
-        let filters = defaultFilters;
     
-        // check if dateRange is defined
-        if(params.dateRange && params.dateRange?.from && params.dateRange?.to){
-            const { from, to } = params.dateRange;
-            filters = [
-                ...filters,
+        try {
+            const results = await search(
                 {
-                    range: {
-                        [indexPattern.timeFieldName || 'timestamp']: {
-                            gte: from,
-                            lte: to,
-                            format: 'strict_date_optional_time'
-                        }
-                    }
+                    indexPattern,
+                    filters: defaultFilters,
+                    query,
+                    pagination,
+                    sorting,
+                    fields: fields
                 }
-            ]
-        }
-    
-        const searchParams = searchSource
-            .setParent(undefined)
-            .setField('filter', filters)
-            .setField('query', query)
-            .setField('sort', sortOrder)
-            .setField('size', pagination?.pageSize)
-            .setField('from', fromField)
-            .setField('index', indexPattern)
-    
-        // add fields
-        if (fields && Array.isArray(fields) && fields.length > 0){
-            searchParams.setField('fields', fields);
-        }
-        try{
-            return await searchParams.fetch();
+            );
+
+            return results;
         }catch(error){
-            if(error.body){
-                throw error.body;
-            }
-            throw error;
+            throw new Error(`Error fetching data: ${error}`);
         }
+        
     }
+
+
+    getFetchFilters(){
+        return [];
+    }
+
+
 
 }

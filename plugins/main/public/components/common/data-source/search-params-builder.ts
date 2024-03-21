@@ -1,6 +1,6 @@
 import { Filter } from "../../../../../../src/plugins/data/common";
 
-export type tFilter = Filter;
+export type tFilter = {} & Filter;
 
 export type tSearchParams = {
     filters?: tFilter[];
