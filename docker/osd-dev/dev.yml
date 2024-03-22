@@ -245,7 +245,6 @@ services:
       - '${SRC}/main:/home/node/kbn/plugins/wazuh'
       - '${SRC}/wazuh-core:/home/node/kbn/plugins/wazuh-core'
       - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
-      - '${SRC}/wazuh-endpoints:/home/node/kbn/plugins/wazuh-endpoints'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
