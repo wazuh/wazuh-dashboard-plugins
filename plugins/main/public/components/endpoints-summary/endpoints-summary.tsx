@@ -15,10 +15,6 @@ import React, { Component } from 'react';
 import { EuiPage, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { AgentsTable } from './table/agents-table';
 import WzReduxProvider from '../../redux/wz-redux-provider';
-import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
-import { AppState } from '../../react-services/app-state';
-import { FilterHandler } from '../../utils/filter-handler';
-import { TabVisualizations } from '../../factories/tab-visualizations';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import {
   withReduxProvider,
@@ -103,20 +99,6 @@ export const EndpointsSummary = compose(
     async componentDidMount() {
       this._isMount = true;
       this.getOutdatedAgents();
-      if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
-        const tabVisualizations = new TabVisualizations();
-        tabVisualizations.removeAll();
-        tabVisualizations.setTab('general');
-        tabVisualizations.assign({
-          general: 1,
-        });
-        const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-        await VisFactoryHandler.buildOverviewVisualizations(
-          filterHandler,
-          'general',
-          null,
-        );
-      }
     }
 
     componentWillUnmount() {

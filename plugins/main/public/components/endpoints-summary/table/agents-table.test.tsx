@@ -294,6 +294,13 @@ jest.mock('../../../redux/reducers/appStateReducers', () => ({
   appStateReducers: state => state,
 }));
 
+jest.mock(
+  '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  }),
+);
+
 const permissionsStore = {
   appStateReducers: {
     userAccount: {
@@ -343,31 +350,6 @@ describe('AgentsTable component', () => {
       </Provider>,
     );
 
-    // Set table id to avoid snapshot changes
-    const tableId = '__table_d203a723-1198-11ee-ab9b-75fc624fc672';
-    wrapper.find('table')[0]['attribs']['id'] = tableId;
-
-    // Set switch id to avoid snapshot changes
-    const switchButtonId =
-      '_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5';
-    wrapper.find('.euiSwitch__button')[0]['attribs']['aria-labelledby'] =
-      switchButtonId;
-    wrapper.find('.euiSwitch__button')[0]['attribs']['id'] = switchButtonId;
-    const switchLabelId =
-      '_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5';
-    wrapper.find('.euiSwitch__label')[0]['attribs']['id'] = switchLabelId;
-
-    // Set select all checkbox id to avoid snapshot changes
-    const checkBoxSelectId =
-      '_selection_column-checkbox_i6bf14741-d0fa-11ee-81c4-29d002524ab5';
-
-    //Mobile
-    wrapper.find('.euiCheckbox__input')[0]['attribs']['id'] = checkBoxSelectId;
-    wrapper.find('.euiCheckbox__label')[0]['attribs']['for'] = checkBoxSelectId;
-
-    //Desktop
-    wrapper.find('.euiCheckbox__input')[1]['attribs']['id'] = checkBoxSelectId;
-
     expect(wrapper).toMatchSnapshot();
     expect(
       window.localStorage.getItem('wz-agents-overview-table-visible-fields'),
@@ -385,31 +367,6 @@ describe('AgentsTable component', () => {
         />
       </Provider>,
     );
-
-    // Set table id to avoid snapshot changes
-    const tableId = '__table_d203a723-1198-11ee-ab9b-75fc624fc672';
-    wrapper.find('table')[0]['attribs']['id'] = tableId;
-
-    // Set switch id to avoid snapshot changes
-    const switchButtonId =
-      '_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5';
-    wrapper.find('.euiSwitch__button')[0]['attribs']['aria-labelledby'] =
-      switchButtonId;
-    wrapper.find('.euiSwitch__button')[0]['attribs']['id'] = switchButtonId;
-    const switchLabelId =
-      '_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5';
-    wrapper.find('.euiSwitch__label')[0]['attribs']['id'] = switchLabelId;
-
-    // Set select all checkbox id to avoid snapshot changes
-    const checkBoxSelectId =
-      '_selection_column-checkbox_i6bf14741-d0fa-11ee-81c4-29d002524ab5';
-
-    //Mobile
-    wrapper.find('.euiCheckbox__input')[0]['attribs']['id'] = checkBoxSelectId;
-    wrapper.find('.euiCheckbox__label')[0]['attribs']['for'] = checkBoxSelectId;
-
-    //Desktop
-    wrapper.find('.euiCheckbox__input')[1]['attribs']['id'] = checkBoxSelectId;
 
     expect(wrapper).toMatchSnapshot();
     expect(
@@ -432,31 +389,6 @@ describe('AgentsTable component', () => {
         />
       </Provider>,
     );
-
-    // Set table id to avoid snapshot changes
-    const tableId = '__table_d203a723-1198-11ee-ab9b-75fc624fc672';
-    wrapper.find('table')[0]['attribs']['id'] = tableId;
-
-    // Set switch id to avoid snapshot changes
-    const switchButtonId =
-      '_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5';
-    wrapper.find('.euiSwitch__button')[0]['attribs']['aria-labelledby'] =
-      switchButtonId;
-    wrapper.find('.euiSwitch__button')[0]['attribs']['id'] = switchButtonId;
-    const switchLabelId =
-      '_show_outdated_switch_button_ic14ef503-e547-11ee-ac6e-71376e7e3fc5';
-    wrapper.find('.euiSwitch__label')[0]['attribs']['id'] = switchLabelId;
-
-    // Set select all checkbox id to avoid snapshot changes
-    const checkBoxSelectId =
-      '_selection_column-checkbox_i6bf14741-d0fa-11ee-81c4-29d002524ab5';
-
-    //Mobile
-    wrapper.find('.euiCheckbox__input')[0]['attribs']['id'] = checkBoxSelectId;
-    wrapper.find('.euiCheckbox__label')[0]['attribs']['for'] = checkBoxSelectId;
-
-    //Desktop
-    wrapper.find('.euiCheckbox__input')[1]['attribs']['id'] = checkBoxSelectId;
 
     expect(wrapper).toMatchSnapshot();
     expect(

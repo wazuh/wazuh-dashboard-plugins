@@ -19,6 +19,7 @@ import {
   EuiCallOut,
   EuiButton,
   EuiSwitch,
+  EuiToolTip,
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { withErrorBoundary } from '../../common/hocs';
@@ -211,6 +212,15 @@ export const AgentsTable = compose(
     ? agentList.totalItems
     : selectedItems.length;
 
+  const switchShowOnlyOutdated = (
+    <EuiSwitch
+      label='Show only outdated'
+      checked={props.showOnlyOutdated}
+      disabled={!props.totalOutdated}
+      onChange={() => props.setShowOnlyOutdated(!props.showOnlyOutdated)}
+    />
+  );
+
   const selectedtemsRenderer = (
     <EuiFlexGroup alignItems='center'>
       {selectedItems.length ? (
@@ -241,12 +251,13 @@ export const AgentsTable = compose(
         </EuiFlexItem>
       ) : null}
       <EuiFlexItem grow={false}>
-        <EuiSwitch
-          label='Show only outdated'
-          checked={props.showOnlyOutdated}
-          disabled={!props.totalOutdated}
-          onChange={() => props.setShowOnlyOutdated(!props.showOnlyOutdated)}
-        />
+        {props.totalOutdated ? (
+          switchShowOnlyOutdated
+        ) : (
+          <EuiToolTip content='There are no outdated agents'>
+            {switchShowOnlyOutdated}
+          </EuiToolTip>
+        )}
       </EuiFlexItem>
     </EuiFlexGroup>
   );
