@@ -18,7 +18,6 @@ import {
   EuiPanel,
   EuiCallOut,
   EuiButton,
-  EuiSwitch,
   EuiToolTip,
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
@@ -48,6 +47,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
 import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
+import { WzButton } from '../../common/buttons';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -212,15 +212,6 @@ export const AgentsTable = compose(
     ? agentList.totalItems
     : selectedItems.length;
 
-  const switchShowOnlyOutdated = (
-    <EuiSwitch
-      label='Show only outdated'
-      checked={props.showOnlyOutdated}
-      disabled={!props.totalOutdated}
-      onChange={() => props.setShowOnlyOutdated(!props.showOnlyOutdated)}
-    />
-  );
-
   const selectedtemsRenderer = (
     <EuiFlexGroup alignItems='center'>
       {selectedItems.length ? (
@@ -251,13 +242,16 @@ export const AgentsTable = compose(
         </EuiFlexItem>
       ) : null}
       <EuiFlexItem grow={false}>
-        {props.totalOutdated ? (
-          switchShowOnlyOutdated
-        ) : (
-          <EuiToolTip content='There are no outdated agents'>
-            {switchShowOnlyOutdated}
-          </EuiToolTip>
-        )}
+        <WzButton
+          buttonType='switch'
+          label='Show only outdated'
+          checked={props.showOnlyOutdated}
+          disabled={!props.totalOutdated}
+          tooltip={
+            !props.totalOutdated && { content: 'There are no outdated agents' }
+          }
+          onChange={() => props.setShowOnlyOutdated(!props.showOnlyOutdated)}
+        />
       </EuiFlexItem>
     </EuiFlexGroup>
   );
