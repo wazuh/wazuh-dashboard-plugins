@@ -17,6 +17,7 @@ import { Agent } from '../types';
 // This is added to prevent the wrap because of the table-layout: auto
 export const agentsTableColumns = (
   allowEditGroups: boolean,
+  allowUpgrade: boolean,
   setAgent: (agents: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
   setIsUpgradeModalVisible: (visible: boolean) => void,
@@ -156,6 +157,7 @@ export const agentsTableColumns = (
     show: true,
     actions: agentsTableActions(
       allowEditGroups,
+      allowUpgrade,
       setAgent,
       setIsEditGroupsVisible,
       setIsUpgradeModalVisible,

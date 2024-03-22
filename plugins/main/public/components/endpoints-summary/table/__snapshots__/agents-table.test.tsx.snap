@@ -82,47 +82,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <div
-                      class="euiPopover euiPopover--anchorDownLeft"
-                      id="agentsTableGlobalActions"
-                    >
-                      <div
-                        class="euiPopover__anchor"
-                      >
-                        <button
-                          class="euiButtonEmpty euiButtonEmpty--primary"
-                          type="button"
-                        >
-                          <span
-                            class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                              focusable="false"
-                              height="16"
-                              role="img"
-                              viewBox="0 0 16 16"
-                              width="16"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                              />
-                            </svg>
-                            <span
-                              class="euiButtonEmpty__text"
-                            >
-                              Add/Remove groups
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="euiFlexItem euiFlexItem--flexGrowZero"
-                  >
                     <button
                       class="euiButtonEmpty euiButtonEmpty--primary"
                       type="button"
@@ -184,6 +143,47 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         </span>
                       </span>
                     </button>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <div
+                      class="euiPopover euiPopover--anchorDownLeft"
+                      id="agentsTableGlobalActions"
+                    >
+                      <div
+                        class="euiPopover__anchor"
+                      >
+                        <button
+                          class="euiButtonEmpty euiButtonEmpty--primary"
+                          type="button"
+                        >
+                          <span
+                            class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                              focusable="false"
+                              height="16"
+                              role="img"
+                              viewBox="0 0 16 16"
+                              width="16"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                              />
+                            </svg>
+                            <span
+                              class="euiButtonEmpty__text"
+                            >
+                              More
+                            </span>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
@@ -738,48 +738,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <div
-                      class="euiPopover euiPopover--anchorDownLeft"
-                      id="agentsTableGlobalActions"
-                    >
-                      <div
-                        class="euiPopover__anchor"
-                      >
-                        <button
-                          class="euiButtonEmpty euiButtonEmpty--primary"
-                          type="button"
-                        >
-                          <span
-                            class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                              focusable="false"
-                              height="16"
-                              role="img"
-                              viewBox="0 0 16 16"
-                              width="16"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
-                                fill-rule="non-zero"
-                              />
-                            </svg>
-                            <span
-                              class="euiButtonEmpty__text"
-                            >
-                              Add/Remove groups
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="euiFlexItem euiFlexItem--flexGrowZero"
-                  >
                     <button
                       class="euiButtonEmpty euiButtonEmpty--primary"
                       type="button"
@@ -841,6 +799,48 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         </span>
                       </span>
                     </button>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <div
+                      class="euiPopover euiPopover--anchorDownLeft"
+                      id="agentsTableGlobalActions"
+                    >
+                      <div
+                        class="euiPopover__anchor"
+                      >
+                        <button
+                          class="euiButtonEmpty euiButtonEmpty--primary"
+                          type="button"
+                        >
+                          <span
+                            class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                              focusable="false"
+                              height="16"
+                              role="img"
+                              viewBox="0 0 16 16"
+                              width="16"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
+                                fill-rule="non-zero"
+                              />
+                            </svg>
+                            <span
+                              class="euiButtonEmpty__text"
+                            >
+                              More
+                            </span>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
@@ -1352,48 +1352,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <div
-                      class="euiPopover euiPopover--anchorDownLeft"
-                      id="agentsTableGlobalActions"
-                    >
-                      <div
-                        class="euiPopover__anchor"
-                      >
-                        <button
-                          class="euiButtonEmpty euiButtonEmpty--primary"
-                          type="button"
-                        >
-                          <span
-                            class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                              focusable="false"
-                              height="16"
-                              role="img"
-                              viewBox="0 0 16 16"
-                              width="16"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
-                                fill-rule="non-zero"
-                              />
-                            </svg>
-                            <span
-                              class="euiButtonEmpty__text"
-                            >
-                              Add/Remove groups
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="euiFlexItem euiFlexItem--flexGrowZero"
-                  >
                     <button
                       class="euiButtonEmpty euiButtonEmpty--primary"
                       type="button"
@@ -1455,6 +1413,48 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         </span>
                       </span>
                     </button>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <div
+                      class="euiPopover euiPopover--anchorDownLeft"
+                      id="agentsTableGlobalActions"
+                    >
+                      <div
+                        class="euiPopover__anchor"
+                      >
+                        <button
+                          class="euiButtonEmpty euiButtonEmpty--primary"
+                          type="button"
+                        >
+                          <span
+                            class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                              focusable="false"
+                              height="16"
+                              role="img"
+                              viewBox="0 0 16 16"
+                              width="16"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
+                                fill-rule="non-zero"
+                              />
+                            </svg>
+                            <span
+                              class="euiButtonEmpty__text"
+                            >
+                              More
+                            </span>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero"
