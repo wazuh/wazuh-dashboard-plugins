@@ -33,23 +33,6 @@ exports[`Group main component renders correctly to match the snapshot 1`] = `
         },
       }
     }
-    groupsProps={
-      Object {
-        "closeAddingAgents": false,
-        "exportConfigurationProps": Object {
-          "type": "group",
-        },
-        "items": Array [
-          Object {
-            "configSum": "ab73af41699f13fdd81903b5f23d8d00",
-            "count": 1,
-            "mergedSum": "2c45c95db2954d2c7d0ea533f09e81a5",
-            "name": "default",
-          },
-        ],
-        "selectedGroup": false,
-      }
-    }
     logtestProps={
       Object {
         "onFlyout": true,

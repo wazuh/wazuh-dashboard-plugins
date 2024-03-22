@@ -48,7 +48,7 @@ export const AgentUpgradesTaskDetailsModal = ({
           tableColumns={[
             {
               field: 'task_id',
-              name: 'Task id',
+              name: 'Task ID',
               sortable: true,
               searchable: true,
               show: true,
@@ -56,7 +56,7 @@ export const AgentUpgradesTaskDetailsModal = ({
             },
             {
               field: 'agent_id',
-              name: 'Agent id',
+              name: 'Agent ID',
               sortable: true,
               searchable: true,
               show: true,
@@ -151,7 +151,7 @@ export const AgentUpgradesTaskDetailsModal = ({
                 return [
                   {
                     label: 'agent_id',
-                    description: 'filter by agent id',
+                    description: 'filter by agent ID',
                   },
                   { label: 'status', description: 'filter by status' },
                   {
@@ -162,7 +162,7 @@ export const AgentUpgradesTaskDetailsModal = ({
                     label: 'last_update_time',
                     description: 'filter by last update date',
                   },
-                  { label: 'task_id', description: 'filter by task id' },
+                  { label: 'task_id', description: 'filter by task ID' },
                 ];
               },
               value: async (currentValue, { field }) => {
