@@ -186,7 +186,7 @@ export class AgentSelectionTable extends Component {
           <Fragment>
             <EuiFlexGroup responsive={false} justifyContent='flexEnd'>
               {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
-              <EuiFlexItem grow={false} style={{marginRight: 0}}>
+              <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
                 <AgentStatus
                   status={selectedAgent.status}
                   agent={selectedAgent}
@@ -238,7 +238,7 @@ export class AgentSelectionTable extends Component {
             suggestions: {
               field(currentValue) {
                 return [
-                  { label: 'id', description: 'filter by id' },
+                  { label: 'id', description: 'filter by ID' },
                   { label: 'group', description: 'filter by group' },
                   { label: 'name', description: 'filter by name' },
                   {

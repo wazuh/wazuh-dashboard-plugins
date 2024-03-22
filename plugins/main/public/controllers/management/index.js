@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { GroupsController } from './groups';
 import { ManagementController } from './management';
 import { ClusterController } from './monitoring';
 import WzManagement from './components/management/management-provider';
@@ -24,7 +23,6 @@ WzManagementConfiguration.displayName = 'WzManagementConfiguration';
 
 app
   .controller('managementController', ManagementController)
-  .controller('groupsPreviewController', GroupsController)
   .controller('clusterController', ClusterController)
   .value('WzManagement', WzManagement)
   .value('WzManagementConfiguration', WzManagementConfiguration);
