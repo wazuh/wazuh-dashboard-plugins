@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added edit agent groups and upgrade agents actions to Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250) [#6476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6476) [#6274](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6274) [#6501](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6501)
 - Added propagation of updates from the table to dashboard visualizations in Endpoints summary [#6460](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6460)
 - Handle index pattern selector on new discover [#6499](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6499)
+- Added macOS log collector tab [#6545](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6545)
 
 ### Changed
 
