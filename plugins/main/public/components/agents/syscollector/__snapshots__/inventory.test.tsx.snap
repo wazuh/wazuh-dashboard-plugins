@@ -141,7 +141,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -544,7 +544,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -897,7 +897,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -1303,7 +1303,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -1711,7 +1711,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -2289,7 +2289,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -2691,7 +2691,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -3075,7 +3075,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -3480,7 +3480,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -3888,7 +3888,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -4587,7 +4587,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -4990,7 +4990,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -5367,7 +5367,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -5770,7 +5770,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -6080,7 +6080,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -6464,7 +6464,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                 class="euiFlexItem"
               >
                 <div
-                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
