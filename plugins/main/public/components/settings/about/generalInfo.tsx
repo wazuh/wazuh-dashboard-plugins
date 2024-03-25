@@ -43,7 +43,7 @@ export const SettingsAboutGeneralInfo = ({
   return (
     <EuiFlexGroup gutterSize='l' direction='row' responsive>
       <Section
-        title={`Welcome to the dashboard`}
+        title={`Welcome to the ${pluginAppName}`}
         content={
           <EuiText size='m'>
             <p>
