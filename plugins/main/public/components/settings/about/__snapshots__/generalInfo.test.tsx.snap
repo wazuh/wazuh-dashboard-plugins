@@ -14,7 +14,7 @@ exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
         <h2
           class="euiTitle euiTitle--medium"
         >
-          Welcome to the Dashboard
+          Welcome to the dashboard
         </h2>
         <div
           class="euiSpacer euiSpacer--l"
