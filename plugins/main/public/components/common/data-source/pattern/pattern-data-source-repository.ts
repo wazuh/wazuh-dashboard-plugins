@@ -1,6 +1,4 @@
-import { tDataSource } from "../data-source";
-import { DataSourceRepository } from "../data-source-repository";
-import { PatternDataSource } from "./pattern-data-source";
+import { tDataSourceRepository } from "../data-source-repository";
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services';
 
@@ -42,7 +40,7 @@ export type tParsedIndexPattern = {
     _fields: any[];
 }
 
-export class PatternDataSourceRepository implements DataSourceRepository<tParsedIndexPattern, PatternDataSource>{
+export class PatternDataSourceRepository implements tDataSourceRepository<tParsedIndexPattern>{
     async get(id: string): Promise<tParsedIndexPattern> {
         try {
             const savedObjectResponse = await GenericRequest.request(
@@ -89,7 +87,7 @@ export class PatternDataSourceRepository implements DataSourceRepository<tParsed
         };
     }
     
-    setDefault(dataSource: PatternDataSource): Promise<void> {
+    setDefault(dataSource: tParsedIndexPattern): Promise<void> {
         if(!dataSource){
             throw new Error('Index pattern is required');
         }

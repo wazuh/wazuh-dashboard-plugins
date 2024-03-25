@@ -10,4 +10,5 @@ export type tDataSource = {
     getFixedFilters: () => tFilter[];
     getFetchFilters: () => tFilter[];
     fetch: (params: tSearchParams) => Promise<any>;
+    toJSON(): object;
 }

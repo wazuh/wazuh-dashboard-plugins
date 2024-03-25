@@ -1,9 +1,9 @@
-import { tDataSource, tSearchParams, tFilter } from "../index";
+import { tDataSource, tSearchParams, tFilter, tParsedIndexPattern } from "../index";
 import { getDataPlugin } from '../../../../kibana-services';
 import { Filter, IndexPatternsContract, IndexPattern } from "../../../../../../../src/plugins/data/public";
 import { search } from '../../search-bar/search-bar-service';
 
-export class PatternDataSource implements tDataSource { 
+export class PatternDataSource implements tDataSource{ 
     id: string;
     title: string;
     fields: any[];
@@ -15,8 +15,6 @@ export class PatternDataSource implements tDataSource {
         this.id = id;
         this.title = title;
     }
-    setFilters: (filters: Filter[]) => void | Promise<void>;
-
     /**
      * Initialize the data source
      */
@@ -25,12 +23,15 @@ export class PatternDataSource implements tDataSource {
         this.indexPattern = await this.patternService.get(this.id);
     }
 
-    getFilters(){
-        return [];
-    }
-
     getFields(){
         return this.fields;
+    }
+
+    setFilters: (filters: Filter[]) => void | Promise<void>;
+
+
+    getFilters(){
+        return [];
     }
 
     getFixedFilters(): tFilter[]{
@@ -83,6 +84,27 @@ export class PatternDataSource implements tDataSource {
             throw new Error(`Error fetching data: ${error}`);
         }
         
+    }
+
+    toJSON(): tParsedIndexPattern {
+        return {
+            attributes: {
+                fields: JSON.stringify(this.fields),
+                title: this.title
+            },
+            title: this.title,
+            id: this.id,
+            migrationVersion: {
+                'index-pattern': '7.10.0'
+            },
+            namespace: [],
+            references: [],
+            score: 0,
+            type: 'index-pattern',
+            updated_at: new Date().toISOString(),
+            version: 'WzPatternDataSource',
+            _fields: this.fields
+        }
     }
 
 }

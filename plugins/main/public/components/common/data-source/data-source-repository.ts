@@ -1,6 +1,6 @@
-export interface DataSourceRepository<T,K> {
+export type tDataSourceRepository<T extends object> = {
     get(id: string): Promise<T>;
     getAll(): Promise<T[]>;
-    setDefault(dataSource: K): Promise<void> | void;
+    setDefault(dataSourceData: T): Promise<void> | void;
     getDefault(): Promise<T | null> | T | null;
 }
