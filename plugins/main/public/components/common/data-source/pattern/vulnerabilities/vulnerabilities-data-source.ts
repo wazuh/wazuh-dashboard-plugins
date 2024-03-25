@@ -68,6 +68,7 @@ export class VulnerabilitiesDataSource extends PatternDataSource {
     getFixedFilters(): tFilter[] {
         return [
             ...this.getClusterManagerFilters(),
+            ...super.getFixedFilters(),
         ]
     }
 
