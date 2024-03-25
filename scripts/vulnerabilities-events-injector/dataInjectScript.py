@@ -115,13 +115,13 @@ def generateRandomVulnerability():
     vulnerability['scanner'] = {'vendor':'vendor-{}'.format(random.randint(0, 9))}
     vulnerability['score'] = {'base':round(random.uniform(0, 10),1), 'environmental':round(random.uniform(0, 10),1), 'temporal':round(random.uniform(0, 10),1),'version':'{}'.format(round(random.uniform(0, 10),1))}
     vulnerability['severity'] = random.choice(['Low','Medium','High','Critical'])
+    vulnerability['published_at'] = generateRandomDate()
+    vulnerability['detected_at'] = generateRandomDate()
     return(vulnerability)
 
 def generateRandomWazuh():
     wazuh = {}
     wazuh['cluster'] = {'name':random.choice(['wazuh.manager', 'wazuh']), 'node':random.choice(['master','worker-01','worker-02','worker-03'])}
-    wazuh['published_at'] = generateRandomDate()
-    wazuh['detected_at'] = generateRandomDate()
     return(wazuh)
 
 def generateRandomData(number):
