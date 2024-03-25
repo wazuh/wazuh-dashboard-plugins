@@ -26,12 +26,12 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Generating automatic reports',
-    href: webDocumentationLink('user-manual/manager/automatic-reports.html')
+    href: webDocumentationLink('user-manual/manager/automatic-reports.html'),
   },
   {
     text: 'Reports reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/reports.html')
-  }
+    href: webDocumentationLink('user-manual/reference/ossec-conf/reports.html'),
+  },
 ];
 
 const mainSettings = [
@@ -44,7 +44,7 @@ const mainSettings = [
   { field: 'level', label: 'Filter by this alert level and above' },
   { field: 'location', label: 'Filter by this log location' },
   { field: 'srcip', label: 'Filter by this source IP address' },
-  { field: 'user', label: 'Filter by this user name' }
+  { field: 'user', label: 'Filter by this user name' },
 ];
 
 class WzConfigurationAlertsReports extends Component {
@@ -72,19 +72,19 @@ class WzConfigurationAlertsReports extends Component {
           !isString(currentConfig['monitor-reports']) &&
           (!currentConfig['monitor-reports'].reports ||
             !currentConfig['monitor-reports'].reports.length) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['monitor-reports']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {currentConfig['monitor-reports'] &&
           !isString(currentConfig['monitor-reports']) &&
           currentConfig['monitor-reports'].reports &&
           currentConfig['monitor-reports'].reports.length && (
             <WzConfigurationSettingsHeader
-              title="Main settings"
-              description="Daily reports about alerts"
+              title='Main settings'
+              description='Daily reports about alerts'
               help={helpLinks}
             >
               <WzConfigurationListSelector
@@ -99,11 +99,11 @@ class WzConfigurationAlertsReports extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAlertsReports.propTypes = {
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default connect(mapStateToProps)(WzConfigurationAlertsReports);

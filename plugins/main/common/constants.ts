@@ -394,7 +394,7 @@ export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
 export const ELASTIC_NAME = 'elastic';
 
 // Default Wazuh indexer name
-export const WAZUH_INDEXER_NAME = 'Wazuh indexer';
+export const WAZUH_INDEXER_NAME = 'indexer';
 
 // Not timeFieldName on index pattern
 export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =

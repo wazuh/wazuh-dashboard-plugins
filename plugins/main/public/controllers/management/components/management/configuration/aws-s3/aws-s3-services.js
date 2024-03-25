@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import WzNoConfig from "../util-components/no-config";
+import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../utils/builders';
@@ -27,7 +27,7 @@ const mainSettings = [
   { field: 'account_alias', label: 'AWS account alias' },
   { field: 'iam_role_arn', label: 'IAM ARN role to read bucket logs' },
   { field: 'only_logs_after', label: 'Parse only logs from this date onwards' },
-  { field: 'regions', label: 'Limit log parsing to these regions' }
+  { field: 'regions', label: 'Limit log parsing to these regions' },
 ];
 
 class WzConfigurationAmazonS3Services extends Component {
@@ -43,18 +43,19 @@ class WzConfigurationAmazonS3Services extends Component {
     return (
       <Fragment>
         {currentConfig &&
-        (!wodleConfig['aws-s3'] || (wodleConfig['aws-s3'] && !wodleConfig['aws-s3'].services)) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+          (!wodleConfig['aws-s3'] ||
+            (wodleConfig['aws-s3'] && !wodleConfig['aws-s3'].services)) && (
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet && (!currentConfig || !wodleConfig['aws-s3']) && (
-          <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+          <WzNoConfig error='Server not ready yet' help={helpLinks} />
         )}
         {currentConfig &&
           wodleConfig['aws-s3'] &&
           wodleConfig['aws-s3'].services && (
             <WzConfigurationSettingsHeader
-              title="Services"
-              description="Amazon services from where logs are read"
+              title='Services'
+              description='Amazon services from where logs are read'
               help={helpLinks}
             >
               <WzConfigurationListSelector
@@ -69,11 +70,11 @@ class WzConfigurationAmazonS3Services extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAmazonS3Services.propTypes = {
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default connect(mapStateToProps)(WzConfigurationAmazonS3Services);

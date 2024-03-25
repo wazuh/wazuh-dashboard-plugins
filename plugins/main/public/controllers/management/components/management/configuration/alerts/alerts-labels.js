@@ -64,7 +64,7 @@ class WzConfigurationAlertsLabels extends Component {
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['agent-labels']) && (
-            <WzNoConfig error='Wazuh not ready yet' />
+            <WzNoConfig error='Server not ready yet' />
           )}
         {currentConfig['agent-labels'] &&
         !isString(currentConfig['agent-labels']) &&

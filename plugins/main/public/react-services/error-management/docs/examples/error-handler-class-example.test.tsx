@@ -6,7 +6,6 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { HttpError } from '../../error-factory';
 import { ErrorOrchestratorService } from '../../../error-orchestrator/error-orchestrator.service';
 
-
 // mocked some required kibana-services
 jest.mock('../../../../kibana-services', () => ({
   ...(jest.requireActual('../../../../kibana-services') as object),
@@ -87,7 +86,7 @@ describe('Error Handler class example tests', () => {
         data: {
           statusCode: 500,
           error: 'Internal Server Error',
-          message: 'Wazuh not ready yet',
+          message: 'Server not ready yet',
         },
         status: 500,
         statusText: 'Internal Server Error',

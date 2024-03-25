@@ -27,29 +27,36 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Active response documentation',
-    href: webDocumentationLink('user-manual/capabilities/active-response/index.html')
+    href: webDocumentationLink(
+      'user-manual/capabilities/active-response/index.html',
+    ),
   },
   {
     text: 'Active response reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/active-response.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/active-response.html',
+    ),
+  },
 ];
 
 const mainSettings = [
   {
     field: 'disabled',
     label: 'Active response status',
-    render: renderValueNoThenEnabled
+    render: renderValueNoThenEnabled,
   },
   {
     field: 'repeated_offenders',
-    label: 'List of timeouts (in minutes) for repeated offenders'
+    label: 'List of timeouts (in minutes) for repeated offenders',
   },
   {
     field: 'ca_store',
-    label: 'Use the following list of root CA certificates'
+    label: 'Use the following list of root CA certificates',
   },
-  { field: 'ca_verification', label: 'Validate WPKs using root CA certificate' }
+  {
+    field: 'ca_verification',
+    label: 'Validate WPKs using root CA certificate',
+  },
 ];
 
 class WzConfigurationActiveResponseAgent extends Component {
@@ -70,18 +77,18 @@ class WzConfigurationActiveResponseAgent extends Component {
         {currentConfig['com-active-response'] &&
           !isString(currentConfig['com-active-response']) &&
           !currentConfig['com-active-response']['active-response'] && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['com-active-response']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {currentConfig['com-active-response'] &&
           !isString(currentConfig['com-active-response']) &&
           currentConfig['com-active-response']['active-response'] && (
             <WzConfigurationSettingsHeader
-              title="Active response settings"
-              description="Find here all the Active response settings for this agent"
+              title='Active response settings'
+              description='Find here all the Active response settings for this agent'
               help={helpLinks}
             >
               <WzConfigurationSettingsGroup
@@ -96,16 +103,16 @@ class WzConfigurationActiveResponseAgent extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 const sectionsAgent = [{ component: 'com', configuration: 'active-response' }];
 
 WzConfigurationActiveResponseAgent.propTypes = {
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent)
+  withWzConfig(sectionsAgent),
 )(WzConfigurationActiveResponseAgent);

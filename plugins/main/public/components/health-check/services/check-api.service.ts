@@ -121,7 +121,7 @@ export const checkApiService =
         checkLogger.info(`Set cluster info in cookie`);
       }
       if (data === 3099) {
-        checkLogger.error('Wazuh not ready yet');
+        checkLogger.error('Server not ready yet');
       } else if (data.data.error || data.data.data.apiIsDown) {
         const errorMessage = data.data.data.apiIsDown
           ? 'API is down'

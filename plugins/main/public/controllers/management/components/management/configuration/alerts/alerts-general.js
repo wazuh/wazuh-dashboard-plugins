@@ -22,23 +22,27 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const mainSettings = [
   {
     field: 'log_alert_level',
-    label: 'Minimum severity level to store the alert'
+    label: 'Minimum severity level to store the alert',
   },
   {
     field: 'email_alert_level',
-    label: 'Minimum severity level to send the alert by email'
+    label: 'Minimum severity level to send the alert by email',
   },
-  { field: 'use_geoip', label: 'Enable GeoIP lookups', render: renderValueOrNo }
+  {
+    field: 'use_geoip',
+    label: 'Enable GeoIP lookups',
+    render: renderValueOrNo,
+  },
 ];
 const helpLinks = [
   {
     text: 'Use cases about alerts generation',
-    href: webDocumentationLink('getting-started/use-cases/index.html')
+    href: webDocumentationLink('getting-started/use-cases/index.html'),
   },
   {
     text: 'Alerts reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/alerts.html')
-  }
+    href: webDocumentationLink('user-manual/reference/ossec-conf/alerts.html'),
+  },
 ];
 
 class WzConfigurationAlertsGeneral extends Component {
@@ -59,18 +63,18 @@ class WzConfigurationAlertsGeneral extends Component {
         {currentConfig['analysis-alerts'] &&
           !isString(currentConfig['analysis-alerts']) &&
           !currentConfig['analysis-alerts'].alerts && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['analysis-alerts']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {currentConfig['analysis-alerts'] &&
           !isString(currentConfig['analysis-alerts']) &&
           currentConfig['analysis-alerts'].alerts && (
             <WzConfigurationSettingsHeader
-              title="Main settings"
-              description="General alert settings"
+              title='Main settings'
+              description='General alert settings'
               help={helpLinks}
             >
               <WzConfigurationSettingsGroup
@@ -85,7 +89,7 @@ class WzConfigurationAlertsGeneral extends Component {
 }
 
 WzConfigurationAlertsGeneral.propTypes = {
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default WzConfigurationAlertsGeneral;

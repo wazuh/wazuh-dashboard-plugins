@@ -136,7 +136,7 @@ export const handleError = async (
   const messageIsString = typeof message === 'string';
   try {
     if (messageIsString && message.includes('ERROR3099')) {
-      updateWazuhNotReadyYet('Wazuh not ready yet.');
+      updateWazuhNotReadyYet('Server not ready yet.');
       await makePing(updateWazuhNotReadyYet, isCluster);
       return;
     }
@@ -195,7 +195,7 @@ export const checkDaemons = async isCluster => {
     if (isValid) {
       return { isValid };
     } else {
-      console.warn('Wazuh not ready yet');
+      console.warn('Server not ready yet');
     }
   } catch (error) {
     throw error;

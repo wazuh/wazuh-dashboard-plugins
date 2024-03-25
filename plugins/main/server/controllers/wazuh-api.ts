@@ -156,7 +156,7 @@ export class WazuhApiCtrl {
       if (this.checkResponseIsDown(context, responseManagerInfo)) {
         return ErrorResponse(
           `ERROR3099 - ${
-            responseManagerInfo.data.detail || 'Wazuh not ready yet'
+            responseManagerInfo.data.detail || 'Server not ready yet'
           }`,
           3099,
           HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -286,7 +286,7 @@ export class WazuhApiCtrl {
               if (this.checkResponseIsDown(context, responseManagerInfo)) {
                 return ErrorResponse(
                   `ERROR3099 - ${
-                    response.data.detail || 'Wazuh not ready yet'
+                    response.data.detail || 'Server not ready yet'
                   }`,
                   3099,
                   HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -397,7 +397,7 @@ export class WazuhApiCtrl {
       } catch (error) {
         return ErrorResponse(
           `ERROR3099 - ${
-            error.response?.data?.detail || 'Wazuh not ready yet'
+            error.response?.data?.detail || 'Server not ready yet'
           }`,
           3099,
           error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -612,7 +612,7 @@ export class WazuhApiCtrl {
       }
 
       if (!isValid) {
-        throw new Error('Wazuh not ready yet');
+        throw new Error('Server not ready yet');
       }
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
@@ -753,7 +753,7 @@ export class WazuhApiCtrl {
               'Server API is online but the server is not ready yet',
             );
             return ErrorResponse(
-              `ERROR3099 - ${error.message || 'Wazuh not ready yet'}`,
+              `ERROR3099 - ${error.message || 'Server not ready yet'}`,
               3099,
               HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
               response,
@@ -788,7 +788,7 @@ export class WazuhApiCtrl {
       const responseIsDown = this.checkResponseIsDown(context, responseToken);
       if (responseIsDown) {
         return ErrorResponse(
-          `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${response.body.message || 'Server not ready yet'}`,
           3099,
           HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response,

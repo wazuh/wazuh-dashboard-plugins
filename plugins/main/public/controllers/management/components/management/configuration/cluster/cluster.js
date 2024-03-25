@@ -70,7 +70,7 @@ class WzCluster extends Component {
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['com-cluster']) && (
-            <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {currentConfig['com-cluster'] &&
           !isString(currentConfig['com-cluster']) && (

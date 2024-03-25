@@ -30,7 +30,7 @@ const responseBody: AxiosResponse = {
   data: {
     statusCode: 500,
     error: 'Internal Server Error',
-    message: '3099 - ERROR3099 - Wazuh not ready yet',
+    message: '3099 - ERROR3099 - Server not ready yet',
   },
   status: 500,
   statusText: 'Internal Server Error',
@@ -38,17 +38,16 @@ const responseBody: AxiosResponse = {
   config: {
     url: '/api/request',
     data: {
-      params: 'here-any-custom-params'
+      params: 'here-any-custom-params',
     }, // the data could contain the params of the request
   },
   request: {},
 };
 
 describe('Error Handler', () => {
-
   beforeAll(() => {
     jest.clearAllMocks();
-  })
+  });
   describe('createError', () => {
     it.each([
       { ErrorType: Error, name: 'Error' },
@@ -105,7 +104,9 @@ describe('Error Handler', () => {
         error.response.data.message = message;
         error.response.data.error = error;
         error.response.config.url = url;
-        const spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => true);
+        const spyIshttp = jest
+          .spyOn(ErrorHandler, 'isHttpError')
+          .mockImplementation(() => true);
         const errorCreated = ErrorHandler.createError(error);
         expect(errorCreated).toBeInstanceOf(WazuhError);
         expect(errorCreated.message).toBe(message);
@@ -117,10 +118,9 @@ describe('Error Handler', () => {
   });
 
   describe('handleError', () => {
-
     afterEach(() => {
       jest.clearAllMocks();
-    })
+    });
     it('should send the error to the ERROR ORCHESTRATOR service with custom log options when is defined', () => {
       const mockedError = new Error('Mocked error');
       ErrorHandler.handleError(mockedError, {
@@ -183,7 +183,7 @@ describe('Error Handler', () => {
         ErrorType,
         name,
         message,
-        url
+        url,
       }: {
         ErrorType?: ErrorConstructor;
         name: string;
@@ -191,12 +191,16 @@ describe('Error Handler', () => {
         url?: string;
       }) => {
         let error;
-        let spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError')
+        let spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError');
         if (ErrorType) {
-          spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => false);
+          spyIshttp = jest
+            .spyOn(ErrorHandler, 'isHttpError')
+            .mockImplementation(() => false);
           error = new ErrorType(message);
         } else {
-          spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => true);
+          spyIshttp = jest
+            .spyOn(ErrorHandler, 'isHttpError')
+            .mockImplementation(() => true);
           error = new Error(message) as AxiosError;
           error.response = responseBody;
           error.response.data.message = message;
@@ -271,7 +275,7 @@ describe('Error Handler', () => {
         ErrorType,
         name,
         message,
-        url
+        url,
       }: {
         ErrorType?: ErrorConstructor;
         name: string;
@@ -279,12 +283,16 @@ describe('Error Handler', () => {
         url?: string;
       }) => {
         let error;
-        let spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError')
+        let spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError');
         if (ErrorType) {
-          spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => false);
+          spyIshttp = jest
+            .spyOn(ErrorHandler, 'isHttpError')
+            .mockImplementation(() => false);
           error = new ErrorType(message);
         } else {
-          spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => true);
+          spyIshttp = jest
+            .spyOn(ErrorHandler, 'isHttpError')
+            .mockImplementation(() => true);
           error = new Error(message) as AxiosError;
           error.response = responseBody;
           error.response.data.message = message;
@@ -300,7 +308,7 @@ describe('Error Handler', () => {
         expect(errorFromHandler.message).toBe(message);
         expect(errorFromHandler.name).toBe(name);
         spyIshttp.mockRestore();
-      }
+      },
     );
   });
 });
