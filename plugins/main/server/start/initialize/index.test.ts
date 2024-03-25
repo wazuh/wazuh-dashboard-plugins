@@ -38,7 +38,7 @@ function mockContextCreator(loggerLevel: string) {
     },
     server: {
       config: {
-        opensearchdashboards: {
+        opensearchDashboards: {
           index: '.kibana',
         },
       },
