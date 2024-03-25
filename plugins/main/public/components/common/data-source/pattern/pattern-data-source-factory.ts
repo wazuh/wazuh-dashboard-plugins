@@ -1,25 +1,14 @@
 import { tDataSourceFactory, PatternDataSource, tDataSource, tParsedIndexPattern } from '../';
 export class PatternDataSourceFactory implements tDataSourceFactory<tParsedIndexPattern, PatternDataSource>{
-    
-    async create(item: tParsedIndexPattern): Promise<PatternDataSource> {
-        if(!item){
-            throw new Error('Cannot create data source from null or undefined');
-        };
-        const dataSource = new PatternDataSource(item.id, item.attributes.title);
+    async create(DataSourceType: new (id: string, title: string) => PatternDataSource, data: tParsedIndexPattern): Promise<PatternDataSource> {
+        const dataSource = new DataSourceType(data.id, data.title);
         await dataSource.init();
         return dataSource;
     }
-    async createAll(items: tParsedIndexPattern[]): Promise<PatternDataSource[]> {
-        if(!items){
-            throw new Error('Cannot create data source from null or undefined');
-        };
-        
-        const dataSources: PatternDataSource[] = [];
-        for (const item of items) {
-            const dataSource = new PatternDataSource(item.id, item.attributes.title);
-            await dataSource.init();
-            dataSources.push(dataSource);
-        }
-        return dataSources;
-    }
+    async createAll(DataSourceType: new (id: string, title: string) => PatternDataSource, data: tParsedIndexPattern[]): Promise<PatternDataSource[]> {
+        return Promise.all(data.map(async (d) => {
+            return this.create(DataSourceType, d);
+        }));
+    }   
+    
 }
