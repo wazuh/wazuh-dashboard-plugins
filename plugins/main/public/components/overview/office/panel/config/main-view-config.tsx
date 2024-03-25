@@ -12,9 +12,9 @@
  */
 
 import React from 'react';
-import { AggTable } from '../../../common/modules/panel/';
+import { AggTable } from '../../../../common/modules/panel/';
 import { EuiFlexItem } from '@elastic/eui';
-import { SecurityAlerts } from '../../../visualize/components';
+import { SecurityAlerts } from '../../../../visualize/components';
 
 export const MainViewConfig = {
   rows: [
@@ -22,12 +22,12 @@ export const MainViewConfig = {
       columns: [
         {
           width: 50,
-          component: (props) => (
+          component: props => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
-                tableTitle="Top users"
-                aggTerm="data.office365.UserId"
-                aggLabel="User"
+                tableTitle='Top users'
+                aggTerm='data.office365.UserId'
+                aggLabel='User'
                 maxRows={5}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />
@@ -36,12 +36,12 @@ export const MainViewConfig = {
         },
         {
           width: 50,
-          component: (props) => (
+          component: props => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
-                tableTitle="Top client IP address"
-                aggTerm="data.office365.ClientIP"
-                aggLabel="Client IP address"
+                tableTitle='Top client IP address'
+                aggTerm='data.office365.ClientIP'
+                aggLabel='Client IP address'
                 maxRows={5}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />
@@ -54,12 +54,12 @@ export const MainViewConfig = {
       columns: [
         {
           width: 50,
-          component: (props) => (
+          component: props => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
-                tableTitle="Top rules"
-                aggTerm="rule.description"
-                aggLabel="Rule"
+                tableTitle='Top rules'
+                aggTerm='rule.description'
+                aggLabel='Rule'
                 maxRows={5}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />
@@ -68,12 +68,12 @@ export const MainViewConfig = {
         },
         {
           width: 50,
-          component: (props) => (
+          component: props => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
-                tableTitle="Top operations"
-                aggTerm="data.office365.Operation"
-                aggLabel="Operation"
+                tableTitle='Top operations'
+                aggTerm='data.office365.Operation'
+                aggLabel='Operation'
                 maxRows={5}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />
