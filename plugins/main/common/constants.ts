@@ -279,7 +279,7 @@ export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © 2023 Wazuh, Inc.';
 export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 
 // Plugin platform
-export const PLUGIN_PLATFORM_NAME = 'Wazuh dashboard';
+export const PLUGIN_PLATFORM_NAME = 'dashboard';
 export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH =
   '/usr/share/wazuh-dashboard/data/wazuh/';
 export const PLUGIN_PLATFORM_INSTALLATION_USER = 'wazuh-dashboard';
@@ -299,7 +299,7 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
 };
 
 // Plugin app
-export const PLUGIN_APP_NAME = 'Dashboard';
+export const PLUGIN_APP_NAME = 'dashboard';
 
 // UI
 export const API_NAME_AGENT_STATUS = {
