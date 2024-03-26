@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from "react";
 import {
+    IDataSourceFactoryConstructor,
     tDataSource,
     tDataSourceRepository,
     tFilter, 
     tSearchParams, 
     PatternDataSourceSelector,
     PatternDataSourceFactory,
-    VulnerabilitiesDataSource,
     PatternDataSource,
     tParsedIndexPattern,
     PatternDataSourceFilterManager
 } from '../index';
+import { FilterManager } from "../../../../../../../src/plugins/data/public";
+
+// create a new type using the FilterManager type but only the getFilters, setFilters, addFilters, getUpdates$
+type tFilterManager = Pick<FilterManager, 'getFilters' | 'setFilters' | 'addFilters' | 'getUpdates$'>;
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
-    filters: tFilter[];
-    factory: PatternDataSourceFactory;
+    DataSource: IDataSourceFactoryConstructor<K>;
     repository: tDataSourceRepository<T>;
+    factory?: PatternDataSourceFactory;
+    filterManager?: tFilterManager;
+    filters?: tFilter[];
 }
 
 type tUseDataSourceLoadedReturns<K> = {
@@ -39,10 +45,16 @@ type tUseDataSourceNotLoadedReturns = {
 }
 
 export function useDataSource<T extends tParsedIndexPattern, K extends PatternDataSource>(props: tUseDataSourceProps<T, K>): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
-    const { filters: defaultFilters = [], factory, repository } = props;
+    const { 
+        filterManager,
+        filters: defaultFilters = [],
+        DataSource: DataSourceConstructor,
+        repository,
+        factory: injectedFactory,
+     } = props;
 
-    if (!factory || !repository) {
-        throw new Error('Factory and repository are required');
+    if (!repository || !DataSourceConstructor) {
+        throw new Error('DataSource and repository are required');
     }
 
     const [dataSource, setDataSource] = useState<tDataSource>();
@@ -73,7 +85,9 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
 
     const init = async () => {
         setIsLoading(true);
-        const dataSources = await factory.createAll(VulnerabilitiesDataSource, await repository.getAll());
+        const factory = injectedFactory || new PatternDataSourceFactory();
+        const patternsData = await repository.getAll();
+        const dataSources = await factory.createAll(DataSourceConstructor, patternsData);
         const selector = new PatternDataSourceSelector(dataSources, repository);
         const dataSource = await selector.getSelectedDataSource();
         if (!dataSource) {
@@ -83,6 +97,15 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
         if (!dataSourceFilterManager) {
             throw new Error('Error creating filter manager');
         }
+
+        // what the filters update
+        dataSourceFilterManager.getUpdates$().subscribe({
+            next: () => {
+                console.log('update filter manager');
+                setAllFilters(dataSourceFilterManager.getFilters());
+                setFetchFilters(dataSourceFilterManager.getFetchFilters());
+            },
+        });
         setAllFilters(dataSourceFilterManager.getFilters());
         setFetchFilters(dataSourceFilterManager.getFetchFilters());
         setDataSourceFilterManager(dataSourceFilterManager);
@@ -93,23 +116,22 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
     if (isLoading) {
         return {
             isLoading: true,
-            dataSource,
+            dataSource: undefined,
             filters: [],
             fetchFilters: [],
             fixedFilters: [],
             fetchData,
             setFilters
         }
+    }else{
+        return {
+            isLoading: false,
+            dataSource: dataSource as K,
+            filters: allFilters,
+            fetchFilters,
+            fixedFilters: dataSourceFilterManager?.getFixedFilters() || [],
+            fetchData,
+            setFilters
+        }
     }
-
-    return {
-        isLoading: false,
-        dataSource,
-        filters: allFilters,
-        fetchFilters,
-        fixedFilters: dataSourceFilterManager?.getFixedFilters() || [],
-        fetchData,
-        setFilters
-    }
-
 }

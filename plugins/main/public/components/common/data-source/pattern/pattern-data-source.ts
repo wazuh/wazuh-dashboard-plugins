@@ -4,7 +4,7 @@ import { Filter, IndexPatternsContract, IndexPattern } from "../../../../../../.
 import { search } from '../../search-bar/search-bar-service';
 import store from '../../../../redux/store';
 import { getFilterExcludeManager, getFilterAllowedAgents } from '../../../../react-services/data-sources/vulnerabilities-states';
-import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT, DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER, VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from "../../../../../common/constants";
+import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT, DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from "../../../../../common/constants";
 import { AppState } from '../../../../react-services/app-state';
 import { FilterHandler }  from '../../../../utils/filter-handler';
 
@@ -81,7 +81,7 @@ export class PatternDataSource implements tDataSource {
 
     async fetch(params: tSearchParams){
         const indexPattern = await this.patternService.get(this.id);
-        const { filters: defaultFilters = [], query, pagination, sorting, fields } = params;
+        const { filters: defaultFilters = [], query, pagination, sorting, fields, dateRange } = params;
         if(!indexPattern){
             return;
         }
@@ -93,7 +93,8 @@ export class PatternDataSource implements tDataSource {
                     query,
                     pagination,
                     sorting,
-                    fields: fields
+                    fields: fields,
+                    dateRange
                 }
             );
 
@@ -132,10 +133,7 @@ export class PatternDataSource implements tDataSource {
             isCluster
                 ? AppState.getClusterInfo().cluster
                 : AppState.getClusterInfo().manager,
-            true,
-            VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER[
-            AppState.getClusterInfo().status
-            ],
+            true
         );
         managerFilter.meta.index = this.id;
         managerFilter.meta.controlledBy = DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER;

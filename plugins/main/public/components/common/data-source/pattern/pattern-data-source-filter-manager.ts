@@ -1,15 +1,27 @@
+import { FilterManager } from '../../../../../../../src/plugins/data/public';
+import { getDataPlugin } from '../../../../kibana-services';
 import { tDataSourceFilterManager, tFilter, tSearchParams, tDataSource } from '../index';
 
 export class PatternDataSourceFilterManager implements tDataSourceFilterManager {
-
-    constructor(private dataSource: tDataSource, private filters: tFilter[] = []) {
+    private filterManager: FilterManager;
+    constructor(private dataSource: tDataSource, filters: tFilter[] = [], filterStorage?: FilterManager) {
       if (!dataSource) {
         throw new Error('Data source is required');
       }
-      this.dataSource = dataSource;
-      this.filters = filters.length ? this.filterUserFilters(filters) as tFilter[] : [];
+      
+      // when the filterManager is not received get the global filterManager
+      this.filterManager = filterStorage || getDataPlugin().query.filterManager;
+      if(!this.filterManager) {
+        throw new Error('Filter manager is required');
+      }
+      
+      this.filterManager.setFilters(this.getDefaultFilters(filters));
     }
   
+    getUpdates$(): any {
+      return this.filterManager.getUpdates$();
+    }
+
     /**
      * Get the filters necessary to fetch the data from the data source
      * @returns 
@@ -17,12 +29,20 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
     fetch(params: Omit<tSearchParams, 'filters'> = {}): Promise<any> {
       return this.dataSource.fetch({
         ...params,
-        filters: [],
+        filters: this.getFetchFilters(),
       });
     }
   
     setFilters(filters: tFilter[]) {
-      this.filters = this.filterUserFilters(filters) as tFilter[] || [];
+      this.filterManager && this.filterManager.setFilters(filters);
+    }
+
+    getDefaultFilters(filters: tFilter[]) {
+      const defaultFilters = filters.length ? filters : this.getFilters();
+      return [
+        ...this.getFixedFilters(),
+        ...this.filterUserFilters(defaultFilters) || [],
+      ];      
     }
   
     /**
@@ -37,7 +57,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
       if (!filters) return [];
       return this.removeRepeatedFilters(filters.filter(
         filter => !(filter?.$state?.['isImplicit'] || filter.meta?.controlledBy || filter.meta?.index !== this.dataSource.id)
-      ) as tFilter[] || []);
+      )) as tFilter[];
     }
   
     /**
@@ -48,7 +68,6 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
      */
     getFixedFilters(): tFilter[] {
       const fixedFilters = this.dataSource.getFixedFilters();
-  
       return [
         ...fixedFilters,
       ]
@@ -60,10 +79,9 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
      * @returns 
      */
     getFilters() {
-      return [
-        ...this.getFixedFilters(),
-        ...this.filters,
-      ]
+        return [
+          ...this.filterManager.getFilters()
+        ] 
     }
   
     /**
@@ -72,6 +90,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
      */
     getFetchFilters(): tFilter[] {
       return [
+        ...this.getFilters(),
         ...this.dataSource.getFetchFilters()
       ] 
       
