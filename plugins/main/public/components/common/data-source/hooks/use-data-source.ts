@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { tFilter, tSearchParams } from "../search-params-builder";
 import {
     tDataSource,
-    tDataSourceFactory,
-    DataSourceRepository,
-    DataSourceSelector,
-    DataSourceFilterManager
+    tDataSourceRepository,
+    tFilter, 
+    tSearchParams, 
+    PatternDataSourceSelector,
+    PatternDataSourceFactory,
+    VulnerabilitiesDataSource,
+    PatternDataSource,
+    tParsedIndexPattern,
+    PatternDataSourceFilterManager
 } from '../index';
 
-type tUseDataSourceProps<T, K> = {
+type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
     filters: tFilter[];
-    factory: tDataSourceFactory<T, K>;
-    repository: DataSourceRepository<T, K>;
+    factory: PatternDataSourceFactory;
+    repository: tDataSourceRepository<T>;
 }
 
 type tUseDataSourceLoadedReturns<K> = {
@@ -34,7 +38,7 @@ type tUseDataSourceNotLoadedReturns = {
     setFilters: (filters: tFilter[]) => void;
 }
 
-export function useDataSource<T, K>(props: tUseDataSourceProps<T, K>): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
+export function useDataSource<T extends tParsedIndexPattern, K extends PatternDataSource>(props: tUseDataSourceProps<T, K>): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
     const { filters: defaultFilters = [], factory, repository } = props;
 
     if (!factory || !repository) {
@@ -42,7 +46,7 @@ export function useDataSource<T, K>(props: tUseDataSourceProps<T, K>): tUseDataS
     }
 
     const [dataSource, setDataSource] = useState<tDataSource>();
-    const [dataSourceFilterManager, setDataSourceFilterManager] = useState<DataSourceFilterManager | null>(null);
+    const [dataSourceFilterManager, setDataSourceFilterManager] = useState<PatternDataSourceFilterManager | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
     const [allFilters, setAllFilters] = useState<tFilter[]>([]);
@@ -69,12 +73,13 @@ export function useDataSource<T, K>(props: tUseDataSourceProps<T, K>): tUseDataS
 
     const init = async () => {
         setIsLoading(true);
-        const selector = new DataSourceSelector(repository, factory);
+        const dataSources = await factory.createAll(VulnerabilitiesDataSource, await repository.getAll());
+        const selector = new PatternDataSourceSelector(dataSources, repository);
         const dataSource = await selector.getSelectedDataSource();
         if (!dataSource) {
             throw new Error('No valid data source found');
         }
-        const dataSourceFilterManager = new DataSourceFilterManager(dataSource, defaultFilters);
+        const dataSourceFilterManager = new PatternDataSourceFilterManager(dataSource, defaultFilters);
         if (!dataSourceFilterManager) {
             throw new Error('Error creating filter manager');
         }

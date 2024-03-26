@@ -51,10 +51,9 @@ export type tDataSourceFactory<T extends object, K extends tDataSource> = {
 export type tDataSourceFilterManager = {
     fetch: () => Promise<any>;
     setFilters: (filters: tFilter[]) => void;
-    getFixedFilters: () => tFilter[];
     getFilters: () => tFilter[];
+    getFixedFilters: () => tFilter[];
     getFetchFilters: () => tFilter[];
-    addMetaDataInFilter: (filter: tFilter) => tFilter;
 }
 
 export type tDataSourceRepository<T extends object> = {

@@ -4,8 +4,9 @@ import { Filter, IndexPatternsContract, IndexPattern } from "../../../../../../.
 import { search } from '../../search-bar/search-bar-service';
 import store from '../../../../redux/store';
 import { getFilterExcludeManager, getFilterAllowedAgents } from '../../../../react-services/data-sources/vulnerabilities-states';
-import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from "../../../../../common/constants";
-
+import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT, DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER, VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from "../../../../../common/constants";
+import { AppState } from '../../../../react-services/app-state';
+import { FilterHandler }  from '../../../../utils/filter-handler';
 
 export class PatternDataSource implements tDataSource { 
     id: string;
@@ -14,7 +15,7 @@ export class PatternDataSource implements tDataSource {
     patternService: IndexPatternsContract;
     indexPattern: IndexPattern;
     defaultFixedFilters: tFilter[];
-    filters: tFilter[];
+    filters: tFilter[] = [];
 
     constructor(id: string, title: string) {
         this.id = id;
@@ -47,15 +48,16 @@ export class PatternDataSource implements tDataSource {
     getFixedFilters(): tFilter[]{
         // return all filters
         return [
+            ...this.getClusterManagerFilters(),
             ...this.getPinnedAgentFilter(),
         ];
     }
 
     getFetchFilters(): tFilter[]{
         return [
-            ...this.filters,
             ...this.getAllowAgentsFilter(),
-            ...this.getExcludeManagerFilter()
+            ...this.getExcludeManagerFilter(),
+            ...this.getFilters(),
         ];
     }
 
@@ -123,6 +125,26 @@ export class PatternDataSource implements tDataSource {
         }
     }
 
+    getClusterManagerFilters() {
+        const filterHandler = new FilterHandler();
+        const isCluster = AppState.getClusterInfo().status == 'enabled';
+        const managerFilter = filterHandler.managerQuery(
+            isCluster
+                ? AppState.getClusterInfo().cluster
+                : AppState.getClusterInfo().manager,
+            true,
+            VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER[
+            AppState.getClusterInfo().status
+            ],
+        );
+        managerFilter.meta.index = this.id;
+        managerFilter.meta.controlledBy = DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER;
+        managerFilter.$state = {
+            store: 'appState'
+        }
+        return [managerFilter] as tFilter[];
+    }
+
      /**
      * Returns the filter when the an agent is pinned (saved in the session storage or redux store)
      */
@@ -138,7 +160,7 @@ export class PatternDataSource implements tDataSource {
             negate: false,
             params: { query: agentId },
             type: 'phrase',
-            index: this.dataSource.id,
+            index: this.id,
             controlledBy: DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT
           },
           query: {
@@ -160,7 +182,7 @@ export class PatternDataSource implements tDataSource {
        */
       getExcludeManagerFilter(): tFilter[] {
         return store.getState().appConfig?.data?.hideManagerAlerts ?
-          [getFilterExcludeManager(this.dataSource.title) as tFilter] : [];
+          [getFilterExcludeManager(this.title) as tFilter] : [];
       }
     
       /**
@@ -170,7 +192,7 @@ export class PatternDataSource implements tDataSource {
       getAllowAgentsFilter(): tFilter[] {
         const allowedAgents = store.getState().appStateReducers?.allowedAgents || [];
         return allowedAgents.lenght > 0 ?
-          [getFilterAllowedAgents(allowedAgents, this.dataSource.title) as tFilter] : []
+          [getFilterAllowedAgents(allowedAgents, this.title) as tFilter] : []
       }
     
 

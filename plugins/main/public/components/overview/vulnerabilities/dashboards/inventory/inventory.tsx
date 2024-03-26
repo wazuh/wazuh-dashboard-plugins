@@ -46,7 +46,12 @@ import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 
-import { VulnerabilitiesDataSourceRepository, VulnerabilitiesDataSourceFactory, tFilter, tParsedIndexPattern, PatternDataSource } from '../../../../common/data-source';
+import { 
+  VulnerabilitiesDataSourceRepository, 
+  PatternDataSourceFactory, 
+  tFilter, 
+  tParsedIndexPattern, 
+  PatternDataSource } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { FilterManager } from '../../../../../../../../src/plugins/data/public';
 
@@ -64,7 +69,7 @@ const InventoryVulsComponent = () => {
     fetchData,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     filters: filterManager.getFilters(),
-    factory: new VulnerabilitiesDataSourceFactory(),
+    factory: new PatternDataSourceFactory(),
     repository: new VulnerabilitiesDataSourceRepository()
   });
 

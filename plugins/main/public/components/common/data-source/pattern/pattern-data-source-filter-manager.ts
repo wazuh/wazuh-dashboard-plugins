@@ -1,4 +1,4 @@
-import { tDataSourceFilterManager, tFilter } from '../index';
+import { tDataSourceFilterManager, tFilter, tSearchParams, tDataSource } from '../index';
 
 export class PatternDataSourceFilterManager implements tDataSourceFilterManager {
 
@@ -7,7 +7,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
         throw new Error('Data source is required');
       }
       this.dataSource = dataSource;
-      this.filters = filters.length ? this.filterUserFilters(filters) : [];
+      this.filters = filters.length ? this.filterUserFilters(filters) as tFilter[] : [];
     }
   
     /**
@@ -17,12 +17,12 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
     fetch(params: Omit<tSearchParams, 'filters'> = {}): Promise<any> {
       return this.dataSource.fetch({
         ...params,
-        filters: this.getFetchFilters(),
+        filters: [],
       });
     }
   
     setFilters(filters: tFilter[]) {
-      this.filters = this.filterUserFilters(filters) || [];
+      this.filters = this.filterUserFilters(filters) as tFilter[] || [];
     }
   
     /**
@@ -37,7 +37,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
       if (!filters) return [];
       return this.removeRepeatedFilters(filters.filter(
         filter => !(filter?.$state?.['isImplicit'] || filter.meta?.controlledBy || filter.meta?.index !== this.dataSource.id)
-      ));
+      ) as tFilter[] || []);
     }
   
     /**

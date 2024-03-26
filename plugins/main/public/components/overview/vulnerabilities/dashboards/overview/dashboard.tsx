@@ -23,7 +23,7 @@ import { ModuleEnabledCheck } from '../../common/components/check-module-enabled
 
 import {
   VulnerabilitiesDataSourceRepository,
-  VulnerabilitiesDataSourceFactory,
+  PatternDataSourceFactory,
   PatternDataSource,
   tFilter,
   tParsedIndexPattern
@@ -53,7 +53,7 @@ const DashboardVulsComponent: React.FC = () => {
     fetchData,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     filters: filterManager.getFilters(),
-    factory: new VulnerabilitiesDataSourceFactory(),
+    factory: new PatternDataSourceFactory(),
     repository: new VulnerabilitiesDataSourceRepository()
   });
 
@@ -103,8 +103,8 @@ const DashboardVulsComponent: React.FC = () => {
       <I18nProvider>
         <>
           <ModuleEnabledCheck />
-          {isLoading ? <LoadingSpinner /> : null}
-          {!isLoading ? (
+          {isLoading || isDataSourceLoading ? <LoadingSpinner /> : null}
+          {!isDataSourceLoading ? (
             <SearchBar
               appName='vulnerability-detector-searchbar'
               {...searchBarProps}
