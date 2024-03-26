@@ -392,6 +392,8 @@ node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/master/
                   }
                 : null;
 
+            //Wazuh prefix is removed due issue [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
+
             accum[httpMethodUppercase] = [
               ...accum[httpMethodUppercase],
               {
