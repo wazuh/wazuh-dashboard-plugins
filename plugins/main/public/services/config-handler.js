@@ -24,11 +24,10 @@ export class ConfigHandler {
    */
   async saveManagerConfiguration(content) {
     try {
-      const result = await WzRequest.apiReq(
-        'PUT',
-        `/manager/configuration`,
-        { content, origin: 'xmleditor' }
-      );
+      const result = await WzRequest.apiReq('PUT', `/manager/configuration`, {
+        content,
+        origin: 'xmleditor',
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -45,7 +44,7 @@ export class ConfigHandler {
       const result = await WzRequest.apiReq(
         'PUT',
         `/cluster/${node}/configuration`,
-        { content, origin: 'xmleditor' }
+        { content, origin: 'xmleditor' },
       );
       return result;
     } catch (error) {
@@ -56,9 +55,7 @@ export class ConfigHandler {
   async performClusterRestart() {
     try {
       await WzRequest.apiReq('PUT', `/cluster/restart`, { delay: 15000 });
-      this.$rootScope.$broadcast('removeRestarting', {});
     } catch (error) {
-      this.$rootScope.$broadcast('removeRestarting', {});
       throw new Error('Error restarting cluster');
     }
   }
@@ -71,7 +68,7 @@ export class ConfigHandler {
       const validationError = await WzRequest.apiReq(
         'GET',
         `/manager/configuration/validation`,
-        {}
+        {},
       );
 
       const data = ((validationError || {}).data || {}).data || {};
@@ -96,7 +93,7 @@ export class ConfigHandler {
       const validationError = await WzRequest.apiReq(
         'GET',
         `/cluster/configuration/validation`,
-        {}
+        {},
       );
 
       const data = ((validationError || {}).data || {}).data || {};
@@ -120,7 +117,7 @@ export class ConfigHandler {
       const validationError = await WzRequest.apiReq(
         'GET',
         `/cluster/${node}/configuration/validation`,
-        {}
+        {},
       );
 
       const data = ((validationError || {}).data || {}).data || {};
@@ -132,7 +129,7 @@ export class ConfigHandler {
       const result = await WzRequest.apiReq(
         'PUT',
         `/cluster/${node}/restart`,
-        {}
+        {},
       );
       return result;
     } catch (error) {
