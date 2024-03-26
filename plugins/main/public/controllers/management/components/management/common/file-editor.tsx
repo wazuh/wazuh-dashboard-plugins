@@ -243,7 +243,7 @@ class WzFileEditor extends Component {
         <WzButtonPermissionsOpenFlyout
           flyoutTitle={isRules}
           flyoutBody={({ onClose, onUpdateCanClose }) => (
-            <Logtest onFlyout={true} showClose={true}></Logtest>
+            <Logtest onFlyout={true}></Logtest>
           )}
           buttonProps={{
             buttonType: 'empty',

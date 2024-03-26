@@ -49,7 +49,6 @@ import { WzFlyout } from '../../../components/common/flyouts';
 import _ from 'lodash';
 
 type LogstestProps = {
-  showClose: boolean;
   onFlyout: boolean;
 };
 
@@ -254,7 +253,7 @@ export const Logtest = compose(
           placeholder='Type one log per line...'
           fullWidth={true}
           aria-label=''
-          rows={props.showClose ? 10 : 4}
+          rows={props.onFlyout ? 10 : 4}
           onChange={onChange}
           onKeyPress={handleKeyPress}
         />
@@ -315,7 +314,7 @@ export const Logtest = compose(
   const dynamicHeight = () =>
     DynamicHeight.dynamicHeightStatic(
       '.euiCodeBlock',
-      props.showClose ? 70 : 100,
+      props.onFlyout ? 70 : 100,
     );
 
   dynamicHeight();
