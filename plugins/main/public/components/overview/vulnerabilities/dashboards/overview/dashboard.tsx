@@ -23,6 +23,7 @@ import { ModuleEnabledCheck } from '../../common/components/check-module-enabled
 
 import {
   VulnerabilitiesDataSourceRepository,
+  VulnerabilitiesDataSource,
   PatternDataSourceFactory,
   PatternDataSource,
   tFilter,
@@ -52,16 +53,9 @@ const DashboardVulsComponent: React.FC = () => {
     isLoading: isDataSourceLoading,
     fetchData,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    filters: filterManager.getFilters(),
-    factory: new PatternDataSourceFactory(),
-    repository: new VulnerabilitiesDataSourceRepository()
+    DataSource: VulnerabilitiesDataSource,
+    repository: new VulnerabilitiesDataSourceRepository(),
   });
-
-  useEffect(() => {
-    if (!isDataSourceLoading) {
-      filterManager.setFilters(defaultFilters);
-    }
-  }, [isDataSourceLoading])
 
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
@@ -71,21 +65,12 @@ const DashboardVulsComponent: React.FC = () => {
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
   useEffect(() => {
-    if (!isLoading) {
-      setFilters(searchBarFilters as tFilter[]);
-    }
-  }, [
-    JSON.stringify(searchBarFilters)
-  ]);
-
-  useEffect(() => {
     if (isLoading || isDataSourceLoading) {
       return;
     }
     fetchData({ query }).then(results => {
-        console.log('results', results);
-        setResults(results);
-      })
+      setResults(results);
+    })
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
@@ -95,7 +80,7 @@ const DashboardVulsComponent: React.FC = () => {
       });
   }, [
     JSON.stringify(fetchFilters),
-    JSON.stringify(query)
+    JSON.stringify(query),
   ])
 
   return (
@@ -103,8 +88,9 @@ const DashboardVulsComponent: React.FC = () => {
       <I18nProvider>
         <>
           <ModuleEnabledCheck />
-          {isLoading || isDataSourceLoading ? <LoadingSpinner /> : null}
-          {!isDataSourceLoading ? (
+          {
+            isLoading || isDataSourceLoading ? 
+            <LoadingSpinner /> :
             <SearchBar
               appName='vulnerability-detector-searchbar'
               {...searchBarProps}
@@ -112,7 +98,7 @@ const DashboardVulsComponent: React.FC = () => {
               showQueryInput={true}
               showQueryBar={true}
             />
-          ) : null}
+          }
           {!isLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

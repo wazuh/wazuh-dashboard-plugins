@@ -1,8 +1,9 @@
-import { PatternDataSource, tFilter } from "../../../index";
+import { tFilter } from "../../../index";
+import { PatternDataSource } from '../../pattern-data-source';
 import { DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP } from '../../../../../../../common/constants';
 
 
-const VULNERABILITIES_GROUP_KEY = 'rules.group';
+const VULNERABILITIES_GROUP_KEY = 'rule.groups';
 const VULNERABILITIES_GROUP_VALUE = 'vulnerability-detector';
 
 export class AlertsVulnerabilitiesDataSource extends PatternDataSource {
@@ -44,6 +45,7 @@ export class AlertsVulnerabilitiesDataSource extends PatternDataSource {
     getFixedFilters(): tFilter[] {
         return [
             ...super.getFixedFilters(),
+            ...this.getRuleGroupsFilter()
         ]
     }
 }

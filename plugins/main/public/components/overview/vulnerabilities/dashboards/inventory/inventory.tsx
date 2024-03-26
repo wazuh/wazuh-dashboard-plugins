@@ -47,7 +47,8 @@ import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-v
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 
 import { 
-  VulnerabilitiesDataSourceRepository, 
+  VulnerabilitiesDataSourceRepository,
+  VulnerabilitiesDataSource,
   PatternDataSourceFactory, 
   tFilter, 
   tParsedIndexPattern, 
@@ -68,21 +69,14 @@ const InventoryVulsComponent = () => {
     isLoading: isDataSourceLoading,
     fetchData,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    filters: filterManager.getFilters(),
-    factory: new PatternDataSourceFactory(),
+    DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository()
   });
-
-  useEffect(() => {
-    if (!isDataSourceLoading) {
-      filterManager.setFilters(defaultFilters);
-    }
-  }, [isDataSourceLoading])
 
   const { searchBarProps } = useSearchBar({
     defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
   });
-  const { isLoading, filters: searchBarFilters, query } = searchBarProps;
+  const { isLoading, query } = searchBarProps;
 
   const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -161,14 +155,6 @@ const InventoryVulsComponent = () => {
   };
 
   useEffect(() => {
-    if (!isLoading) {
-      setFilters(searchBarFilters as tFilter[]);
-    }
-  }, [
-    JSON.stringify(searchBarFilters)
-  ]);
-
-  useEffect(() => {
     if (isLoading || isDataSourceLoading) {
       return;
     }
@@ -176,6 +162,7 @@ const InventoryVulsComponent = () => {
     fetchData({ query, pagination, sorting })
       .then(results => {
         console.log('results', results);
+        console.log('filters', fetchFilters);
         setResults(results);
       })
       .catch(error => {
