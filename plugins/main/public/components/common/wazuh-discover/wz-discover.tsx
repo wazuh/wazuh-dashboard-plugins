@@ -38,6 +38,7 @@ import { search } from '../search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
 import { getWazuhCorePlugin } from '../../../kibana-services';
+import { useIndexPattern } from '../hooks/use-index-pattern';
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
@@ -46,12 +47,12 @@ import { withErrorBoundary } from '../hocs';
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
 type WazuhDiscoverProps = {
-  indexPatternName: string;
+  defaultIndexPattern?: IndexPattern;
   tableColumns: tDataGridColumn[];
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
-  const { indexPatternName, tableColumns: defaultTableColumns } = props;
+  const { defaultIndexPattern, tableColumns: defaultTableColumns } = props;
   const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
@@ -61,6 +62,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
+  const [indexPatternTitle, setIndexPatternTitle] = useState<string>('');
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
@@ -86,7 +88,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   };
 
   const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: indexPatternName,
+    defaultIndexPatternID: indexPatternTitle,
   });
   const {
     isLoading,
@@ -117,12 +119,20 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     indexPattern: indexPattern as IndexPattern,
   });
 
+  const currentIndexPattern = useIndexPattern();
+
   useEffect(() => {
-    if (!isLoading) {
+    if (currentIndexPattern) {
+      setIndexPattern(currentIndexPattern);
+      setIndexPatternTitle(currentIndexPattern.title);
+    }
+  }, [currentIndexPattern])
+
+  useEffect(() => {
+    if (!isLoading && indexPattern) {
       setIsSearching(true);
-      setIndexPattern(indexPatterns?.[0] as IndexPattern);
       search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
+        indexPattern: indexPattern as IndexPattern,
         filters,
         query,
         pagination,
@@ -157,7 +167,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const onClickExportResults = async () => {
     const params = {
-      indexPattern: indexPatterns?.[0] as IndexPattern,
+      indexPattern: indexPattern as IndexPattern,
       filters,
       query,
       fields: columnVisibility.visibleColumns,
@@ -214,7 +224,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   <EuiPanel>
                     <DashboardByRenderer
                       input={histogramChartInput(
-                        indexPatternName,
+                        indexPatternTitle,
                         filters,
                         query,
                         dateRangeFrom,
