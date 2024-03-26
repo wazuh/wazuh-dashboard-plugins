@@ -16,16 +16,11 @@ import {
   EuiCodeBlock,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiFlyout,
-  EuiFlyoutBody,
-  EuiFlyoutHeader,
-  EuiOverlayMask,
   EuiPage,
   EuiPanel,
   EuiSpacer,
   EuiTextArea,
   EuiTitle,
-  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services';
 import {
@@ -45,7 +40,6 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { WzFlyout } from '../../../components/common/flyouts';
 import _ from 'lodash';
 
 type LogstestProps = {
