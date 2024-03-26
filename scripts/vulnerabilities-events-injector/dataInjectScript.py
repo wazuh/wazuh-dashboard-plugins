@@ -115,6 +115,8 @@ def generateRandomVulnerability():
     vulnerability['scanner'] = {'vendor':'vendor-{}'.format(random.randint(0, 9))}
     vulnerability['score'] = {'base':round(random.uniform(0, 10),1), 'environmental':round(random.uniform(0, 10),1), 'temporal':round(random.uniform(0, 10),1),'version':'{}'.format(round(random.uniform(0, 10),1))}
     vulnerability['severity'] = random.choice(['Low','Medium','High','Critical'])
+    vulnerability['published_at'] = generateRandomDate()
+    vulnerability['detected_at'] = generateRandomDate()
     return(vulnerability)
 
 def generateRandomWazuh():
@@ -125,7 +127,6 @@ def generateRandomWazuh():
 def generateRandomData(number):
     for i in range(0, int(number)):
         yield{
-            '@timestamp':generateRandomDate(),
             'agent':generateRandomAgent(),
             'ecs':{'version':'1.7.0'},
             'host':generateRandomHost(),
