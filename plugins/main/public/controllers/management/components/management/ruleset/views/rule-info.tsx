@@ -752,7 +752,7 @@ export default class WzRuleInfo extends Component {
                 iconType='popout'
                 aria-label='popout'
                 href={getCore().application.getUrlForApp(threatHunting.id, {
-                  path: `#/overview?tab=general&tabView=panels&addRuleFilter=${id}`,
+                  path: `#/overview/?tab=general&tabView=panels&addRuleFilter=${id}`,
                 })}
                 target='blank'
               >
