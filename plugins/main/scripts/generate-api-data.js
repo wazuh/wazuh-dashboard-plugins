@@ -397,11 +397,25 @@ node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/master/
               {
                 name,
                 documentation,
-                description,
-                summary,
+                description: description.replace(/Wazuh/g, 'Server'),
+                summary: summary.replace(/Wazuh/g, 'Server'),
                 tags,
                 ...(args.length ? { args } : {}),
-                ...(query.length ? { query } : {}),
+                ...(query.length
+                  ? {
+                      query: query.map(({ ...params }) => ({
+                        ...params,
+                        ...(params.description
+                          ? {
+                              description: params.description.replace(
+                                /Wazuh/g,
+                                'Server',
+                              ),
+                            }
+                          : {}),
+                      })),
+                    }
+                  : {}),
                 ...(body ? { body: [body] } : {}),
               },
             ];
