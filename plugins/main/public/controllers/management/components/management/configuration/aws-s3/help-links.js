@@ -13,7 +13,7 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 export default [
   {
-    text: 'Using Wazuh to monitor AWS',
+    text: 'Monitoring AWS',
     href: webDocumentationLink('cloud-security/amazon/index.html'),
   },
   {

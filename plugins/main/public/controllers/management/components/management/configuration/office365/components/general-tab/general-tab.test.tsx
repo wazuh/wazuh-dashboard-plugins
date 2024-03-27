@@ -40,7 +40,9 @@ describe('GeneralTab component', () => {
     };
     const agent = { id: '000' };
 
-    const wrapper = mount(<GeneralTab wodleConfiguration={wodleConfiguration} agent={agent} />);
+    const wrapper = mount(
+      <GeneralTab wodleConfiguration={wodleConfiguration} agent={agent} />,
+    );
 
     expect(wrapper).toMatchSnapshot();
   });

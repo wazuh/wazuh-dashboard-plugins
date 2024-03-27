@@ -27,41 +27,47 @@ const mainSettings = [
   { field: 'email_to', label: 'Send alerts to this email address' },
   {
     field: 'level',
-    label: 'Minimum severity level to send the alert by email'
+    label: 'Minimum severity level to send the alert by email',
   },
   {
     field: 'group',
-    label: 'Send only alerts that belong to one of these groups'
+    label: 'Send only alerts that belong to one of these groups',
   },
   {
     field: 'event_location',
-    label: 'Send alerts when they match this event location'
+    label: 'Send alerts when they match this event location',
   },
   { field: 'format', label: 'Format for email alerts' },
   {
     field: 'rule_id',
-    label: 'Send only alerts that belong to one of these rule IDs'
+    label: 'Send only alerts that belong to one of these rule IDs',
   },
   { field: 'do_not_delay', label: 'Disable delayed email delivery' },
   {
     field: 'do_not_group',
-    label: 'Disable alerts grouping into the same email'
-  }
+    label: 'Disable alerts grouping into the same email',
+  },
 ];
 
 const helpLinks = [
   {
     text: 'Configuring email alerts',
-    href: webDocumentationLink('user-manual/manager/manual-email-report/index.html')
+    href: webDocumentationLink(
+      'user-manual/manager/manual-email-report/index.html',
+    ),
   },
   {
     text: 'SMTP server with authentication',
-    href: webDocumentationLink('user-manual/manager/manual-email-report/smtp-authentication.html')
+    href: webDocumentationLink(
+      'user-manual/manager/manual-email-report/smtp-authentication.html',
+    ),
   },
   {
     text: 'Email alerts reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/email-alerts.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/email-alerts.html',
+    ),
+  },
 ];
 
 class WzConfigurationAlertsEmailAlerts extends Component {
@@ -76,7 +82,7 @@ class WzConfigurationAlertsEmailAlerts extends Component {
       isArray(currentConfig['mail-alerts'].email_alerts)
         ? settingsListBuilder(
             currentConfig['mail-alerts'].email_alerts,
-            'email_to'
+            'email_to',
           )
         : [];
     return (
@@ -89,18 +95,18 @@ class WzConfigurationAlertsEmailAlerts extends Component {
         !isString(currentConfig['mail-alerts']) &&
         (!currentConfig['mail-alerts'].email_alerts ||
           !currentConfig['mail-alerts'].email_alerts.length) ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['mail-alerts']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {currentConfig['mail-alerts'] &&
         isArray(currentConfig['mail-alerts'].email_alerts) &&
         currentConfig['mail-alerts'].email_alerts.length ? (
           <WzConfigurationSettingsHeader
-            title="Main settings"
-            description="Granular email alert options"
+            title='Main settings'
+            description='Granular email alert options'
             help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
@@ -115,11 +121,11 @@ class WzConfigurationAlertsEmailAlerts extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAlertsEmailAlerts.propTypes = {
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default connect(mapStateToProps)(WzConfigurationAlertsEmailAlerts);

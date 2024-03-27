@@ -29,7 +29,7 @@ const mainSettings = [
   {
     field: 'disabled',
     label: 'Status of this active response',
-    render: renderValueNoThenEnabled
+    render: renderValueNoThenEnabled,
   },
   { field: 'command', label: 'Command to execute' },
   { field: 'location', label: 'Execute the command on this location' },
@@ -37,18 +37,22 @@ const mainSettings = [
   { field: 'level', label: 'Match to this severity level or above' },
   { field: 'rules_group', label: 'Match to one of these groups' },
   { field: 'rules_id', label: 'Match to one of these rule IDs' },
-  { field: 'timeout', label: 'Timeout (in seconds) before reverting' }
+  { field: 'timeout', label: 'Timeout (in seconds) before reverting' },
 ];
 
 const helpLinks = [
   {
     text: 'Active response documentation',
-    href: webDocumentationLink('user-manual/capabilities/active-response/index.html')
+    href: webDocumentationLink(
+      'user-manual/capabilities/active-response/index.html',
+    ),
   },
   {
     text: 'Active response reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/active-response.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/active-response.html',
+    ),
+  },
 ];
 
 class WzConfigurationActiveResponseActiveResponse extends Component {
@@ -63,7 +67,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component {
       currentConfig['analysis-active_response']['active-response'].length
         ? settingsListBuilder(
             currentConfig['analysis-active_response']['active-response'],
-            'command'
+            'command',
           )
         : [];
     return (
@@ -79,17 +83,17 @@ class WzConfigurationActiveResponseActiveResponse extends Component {
           !isString(currentConfig['analysis-active_response']) &&
           currentConfig['analysis-active_response']['active-response'] &&
           !currentConfig['analysis-active_response']['active-response']
-            .length && <WzNoConfig error="not-present" help={helpLinks} />}
+            .length && <WzNoConfig error='not-present' help={helpLinks} />}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['analysis-active_response']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {currentConfig['analysis-active_response'] &&
         !isString(currentConfig['analysis-active_response']) &&
         currentConfig['analysis-active_response']['active-response'].length ? (
           <WzConfigurationSettingsHeader
-            title="Active response definitions"
-            description="Find here all the currently defined Active responses"
+            title='Active response definitions'
+            description='Find here all the currently defined Active responses'
             help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
@@ -105,24 +109,24 @@ class WzConfigurationActiveResponseActiveResponse extends Component {
 
 WzConfigurationActiveResponseActiveResponse.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 export default connect(mapStateToProps)(
-  WzConfigurationActiveResponseActiveResponse
+  WzConfigurationActiveResponseActiveResponse,
 );
 
 const sectionsAgent = [{ component: 'com', configuration: 'active-response' }];
 
 export const WzConfigurationActiveResponseActiveResponseAgent = compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent)
+  withWzConfig(sectionsAgent),
 )(WzConfigurationActiveResponseActiveResponse);
 
 WzConfigurationActiveResponseActiveResponseAgent.propTypes = {
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };

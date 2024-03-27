@@ -14,8 +14,8 @@
   const OUTPUT_FILE_SECURITY_ACTIONS = 'security-actions.json';
 
   // Define the CLI information
-  const cliName = 'Wazuh API data extractor';
-  const cliDescription = `Extract the Wazuh API data
+  const cliName = 'API data extractor';
+  const cliDescription = `Extract the API data
 
 Some warning messages are sent to stderr.`;
   const cliFilePath = process.argv[1];
@@ -392,16 +392,32 @@ node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/master/
                   }
                 : null;
 
+            //Wazuh prefix is removed due issue [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
+
             accum[httpMethodUppercase] = [
               ...accum[httpMethodUppercase],
               {
                 name,
                 documentation,
-                description,
-                summary,
+                description: description.replace(/Wazuh/g, 'Server'),
+                summary: summary.replace(/Wazuh/g, 'Server'),
                 tags,
                 ...(args.length ? { args } : {}),
-                ...(query.length ? { query } : {}),
+                ...(query.length
+                  ? {
+                      query: query.map(({ ...params }) => ({
+                        ...params,
+                        ...(params.description
+                          ? {
+                              description: params.description.replace(
+                                /Wazuh/g,
+                                'Server',
+                              ),
+                            }
+                          : {}),
+                      })),
+                    }
+                  : {}),
                 ...(body ? { body: [body] } : {}),
               },
             ];

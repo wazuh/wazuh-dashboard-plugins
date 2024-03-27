@@ -15,80 +15,94 @@ interface SettingsAboutGeneralInfoProps {
   pluginAppName: string;
 }
 
-export const SettingsAboutGeneralInfo = ({ pluginAppName }: SettingsAboutGeneralInfoProps) => {
-  const googleGroupsSVG = getHttp().basePath.prepend(getAssetURL('images/icons/google_groups.svg'));
+export const SettingsAboutGeneralInfo = ({
+  pluginAppName,
+}: SettingsAboutGeneralInfoProps) => {
+  const googleGroupsSVG = getHttp().basePath.prepend(
+    getAssetURL('images/icons/google_groups.svg'),
+  );
 
-  const Section = ({ title, content }: { title: string; content: React.ReactNode }) => (
+  const Section = ({
+    title,
+    content,
+  }: {
+    title: string;
+    content: React.ReactNode;
+  }) => (
     <EuiFlexItem>
-      <EuiPanel paddingSize="l">
-        <EuiTitle size="m">
+      <EuiPanel paddingSize='l'>
+        <EuiTitle size='m'>
           <h2>{title}</h2>
         </EuiTitle>
-        <EuiSpacer size="l" />
+        <EuiSpacer size='l' />
         {content}
       </EuiPanel>
     </EuiFlexItem>
   );
 
   return (
-    <EuiFlexGroup gutterSize="l" direction="row" responsive>
+    <EuiFlexGroup gutterSize='l' direction='row' responsive>
       <Section
         title={`Welcome to the ${pluginAppName}`}
         content={
-          <EuiText size="m">
+          <EuiText size='m'>
             <p>
-              {pluginAppName} provides management and monitoring capabilities, giving users control
-              over the Wazuh infrastructure. You can monitor your agents status and configuration,
-              query and visualize your alert data and monitor manager rules and configuration.
+              Dashboard provides management and monitoring capabilities, giving
+              users control over the infrastructure. You can monitor your agents
+              status and configuration, query and visualize your alert data and
+              monitor manager rules and configuration.
             </p>
           </EuiText>
         }
       />
       <Section
-        title="Community"
+        title='Community'
         content={
           <div>
-            <EuiText size="m">
-              <p>Enjoy your Wazuh experience and please don't hesitate to give us your feedback.</p>
+            <EuiText size='m'>
+              <p>
+                Enjoy your experience and please don't hesitate to give us your
+                feedback.
+              </p>
             </EuiText>
-            <EuiSpacer size="l" />
+            <EuiSpacer size='l' />
             <EuiFlexGroup
-              alignItems="center"
-              justifyContent="center"
-              gutterSize="xl"
+              alignItems='center'
+              justifyContent='center'
+              gutterSize='xl'
               responsive={false}
             >
               <EuiFlexItem grow={false}>
                 <EuiButtonIcon
-                  aria-label="Slack"
-                  iconType="logoSlack"
-                  iconSize="xxl"
-                  href="https://wazuh.com/community/join-us-on-slack/"
-                  target="_blank"
+                  aria-label='Slack'
+                  iconType='logoSlack'
+                  iconSize='xxl'
+                  href='https://wazuh.com/community/join-us-on-slack/'
+                  target='_blank'
                 >
-                  Wazuh Slack
+                  Slack
                 </EuiButtonIcon>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButtonIcon
-                  aria-label="Google Groups"
+                  aria-label='Google Groups'
                   iconType={googleGroupsSVG}
-                  iconSize="xxl"
-                  href="https://groups.google.com/forum/#!forum/wazuh"
-                  target="_blank"
+                  iconSize='xxl'
+                  href='https://groups.google.com/forum/#!forum/wazuh'
+                  target='_blank'
                 >
-                  Wazuh forum
+                  Google groups
                 </EuiButtonIcon>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButtonIcon
-                  aria-label="Github"
-                  iconType="logoGithub"
-                  iconSize="xxl"
-                  href="https://github.com/wazuh/wazuh-kibana-app"
-                  target="_blank"
+                  aria-label='Github'
+                  iconType='logoGithub'
+                  iconSize='xxl'
+                  href='https://github.com/wazuh/wazuh-kibana-app'
+                  target='_blank'
                 >
-                  Wazuh dashboard Github
+                  Github
                 </EuiButtonIcon>
               </EuiFlexItem>
             </EuiFlexGroup>

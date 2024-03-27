@@ -16,7 +16,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiTitle,
-  EuiIcon
+  EuiIcon,
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { connect } from 'react-redux';
@@ -51,7 +51,7 @@ export class WzStatusAgentInfo extends Component {
     }
 
     const greyStyle = {
-      color: 'grey'
+      color: 'grey',
     };
 
     return (
@@ -60,7 +60,7 @@ export class WzStatusAgentInfo extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle size="m">
+                <EuiTitle size='m'>
                   <h2>Last registered agent</h2>
                 </EuiTitle>
               </EuiFlexItem>
@@ -77,7 +77,9 @@ export class WzStatusAgentInfo extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>Status</EuiFlexItem>
-          <EuiFlexItem style={{...greyStyle}}>{agentStatusLabelByAgentStatus(agentInfo.status)}</EuiFlexItem>
+          <EuiFlexItem style={{ ...greyStyle }}>
+            {agentStatusLabelByAgentStatus(agentInfo.status)}
+          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>IP address</EuiFlexItem>
@@ -85,13 +87,17 @@ export class WzStatusAgentInfo extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>Date added</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{formatUIDate(agentInfo.dateAdd)}</EuiFlexItem>
+          <EuiFlexItem style={greyStyle}>
+            {formatUIDate(agentInfo.dateAdd)}
+          </EuiFlexItem>
         </EuiFlexGroup>
         {status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
           <div>
             <EuiFlexGroup>
               <EuiFlexItem>Version</EuiFlexItem>
-              <EuiFlexItem style={greyStyle}>{agentInfo.version || '-'}</EuiFlexItem>
+              <EuiFlexItem style={greyStyle}>
+                {agentInfo.version || '-'}
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>Last keep alive</EuiFlexItem>
@@ -114,7 +120,7 @@ export class WzStatusAgentInfo extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers
+    state: state.statusReducers,
   };
 };
 

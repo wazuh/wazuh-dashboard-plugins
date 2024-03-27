@@ -36,7 +36,7 @@ const mainSettings = [
   },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since Wazuh agent was started',
+    label: 'Collect events generated since agent was started',
   },
   {
     field: 'time_delay',
@@ -61,7 +61,7 @@ const columns = [
 
 const helpLinks = [
   {
-    text: 'Using Wazuh to monitor GitHub',
+    text: 'Monitoring GitHub',
     href: webDocumentationLink('cloud-security/github/index.html'),
   },
   {
@@ -124,10 +124,10 @@ const tabWrapper = compose(
   ),
 );
 
-const GeneralTab = tabWrapper(({agent, wodleConfiguration}) => (
+const GeneralTab = tabWrapper(({ agent, wodleConfiguration }) => (
   <WzConfigurationSettingsHeader
-    title="Main settings"
-    description="Configuration for the GitHub module"
+    title='Main settings'
+    description='Configuration for the GitHub module'
     help={helpLinks}
   >
     <WzConfigurationSettingsGroup
@@ -145,7 +145,7 @@ const CredentialsTab = tabWrapper(({ agent, wodleConfiguration }) => {
   );
   return (
     <WzConfigurationSettingsHeader
-      title="List of organizations to auditing"
+      title='List of organizations to auditing'
       help={helpLinks}
     >
       <WzConfigurationSettingsListSelector
@@ -153,5 +153,5 @@ const CredentialsTab = tabWrapper(({ agent, wodleConfiguration }) => {
         settings={columns}
       />
     </WzConfigurationSettingsHeader>
-  )
+  );
 });

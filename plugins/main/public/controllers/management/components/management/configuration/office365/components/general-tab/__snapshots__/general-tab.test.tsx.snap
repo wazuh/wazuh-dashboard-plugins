@@ -38,7 +38,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
       Array [
         Object {
           "href": "https://documentation.wazuh.com/4.9/cloud-security/office365/index.html",
-          "text": "Using Wazuh to monitor Office 365",
+          "text": "Monitoring Office 365",
         },
         Object {
           "href": "https://documentation.wazuh.com/4.9/user-manual/reference/ossec-conf/office365-module.html",
@@ -107,7 +107,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                       Array [
                         Object {
                           "href": "https://documentation.wazuh.com/4.9/cloud-security/office365/index.html",
-                          "text": "Using Wazuh to monitor Office 365",
+                          "text": "Monitoring Office 365",
                         },
                         Object {
                           "href": "https://documentation.wazuh.com/4.9/user-manual/reference/ossec-conf/office365-module.html",
@@ -269,7 +269,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
           },
           Object {
             "field": "only_future_events",
-            "label": "Collect events generated since Wazuh manager is initialized",
+            "label": "Collect events generated since manager is initialized",
           },
           Object {
             "field": "interval",
@@ -425,9 +425,9 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                 </EuiSpacer>
               </WzConfigurationSetting>
               <WzConfigurationSetting
-                key="-Collect events generated since Wazuh manager is initialized-undefined-1"
-                keyItem="-Collect events generated since Wazuh manager is initialized-undefined-1"
-                label="Collect events generated since Wazuh manager is initialized"
+                key="-Collect events generated since manager is initialized-undefined-1"
+                keyItem="-Collect events generated since manager is initialized-undefined-1"
+                label="Collect events generated since manager is initialized"
                 value="yes"
               >
                 <div
@@ -454,7 +454,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                       <div
                         className="euiTextAlign euiTextAlign--right"
                       >
-                        Collect events generated since Wazuh manager is initialized
+                        Collect events generated since manager is initialized
                       </div>
                     </EuiTextAlign>
                   </div>
@@ -466,7 +466,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                     }
                   >
                     <EuiFieldText
-                      data-testid="collect-events-generated-since-wazuh-manager-is-initialized"
+                      data-testid="collect-events-generated-since-manager-is-initialized"
                       readOnly={true}
                       value="yes"
                     >
@@ -483,7 +483,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                             <EuiValidatableControl>
                               <input
                                 className="euiFieldText"
-                                data-testid="collect-events-generated-since-wazuh-manager-is-initialized"
+                                data-testid="collect-events-generated-since-manager-is-initialized"
                                 readOnly={true}
                                 type="text"
                                 value="yes"

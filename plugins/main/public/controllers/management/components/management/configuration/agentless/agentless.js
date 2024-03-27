@@ -29,18 +29,22 @@ const mainSettings = [
   { field: 'frequency', label: 'Interval (in seconds) between checks' },
   { field: 'host', label: 'Device username and hostname' },
   { field: 'state', label: 'Device check type' },
-  { field: 'arguments', label: 'Pass these arguments to check' }
+  { field: 'arguments', label: 'Pass these arguments to check' },
 ];
 
 const helpLinks = [
   {
     text: 'How to monitor agentless devices',
-    href: webDocumentationLink('user-manual/capabilities/agentless-monitoring/index.html')
+    href: webDocumentationLink(
+      'user-manual/capabilities/agentless-monitoring/index.html',
+    ),
   },
   {
     text: 'Agentless reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/agentless.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/agentless.html',
+    ),
+  },
 ];
 
 class WzConfigurationAgentless extends Component {
@@ -55,7 +59,7 @@ class WzConfigurationAgentless extends Component {
       currentConfig['agentless-agentless'].agentless
         ? currentConfig['agentless-agentless'].agentless.map(item => ({
             label: `${item.type} (${item.state})`,
-            data: item
+            data: item,
           }))
         : false;
     return (
@@ -69,12 +73,12 @@ class WzConfigurationAgentless extends Component {
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['agentless-agentless']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {currentConfig['agentless-agentless'] &&
           !isString(currentConfig['agentless-agentless']) && (
             <WzConfigurationSettingsHeader
-              title="Devices list"
+              title='Devices list'
               description="List of monitored devices that don't use the agent"
               help={helpLinks}
             >
@@ -92,14 +96,14 @@ class WzConfigurationAgentless extends Component {
 const sections = [{ component: 'agentless', configuration: 'agentless' }];
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAgentless.propTypes = {
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default compose(
   withWzConfig(sections),
-  connect(mapStateToProps)
+  connect(mapStateToProps),
 )(WzConfigurationAgentless);

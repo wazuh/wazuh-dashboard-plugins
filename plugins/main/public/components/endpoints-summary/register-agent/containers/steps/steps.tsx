@@ -149,13 +149,13 @@ export const Steps = ({
     ...(needsPassword && !wazuhPassword
       ? [
           {
-            title: 'Wazuh password:',
+            title: 'Password',
             children: (
               <EuiCallOut
                 color='warning'
                 title={
                   <span>
-                    The Wazuh password is required but wasn't defined. Please
+                    The password is required but wasn't defined. Please
                     check our{' '}
                     <EuiLink
                       target='_blank'

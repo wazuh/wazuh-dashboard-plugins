@@ -87,7 +87,7 @@ export class CacheAPIUserAllowRunAs {
         excludePassword: true,
       });
       throw new Error(
-        `API with host ID [${apiId}] misconfigured. The Wazuh API user [${api.username}] is not allowed to use [run_as]. Allow it in the user configuration or set [run_as] host setting with [false] value.`,
+        `API with host ID [${apiId}] misconfigured. The server API user [${api.username}] is not allowed to use [run_as]. Allow it in the user configuration or set [run_as] host setting with [false] value.`,
       );
     }
     return ApiUserCanUseStatus;

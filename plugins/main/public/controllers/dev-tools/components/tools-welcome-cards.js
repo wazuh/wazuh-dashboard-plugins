@@ -18,7 +18,7 @@ import {
   EuiTitle,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiSpacer
+  EuiSpacer,
 } from '@elastic/eui';
 
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
@@ -34,7 +34,7 @@ export class ToolsWelcomeCards extends Component {
         <EuiFlexItem grow={true}></EuiFlexItem>
         <EuiFlexItem grow={true} key={index}>
           <EuiCard
-            icon={<EuiIcon size="xxl" type={tab.icon} />}
+            icon={<EuiIcon size='xxl' type={tab.icon} />}
             title={WAZUH_MODULES[tab.id].title}
             onClick={() => this.props.clickAction(tab.id)}
             description={WAZUH_MODULES[tab.id].description}
@@ -49,10 +49,10 @@ export class ToolsWelcomeCards extends Component {
   render() {
     return (
       <div>
-        <EuiTitle size="m">
-          <h1>Wazuh tools</h1>
+        <EuiTitle size='m'>
+          <h1>Tools</h1>
         </EuiTitle>
-        <EuiSpacer size="m" />
+        <EuiSpacer size='m' />
         <EuiFlexGroup>{this.buildToolsCards()}</EuiFlexGroup>
       </div>
     );
@@ -61,5 +61,5 @@ export class ToolsWelcomeCards extends Component {
 
 ToolsWelcomeCards.propTypes = {
   sections: PropTypes.array,
-  clickAction: PropTypes.func
+  clickAction: PropTypes.func,
 };

@@ -22,9 +22,12 @@ interface IHistoryItem {
 const wzMisc = new WzMisc();
 let history = [];
 const filterHistoryTimeInMs = 2000;
-const filterRecentHistory = (date) =>
-  history.filter((item: IHistoryItem) => date - item.date <= filterHistoryTimeInMs);
-const isErrorRecentlyShown = (text) => history.some((item: IHistoryItem) => item.text === text);
+const filterRecentHistory = date =>
+  history.filter(
+    (item: IHistoryItem) => date - item.date <= filterHistoryTimeInMs,
+  );
+const isErrorRecentlyShown = text =>
+  history.some((item: IHistoryItem) => item.text === text);
 
 export class ErrorHandler {
   /**
@@ -35,9 +38,10 @@ export class ErrorHandler {
     if ((error || {}).status === -1) {
       const origin = ((error || {}).config || {}).url || '';
       const isFromAPI =
-        origin.includes('/api/request') ||
-        origin.includes('/api/csv');
-      return isFromAPI ? 'Wazuh API is not reachable. Reason: timeout.' : 'Server did not respond';
+        origin.includes('/api/request') || origin.includes('/api/csv');
+      return isFromAPI
+        ? 'API is not reachable. Reason: timeout.'
+        : 'Server did not respond';
     }
 
     if ((((error || {}).response || {}).data || {}).message) {
@@ -139,9 +143,9 @@ export class ErrorHandler {
     const message = ErrorHandler.extractMessage(error);
     const messageIsString = typeof message === 'string';
     if (messageIsString && message.includes('ERROR3099')) {
-      const updateNotReadyYet = updateWazuhNotReadyYet('Wazuh not ready yet.');
+      const updateNotReadyYet = updateWazuhNotReadyYet('Server not ready yet.');
       store.dispatch(updateNotReadyYet);
-      CheckDaemonsStatus.makePing().catch((error) => {});
+      CheckDaemonsStatus.makePing().catch(error => {});
       return;
     }
 
@@ -178,7 +182,9 @@ export class ErrorHandler {
     if (!params.silent && !recentlyShown) {
       if (
         params.warning ||
-        (text && typeof text === 'string' && text.toLowerCase().includes('no results'))
+        (text &&
+          typeof text === 'string' &&
+          text.toLowerCase().includes('no results'))
       ) {
         getToasts().addWarning(text);
       } else {

@@ -39,7 +39,7 @@ export class CheckDaemonsStatus {
         throw new Error('Not recovered');
       }
     } catch (error) {
-      store.dispatch(updateWazuhNotReadyYet('Wazuh could not be recovered.'));
+      store.dispatch(updateWazuhNotReadyYet('Server could not be recovered.'));
       throw error;
     }
     busy = false;

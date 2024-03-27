@@ -156,7 +156,7 @@ export class WazuhApiCtrl {
       if (this.checkResponseIsDown(context, responseManagerInfo)) {
         return ErrorResponse(
           `ERROR3099 - ${
-            responseManagerInfo.data.detail || 'Wazuh not ready yet'
+            responseManagerInfo.data.detail || 'Server not ready yet'
           }`,
           3099,
           HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -286,7 +286,7 @@ export class WazuhApiCtrl {
               if (this.checkResponseIsDown(context, responseManagerInfo)) {
                 return ErrorResponse(
                   `ERROR3099 - ${
-                    response.data.detail || 'Wazuh not ready yet'
+                    response.data.detail || 'Server not ready yet'
                   }`,
                   3099,
                   HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -397,7 +397,7 @@ export class WazuhApiCtrl {
       } catch (error) {
         return ErrorResponse(
           `ERROR3099 - ${
-            error.response?.data?.detail || 'Wazuh not ready yet'
+            error.response?.data?.detail || 'Server not ready yet'
           }`,
           3099,
           error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -473,7 +473,7 @@ export class WazuhApiCtrl {
           );
 
           if (responseCluster.status === HTTP_STATUS_CODES.OK) {
-            context.wazuh.logger.debug('Wazuh API response is valid');
+            context.wazuh.logger.debug('Server API response is valid');
             if (responseCluster.data.data.enabled === 'yes') {
               // If cluster mode is active
               let responseClusterLocal =
@@ -540,7 +540,7 @@ export class WazuhApiCtrl {
       }
       if (error.code === 'EPROTO') {
         return ErrorResponse(
-          'Wrong protocol being used to connect to the Wazuh API',
+          'Wrong protocol being used to connect to the API',
           3005,
           HTTP_STATUS_CODES.BAD_REQUEST,
           response,
@@ -564,7 +564,7 @@ export class WazuhApiCtrl {
 
       isDown &&
         context.wazuh.logger.error(
-          'Wazuh API is online but Wazuh is not ready yet',
+          'Server API is online but the server is not ready yet',
         );
 
       return isDown;
@@ -612,7 +612,7 @@ export class WazuhApiCtrl {
       }
 
       if (!isValid) {
-        throw new Error('Wazuh not ready yet');
+        throw new Error('Server not ready yet');
       }
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
@@ -750,10 +750,10 @@ export class WazuhApiCtrl {
           const isDown = (error || {}).code === 'ECONNREFUSED';
           if (!isDown) {
             context.wazuh.logger.error(
-              'Wazuh API is online but Wazuh is not ready yet',
+              'Server API is online but the server is not ready yet',
             );
             return ErrorResponse(
-              `ERROR3099 - ${error.message || 'Wazuh not ready yet'}`,
+              `ERROR3099 - ${error.message || 'Server not ready yet'}`,
               3099,
               HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
               response,
@@ -788,7 +788,7 @@ export class WazuhApiCtrl {
       const responseIsDown = this.checkResponseIsDown(context, responseToken);
       if (responseIsDown) {
         return ErrorResponse(
-          `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
+          `ERROR3099 - ${response.body.message || 'Server not ready yet'}`,
           3099,
           HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response,
@@ -821,7 +821,7 @@ export class WazuhApiCtrl {
       }
       throw responseError && responseBody.detail
         ? { message: responseBody.detail, code: responseError }
-        : new Error('Unexpected error fetching data from the Wazuh API');
+        : new Error('Unexpected error fetching data from the API');
     } catch (error) {
       if (
         error &&
@@ -830,7 +830,7 @@ export class WazuhApiCtrl {
       ) {
         return ErrorResponse(
           error.message || error,
-          error.code ? `Wazuh API error: ${error.code}` : 3013,
+          error.code ? `API error: ${error.code}` : 3013,
           HTTP_STATUS_CODES.UNAUTHORIZED,
           response,
         );
@@ -847,7 +847,7 @@ export class WazuhApiCtrl {
         }
         return ErrorResponse(
           errorMsg.detail || error,
-          error.code ? `Wazuh API error: ${error.code}` : 3013,
+          error.code ? `API error: ${error.code}` : 3013,
           HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response,
         );

@@ -33,20 +33,20 @@ const mainSettings = [
   { field: 'port', label: 'Port to listen to cluster communications' },
   {
     field: 'bind_addr',
-    label: 'IP address to listen to cluster communications'
+    label: 'IP address to listen to cluster communications',
   },
-  { field: 'hidden', label: 'Hide cluster information in alerts' }
+  { field: 'hidden', label: 'Hide cluster information in alerts' },
 ];
 
 const helpLinks = [
   {
-    text: 'Configuring a Wazuh cluster',
-    href: webDocumentationLink('user-manual/configuring-cluster/index.html')
+    text: 'Configuring a cluster',
+    href: webDocumentationLink('user-manual/configuring-cluster/index.html'),
   },
   {
-    text: 'Wazuh cluster reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/cluster.html')
-  }
+    text: 'Cluster reference',
+    href: webDocumentationLink('user-manual/reference/ossec-conf/cluster.html'),
+  },
 ];
 
 class WzCluster extends Component {
@@ -58,7 +58,9 @@ class WzCluster extends Component {
     let mainSettingsConfig = {
       ...currentConfig['com-cluster'],
       disabled:
-        currentConfig['com-cluster'].disabled === 'yes' ? 'disabled' : 'enabled'
+        currentConfig['com-cluster'].disabled === 'yes'
+          ? 'disabled'
+          : 'enabled',
     };
     return (
       <Fragment>
@@ -68,12 +70,12 @@ class WzCluster extends Component {
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['com-cluster']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {currentConfig['com-cluster'] &&
           !isString(currentConfig['com-cluster']) && (
             <WzConfigurationSettingsHeader
-              title="Main settings"
+              title='Main settings'
               help={helpLinks}
             >
               <WzConfigurationSettingsGroup
@@ -90,14 +92,14 @@ class WzCluster extends Component {
 const sections = [{ component: 'com', configuration: 'cluster' }];
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzCluster.propTypes = {
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default compose(
   withWzConfig(sections),
-  connect(mapStateToProps)
+  connect(mapStateToProps),
 )(WzCluster);

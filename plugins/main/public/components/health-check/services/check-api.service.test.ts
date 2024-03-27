@@ -13,7 +13,7 @@ jest.mock('../../../kibana-services', () => ({
       get: () => {
         return 'http://localhost:5601';
       },
-      prepend: (url) => {
+      prepend: url => {
         return `http://localhost:5601${url}`;
       },
     },
@@ -52,7 +52,7 @@ const checkStoredErrorResponse: AxiosResponse = {
   data: {
     statusCode: 500,
     error: 'Internal Server Error',
-    message: '3099 - ERROR3099 - Wazuh not ready yet',
+    message: '3099 - ERROR3099 - Server not ready yet',
   },
   status: 500,
   statusText: 'Internal Server Error',
@@ -71,7 +71,9 @@ const checkLoggerMocked: CheckLogger = {
 describe.skip('CheckApi Service', () => {
   it('Should show logs info when api check pass successfully and have cluster_info ', async () => {
     const currentApi = { id: 'api-mocked' };
-    AppState.getCurrentAPI = jest.fn().mockReturnValue(JSON.stringify(currentApi));
+    AppState.getCurrentAPI = jest
+      .fn()
+      .mockReturnValue(JSON.stringify(currentApi));
     AppState.setClusterInfo = jest.fn();
     const checkStoredResponse = {
       data: {
@@ -90,24 +92,36 @@ describe.skip('CheckApi Service', () => {
         },
       },
     };
-    ApiCheck.checkStored = jest.fn().mockResolvedValue(Promise.resolve(checkStoredResponse));
+    ApiCheck.checkStored = jest
+      .fn()
+      .mockResolvedValue(Promise.resolve(checkStoredResponse));
     await service.checkApiService({})(checkLoggerMocked);
-    expect(checkLoggerMocked.info).toBeCalledWith(`Current API id [${currentApi.id}]`);
-    expect(checkLoggerMocked.info).toBeCalledWith(`Checking current API id [${currentApi.id}]...`);
+    expect(checkLoggerMocked.info).toBeCalledWith(
+      `Current API id [${currentApi.id}]`,
+    );
+    expect(checkLoggerMocked.info).toBeCalledWith(
+      `Checking current API id [${currentApi.id}]...`,
+    );
     expect(checkLoggerMocked.info).toBeCalledWith(`Set cluster info in cookie`);
     expect(checkLoggerMocked.info).toBeCalledTimes(3);
   });
 
   it('Should return ERROR and show logs info when api check fails on checkApi', async () => {
     const currentApi = { id: 'api-mocked' };
-    AppState.getCurrentAPI = jest.fn().mockReturnValue(JSON.stringify(currentApi));
+    AppState.getCurrentAPI = jest
+      .fn()
+      .mockReturnValue(JSON.stringify(currentApi));
     AppState.setClusterInfo = jest.fn();
-    ApiCheck.checkStored = jest.fn().mockResolvedValue(Promise.reject(checkStoredErrorResponse));
+    ApiCheck.checkStored = jest
+      .fn()
+      .mockResolvedValue(Promise.reject(checkStoredErrorResponse));
     (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
-      Promise.resolve(getApiHostsResponse)
+      Promise.resolve(getApiHostsResponse),
     );
 
-    ApiCheck.checkApi = jest.fn().mockResolvedValue(Promise.reject(checkStoredErrorResponse));
+    ApiCheck.checkApi = jest
+      .fn()
+      .mockResolvedValue(Promise.reject(checkStoredErrorResponse));
 
     try {
       await service.checkApiService({})(checkLoggerMocked);

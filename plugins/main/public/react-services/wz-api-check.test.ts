@@ -27,7 +27,7 @@ describe('Wz Api Check', () => {
     data: {
       statusCode: 500,
       error: 'Internal Server Error',
-      message: '3099 - ERROR3099 - Wazuh not ready yet',
+      message: '3099 - ERROR3099 - Server not ready yet',
     },
     status: 500,
     statusText: 'Internal Server Error',

@@ -167,7 +167,7 @@ export const WzVisualize = compose(
               There were some unknown fields for the current index pattern. You
               need to refresh the page to apply the changes.
               <EuiLink
-                title='More information in Wazuh documentation'
+                title='More information in documentation'
                 href={urlTroubleShootingDocs}
                 target='_blank'
                 external

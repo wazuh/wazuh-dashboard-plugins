@@ -13,7 +13,7 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
-    text: 'Using Wazuh to monitor GCP services',
+    text: 'Monitoring GCP services',
     href: webDocumentationLink('cloud-security/gcp/index.html'),
   },
   {
@@ -78,8 +78,8 @@ class WzConfigurationGoogleCloudPubSub extends Component {
           )}
         {currentConfig && this.wodleConfig['gcp-pubsub'] && (
           <WzConfigurationSettingsHeader
-            title="Main settings"
-            description="Configuration for the Google Cloud Pub/Sub module"
+            title='Main settings'
+            description='Configuration for the Google Cloud Pub/Sub module'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup

@@ -11,14 +11,19 @@
  */
 import { AxiosError, AxiosResponse } from 'axios';
 import { ErrorFactory } from './error-factory';
-import { IndexerApiError, WazuhReportingError, HttpError, WazuhApiError } from './errors';
+import {
+  IndexerApiError,
+  WazuhReportingError,
+  HttpError,
+  WazuhApiError,
+} from './errors';
 import WazuhError from './errors/WazuhError';
 
 const response: AxiosResponse = {
   data: {
     statusCode: 500,
     error: 'Internal Server Error',
-    message: '3099 - ERROR3099 - Wazuh not ready yet',
+    message: '3099 - ERROR3099 - Server not ready yet',
   },
   status: 500,
   statusText: 'Internal Server Error',
@@ -44,7 +49,7 @@ describe('Error Factory', () => {
       };
       const errorCreated = ErrorFactory.create(errorType, {
         error,
-        message: response.data.message
+        message: response.data.message,
       });
       expect(errorCreated.name).toBe(name);
       expect(errorCreated.stack).toBe(error.stack);
