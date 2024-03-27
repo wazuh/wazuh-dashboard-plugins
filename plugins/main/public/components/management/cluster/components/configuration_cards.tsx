@@ -101,10 +101,7 @@ export const ConfigurationCards = ({
               />
             )}
           </EuiFlexItem>
-          <EuiFlexItem
-            grow={false}
-            style={{ padding: '8px 0 0 0', height: '364px' }}
-          >
+          <EuiFlexItem style={{ padding: '8px 0 0 0', height: '364px' }}>
             <EuiCard
               textAlign='left'
               title={
