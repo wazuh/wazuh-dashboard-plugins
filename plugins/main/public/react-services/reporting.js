@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import $ from 'jquery';
 import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { AppState } from './app-state';
