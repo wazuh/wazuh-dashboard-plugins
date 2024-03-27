@@ -21,6 +21,7 @@ import { KibanaVisWrapper } from '../components/management/cluster/cluster-visua
 import { ToastNotificationsModal } from '../components/notifications/modal';
 import { getAngularModule } from '../kibana-services';
 import { WzUpdatesNotification } from './wz-updates-notification';
+import { ClusterOverview } from '../controllers/management/components/management/cluster/cluster-overview';
 
 const app = getAngularModule();
 
@@ -29,8 +30,6 @@ app.value('WzVisualize', WzVisualize);
 app.value('WzMenuWrapper', WzMenuWrapper);
 app.value('WzAgentSelectorWrapper', WzAgentSelectorWrapper);
 app.value('WzBlankScreen', WzBlankScreen);
-app.value('ClusterDisabled', ClusterDisabled);
-app.value('ClusterTimelions', ClusterTimelions);
 app.value('KibanaVisualization', KibanaVisWrapper);
 app.value('ToastNotificationsModal', ToastNotificationsModal);
 app.value('WzUpdatesNotification', WzUpdatesNotification);

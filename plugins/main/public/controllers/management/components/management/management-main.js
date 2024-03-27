@@ -27,6 +27,7 @@ import {
   SECTION_DECODERS_SECTION,
   SECTION_RULES_SECTION,
 } from './common/constants';
+import { ClusterOverview } from './cluster/cluster-overview';
 
 class WzManagementMain extends Component {
   constructor(props) {
@@ -41,6 +42,7 @@ class WzManagementMain extends Component {
       <Fragment>
         {(section === 'groups' && <WzGroups {...this.props} />) ||
           (section === 'status' && <WzStatus />) ||
+          (section === 'monitoring' && <ClusterOverview />) ||
           (section === 'reporting' && <WzReporting />) ||
           (section === 'statistics' && <WzStatistics />) ||
           (section === 'logs' && <WzLogs />) ||

@@ -25,6 +25,5 @@ WzManagementConfiguration.displayName = 'WzManagementConfiguration';
 app
   .controller('managementController', ManagementController)
   .controller('groupsPreviewController', GroupsController)
-  .controller('clusterController', ClusterController)
   .value('WzManagement', WzManagement)
   .value('WzManagementConfiguration', WzManagementConfiguration);
