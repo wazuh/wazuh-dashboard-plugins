@@ -99,14 +99,9 @@ export class WazuhCorePlugin
 
     this.services.configuration.setup();
 
-    this.services.updateRegistry = new UpdateRegistry(
-      this.logger.get('update-registry'),
-    );
-
     this.services.manageHosts = new ManageHosts(
       this.logger.get('manage-hosts'),
       this.services.configuration,
-      this.services.updateRegistry,
     );
 
     this.services.serverAPIClient = new ServerAPIClient(
@@ -161,6 +156,8 @@ export class WazuhCorePlugin
       configurationStore: this._internal.configurationStore,
       logger: this.logger.get(MigrationConfigFile.name),
     });
+
+    await this.services.manageHosts.start();
 
     return {
       ...this.services,

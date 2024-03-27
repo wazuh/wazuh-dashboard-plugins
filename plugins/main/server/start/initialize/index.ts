@@ -12,17 +12,10 @@
 import packageJSON from '../../../package.json';
 import { pluginPlatformTemplate } from '../../integration-files/kibana-template';
 import { totalmem } from 'os';
-import fs from 'fs';
 import {
-  WAZUH_DATA_CONFIG_REGISTRY_PATH,
   WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME,
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
   PLUGIN_PLATFORM_NAME,
-  PLUGIN_PLATFORM_INSTALLATION_USER_GROUP,
-  PLUGIN_PLATFORM_INSTALLATION_USER,
-  PLUGIN_APP_NAME,
 } from '../../../common/constants';
-import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
 import _ from 'lodash';
 
 export function jobInitializeRun(context) {
@@ -43,107 +36,6 @@ export function jobInitializeRun(context) {
       `Could not check total RAM due to: ${error.message}`,
     );
   }
-
-  // Save Wazuh App setup
-  const saveConfiguration = async (hosts = {}) => {
-    try {
-      const commonDate = new Date().toISOString();
-      const configuration = {
-        name: PLUGIN_APP_NAME,
-        'app-version': packageJSON.version,
-        revision: packageJSON.revision,
-        installationDate: commonDate,
-        lastRestart: commonDate,
-        hosts,
-      };
-      context.wazuh.logger.debug('Saving the configuration');
-      createDataDirectoryIfNotExists();
-      createDataDirectoryIfNotExists('config');
-      context.wazuh.logger.debug(
-        `Saving configuration in registry file: ${JSON.stringify(
-          configuration,
-        )}`,
-      );
-      await fs.writeFileSync(
-        WAZUH_DATA_CONFIG_REGISTRY_PATH,
-        JSON.stringify(configuration),
-        'utf8',
-      );
-      context.wazuh.logger.info('Configuration registry saved.');
-    } catch (error) {
-      context.wazuh.logger.error(
-        `Error creating the registry file: ${error.message}`,
-      );
-    }
-  };
-
-  /**
-   * Checks if the .wazuh-registry.json file exists:
-   * - yes: check the plugin version and revision match the values stored in the registry file.
-   *  If not, then it migrates the data rebuilding the registry file.
-   * - no: create the file with empty hosts
-   */
-  const checkWazuhRegistry = async () => {
-    context.wazuh.logger.debug('Checking the existence app data directory.');
-
-    if (!fs.existsSync(WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH)) {
-      throw new Error(
-        `The data directory is missing in the ${PLUGIN_PLATFORM_NAME} root instalation. Create the directory in ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH} and give it the required permissions (sudo mkdir ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH};sudo chown -R ${PLUGIN_PLATFORM_INSTALLATION_USER}:${PLUGIN_PLATFORM_INSTALLATION_USER_GROUP} ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}). After restart the ${PLUGIN_PLATFORM_NAME} service.`,
-      );
-    }
-
-    context.wazuh.logger.debug('Checking the existence of registry file.');
-
-    if (!fs.existsSync(WAZUH_DATA_CONFIG_REGISTRY_PATH)) {
-      context.wazuh.logger.debug(
-        'Registry file does not exist. Initializing configuration.',
-      );
-
-      // Create the app registry file for the very first time
-      await saveConfiguration();
-    } else {
-      context.wazuh.logger.debug('Reading the registry file');
-      // If this function fails, it throws an exception
-      const source = JSON.parse(
-        fs.readFileSync(WAZUH_DATA_CONFIG_REGISTRY_PATH, 'utf8'),
-      );
-      context.wazuh.logger.debug('The registry file was read');
-
-      // Check if the stored revision differs from the package.json revision
-      const isUpgradedApp =
-        packageJSON.revision !== source.revision ||
-        packageJSON.version !== source['app-version'];
-
-      // Rebuild the registry file if revision or version fields are differents
-      if (isUpgradedApp) {
-        context.wazuh.logger.info(
-          'App revision or version changed, regenerating registry file',
-        );
-        // Generate the hosts data.
-        const registryHostsData = Object.entries(source.hosts).reduce(
-          (accum, [hostID, hostData]) => {
-            // Migration: Remove the extensions property of the hosts data.
-            if (hostData.extensions) {
-              delete hostData.extensions;
-            }
-            accum[hostID] = hostData;
-            return accum;
-          },
-          {},
-        );
-
-        // Rebuild the registry file with the migrated host data
-        await saveConfiguration(registryHostsData);
-
-        context.wazuh.logger.info('Migrated the registry file.');
-      }
-    }
-  };
-
-  // Init function. Check for wazuh-registry.json file exists.
-  const init = async () => {
-    await checkWazuhRegistry();
-  };
 
   const createKibanaTemplate = () => {
     context.wazuh.logger.debug(
@@ -171,7 +63,6 @@ export function jobInitializeRun(context) {
         index: PLUGIN_PLATFORM_INDEX,
       });
       context.wazuh.logger.info(`${PLUGIN_PLATFORM_INDEX} index created`);
-      await init();
     } catch (error) {
       throw new Error(
         `Error creating ${PLUGIN_PLATFORM_INDEX} index: ${error.message}`,
@@ -222,8 +113,6 @@ export function jobInitializeRun(context) {
         });
       if (response.body) {
         context.wazuh.logger.debug(`${PLUGIN_PLATFORM_INDEX} index exist`);
-        // It exists, initialize!
-        await init();
       } else {
         context.wazuh.logger.debug(
           `${PLUGIN_PLATFORM_INDEX} index does not exist`,

@@ -4,7 +4,6 @@ import {
   ServerAPIClient,
   ServerAPIInternalUserClient,
   ServerAPIScopedUserClient,
-  UpdateRegistry,
 } from './services';
 import { Configuration } from '../common/services/configuration';
 
@@ -14,7 +13,6 @@ export interface WazuhCorePluginSetup {
   configuration: Configuration;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
-  updateRegistry: UpdateRegistry;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
@@ -28,7 +26,6 @@ export interface WazuhCorePluginStart {
   configuration: Configuration;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
-  updateRegistry: UpdateRegistry;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
