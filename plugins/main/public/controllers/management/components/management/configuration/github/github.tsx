@@ -61,7 +61,7 @@ const columns = [
 
 const helpLinks = [
   {
-    text: 'Monitor GitHub',
+    text: 'Monitoring GitHub',
     href: webDocumentationLink('cloud-security/github/index.html'),
   },
   {

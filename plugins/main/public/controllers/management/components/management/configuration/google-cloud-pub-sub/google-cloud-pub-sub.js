@@ -13,7 +13,7 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
-    text: 'Monitor GCP services',
+    text: 'Monitoring GCP services',
     href: webDocumentationLink('cloud-security/gcp/index.html'),
   },
   {
