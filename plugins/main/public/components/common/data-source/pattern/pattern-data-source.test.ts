@@ -20,9 +20,9 @@ jest.mock('../../../../kibana-services', () => ({
 }));
 
 describe('PatternDataSource', () => {
-    it('should create a new data source handler', () => {
+    it('should create a new data source instance', () => {
         const patternDataSource = new PatternDataSource('id', 'title');
-        expect(patternDataSource).toEqual({ id: 'id', title: 'title' });
+        expect(patternDataSource).toBeInstanceOf(PatternDataSource);
     });
 
     it('should have the correct id', () => {

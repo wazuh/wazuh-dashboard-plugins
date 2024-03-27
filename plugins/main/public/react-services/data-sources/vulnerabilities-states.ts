@@ -10,7 +10,7 @@ import { IDataSourcesFilterManager } from './types';
  * @param indexPatternTitle Index pattern title
  * @returns
  */
-function getFilterExcludeManager(indexPatternTitle: string) {
+export function getFilterExcludeManager(indexPatternTitle: string) {
   return {
     meta: {
       alias: null,
@@ -33,7 +33,7 @@ function getFilterExcludeManager(indexPatternTitle: string) {
  * @param indexPatternTitle
  * @returns
  */
-function getFilterAllowedAgents(
+export function getFilterAllowedAgents(
   agentsIds: string[],
   indexPatternTitle: string,
 ) {
