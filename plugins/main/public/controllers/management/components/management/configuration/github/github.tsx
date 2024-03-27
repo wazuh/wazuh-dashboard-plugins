@@ -61,7 +61,7 @@ const columns = [
 
 const helpLinks = [
   {
-    text: 'Using Wazuh to monitor GitHub',
+    text: 'Monitor GitHub',
     href: webDocumentationLink('cloud-security/github/index.html'),
   },
   {

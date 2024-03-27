@@ -21,7 +21,7 @@ import helpLinks from './help-links';
 
 const mainSettings = [
   { field: 'restart_audit', label: 'Restart audit' },
-  { field: 'startup_healthcheck', label: 'Startup healthcheck' }
+  { field: 'startup_healthcheck', label: 'Startup healthcheck' },
 ];
 
 const columns = [{ field: 'audit_key', name: 'Keys' }];
@@ -38,15 +38,15 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
           currentConfig['syscheck-syscheck'] &&
           currentConfig['syscheck-syscheck'].syscheck &&
           !currentConfig['syscheck-syscheck'].syscheck.whodata && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig &&
           currentConfig['syscheck-syscheck'] &&
           currentConfig['syscheck-syscheck'].syscheck &&
           currentConfig['syscheck-syscheck'].syscheck.whodata && (
             <WzConfigurationSettingsHeader
-              title="Who-data audit keys"
-              description="Wazuh will include in its FIM baseline those events being monitored by Audit using audit_key."
+              title='Who-data audit keys'
+              description='Server will include in its FIM baseline those events being monitored by Audit using audit_key.'
               help={helpLinks}
             >
               <WzConfigurationSettingsGroup
@@ -59,7 +59,7 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
                   items={currentConfig[
                     'syscheck-syscheck'
                   ].syscheck.whodata.audit_key.map(item => ({
-                    audit_key: item
+                    audit_key: item,
                   }))}
                   columns={columns}
                 />

@@ -233,7 +233,7 @@ export const makePing = async (
     }
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
-    throw new Error('Wazuh could not be recovered.');
+    throw new Error('Server could not be recovered.');
   }
 };
 
