@@ -98,7 +98,6 @@ export class OverviewController {
     this.$scope.getMainProps = resultState => {
       return {
         section: this.tab,
-        disabledReport: resultState !== 'ready',
         agentsSelectionProps: this.agentsSelectionProps,
         switchSubTab: subtab => this.switchSubtab(subtab),
       };
