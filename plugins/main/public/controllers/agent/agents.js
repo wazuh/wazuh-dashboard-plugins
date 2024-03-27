@@ -41,7 +41,6 @@ export class AgentsController {
    * @param {Object} $rootScope
    * @param {Object} errorHandler
    * @param {Object} commonData
-   * @param {Object} reportingService
    * @param {Object} visFactoryService
    * @param {Object} csvReq
    */
@@ -51,7 +50,6 @@ export class AgentsController {
     $rootScope,
     errorHandler,
     commonData,
-    reportingService,
     visFactoryService,
     csvReq,
   ) {
@@ -63,7 +61,6 @@ export class AgentsController {
     this.$scope.visualizations = visualizations;
     this.shareAgent = new ShareAgent();
     this.commonData = commonData;
-    this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
     this.wazuhConfig = new WazuhConfig();
@@ -190,14 +187,6 @@ export class AgentsController {
     this.$scope.goGroup = () => {
       this.shareAgent.setAgent(this.$scope.agent);
       this.$location.path('/manager/groups');
-    };
-
-    this.$scope.exportConfiguration = enabledComponents => {
-      this.reportingService.startConfigReport(
-        this.$scope.agent,
-        'agentConfig',
-        enabledComponents,
-      );
     };
 
     //Load
