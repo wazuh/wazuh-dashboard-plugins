@@ -17,13 +17,23 @@ import { WzRequest } from './wz-request';
 import { Vis2PNG } from '../factories/vis2png';
 import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
-import { getAngularModule, getDataPlugin, getToasts } from '../kibana-services';
+import {
+  getAngularModule,
+  getCore,
+  getDataPlugin,
+  getHttp,
+  getToasts,
+} from '../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 import store from '../redux/store';
 import domtoimage from '../utils/dom-to-image';
 import dateMath from '@elastic/datemath';
+import React from 'react';
+import { EuiFlexGroup, EuiFlexItem, EuiButton, EuiLink } from '@elastic/eui';
+import { reporting } from '../utils/applications';
+import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
 
 const app = getAngularModule();
 
@@ -60,6 +70,50 @@ export class ReportingService {
       return visArray;
     }
     return idArray;
+  }
+
+  renderSucessReportsToast({ filename }) {
+    this.showToast(
+      'success',
+      'Created report',
+      <>
+        <EuiFlexGroup alignItems='center'>
+          <EuiFlexItem>
+            <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
+              <EuiFlexItem style={{ whiteSpace: 'nowrap' }} grow={false}>
+                See the reports on
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiLink
+                    aria-label='go to Endpoint summary'
+                    href={getCore().application.getUrlForApp(reporting.id, {
+                      path: '',
+                    })}
+                  >
+                    Reporting
+                  </EuiLink>
+                </RedirectAppLinks>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              onClick={() =>
+                window.open(
+                  getHttp().basePath.prepend(`/reports/${filename}`),
+                  '_blank',
+                )
+              }
+              size='s'
+            >
+              Open report
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </>,
+      1000000,
+    );
   }
 
   async getVisualizationsFromDOM() {
@@ -117,18 +171,12 @@ export class ReportingService {
         tab === 'syscollector'
           ? `/reports/agents/${agents}/inventory`
           : `/reports/modules/${tab}`;
-      await WzRequest.genericReq('POST', apiEndpoint, data);
+      const response = await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.showToast(
-        'success',
-        'Created report',
-        'Success. Go to Dashboard management > Reporting',
-        4000,
-      );
-      return;
+      this.renderSucessReportsToast({ filename: response.data.filename });
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
@@ -168,18 +216,12 @@ export class ReportingService {
         type === 'agentConfig'
           ? `/reports/agents/${obj.id}`
           : `/reports/groups/${obj.name}`;
-      await WzRequest.genericReq('POST', apiEndpoint, data);
+      const response = await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.showToast(
-        'success',
-        'Created report',
-        'Success. Go to Dashboard management > Reporting',
-        4000,
-      );
-      return;
+      this.renderSucessReportsToast({ filename: response.data.filename });
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
