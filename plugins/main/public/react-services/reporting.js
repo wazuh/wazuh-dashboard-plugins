@@ -75,7 +75,7 @@ export class ReportingService {
   renderSucessReportsToast({ filename }) {
     this.showToast(
       'success',
-      'Created report',
+      'Report created',
       <>
         <EuiFlexGroup alignItems='center'>
           <EuiFlexItem>
@@ -91,7 +91,7 @@ export class ReportingService {
                       path: '',
                     })}
                   >
-                    Reporting
+                    {reporting.title}
                   </EuiLink>
                 </RedirectAppLinks>
               </EuiFlexItem>
@@ -112,7 +112,7 @@ export class ReportingService {
           </EuiFlexItem>
         </EuiFlexGroup>
       </>,
-      1000000,
+      10000,
     );
   }
 
