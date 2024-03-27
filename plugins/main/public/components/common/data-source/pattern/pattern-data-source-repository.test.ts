@@ -1,5 +1,5 @@
 import { PatternDataSourceRepository, tSavedObjectResponse } from './pattern-data-source-repository';
-import { tDataSource } from '../data-source';
+import { PatternDataSource, tDataSource } from '../index';
 
 import { GenericRequest } from '../../../../react-services/generic-request';
 jest.mock('../../../../react-services/generic-request');
@@ -106,11 +106,11 @@ describe('PatternDataSourceRepository', () => {
                     title: mockTitle,
                 }
             }
-        };
+        } as tSavedObjectResponse;
         const mockRequest = jest.fn().mockResolvedValue(expectedResponse);
         GenericRequest.request = mockRequest;
 
-        const result = await repository.get(mockId) as tDataSource;
+        const result = await repository.get(mockId);
 
         expect(result.id).toEqual(expectedResponse.data.id);
         expect(result.title).toEqual(expectedResponse.data.attributes.title);
@@ -241,7 +241,8 @@ describe('PatternDataSourceRepository', () => {
         GenericRequest.request = mockRequest;
         const result = await repository.getDefault();
         // mock the get method to return the current pattern
-        expect(result.id).toEqual('test-pattern-id');
+        expect(result).toBeDefined();
+        expect(result?.id).toEqual('test-pattern-id');
     });
 
     it('should return an ERROR when default index pattern is not saved in storage', async () => {

@@ -1,4 +1,5 @@
 import { Filter } from "../../../../../../src/plugins/data/common";
+import { FilterManager } from "../../../../../../src/plugins/data/public";
 
 export type tFilter = Filter & {
     meta?: {
@@ -25,6 +26,9 @@ export type tSearchParams = {
         to: string;
     };
 }
+
+// create a new type using the FilterManager type but only the getFilters, setFilters, addFilters, getUpdates$
+export type tFilterManager = Pick<FilterManager, 'getFilters' | 'setFilters' | 'addFilters' | 'getUpdates$'>;
 
 export type tDataSource = {
     id: string;

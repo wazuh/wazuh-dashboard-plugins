@@ -34,11 +34,13 @@ export class VulnerabilitiesDataSourceRepository extends PatternDataSourceReposi
     }
 
     getDefault(){
+        console.warn('getDefault not implemented for vulnerabilities data source repository');
         return null;
     }
 
-    setDefault(dataSource: tDataSource){
-        return null;
+    setDefault(dataSource: tParsedIndexPattern){
+        console.warn('setDefault not implemented for vulnerabilities data source repository');
+        return Promise.resolve();
     }
 
 }

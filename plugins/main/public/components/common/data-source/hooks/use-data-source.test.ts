@@ -10,7 +10,34 @@ import {
     tParsedIndexPattern 
 } from '../index';
 import { IndexPatternsService, IndexPattern } from '../../../../../../../src/plugins/data/common';
+import { getDataPlugin } from '../../../../kibana-services';
 
+jest.mock('../../../../kibana-services', () => ({
+    ...(jest.requireActual('../../../../kibana-services') as object),
+    getDataPlugin: () => ({
+        // mock indexPatterns getter
+        indexPatterns: {
+            get: jest.fn().mockResolvedValue({
+                fields: {
+                    replaceAll: jest.fn(),
+                    map: jest.fn().mockReturnValue([]),
+                },
+                getScriptedFields: jest.fn().mockReturnValue([]),
+            }),
+            getFieldsForIndexPattern: jest.fn().mockResolvedValue([]),
+            updateSavedObject: jest.fn().mockResolvedValue({}),
+        },
+        query: {
+            filterManager: {
+                getFilters: jest.fn().mockReturnValue([]),
+                setFilters: jest.fn(),
+                getUpdates$: jest.fn().mockReturnValue({
+                    subscribe: jest.fn()
+                })
+            }
+        }
+    }),
+}));
 
 const mockedGetFilters = jest.fn().mockReturnValue([]);
 
@@ -67,7 +94,7 @@ describe('useDataSource hook', () => {
         
     })
 
-    it('shoudl throw ERROR when the DataSource is not defined', () => {
+    it('should throw ERROR when the DataSource is not defined', () => {
        
         try {
             renderHook(() => useDataSource({

@@ -135,11 +135,16 @@ export class PatternDataSource implements tDataSource {
                 : AppState.getClusterInfo().manager,
             true
         );
-        managerFilter.meta.index = this.id;
-        managerFilter.meta.controlledBy = DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER;
+        managerFilter.meta = {
+            ...managerFilter.meta,
+            controlledBy: DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
+            index: this.id
+        }
+        //@ts-ignore
         managerFilter.$state = {
             store: 'appState'
         }
+        //@ts-ignore
         return [managerFilter] as tFilter[];
     }
 
@@ -148,7 +153,11 @@ export class PatternDataSource implements tDataSource {
      */
      getPinnedAgentFilter(): tFilter[] {
         const agentId = store.getState().appStateReducers?.currentAgentData?.id;
-        if (!agentId) return [];
+        const url = window.location.href;
+        const regex = new RegExp('agentId=' + '[^&]*');
+        const match = url.match(regex);
+        const isPinnedAgentByUrl = match && match[0];
+        if (!agentId && !isPinnedAgentByUrl) return [];
         return [{
           meta: {
             removable: false, // used to hide the close icon in the filter

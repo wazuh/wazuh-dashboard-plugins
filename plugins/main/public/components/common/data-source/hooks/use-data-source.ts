@@ -9,12 +9,9 @@ import {
     PatternDataSourceFactory,
     PatternDataSource,
     tParsedIndexPattern,
-    PatternDataSourceFilterManager
+    PatternDataSourceFilterManager,
+    tFilterManager
 } from '../index';
-import { FilterManager } from "../../../../../../../src/plugins/data/public";
-
-// create a new type using the FilterManager type but only the getFilters, setFilters, addFilters, getUpdates$
-type tFilterManager = Pick<FilterManager, 'getFilters' | 'setFilters' | 'addFilters' | 'getUpdates$'>;
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
     DataSource: IDataSourceFactoryConstructor<K>;
@@ -30,8 +27,9 @@ type tUseDataSourceLoadedReturns<K> = {
     filters: tFilter[];
     fetchFilters: tFilter[];
     fixedFilters: tFilter[];
-    fetchData: () => Promise<any>;
+    fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
     setFilters: (filters: tFilter[]) => void;
+    filterManager: PatternDataSourceFilterManager;
 }
 
 type tUseDataSourceNotLoadedReturns = {
@@ -42,6 +40,7 @@ type tUseDataSourceNotLoadedReturns = {
     fixedFilters: [];
     fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
     setFilters: (filters: tFilter[]) => void;
+    filterManager: null;
 }
 
 export function useDataSource<T extends tParsedIndexPattern, K extends PatternDataSource>(props: tUseDataSourceProps<T, K>): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
@@ -93,6 +92,7 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
         if (!dataSource) {
             throw new Error('No valid data source found');
         }
+        setDataSource(dataSource);
         const dataSourceFilterManager = new PatternDataSourceFilterManager(dataSource, defaultFilters);
         if (!dataSourceFilterManager) {
             throw new Error('Error creating filter manager');
@@ -101,7 +101,6 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
         // what the filters update
         dataSourceFilterManager.getUpdates$().subscribe({
             next: () => {
-                console.log('update filter manager');
                 setAllFilters(dataSourceFilterManager.getFilters());
                 setFetchFilters(dataSourceFilterManager.getFetchFilters());
             },
@@ -109,7 +108,6 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
         setAllFilters(dataSourceFilterManager.getFilters());
         setFetchFilters(dataSourceFilterManager.getFetchFilters());
         setDataSourceFilterManager(dataSourceFilterManager);
-        setDataSource(dataSource);
         setIsLoading(false);
     }
 
@@ -121,7 +119,8 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
             fetchFilters: [],
             fixedFilters: [],
             fetchData,
-            setFilters
+            setFilters,
+            filterManager: null
         }
     }else{
         return {
@@ -131,7 +130,8 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
             fetchFilters,
             fixedFilters: dataSourceFilterManager?.getFixedFilters() || [],
             fetchData,
-            setFilters
+            setFilters,
+            filterManager: dataSourceFilterManager as PatternDataSourceFilterManager
         }
     }
 }

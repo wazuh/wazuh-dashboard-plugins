@@ -1,4 +1,4 @@
-import { tDataSourceRepository } from "../data-source-repository";
+import { tDataSourceRepository } from "../index";
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services';
 
@@ -38,7 +38,7 @@ export type tParsedIndexPattern = {
     updated_at: string;
     version: string;
     _fields: any[];
-}
+} & object;
 
 export class PatternDataSourceRepository implements tDataSourceRepository<tParsedIndexPattern>{
     async get(id: string): Promise<tParsedIndexPattern> {

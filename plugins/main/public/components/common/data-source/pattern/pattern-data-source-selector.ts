@@ -93,7 +93,7 @@ export class PatternDataSourceSelector implements tDataSourceSelector<PatternDat
             throw new Error('Data source not found');
         }
         await dataSource.select();
-        await this.repository.setDefault(dataSource);
+        await this.repository.setDefault(dataSource.toJSON());
     }
 
     /**

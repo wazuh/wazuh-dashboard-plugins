@@ -1,32 +1,51 @@
-import { DataSourceFilterManager, tDataSource, tSearchParams, tFilter } from './index';
+import { 
+    PatternDataSourceFilterManager, 
+    tParsedIndexPattern,
+    tDataSource, 
+    tSearchParams, 
+    tFilter, 
+    PatternDataSource } from '../index';
+import store from '../../../../redux/store';
+import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from '../../../../../common/constants';
+import { IndexPatternsService, IndexPattern } from '../../../../../../../src/plugins/data/public';
 
-// mock the store
-import store from '../../../redux/store';
-import { DATA_SOURCE_FILTER_CONTROLLER_PINNED_AGENT } from '../../../../common/constants';
-
-// mock the AppState
-jest.mock('../../../redux/store', () => ({
+jest.mock('../../../../redux/store', () => ({
     getState: jest.fn().mockReturnValue({
         appStateReducers: {
         }
     })
 }));
 
-class DataSourceMocked implements tDataSource {
-    constructor(id: string, title: string) {
+let mockedGetFilters = jest.fn().mockReturnValue([]);
+class DataSourceMocked implements PatternDataSource {
+    constructor(public id: string, public title: string) {
         this.id = id;
         this.title = title;
     }
-    id: string;
-    title: string;
+    fields: any[];
+    patternService: IndexPatternsService;
+    indexPattern: IndexPattern;
+    defaultFixedFilters: tFilter[];
+    filters: tFilter[];
+    init = jest.fn();
     select = jest.fn();
-    getFilters = jest.fn();
-    setFilters = jest.fn();
-    getFields = jest.fn();
-    getFixedFilters = jest.fn();
     fetch = jest.fn();
+    getFilters = mockedGetFilters;
+    setFilters = jest.fn();
+    getFields = mockedGetFilters
+    getFixedFilters = mockedGetFilters
+    getFetchFilters = mockedGetFilters
+    toJSON(): tParsedIndexPattern {
+        return {
+            id: this.id,
+            title: this.title,
+        } as tParsedIndexPattern;
+    }
+    getClusterManagerFilters = mockedGetFilters
+    getPinnedAgentFilter = mockedGetFilters
+    getExcludeManagerFilter = mockedGetFilters
+    getAllowAgentsFilter = mockedGetFilters
 }
-
 
 const createFilter = (id: string, value: string, index: string) => {
     return {
@@ -55,7 +74,7 @@ const createFilter = (id: string, value: string, index: string) => {
 }
 
 
-describe('DataSourceFilterManager', () => {
+describe('PatternDataSourceFilterManager', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -63,13 +82,13 @@ describe('DataSourceFilterManager', () => {
 
     describe('constructor', () => {
         it('should initialize the data source filter manager', () => {
-            const filterManager = new DataSourceFilterManager(new DataSourceMocked('my-id', 'my-title'), []);
+            const filterManager = new PatternDataSourceFilterManager(new DataSourceMocked('my-id', 'my-title'), []);
             expect(filterManager).toBeDefined();
         })
 
         it('should return ERROR when the data source is not defined', () => {
             try {
-                new DataSourceFilterManager(null as any, []);
+                new PatternDataSourceFilterManager(null as any, []);
             } catch (error) {
                 expect(error.message).toBe('Data source is required');
             }
@@ -80,7 +99,7 @@ describe('DataSourceFilterManager', () => {
             const filterDifIndex = createFilter('agent.id', '1', 'different filter');
             const fixedFilter = createFilter('agent.id', '1', 'my-index');
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
-            const filterManager = new DataSourceFilterManager(dataSource, [filterDifIndex]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [filterDifIndex]);
             expect(filterManager.getFilters()).not.toContainEqual(filterDifIndex);
             expect(filterManager.getFilters()).toContainEqual(fixedFilter);
         })
@@ -88,10 +107,10 @@ describe('DataSourceFilterManager', () => {
         it('should filter the filters received in the constructor then no keep the filters with meta.controlledBy property (with same index)', () => {
             const dataSource = new DataSourceMocked('my-index', 'my-title');
             const filterSameIndexControlled = createFilter('agent.id', '1', 'my-index');
-            filterSameIndexControlled.meta.controlledBy = DATA_SOURCE_FILTER_CONTROLLER_PINNED_AGENT;
+            filterSameIndexControlled.meta.controlledBy = DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT;
             const fixedFilter = createFilter('agent.id', '1', 'my-index');
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
-            const filterManager = new DataSourceFilterManager(dataSource, [filterSameIndexControlled]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [filterSameIndexControlled]);
             expect(filterManager.getFilters()).not.toContainEqual(filterSameIndexControlled);
             expect(filterManager.getFilters()).toEqual([fixedFilter]);
         })
@@ -107,7 +126,7 @@ describe('DataSourceFilterManager', () => {
             }
             const fixedFilter = createFilter('agent.id', '1', 'my-index');
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
-            const filterManager = new DataSourceFilterManager(dataSource, [filterSameIndexControlled]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [filterSameIndexControlled]);
             expect(filterManager.getFilters()).not.toContainEqual(filterSameIndexControlled);
             expect(filterManager.getFilters()).toContainEqual(fixedFilter);
         })
@@ -118,7 +137,7 @@ describe('DataSourceFilterManager', () => {
             const sameIndexFilter = createFilter('agent.id', '1', 'my-index');
             const fixedFilter = createFilter('agent.id', '1', 'my-index');
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
-            const filterManager = new DataSourceFilterManager(dataSource, [sameIndexFilter]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [sameIndexFilter]);
             expect(filterManager.getFilters()).toEqual([sameIndexFilter, fixedFilter]);
         });
 
@@ -130,7 +149,7 @@ describe('DataSourceFilterManager', () => {
             const dataSource = new DataSourceMocked('my-index', 'my-title');
             const fixedFilter = createFilter('agent.id', '1', 'my-index');
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
-            const filterManager = new DataSourceFilterManager(dataSource, []);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, []);
             const filters = filterManager.getFilters();
             expect(filters).toEqual([fixedFilter]);
         })
@@ -140,7 +159,7 @@ describe('DataSourceFilterManager', () => {
             const fixedFilter = createFilter('agent.id', '1', 'my-index');
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
             const sameIndexFilter = createFilter('agent.id', '1', 'my-index');
-            const filterManager = new DataSourceFilterManager(dataSource, [sameIndexFilter]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [sameIndexFilter]);
             const filters = filterManager.getFilters();
             expect(filters).toEqual([fixedFilter, sameIndexFilter]);
         })
@@ -150,7 +169,7 @@ describe('DataSourceFilterManager', () => {
             const fixedFilter = createFilter('agent.id', '1', 'my-index');
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
             const anotherIndexFilter = createFilter('agent.id', '1', 'another-index');
-            const filterManager = new DataSourceFilterManager(dataSource, [anotherIndexFilter]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [anotherIndexFilter]);
             const filters = filterManager.getFilters();
             expect(filters).toEqual([fixedFilter]);
             expect(filters).not.toContainEqual(anotherIndexFilter);
@@ -168,7 +187,7 @@ describe('DataSourceFilterManager', () => {
                     }
                 });
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
-            const filterManager = new DataSourceFilterManager(dataSource, []);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, []);
             const filters = filterManager.getFixedFilters();
             expect(filters).toContainEqual(fixedFilter);
             expect(dataSource.getFixedFilters).toHaveBeenCalledTimes(1);
@@ -187,7 +206,7 @@ describe('DataSourceFilterManager', () => {
             const dataSource = new DataSourceMocked('my-index', 'my-title');
             const fixedFilter = createFilter('agent.id', '1', 'my-index');
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
-            const filterManager = new DataSourceFilterManager(dataSource, []);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, []);
             const filters = filterManager.getFixedFilters();
             const agentPinnedFilter = filterManager.getPinnedAgentFilter();
             expect(filters).toContainEqual(fixedFilter);
@@ -204,7 +223,7 @@ describe('DataSourceFilterManager', () => {
             const dataSource = new DataSourceMocked('my-index', 'my-title');
             const fixedFilter = createFilter('agent.id', '1', 'my-index');
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
-            const filterManager = new DataSourceFilterManager(dataSource, []);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, []);
             const filters = filterManager.getFixedFilters();
             expect(filters).toContainEqual(fixedFilter);
             expect(filters).not.toContainEqual(filterManager.getPinnedAgentFilter());
@@ -217,7 +236,7 @@ describe('DataSourceFilterManager', () => {
             const dataSource = new DataSourceMocked('my-index', 'my-title');
             const storedFilter = createFilter('agent.id', '1', 'my-index');
 
-            const filterManager = new DataSourceFilterManager(dataSource, []);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, []);
             jest.spyOn(filterManager, 'getFilters').mockReturnValue([storedFilter]);  
         })
 
@@ -232,7 +251,7 @@ describe('DataSourceFilterManager', () => {
                         }
                     }
                 });
-            const filterManager = new DataSourceFilterManager(dataSource, [storedFilter]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [storedFilter]);
             const excludeManager = filterManager.getExcludeManagerFilter();
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([]);
             const filters = filterManager.getFetchFilters();
@@ -249,7 +268,7 @@ describe('DataSourceFilterManager', () => {
                         }
                     }
                 });
-            const filterManager = new DataSourceFilterManager(dataSource, [storedFilter]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [storedFilter]);
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([]);
             const filters = filterManager.getFetchFilters();
             expect(filters).toEqual([storedFilter]);
@@ -264,7 +283,7 @@ describe('DataSourceFilterManager', () => {
                         allowedAgents: ['001']
                     }
                 });
-            const filterManager = new DataSourceFilterManager(dataSource, [storedFilter]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [storedFilter]);
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([]);
             const allowedAgents = filterManager.getAllowAgentsFilter();
             const filters = filterManager.getFetchFilters();
@@ -279,7 +298,7 @@ describe('DataSourceFilterManager', () => {
                     appStateReducers: {
                     }
                 });
-            const filterManager = new DataSourceFilterManager(dataSource, [storedFilter]);
+            const filterManager = new PatternDataSourceFilterManager(dataSource, [storedFilter]);
             jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([]);
             const filters = filterManager.getFetchFilters();
             expect(filters).toEqual([storedFilter]);
