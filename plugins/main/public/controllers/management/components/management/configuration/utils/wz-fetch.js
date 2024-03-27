@@ -347,11 +347,9 @@ export const restartCluster = async () => {
       const str = validationError.detail;
       throw new Error(str);
     }
-    // this.performClusterRestart(); // TODO: convert AngularJS to React
     await WzRequest.apiReq('PUT', `/cluster/restart`, {
       delay: 15000,
     });
-    // this.$rootScope.$broadcast('removeRestarting', {}); TODO: isRestarting: false?
     return {
       data: {
         data: 'Restarting cluster',

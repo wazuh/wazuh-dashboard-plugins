@@ -27,12 +27,16 @@ import {
   SECTION_DECODERS_SECTION,
   SECTION_RULES_SECTION,
 } from './common/constants';
+import { getAngularModule } from '../../../../kibana-services';
+import {
+  withGuardAsync,
+  withReduxProvider,
+} from '../../../../components/common/hocs';
+import { compose } from 'redux';
 
 class WzManagementMain extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
-    this.store = store;
   }
 
   render() {
@@ -45,20 +49,50 @@ class WzManagementMain extends Component {
           (section === 'statistics' && <WzStatistics />) ||
           (section === 'logs' && <WzLogs />) ||
           (section === 'configuration' && (
-            <WzConfiguration {...this.props.configurationProps} />
+            <WzConfiguration
+              agent={{
+                id: '000',
+              }}
+            />
           )) ||
-          (section === SECTION_DECODERS_SECTION && (
-            <WzDecoders logtestProps={this.props.logtestProps} />
-          )) ||
-          (section === SECTION_CDBLIST_SECTION && (
-            <WzCDBLists logtestProps={this.props.logtestProps} />
-          )) ||
+          (section === SECTION_DECODERS_SECTION && <WzDecoders />) ||
+          (section === SECTION_CDBLIST_SECTION && <WzCDBLists />) ||
           (['ruleset', SECTION_RULES_SECTION].includes(section) && (
-            <WzRuleset logtestProps={this.props.logtestProps} />
+            <WzRuleset />
           ))}
       </Fragment>
     );
   }
 }
 
-export default WzManagementMain;
+const availableViews = [
+  'groups',
+  'status',
+  'reporting',
+  'statistics',
+  'logs',
+  'configuration',
+  'decoders',
+  'lists',
+  'ruleset',
+  'rules',
+  'monitoring',
+];
+
+export const ManagementRouter = compose(
+  withReduxProvider,
+  withGuardAsync(
+    () => {
+      const section = getAngularModule()
+        .$injector.get('$location')
+        .search().tab;
+      if (availableViews.includes(section)) {
+        return { ok: false, data: { section } };
+      }
+      return { ok: true, data: { section } };
+    },
+    () => null,
+  ),
+)(({ section }) => <WzManagementMain section={section} />);
+
+export default ManagementRouter;
