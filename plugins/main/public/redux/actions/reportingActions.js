@@ -17,7 +17,7 @@
 export const updateIsProcessing = isProcessing => {
   return {
     type: 'UPDATE_IS_PROCESSING',
-    isProcessing: isProcessing
+    isProcessing: isProcessing,
   };
 };
 
@@ -28,7 +28,7 @@ export const updateIsProcessing = isProcessing => {
 export const updateListItemsForRemove = itemList => {
   return {
     type: 'UPDATE_LIST_ITEMS_FOR_REMOVE',
-    itemList: itemList
+    itemList: itemList,
   };
 };
 
@@ -39,7 +39,7 @@ export const updateListItemsForRemove = itemList => {
 export const updateShowModal = showModal => {
   return {
     type: 'UPDATE_SHOW_MODAL',
-    showModal: showModal
+    showModal: showModal,
   };
 };
 
@@ -49,6 +49,18 @@ export const updateShowModal = showModal => {
  */
 export const cleanInfo = () => {
   return {
-    type: 'CLEAN_INFO'
+    type: 'CLEAN_INFO',
   };
 };
+
+/**
+ * Update reporting data source search context
+ * @param {Object} dataSourceSearchContext
+ */
+export const updateReportingCommunicateSearchContext =
+  dataSourceSearchContext => {
+    return {
+      type: 'UPDATE_REPORTING_DATA_SEARCH_SOURCE_CONTEXT',
+      dataSourceSearchContext,
+    };
+  };

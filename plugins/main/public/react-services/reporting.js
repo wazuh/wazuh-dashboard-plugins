@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import $ from 'jquery';
 import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { AppState } from './app-state';
@@ -18,10 +17,24 @@ import { WzRequest } from './wz-request';
 import { Vis2PNG } from '../factories/vis2png';
 import { RawVisualizations } from '../factories/raw-visualizations';
 import { VisHandlers } from '../factories/vis-handlers';
-import { getAngularModule, getDataPlugin, getToasts } from '../kibana-services';
+import {
+  getAngularModule,
+  getCore,
+  getDataPlugin,
+  getHttp,
+  getToasts,
+} from '../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
+import store from '../redux/store';
+import domtoimage from '../utils/dom-to-image';
+import dateMath from '@elastic/datemath';
+import React from 'react';
+import { EuiFlexGroup, EuiFlexItem, EuiButton, EuiLink } from '@elastic/eui';
+import { reporting } from '../utils/applications';
+import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
+
 const app = getAngularModule();
 
 export class ReportingService {
@@ -59,63 +72,98 @@ export class ReportingService {
     return idArray;
   }
 
-  async startVis2Png(tab, agents = false, syscollectorFilters = null) {
+  renderSucessReportsToast({ filename }) {
+    this.showToast(
+      'success',
+      'Report created',
+      <>
+        <EuiFlexGroup alignItems='center'>
+          <EuiFlexItem>
+            <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
+              <EuiFlexItem style={{ whiteSpace: 'nowrap' }} grow={false}>
+                See the reports on
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiLink
+                    aria-label='go to Endpoint summary'
+                    href={getCore().application.getUrlForApp(reporting.id, {
+                      path: '',
+                    })}
+                  >
+                    {reporting.title}
+                  </EuiLink>
+                </RedirectAppLinks>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              onClick={() =>
+                window.open(
+                  getHttp().basePath.prepend(`/reports/${filename}`),
+                  '_blank',
+                )
+              }
+              size='s'
+            >
+              Open report
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </>,
+      10000,
+    );
+  }
+
+  async getVisualizationsFromDOM() {
+    const domVisualizations = document.querySelectorAll('.visualization');
+    return await Promise.all(
+      Array.from(domVisualizations).map(async node => {
+        return {
+          element: await domtoimage.toPng(node),
+          width: node.clientWidth,
+          height: node.clientHeight,
+          title: node?.parentNode?.parentNode?.parentNode?.querySelector(
+            'figcaption > h2 > .embPanel__titleInner',
+          )?.textContent,
+        };
+      }),
+    );
+  }
+
+  async getDataSourceSearchContext() {
+    return store.getState().reportingReducers?.dataSourceSearchContext;
+  }
+
+  async startVis2Png(tab, agents = false, searchContext = null) {
     try {
-      if (this.vis2png.isWorking()) {
-        this.showToast('danger', 'Error', 'Report in progress', 4000);
-        return;
-      }
       this.$rootScope.reportBusy = true;
       this.$rootScope.reportStatus = 'Generating report...0%';
       this.$rootScope.$applyAsync();
 
-      this.vis2png.clear();
-
-      const rawVisualizations = this.rawVisualizations
-        .getList()
-        .filter(this.removeTableVis);
-
-      let idArray = [];
-      if (tab === 'general') {
-        idArray = this.removeAgentStatusVis(
-          rawVisualizations.map(item => item.id),
-        );
-      } else {
-        idArray = rawVisualizations.map(item => item.id);
-      }
-
-      const visualizationIDList = [];
-      for (const item of idArray) {
-        const tmpHTMLElement = $(`#${item}`);
-        if (tmpHTMLElement[0]) {
-          this.vis2png.assignHTMLItem(item, tmpHTMLElement);
-          visualizationIDList.push(item);
-        }
-      }
-
-      const appliedFilters = await this.visHandlers.getAppliedFilters(
-        syscollectorFilters,
-      );
+      const dataSourceContext =
+        searchContext || (await this.getDataSourceSearchContext());
+      const visualizations = await this.getVisualizationsFromDOM();
       const dataplugin = await getDataPlugin();
       const serverSideQuery = dataplugin.query.getOpenSearchQuery();
-      const array = await this.vis2png.checkArray(visualizationIDList);
-
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
-        array,
+        array: visualizations,
         serverSideQuery, // Used for applying the same filters on the server side requests
-        filters: appliedFilters.filters,
-        time: appliedFilters.time,
-        searchBar: appliedFilters.searchBar,
-        tables: appliedFilters.tables,
+        filters: dataSourceContext.filters,
+        time: {
+          to: dateMath.parse(dataSourceContext.time.to),
+          from: dateMath.parse(dataSourceContext.time.to),
+        },
+        searchBar: dataSourceContext?.query?.query || '',
+        tables: [], // TODO: check is this is used
         tab,
         section: agents ? 'agents' : 'overview',
         agents,
         browserTimezone,
-        indexPatternTitle: (
-          await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
-        ).title,
+        indexPatternTitle: dataSourceContext.indexPattern.title,
         apiId: JSON.parse(AppState.getCurrentAPI()).id,
       };
 
@@ -123,18 +171,12 @@ export class ReportingService {
         tab === 'syscollector'
           ? `/reports/agents/${agents}/inventory`
           : `/reports/modules/${tab}`;
-      await WzRequest.genericReq('POST', apiEndpoint, data);
+      const response = await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.showToast(
-        'success',
-        'Created report',
-        'Success. Go to Dashboard management > Reporting',
-        4000,
-      );
-      return;
+      this.renderSucessReportsToast({ filename: response.data.filename });
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
@@ -174,18 +216,12 @@ export class ReportingService {
         type === 'agentConfig'
           ? `/reports/agents/${obj.id}`
           : `/reports/groups/${obj.name}`;
-      await WzRequest.genericReq('POST', apiEndpoint, data);
+      const response = await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
       this.$rootScope.$applyAsync();
-      this.showToast(
-        'success',
-        'Created report',
-        'Success. Go to Dashboard management > Reporting',
-        4000,
-      );
-      return;
+      this.renderSucessReportsToast({ filename: response.data.filename });
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;

@@ -30,7 +30,7 @@
     >
       <react-component
         name="MainModule"
-        props="{agent, section: tab, disabledReport: resultState !== 'ready', cardsProps: getWelcomeCardsProps(resultState), goGroups: goGroups, exportConfiguration: exportConfiguration}"
+        props="{agent, section: tab, cardsProps: getWelcomeCardsProps(resultState), goGroups: goGroups, exportConfiguration: exportConfiguration}"
       ></react-component>
     </div>
     <div ng-if="!loadingDashboard">
@@ -115,7 +115,11 @@
   </div>
   <!-- end agents module -->
   <!-- agents syscollector -->
-  <div ng-if="tab === 'syscollector' && agent" ng-show="!load" class="euiPageBody">
+  <div
+    ng-if="tab === 'syscollector' && agent"
+    ng-show="!load"
+    class="euiPageBody"
+  >
     <react-component
       name="MainSyscollector"
       props="{agent: agent}"
