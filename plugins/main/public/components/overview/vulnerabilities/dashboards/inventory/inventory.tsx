@@ -14,7 +14,6 @@ import {
   EuiTitle,
   EuiButtonEmpty,
 } from '@elastic/eui';
-import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
 import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
@@ -31,17 +30,10 @@ import { LoadingSpinner } from '../../common/components/loading_spinner';
 // common components/hooks
 import DocViewer from '../../../../common/doc-viewer/doc-viewer';
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
-import { useAppConfig, useFilterManager } from '../../../../common/hooks';
 import { useDataGrid } from '../../../../common/data-grid/use-data-grid';
 import { useDocViewer } from '../../../../common/doc-viewer/use-doc-viewer';
 import { withErrorBoundary } from '../../../../common/hocs';
-import { search } from '../../../../common/search-bar/search-bar-service';
 import { exportSearchToCSV } from '../../../../common/data-grid/data-grid-service';
-import {
-  vulnerabilityIndexFiltersAdapter,
-  onUpdateAdapter,
-  restorePrevIndexFiltersAdapter,
-} from '../../common/vulnerability_detector_adapters';
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
@@ -49,34 +41,25 @@ import { ModuleEnabledCheck } from '../../common/components/check-module-enabled
 import { 
   VulnerabilitiesDataSourceRepository,
   VulnerabilitiesDataSource,
-  PatternDataSourceFactory, 
-  tFilter, 
   tParsedIndexPattern, 
   PatternDataSource } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
-import { FilterManager } from '../../../../../../../../src/plugins/data/public';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 
 const InventoryVulsComponent = () => {
-  const appConfig = useAppConfig();
-  const VULNERABILITIES_INDEX_PATTERN_ID =
-    appConfig.data['vulnerabilities.pattern'];
-  const filterManager = useFilterManager().filterManager as FilterManager;
   const {
     dataSource,
-    filters: defaultFilters,
     fetchFilters,
-    setFilters,
     isLoading: isDataSourceLoading,
     fetchData,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository()
   });
-
   const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
   });
-  const { isLoading, query } = searchBarProps;
+  const { query } = searchBarProps;
 
   const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -155,14 +138,12 @@ const InventoryVulsComponent = () => {
   };
 
   useEffect(() => {
-    if (isLoading || isDataSourceLoading) {
+    if (isDataSourceLoading) {
       return;
     }
     setIndexPattern(dataSource?.indexPattern);
     fetchData({ query, pagination, sorting })
       .then(results => {
-        console.log('results', results);
-        console.log('filters', fetchFilters);
         setResults(results);
       })
       .catch(error => {
@@ -189,7 +170,7 @@ const InventoryVulsComponent = () => {
           grow
         >
           <>
-            {isLoading || isDataSourceLoading ? (
+            {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
               <SearchBar
@@ -200,10 +181,10 @@ const InventoryVulsComponent = () => {
                 showQueryBar={true}
               />
             )}
-            {!isLoading && results?.hits?.total === 0 ? (
+            {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
             ) : null}
-            {!isLoading && results?.hits?.total > 0 ? (
+            {!isDataSourceLoading && results?.hits?.total > 0 ? (
               <EuiDataGrid
                 {...dataGridProps}
                 className={sideNavDocked ? 'dataGridDockedNav' : ''}

@@ -17,7 +17,6 @@ import {
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
 import {
-  Filter,
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
@@ -75,7 +74,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const {
     dataSource,
     fetchFilters,
-    setFilters,
     isLoading: isDataSourceLoading,
     fetchData,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
@@ -107,10 +105,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   };
 
   const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: dataSource?.id,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
   });
   const {
-    isLoading,
     query,
     dateRangeFrom,
     dateRangeTo,
@@ -137,7 +134,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   });
 
   useEffect(() => {
-    if (isLoading || isDataSourceLoading) {
+    if (isDataSourceLoading) {
       return;
     }
     setIndexPattern(dataSource?.indexPattern);
@@ -148,7 +145,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
     })
       .then(results => {
-        console.log('results', results);
         setResults(results);
       })
       .catch(error => {
@@ -206,7 +202,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         grow
       >
         <>
-          {isLoading || isDataSourceLoading ? (
+          {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
             <SearchBar
@@ -215,10 +211,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               showSaveQuery={true}
             />
           )}
-          {!isLoading && results?.hits?.total === 0 ? (
+          {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
-          {!isLoading && !isDataSourceLoading && results?.hits?.total > 0 ? (
+          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
             <>
               <EuiFlexItem grow={false} className='discoverChartContainer'>
                 <EuiPanel

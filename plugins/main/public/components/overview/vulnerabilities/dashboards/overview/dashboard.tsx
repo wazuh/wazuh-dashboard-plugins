@@ -8,7 +8,6 @@ import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { getDashboardFilters } from './dashboard_panels_filters';
 import './vulnerability_detector_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
-import { useAppConfig, useFilterManager } from '../../../../common/hooks';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
@@ -24,13 +23,11 @@ import { ModuleEnabledCheck } from '../../common/components/check-module-enabled
 import {
   VulnerabilitiesDataSourceRepository,
   VulnerabilitiesDataSource,
-  PatternDataSourceFactory,
   PatternDataSource,
-  tFilter,
   tParsedIndexPattern
 } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
-import { FilterManager } from '../../../../../../../../src/plugins/data/public';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 
 const plugins = getPlugins();
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -41,15 +38,9 @@ a wrapper for visual adjustments, while the Kpi, the Open vs Close visualization
 the rest of the visualizations have different configurations at the dashboard level. */
 
 const DashboardVulsComponent: React.FC = () => {
-  const appConfig = useAppConfig();
-  const VULNERABILITIES_INDEX_PATTERN_ID =
-    appConfig.data['vulnerabilities.pattern'];
-  const filterManager = useFilterManager().filterManager as FilterManager;
   const {
     dataSource,
-    filters: defaultFilters,
     fetchFilters,
-    setFilters,
     isLoading: isDataSourceLoading,
     fetchData,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
@@ -57,15 +48,15 @@ const DashboardVulsComponent: React.FC = () => {
     repository: new VulnerabilitiesDataSourceRepository(),
   });
 
-  const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
-  });
-
-  const { isLoading, query, filters: searchBarFilters } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
+  const { searchBarProps } = useSearchBar({
+    indexPattern: dataSource?.indexPattern as IndexPattern,
+  });
+  const { query } = searchBarProps;
+
   useEffect(() => {
-    if (isLoading || isDataSourceLoading) {
+    if (isDataSourceLoading) {
       return;
     }
     fetchData({ query }).then(results => {
@@ -89,28 +80,26 @@ const DashboardVulsComponent: React.FC = () => {
         <>
           <ModuleEnabledCheck />
           {
-            isLoading || isDataSourceLoading ? 
-            <LoadingSpinner /> :
-            <SearchBar
-              appName='vulnerability-detector-searchbar'
-              {...searchBarProps}
-              showDatePicker={false}
-              showQueryInput={true}
-              showQueryBar={true}
-            />
+            isDataSourceLoading && !dataSource ?
+              <LoadingSpinner /> : 
+              <SearchBar
+                appName='vulnerability-detector-searchbar'
+                {...searchBarProps}
+                showDatePicker={false}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
           }
-          {!isLoading && results?.hits?.total === 0 ? (
+          {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
-          {!isLoading && results?.hits?.total > 0 ? (
+          {dataSource && results?.hits?.total > 0 ? (
             <div className='vulnerability-dashboard-responsive'>
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,
-                    panels: getDashboardFilters(
-                      VULNERABILITIES_INDEX_PATTERN_ID,
-                    ),
+                    panels: getDashboardFilters(dataSource?.id),
                     isFullScreenMode: false,
                     filters: fetchFilters ?? [],
                     useMargins: false,
@@ -129,12 +118,16 @@ const DashboardVulsComponent: React.FC = () => {
                     },
                     hidePanelTitles: true,
                   }}
+
+                  onInputUpdated={(value) => {
+                    console.log('onInputUpdated', value);
+                  }}
                 />
               </div>
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
-                  panels: getKPIsPanel(VULNERABILITIES_INDEX_PATTERN_ID),
+                  panels: getKPIsPanel(dataSource?.id),
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
                   useMargins: true,
@@ -152,11 +145,15 @@ const DashboardVulsComponent: React.FC = () => {
                   },
                   hidePanelTitles: true,
                 }}
+
+                onInputUpdated={(value) => {
+                  console.log('onInputUpdated', value);
+                }}
               />
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(VULNERABILITIES_INDEX_PATTERN_ID),
+                  panels: getDashboardPanels(dataSource?.id),
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
                   useMargins: true,
@@ -173,6 +170,10 @@ const DashboardVulsComponent: React.FC = () => {
                     value: 15,
                   },
                   hidePanelTitles: false,
+                }}
+
+                onInputUpdated={(value) => {
+                  console.log('onInputUpdated', value);
                 }}
               />
             </div>
