@@ -35,11 +35,7 @@ export const ConfigurationCards = ({
   indexPatternId,
 }: ConfigurationCardsProps) => {
   return (
-    <EuiFlexGroup
-      direction='column'
-      gutterSize='s'
-      /* style={{ padding: '0 16px' }} */
-    >
+    <EuiFlexGroup direction='column' gutterSize='s'>
       <EuiFlexItem>
         <EuiFlexGroup responsive={false} alignItems='center' gutterSize='s'>
           <EuiFlexItem grow={false}>

@@ -6,17 +6,18 @@ import {
   withReduxProvider,
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
-import { cluster, endpointSummary } from '../../../../../utils/applications';
-import {
-  AppState,
-  WazuhConfig,
-  WzRequest,
-} from '../../../../../react-services';
-import { ShareAgent } from '../../../../../factories/share-agent';
-import { getCore } from '../../../../../kibana-services';
-import { TabVisualizations } from '../../../../../factories/tab-visualizations';
+import { cluster } from '../../../../../utils/applications';
+import { AppState, WzRequest } from '../../../../../react-services';
 import { ClusterDisabled } from '../../../../../components/management/cluster/cluster-disabled';
 import { ClusterDashboard } from '../../../../../components/management/cluster/dashboard/dashboard';
+
+interface ClusterOverviewState {
+  authorized: boolean;
+  clusterEnabled: boolean;
+  isClusterRunning: boolean;
+  statusRunning: string;
+  permissions: any;
+}
 
 export const ClusterOverview = compose(
   withErrorBoundary,
@@ -26,29 +27,18 @@ export const ClusterOverview = compose(
     { action: 'cluster:status', resource: '*:*:*' },
   ]),
 )(
-  class ClusterOverview extends Component {
+  class ClusterOverview extends Component<unknown, ClusterOverviewState> {
     _isMount = false;
-    wazuhConfig: any;
-    shareAgent: any;
-    tabVisualizations: any;
-    nodeProps: any;
 
     constructor(props) {
       super(props);
       this.state = {
-        loading: true,
-        currentNode: null,
-        nodeSearchTerm: '',
         authorized: true,
         clusterEnabled: false,
         isClusterRunning: false,
         statusRunning: 'no',
+        permissions: undefined,
       };
-
-      this.tabVisualizations = new TabVisualizations();
-      this.wazuhConfig = new WazuhConfig();
-      this.shareAgent = new ShareAgent();
-      this.nodeProps = { goBack: () => this.goBack() };
     }
 
     clusterStatus = async () => {
@@ -71,26 +61,13 @@ export const ClusterOverview = compose(
       const clusterEnabled =
         AppState.getClusterInfo() &&
         AppState.getClusterInfo().status === 'enabled';
-      /* $location.search('tabView', 'cluster-monitoring');
-      $location.search('tab', 'monitoring');
-      $location.search('_a', null); */
-      this.tabVisualizations.removeAll();
-      this.tabVisualizations.setTab('monitoring');
-      this.tabVisualizations.assign({
-        monitoring: 2,
-      });
 
-      const status = await this.clusterStatus();
-      const statusRunning = status?.data.data.running;
+      const status: any = await this.clusterStatus();
+      const statusRunning = status?.data?.data?.running;
       this.setState({
-        authorized: true,
         clusterEnabled: clusterEnabled,
         isClusterRunning: statusRunning === 'no' ? false : true,
         statusRunning,
-        permissions: !status
-          ? [{ action: 'cluster:status', resource: '*:*:*' }]
-          : undefined,
-        loading: false,
       });
     }
 
@@ -102,14 +79,18 @@ export const ClusterOverview = compose(
       return (
         <>
           <div style={{ padding: '16px' }}>
-            {!this.state?.clusterEnabled || !this.state?.isClusterRunning ? (
+            {!this.state?.clusterEnabled ||
+            !this.state?.isClusterRunning ||
+            !this.state?.authorized ? (
               <ClusterDisabled
                 enabled={this.state?.clusterEnabled}
                 running={this.state?.isClusterRunning}
               />
             ) : null}
           </div>
-          {this.state?.clusterEnabled && this.state?.isClusterRunning ? (
+          {this.state?.clusterEnabled &&
+          this.state?.isClusterRunning &&
+          this.state?.authorized ? (
             <ClusterDashboard statusRunning={this.state?.statusRunning} />
           ) : null}
         </>

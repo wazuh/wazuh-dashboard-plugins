@@ -17,7 +17,6 @@ import { EuiSpacer, EuiFlexItem } from '@elastic/eui';
 
 import { OverviewCards } from '../components/overview_cards';
 import { endpointSummary } from '../../../../utils/applications';
-import { TabVisualizations } from '../../../../factories/tab-visualizations';
 import { WzRequest } from '../../../../react-services';
 import { ConfigurationCards } from '../components/configuration_cards';
 import { NodeList } from '../node-list';
@@ -25,7 +24,6 @@ import { NodeList } from '../node-list';
 const SearchBar = getPlugins().data.ui.SearchBar;
 
 interface DashboardCTProps {
-  tabVisualizations: TabVisualizations;
   statusRunning: string;
 }
 
@@ -39,10 +37,7 @@ interface ClusterDashboardState {
   agentsCount: number;
 }
 
-const DashboardCT: React.FC<DashboardCTProps> = ({
-  tabVisualizations,
-  statusRunning,
-}) => {
+const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
   /* TODO: Analyze whether to use the new index pattern handler https://github.com/wazuh/wazuh-dashboard-plugins/issues/6434
   Replace WAZUH_ALERTS_PATTERN with appState.getCurrentPattern... */
   const CT_INDEX_PATTERN_ID = WAZUH_ALERTS_PATTERN;
@@ -81,23 +76,14 @@ const DashboardCT: React.FC<DashboardCTProps> = ({
 
   const goBack = () => {
     setBooleans(null);
-    tabVisualizations.assign({
-      monitoring: 2,
-    });
   };
 
   const goNodes = () => {
     setBooleans('showNodes');
-    tabVisualizations.assign({
-      monitoring: 1,
-    });
   };
 
   const goConfiguration = () => {
     setBooleans('showConfig');
-    tabVisualizations.assign({
-      monitoring: 1,
-    });
   };
 
   useEffect(() => {

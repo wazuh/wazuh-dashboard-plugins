@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { WzRequest } from '../../../../react-services';
+import React from 'react';
 import {
   EuiFlexItem,
   EuiButtonEmpty,
@@ -53,10 +52,7 @@ export const OverviewCards = ({
 }: OverviewCardsProps) => {
   return (
     <>
-      <EuiFlexGroup
-        responsive
-        gutterSize='s' /* style={{ padding: '0 16px' }} */
-      >
+      <EuiFlexGroup responsive gutterSize='s'>
         <EuiFlexItem>
           <EuiCard
             textAlign='left'
@@ -101,7 +97,7 @@ export const OverviewCards = ({
                 },
                 {
                   title: 'Version',
-                  description: version,
+                  description: version ?? '-',
                 },
               ]}
               titleProps={{
