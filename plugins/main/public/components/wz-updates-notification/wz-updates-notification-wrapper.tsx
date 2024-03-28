@@ -10,5 +10,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import React from 'react';
+import WzUpdatesNotificationMain from './wz-updates-notification';
+import { compose } from 'redux';
+import { withErrorBoundary, withReduxProvider } from '../common/hocs';
 
-export { WzUpdatesNotificationWrapper } from './wz-updates-notification-wrapper';
+export const WzUpdatesNotificationWrapper = compose(withReduxProvider)(
+  WzUpdatesNotificationMain,
+);

@@ -1740,6 +1740,32 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.number({ validate: this.validate.bind(this) });
     },
   },
+  'wazuh.updates.disabled': {
+    title: 'Check updates',
+    description: 'Define if the check updates service is active.',
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: false,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
   'vulnerabilities.pattern': {
     title: 'Index pattern',
     description: 'Default index pattern to use for vulnerabilities.',
