@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react';
 import {
   SearchBarProps,
-  FilterManager,
   TimeRange,
   Query,
   Filter,
-  IIndexPattern,
+  IndexPattern,
   IndexPatternsContract,
 } from '../../../../../../src/plugins/data/public';
 import { getDataPlugin } from '../../../kibana-services';
-import { useFilterManager, useQueryManager, useTimeFilter } from '../hooks';
-
+import { useQueryManager, useTimeFilter } from '../hooks';
+import './search-bar-styles.scss';
 // Input - types
 type tUseSearchBarCustomInputs = {
-  indexPattern: IIndexPattern;
-  filterManager?: FilterManager;
+  indexPattern: IndexPattern;
+  setFilters: (filters: Filter[]) => void;
   onFiltersUpdated?: (filters: Filter[]) => void;
   onQuerySubmitted?: (
     payload: { dateRange: TimeRange; query?: Query },
@@ -25,7 +24,7 @@ type tUseSearchBarProps = Partial<SearchBarProps> & tUseSearchBarCustomInputs;
 
 // Output types
 type tUserSearchBarResponse = {
-  searchBarProps: Partial<SearchBarProps>;
+  searchBarProps: Partial<SearchBarProps>
 };
 
 /**
@@ -36,32 +35,38 @@ type tUserSearchBarResponse = {
 const useSearchBarConfiguration = (
   props: tUseSearchBarProps,
 ): tUserSearchBarResponse => {
-  const { indexPattern, filterManager: defaultFilterManager, filters: defaultFilters } = props;
+  const { indexPattern, filters: defaultFilters, setFilters } = props;
   // dependencies
-  const filterManager = defaultFilterManager ? defaultFilterManager : useFilterManager().filterManager as FilterManager;
-  const filters = defaultFilters ? defaultFilters : filterManager.getFilters();
+  const filters = defaultFilters ? defaultFilters : [];
   const [query, setQuery] = props?.query
     ? useState(props?.query)
     : useQueryManager();
   const { timeFilter, timeHistory, setTimeFilter } = useTimeFilter();
   // states
   const [isLoading, setIsLoading] = useState(false);
-  const [indexPatternSelected, setIndexPatternSelected] = useState<IIndexPattern>(indexPattern);
+  const [indexPatternSelected, setIndexPatternSelected] = useState<IndexPattern>(indexPattern);
 
   useEffect(() => {
-    // default index pattern id is required
     if (indexPattern) {
-      initSearchBar();
+      setIndexPatternSelected(indexPattern);
     }
   }, [indexPattern]);
+
+  useEffect(() => {
+    initSearchBar();
+  }, []);
 
   /**
    * Initialize the searchbar props with the corresponding index pattern and filters
    */
   const initSearchBar = async () => {
     setIsLoading(true);
-    const defaultIndexPattern = await getDefaultIndexPattern();
-    setIndexPatternSelected(indexPattern || defaultIndexPattern);
+    if(!indexPattern) {
+      const defaultIndexPattern = await getDefaultIndexPattern();
+      setIndexPatternSelected(defaultIndexPattern);
+    }else{
+      setIndexPatternSelected(indexPattern);
+    }
     setIsLoading(false);
   };
 
@@ -78,7 +83,7 @@ const useSearchBarConfiguration = (
   /**
    * Search bar properties necessary to render and initialize the osd search bar component
    */
-  const searchBarProps: Partial<SearchBarProps> = {
+  const searchBarProps: Partial<SearchBarProps & { useDefaultBehaviors: boolean }> = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
     filters: filters,
@@ -87,7 +92,7 @@ const useSearchBarConfiguration = (
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (filters: Filter[]) => {
-      filterManager.setFilters(filters);
+      setFilters ? setFilters(filters) : console.warn('setFilters function is not defined');
       props?.onFiltersUpdated && props?.onFiltersUpdated(filters);
     },
     onQuerySubmit: (
