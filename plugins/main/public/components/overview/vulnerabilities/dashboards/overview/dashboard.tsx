@@ -39,10 +39,12 @@ the rest of the visualizations have different configurations at the dashboard le
 
 const DashboardVulsComponent: React.FC = () => {
   const {
+    filters,
     dataSource,
     fetchFilters,
     isLoading: isDataSourceLoading,
     fetchData,
+    setFilters
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository(),
@@ -52,6 +54,8 @@ const DashboardVulsComponent: React.FC = () => {
 
   const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters,
   });
   const { query } = searchBarProps;
 
@@ -82,13 +86,15 @@ const DashboardVulsComponent: React.FC = () => {
           {
             isDataSourceLoading && !dataSource ?
               <LoadingSpinner /> : 
-              <SearchBar
-                appName='vulnerability-detector-searchbar'
-                {...searchBarProps}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
+              <div className="wz-search-bar">
+                <SearchBar
+                  appName='vulnerability-detector-searchbar'
+                  {...searchBarProps}
+                  showDatePicker={false}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                />
+              </div>
           }
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
@@ -118,10 +124,6 @@ const DashboardVulsComponent: React.FC = () => {
                     },
                     hidePanelTitles: true,
                   }}
-
-                  onInputUpdated={(value) => {
-                    console.log('onInputUpdated', value);
-                  }}
                 />
               </div>
               <DashboardByRenderer
@@ -145,10 +147,6 @@ const DashboardVulsComponent: React.FC = () => {
                   },
                   hidePanelTitles: true,
                 }}
-
-                onInputUpdated={(value) => {
-                  console.log('onInputUpdated', value);
-                }}
               />
               <DashboardByRenderer
                 input={{
@@ -170,10 +168,6 @@ const DashboardVulsComponent: React.FC = () => {
                     value: 15,
                   },
                   hidePanelTitles: false,
-                }}
-
-                onInputUpdated={(value) => {
-                  console.log('onInputUpdated', value);
                 }}
               />
             </div>

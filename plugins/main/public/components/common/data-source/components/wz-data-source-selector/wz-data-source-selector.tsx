@@ -6,12 +6,10 @@ import {
 } from '@elastic/eui';
 import {
     tDataSource,
-    tDataSourceFactory,
     tDataSourceSelector,
     PatternDataSourceFactory,
     PatternDataSource,
     AlertsDataSourceRepository,
-    tDataSourceRepository,
     tParsedIndexPattern
 } from '../../index';
 import {
@@ -22,8 +20,6 @@ import {
 import { 
     PatternDataSourceSelector,
 } from '../../pattern/pattern-data-source-selector';
-
-
 
 type tWzDataSourceSelector<T extends tParsedIndexPattern, K extends tDataSource> = {
     name: 'string';

@@ -73,9 +73,11 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const {
     dataSource,
+    filters,
     fetchFilters,
     isLoading: isDataSourceLoading,
     fetchData,
+    setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
     DataSource
@@ -106,6 +108,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters
   });
   const {
     query,
@@ -205,11 +209,13 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-            <SearchBar
-              appName='wazuh-discover-search-bar'
-              {...searchBarProps}
-              showSaveQuery={true}
-            />
+            <div className="wz-search-bar">
+              <SearchBar
+                appName='wazuh-discover-search-bar'
+                {...searchBarProps}
+                showSaveQuery={true}
+              />
+            </div>
           )}
           {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />

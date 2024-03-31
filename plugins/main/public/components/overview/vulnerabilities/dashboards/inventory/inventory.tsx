@@ -49,15 +49,19 @@ import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 const InventoryVulsComponent = () => {
   const {
     dataSource,
+    filters,
     fetchFilters,
     isLoading: isDataSourceLoading,
     fetchData,
+    setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository()
   });
   const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters
   });
   const { query } = searchBarProps;
 
@@ -173,13 +177,15 @@ const InventoryVulsComponent = () => {
             {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
-              <SearchBar
-                appName='inventory-vuls'
-                {...searchBarProps}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
+              <div className="wz-search-bar">
+                <SearchBar
+                  appName='inventory-vuls'
+                  {...searchBarProps}
+                  showDatePicker={false}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                />
+              </div>
             )}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
