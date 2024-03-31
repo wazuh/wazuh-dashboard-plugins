@@ -70,6 +70,7 @@ export const WzButtonPermissions = ({
 
         return additionalProps;
       }}
+      {...rest}
     >
       <Button {...rest} />
     </WzElementPermissions>
