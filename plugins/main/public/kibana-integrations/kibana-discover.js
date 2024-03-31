@@ -1127,7 +1127,7 @@ function discoverController(
   $scope.$watch('fetchStatus', () => {
     if ($scope.fetchStatus !== fetchStatuses.UNINITIALIZED) {
       setTimeout(() => {
-        modulesHelper.hideCloseButtons();
+        //modulesHelper.hideCloseButtons();
       }, 100);
     }
   });
