@@ -1,8 +1,7 @@
 import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER, VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from '../../../../../../common/constants';
-import { FilterHandler } from '../../../../../utils/filter-handler';
-import { tFilter } from '../../index';
-import { PatternDataSource } from '../pattern-data-source';
+import { tFilter, PatternDataSourceFilterManager } from '../../index';
 import { AppState } from '../../../../../react-services/app-state';
+import { PatternDataSource } from '../pattern-data-source';
 
 export class VulnerabilitiesDataSource extends PatternDataSource {
 
@@ -12,29 +11,18 @@ export class VulnerabilitiesDataSource extends PatternDataSource {
 
     getFixedFilters(): tFilter[] {
         return [
+            ...this.getClusterManagerFilters(),
             ...super.getFixedFilters(),
         ]
     }
 
     getClusterManagerFilters() {
-        const filterHandler = new FilterHandler();
-        const isCluster = AppState.getClusterInfo().status == 'enabled';
-        const managerFilter = filterHandler.managerQuery(
-            isCluster
-                ? AppState.getClusterInfo().cluster
-                : AppState.getClusterInfo().manager,
-            true,
+        return PatternDataSourceFilterManager.getClusterManagerFilters(this.title, 
+            DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
             VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER[
-            AppState.getClusterInfo().status
+                AppState.getClusterInfo().status
             ],
-
-        );
-        managerFilter.meta.index = this.id;
-        managerFilter.meta.controlledBy = DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER;
-        managerFilter.$state = {
-            store: 'appState'
-        }
-        return [managerFilter] as tFilter[];
+        );   
     }
 
 }

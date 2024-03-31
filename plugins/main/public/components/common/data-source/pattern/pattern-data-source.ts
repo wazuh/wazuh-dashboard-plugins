@@ -1,12 +1,8 @@
 import { tDataSource, tSearchParams, tFilter, tParsedIndexPattern } from "../index";
 import { getDataPlugin } from '../../../../kibana-services';
-import { Filter, IndexPatternsContract, IndexPattern } from "../../../../../../../src/plugins/data/public";
+import { IndexPatternsContract, IndexPattern } from "../../../../../../../src/plugins/data/public";
 import { search } from '../../search-bar/search-bar-service';
-import store from '../../../../redux/store';
-import { getFilterExcludeManager, getFilterAllowedAgents } from '../../../../react-services/data-sources/vulnerabilities-states';
-import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT, DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from "../../../../../common/constants";
-import { AppState } from '../../../../react-services/app-state';
-import { FilterHandler }  from '../../../../utils/filter-handler';
+import { PatternDataSourceFilterManager } from '../index';
 
 export class PatternDataSource implements tDataSource { 
     id: string;
@@ -14,8 +10,6 @@ export class PatternDataSource implements tDataSource {
     fields: any[];
     patternService: IndexPatternsContract;
     indexPattern: IndexPattern;
-    defaultFixedFilters: tFilter[];
-    filters: tFilter[] = [];
 
     constructor(id: string, title: string) {
         this.id = id;
@@ -33,22 +27,9 @@ export class PatternDataSource implements tDataSource {
         return this.fields;
     }
 
-    setFilters(filters: Filter[]) {
-        this.filters = filters;
-    }
-
-
-    getFilters(){
-        return [
-            ...this.getFixedFilters(),
-            ...this.filters
-        ];
-    }
-
     getFixedFilters(): tFilter[]{
         // return all filters
         return [
-            ...this.getClusterManagerFilters(),
             ...this.getPinnedAgentFilter(),
         ];
     }
@@ -56,8 +37,7 @@ export class PatternDataSource implements tDataSource {
     getFetchFilters(): tFilter[]{
         return [
             ...this.getAllowAgentsFilter(),
-            ...this.getExcludeManagerFilter(),
-            ...this.getFilters(),
+            ...this.getExcludeManagerFilter()
         ];
     }
 
@@ -126,81 +106,19 @@ export class PatternDataSource implements tDataSource {
         }
     }
 
-    getClusterManagerFilters() {
-        const filterHandler = new FilterHandler();
-        const isCluster = AppState.getClusterInfo().status == 'enabled';
-        const managerFilter = filterHandler.managerQuery(
-            isCluster
-                ? AppState.getClusterInfo().cluster
-                : AppState.getClusterInfo().manager,
-            true
-        );
-        managerFilter.meta = {
-            ...managerFilter.meta,
-            controlledBy: DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
-            index: this.id
-        }
-        //@ts-ignore
-        managerFilter.$state = {
-            store: 'appState'
-        }
-        //@ts-ignore
-        return [managerFilter] as tFilter[];
-    }
-
      /**
      * Returns the filter when the an agent is pinned (saved in the session storage or redux store)
      */
-     getPinnedAgentFilter(): tFilter[] {
-        const agentId = store.getState().appStateReducers?.currentAgentData?.id;
-        const url = window.location.href;
-        const regex = new RegExp('agentId=' + '[^&]*');
-        const match = url.match(regex);
-        const isPinnedAgentByUrl = match && match[0];
-        if (!agentId && !isPinnedAgentByUrl) return [];
-        return [{
-          meta: {
-            removable: false, // used to hide the close icon in the filter
-            alias: null,
-            disabled: false,
-            key: 'agent.id',
-            negate: false,
-            params: { query: agentId },
-            type: 'phrase',
-            index: this.id,
-            controlledBy: DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT
-          },
-          query: {
-            match: {
-              'agent.id': {
-                query: agentId,
-                type: 'phrase',
-              },
-            },
-          },
-          $state: {
-            store: 'appState' // check appStore is not assignable, why is stored here?
-          },
-        } as tFilter]
-      }
-    
-      /**
-       * Return the filter to exclude the data related to servers (managers) due to the setting hideManagerAlerts is enabled
-       */
-      getExcludeManagerFilter(): tFilter[] {
-        return store.getState().appConfig?.data?.hideManagerAlerts ?
-          [getFilterExcludeManager(this.title) as tFilter] : [];
-      }
-    
-      /**
-       * Return the allowed agents related to the user permissions to read data from agents in the
-        API server
-       */
-      getAllowAgentsFilter(): tFilter[] {
-        const allowedAgents = store.getState().appStateReducers?.allowedAgents || [];
-        return allowedAgents.lenght > 0 ?
-          [getFilterAllowedAgents(allowedAgents, this.title) as tFilter] : []
-      }
-    
+    getPinnedAgentFilter(): tFilter[] {
+        return PatternDataSourceFilterManager.getPinnedAgentFilter(this.title);   
+    }
+
+    getAllowAgentsFilter(): tFilter[] {
+        return PatternDataSourceFilterManager.getAllowAgentsFilter(this.title);
+    }
+
+    getExcludeManagerFilter(): tFilter[] {
+        return PatternDataSourceFilterManager.getExcludeManagerFilter(this.title);
+    }
 
 }

@@ -101,6 +101,8 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
         // what the filters update
         dataSourceFilterManager.getUpdates$().subscribe({
             next: () => {
+                // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
+                dataSourceFilterManager.setFilters(dataSourceFilterManager.getFilters());
                 setAllFilters(dataSourceFilterManager.getFilters());
                 setFetchFilters(dataSourceFilterManager.getFetchFilters());
             },

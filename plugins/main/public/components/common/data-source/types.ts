@@ -1,14 +1,8 @@
 import { Filter } from "../../../../../../src/plugins/data/common";
 import { FilterManager } from "../../../../../../src/plugins/data/public";
 
-export type tFilter = Filter & {
-    meta?: {
-        removable?: boolean;
-    }
-};
-
 export type tSearchParams = {
-    filters?: tFilter[];
+    filters?: Filter[];
     query?: any;
     pagination?: {
         pageIndex?: number;
@@ -27,6 +21,8 @@ export type tSearchParams = {
     };
 }
 
+export type tFilter = Filter;
+
 // create a new type using the FilterManager type but only the getFilters, setFilters, addFilters, getUpdates$
 export type tFilterManager = Pick<FilterManager, 'getFilters' | 'setFilters' | 'addFilters' | 'getUpdates$'>;
 
@@ -34,9 +30,7 @@ export type tDataSource = {
     id: string;
     title: string;
     select(): Promise<void>;
-    getFilters: () => Promise<tFilter[]> | tFilter[];
-    setFilters: (filters: tFilter[]) => Promise<void> | void;
-    getFields: () => Promise<any[]> | any[];
+    getFields(): any[];
     getFixedFilters: () => tFilter[];
     getFetchFilters: () => tFilter[];
     fetch: (params: tSearchParams) => Promise<any>;
