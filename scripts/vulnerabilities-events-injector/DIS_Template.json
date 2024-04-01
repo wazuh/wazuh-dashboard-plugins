@@ -13,9 +13,6 @@
       }
     ],
     "properties": {
-      "@timestamp": {
-        "type": "date"
-      },
       "agent": {
         "properties": {
           "build": {
@@ -182,6 +179,9 @@
             "ignore_above": 1024,
             "type": "keyword"
           },
+          "detected_at": {
+            "type": "date"
+          },
           "enumeration": {
             "ignore_above": 1024,
             "type": "keyword"
@@ -189,6 +189,9 @@
           "id": {
             "ignore_above": 1024,
             "type": "keyword"
+          },
+          "published_at": {
+            "type": "date"
           },
           "reference": {
             "ignore_above": 1024,
