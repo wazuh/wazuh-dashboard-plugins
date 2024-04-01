@@ -1866,3 +1866,12 @@ iframe.width-changed {
     left: 320px;
   }
 }
+
+.wz-app {
+  .euiPage {
+    background-color: transparent;
+  }
+  [name='OverviewWelcome'] .euiIcon--app .euiIcon__fillSecondary {
+    fill: #000000bb;
+  }
+}
