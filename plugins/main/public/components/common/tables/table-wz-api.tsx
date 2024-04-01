@@ -44,15 +44,25 @@ const getFilters = filters => {
 
 export function TableWzAPI({
   actionButtons,
+  postActionButtons,
+  addOnTitle,
+  extra,
+  setReload,
   ...rest
 }: {
   actionButtons?:
     | ReactNode
     | ReactNode[]
     | (({ filters }: { filters }) => ReactNode);
+  postActionButtons?:
+    | ReactNode
+    | ReactNode[]
+    | (({ filters }: { filters }) => ReactNode);
+
   title?: string;
   addOnTitle?: ReactNode;
   description?: string;
+  extra?: ReactNode;
   downloadCsv?: boolean | string;
   searchTable?: boolean;
   endpoint: string;
@@ -62,6 +72,7 @@ export function TableWzAPI({
   searchBarProps?: any;
   reload?: boolean;
   onDataChange?: Function;
+  setReload?: (newValue: number) => void;
 }) {
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({});
@@ -142,7 +153,7 @@ export function TableWzAPI({
   },
   []);
 
-  const renderActionButtons = filters => {
+  const renderActionButtons = (actionButtons, filters) => {
     if (Array.isArray(actionButtons)) {
       return actionButtons.map((button, key) => (
         <EuiFlexItem key={key} grow={false}>
@@ -161,10 +172,13 @@ export function TableWzAPI({
   };
 
   /**
-   *  Generate a new reload footprint
+   *  Generate a new reload footprint and set reload to propagate refresh
    */
   const triggerReload = () => {
     setReloadFootprint(Date.now());
+    if (setReload) {
+      setReload(Date.now());
+    }
   };
 
   useEffect(() => {
@@ -183,7 +197,7 @@ export function TableWzAPI({
     <>
       <EuiFlexGroup wrap alignItems='center' responsive={false}>
         <EuiFlexItem>
-          <EuiFlexGroup alignItems='center' responsive={false}>
+          <EuiFlexGroup wrap alignItems='center' responsive={false}>
             <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
               {rest.title && (
                 <EuiTitle size='s'>
@@ -198,9 +212,9 @@ export function TableWzAPI({
                 </EuiTitle>
               )}
             </EuiFlexItem>
-            {rest.addOnTitle ? (
+            {addOnTitle ? (
               <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
-                {rest.addOnTitle}
+                {addOnTitle}
               </EuiFlexItem>
             ) : null}
           </EuiFlexGroup>
@@ -208,7 +222,7 @@ export function TableWzAPI({
         <EuiFlexItem grow={false}>
           <EuiFlexGroup wrap alignItems={'center'} responsive={false}>
             {/* Render optional custom action button */}
-            {renderActionButtons(filters)}
+            {renderActionButtons(actionButtons, filters)}
             {/* Render optional reload button */}
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}
@@ -224,6 +238,8 @@ export function TableWzAPI({
                 }
               />
             )}
+            {/* Render optional post custom action button */}
+            {renderActionButtons(postActionButtons, filters)}
             {rest.showFieldSelector && (
               <EuiFlexItem grow={false}>
                 <EuiToolTip content='Select visible fields' position='left'>
@@ -293,6 +309,7 @@ export function TableWzAPI({
           <EuiText color='subdued'>{rest.description}</EuiText>
         </EuiFlexItem>
       )}
+      {extra ? <EuiFlexItem>{extra}</EuiFlexItem> : null}
       <EuiFlexItem>{table}</EuiFlexItem>
     </EuiFlexGroup>
   );

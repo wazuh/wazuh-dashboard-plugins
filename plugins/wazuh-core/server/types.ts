@@ -1,24 +1,20 @@
 import {
-  CacheAPIUserAllowRunAs,
   ISecurityFactory,
   ManageHosts,
   ServerAPIClient,
-  ServerAPIHostEntries,
   ServerAPIInternalUserClient,
   ServerAPIScopedUserClient,
-  UpdateConfigurationFile,
   UpdateRegistry,
 } from './services';
+import { Configuration } from '../common/services/configuration';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginSetup {
   dashboardSecurity: ISecurityFactory;
-  cacheAPIUserAllowRunAs: CacheAPIUserAllowRunAs;
+  configuration: Configuration;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
-  serverAPIHostEntries: ServerAPIHostEntries;
   updateRegistry: UpdateRegistry;
-  updateConfigurationFile: UpdateConfigurationFile;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
@@ -29,12 +25,10 @@ export interface WazuhCorePluginSetup {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginStart {
   dashboardSecurity: ISecurityFactory;
-  cacheAPIUserAllowRunAs: CacheAPIUserAllowRunAs;
+  configuration: Configuration;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
-  serverAPIHostEntries: ServerAPIHostEntries;
   updateRegistry: UpdateRegistry;
-  updateConfigurationFile: UpdateConfigurationFile;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;

@@ -6,9 +6,9 @@ import { mount } from 'enzyme';
 import { EuiButtonEmpty, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
-jest.mock('../../../common/hooks/useApiService', () => ({
+jest.mock('../../../common/hooks/use-service', () => ({
   __esModule: true,
-  useApiService: jest.fn(),
+  useService: jest.fn(),
 }));
 
 describe('OutdatedAgentsCard', () => {
@@ -18,102 +18,102 @@ describe('OutdatedAgentsCard', () => {
       wrapper.update();
     });
   };
-
-  const mockLoading = false;
-  const mockDataNoOutdatedAgents = [];
-  const useApiServiceMockNoOutdatedAgent = jest.fn(() => [mockLoading, mockDataNoOutdatedAgents]);
-  const mockDataOutdatedAgents = [
-    {
-        version: "Wazuh v3.0.0",
-        id: "003",
-        name: "main_database"
-    },
-    {
-        version: "Wazuh v3.0.0",
-        id: "004",
-        name: "dmz002"
-    }
-];
-  const useApiServiceMockOutdatedAgent = jest.fn(() => [mockLoading, mockDataOutdatedAgents]);
-  
-  const handleClick = jest.fn();
+  const filterByOutdatedAgent = jest.fn();
 
   it('renders with not outdated agents', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockNoOutdatedAgent;  
-    
     await act(async () => {
       const { getByTestId } = render(
-        <OutdatedAgentsCard onClick={handleClick} />
+        <OutdatedAgentsCard
+          isLoading={false}
+          outdatedAgents={0}
+          filterByOutdatedAgent={filterByOutdatedAgent}
+        />,
       );
 
-      const outdatedAgentsNumberElement = getByTestId('wazuh-endpoints-summary-outdated-agents-number')
-      expect(outdatedAgentsNumberElement).toHaveClass('euiTextColor euiTextColor--success');
-      expect(outdatedAgentsNumberElement.textContent).toBe(`${mockDataNoOutdatedAgents.length}`);
+      const outdatedAgentsNumberElement = getByTestId(
+        'wazuh-endpoints-summary-outdated-agents-number',
+      );
+      expect(outdatedAgentsNumberElement).toHaveClass(
+        'euiTextColor euiTextColor--success',
+      );
+      expect(outdatedAgentsNumberElement.textContent).toBe('0');
     });
   });
 
   it('renders with outdated agents', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockOutdatedAgent;  
-    
     await act(async () => {
       const { getByTestId } = render(
-        <OutdatedAgentsCard onClick={handleClick} />
+        <OutdatedAgentsCard
+          isLoading={false}
+          outdatedAgents={2}
+          filterByOutdatedAgent={filterByOutdatedAgent}
+        />,
       );
 
-      const outdatedAgentsNumberElement = getByTestId('wazuh-endpoints-summary-outdated-agents-number')
-      expect(outdatedAgentsNumberElement).toHaveClass('euiTextColor euiTextColor--warning');
-      expect(outdatedAgentsNumberElement.textContent).toBe(`${mockDataOutdatedAgents.length}`);
+      const outdatedAgentsNumberElement = getByTestId(
+        'wazuh-endpoints-summary-outdated-agents-number',
+      );
+      expect(outdatedAgentsNumberElement).toHaveClass(
+        'euiTextColor euiTextColor--warning',
+      );
+      expect(outdatedAgentsNumberElement.textContent).toBe('2');
     });
   });
 
   it('renders popover on click with outdated agents', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockOutdatedAgent;
-        
     const wrapper = await mount(
-      <OutdatedAgentsCard onClick={handleClick} />,
+      <OutdatedAgentsCard
+        isLoading={false}
+        outdatedAgents={2}
+        filterByOutdatedAgent={filterByOutdatedAgent}
+      />,
     );
 
     await awaitForMyComponent(wrapper);
-    
+
     expect(wrapper.find('.wazuh-outdated-agents-panel').exists()).toBeTruthy();
     expect(wrapper.find(EuiButtonEmpty).exists()).not.toBeTruthy();
-    
+
     wrapper.find('.wazuh-outdated-agents-panel').simulate('click');
     expect(wrapper.find(EuiButtonEmpty).exists()).toBeTruthy();
   });
 
   it('handles click with correct data', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockOutdatedAgent;
-        
     const wrapper = await mount(
-      <OutdatedAgentsCard onClick={handleClick} />,
+      <OutdatedAgentsCard
+        isLoading={false}
+        outdatedAgents={2}
+        filterByOutdatedAgent={filterByOutdatedAgent}
+      />,
     );
 
     await awaitForMyComponent(wrapper);
-    
+
     expect(wrapper.find('.wazuh-outdated-agents-panel').exists()).toBeTruthy();
     expect(wrapper.find(EuiButtonEmpty).exists()).not.toBeTruthy();
-    
+
     wrapper.find('.wazuh-outdated-agents-panel').simulate('click');
     expect(wrapper.find(EuiButtonEmpty).exists()).toBeTruthy();
 
     wrapper.find(EuiButtonEmpty).simulate('click');
-    expect(handleClick).toHaveBeenCalledTimes(1);
-    expect(handleClick).toHaveBeenCalledWith(mockDataOutdatedAgents);
+    expect(filterByOutdatedAgent).toHaveBeenCalledTimes(1);
+    expect(filterByOutdatedAgent).toHaveBeenCalledWith(true);
   });
 
   it('EuiButtonEmpty filter must be disabled when no data', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockNoOutdatedAgent;
-        
     const wrapper = await mount(
-      <OutdatedAgentsCard onClick={handleClick} />,
+      <OutdatedAgentsCard
+        isLoading={false}
+        outdatedAgents={0}
+        filterByOutdatedAgent={filterByOutdatedAgent}
+      />,
     );
 
     await awaitForMyComponent(wrapper);
-    
+
     expect(wrapper.find('.wazuh-outdated-agents-panel').exists()).toBeTruthy();
     expect(wrapper.find(EuiButtonEmpty).exists()).not.toBeTruthy();
-    
+
     wrapper.find('.wazuh-outdated-agents-panel').simulate('click');
     expect(wrapper.find(EuiButtonEmpty).exists()).toBeTruthy();
     expect(wrapper.find(EuiButtonEmpty).prop('isDisabled')).toBe(true);
@@ -123,20 +123,21 @@ describe('OutdatedAgentsCard', () => {
     const documentationLink = webDocumentationLink(
       'upgrade-guide/wazuh-agent/index.html',
     );
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockNoOutdatedAgent;
-        
     const wrapper = await mount(
-      <OutdatedAgentsCard onClick={handleClick} />,
+      <OutdatedAgentsCard
+        isLoading={false}
+        outdatedAgents={0}
+        filterByOutdatedAgent={filterByOutdatedAgent}
+      />,
     );
 
     await awaitForMyComponent(wrapper);
-    
+
     expect(wrapper.find('.wazuh-outdated-agents-panel').exists()).toBeTruthy();
     expect(wrapper.find(EuiButtonEmpty).exists()).not.toBeTruthy();
-    
+
     wrapper.find('.wazuh-outdated-agents-panel').simulate('click');
     expect(wrapper.find(EuiLink).exists()).toBeTruthy();
     expect(wrapper.find(EuiLink).prop('href')).toBe(documentationLink);
   });
-
 });

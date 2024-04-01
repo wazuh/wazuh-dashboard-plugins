@@ -28,21 +28,6 @@ jest.mock('../../../../../kibana-services', () => ({
 
 const mockProps = {
   section: 'groups',
-  groupsProps: {
-    items: [
-      {
-        name: 'default',
-        count: 1,
-        mergedSum: '2c45c95db2954d2c7d0ea533f09e81a5',
-        configSum: 'ab73af41699f13fdd81903b5f23d8d00',
-      },
-    ],
-    closeAddingAgents: false,
-    exportConfigurationProps: {
-      type: 'group',
-    },
-    selectedGroup: false,
-  },
   configurationProps: {
     agent: {
       id: '000',

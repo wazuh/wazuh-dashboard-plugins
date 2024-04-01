@@ -62,9 +62,10 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                   <EuiFlexGroup
                     alignItems="center"
                     responsive={false}
+                    wrap={true}
                   >
                     <div
-                      className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                      className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                     >
                       <EuiFlexItem
                         className="wz-flex-basis-auto"

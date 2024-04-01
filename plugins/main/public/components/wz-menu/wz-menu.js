@@ -43,6 +43,14 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
+import {
+  DataSourceSelector,
+  PatternDataSource,
+  AlertsDataSourceRepository,
+  PatternDataSourceFactory
+} from '../common/data-source';
+
+import WzDataSourceSelector from '../common/data-source/wz-data-source-selector/wz-data-source-selector';
 
 const sections = {
   overview: 'overview',
@@ -72,6 +80,7 @@ export const WzMenu = withWindowSize(
         currentSelectedPattern: '',
         isManagementPopoverOpen: false,
         isOverviewPopoverOpen: false,
+        dataSourceSelector: new DataSourceSelector(new AlertsDataSourceRepository(), new PatternDataSourceFactory())
       };
       this.store = store;
       this.genericReq = GenericRequest;
@@ -89,6 +98,7 @@ export const WzMenu = withWindowSize(
       );
       try {
         const APIlist = await this.loadApiList();
+        this.setState({ APIlist: APIlist });
         if (APIlist.length) {
           const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
           const filteredApi = APIlist.filter(api => api.id === apiId);
@@ -143,9 +153,7 @@ export const WzMenu = withWindowSize(
     loadApiList = async () => {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const APIlist = (result || {}).data || [];
-      if (APIlist.length) {
-        return APIlist;
-      }
+      return APIlist;
     };
 
     loadIndexPatternsList = async () => {
@@ -161,8 +169,8 @@ export const WzMenu = withWindowSize(
               ),
           ));
 
-        // Abort if we have disabled the pattern selector
-        if (!AppState.getPatternSelector()) return;
+        // When not exists patterns, not show the selector
+        if(list.length === 1) return;
 
         let filtered = false;
         // If there is no current pattern, fetch it
@@ -201,10 +209,6 @@ export const WzMenu = withWindowSize(
 
     async componentDidUpdate(prevProps) {
       let newState = {};
-      if (this.state.APIlist && !this.state.APIlist.length) {
-        const APIlist = await this.loadApiList();
-        newState = { ...newState, APIlist };
-      }
       const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
       const { currentAPI } = this.state;
       const currentTab = this.getCurrentTab();
@@ -290,9 +294,6 @@ export const WzMenu = withWindowSize(
               ),
           ));
 
-        // Abort if we have disabled the pattern selector
-        if (!AppState.getPatternSelector()) return;
-
         let filtered = false;
         // If there is no current pattern, fetch it
         if (!AppState.getCurrentPattern()) {
@@ -341,41 +342,11 @@ export const WzMenu = withWindowSize(
       this.isLoading = false;
     }
 
-    changePattern = async event => {
-      try {
-        const newPattern = event.target;
-        if (!AppState.getPatternSelector()) return;
-        await PatternHandler.changePattern(newPattern.value);
-        this.setState({ currentSelectedPattern: newPattern.value });
-        if (this.state.currentMenuTab !== 'wazuh-dev') {
-          this.router.reload();
-        }
-
-        if (newPattern?.id === 'selectIndexPatternBar') {
-          this.updatePatternAndApi();
-        }
-      } catch (error) {
-        const options = {
-          context: `${WzMenu.name}.changePattern`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: false,
-          display: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error changing the Index Pattern`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    };
-
     updatePatternAndApi = async () => {
       this.setState({
         menuOpened: false,
         hover: this.state.currentMenuTab,
-        ...(await this.loadApiList()),
+        ...{ APIlist: await this.loadApiList() },
         ...(await this.loadIndexPatternsList()),
       });
     };
@@ -434,38 +405,6 @@ export const WzMenu = withWindowSize(
       }
     };
 
-    buildPatternSelector() {
-      return (
-        <EuiFormRow label='Selected index pattern'>
-          <EuiSelect
-            id='selectIndexPattern'
-            options={this.state.patternList.map(item => {
-              return { value: item.id, text: item.title };
-            })}
-            value={this.state.currentSelectedPattern}
-            onChange={this.changePattern}
-            aria-label='Index pattern selector'
-          />
-        </EuiFormRow>
-      );
-    }
-
-    buildApiSelector() {
-      return (
-        <EuiFormRow label='Selected API'>
-          <EuiSelect
-            id='selectAPI'
-            options={this.state.APIlist.map(item => {
-              return { value: item.id, text: item.id };
-            })}
-            value={this.state.currentAPI}
-            onChange={this.changeAPI}
-            aria-label='API selector'
-          />
-        </EuiFormRow>
-      );
-    }
-
     buildWazuhNotReadyYet() {
       const container = document.getElementsByClassName('wazuhNotReadyYet');
       return ReactDOM.createPortal(
@@ -522,20 +461,6 @@ export const WzMenu = withWindowSize(
       });
     }
 
-    thereAreSelectors() {
-      return (
-        (AppState.getAPISelector() &&
-          this.state.currentAPI &&
-          this.state.APIlist &&
-          this.state.APIlist.length > 1) ||
-        !this.state.currentAPI ||
-        (AppState.getPatternSelector() &&
-          this.state.theresPattern &&
-          this.state.patternList &&
-          this.state.patternList.length > 1)
-      );
-    }
-
     getApiSelectorComponent() {
       let style = { minWidth: 100, textOverflow: 'ellipsis' };
       if (this.showSelectorsInPopover) {
@@ -565,6 +490,30 @@ export const WzMenu = withWindowSize(
       );
     }
 
+    onChangePattern = async pattern => {
+      try {
+        this.setState({ currentSelectedPattern: pattern.id });
+        if (this.state.currentMenuTab !== 'wazuh-dev') {
+          this.router.reload();
+        }
+        await this.updatePatternAndApi(); 
+      } catch (error) {
+        const options = {
+          context: `${WzMenu.name}.onChangePattern`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: false,
+          display: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error changing the Index Pattern`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    };
+
     getIndexPatternSelectorComponent() {
       let style = { maxWidth: 200, maxHeight: 50 };
       if (this.showSelectorsInPopover) {
@@ -576,19 +525,12 @@ export const WzMenu = withWindowSize(
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <p>Index pattern</p>
           </EuiFlexItem>
-
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
-              <EuiSelect
-                id='selectIndexPatternBar'
-                fullWidth={true}
-                options={this.state.patternList.map(item => {
-                  return { value: item.id, text: item.title };
-                })}
-                value={this.state.currentSelectedPattern}
-                onChange={this.changePattern}
-                aria-label='Index pattern selector'
-              />
+              <WzDataSourceSelector 
+                onChange={this.onChangePattern} 
+                dataSourceSelector={this.state.dataSourceSelector}
+                name="index pattern"/>
             </div>
           </EuiFlexItem>
         </>

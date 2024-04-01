@@ -19,6 +19,10 @@ export interface ISecurityFactory {
     request: OpenSearchDashboardsRequest,
     context?: RequestHandlerContext,
   ): Promise<CurrentUser>;
+  isAdministratorUser(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+  ): Promise<void>;
 }
 
 export function createDashboardSecurity({

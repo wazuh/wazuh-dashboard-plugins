@@ -22,35 +22,10 @@
   <!-- api -->
   <div ng-if="ctrl.tab === 'api' && !ctrl.load">
     <!-- API table section-->
-    <div ng-if="ctrl.apiEntries.length && !ctrl.addingApi && !ctrl.apiIsDown">
+    <div>
       <react-component
         name="ApiTable"
         props="ctrl.apiTableProps"
-      ></react-component>
-    </div>
-
-    <!-- Add API section-->
-    <div
-      layout="row"
-      layout-padding
-      ng-if="!ctrl.apiEntries.length || ctrl.addingApi"
-    >
-      <react-component
-        flex
-        name="AddApi"
-        props="ctrl.addApiProps"
-      ></react-component>
-    </div>
-
-    <!-- API is down section-->
-    <div
-      layout="column"
-      layout-padding
-      ng-if="ctrl.apiIsDown && !ctrl.addingApi"
-    >
-      <react-component
-        name="ApiIsDown"
-        props="ctrl.apiIsDownProps"
       ></react-component>
     </div>
   </div>

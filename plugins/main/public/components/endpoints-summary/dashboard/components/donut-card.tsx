@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiCard } from '@elastic/eui';
-import { useApiService } from '../../../common/hooks/useApiService';
 import { VisualizationBasic } from '../../../common/charts/visualizations/basic';
+import { useService } from '../../../common/hooks/use-service';
 
 interface AgentsByStatusCardProps {
   title?: string;
@@ -9,6 +9,7 @@ interface AgentsByStatusCardProps {
   betaBadgeLabel?: string;
   noDataTitle?: string;
   noDataMessage?: string;
+  reload?: number;
   getInfo: () => Promise<any[]>;
   onClickLabel?: (status: any) => void;
   [key: string]: any;
@@ -20,11 +21,12 @@ const DonutCard = ({
   betaBadgeLabel,
   noDataTitle = 'No results',
   noDataMessage = 'No results were found',
+  reload,
   getInfo,
   onClickLabel,
   ...props
 }: AgentsByStatusCardProps) => {
-  const [loading, data] = useApiService<any>(getInfo, undefined);
+  const { data, isLoading } = useService<any>(getInfo, undefined, reload);
 
   const handleClick = (item: any) => {
     if (onClickLabel) {
@@ -41,7 +43,7 @@ const DonutCard = ({
       <EuiFlexGroup>
         <EuiFlexItem className='align-items-center'>
           <VisualizationBasic
-            isLoading={loading}
+            isLoading={isLoading}
             type='donut'
             size={{ width: '100%', height: '150px' }}
             showLegend

@@ -12,24 +12,17 @@
 
 // Require some libraries
 import { ErrorResponse } from '../../lib/error-response';
-import { getConfiguration } from '../../lib/get-configuration';
-import { read } from 'read-last-lines';
-import jwtDecode from 'jwt-decode';
-import {
-  WAZUH_ROLE_ADMINISTRATOR_ID,
-  PLUGIN_SETTINGS,
-} from '../../../common/constants';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
-import { getCookieValueByName } from '../../lib/cookie';
 import fs from 'fs';
 import path from 'path';
 import { createDirectoryIfNotExists } from '../../lib/filesystem';
 import glob from 'glob';
 import { getFileExtensionFromBuffer } from '../../../common/services/file-extension';
+import { routeDecoratorProtectedAdministrator } from '../decorators';
 
 // TODO: these controllers have no logs. We should include them.
 export class WazuhUtilsCtrl {
@@ -40,25 +33,30 @@ export class WazuhUtilsCtrl {
   constructor() {}
 
   /**
-   * Returns the wazuh.yml file parsed
+   * Get the configuration excluding the API hosts configuration
    * @param {Object} context
    * @param {Object} request
    * @param {Object} response
-   * @returns {Object} Configuration File or ErrorResponse
+   * @returns {Object}
    */
-  getConfigurationFile(
+  async getConfiguration(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const configFile = getConfiguration();
-
+      context.wazuh.logger.debug('Getting configuration');
+      const configuration = await context.wazuh_core.configuration.get();
+      // Exclude the API host configuration
+      const { hosts, ...rest } = configuration;
+      context.wazuh.logger.debug(
+        `Configuration: ${JSON.stringify(configuration)}`,
+      );
       return response.ok({
         body: {
           statusCode: 200,
           error: 0,
-          data: configFile || {},
+          data: rest,
         },
       });
     } catch (error) {
@@ -67,80 +65,67 @@ export class WazuhUtilsCtrl {
   }
 
   /**
-   * Returns the wazuh.yml file in raw
+   * Clear the configuration
    * @param {Object} context
    * @param {Object} request
    * @param {Object} response
-   * @returns {Object} Configuration File or ErrorResponse
+   * @returns {Object}
    */
-  updateConfigurationFile =
-    this.routeDecoratorProtectedAdministratorRoleValidToken(
-      async (
-        context: RequestHandlerContext,
-        request: OpenSearchDashboardsRequest,
-        response: OpenSearchDashboardsResponseFactory,
-      ) => {
-        let requiresRunningHealthCheck: boolean = false,
-          requiresReloadingBrowserTab: boolean = false,
-          requiresRestartingPluginPlatform: boolean = false;
+  clearConfiguration = routeDecoratorProtectedAdministrator(
+    async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
+      context.wazuh.logger.debug('Clearing configuration');
+      await context.wazuh_core.configuration.clear();
+      return response.ok({
+        body: {
+          message: 'Configuration was cleared',
+        },
+      });
+    },
+    3020,
+  );
 
-        // Plugin settings configurables in the configuration file.
-        const pluginSettingsConfigurableFile = Object.keys(request.body)
-          .filter(
-            pluginSettingKey =>
-              PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile,
-          )
-          .reduce(
-            (accum, pluginSettingKey: string) => ({
-              ...accum,
-              [pluginSettingKey]: request.body[pluginSettingKey],
-            }),
-            {},
-          );
+  /**
+   * Update the configuration
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object}
+   */
+  updateConfiguration = routeDecoratorProtectedAdministrator(
+    async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
+      context.wazuh.logger.debug(
+        `Updating configuration: ${JSON.stringify(request.body)}`,
+      );
 
-        if (Object.keys(pluginSettingsConfigurableFile).length) {
-          // Update the configuration file.
-          await context.wazuh_core.updateConfigurationFile.updateConfiguration(
-            pluginSettingsConfigurableFile,
-          );
+      const updatedSettings = {
+        ...request.body,
+      };
+      context.wazuh.logger.debug(
+        `Updating configuration with ${JSON.stringify(updatedSettings)}`,
+      );
+      const { requirements, update: updatedConfiguration } =
+        await context.wazuh_core.configuration.set(updatedSettings);
+      context.wazuh.logger.debug('Configuration updated');
 
-          requiresRunningHealthCheck =
-            Object.keys(pluginSettingsConfigurableFile).some(
-              (pluginSettingKey: string) =>
-                Boolean(
-                  PLUGIN_SETTINGS[pluginSettingKey].requiresRunningHealthCheck,
-                ),
-            ) || requiresRunningHealthCheck;
-          requiresReloadingBrowserTab =
-            Object.keys(pluginSettingsConfigurableFile).some(
-              (pluginSettingKey: string) =>
-                Boolean(
-                  PLUGIN_SETTINGS[pluginSettingKey].requiresReloadingBrowserTab,
-                ),
-            ) || requiresReloadingBrowserTab;
-          requiresRestartingPluginPlatform =
-            Object.keys(pluginSettingsConfigurableFile).some(
-              (pluginSettingKey: string) =>
-                Boolean(
-                  PLUGIN_SETTINGS[pluginSettingKey]
-                    .requiresRestartingPluginPlatform,
-                ),
-            ) || requiresRestartingPluginPlatform;
-        }
-
-        return response.ok({
-          body: {
-            data: {
-              requiresRunningHealthCheck,
-              requiresReloadingBrowserTab,
-              requiresRestartingPluginPlatform,
-              updatedConfiguration: pluginSettingsConfigurableFile,
-            },
+      return response.ok({
+        body: {
+          data: {
+            ...requirements,
+            updatedConfiguration: updatedConfiguration,
           },
-        });
-      },
-      3021,
-    );
+        },
+      });
+    },
+    3021,
+  );
 
   /**
    * Upload a file
@@ -149,7 +134,7 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  uploadFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
+  uploadFile = routeDecoratorProtectedAdministrator(
     async (
       context: RequestHandlerContext,
       request: KibanaRequest,
@@ -157,7 +142,8 @@ export class WazuhUtilsCtrl {
     ) => {
       const { key } = request.params;
       const { file: bufferFile } = request.body;
-      const pluginSetting = PLUGIN_SETTINGS[key];
+
+      const pluginSetting = context.wazuh_core.configuration._settings.get(key);
 
       // Check file extension
       const fileExtension = getFileExtensionFromBuffer(bufferFile);
@@ -181,36 +167,34 @@ export class WazuhUtilsCtrl {
         '../../..',
         pluginSetting.options.file.store.relativePathFileSystem,
       );
+      context.wazuh.logger.debug(`Directory: ${targetDirectory}`);
       createDirectoryIfNotExists(targetDirectory);
       // Get the files related to the setting and remove them
       const files = glob.sync(path.join(targetDirectory, `${key}.*`));
+      context.wazuh.logger.debug(
+        `Removing previous files: ${files.join(', ')}`,
+      );
       files.forEach(fs.unlinkSync);
 
       // Store the file in the target directory.
-      fs.writeFileSync(path.join(targetDirectory, fileNamePath), bufferFile);
+      const storeFilePath = path.join(targetDirectory, fileNamePath);
+      context.wazuh.logger.debug(`Storing file on : ${files.join(', ')}`);
+      fs.writeFileSync(storeFilePath, bufferFile);
 
       // Update the setting in the configuration cache
       const pluginSettingValue =
         pluginSetting.options.file.store.resolveStaticURL(fileNamePath);
-      await context.wazuh_core.updateConfigurationFile.updateConfiguration({
+      const updatedConfiguration = {
         [key]: pluginSettingValue,
-      });
+      };
+      const { requirements, update } =
+        await context.wazuh_core.configuration.set(updatedConfiguration);
 
       return response.ok({
         body: {
           data: {
-            requiresRunningHealthCheck: Boolean(
-              pluginSetting.requiresRunningHealthCheck,
-            ),
-            requiresReloadingBrowserTab: Boolean(
-              pluginSetting.requiresReloadingBrowserTab,
-            ),
-            requiresRestartingPluginPlatform: Boolean(
-              pluginSetting.requiresRestartingPluginPlatform,
-            ),
-            updatedConfiguration: {
-              [key]: pluginSettingValue,
-            },
+            ...requirements,
+            updatedConfiguration: update,
           },
         },
       });
@@ -225,14 +209,14 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  deleteFile = this.routeDecoratorProtectedAdministratorRoleValidToken(
+  deleteFile = routeDecoratorProtectedAdministrator(
     async (
       context: RequestHandlerContext,
       request: KibanaRequest,
       response: KibanaResponseFactory,
     ) => {
       const { key } = request.params;
-      const pluginSetting = PLUGIN_SETTINGS[key];
+      const pluginSetting = context.wazuh_core.configuration._settings.get(key);
 
       // Get the files related to the setting and remove them
       const targetDirectory = path.join(
@@ -240,32 +224,24 @@ export class WazuhUtilsCtrl {
         '../../..',
         pluginSetting.options.file.store.relativePathFileSystem,
       );
+      context.wazuh.logger.debug(`Directory: ${targetDirectory}`);
       const files = glob.sync(path.join(targetDirectory, `${key}.*`));
+      context.wazuh.logger.debug(
+        `Removing previous files: ${files.join(', ')}`,
+      );
       files.forEach(fs.unlinkSync);
 
       // Update the setting in the configuration cache
-      const pluginSettingValue = pluginSetting.defaultValue;
-      await context.wazuh_core.updateConfigurationFile.updateConfiguration({
-        [key]: pluginSettingValue,
-      });
+      const { requirements, update } =
+        await context.wazuh_core.configuration.clear(key);
 
       return response.ok({
         body: {
           message:
             'All files were removed and the configuration file was updated.',
           data: {
-            requiresRunningHealthCheck: Boolean(
-              pluginSetting.requiresRunningHealthCheck,
-            ),
-            requiresReloadingBrowserTab: Boolean(
-              pluginSetting.requiresReloadingBrowserTab,
-            ),
-            requiresRestartingPluginPlatform: Boolean(
-              pluginSetting.requiresRestartingPluginPlatform,
-            ),
-            updatedConfiguration: {
-              [key]: pluginSettingValue,
-            },
+            ...requirements,
+            updatedConfiguration: update,
           },
         },
       });
@@ -273,49 +249,62 @@ export class WazuhUtilsCtrl {
     3023,
   );
 
-  private routeDecoratorProtectedAdministratorRoleValidToken(
-    routeHandler,
-    errorCode: number,
+  /**
+   * Import the configuration from a configuration file
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object} Configuration File or ErrorResponse
+   */
+  importConfiguration = routeDecoratorProtectedAdministrator(
+    async (
+      context: RequestHandlerContext,
+      request: KibanaRequest,
+      response: KibanaResponseFactory,
+    ) => {
+      const { file: fileBuffer } = request.body;
+      const responseImportFile =
+        await context.wazuh_core.configuration.importFile(fileBuffer);
+
+      return response.ok({
+        body: {
+          message: 'Configuration was imported',
+          ...responseImportFile,
+        },
+      });
+    },
+    3024,
+  );
+
+  /**
+   * Get the plugin scoped account
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object} Scoped user account or ErrorResponse
+   */
+  async getPluginScopedAccount(
+    context: RequestHandlerContext,
+    request: KibanaRequest,
+    response: KibanaResponseFactory,
   ) {
-    return async (context, request, response) => {
-      try {
-        // Check if user has administrator role in token
-        const token = getCookieValueByName(request.headers.cookie, 'wz-token');
-        if (!token) {
-          return ErrorResponse('No token provided', 401, 401, response);
-        }
-        const decodedToken = jwtDecode(token);
-        if (!decodedToken) {
-          return ErrorResponse('No permissions in token', 401, 401, response);
-        }
-        if (
-          !decodedToken.rbac_roles ||
-          !decodedToken.rbac_roles.includes(WAZUH_ROLE_ADMINISTRATOR_ID)
-        ) {
-          return ErrorResponse('No administrator role', 401, 401, response);
-        }
-        // Check the provided token is valid
-        const apiHostID = getCookieValueByName(
-          request.headers.cookie,
-          'wz-api',
-        );
-        if (!apiHostID) {
-          return ErrorResponse('No API id provided', 401, 401, response);
-        }
-        const responseTokenIsWorking =
-          await context.wazuh.api.client.asCurrentUser.request(
-            'GET',
-            '/',
-            {},
-            { apiHostID },
-          );
-        if (responseTokenIsWorking.status !== 200) {
-          return ErrorResponse('Token is not valid', 401, 401, response);
-        }
-        return await routeHandler(context, request, response);
-      } catch (error) {
-        return ErrorResponse(error.message || error, errorCode, 500, response);
-      }
-    };
+    try {
+      await context.wazuh_core.dashboardSecurity.isAdministratorUser(
+        context,
+        request,
+      );
+      return response.ok({
+        body: {
+          administrator: true,
+        },
+      });
+    } catch (error) {
+      return response.ok({
+        body: {
+          administrator: false,
+          administrator_error_message: error.message,
+        },
+      });
+    }
   }
 }

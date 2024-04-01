@@ -11,7 +11,6 @@
  */
 import React, { Component } from 'react';
 import {
-  EuiButtonEmpty,
   EuiOverlayMask,
   EuiOutsideClickDetector,
   EuiModal,
@@ -23,9 +22,12 @@ import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import { AgentSelectionTable } from '../../controllers/overview/components/overview-actions/agents-selection-table';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 import { AppState } from '../../react-services/app-state';
-import { getAngularModule, getDataPlugin } from '../../kibana-services';
+import {
+  getAngularModule,
+  getDataPlugin,
+  getWazuhCorePlugin,
+} from '../../kibana-services';
 import { getServices } from '../../kibana-integrations/discover/kibana_services';
 
 class WzAgentSelector extends Component {
@@ -75,7 +77,8 @@ class WzAgentSelector extends Component {
           return x.meta.key !== 'agent.id';
         });
         const cookieCurrentPattern =
-          AppState.getCurrentPattern() || getSettingDefaultValue('pattern');
+          AppState.getCurrentPattern() ||
+          getWazuhCorePlugin().configuration.getSettingValue('pattern');
         const currentPattern =
           this.props?.moduleIndexPatternTitle ?? cookieCurrentPattern;
         const filter = {

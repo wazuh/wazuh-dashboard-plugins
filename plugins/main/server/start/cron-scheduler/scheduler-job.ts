@@ -19,17 +19,22 @@ export class SchedulerJob {
   }
 
   public async run() {
-    const { index, status } = configuredJobs({})[this.jobName];
-    if (!status) {
-      return;
-    }
     try {
+      const { index, status } = (await configuredJobs(this.context, {}))[
+        this.jobName
+      ];
+      if (!status) {
+        return;
+      }
       const hosts = await this.getApiObjects();
       const jobPromises = hosts.map(async host => {
         try {
-          const { status } = configuredJobs({ host, jobName: this.jobName })[
-            this.jobName
-          ];
+          const { status } = (
+            await configuredJobs(this.context, {
+              host,
+              jobName: this.jobName,
+            })
+          )[this.jobName];
           if (!status) return;
           return await this.getResponses(host);
         } catch (error) {
@@ -50,9 +55,14 @@ export class SchedulerJob {
   private async getApiObjects() {
     const { apis } = jobs[this.jobName];
     const hostsResponse: IApi[] =
-      await this.context.wazuh_core.serverAPIHostEntries.getHostsEntries();
+      await this.context.wazuh_core.manageHosts.getEntries({
+        excludePassword: true,
+      });
     if (!hostsResponse.length)
-      throw { error: 10001, message: 'No Wazuh host configured in wazuh.yml' };
+      throw {
+        error: 10001,
+        message: 'No API host configured in configuration',
+      };
     if (apis && apis.length) {
       return this.filterHosts(hostsResponse, apis);
     }

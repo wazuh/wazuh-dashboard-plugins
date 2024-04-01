@@ -18,8 +18,7 @@ import {
 import { WzButton } from '../../../../components/common/buttons';
 import './agents-selector.scss';
 import { AppState } from '../../../../react-services/app-state';
-import { getDataPlugin } from '../../../../kibana-services';
-import { getSettingDefaultValue } from '../../../../../common/services/settings';
+import { getDataPlugin, getWazuhCorePlugin } from '../../../../kibana-services';
 
 class OverviewActions extends Component {
   constructor(props) {
@@ -101,7 +100,8 @@ class OverviewActions extends Component {
             params: { query: agentIdList[0] },
             type: 'phrase',
             index:
-              AppState.getCurrentPattern() || getSettingDefaultValue('pattern'),
+              AppState.getCurrentPattern() ||
+              getWazuhCorePlugin().configuration.getSettingValue('pattern'),
           },
           query: {
             match: {

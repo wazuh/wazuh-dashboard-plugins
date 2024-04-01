@@ -4,10 +4,13 @@ import {
   EuiButtonEmpty,
   EuiContextMenuPanel,
   EuiContextMenuItem,
+  EuiHorizontalRule,
+  EuiToolTip,
 } from '@elastic/eui';
 import { WzElementPermissions } from '../../../common/permissions/element';
 import { Agent } from '../../types';
 import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
+import { UpgradeAgentsModal } from './upgrade/upgrade-modal';
 
 export interface AgentsTableGlobalActionsProps {
   selectedAgents: Agent[];
@@ -15,7 +18,11 @@ export interface AgentsTableGlobalActionsProps {
   allAgentsCount: number;
   filters: any;
   allowEditGroups: boolean;
+  allowUpgrade: boolean;
+  allowGetTasks: boolean;
   reloadAgents: () => void;
+  setIsUpgradeTasksModalVisible: (isModalVisible: boolean) => void;
+  setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const AgentsTableGlobalActions = ({
@@ -24,13 +31,18 @@ export const AgentsTableGlobalActions = ({
   allAgentsCount,
   filters,
   allowEditGroups,
+  allowUpgrade,
+  allowGetTasks,
   reloadAgents,
+  setIsUpgradeTasksModalVisible,
+  setIsUpgradePanelClosed,
 }: AgentsTableGlobalActionsProps) => {
   const [isPopoverOpen, setPopover] = useState(false);
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [addOrRemoveGroups, setAddOrRemoveGroups] = useState<
     'add' | 'remove'
   >();
+  const [isUpgradeAgentsVisible, setIsUpgradeAgentsVisible] = useState(false);
 
   const onButtonClick = () => {
     setPopover(!isPopoverOpen);
@@ -46,13 +58,25 @@ export const AgentsTableGlobalActions = ({
       iconSide='right'
       onClick={onButtonClick}
     >
-      Add/Remove groups
+      More
     </EuiButtonEmpty>
   );
 
   const totalAgents = allAgentsSelected
     ? allAgentsCount
     : selectedAgents.length;
+
+  const selectAgentsTooltip = (content: React.ReactNode) => (
+    <EuiToolTip content='Select agents to perfom the action'>
+      <span>{content}</span>
+    </EuiToolTip>
+  );
+
+  const actions = {
+    addGroups: 'Add groups to agents',
+    removeGroups: 'Remove groups from agents',
+    upgrade: 'Upgrade agents',
+  };
 
   return (
     <>
@@ -75,41 +99,95 @@ export const AgentsTableGlobalActions = ({
               setIsEditGroupsVisible(true);
             }}
           >
-            <WzElementPermissions
-              permissions={[
-                {
-                  action: 'group:modify_assignments',
-                  resource: 'group:id:*',
-                },
-              ]}
-            >
-              <span>
-                Add groups to agents
-                {totalAgents ? ` (${totalAgents})` : ''}
-              </span>
-            </WzElementPermissions>
+            {allowEditGroups && !totalAgents ? (
+              selectAgentsTooltip(actions.addGroups)
+            ) : (
+              <WzElementPermissions
+                permissions={[
+                  {
+                    action: 'group:modify_assignments',
+                    resource: 'group:id:*',
+                  },
+                ]}
+              >
+                <span>
+                  {actions.addGroups}
+                  {totalAgents ? ` (${totalAgents})` : ''}
+                </span>
+              </WzElementPermissions>
+            )}
           </EuiContextMenuItem>
           <EuiContextMenuItem
             icon='trash'
-            disabled={!selectedAgents?.length || !allowEditGroups}
+            disabled={!totalAgents || !allowEditGroups}
             onClick={() => {
               setAddOrRemoveGroups('remove');
               closePopover();
               setIsEditGroupsVisible(true);
             }}
           >
+            {allowEditGroups && !totalAgents ? (
+              selectAgentsTooltip(actions.removeGroups)
+            ) : (
+              <WzElementPermissions
+                permissions={[
+                  {
+                    action: 'group:modify_assignments',
+                    resource: 'group:id:*',
+                  },
+                ]}
+              >
+                <span>
+                  {actions.removeGroups}
+                  {totalAgents ? ` (${totalAgents})` : ''}
+                </span>
+              </WzElementPermissions>
+            )}
+          </EuiContextMenuItem>
+          <EuiHorizontalRule margin='xs' />
+          <EuiContextMenuItem
+            icon='package'
+            disabled={!totalAgents || !allowUpgrade}
+            onClick={() => {
+              closePopover();
+              setIsUpgradeAgentsVisible(true);
+            }}
+          >
+            {allowUpgrade && !totalAgents ? (
+              selectAgentsTooltip(actions.upgrade)
+            ) : (
+              <WzElementPermissions
+                permissions={[
+                  {
+                    action: 'agent:upgrade',
+                    resource: 'agent:id:*',
+                  },
+                ]}
+              >
+                <span>
+                  {actions.upgrade}
+                  {totalAgents ? ` (${totalAgents})` : ''}
+                </span>
+              </WzElementPermissions>
+            )}
+          </EuiContextMenuItem>
+          <EuiContextMenuItem
+            icon='eye'
+            disabled={!allowGetTasks}
+            onClick={() => {
+              closePopover();
+              setIsUpgradeTasksModalVisible(true);
+            }}
+          >
             <WzElementPermissions
               permissions={[
                 {
-                  action: 'group:modify_assignments',
-                  resource: 'group:id:*',
+                  action: 'task:status',
+                  resource: '*:*:*',
                 },
               ]}
             >
-              <span>
-                Remove groups from agents
-                {totalAgents ? ` (${totalAgents})` : ''}
-              </span>
+              <span>Upgrade task details</span>
             </WzElementPermissions>
           </EuiContextMenuItem>
         </EuiContextMenuPanel>
@@ -124,6 +202,18 @@ export const AgentsTableGlobalActions = ({
             setIsEditGroupsVisible(false);
           }}
           addOrRemove={addOrRemoveGroups}
+        />
+      ) : null}
+      {isUpgradeAgentsVisible ? (
+        <UpgradeAgentsModal
+          selectedAgents={selectedAgents}
+          allAgentsSelected={allAgentsSelected}
+          filters={filters}
+          reloadAgents={() => reloadAgents()}
+          onClose={() => {
+            setIsUpgradeAgentsVisible(false);
+          }}
+          setIsUpgradePanelClosed={setIsUpgradePanelClosed}
         />
       ) : null}
     </>

@@ -16,14 +16,18 @@ import jwtDecode from 'jwt-decode';
 import store from '../redux/store';
 import {
   updateUserPermissions,
-  updateUserRoles,
   updateWithUserLogged,
   updateAllowedAgents,
 } from '../redux/actions/appStateActions';
-import { UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../common/constants';
+import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { getToasts } from '../kibana-services';
 import { getAuthorizedAgents } from '../react-services/wz-agents';
-import { UI_ERROR_SEVERITIES, UIErrorLog, UIErrorSeverity, UILogLevel } from './error-orchestrator/types';
+import {
+  UI_ERROR_SEVERITIES,
+  UIErrorLog,
+  UIErrorSeverity,
+  UILogLevel,
+} from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 
 /**
@@ -40,11 +44,14 @@ export class WzAuthentication {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
       while (!idHost) {
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 500));
         idHost = JSON.parse(AppState.getCurrentAPI()).id;
       }
 
-      const response = await WzRequest.genericReq('POST', '/api/login', { idHost, force });
+      const response = await WzRequest.genericReq('POST', '/api/login', {
+        idHost,
+        force,
+      });
 
       const token = ((response || {}).data || {}).token;
       return token as string;
@@ -86,11 +93,6 @@ export class WzAuthentication {
 
       // Dispatch actions to set permissions and roles
       store.dispatch(updateUserPermissions(userPolicies));
-      store.dispatch(
-        updateUserRoles(
-          WzAuthentication.mapUserRolesIDToAdministratorRole(jwtPayload.rbac_roles || [])
-        )
-      );
       store.dispatch(updateWithUserLogged(true));
     } catch (error) {
       const options: UIErrorLog = {
@@ -118,27 +120,19 @@ export class WzAuthentication {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
       while (!idHost) {
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 500));
         idHost = JSON.parse(AppState.getCurrentAPI()).id;
       }
-      const response = await WzRequest.apiReq('GET', '/security/users/me/policies', { idHost });
+      const response = await WzRequest.apiReq(
+        'GET',
+        '/security/users/me/policies',
+        { idHost },
+      );
       const policies = ((response || {}).data || {}).data || {};
       return policies;
     } catch (error) {
       return Promise.reject(error);
     }
-  }
-
-  /**
-   * Map the current user to admin roles
-   *
-   * @param {Object} roles
-   * @returns {Object} modified roles.
-   */
-  private static mapUserRolesIDToAdministratorRole(roles) {
-    return roles.map((role: number) =>
-      role === WAZUH_ROLE_ADMINISTRATOR_ID ? WAZUH_ROLE_ADMINISTRATOR_NAME : role
-    );
   }
 
   /**
@@ -148,7 +142,11 @@ export class WzAuthentication {
    */
   static async deleteExistentToken() {
     try {
-      const response = await WzRequest.apiReq('DELETE', '/security/user/authenticate', {delay: 5000});
+      const response = await WzRequest.apiReq(
+        'DELETE',
+        '/security/user/authenticate',
+        { delay: 5000 },
+      );
 
       return ((response || {}).data || {}).data || {};
     } catch (error) {
@@ -170,7 +168,7 @@ export class WzAuthentication {
       const allIds = agentReadPolicies['agent:id:*'] == 'allow';
       const allGroups = agentReadPolicies['agent:group:*'] == 'allow';
       const denyAgents = Object.keys(agentReadPolicies).some(
-        (k) => !k.includes('*') && agentReadPolicies[k] == 'deny'
+        k => !k.includes('*') && agentReadPolicies[k] == 'deny',
       );
       return !((allIds || allGroups) && !denyAgents);
     }
