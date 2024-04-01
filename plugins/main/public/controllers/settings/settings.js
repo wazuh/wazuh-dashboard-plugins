@@ -95,10 +95,6 @@ export class SettingsController {
       this.setComponentProps();
       // Loading data
       await this.getSettings();
-      const down = await this.checkApisStatus();
-      //Checks if all the API entries are down
-      this.apiIsDown =
-        down >= this.apiEntries.length && this.apiEntries.length > 0;
 
       await this.getAppInfo();
     } catch (error) {
@@ -127,41 +123,15 @@ export class SettingsController {
       compressed: true,
       setDefault: entry => this.setDefault(entry),
       checkManager: entry => this.checkManager(entry),
-      showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
       testApi: (entry, force) => ApiCheck.checkApi(entry, force),
-      showAddApiWithInitialError: error =>
-        this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
-      showApiIsDown: () => this.showApiIsDown(),
       copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
 
     this.addApiProps = {
-      checkForNewApis: () => this.checkForNewApis(),
       closeAddApi: () => this.closeAddApi(),
-    };
-
-    this.apiIsDownProps = {
-      apiEntries: this.apiEntries,
-      setDefault: entry => this.setDefault(entry),
-      testApi: (entry, force) => ApiCheck.checkApi(entry, force),
-      closeApiIsDown: () => this.closeApiIsDown(),
-      getHosts: () => this.getHosts(),
-      updateClusterInfoInRegistry: (id, clusterInfo) =>
-        this.updateClusterInfoInRegistry(id, clusterInfo),
-      copyToClipBoard: msg => this.copyToClipBoard(msg),
-    };
-    this.settingsTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab, true);
-      },
-      selectedTab: this.tab || 'api',
-      // Define tabs for Wazuh plugin settings application
-      tabs:
-        getWzCurrentAppID() === appSettings.id ? this.tabsConfiguration : null,
-      wazuhConfig: this.wazuhConfig,
     };
   }
 
@@ -307,8 +277,6 @@ export class SettingsController {
 
       await this.getHosts();
 
-      // Set the addingApi flag based on if there is any API entry
-      this.addingApi = !this.apiEntries.length;
       const currentApi = AppState.getCurrentAPI();
 
       if (currentApi) {
@@ -389,7 +357,6 @@ export class SettingsController {
       this.apiEntries[index].status = 'online';
       this.apiEntries[index].allow_run_as = data.data.allow_run_as;
       this.wzMisc.setApiIsDown(false);
-      this.apiIsDown = false;
       !silent && ErrorHandler.info('Connection success', 'Settings');
       this.$scope.$applyAsync();
     } catch (error) {
@@ -467,143 +434,15 @@ export class SettingsController {
   }
 
   /**
-   * Checks if there are new APIs entries in the wazuh.yml
-   */
-  async checkForNewApis() {
-    try {
-      this.addingApi = true;
-      this.addApiProps.errorsAtInit = false;
-      const hosts = await this.getHosts();
-      //Tries to check if there are new APIs entries in the wazuh.yml also, checks if some of them have connection
-      if (!hosts.length)
-        throw {
-          message: 'There were not found any API entry in the wazuh.yml',
-          type: 'warning',
-          closedEnabled: false,
-        };
-      const notRecheable = await this.checkApisStatus();
-      if (notRecheable) {
-        if (notRecheable >= hosts.length) {
-          this.apiIsDown = true;
-          throw {
-            message:
-              'Wazuh API not recheable, please review your configuration',
-            type: 'danger',
-            closedEnabled: true,
-          };
-        }
-        throw {
-          message: `Some of the API entries are not reachable. You can still use the ${PLUGIN_APP_NAME} but please, review your hosts configuration.`,
-          type: 'warning',
-          closedEnabled: true,
-        };
-      }
-    } catch (error) {
-      const options = {
-        context: `${SettingsController.name}.checkForNewApis`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Get the hosts in the wazuh.yml
+   * Get the API hosts
    */
   async getHosts() {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      this.apiEntries =
-        this.apiTableProps.apiEntries =
-        this.apiIsDownProps.apiEntries =
-          hosts;
-      if (!hosts.length) {
-        this.apiIsDown = false;
-        this.addingApi = true;
-        this.$scope.$applyAsync();
-      }
+      this.apiEntries = this.apiTableProps.apiEntries = hosts;
       return hosts;
     } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Closes the add API component
-   */
-  closeAddApi() {
-    this.addingApi = false;
-    this.$scope.$applyAsync();
-  }
-
-  /**
-   * Shows the add API component
-   */
-  showAddApi() {
-    this.addingApi = true;
-    this.addApiProps.enableClose = true;
-    this.$scope.$applyAsync();
-  }
-
-  /**
-   * Shows the add API component
-   */
-  showApiIsDown() {
-    this.apiIsDown = true;
-    this.$scope.$applyAsync();
-  }
-
-  /**
-   * Closes the API is down component
-   */
-  closeApiIsDown() {
-    this.apiIsDown = false;
-    this.$scope.$applyAsync();
-  }
-
-  /**
-   * Shows the add api component with an initial error
-   */
-  showAddApiWithInitialError(error) {
-    this.addApiProps.errorsAtInit = error;
-    this.apiEntries = [];
-    this.addingApi = true;
-    this.$scope.$applyAsync();
-  }
-
-  /**
-   * Refresh the API entries
-   */
-  async refreshApiEntries() {
-    try {
-      this.apiEntries = await this.getHosts();
-      const down = await this.checkApisStatus();
-      //Checks if all the API entries are down
-      this.apiIsDown =
-        down >= this.apiEntries.length && this.apiEntries.length > 0;
-      this.$scope.$applyAsync();
-      return this.apiEntries;
-    } catch (error) {
-      this.showAddApiWithInitialError(error);
-      const options = {
-        context: `${SettingsController.name}.refreshApiEntries`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
       return Promise.reject(error);
     }
   }

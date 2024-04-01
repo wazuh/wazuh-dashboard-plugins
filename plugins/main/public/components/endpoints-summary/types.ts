@@ -30,3 +30,8 @@ export type Group = {
   name: string;
   count: number;
 };
+
+export type ResponseUpgradeAgents = {
+  agent: string;
+  task_id: number;
+};

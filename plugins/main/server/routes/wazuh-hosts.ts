@@ -13,15 +13,17 @@ import { WazuhHostsCtrl } from '../controllers';
 import { IRouter } from 'opensearch_dashboards/server';
 import { schema } from '@osd/config-schema';
 
-export function WazuhHostsRoutes(router: IRouter) {
+export function WazuhHostsRoutes(router: IRouter, services) {
   const ctrl = new WazuhHostsCtrl();
 
   // Get Wazuh-API entries list (Multimanager) from elasticsearch index
-  router.get({
+  router.get(
+    {
       path: '/hosts/apis',
-      validate: false
+      validate: false,
     },
-    async (context, request, response) => ctrl.getHostsEntries(context, request, response)
+    async (context, request, response) =>
+      ctrl.getHostsEntries(context, request, response),
   );
 
   // Updates the cluster-info or manager-info
@@ -30,15 +32,118 @@ export function WazuhHostsRoutes(router: IRouter) {
       path: '/hosts/update-hostname/{id}',
       validate: {
         params: schema.object({
-          id: schema.string()
+          id: schema.string(),
         }),
         body: schema.object({
-          cluster_info: schema.any()
-        })
-      }
+          cluster_info: schema.any(),
+        }),
+      },
     },
-    async (context, request, response) => ctrl.updateClusterInfo(context, request, response)
-  )
+    async (context, request, response) =>
+      ctrl.updateClusterInfo(context, request, response),
+  );
+
+  // Create the API host entry
+  router.post(
+    {
+      path: '/hosts/apis/{id}',
+      validate: {
+        params: schema.object({
+          id:
+            services.configuration._settings
+              .get('hosts')
+              ?.options?.arrayOf?.id?.validateBackend?.(schema) ??
+            schema.string(),
+        }),
+        body: (value, response) => {
+          const settingHosts = services.configuration._settings.get('hosts');
+
+          try {
+            const validation = schema
+              .object(
+                Object.fromEntries(
+                  Object.entries(settingHosts.options.arrayOf).map(
+                    ([key, value]) => [
+                      key,
+                      value.validateBackend
+                        ? value.validateBackend(schema)
+                        : schema.any(),
+                    ],
+                  ),
+                ),
+              )
+              .validate(value);
+            return response.ok(validation);
+          } catch (error) {
+            return response.badRequest(error.message);
+          }
+        },
+      },
+    },
+    async (context, request, response) =>
+      ctrl.createAPIHost(context, request, response),
+  );
+
+  // Update the API host entry
+  router.put(
+    {
+      path: '/hosts/apis/{id}',
+      validate: {
+        params: schema.object({
+          id:
+            services.configuration._settings
+              .get('hosts')
+              ?.options?.arrayOf?.id?.validateBackend?.(schema) ??
+            schema.string(),
+        }),
+        body: (value, response) => {
+          const settingHosts = services.configuration._settings.get('hosts');
+
+          try {
+            const validation = schema
+              .object(
+                Object.fromEntries(
+                  Object.entries(settingHosts.options.arrayOf).map(
+                    ([key, value]) => [
+                      key,
+                      schema.maybe(
+                        value.validateBackend
+                          ? value.validateBackend(schema)
+                          : schema.any(),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+              .validate(value);
+            return response.ok(validation);
+          } catch (error) {
+            return response.badRequest(error.message);
+          }
+        },
+      },
+    },
+    async (context, request, response) =>
+      ctrl.updateAPIHost(context, request, response),
+  );
+
+  // Delete the API host entry
+  router.delete(
+    {
+      path: '/hosts/apis/{id}',
+      validate: {
+        params: schema.object({
+          id:
+            services.configuration._settings
+              .get('hosts')
+              ?.options?.arrayOf?.id?.validateBackend?.(schema) ??
+            schema.string(),
+        }),
+      },
+    },
+    async (context, request, response) =>
+      ctrl.deleteAPIHost(context, request, response),
+  );
 
   // Checks the orphan hosts in the registry in order to delete them
   router.post(
@@ -46,10 +151,11 @@ export function WazuhHostsRoutes(router: IRouter) {
       path: '/hosts/remove-orphan-entries',
       validate: {
         body: schema.object({
-          entries: schema.arrayOf(schema.any())
-        })
-      }
+          entries: schema.arrayOf(schema.any()),
+        }),
+      },
     },
-    async (context, request, response) => ctrl.removeOrphanEntries(context, request, response)
-  )
+    async (context, request, response) =>
+      ctrl.removeOrphanEntries(context, request, response),
+  );
 }

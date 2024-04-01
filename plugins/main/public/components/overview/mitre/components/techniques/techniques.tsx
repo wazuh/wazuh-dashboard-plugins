@@ -33,11 +33,14 @@ import { withWindowSize } from '../../../../../components/common/hocs/withWindow
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { AppState } from '../../../../../react-services/app-state';
 import { WzFieldSearchDelay } from '../../../../common/search';
-import { getDataPlugin, getToasts } from '../../../../../kibana-services';
+import {
+  getDataPlugin,
+  getToasts,
+  getWazuhCorePlugin,
+} from '../../../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { getSettingDefaultValue } from '../../../../../../common/services/settings';
 
 const MITRE_ATTACK = 'mitre-attack';
 
@@ -516,7 +519,8 @@ export const Techniques = withWindowSize(
           type: 'phrase',
           negate: filter.negate || false,
           index:
-            AppState.getCurrentPattern() || getSettingDefaultValue('pattern'),
+            AppState.getCurrentPattern() ||
+            getWazuhCorePlugin().configuration.getSettingValue('pattern'),
         },
         query: { match_phrase: matchPhrase },
         $state: { store: 'appState' },

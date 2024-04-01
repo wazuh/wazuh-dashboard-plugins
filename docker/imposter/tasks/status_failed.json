@@ -1,0 +1,22 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "message": "Success",
+        "agent": "002",
+        "task_id": 2,
+        "node": "worker2",
+        "module": "upgrade_module",
+        "command": "upgrade",
+        "status": "Failed",
+        "create_time": "2024-03-11T11:57:44.000Z",
+        "last_update_time": "2020-03-11T12:11:32.000Z"
+      }
+    ],
+    "total_affected_items": 1,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "message": "All specified task's status were returned",
+  "error": 0
+}

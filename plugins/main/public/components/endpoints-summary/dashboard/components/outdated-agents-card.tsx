@@ -11,39 +11,29 @@ import {
   EuiButtonEmpty,
 } from '@elastic/eui';
 import './outdated-agents-card.scss';
-import { getOutdatedAgents } from '../../services/get-outdated-agents';
-import { useApiService } from '../../../common/hooks/useApiService';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
 interface OutdatedAgentsCardProps {
-  onClick?: (status: any) => void;
-  [key: string]: any;
+  isLoading: boolean;
+  outdatedAgents: number;
+  filterByOutdatedAgent: (value: boolean) => void;
 }
 
-const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
-  const [loading, data] = useApiService<any>(getOutdatedAgents, undefined);
-  const outdatedAgents = data?.length;
+const OutdatedAgentsCard = ({
+  isLoading,
+  outdatedAgents,
+  filterByOutdatedAgent,
+}: OutdatedAgentsCardProps) => {
   const contentType = outdatedAgents > 0 ? 'warning' : 'success';
   const contentIcon = outdatedAgents > 0 ? 'alert' : 'check';
-  const [showOutdatedAgents, setShowOutdatedAgents] =
-    React.useState<boolean>(false);
+  const [showOptions, setShowOptions] = React.useState<boolean>(false);
 
-  const onShowOutdatedAgents = () => setShowOutdatedAgents(!showOutdatedAgents);
-  const onHideOutdatedAgents = () => setShowOutdatedAgents(false);
-
-  const handleClick = () => {
-    if (onClick) {
-      onClick(data);
-      setShowOutdatedAgents(false);
-    }
-  };
+  const onShowOptions = () => setShowOptions(true);
+  const onHideOptions = () => setShowOptions(false);
 
   const renderMetric = () => {
     return (
-      <div
-        className='wazuh-outdated-agents-panel'
-        onClick={onShowOutdatedAgents}
-      >
+      <div className='wazuh-outdated-agents-panel' onClick={onShowOptions}>
         <EuiIcon
           type={contentIcon}
           color={contentType}
@@ -61,11 +51,11 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
           }
           description={
             <EuiTextColor color={contentType}>
-              <small>Agents</small>
+              <small>{outdatedAgents === 1 ? 'Agent' : 'Agents'}</small>
             </EuiTextColor>
           }
-          titleColor='danger'
-          isLoading={loading}
+          titleColor='subdued'
+          isLoading={isLoading}
           titleSize='l'
           textAlign='center'
           reverse
@@ -79,15 +69,18 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
       <EuiCard title='' betaBadgeLabel='Outdated'>
         <EuiPopover
           button={renderMetric()}
-          isOpen={showOutdatedAgents}
-          closePopover={onHideOutdatedAgents}
+          isOpen={showOptions}
+          closePopover={onHideOptions}
           anchorPosition='downLeft'
           panelStyle={{ overflowY: 'auto' }}
         >
           <EuiButtonEmpty
             iconType='filter'
-            onClick={handleClick}
-            isDisabled={!(data?.length > 0)}
+            onClick={() => {
+              onHideOptions();
+              filterByOutdatedAgent(true);
+            }}
+            isDisabled={!outdatedAgents}
           >
             Filter outdated agents
           </EuiButtonEmpty>
@@ -100,6 +93,7 @@ const OutdatedAgentsCard = ({ onClick, ...props }: OutdatedAgentsCardProps) => {
                 target='_blank'
                 external
                 rel='noopener noreferrer'
+                onClick={() => onHideOptions()}
               >
                 How to update agents
               </EuiLink>

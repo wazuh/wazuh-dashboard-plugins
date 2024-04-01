@@ -12,19 +12,9 @@
  */
 
 import React, { Component } from 'react';
-import {
-  EuiPage,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiSpacer,
-  EuiFlexGrid,
-} from '@elastic/eui';
+import { EuiPage, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { AgentsTable } from './table/agents-table';
 import WzReduxProvider from '../../redux/wz-redux-provider';
-import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
-import { AppState } from '../../react-services/app-state';
-import { FilterHandler } from '../../utils/filter-handler';
-import { TabVisualizations } from '../../factories/tab-visualizations';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import {
   withReduxProvider,
@@ -36,12 +26,11 @@ import { compose } from 'redux';
 import { endpointSummary } from '../../utils/applications';
 import { ShareAgent } from '../../factories/share-agent';
 import './endpoints-summary.scss';
-import OutdatedAgentsCard from './dashboard/components/outdated-agents-card';
-import DonutCard from './dashboard/components/donut-card';
-import { getSummaryAgentsStatus } from './services/get-summary-agents-status';
-import { getAgentsByOs } from './services/get-agents-by-os';
-import { getAgentsByGroup } from './services/get-agents-by-group';
 import { EndpointsSummaryDashboard } from './dashboard/endpoints-summary-dashboard';
+import { getOutdatedAgents } from './services';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export const EndpointsSummary = compose(
   withErrorBoundary,
@@ -60,6 +49,10 @@ export const EndpointsSummary = compose(
       super();
       this.state = {
         agentTableFilters: {},
+        reload: 0,
+        outdatedAgents: 0,
+        isLoadingOutdatedAgents: true,
+        showOnlyOutdatedAgents: false,
       };
       this.wazuhConfig = new WazuhConfig();
       this.shareAgent = new ShareAgent();
@@ -69,22 +62,43 @@ export const EndpointsSummary = compose(
       this.filterByOutdatedAgent = this.filterByOutdatedAgent.bind(this);
     }
 
+    getOutdatedAgents = async () => {
+      try {
+        this.setState({ isLoadingOutdatedAgents: true });
+        const { total_affected_items } = await getOutdatedAgents({ limit: 1 });
+        this.setState({ outdatedAgents: total_affected_items });
+      } catch (error) {
+        const options = {
+          context: `EndpointsSummary.getOutdatedAgents`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error,
+            message: error.message || error,
+            title: `Could not get outdated agents`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      } finally {
+        this.setState({ isLoadingOutdatedAgents: false });
+      }
+    };
+
+    setReload = (newValue: number) => {
+      this.setState({
+        reload: newValue,
+      });
+      this.getOutdatedAgents();
+    };
+
+    setShowOnlyOutdatedAgents = (newValue: boolean) => {
+      this.setState({ showOnlyOutdatedAgents: newValue });
+    };
+
     async componentDidMount() {
       this._isMount = true;
-      if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
-        const tabVisualizations = new TabVisualizations();
-        tabVisualizations.removeAll();
-        tabVisualizations.setTab('general');
-        tabVisualizations.assign({
-          general: 1,
-        });
-        const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-        await VisFactoryHandler.buildOverviewVisualizations(
-          filterHandler,
-          'general',
-          null,
-        );
-      }
+      this.getOutdatedAgents();
     }
 
     componentWillUnmount() {
@@ -108,7 +122,7 @@ export const EndpointsSummary = compose(
 
     filterAgentByOS(item: any) {
       const query =
-        item.label === 'unknown'
+        item.label === 'N/A'
           ? 'id!=000;os.name=null'
           : `id!=000;os.name~${item.label}`;
       this._isMount &&
@@ -119,7 +133,7 @@ export const EndpointsSummary = compose(
 
     filterAgentByGroup(item: any) {
       const query =
-        item.label === 'unknown'
+        item.label === 'N/A'
           ? 'id!=000;group=null'
           : `id!=000;group=${item.label}`;
       this._isMount &&
@@ -128,14 +142,8 @@ export const EndpointsSummary = compose(
         });
     }
 
-    filterByOutdatedAgent(outdatedAgents: any) {
-      const ids: string = outdatedAgents
-        .map((agent: any) => `id=${agent.id}`)
-        .join(',');
-      this._isMount &&
-        this.setState({
-          agentTableFilters: { q: `id!=000;${ids}` },
-        });
+    filterByOutdatedAgent() {
+      this._isMount && this.setShowOnlyOutdatedAgents(true);
     }
 
     render() {
@@ -146,11 +154,21 @@ export const EndpointsSummary = compose(
               filterAgentByStatus={this.filterAgentByStatus}
               filterAgentByOS={this.filterAgentByOS}
               filterAgentByGroup={this.filterAgentByGroup}
+              outdatedAgents={this.state.outdatedAgents}
+              isLoadingOutdatedAgents={this.state.isLoadingOutdatedAgents}
               filterByOutdatedAgent={this.filterByOutdatedAgent}
+              reloadDashboard={this.state.reload}
             />
             <EuiSpacer size='m' />
             <WzReduxProvider>
-              <AgentsTable filters={this.state.agentTableFilters} />
+              <AgentsTable
+                filters={this.state.agentTableFilters}
+                externalReload={this.state.reload}
+                setExternalReload={this.setReload}
+                showOnlyOutdated={this.state.showOnlyOutdatedAgents}
+                setShowOnlyOutdated={this.setShowOnlyOutdatedAgents}
+                totalOutdated={this.state.outdatedAgents}
+              />
             </WzReduxProvider>
           </EuiFlexItem>
         </EuiPage>

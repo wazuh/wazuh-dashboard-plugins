@@ -73,7 +73,7 @@ export class UpdateRegistry {
    */
   async writeContent(content) {
     try {
-      this.logger.debug('Writting wazuh-registry.json content');
+      this.logger.debug('Writing wazuh-registry.json content');
       if (this.busy) {
         throw new Error('Another process is updating the registry file');
       }

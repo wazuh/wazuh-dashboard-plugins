@@ -11,9 +11,9 @@ class ResizeObserver {
 }
 global.ResizeObserver = ResizeObserver;
 
-jest.mock('../../../common/hooks/useApiService', () => ({
+jest.mock('../../../common/hooks/use-service', () => ({
   __esModule: true,
-  useApiService: jest.fn(),
+  useService: jest.fn(),
 }));
 
 describe('DonutCard', () => {
@@ -45,12 +45,12 @@ describe('DonutCard', () => {
     },
   ];
   const mockGetInfo = jest.fn().mockResolvedValue(mockData);
-  const useApiServiceMock = jest.fn(() => [mockLoading, mockData]);
+  const useServiceMock = jest.fn(() => ({data: mockData, isLoading: mockLoading}));
   const mockGetInfoNoData = jest.fn().mockResolvedValue([]);
-  const useApiServiceMockNoData = jest.fn(() => [mockLoading, []]);
+  const useServiceMockNoData = jest.fn(() => ({data: [], isLoading: mockLoading}));
   
   it('renders with data', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMock;
+    require('../../../common/hooks/use-service').useService = useServiceMock;
     
     await act(async () => {
       const { getByText } = render(
@@ -67,7 +67,7 @@ describe('DonutCard', () => {
   });
 
   it('handles click on data', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMock;
+    require('../../../common/hooks/use-service').useService = useServiceMock;
     
     const handleClick = jest.fn();
     const firstMockData = mockData[0];
@@ -86,7 +86,7 @@ describe('DonutCard', () => {
   });
 
   it('show noDataTitle and noDataMessage when no data', async () => {
-    require('../../../common/hooks/useApiService').useApiService = useApiServiceMockNoData;
+    require('../../../common/hooks/use-service').useService = useServiceMockNoData;
     
     await act(async () => {
       const { getByText } = render(

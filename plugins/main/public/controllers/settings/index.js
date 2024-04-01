@@ -11,8 +11,6 @@
  */
 import { SettingsController } from './settings';
 import { ApiTable } from '../../components/settings/api/api-table';
-import { AddApi } from '../../components/settings/api/add-api';
-import { ApiIsDown } from '../../components/settings/api/api-is-down';
 import { WzConfigurationSettings } from '../../components/settings/configuration/configuration';
 import { SettingsMiscellaneous } from '../../components/settings/miscellaneous/miscellaneous';
 import { WzSampleDataWrapper } from '../../components/add-modules-data/WzSampleDataWrapper';
@@ -25,8 +23,6 @@ WzSampleDataWrapper.displayName = 'WzSampleDataWrapper';
 WzConfigurationSettings.displayName = 'WzConfigurationSettings';
 SettingsMiscellaneous.displayName = 'SettingsMiscellaneous';
 ApiTable.displayName = 'ApiTable';
-AddApi.displayName = 'AddApi';
-ApiIsDown.displayName = 'ApiIsDown';
 SettingsAbout.displayName = 'SettingsAbout';
 
 app
@@ -35,6 +31,4 @@ app
   .value('WzConfigurationSettings', WzConfigurationSettings)
   .value('SettingsMiscelaneous', SettingsMiscellaneous)
   .value('ApiTable', ApiTable)
-  .value('AddApi', AddApi)
-  .value('ApiIsDown', ApiIsDown)
   .value('SettingsAbout', SettingsAbout);

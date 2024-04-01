@@ -18,7 +18,11 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
-import { getToasts, getDataPlugin } from '../../kibana-services';
+import {
+  getToasts,
+  getDataPlugin,
+  getWazuhCorePlugin,
+} from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { formatUIDate } from '../../react-services/time-service';
@@ -26,7 +30,6 @@ import { hasAgentSupportModule } from '../../react-services/wz-agents';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 
@@ -503,7 +506,8 @@ export class AgentsController {
    */
   addMitrefilter(id) {
     const filter = `{"meta":{"index": ${
-      AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
+      AppState.getCurrentPattern() ||
+      getWazuhCorePlugin().configuration.getSettingValue('pattern')
     }},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', {
       filter: JSON.parse(filter),
