@@ -44,3 +44,8 @@
 span.statWithLink:hover {
   text-decoration: underline;
 }
+
+[name="OverviewWelcome"] .flex-redirect-app-links {
+  display: flex;
+  flex-grow: 1;
+}
