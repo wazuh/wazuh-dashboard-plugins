@@ -9,6 +9,4 @@ export function plugin(initializerContext: PluginInitializerContext) {
   return new WazuhCorePlugin(initializerContext);
 }
 
-export type WazuhCorePluginConfigType = TypeOf<typeof configSchema>;
-
 export { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
