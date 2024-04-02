@@ -18,12 +18,12 @@ export class WazuhCorePlugin
   _internal: { [key: string]: any } = {};
   services: { [key: string]: any } = {};
   public setup(core: CoreSetup): WazuhCorePluginSetup {
-    // TODO: change to noop
+    const noop = () => {};
     const logger = {
-      info: console.log,
-      error: console.error,
-      debug: console.debug,
-      warn: console.warn,
+      info: noop,
+      error: noop,
+      debug: noop,
+      warn: noop,
     };
     this._internal.configurationStore = new ConfigurationStore(logger);
     this.services.configuration = new Configuration(
