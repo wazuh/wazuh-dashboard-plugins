@@ -1446,7 +1446,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       arrayOf: {
         id: {
           title: 'Identifier',
-          description: 'API host identifier',
+          description: 'Identifier of the API connection. This must be unique.',
           type: EpluginSettingType.text,
           defaultValue: 'default',
           isConfigurableFromSettings: true,
@@ -1457,7 +1457,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
         url: {
           title: 'URL',
-          description: 'URL address',
+          description: 'Server URL address',
           type: EpluginSettingType.text,
           defaultValue: 'https://localhost',
           isConfigurableFromSettings: true,
@@ -1498,7 +1498,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
         username: {
           title: 'Username',
-          description: 'Username',
+          description: 'Server API username',
           type: EpluginSettingType.text,
           defaultValue: 'wazuh-wui',
           isConfigurableFromSettings: true,
@@ -1509,7 +1509,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
         password: {
           title: 'Password',
-          description: 'Password',
+          description: "User's Password",
           type: EpluginSettingType.password,
           defaultValue: 'wazuh-wui',
           isConfigurableFromSettings: true,
