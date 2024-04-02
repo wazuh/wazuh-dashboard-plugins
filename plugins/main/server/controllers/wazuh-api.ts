@@ -1161,10 +1161,15 @@ export class WazuhApiCtrl {
       const source = JSON.parse(
         fs.readFileSync(context.wazuh_core.updateRegistry.file, 'utf8'),
       );
+      const data = !Object.values(source).length ? {} : source;
+
       return response.ok({
         body: {
           statusCode: HTTP_STATUS_CODES.OK,
-          data: !Object.values(source).length ? '' : source,
+          data: {
+            ...data,
+            configuration_file: context.wazuh_core.configuration.store.file,
+          },
         },
       });
     } catch (error) {

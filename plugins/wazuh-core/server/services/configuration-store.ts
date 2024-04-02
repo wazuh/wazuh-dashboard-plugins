@@ -1,7 +1,6 @@
 import { Logger } from 'opensearch-dashboards/server';
 import {
   IConfigurationStore,
-  TConfigurationSetting,
   IConfiguration,
 } from '../../common/services/configuration';
 import { CacheTTL } from '../../common/services/cache';
@@ -11,8 +10,6 @@ import { createDataDirectoryIfNotExists } from './filesystem';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 
 interface IConfigurationStoreOptions {
-  instance: string;
-  encryption_key: string;
   cache_seconds: number;
   file: string;
 }
@@ -23,12 +20,18 @@ interface IStoreGetOptions {
 
 export class ConfigurationStore implements IConfigurationStore {
   private configuration: IConfiguration;
-  private _config: IConfigurationStoreOptions;
   private _cache: CacheTTL<any>;
   private _cacheKey: string;
   private _fileEncoding: string = 'utf-8';
+  file: string = '';
   constructor(private logger: Logger, options: IConfigurationStoreOptions) {
-    this._config = options;
+    this.file = options.file;
+
+    if (!this.file) {
+      const error = new Error('File is not defined');
+      this.logger.error(error.message);
+      throw error;
+    }
 
     /* The ttl cache is used to support sharing configuration through different instances of the
     platfrom */
@@ -38,25 +41,25 @@ export class ConfigurationStore implements IConfigurationStore {
     this._cacheKey = 'configuration';
   }
   private readContentConfigurationFile() {
-    this.logger.debug(`Reading file [${this._config.file}]`);
-    const content = fs.readFileSync(this._config.file, {
+    this.logger.debug(`Reading file [${this.file}]`);
+    const content = fs.readFileSync(this.file, {
       encoding: this._fileEncoding,
     });
     return content;
   }
   private writeContentConfigurationFile(content: string, options = {}) {
-    this.logger.debug(`Writing file [${this._config.file}]`);
-    fs.writeFileSync(this._config.file, content, {
+    this.logger.debug(`Writing file [${this.file}]`);
+    fs.writeFileSync(this.file, content, {
       encoding: this._fileEncoding,
       ...options,
     });
-    this.logger.debug(`Wrote file [${this._config.file}]`);
+    this.logger.debug(`Wrote file [${this.file}]`);
   }
   private readConfigurationFile() {
     const content = this.readContentConfigurationFile();
     const contentAsJSON = yml.load(content);
     this.logger.debug(
-      `Content file [${this._config.file}]: ${JSON.stringify(contentAsJSON)}`,
+      `Content file [${this.file}]: ${JSON.stringify(contentAsJSON)}`,
     );
     // Transform value for key in the configuration file
     return Object.fromEntries(
@@ -168,10 +171,6 @@ hosts:
       run_as: false
 `;
 
-    // const pluginSettingsConfigurationFile = Array.from(
-    //   this.configuration._settings,
-    // ).filter(setting => setting?.store?.file?.configurable);
-
     const pluginSettingsConfigurationFileGroupByCategory =
       this.configuration.groupSettingsByCategory(
         null,
@@ -181,10 +180,7 @@ hosts:
     const pluginSettingsConfiguration =
       pluginSettingsConfigurationFileGroupByCategory
         .map(({ category: categorySetting, settings }) => {
-          const category = printSettingCategory(
-            categorySetting,
-            // PLUGIN_SETTINGS_CATEGORIES[categoryID],
-          );
+          const category = printSettingCategory(categorySetting);
 
           const pluginSettingsOfCategory = settings
             .map(setting => printSetting(setting))
@@ -214,18 +210,16 @@ hosts:
       this.logger.debug('Ensuring the configuration file is created');
       createDataDirectoryIfNotExists();
       createDataDirectoryIfNotExists('config');
-      if (!fs.existsSync(this._config.file)) {
+      if (!fs.existsSync(this.file)) {
         this.writeContentConfigurationFile(
           this.getDefaultConfigurationFileContent(),
           {
             mode: 0o600,
           },
         );
-        this.logger.info(
-          `Configuration file was created [${this._config.file}]`,
-        );
+        this.logger.info(`Configuration file was created [${this.file}]`);
       } else {
-        this.logger.debug(`Configuration file exists [${this._config.file}]`);
+        this.logger.debug(`Configuration file exists [${this.file}]`);
       }
     } catch (error) {
       const enhancedError = new Error(
@@ -235,9 +229,10 @@ hosts:
       throw enhancedError;
     }
   }
-  async setup(settings: { [key: string]: TConfigurationSetting }) {}
+  async setup() {
+    this.logger.debug('Setup');
+  }
   async start() {
-    // TODO: create the file in start
     try {
       this.logger.debug('Start');
       this.ensureConfigurationFileIsCreated();
@@ -245,7 +240,9 @@ hosts:
       this.logger.error(`Error starting: ${error.message}`);
     }
   }
-  async stop() {}
+  async stop() {
+    this.logger.debug('Stop');
+  }
   async get(...settings: string[]): Promise<any | { [key: string]: any }> {
     try {
       const storeGetOptions =

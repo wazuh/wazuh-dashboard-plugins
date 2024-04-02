@@ -17,7 +17,7 @@ export class WazuhCorePlugin
 {
   _internal: { [key: string]: any } = {};
   services: { [key: string]: any } = {};
-  public setup(core: CoreSetup): WazuhCorePluginSetup {
+  public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     const noop = () => {};
     const logger = {
       info: noop,
@@ -25,7 +25,10 @@ export class WazuhCorePlugin
       debug: noop,
       warn: noop,
     };
-    this._internal.configurationStore = new ConfigurationStore(logger);
+    this._internal.configurationStore = new ConfigurationStore(
+      logger,
+      core.http,
+    );
     this.services.configuration = new Configuration(
       logger,
       this._internal.configurationStore,
@@ -43,7 +46,7 @@ export class WazuhCorePlugin
 
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
-    this.services.dashboardSecurity.setup();
+    await this.services.dashboardSecurity.setup();
 
     return {
       ...this.services,
@@ -52,10 +55,12 @@ export class WazuhCorePlugin
     };
   }
 
-  public start(core: CoreStart): WazuhCorePluginStart {
+  public async start(core: CoreStart): Promise<WazuhCorePluginStart> {
     setChrome(core.chrome);
     setCore(core);
     setUiSettings(core.uiSettings);
+
+    await this.services.configuration.start({ http: core.http });
 
     return {
       ...this.services,

@@ -171,7 +171,7 @@ export interface IConfiguration {
 }
 
 export class Configuration implements IConfiguration {
-  private store: IConfigurationStore;
+  store: IConfigurationStore | null = null;
   _settings: Map<string, { [key: string]: TConfigurationSetting }>;
   _categories: Map<string, { [key: string]: any }>;
   constructor(private logger: ILogger, store: IConfigurationStore) {
@@ -183,14 +183,14 @@ export class Configuration implements IConfiguration {
     this.store = store;
     this.store.setConfiguration(this);
   }
-  async setup() {
-    return this.store.setup(Object.fromEntries(this._settings.entries()));
+  async setup(dependencies: any = {}) {
+    return this.store.setup(dependencies);
   }
-  async start() {
-    return this.store.start(Object.fromEntries(this._settings.entries()));
+  async start(dependencies: any = {}) {
+    return this.store.start(dependencies);
   }
-  async stop() {
-    return this.store.stop(Object.fromEntries(this._settings.entries()));
+  async stop(dependencies: any = {}) {
+    return this.store.stop(dependencies);
   }
   /**
    * Register a setting
