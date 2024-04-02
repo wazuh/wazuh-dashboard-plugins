@@ -65,7 +65,7 @@ export const fileIntegrityMonitoring = {
     defaultMessage:
       'Alerts related to file changes, including permissions, content, ownership, and attributes.',
   }),
-  euiIconType: 'indexRollupApp',
+  euiIconType: 'sqlApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
   order: 202,
@@ -231,10 +231,10 @@ export const virustotal = {
   category: 'wz-category-threat-intelligence',
   id: 'virustotal',
   title: i18n.translate('wz-app-virustotal-title', {
-    defaultMessage: 'Virustotal',
+    defaultMessage: 'VirusTotal',
   }),
   breadcrumbLabel: i18n.translate('wz-app-virustotal-breadcrumbLabel', {
-    defaultMessage: 'Virustotal',
+    defaultMessage: 'VirusTotal',
   }),
   description: i18n.translate('wz-app-virustotal-description', {
     defaultMessage:
@@ -265,7 +265,7 @@ const pciDss = {
     defaultMessage:
       'Global security standard for entities that process, store, or transmit payment cardholder data.',
   }),
-  euiIconType: 'sqlApp',
+  euiIconType: 'visTagCloud',
   order: 400,
   showInOverviewApp: true,
   showInAgentMenu: true,
@@ -315,7 +315,7 @@ const gdpr = {
     defaultMessage:
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
   }),
-  euiIconType: 'sqlApp',
+  euiIconType: 'visBarVertical',
   order: 401,
   showInOverviewApp: true,
   showInAgentMenu: true,
@@ -669,7 +669,7 @@ export const reporting = {
     defaultMessage: 'Check your stored reports.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 702,
+  order: 10002,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=reporting',
@@ -765,7 +765,7 @@ export const serverApis = {
     defaultMessage: 'Manage and configure the API entries.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 703,
+  order: 10003,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=api',
@@ -803,7 +803,7 @@ export const appSettings = {
     defaultMessage: 'Manage your cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 704,
+  order: 10004,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=configuration',
@@ -822,7 +822,7 @@ const about = {
     defaultMessage: 'Show information about App Versions and community links.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 706,
+  order: 10006,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=about',
@@ -931,7 +931,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-dashboard-management', {
       defaultMessage: 'Dashboard management',
     }),
-    order: 700,
+    order: 6e3,
     euiIconType: 'dashboardApp',
   },
   {
