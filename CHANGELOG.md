@@ -16,6 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a redirection button to Endpoint Summary from IT Hygiene application [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176)
 - Added information icon with tooltip on the most active agent in the endpoint summary view [#6364](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6364) [#6421](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6421)
 - Added a dash with a tooltip in the server APIs table when the run as is disabled [#6354](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6354)
+- Added a dash with agents status and alerts to overview [#6569](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6569)
 
 ### Changed
 
