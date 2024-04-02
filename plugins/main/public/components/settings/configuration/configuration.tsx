@@ -190,8 +190,7 @@ const WzConfigurationSettingsProvider = props => {
         type: pluginSetting.type,
         options: pluginSetting?.options,
         title: pluginSetting?.title,
-        description:
-          getWazuhCorePlugin().configuration.getSettingDescription(fieldKey),
+        description: pluginSetting.description,
       };
     },
   );

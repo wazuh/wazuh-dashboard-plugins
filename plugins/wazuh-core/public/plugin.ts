@@ -10,7 +10,6 @@ import {
   PLUGIN_SETTINGS_CATEGORIES,
 } from '../common/constants';
 import { DashboardSecurity } from './utils/dashboard-security';
-import { enhanceConfiguration } from './utils/enhance-configuration';
 import * as hooks from './hooks';
 
 export class WazuhCorePlugin
@@ -31,8 +30,6 @@ export class WazuhCorePlugin
       logger,
       this._internal.configurationStore,
     );
-    // Extend the configuration instance to define the categories
-    enhanceConfiguration(this.services.configuration);
 
     // Register the plugin settings
     Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
