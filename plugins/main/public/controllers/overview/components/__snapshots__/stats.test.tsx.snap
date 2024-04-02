@@ -9,118 +9,283 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
       class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
     >
       <div
-        class="euiFlexItem"
-      />
-      <div
-        class="euiFlexItem"
+        class="euiFlexItem euiFlexItem--flexGrowZero"
       >
         <div
-          class="euiStat euiStat--centerAligned"
+          class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge"
         >
           <div
-            class="euiText euiText--small euiStat__description"
-          >
-            <p
-              aria-hidden="true"
-            >
-              Active agents
-            </p>
-          </div>
-          <p
-            aria-hidden="true"
-            class="euiTitle euiTitle--large euiStat__title"
-            style="color: rgb(0, 120, 113);"
+            class="euiCard__content"
           >
             <span
-              class="euiToolTipAnchor"
-            >
-              <button
-                class="euiLink euiLink--primary statWithLink"
-                style="font-weight: normal; color: rgb(0, 120, 113);"
-                type="button"
-              >
-                -
-              </button>
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        class="euiFlexItem"
-      >
-        <div
-          class="euiStat euiStat--centerAligned"
-        >
-          <div
-            class="euiText euiText--small euiStat__description"
-          >
-            <p
-              aria-hidden="true"
-            >
-              Disconnected agents
-            </p>
-          </div>
-          <p
-            aria-hidden="true"
-            class="euiTitle euiTitle--large euiStat__title"
-            style="color: rgb(189, 39, 30);"
-          >
-            <span
-              class="euiToolTipAnchor"
-            >
-              <button
-                class="euiLink euiLink--primary statWithLink"
-                style="font-weight: normal; color: rgb(189, 39, 30);"
-                type="button"
-              >
-                -
-              </button>
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        class="euiFlexItem"
-      >
-        <div
-          class="osdRedirectCrossAppLinks"
-        >
-          <div
-            class="euiStat euiStat--centerAligned"
-          >
+              class="euiTitle euiTitle--small euiCard__title"
+              id="ic0ac60c1-f0ea-11ee-9d6f-3f950acb4a46Title"
+            />
             <div
-              class="euiText euiText--small euiStat__description"
+              class="euiCard__children"
             >
-              <p
-                aria-hidden="true"
+              <div
+                style="width: 100%; height: 150px;"
               >
-                Last 24 hours alerts
-              </p>
-            </div>
-            <p
-              aria-hidden="true"
-              class="euiTitle euiTitle--large euiStat__title"
-              style="color: rgb(0, 120, 113);"
-            >
-              <span
-                class="euiToolTipAnchor"
-              >
-                <a
-                  class="euiLink euiLink--primary statWithLink"
-                  href=""
-                  rel="noreferrer"
-                  style="font-weight: normal; color: rgb(0, 120, 113);"
+                <div
+                  class="euiFlexGroup euiFlexGroup--directionRow"
+                  style="height: 100%;"
                 >
-                  -
-                </a>
-              </span>
-            </p>
+                  <div
+                    class="euiFlexItem"
+                    style="align-items: flex-end; padding-right: 1em;"
+                  >
+                    <svg
+                      height="0"
+                      width="0"
+                    >
+                      <g
+                        transform="translate(0,0)"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    class="euiFlexItem"
+                    style="height: 100%; padding-left: 1em;"
+                  >
+                    <ul
+                      class="euiListGroup euiListGroup-flush euiListGroup--gutterSmall euiListGroup-maxWidthDefault chart-legend"
+                    >
+                      <li
+                        class="euiListGroupItem euiListGroupItem--medium euiListGroupItem--text euiListGroupItem-isClickable"
+                      >
+                        <button
+                          class="euiListGroupItem__button"
+                          type="button"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            class="euiIcon euiIcon--large euiIcon--customColor euiIcon-isLoading euiListGroupItem__icon"
+                            focusable="false"
+                            height="16"
+                            role="img"
+                            style="color: rgb(0, 120, 113);"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            xmlns="http://www.w3.org/2000/svg"
+                          />
+                          <span
+                            class="euiListGroupItem__label"
+                          >
+                            <div
+                              style="font-size: 0.875rem;"
+                            >
+                              Active (0)
+                            </div>
+                          </span>
+                        </button>
+                      </li>
+                      <li
+                        class="euiListGroupItem euiListGroupItem--medium euiListGroupItem--text euiListGroupItem-isClickable"
+                      >
+                        <button
+                          class="euiListGroupItem__button"
+                          type="button"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            class="euiIcon euiIcon--large euiIcon--customColor euiIcon-isLoading euiListGroupItem__icon"
+                            focusable="false"
+                            height="16"
+                            role="img"
+                            style="color: rgb(189, 39, 30);"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            xmlns="http://www.w3.org/2000/svg"
+                          />
+                          <span
+                            class="euiListGroupItem__label"
+                          >
+                            <div
+                              style="font-size: 0.875rem;"
+                            >
+                              Disconnected (0)
+                            </div>
+                          </span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+          <span
+            class="euiCard__betaBadgeWrapper"
+          >
+            <span
+              class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
+              id="ic0ac60c1-f0ea-11ee-9d6f-3f950acb4a46BetaBadge"
+              title="Agents summary"
+            >
+              Agents summary
+            </span>
+          </span>
         </div>
       </div>
       <div
         class="euiFlexItem"
-      />
+      >
+        <div
+          class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge"
+        >
+          <div
+            class="euiCard__content"
+          >
+            <span
+              class="euiTitle euiTitle--small euiCard__title"
+              id="ic0ad7231-f0ea-11ee-9d6f-3f950acb4a46Title"
+            />
+            <div
+              class="euiCard__children"
+            >
+              <div
+                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive vulnerabilites-summary-card"
+              >
+                <div
+                  class="euiFlexItem"
+                >
+                  <div
+                    class="osdRedirectCrossAppLinks"
+                  >
+                    <div
+                      class="euiStat euiStat--centerAligned"
+                    >
+                      <div
+                        class="euiText euiText--small euiStat__description"
+                      >
+                        <p
+                          aria-hidden="true"
+                        >
+                          <h3>
+                            High severity
+                          </h3>
+                        </p>
+                      </div>
+                      <p
+                        aria-hidden="true"
+                        class="euiTitle euiTitle--large euiStat__title"
+                        style="color: rgb(189, 39, 30);"
+                      >
+                        <span
+                          class="euiToolTipAnchor"
+                        >
+                          <a
+                            class="euiLink euiLink--primary statWithLink"
+                            href=""
+                            rel="noreferrer"
+                            style="font-weight: normal; color: rgb(189, 39, 30);"
+                          >
+                            -
+                          </a>
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="euiFlexItem"
+                >
+                  <div
+                    class="osdRedirectCrossAppLinks"
+                  >
+                    <div
+                      class="euiStat euiStat--centerAligned"
+                    >
+                      <div
+                        class="euiText euiText--small euiStat__description"
+                      >
+                        <p
+                          aria-hidden="true"
+                        >
+                          <h3>
+                            Medium severity
+                          </h3>
+                        </p>
+                      </div>
+                      <p
+                        aria-hidden="true"
+                        class="euiTitle euiTitle--large euiStat__title"
+                        style="color: rgb(254, 197, 20);"
+                      >
+                        <span
+                          class="euiToolTipAnchor"
+                        >
+                          <a
+                            class="euiLink euiLink--primary statWithLink"
+                            href=""
+                            rel="noreferrer"
+                            style="font-weight: normal; color: rgb(254, 197, 20);"
+                          >
+                            -
+                          </a>
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="euiFlexItem"
+                >
+                  <div
+                    class="osdRedirectCrossAppLinks"
+                  >
+                    <div
+                      class="euiStat euiStat--centerAligned"
+                    >
+                      <div
+                        class="euiText euiText--small euiStat__description"
+                      >
+                        <p
+                          aria-hidden="true"
+                        >
+                          <h3>
+                            Low severity
+                          </h3>
+                        </p>
+                      </div>
+                      <p
+                        aria-hidden="true"
+                        class="euiTitle euiTitle--large euiStat__title"
+                        style="color: rgb(0, 120, 113);"
+                      >
+                        <span
+                          class="euiToolTipAnchor"
+                        >
+                          <a
+                            class="euiLink euiLink--primary statWithLink"
+                            href=""
+                            rel="noreferrer"
+                            style="font-weight: normal; color: rgb(0, 120, 113);"
+                          >
+                            -
+                          </a>
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span
+            class="euiCard__betaBadgeWrapper"
+          >
+            <span
+              class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
+              id="ic0ad7231-f0ea-11ee-9d6f-3f950acb4a46BetaBadge"
+              title="Last 24 hours alerts"
+            >
+              Last 24 hours alerts
+            </span>
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
