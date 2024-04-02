@@ -1449,13 +1449,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.boolean();
     },
   },
-  'check_updates.enabled': {
+  'wazuh.updates.disabled': {
     title: 'Check updates',
     description: 'Define if the check updates service is active.',
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromFile: true,
+    defaultValue: false,
+    isConfigurableFromFile: false,
     isConfigurableFromUI: false,
     options: {
       switch: {
