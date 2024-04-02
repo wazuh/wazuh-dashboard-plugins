@@ -142,12 +142,7 @@ export const getApiTableColumns = ({
         }
       },
     },
-    {
-      field: 'current_version',
-      name: 'Version',
-      align: 'left',
-      sortable: true,
-    },
+
     {
       name: 'Run as',
       field: 'allow_run_as',
@@ -210,87 +205,97 @@ export const getApiTableColumns = ({
     },
   ];
   if (isUpdatesEnabled) {
-    columns.splice(7, 0, {
-      field: 'version_status',
-      name: 'Updates status',
-      sortable: true,
-      render: (item, api) => {
-        const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
-
-        const content =
-          API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
-
-        if (!refreshingAvailableUpdates) {
-          return (
-            <EuiFlexGroup
-              alignItems='center'
-              gutterSize='xs'
-              responsive={false}
-            >
-              <EuiFlexItem grow={false}>
-                <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
-                  {content}
-                </EuiHealth>
-              </EuiFlexItem>
-              {!item ? (
-                <EuiFlexItem grow={false}>
-                  <EuiToolTip
-                    position='top'
-                    content={
-                      <p>
-                        Click <b>Check updates</b> button to get information
-                      </p>
-                    }
-                  >
-                    <EuiButtonIcon
-                      aria-label={content}
-                      iconType='questionInCircle'
-                    />
-                  </EuiToolTip>
-                </EuiFlexItem>
-              ) : null}
-              {item === 'availableUpdates' ? (
-                <EuiFlexItem grow={false}>
-                  <EuiToolTip
-                    position='top'
-                    content={<p>View available updates</p>}
-                  >
-                    <EuiButtonIcon
-                      aria-label='Availabe updates'
-                      iconType='eye'
-                      onClick={() => viewApiAvailableUpdateDetails(api)}
-                    />
-                  </EuiToolTip>
-                </EuiFlexItem>
-              ) : null}
-              {item === 'error' && api.error?.detail ? (
-                <EuiFlexItem grow={false}>
-                  <EuiToolTip
-                    position='top'
-                    title={api.error.title}
-                    content={api.error.detail}
-                  >
-                    <EuiButtonIcon
-                      color='primary'
-                      iconType='questionInCircle'
-                      aria-label='Info about the error'
-                      onClick={() => copyToClipBoard(api.error.detail)}
-                    />
-                  </EuiToolTip>
-                </EuiFlexItem>
-              ) : null}
-            </EuiFlexGroup>
-          );
-        } else {
-          return (
-            <span>
-              <EuiLoadingSpinner size='s' />
-              <span>&nbsp;&nbsp;Checking</span>
-            </span>
-          );
-        }
+    columns.splice(
+      7,
+      0,
+      {
+        field: 'current_version',
+        name: 'Version',
+        align: 'left',
+        sortable: true,
       },
-    });
+      {
+        field: 'version_status',
+        name: 'Updates status',
+        sortable: true,
+        render: (item, api) => {
+          const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
+
+          const content =
+            API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
+
+          if (!refreshingAvailableUpdates) {
+            return (
+              <EuiFlexGroup
+                alignItems='center'
+                gutterSize='xs'
+                responsive={false}
+              >
+                <EuiFlexItem grow={false}>
+                  <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
+                    {content}
+                  </EuiHealth>
+                </EuiFlexItem>
+                {!item ? (
+                  <EuiFlexItem grow={false}>
+                    <EuiToolTip
+                      position='top'
+                      content={
+                        <p>
+                          Click <b>Check updates</b> button to get information
+                        </p>
+                      }
+                    >
+                      <EuiButtonIcon
+                        aria-label={content}
+                        iconType='questionInCircle'
+                      />
+                    </EuiToolTip>
+                  </EuiFlexItem>
+                ) : null}
+                {item === 'availableUpdates' ? (
+                  <EuiFlexItem grow={false}>
+                    <EuiToolTip
+                      position='top'
+                      content={<p>View available updates</p>}
+                    >
+                      <EuiButtonIcon
+                        aria-label='Availabe updates'
+                        iconType='eye'
+                        onClick={() => viewApiAvailableUpdateDetails(api)}
+                      />
+                    </EuiToolTip>
+                  </EuiFlexItem>
+                ) : null}
+                {item === 'error' && api.error?.detail ? (
+                  <EuiFlexItem grow={false}>
+                    <EuiToolTip
+                      position='top'
+                      title={api.error.title}
+                      content={api.error.detail}
+                    >
+                      <EuiButtonIcon
+                        color='primary'
+                        iconType='questionInCircle'
+                        aria-label='Info about the error'
+                        onClick={() => copyToClipBoard(api.error.detail)}
+                      />
+                    </EuiToolTip>
+                  </EuiFlexItem>
+                ) : null}
+              </EuiFlexGroup>
+            );
+          } else {
+            return (
+              <span>
+                <EuiLoadingSpinner size='s' />
+                <span>&nbsp;&nbsp;Checking</span>
+              </span>
+            );
+          }
+        },
+      },
+    );
   }
   return columns;
 };
