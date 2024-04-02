@@ -22,12 +22,13 @@ import {
 import { Configuration } from '../common/services/configuration';
 import {
   PLUGIN_SETTINGS,
+  PLUGIN_SETTINGS_CATEGORIES,
   WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
+  WAZUH_DATA_CONFIG_APP_PATH,
 } from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
 import { first } from 'rxjs/operators';
 import { WazuhCorePluginConfigType } from '.';
-import MigrationConfigFile from './start/tasks/config-file';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -59,11 +60,11 @@ export class WazuhCorePlugin
 
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-saved-object'),
-      core.savedObjects,
       {
         ...config.configuration,
         instance: config.instance,
         cache_seconds: WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
+        file: WAZUH_DATA_CONFIG_APP_PATH,
       },
     );
     this.services.configuration = new Configuration(
@@ -78,6 +79,11 @@ export class WazuhCorePlugin
     Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
       this.services.configuration.register(key, value),
     );
+
+    // Add categories to the configuration
+    Object.entries(PLUGIN_SETTINGS_CATEGORIES).forEach(([key, value]) => {
+      this.services.configuration.registerCategory({ ...value, id: key });
+    });
 
     /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
       Because the settings are defined in the backend and frontend side using the same definitions,
@@ -149,18 +155,7 @@ export class WazuhCorePlugin
 
     setCore(core);
 
-    this._internal.configurationStore.setSavedObjectRepository(
-      core.savedObjects.createInternalRepository(),
-    );
-
     await this.services.configuration.start();
-
-    // Migrate the configuration file
-    await MigrationConfigFile.start({
-      ...this.services,
-      configurationStore: this._internal.configurationStore,
-      logger: this.logger.get(MigrationConfigFile.name),
-    });
 
     return {
       ...this.services,

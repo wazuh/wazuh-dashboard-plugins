@@ -1,4 +1,6 @@
 import { cloneDeep } from 'lodash';
+import { formatLabelValuePair } from './settings';
+import { formatBytes } from './file-size';
 
 export interface ILogger {
   debug(message: string): void;
@@ -111,10 +113,9 @@ export type TConfigurationSetting = {
     | TConfigurationSettingOptionsSwitch
     | TConfigurationSettingOptionsTextArea;
   store?: {
-    savedObject?: {
-      mapping: any;
-      get?: (value: any, configuration: any) => any;
-      set?: (value: any, configuration: any) => any;
+    file: {
+      configurable?: boolean;
+      transfromFrom?: (value: any) => any;
     };
   };
   // Transform the input value. The result is saved in the form global state of Settings/Configuration
@@ -171,8 +172,11 @@ export interface IConfiguration {
 
 export class Configuration implements IConfiguration {
   private store: IConfigurationStore;
+  _settings: Map<string, { [key: string]: TConfigurationSetting }>;
+  _categories: Map<string, { [key: string]: any }>;
   constructor(private logger: ILogger, store: IConfigurationStore) {
     this._settings = new Map();
+    this._categories = new Map();
     this.setStore(store);
   }
   setStore(store: IConfigurationStore) {
@@ -195,7 +199,13 @@ export class Configuration implements IConfiguration {
    */
   register(id: string, value: any) {
     if (!this._settings.has(id)) {
-      this._settings.set(id, value);
+      // Enhance the setting
+      const enhancedValue = value;
+      // Enhance the description
+      enhancedValue._description = value.description;
+      enhancedValue.description = this.enhanceSettingDescription(value);
+      // Register the setting
+      this._settings.set(id, enhancedValue);
       this.logger.debug(`Registered ${id}`);
     } else {
       const message = `Setting ${id} exists`;
@@ -352,5 +362,138 @@ export class Configuration implements IConfiguration {
     } else {
       return await this.reset(...this._settings.keys());
     }
+  }
+
+  registerCategory({ id, ...rest }) {
+    if (this._categories.has(id)) {
+      this.logger.error(`Registered category [${id}]`);
+      throw new Error(`Category exists [${id}]`);
+    }
+    this._categories.set(id, rest);
+    this.logger.debug(`Registered category [${id}]`);
+  }
+
+  getUniqueCategories() {
+    return [
+      ...new Set(
+        Array.from(this._settings.entries())
+          .filter(
+            ([, { isConfigurableFromSettings }]) => isConfigurableFromSettings,
+          )
+          .map(([, { category }]) => category),
+      ),
+    ]
+      .map(categoryID => this._categories.get(String(categoryID)))
+      .sort((categoryA, categoryB) => {
+        if (categoryA.title > categoryB.title) {
+          return 1;
+        } else if (categoryA.title < categoryB.title) {
+          return -1;
+        }
+        return 0;
+      });
+  }
+  private enhanceSettingDescription(setting: TConfigurationSetting) {
+    const { description, options } = setting;
+    return [
+      description,
+      ...(options?.select
+        ? [
+            `Allowed values: ${options.select
+              .map(({ text, value }) => formatLabelValuePair(text, value))
+              .join(', ')}.`,
+          ]
+        : []),
+      ...(options?.switch
+        ? [
+            `Allowed values: ${['enabled', 'disabled']
+              .map(s =>
+                formatLabelValuePair(
+                  options.switch.values[s].label,
+                  options.switch.values[s].value,
+                ),
+              )
+              .join(', ')}.`,
+          ]
+        : []),
+      ...(options?.number && 'min' in options.number
+        ? [`Minimum value: ${options.number.min}.`]
+        : []),
+      ...(options?.number && 'max' in options.number
+        ? [`Maximum value: ${options.number.max}.`]
+        : []),
+      // File extensions
+      ...(options?.file?.extensions
+        ? [`Supported extensions: ${options.file.extensions.join(', ')}.`]
+        : []),
+      // File recommended dimensions
+      ...(options?.file?.recommended?.dimensions
+        ? [
+            `Recommended dimensions: ${
+              options.file.recommended.dimensions.width
+            }x${options.file.recommended.dimensions.height}${
+              options.file.recommended.dimensions.unit || ''
+            }.`,
+          ]
+        : []),
+      // File size
+      ...(options?.file?.size &&
+      typeof options.file.size.minBytes !== 'undefined'
+        ? [`Minimum file size: ${formatBytes(options.file.size.minBytes)}.`]
+        : []),
+      ...(options?.file?.size &&
+      typeof options.file.size.maxBytes !== 'undefined'
+        ? [`Maximum file size: ${formatBytes(options.file.size.maxBytes)}.`]
+        : []),
+      // Multi line text
+      ...(options?.maxRows && typeof options.maxRows !== 'undefined'
+        ? [`Maximum amount of lines: ${options.maxRows}.`]
+        : []),
+      ...(options?.minRows && typeof options.minRows !== 'undefined'
+        ? [`Minimum amount of lines: ${options.minRows}.`]
+        : []),
+      ...(options?.maxLength && typeof options.maxLength !== 'undefined'
+        ? [`Maximum lines length is ${options.maxLength} characters.`]
+        : []),
+    ].join(' ');
+  }
+  groupSettingsByCategory(
+    _settings: string[] | null = null,
+    filterFunction:
+      | ((setting: TConfigurationSettingWithKey) => boolean)
+      | null = null,
+  ) {
+    const settings = (
+      _settings && Array.isArray(_settings)
+        ? Array.from(this._settings.entries()).filter(([key]) =>
+            _settings.includes(key),
+          )
+        : Array.from(this._settings.entries())
+    ).map(([key, value]) => ({
+      ...value,
+      key,
+    }));
+
+    const settingsSortedByCategories = (
+      filterFunction ? settings.filter(filterFunction) : settings
+    )
+      .sort((settingA, settingB) => settingA.key?.localeCompare?.(settingB.key))
+      .reduce(
+        (accum, pluginSettingConfiguration) => ({
+          ...accum,
+          [pluginSettingConfiguration.category]: [
+            ...(accum[pluginSettingConfiguration.category] || []),
+            { ...pluginSettingConfiguration },
+          ],
+        }),
+        {},
+      );
+
+    return Object.entries(settingsSortedByCategories)
+      .map(([category, settings]) => ({
+        category: this._categories.get(String(category)),
+        settings,
+      }))
+      .filter(categoryEntry => categoryEntry.settings.length);
   }
 }
