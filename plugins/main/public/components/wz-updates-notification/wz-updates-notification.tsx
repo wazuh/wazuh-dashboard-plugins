@@ -12,23 +12,23 @@
  */
 
 import React from 'react';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
 import { getWazuhCheckUpdatesPlugin } from '../../kibana-services';
-import { WazuhConfig } from '../../react-services/wazuh-config';
-import { connect } from 'redux';
-
-const WzUpdatesNotificationMain = props => {
-  console.log('WzUpdatesNotificationMain props:', props);
-  const wazuhConfig = new WazuhConfig().getConfig();
-  const isUpdatesEnabled = !wazuhConfig?.['wazuh.updates.disabled'];
-  const { UpdatesNotification } = getWazuhCheckUpdatesPlugin();
-
-  return isUpdatesEnabled ? <UpdatesNotification /> : <></>;
-};
+import { withReduxProvider } from '../common/hocs';
 
 const mapStateToProps = state => {
   return {
-    appConfig: state.appConfig,
+    appConfig: state?.appConfig,
   };
 };
+export const WzUpdatesNotification = compose(
+  withReduxProvider,
+  connect(mapStateToProps),
+)(({ appConfig }) => {
+  const isUpdatesEnabled =
+    !appConfig?.isLoading && !appConfig?.data?.['wazuh.updates.disabled'];
+  const { UpdatesNotification } = getWazuhCheckUpdatesPlugin();
 
-export default connect(mapStateToProps, null)(WzUpdatesNotificationMain);
+  return isUpdatesEnabled ? <UpdatesNotification /> : <></>;
+});

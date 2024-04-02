@@ -11,4 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { WzUpdatesNotificationWrapper } from './wz-updates-notification-wrapper';
+export { WzUpdatesNotification } from './wz-updates-notification';

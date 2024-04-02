@@ -20,7 +20,7 @@ import { ClusterTimelions } from '../components/management/cluster/cluster-timel
 import { KibanaVisWrapper } from '../components/management/cluster/cluster-visualization';
 import { ToastNotificationsModal } from '../components/notifications/modal';
 import { getAngularModule } from '../kibana-services';
-import { WzUpdatesNotificationWrapper } from './wz-updates-notification';
+import { WzUpdatesNotification } from './wz-updates-notification';
 
 const app = getAngularModule();
 
@@ -33,4 +33,4 @@ app.value('ClusterDisabled', ClusterDisabled);
 app.value('ClusterTimelions', ClusterTimelions);
 app.value('KibanaVisualization', KibanaVisWrapper);
 app.value('ToastNotificationsModal', ToastNotificationsModal);
-app.value('WzUpdatesNotificationWrapper', WzUpdatesNotificationWrapper);
+app.value('WzUpdatesNotification', WzUpdatesNotification);

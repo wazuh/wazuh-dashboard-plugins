@@ -1,9 +1,6 @@
 import React from 'react';
 import { EuiFlexItem, EuiToolTip, EuiButtonEmpty, EuiIcon } from '@elastic/eui';
-import {
-  getWazuhCheckUpdatesPlugin,
-  getWazuhCorePlugin,
-} from '../../../kibana-services';
+import { getWazuhCorePlugin } from '../../../kibana-services';
 
 export const CheckUpdatesButton = ({
   isUpdatesEnabled,
