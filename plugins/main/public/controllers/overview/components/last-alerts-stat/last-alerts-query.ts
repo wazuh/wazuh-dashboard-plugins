@@ -2,6 +2,10 @@ export const getLastAlertsQuery = (
   currentIndexPattern: string,
   isClusterEnabled: boolean,
   clusterValue: string,
+  ruleLevelRange: {
+    minRuleLevel: number;
+    maxRuleLevel?: number;
+  },
 ) => {
   const clusterField = isClusterEnabled ? 'cluster.name' : 'manager.name';
   return {
@@ -24,6 +28,14 @@ export const getLastAlertsQuery = (
             gte: 'now-24h',
             lte: 'now',
             format: 'epoch_millis',
+          },
+        },
+      },
+      {
+        range: {
+          'rule.level': {
+            gte: ruleLevelRange.minRuleLevel,
+            lte: ruleLevelRange.maxRuleLevel || 15,
           },
         },
       },
