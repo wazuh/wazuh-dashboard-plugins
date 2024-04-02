@@ -30,6 +30,7 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
 import { compose } from 'redux';
 import { withGlobalBreadcrumb } from '../../../../../components/common/hocs';
 import { endpointGroups } from '../../../../../utils/applications';
+import { MultipleAgentSelector } from '../../../../../components/management/groups/multiple-agent-selector';
 
 class WzGroups extends Component {
   constructor(props) {
@@ -71,29 +72,15 @@ class WzGroups extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.groupsProps.closeAddingAgents &&
-      this.props.state.showAddAgents
-    ) {
+    if (this.props.state.showAddAgents) {
       this.props.updateShowAddAgents(false);
-    }
-    if (
-      nextProps.groupsProps.selectedGroup &&
-      nextProps.groupsProps.selectedGroup !==
-        this.props.groupsProps.selectedGroup
-    ) {
-      store.dispatch(updateGroupDetail(nextProps.groupsProps.selectedGroup));
     }
   }
   componentWillUnmount() {
     // When the component is going to be unmounted the groups state is reset
     this.props.resetGroup();
   }
-  componentDidUpdate() {
-    if (this.props.groupsProps.selectedGroup) {
-      this.props.groupsProps.updateProps();
-    }
-  }
+
   render() {
     const { itemDetail, showAddAgents, fileContent } = this.props.state;
     return (
@@ -101,6 +88,12 @@ class WzGroups extends Component {
         {!showAddAgents &&
           ((itemDetail && !fileContent && <WzGroupDetail {...this.props} />) ||
             (fileContent && <WzGroupEditor />) || <WzGroupsOverview />)}
+        {showAddAgents && itemDetail && (
+          <MultipleAgentSelector
+            currentGroup={itemDetail}
+            cancelButton={() => this.props.updateShowAddAgents(false)}
+          />
+        )}
       </WzReduxProvider>
     );
   }
