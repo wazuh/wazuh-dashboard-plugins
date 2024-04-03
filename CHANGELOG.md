@@ -25,12 +25,19 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the usage of the endpoint GET /groups/{group_id}/files/{file_name} [#6385](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6385)
 - Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
 - Move the AngularJS controller and template of blank screen to ReactJS component [#6538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6538)
+- Moved the registry data to in-memory cache [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Remove AngularJS controller for manage groups [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
 - Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
 
 ### Fixed
 
 - Fixed the scripted fields disappear when the fields of the events index pattern was refreshed [#6237](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6237)
+
+### Removed
+
+- Removed API endpoint GET /api/timestamp [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
+- Removed API endpoint PUT /api/update-hostname/{id} [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
+- Removed API endpoint DELETE /hosts/remove-orphan-entries [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 
 ## Wazuh v4.8.2 - OpenSearch Dashboards 2.10.0 - Revision 00
 
