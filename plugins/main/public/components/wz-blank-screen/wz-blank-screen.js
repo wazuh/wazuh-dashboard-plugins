@@ -105,12 +105,12 @@ export class WzBlankScreen extends Component {
                 rel='noopener noreferrer'
                 external
               >
-                Wazuh installation guide
+                Installation guide
               </EuiLink>
             </p>
             <EuiSpacer />
 
-            <EuiButton onClick={() => this.goToOverview()} color='primary' fill>
+            <EuiButton onClick={() => this.goOverview()} color='primary' fill>
               Refresh
             </EuiButton>
           </>

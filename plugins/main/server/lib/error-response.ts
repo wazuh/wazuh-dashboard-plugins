@@ -33,7 +33,7 @@ export function ErrorResponse(message = null, code = null, statusCode = null, re
   if (code) {
     const isString = typeof message === 'string';
     if (isString && message === 'socket hang up' && code === 3005) {
-      filteredMessage = 'Wrong protocol being used to connect to the Wazuh API';
+      filteredMessage = 'Wrong protocol being used to connect to the API';
     } else if (
       isString &&
       (message.includes('ENOTFOUND') ||
@@ -42,9 +42,9 @@ export function ErrorResponse(message = null, code = null, statusCode = null, re
         message.includes('EAI_AGAIN')) &&
       code === 3005
     ) {
-      filteredMessage = 'Wazuh API is not reachable. Please check your url and port.';
+      filteredMessage = 'API is not reachable. Please check your url and port.';
     } else if (isString && message.includes('ECONNREFUSED') && code === 3005) {
-      filteredMessage = 'Wazuh API is not reachable. Please check your url and port.';
+      filteredMessage = 'API is not reachable. Please check your url and port.';
     } else if (isString && message.toLowerCase().includes('not found') && code === 3002) {
       filteredMessage = 'It seems the selected API was deleted.';
     } else if (
