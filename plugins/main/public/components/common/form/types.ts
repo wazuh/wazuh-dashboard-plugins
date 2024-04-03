@@ -33,7 +33,6 @@ interface FieldConfiguration {
   initialValue: any;
   validate?: (value: any) => string | undefined;
   transformChangedInputValue?: (value: any) => any;
-  transformChangedOutputValue?: (value: any) => any;
 }
 
 export interface DefaultFieldConfiguration extends FieldConfiguration {

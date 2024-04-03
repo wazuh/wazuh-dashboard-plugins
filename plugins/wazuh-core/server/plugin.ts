@@ -81,15 +81,15 @@ export class WazuhCorePlugin
     const setting = this.services.configuration._settings.get(
       'cron.statistics.interval',
     );
+    !setting.validateUIForm &&
+      (setting.validateUIForm = function (value) {
+        return this.validate(value);
+      });
     !setting.validate &&
       (setting.validate = function (value: string) {
         return validateNodeCronInterval(value)
           ? undefined
           : 'Interval is not valid.';
-      });
-    !setting.validateBackend &&
-      (setting.validateBackend = function (schema) {
-        return schema.string({ validate: this.validate });
       });
 
     this.services.configuration.setup();

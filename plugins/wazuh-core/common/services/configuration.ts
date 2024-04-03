@@ -124,10 +124,10 @@ export type TConfigurationSetting = {
   uiFormTransformConfigurationValueToInputValue?: (value: any) => any;
   // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
   uiFormTransformInputValueToConfigurationValue?: (value: any) => any;
-  // Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error.
-  validate?: (value: any) => string | undefined;
-  // Validate function creator to validate the setting in the backend. It uses `schema` of the `@kbn/config-schema` package.
-  validateBackend?: (schema: any) => (value: unknown) => string | undefined;
+  // Validate the value in the form of App Settings. It returns a string if there is some validation error.
+  validateUIForm?: (value: any) => string | undefined;
+  // Validate function creator to validate the setting in the backend.
+  validate?: (schema: any) => (value: unknown) => string | undefined;
 };
 
 export type TConfigurationSettingWithKey = TConfigurationSetting & {

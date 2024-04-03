@@ -73,11 +73,11 @@ const transformPluginSettingsToFormFields = (configuration, pluginSettings) => {
           key,
           {
             type,
-            validate,
+            validateUIForm,
             defaultValue: initialValue,
             uiFormTransformChangedInputValue,
             uiFormTransformConfigurationValueToInputValue,
-            uiFormTransformInputValueToConfigurationValue,
+
             ...rest
           },
         ],
@@ -95,11 +95,9 @@ const transformPluginSettingsToFormFields = (configuration, pluginSettings) => {
               }
             : {
                 type,
-                validate: validate?.bind?.(rest),
+                validate: validateUIForm?.bind?.(rest),
                 transformChangedInputValue:
                   uiFormTransformChangedInputValue?.bind?.(rest),
-                transformChangedOutputValue:
-                  uiFormTransformInputValueToConfigurationValue?.bind?.(rest),
                 initialValue: uiFormTransformConfigurationValueToInputValue
                   ? uiFormTransformConfigurationValueToInputValue.bind(rest)(
                       configuration?.[key] ?? initialValue,
@@ -214,6 +212,11 @@ const WzConfigurationSettingsProvider = props => {
         (accum, [pluginSettingKey, currentValue]) => {
           const pluginSetting =
             getWazuhCorePlugin().configuration._settings.get(pluginSettingKey);
+
+          const transformedValue =
+            pluginSetting?.uiFormTransformInputValueToConfigurationValue?.(
+              currentValue,
+            ) ?? currentValue;
           if (
             pluginSetting.isConfigurableFromSettings &&
             pluginSetting.type === EpluginSettingType.filepicker
@@ -221,14 +224,14 @@ const WzConfigurationSettingsProvider = props => {
             accum.fileUpload = {
               ...accum.fileUpload,
               [pluginSettingKey]: {
-                file: currentValue,
-                extension: path.extname(currentValue.name),
+                file: transformedValue,
+                extension: path.extname(transformedValue.name),
               },
             };
           } else if (pluginSetting.isConfigurableFromSettings) {
             accum.saveOnConfigurationFile = {
               ...accum.saveOnConfigurationFile,
-              [pluginSettingKey]: currentValue,
+              [pluginSettingKey]: transformedValue,
             };
           }
           return accum;

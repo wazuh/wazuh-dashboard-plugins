@@ -502,9 +502,9 @@ export type TPluginSetting = {
   // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
   uiFormTransformInputValueToConfigurationValue?: (value: any) => any;
   // Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error.
-  validate?: (value: any) => string | undefined;
-  // Validate function creator to validate the setting in the backend. It uses `schema` of the `@kbn/config-schema` package.
-  validateBackend?: (schema: any) => (value: unknown) => string | undefined;
+  validateUIForm?: (value: any) => string | undefined;
+  // Validate function creator to validate the setting in the backend.
+  validate?: (value: unknown) => string | undefined;
 };
 
 export type TPluginSettingWithKey = TPluginSetting & { key: TPluginSettingKey };
@@ -576,8 +576,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: WAZUH_SAMPLE_ALERT_PREFIX,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
+      SettingsValidator.isString,
       SettingsValidator.isNotEmptyString,
       SettingsValidator.hasNoSpaces,
       SettingsValidator.noStartsWithString('-', '_', '+', '.'),
@@ -594,9 +598,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         '*',
       ),
     ),
-    validateBackend: function (schema) {
-      return schema.string({ validate: this.validate });
-    },
   },
   'checks.api': {
     title: 'API connection',
@@ -623,10 +624,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'checks.fields': {
     title: 'Known fields',
@@ -654,10 +655,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'checks.maxBuckets': {
     title: 'Set max buckets to 200000',
@@ -685,10 +686,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'checks.metaFields': {
     title: 'Remove meta fields',
@@ -716,10 +717,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'checks.pattern': {
     title: 'Index pattern',
@@ -747,10 +748,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'checks.setup': {
     title: 'API version',
@@ -778,10 +779,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'checks.template': {
     title: 'Index template',
@@ -809,10 +810,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'checks.timeFilter': {
     title: 'Set time filter to 24h',
@@ -840,10 +841,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'cron.prefix': {
     title: 'Cron prefix',
@@ -857,8 +858,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.text,
     defaultValue: WAZUH_STATISTICS_DEFAULT_PREFIX,
     isConfigurableFromSettings: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
+      SettingsValidator.isString,
       SettingsValidator.isNotEmptyString,
       SettingsValidator.hasNoSpaces,
       SettingsValidator.noStartsWithString('-', '_', '+', '.'),
@@ -875,9 +880,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         '*',
       ),
     ),
-    validateBackend: function (schema) {
-      return schema.string({ validate: this.validate });
-    },
   },
   'cron.statistics.apis': {
     title: 'Includes APIs',
@@ -909,7 +911,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         return value;
       }
     },
-    validate: SettingsValidator.json(
+    validateUIForm: SettingsValidator.json(
       SettingsValidator.compose(
         SettingsValidator.array(
           SettingsValidator.compose(
@@ -920,16 +922,15 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         ),
       ),
     ),
-    validateBackend: function (schema) {
-      return schema.arrayOf(
-        schema.string({
-          validate: SettingsValidator.compose(
-            SettingsValidator.isNotEmptyString,
-            SettingsValidator.hasNoSpaces,
-          ),
-        }),
-      );
-    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.array(
+        SettingsValidator.compose(
+          SettingsValidator.isString,
+          SettingsValidator.isNotEmptyString,
+          SettingsValidator.hasNoSpaces,
+        ),
+      ),
+    ),
   },
   'cron.statistics.index.creation': {
     title: 'Index creation',
@@ -964,15 +965,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: WAZUH_STATISTICS_DEFAULT_CREATION,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.literal(
         this.options.select.map(({ value }) => value),
       )(value);
-    },
-    validateBackend: function (schema) {
-      return schema.oneOf(
-        this.options.select.map(({ value }) => schema.literal(value)),
-      );
     },
   },
   'cron.statistics.index.name': {
@@ -989,8 +988,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: WAZUH_STATISTICS_DEFAULT_NAME,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
+      SettingsValidator.isString,
       SettingsValidator.isNotEmptyString,
       SettingsValidator.hasNoSpaces,
       SettingsValidator.noStartsWithString('-', '_', '+', '.'),
@@ -1007,9 +1010,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         '*',
       ),
     ),
-    validateBackend: function (schema) {
-      return schema.string({ validate: this.validate });
-    },
   },
   'cron.statistics.index.replicas': {
     title: 'Index replicas',
@@ -1041,11 +1041,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): number {
       return Number(value);
     },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
-    },
-    validateBackend: function (schema) {
-      return schema.number({ validate: this.validate.bind(this) });
     },
   },
   'cron.statistics.index.shards': {
@@ -1076,11 +1076,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): number {
       return Number(value);
     },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
-    },
-    validateBackend: function (schema) {
-      return schema.number({ validate: this.validate.bind(this) });
     },
   },
   'cron.statistics.interval': {
@@ -1103,8 +1103,8 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     //     ? undefined
     //     : 'Interval is not valid.';
     // },
-    // validateBackend: function (schema) {
-    //   return schema.string({ validate: this.validate });
+    // validate: function (schema) {
+    //   return schema.string({ validate: this.validateUIForm });
     // },
   },
   'cron.statistics.status': {
@@ -1132,10 +1132,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'customization.enabled': {
     title: 'Status',
@@ -1163,10 +1163,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'customization.logo.app': {
     title: 'App main logo',
@@ -1204,7 +1204,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    validate: function (value) {
+    validateUIForm: function (value) {
       return SettingsValidator.compose(
         SettingsValidator.filePickerFileSize({
           ...this.options.file.size,
@@ -1252,7 +1252,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    validate: function (value) {
+    validateUIForm: function (value) {
       return SettingsValidator.compose(
         SettingsValidator.filePickerFileSize({
           ...this.options.file.size,
@@ -1299,7 +1299,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    validate: function (value) {
+    validateUIForm: function (value) {
       return SettingsValidator.compose(
         SettingsValidator.filePickerFileSize({
           ...this.options.file.size,
@@ -1325,14 +1325,14 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
     isConfigurableFromSettings: true,
     options: { maxRows: 2, maxLength: 50 },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.multipleLinesString({
         maxRows: this.options?.maxRows,
         maxLength: this.options?.maxLength,
       })(value);
-    },
-    validateBackend: function (schema) {
-      return schema.string({ validate: this.validate.bind(this) });
     },
   },
   'customization.reports.header': {
@@ -1349,14 +1349,14 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
     isConfigurableFromSettings: true,
     options: { maxRows: 3, maxLength: 40 },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.multipleLinesString({
         maxRows: this.options?.maxRows,
         maxLength: this.options?.maxLength,
       })(value);
-    },
-    validateBackend: function (schema) {
-      return schema.string({ validate: this.validate.bind(this) });
     },
   },
   'enrollment.dns': {
@@ -1372,10 +1372,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.text,
     defaultValue: '',
     isConfigurableFromSettings: true,
-    validate: SettingsValidator.hasNoSpaces, // TODO: replace by the validator of Deploy new agent
-    validateBackend: function (schema) {
-      return schema.string({ validate: this.validate });
-    },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    }, // TODO: replace by the validator of Deploy new agent
+    validate: SettingsValidator.hasNoSpaces,
   },
   'enrollment.password': {
     title: 'Enrollment password',
@@ -1390,10 +1390,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.text,
     defaultValue: '',
     isConfigurableFromSettings: false,
-    validate: SettingsValidator.isNotEmptyString,
-    validateBackend: function (schema) {
-      return schema.string({ validate: this.validate });
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isNotEmptyString,
   },
   hideManagerAlerts: {
     title: 'Hide manager alerts',
@@ -1421,10 +1421,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   hosts: {
     title: 'Server hosts',
@@ -1450,10 +1450,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           type: EpluginSettingType.text,
           defaultValue: 'default',
           isConfigurableFromSettings: true,
-          validate: SettingsValidator.isNotEmptyString,
-          validateBackend: function (schema) {
-            return schema.string({ validate: this.validate });
+          validateUIForm: function (value) {
+            return this.validate(value);
           },
+          validate: SettingsValidator.isNotEmptyString,
         },
         url: {
           title: 'URL',
@@ -1461,10 +1461,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           type: EpluginSettingType.text,
           defaultValue: 'https://localhost',
           isConfigurableFromSettings: true,
-          validate: SettingsValidator.isNotEmptyString,
-          validateBackend: function (schema) {
-            return schema.string({ validate: this.validate });
+          validateUIForm: function (value) {
+            return this.validate(value);
           },
+          validate: SettingsValidator.isNotEmptyString,
         },
         port: {
           title: 'Port',
@@ -1489,11 +1489,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           ): number {
             return Number(value);
           },
+          validateUIForm: function (value) {
+            return this.validate(value);
+          },
           validate: function (value) {
             return SettingsValidator.number(this.options.number)(value);
-          },
-          validateBackend: function (schema) {
-            return schema.number({ validate: this.validate.bind(this) });
           },
         },
         username: {
@@ -1502,10 +1502,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           type: EpluginSettingType.text,
           defaultValue: 'wazuh-wui',
           isConfigurableFromSettings: true,
-          validate: SettingsValidator.isNotEmptyString,
-          validateBackend: function (schema) {
-            return schema.string({ validate: this.validate });
+          validateUIForm: function (value) {
+            return this.validate(value);
           },
+          validate: SettingsValidator.isNotEmptyString,
         },
         password: {
           title: 'Password',
@@ -1513,10 +1513,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           type: EpluginSettingType.password,
           defaultValue: 'wazuh-wui',
           isConfigurableFromSettings: true,
-          validate: SettingsValidator.isNotEmptyString,
-          validateBackend: function (schema) {
-            return schema.string({ validate: this.validate });
+          validateUIForm: function (value) {
+            return this.validate(value);
           },
+          validate: SettingsValidator.isNotEmptyString,
         },
         run_as: {
           title: 'Run as',
@@ -1537,10 +1537,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           ): boolean {
             return Boolean(value);
           },
-          validate: SettingsValidator.isBoolean,
-          validateBackend: function (schema) {
-            return schema.boolean();
+          validateUIForm: function (value) {
+            return this.validate(value);
           },
+          validate: SettingsValidator.isBoolean,
         },
       },
     },
@@ -1552,7 +1552,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     },
     // TODO: add validation
     // validate: SettingsValidator.isBoolean,
-    // validateBackend: function (schema) {
+    // validate: function (schema) {
     //   return schema.boolean();
     // },
   },
@@ -1587,7 +1587,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       }
     },
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: SettingsValidator.json(
+    validateUIForm: SettingsValidator.json(
       SettingsValidator.compose(
         SettingsValidator.array(
           SettingsValidator.compose(
@@ -1611,29 +1611,28 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         ),
       ),
     ),
-    validateBackend: function (schema) {
-      return schema.arrayOf(
-        schema.string({
-          validate: SettingsValidator.compose(
-            SettingsValidator.isNotEmptyString,
-            SettingsValidator.hasNoSpaces,
-            SettingsValidator.noLiteralString('.', '..'),
-            SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-            SettingsValidator.hasNotInvalidCharacters(
-              '\\',
-              '/',
-              '?',
-              '"',
-              '<',
-              '>',
-              '|',
-              ',',
-              '#',
-            ),
+    validate: SettingsValidator.compose(
+      SettingsValidator.array(
+        SettingsValidator.compose(
+          SettingsValidator.isString,
+          SettingsValidator.isNotEmptyString,
+          SettingsValidator.hasNoSpaces,
+          SettingsValidator.noLiteralString('.', '..'),
+          SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+          SettingsValidator.hasNotInvalidCharacters(
+            '\\',
+            '/',
+            '?',
+            '"',
+            '<',
+            '>',
+            '|',
+            ',',
+            '#',
           ),
-        }),
-      );
-    },
+        ),
+      ),
+    ),
   },
   'ip.selector': {
     title: 'IP selector',
@@ -1661,10 +1660,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   pattern: {
     title: 'Index pattern',
@@ -1681,7 +1680,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: SettingsValidator.compose(
+      SettingsValidator.isString,
       SettingsValidator.isNotEmptyString,
       SettingsValidator.hasNoSpaces,
       SettingsValidator.noLiteralString('.', '..'),
@@ -1698,9 +1701,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         '#',
       ),
     ),
-    validateBackend: function (schema) {
-      return schema.string({ validate: this.validate });
-    },
   },
   timeout: {
     title: 'Request timeout',
@@ -1729,11 +1729,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): number {
       return Number(value);
     },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
-    },
-    validateBackend: function (schema) {
-      return schema.number({ validate: this.validate.bind(this) });
     },
   },
   'wazuh.monitoring.creation': {
@@ -1770,15 +1770,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: WAZUH_MONITORING_DEFAULT_CREATION,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.literal(
         this.options.select.map(({ value }) => value),
       )(value);
-    },
-    validateBackend: function (schema) {
-      return schema.oneOf(
-        this.options.select.map(({ value }) => schema.literal(value)),
-      );
     },
   },
   'wazuh.monitoring.enabled': {
@@ -1808,10 +1806,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): boolean {
       return Boolean(value);
     },
-    validate: SettingsValidator.isBoolean,
-    validateBackend: function (schema) {
-      return schema.boolean();
+    validateUIForm: function (value) {
+      return this.validate(value);
     },
+    validate: SettingsValidator.isBoolean,
   },
   'wazuh.monitoring.frequency': {
     title: 'Frequency',
@@ -1841,11 +1839,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): number {
       return Number(value);
     },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
-    },
-    validateBackend: function (schema) {
-      return schema.number({ validate: this.validate.bind(this) });
     },
   },
   'wazuh.monitoring.pattern': {
@@ -1861,6 +1859,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: WAZUH_MONITORING_PATTERN,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: SettingsValidator.compose(
       SettingsValidator.isNotEmptyString,
       SettingsValidator.hasNoSpaces,
@@ -1878,9 +1879,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         '#',
       ),
     ),
-    validateBackend: function (schema) {
-      return schema.string({ minLength: 1, validate: this.validate });
-    },
   },
   'wazuh.monitoring.replicas': {
     title: 'Index replicas',
@@ -1910,11 +1908,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): number {
       return Number(value);
     },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
-    },
-    validateBackend: function (schema) {
-      return schema.number({ validate: this.validate.bind(this) });
     },
   },
   'wazuh.monitoring.shards': {
@@ -1945,11 +1943,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): number {
       return Number(value);
     },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
-    },
-    validateBackend: function (schema) {
-      return schema.number({ validate: this.validate.bind(this) });
     },
   },
   'vulnerabilities.pattern': {
@@ -1965,6 +1963,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: WAZUH_VULNERABILITIES_PATTERN,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
     validate: SettingsValidator.compose(
       SettingsValidator.isNotEmptyString,
       SettingsValidator.hasNoSpaces,
@@ -1982,9 +1983,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         '#',
       ),
     ),
-    validateBackend: function (schema) {
-      return schema.string({ minLength: 1, validate: this.validate });
-    },
   },
 };
 
