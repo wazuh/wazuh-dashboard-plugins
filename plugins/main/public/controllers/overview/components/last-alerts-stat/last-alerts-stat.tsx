@@ -71,11 +71,11 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:rule.level,negate:!f,params:(gte:${
             severityLabel[severity].ruleLevelRange.minRuleLevel
           },lte:${
-            severityLabel[severity].ruleLevelRange.maxRuleLevel || 15
+            severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
           }),type:range),range:(rule.level:(gte:${
             severityLabel[severity].ruleLevelRange.minRuleLevel
           },lte:${
-            severityLabel[severity].ruleLevelRange.maxRuleLevel || 15
+            severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
           })))),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))&_q=(filters:!(),query:(language:kuery,query:''))`,
         });
         console.log(destURL);
