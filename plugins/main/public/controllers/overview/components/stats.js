@@ -81,36 +81,8 @@ export const Stats = withErrorBoundary(
       return (
         <EuiPage>
           <EuiFlexGroup>
-            {/*this.agentStatus.map(({ status, label, onClick, color }) => (
-              <EuiFlexItem key={`agent-status-${status}`}>
-                <EuiStat
-                  title={
-                    <EuiToolTip
-                      position='top'
-                      content={`Go to ${label.toLowerCase()} agents`}
-                    >
-                      <EuiLink
-                        className='statWithLink'
-                        style={{ fontWeight: 'normal', color }}
-                        onClick={onClick}
-                      >
-                        {typeof this.props[status] !== 'undefined'
-                          ? this.props[status]
-                          : '-'}
-                      </EuiLink>
-                    </EuiToolTip>
-                  }
-                  description={`${label} agents`}
-                  titleColor={color}
-                  textAlign='center'
-                />
-              </EuiFlexItem>
-            ))*/}
             <EuiFlexItem grow={false}>
-              <EuiCard
-                betaBadgeLabel='Agents summary'
-                id={`agent-status-${status}`}
-              >
+              <EuiCard betaBadgeLabel='Agents summary'>
                 <VisualizationBasic
                   isLoading={this.state.loadingSummary}
                   type='donut'
@@ -133,6 +105,7 @@ export const Stats = withErrorBoundary(
             <EuiFlexItem>
               <EuiCard betaBadgeLabel='Last 24 hours alerts'>
                 <EuiFlexGroup className='vulnerabilites-summary-card'>
+                  <LastAlertsStat severity='critical' />
                   <LastAlertsStat severity='high' />
                   <LastAlertsStat severity='medium' />
                   <LastAlertsStat severity='low' />

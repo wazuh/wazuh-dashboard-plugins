@@ -13,14 +13,13 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
       >
         <div
           class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge"
-          id="agent-status-"
         >
           <div
             class="euiCard__content"
           >
             <span
               class="euiTitle euiTitle--small euiCard__title"
-              id="i562bca91-f18c-11ee-ac96-cd9df4e6ed3eTitle"
+              id="htmlIdTitle"
             />
             <div
               class="euiCard__children"
@@ -121,7 +120,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
           >
             <span
               class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
-              id="i562bca91-f18c-11ee-ac96-cd9df4e6ed3eBetaBadge"
+              id="htmlIdBetaBadge"
               title="Agents summary"
             >
               Agents summary
@@ -140,7 +139,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
           >
             <span
               class="euiTitle euiTitle--small euiCard__title"
-              id="i562cdc01-f18c-11ee-ac96-cd9df4e6ed3eTitle"
+              id="htmlIdTitle"
             />
             <div
               class="euiCard__children"
@@ -279,7 +278,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
           >
             <span
               class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
-              id="i562cdc01-f18c-11ee-ac96-cd9df4e6ed3eBetaBadge"
+              id="htmlIdBetaBadge"
               title="Last 24 hours alerts"
             >
               Last 24 hours alerts

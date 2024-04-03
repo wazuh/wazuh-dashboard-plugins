@@ -17,6 +17,13 @@ import { render, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Stats } from './stats';
 
+jest.mock(
+  '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  }),
+);
+
 jest.mock('react-use/lib/useObservable', () => () => {});
 jest.mock('./last-alerts-stat/last-alerts-service', () => ({
   getLast24HoursAlerts: jest.fn().mockReturnValue({

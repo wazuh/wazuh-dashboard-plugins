@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { EuiStat, EuiFlexItem, EuiLink, EuiToolTip } from '@elastic/eui';
+import {
+  EuiStat,
+  EuiFlexItem,
+  EuiLink,
+  EuiToolTip,
+  EuiText,
+} from '@elastic/eui';
 import { getLast24HoursAlerts } from './last-alerts-service';
 import { UI_COLOR_AGENT_STATUS } from '../../../../../common/constants';
 import { getCore } from '../../../../kibana-services';
@@ -19,22 +25,31 @@ export function LastAlertsStat({ severity }: { severity: string }) {
       color: UI_COLOR_AGENT_STATUS.active,
       ruleLevelRange: {
         minRuleLevel: 0,
-        maxRuleLevel: 5,
+        maxRuleLevel: 3,
       },
     },
     medium: {
       label: 'Medium',
-      color: UI_COLOR_AGENT_STATUS.pending,
+      color: '#6092C0',
       ruleLevelRange: {
-        minRuleLevel: 6,
-        maxRuleLevel: 10,
+        minRuleLevel: 4,
+        maxRuleLevel: 7,
       },
     },
     high: {
       label: 'High',
+      color: UI_COLOR_AGENT_STATUS.pending,
+      ruleLevelRange: {
+        minRuleLevel: 8,
+        maxRuleLevel: 11,
+      },
+    },
+    critical: {
+      label: 'Critical',
       color: UI_COLOR_AGENT_STATUS.disconnected,
       ruleLevelRange: {
-        minRuleLevel: 11,
+        minRuleLevel: 12,
+        maxRuleLevel: 15,
       },
     },
   };
@@ -82,7 +97,11 @@ export function LastAlertsStat({ severity }: { severity: string }) {
       <RedirectAppLinks application={getCore().application}>
         <EuiStat
           title={
-            <EuiToolTip position='top' content={`See alerts`}>
+            <EuiToolTip
+              position='top'
+              content={`Click to see rule.level between ${severityLabel[severity].ruleLevelRange.minRuleLevel} and
+          ${severityLabel[severity].ruleLevelRange.maxRuleLevel}`}
+            >
               <EuiLink
                 className='statWithLink'
                 style={{
@@ -95,10 +114,14 @@ export function LastAlertsStat({ severity }: { severity: string }) {
               </EuiLink>
             </EuiToolTip>
           }
-          description={<h3>{`${severityLabel[severity].label} severity`}</h3>}
+          description={<h2>{`${severityLabel[severity].label} severity`}</h2>}
           titleColor={severityLabel[severity].color}
           textAlign='center'
         />
+        <EuiText size='s' color='#646A77' css='margin-top: 0.7vh'>
+          Rule level {severityLabel[severity].ruleLevelRange.minRuleLevel} to{' '}
+          {severityLabel[severity].ruleLevelRange.maxRuleLevel}
+        </EuiText>
       </RedirectAppLinks>
     </EuiFlexItem>
   );
