@@ -285,7 +285,9 @@ export const ApiTable = compose(
               </EuiFlexItem>
               <CheckUpdatesButton
                 isUpdatesEnabled={this.isUpdatesEnabled}
-                getApisAvailableUpdates={this.getApisAvailableUpdates}
+                getApisAvailableUpdates={this.getApisAvailableUpdates.bind(
+                  this,
+                )}
                 availableUpdates={this.state.availableUpdates}
               />
               {this.isUpdatesEnabled ? (
