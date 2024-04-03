@@ -86,11 +86,21 @@ export class ConfigurationStore implements IConfigurationStore {
       pluginSettingsConfigurableFile,
     ).reduce((accum, [key, value]) => {
       const re = new RegExp(`^${key}\\s{0,}:\\s{1,}.*`, 'gm');
-      const formatedValue = formatSettingValueToFile(value);
       const match = accum.match(re);
-      return match /*|| exists*/
-        ? accum.replace(re, `${key}: ${formatedValue}`)
-        : `${accum}\n${key}: ${formatedValue}`;
+
+      // Remove the setting if value is null
+      if (value === null) {
+        return accum.replace(re, '');
+      }
+
+      const formatedValue = formatSettingValueToFile(value);
+      const updateSettingEntry = `${key}: ${formatedValue}`;
+      return match
+        ? /* Replace the setting if it is defined */
+          accum.replace(re, `${updateSettingEntry}`)
+        : /* Append the new setting entry to the end of file */ `${accum}${
+            accum.endsWith('\n') ? '' : '\n'
+          }${updateSettingEntry}` /*exists*/;
     }, content);
 
     this.writeContentConfigurationFile(contentUpdated);
@@ -295,16 +305,11 @@ hosts:
   }
   async clear(...settings: string[]): Promise<any> {
     try {
-      const stored = await this.storeGet({ ignoreCache: true });
-      const updatedSettings = {
-        ...stored,
-      };
       const removedSettings = {};
       settings.forEach(setting => {
-        delete updatedSettings[setting];
         removedSettings[setting] = null;
       });
-      await this.storeSet(updatedSettings);
+      await this.storeSet(removedSettings);
       return removedSettings;
     } catch (error) {
       const enhancedError = new Error(
