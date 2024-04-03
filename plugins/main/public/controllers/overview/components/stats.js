@@ -107,7 +107,10 @@ export const Stats = withErrorBoundary(
               </EuiFlexItem>
             ))*/}
             <EuiFlexItem grow={false}>
-              <EuiCard betaBadgeLabel='Agents summary'>
+              <EuiCard
+                betaBadgeLabel='Agents summary'
+                id={`agent-status-${status}`}
+              >
                 <VisualizationBasic
                   isLoading={this.state.loadingSummary}
                   type='donut'
