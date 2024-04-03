@@ -24,6 +24,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Change the view of API is down and check connection to Server APIs application [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Changed the usage of the endpoint GET /groups/{group_id}/files/{file_name} [#6385](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6385)
 - Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
+- Move AngularJS controller and view for manage groups to ReactJS [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
+- Move AngularJS controllers and views of Tools and Dev Tools to ReactJS [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
 
 ### Fixed
 
@@ -31,8 +33,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
-- Remove AngularJS controller for manage groups [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
-- Remove AngularJS controllers and views of Tools and Dev Tools [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
 - Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
 
 ## Wazuh v4.8.2 - OpenSearch Dashboards 2.10.0 - Revision 00
