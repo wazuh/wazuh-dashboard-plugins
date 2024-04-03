@@ -16,9 +16,9 @@ export default [
     _id: 'Wazuh-App-Statistics-remoted-Recv-bytes',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics remoted Recv bytes',
+      title: 'App Statistics remoted Recv bytes',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics remoted Recv bytes',
+        title: 'App Statistics remoted Recv bytes',
         type: 'line',
         aggs: [
           {
@@ -169,9 +169,9 @@ export default [
     _id: 'Wazuh-App-Statistics-remoted-event-count',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics remoted event count',
+      title: 'App Statistics remoted event count',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics remoted event count',
+        title: 'App Statistics remoted event count',
         type: 'line',
         aggs: [
           {
@@ -321,9 +321,9 @@ export default [
     _id: 'Wazuh-App-Statistics-remoted-tcp-sessions',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics remoted tcp sessions',
+      title: 'App Statistics remoted tcp sessions',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics remoted tcp sessions',
+        title: 'App Statistics remoted tcp sessions',
         type: 'line',
         aggs: [
           {
@@ -473,9 +473,9 @@ export default [
     _id: 'Wazuh-App-Statistics-Analysisd-Overview-Events-Decoded',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics Overview events decoded',
+      title: 'App Statistics Overview events decoded',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics Overview events decoded',
+        title: 'App Statistics Overview events decoded',
         type: 'line',
         aggs: [
           {
@@ -756,7 +756,7 @@ export default [
     _id: 'Wazuh-App-Statistics-Analysisd-Syscheck',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics Syscheck',
+      title: 'App Statistics Syscheck',
       visState: JSON.stringify({
         title: 'syscheck',
         type: 'line',
@@ -1071,9 +1071,9 @@ export default [
     _id: 'Wazuh-App-Statistics-Analysisd-Syscollector',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics Syscollector',
+      title: 'App Statistics Syscollector',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics Syscollector',
+        title: 'App Statistics Syscollector',
         type: 'line',
         aggs: [
           {
@@ -1380,9 +1380,9 @@ export default [
     _id: 'Wazuh-App-Statistics-Analysisd-Rootcheck',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics Rootcheck',
+      title: 'App Statistics Rootcheck',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics Rootcheck',
+        title: 'App Statistics Rootcheck',
         type: 'line',
         aggs: [
           {
@@ -1641,9 +1641,9 @@ export default [
     _id: 'Wazuh-App-Statistics-Analysisd-SCA',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics SCA',
+      title: 'App Statistics SCA',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics SCA',
+        title: 'App Statistics SCA',
         type: 'line',
         aggs: [
           {
@@ -1903,9 +1903,9 @@ export default [
     _id: 'Wazuh-App-Statistics-Analysisd-HostInfo',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics HostInfo',
+      title: 'App Statistics HostInfo',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics HostInfo',
+        title: 'App Statistics HostInfo',
         type: 'line',
         aggs: [
           {
@@ -2174,12 +2174,13 @@ export default [
     },
   },
   {
+
     _id: 'Wazuh-App-Statistics-Analysisd-Queues-Usage',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Statistics Queues Usage',
+      title: 'App Statistics Queues Usage',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics Queues Usage',
+        title: 'App Statistics Queues Usage',
         type: 'line',
         aggs: [
           {

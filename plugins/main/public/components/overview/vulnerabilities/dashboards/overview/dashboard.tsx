@@ -101,6 +101,29 @@ const DashboardVulsComponent: React.FC = () => {
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
             <div className='vulnerability-dashboard-responsive'>
+              <DashboardByRenderer
+                input={{
+                  viewMode: ViewMode.VIEW,
+                  panels: getKPIsPanel(dataSource?.id),
+                  isFullScreenMode: false,
+                  filters: fetchFilters ?? [],
+                  useMargins: true,
+                  id: 'kpis-vulnerability-detector-dashboard-tab',
+                  timeRange: {
+                    from: searchBarProps.dateRangeFrom,
+                    to: searchBarProps.dateRangeTo,
+                  },
+                  title: 'KPIs Vulnerability detector dashboard',
+                  description: 'KPIs Dashboard of the Vulnerability detector',
+                  query: searchBarProps.query,
+                  refreshConfig: {
+                    pause: false,
+                    value: 15,
+                  },
+                  hidePanelTitles: true,
+                }}
+                onInputUpdated={handleFilterByVisualization}
+              />
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer
                   input={{
@@ -126,28 +149,6 @@ const DashboardVulsComponent: React.FC = () => {
                   }}
                 />
               </div>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getKPIsPanel(dataSource?.id),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'kpis-vulnerability-detector-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'KPIs Vulnerability detector dashboard',
-                  description: 'KPIs Dashboard of the Vulnerability detector',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: true,
-                }}
-              />
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,

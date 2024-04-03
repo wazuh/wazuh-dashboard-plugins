@@ -47,7 +47,7 @@ import {
   DataSourceSelector,
   PatternDataSource,
   AlertsDataSourceRepository,
-  PatternDataSourceFactory
+  PatternDataSourceFactory,
 } from '../common/data-source';
 import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
 
@@ -168,7 +168,7 @@ export const WzMenu = withWindowSize(
           ));
 
         // When not exists patterns, not show the selector
-        if(list.length === 1) return;
+        if (list.length === 1) return;
 
         let filtered = false;
         // If there is no current pattern, fetch it
@@ -425,7 +425,7 @@ export const WzMenu = withWindowSize(
                 </EuiFlexItem>
               )}
             {this.props.state.wazuhNotReadyYet ===
-              'Wazuh could not be recovered.' && (
+              'Server could not be recovered.' && (
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
@@ -494,7 +494,7 @@ export const WzMenu = withWindowSize(
         if (this.state.currentMenuTab !== 'wazuh-dev') {
           this.router.reload();
         }
-        await this.updatePatternAndApi(); 
+        await this.updatePatternAndApi();
       } catch (error) {
         const options = {
           context: `${WzMenu.name}.onChangePattern`,

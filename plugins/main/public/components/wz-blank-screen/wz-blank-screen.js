@@ -12,7 +12,11 @@
 import React, { Component } from 'react';
 import { EuiButton, EuiSpacer, EuiLink } from '@elastic/eui';
 import { ErrorComponentPrompt } from '../common/error-boundary-prompt/error-boundary-prompt';
-import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING, PLUGIN_PLATFORM_URL_GUIDE, PLUGIN_PLATFORM_URL_GUIDE_TITLE } from '../../../common/constants';
+import {
+  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
+  PLUGIN_PLATFORM_URL_GUIDE,
+  PLUGIN_PLATFORM_URL_GUIDE_TITLE,
+} from '../../../common/constants';
 import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 export class WzBlankScreen extends Component {
@@ -47,12 +51,12 @@ export class WzBlankScreen extends Component {
                 rel='noopener noreferrer'
                 external
               >
-                Wazuh installation guide
+                Installation guide
               </EuiLink>
             </p>
             <EuiSpacer />
 
-            <EuiButton onClick={this.props.goToOverview} color="primary" fill>
+            <EuiButton onClick={this.props.goToOverview} color='primary' fill>
               Refresh
             </EuiButton>
           </>
