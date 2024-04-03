@@ -154,27 +154,6 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
       ctrl.clearConfiguration(context, request, response),
   );
 
-  // Import the configuration file
-  router.post(
-    {
-      path: '/utils/configuration/import',
-      validate: {
-        body: schema.object({
-          // file: buffer
-          file: schema.buffer(),
-        }),
-      },
-      options: {
-        body: {
-          maxBytes:
-            CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
-        },
-      },
-    },
-    async (context, request, response) =>
-      ctrl.importConfiguration(context, request, response),
-  );
-
   // Get if the current user is an administrator
   router.get(
     {

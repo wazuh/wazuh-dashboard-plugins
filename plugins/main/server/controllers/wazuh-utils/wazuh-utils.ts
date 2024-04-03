@@ -250,33 +250,6 @@ export class WazuhUtilsCtrl {
   );
 
   /**
-   * Import the configuration from a configuration file
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} Configuration File or ErrorResponse
-   */
-  importConfiguration = routeDecoratorProtectedAdministrator(
-    async (
-      context: RequestHandlerContext,
-      request: KibanaRequest,
-      response: KibanaResponseFactory,
-    ) => {
-      const { file: fileBuffer } = request.body;
-      const responseImportFile =
-        await context.wazuh_core.configuration.importFile(fileBuffer);
-
-      return response.ok({
-        body: {
-          message: 'Configuration was imported',
-          ...responseImportFile,
-        },
-      });
-    },
-    3024,
-  );
-
-  /**
    * Get the plugin scoped account
    * @param {Object} context
    * @param {Object} request
