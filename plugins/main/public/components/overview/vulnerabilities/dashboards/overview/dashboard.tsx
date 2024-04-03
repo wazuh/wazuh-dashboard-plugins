@@ -122,7 +122,6 @@ const DashboardVulsComponent: React.FC = () => {
                   },
                   hidePanelTitles: true,
                 }}
-                onInputUpdated={handleFilterByVisualization}
               />
               <div className='vulnerability-dashboard-filters-wrapper'>
                 <DashboardByRenderer
