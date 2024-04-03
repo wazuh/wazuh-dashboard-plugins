@@ -1449,6 +1449,32 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return schema.boolean();
     },
   },
+  'wazuh.updates.disabled': {
+    title: 'Check updates',
+    description: 'Define if the check updates service is active.',
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: false,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+    validateBackend: function (schema) {
+      return schema.boolean();
+    },
+  },
   'logs.level': {
     title: 'Log level',
     description: 'Logging level of the App.',
