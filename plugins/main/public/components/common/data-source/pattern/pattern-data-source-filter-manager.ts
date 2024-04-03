@@ -125,7 +125,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
     /**
      * Filter the filters that was added by the user
      * The filters must not have:
-     *  - the property isImplicit ($state.isImplicit) defined
+     *  - the property isImplicit ($state.isImplicit) defined --- DEPRECATED THE USE OF isImplicity PROPERTY INSIDE THE FILTERS
      *  - the meta.controlledBy property defined
      *  - the meta.index is not the same as the dataSource.id
      * 
@@ -241,7 +241,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
       }
       //@ts-ignore
       managerFilter.$state = {
-          store: 'globalState'
+          store: 'appState'
       }
       //@ts-ignore
       return [managerFilter] as tFilter[];
@@ -278,7 +278,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
           },
         },
         $state: {
-          store: 'globalState' // this makes that the filter is pinned and can be remove the close icon by css
+          store: 'appState' // this makes that the filter is pinned and can be remove the close icon by css
         },
       } as tFilter]
     }

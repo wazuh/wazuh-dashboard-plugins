@@ -101,7 +101,7 @@ class WzAgentSelector extends Component {
               },
             },
           },
-          $state: { store: 'globalState' },
+          $state: { store: 'appState' },
         };
         agentFilters.push(filter);
         filterManager.setFilters(agentFilters);

@@ -43,7 +43,7 @@ export class AlertsDataSource extends PatternDataSource {
                 },
             },
             $state: {
-                store: 'globalState',
+                store: 'appState',
             },
         } as tFilter];
     }

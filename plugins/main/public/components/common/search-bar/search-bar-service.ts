@@ -1,6 +1,7 @@
 import { getPlugins } from '../../../kibana-services';
 import { IndexPattern, Filter, OpenSearchQuerySortValue } from "../../../../../../src/plugins/data/public";
 import { SearchResponse } from "../../../../../../src/core/server";
+import { tFilter } from '../data-source/index';
 
 export interface SearchParams {
     indexPattern: IndexPattern;
@@ -25,7 +26,7 @@ export interface SearchParams {
 
 export const search = async (params: SearchParams): Promise<SearchResponse | void> => {
     const { indexPattern, filters: defaultFilters = [], query, pagination, sorting, fields } = params;
-    if(!indexPattern){
+    if (!indexPattern) {
         return;
     }
     const data = getPlugins().data;
@@ -38,11 +39,12 @@ export const search = async (params: SearchParams): Promise<SearchResponse | voi
     let filters = defaultFilters;
 
     // check if dateRange is defined
-    if(params.dateRange && params.dateRange?.from && params.dateRange?.to){
+    if (params.dateRange && params.dateRange?.from && params.dateRange?.to) {
         const { from, to } = params.dateRange;
         filters = [
             ...filters,
             {
+                // @ts-ignore
                 range: {
                     [indexPattern.timeFieldName || 'timestamp']: {
                         gte: from,
@@ -64,15 +66,49 @@ export const search = async (params: SearchParams): Promise<SearchResponse | voi
         .setField('index', indexPattern)
 
     // add fields
-    if (fields && Array.isArray(fields) && fields.length > 0){
+    if (fields && Array.isArray(fields) && fields.length > 0) {
         searchParams.setField('fields', fields);
     }
-    try{
+    try {
         return await searchParams.fetch();
-    }catch(error){
-        if(error.body){
+    } catch (error) {
+        if (error.body) {
             throw error.body;
         }
         throw error;
     }
 };
+
+export const hideCloseButtonOnFixedFilters = (filters: tFilter[], elements: NodeListOf<Element>) => {
+    const fixedFilters = filters.map((filter, index) => {
+        if (filter.meta.controlledBy && !filter.meta.controlledBy.startsWith('hidden')) {
+            return {
+                index,
+                filter,
+                field: filter.meta?.key,
+                value: filter.meta?.params?.query
+            }
+        }
+    }).filter((filter) => filter);
+
+    elements.forEach((element, index) => {
+        // the filter badge will be changed only when the field and value are the same and the position in the array is the same
+        const filterField = element.querySelector('.euiBadge__content .euiBadge__childButton > span')?.textContent?.split(':')[0];
+        const filterValue = element.querySelector('.euiBadge__content .globalFilterLabel__value')?.textContent;
+        // when the field,value and index is the same, hide the remove button
+        const filter = fixedFilters.find((filter) => filter?.field === filterField && filter?.value === filterValue && filter?.index === index);
+        if (filter) {
+            // hide the remove button
+            const iconButton = element.querySelector('.euiBadge__iconButton') as HTMLElement;
+            iconButton?.style?.setProperty('display', 'none');
+            // change the cursor to not-allowed
+            const badgeButton = element.querySelector('.euiBadge__content .euiBadge__childButton') as HTMLElement;
+            badgeButton?.style?.setProperty('cursor', 'not-allowed');
+            // remove the popup on click to prevent the filter from being removed
+            element.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+            })
+        }
+    })
+}
