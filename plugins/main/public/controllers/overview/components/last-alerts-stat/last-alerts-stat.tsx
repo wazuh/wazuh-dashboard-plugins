@@ -25,31 +25,30 @@ export function LastAlertsStat({ severity }: { severity: string }) {
       color: UI_COLOR_AGENT_STATUS.active,
       ruleLevelRange: {
         minRuleLevel: 0,
-        maxRuleLevel: 3,
+        maxRuleLevel: 6,
       },
     },
     medium: {
       label: 'Medium',
       color: '#6092C0',
       ruleLevelRange: {
-        minRuleLevel: 4,
-        maxRuleLevel: 7,
+        minRuleLevel: 7,
+        maxRuleLevel: 11,
       },
     },
     high: {
       label: 'High',
       color: UI_COLOR_AGENT_STATUS.pending,
       ruleLevelRange: {
-        minRuleLevel: 8,
-        maxRuleLevel: 11,
+        minRuleLevel: 12,
+        maxRuleLevel: 14,
       },
     },
     critical: {
       label: 'Critical',
       color: UI_COLOR_AGENT_STATUS.disconnected,
       ruleLevelRange: {
-        minRuleLevel: 12,
-        maxRuleLevel: 15,
+        minRuleLevel: 15,
       },
     },
   };
@@ -99,8 +98,15 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           title={
             <EuiToolTip
               position='top'
-              content={`Click to see rule.level between ${severityLabel[severity].ruleLevelRange.minRuleLevel} and
-          ${severityLabel[severity].ruleLevelRange.maxRuleLevel}`}
+              content={`Click to see rule.level ${
+                severityLabel[severity].ruleLevelRange.maxRuleLevel
+                  ? 'between ' +
+                    severityLabel[severity].ruleLevelRange.minRuleLevel +
+                    ' to ' +
+                    severityLabel[severity].ruleLevelRange.maxRuleLevel
+                  : severityLabel[severity].ruleLevelRange.minRuleLevel +
+                    ' or higher'
+              }`}
             >
               <EuiLink
                 className='statWithLink'
@@ -119,8 +125,11 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           textAlign='center'
         />
         <EuiText size='s' color='#646A77' css='margin-top: 0.7vh'>
-          Rule level {severityLabel[severity].ruleLevelRange.minRuleLevel} to{' '}
-          {severityLabel[severity].ruleLevelRange.maxRuleLevel}
+          {'Rule level ' +
+            severityLabel[severity].ruleLevelRange.minRuleLevel +
+            (severityLabel[severity].ruleLevelRange.maxRuleLevel
+              ? ' to ' + severityLabel[severity].ruleLevelRange.maxRuleLevel
+              : ' or higher')}
         </EuiText>
       </RedirectAppLinks>
     </EuiFlexItem>

@@ -22,7 +22,14 @@ import {
   randomElements,
   randomArrayItem,
 } from './sample-data/common';
-import { PCI_DSS, GDPR, HIPAA, GPG13, NIST_800_53, tsc } from './sample-data/regulatory-compliance';
+import {
+  PCI_DSS,
+  GDPR,
+  HIPAA,
+  GPG13,
+  NIST_800_53,
+  tsc,
+} from './sample-data/regulatory-compliance';
 
 import * as Audit from './sample-data/audit';
 import * as Authentication from './sample-data/authentication';
@@ -54,7 +61,7 @@ const ruleDescription = [
   'Sample alert 4',
   'Sample alert 5',
 ];
-const ruleMaxLevel = 14;
+const ruleMaxLevel = 15;
 
 /**
  * Generate a alert
@@ -143,7 +150,9 @@ function generateAlert(params) {
       'iamPolicyGrantGlobal',
     ]);
 
-    const beforeDate = new Date(new Date(alert.timestamp) - 3 * 24 * 60 * 60 * 1000);
+    const beforeDate = new Date(
+      new Date(alert.timestamp) - 3 * 24 * 60 * 60 * 1000,
+    );
     switch (randomType) {
       case 'guarddutyPortProbe': {
         const typeAlert = AWS.guarddutyPortProbe;
@@ -151,29 +160,39 @@ function generateAlert(params) {
         alert.data = { ...typeAlert.data };
         alert.data.integration = 'aws';
         alert.data.aws.region = randomArrayItem(AWS.region);
-        alert.data.aws.resource.instanceDetails = { ...randomArrayItem(AWS.instanceDetails) };
-        alert.data.aws.resource.instanceDetails.iamInstanceProfile.arn = interpolateAlertProps(
-          typeAlert.data.aws.resource.instanceDetails.iamInstanceProfile.arn,
-          alert
+        alert.data.aws.resource.instanceDetails = {
+          ...randomArrayItem(AWS.instanceDetails),
+        };
+        alert.data.aws.resource.instanceDetails.iamInstanceProfile.arn =
+          interpolateAlertProps(
+            typeAlert.data.aws.resource.instanceDetails.iamInstanceProfile.arn,
+            alert,
+          );
+        alert.data.aws.title = interpolateAlertProps(
+          alert.data.aws.title,
+          alert,
         );
-        alert.data.aws.title = interpolateAlertProps(alert.data.aws.title, alert);
         alert.data.aws.accountId = randomArrayItem(AWS.accountId);
-        alert.data.aws.service.eventFirstSeen = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+        alert.data.aws.service.eventFirstSeen = formatDate(
+          beforeDate,
+          'Y-M-DTh:m:s.lZ',
+        );
         alert.data.aws.service.eventLastSeen = formatDate(
           new Date(alert.timestamp),
-          'Y-M-DTh:m:s.lZ'
+          'Y-M-DTh:m:s.lZ',
         );
-        alert.data.aws.service.action.portProbeAction.portProbeDetails.remoteIpDetails = {
-          ...randomArrayItem(AWS.remoteIpDetails),
-        };
+        alert.data.aws.service.action.portProbeAction.portProbeDetails.remoteIpDetails =
+          {
+            ...randomArrayItem(AWS.remoteIpDetails),
+          };
         alert.data.aws.log_info = {
           s3bucket: randomArrayItem(AWS.buckets),
           log_file: `guardduty/${formatDate(
             new Date(alert.timestamp),
-            'Y/M/D/h'
+            'Y/M/D/h',
           )}/firehose_guardduty-1-${formatDate(
             new Date(alert.timestamp),
-            'Y-M-D-h-m-s-l'
+            'Y-M-D-h-m-s-l',
           )}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
         };
         alert.data.aws.service.count = `${randomIntervalInteger(400, 4000)}`;
@@ -181,7 +200,10 @@ function generateAlert(params) {
 
         alert.rule = { ...typeAlert.rule };
         alert.rule.firedtimes = randomIntervalInteger(1, 50);
-        alert.rule.description = interpolateAlertProps(typeAlert.rule.description, alert);
+        alert.rule.description = interpolateAlertProps(
+          typeAlert.rule.description,
+          alert,
+        );
 
         alert.decoder = { ...typeAlert.decoder };
         alert.location = typeAlert.location;
@@ -193,36 +215,49 @@ function generateAlert(params) {
         alert.data = { ...typeAlert.data };
         alert.data.integration = 'aws';
         alert.data.aws.region = randomArrayItem(AWS.region);
-        alert.data.aws.resource.accessKeyDetails.userName = randomArrayItem(Users);
+        alert.data.aws.resource.accessKeyDetails.userName =
+          randomArrayItem(Users);
         alert.data.aws.log_info = {
           s3bucket: randomArrayItem(AWS.buckets),
           log_file: `guardduty/${formatDate(
             new Date(alert.timestamp),
-            'Y/M/D/h'
+            'Y/M/D/h',
           )}/firehose_guardduty-1-${formatDate(
             new Date(alert.timestamp),
-            'Y-M-D-h-m-s-l'
+            'Y-M-D-h-m-s-l',
           )}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
         };
         alert.data.aws.accountId = randomArrayItem(AWS.accountId);
         alert.data.aws.service.action.awsApiCallAction.remoteIpDetails = {
           ...randomArrayItem(AWS.remoteIpDetails),
         };
-        alert.data.aws.service.eventFirstSeen = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+        alert.data.aws.service.eventFirstSeen = formatDate(
+          beforeDate,
+          'Y-M-DTh:m:s.lZ',
+        );
         alert.data.aws.service.eventLastSeen = formatDate(
           new Date(alert.timestamp),
-          'Y-M-DTh:m:s.lZ'
+          'Y-M-DTh:m:s.lZ',
         );
         alert.data.aws.createdAt = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
-        alert.data.aws.title = interpolateAlertProps(alert.data.aws.title, alert);
-        alert.data.aws.description = interpolateAlertProps(alert.data.aws.description, alert);
+        alert.data.aws.title = interpolateAlertProps(
+          alert.data.aws.title,
+          alert,
+        );
+        alert.data.aws.description = interpolateAlertProps(
+          alert.data.aws.description,
+          alert,
+        );
         const count = `${randomIntervalInteger(400, 4000)}`;
         alert.data.aws.service.additionalInfo.recentApiCalls.count = count;
         alert.data.aws.service.count = count;
 
         alert.rule = { ...typeAlert.rule };
         alert.rule.firedtimes = randomIntervalInteger(1, 50);
-        alert.rule.description = interpolateAlertProps(typeAlert.rule.description, alert);
+        alert.rule.description = interpolateAlertProps(
+          typeAlert.rule.description,
+          alert,
+        );
 
         alert.decoder = { ...typeAlert.decoder };
         alert.location = typeAlert.location;
@@ -234,28 +269,40 @@ function generateAlert(params) {
         alert.data = { ...typeAlert.data };
         alert.data.integration = 'aws';
         alert.data.aws.region = randomArrayItem(AWS.region);
-        alert.data.aws.resource.instanceDetails = { ...randomArrayItem(AWS.instanceDetails) };
+        alert.data.aws.resource.instanceDetails = {
+          ...randomArrayItem(AWS.instanceDetails),
+        };
         alert.data.aws.log_info = {
           s3bucket: randomArrayItem(AWS.buckets),
           log_file: `guardduty/${formatDate(
             new Date(alert.timestamp),
-            'Y/M/D/h'
+            'Y/M/D/h',
           )}/firehose_guardduty-1-${formatDate(
             new Date(alert.timestamp),
-            'Y-M-D-h-m-s-l'
+            'Y-M-D-h-m-s-l',
           )}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
         };
-        alert.data.aws.description = interpolateAlertProps(alert.data.aws.description, alert);
-        alert.data.aws.title = interpolateAlertProps(alert.data.aws.title, alert);
+        alert.data.aws.description = interpolateAlertProps(
+          alert.data.aws.description,
+          alert,
+        );
+        alert.data.aws.title = interpolateAlertProps(
+          alert.data.aws.title,
+          alert,
+        );
         alert.data.aws.accountId = randomArrayItem(AWS.accountId);
         alert.data.aws.createdAt = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
-        alert.data.aws.service.action.networkConnectionAction.remoteIpDetails = {
-          ...randomArrayItem(AWS.remoteIpDetails),
-        };
-        alert.data.aws.service.eventFirstSeen = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+        alert.data.aws.service.action.networkConnectionAction.remoteIpDetails =
+          {
+            ...randomArrayItem(AWS.remoteIpDetails),
+          };
+        alert.data.aws.service.eventFirstSeen = formatDate(
+          beforeDate,
+          'Y-M-DTh:m:s.lZ',
+        );
         alert.data.aws.service.eventLastSeen = formatDate(
           new Date(alert.timestamp),
-          'Y-M-DTh:m:s.lZ'
+          'Y-M-DTh:m:s.lZ',
         );
         alert.data.aws.service.additionalInfo = {
           localPort: `${randomArrayItem(Ports)}`,
@@ -266,10 +313,16 @@ function generateAlert(params) {
         alert.data.aws.service.count = `${randomIntervalInteger(400, 4000)}`;
         alert.data.aws.service.action.networkConnectionAction.localIpDetails.ipAddressV4 =
           alert.data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress;
-        alert.data.aws.arn = interpolateAlertProps(typeAlert.data.aws.arn, alert);
+        alert.data.aws.arn = interpolateAlertProps(
+          typeAlert.data.aws.arn,
+          alert,
+        );
         alert.rule = { ...typeAlert.rule };
         alert.rule.firedtimes = randomIntervalInteger(1, 50);
-        alert.rule.description = interpolateAlertProps(typeAlert.rule.description, alert);
+        alert.rule.description = interpolateAlertProps(
+          typeAlert.rule.description,
+          alert,
+        );
 
         alert.decoder = { ...typeAlert.decoder };
         alert.location = typeAlert.location;
@@ -281,23 +334,32 @@ function generateAlert(params) {
         alert.data = { ...typeAlert.data };
         alert.data.integration = 'aws';
         alert.data.aws.region = randomArrayItem(AWS.region);
-        alert.data.aws.summary.Timestamps = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
+        alert.data.aws.summary.Timestamps = formatDate(
+          beforeDate,
+          'Y-M-DTh:m:s.lZ',
+        );
         alert.data.aws.log_info = {
           s3bucket: randomArrayItem(AWS.buckets),
           log_file: `macie/${formatDate(
             new Date(alert.timestamp),
-            'Y/M/D/h'
+            'Y/M/D/h',
           )}/firehose_macie-1-${formatDate(
             new Date(alert.timestamp),
-            'Y-M-D-h-m-s'
+            'Y-M-D-h-m-s',
           )}-0b1ede94-f399-4e54-8815-1c6587eee3b1//firehose_guardduty-1-${formatDate(
             new Date(alert.timestamp),
-            'Y-M-D-h-m-s-l'
+            'Y-M-D-h-m-s-l',
           )}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
         };
         alert.data.aws['created-at'] = formatDate(beforeDate, 'Y-M-DTh:m:s.lZ');
-        alert.data.aws.url = interpolateAlertProps(typeAlert.data.aws.url, alert);
-        alert.data.aws['alert-arn'] = interpolateAlertProps(typeAlert.data.aws['alert-arn'], alert);
+        alert.data.aws.url = interpolateAlertProps(
+          typeAlert.data.aws.url,
+          alert,
+        );
+        alert.data.aws['alert-arn'] = interpolateAlertProps(
+          typeAlert.data.aws['alert-arn'],
+          alert,
+        );
 
         alert.rule = { ...typeAlert.rule };
         alert.rule.firedtimes = randomIntervalInteger(1, 50);
@@ -317,25 +379,31 @@ function generateAlert(params) {
     alert.agent = {
       id: '000',
       ip: alert.agent.ip,
-      name: alert.agent.name
+      name: alert.agent.name,
     };
 
     if (params.manager && params.manager.name) {
       alert.agent.name = params.manager.name;
-    };
+    }
 
-    const beforeDate = new Date(new Date(alert.timestamp) - 3 * 24 * 60 * 60 * 1000);
+    const beforeDate = new Date(
+      new Date(alert.timestamp) - 3 * 24 * 60 * 60 * 1000,
+    );
     const IntraID = randomArrayItem(Office.arrayUuidOffice);
     const OrgID = randomArrayItem(Office.arrayUuidOffice);
     const objID = randomArrayItem(Office.arrayUuidOffice);
     const userKey = randomArrayItem(Office.arrayUuidOffice);
     const userID = randomArrayItem(Office.arrayUserId);
     const userType = randomArrayItem([0, 2, 4]);
-    const resultStatus = randomArrayItem(['Succeeded', 'PartiallySucceeded', 'Failed']);
+    const resultStatus = randomArrayItem([
+      'Succeeded',
+      'PartiallySucceeded',
+      'Failed',
+    ]);
     const log = randomArrayItem(Office.arrayLogs);
     const ruleData = Office.officeRules[log.RecordType];
 
-    alert.agent.id = '000'
+    alert.agent.id = '000';
     alert.rule = ruleData.rule;
     alert.decoder = randomArrayItem(Office.arrayDecoderOffice);
     alert.GeoLocation = randomArrayItem(GeoLocation);
@@ -362,13 +430,30 @@ function generateAlert(params) {
     alert.data.gcp = {
       insertId: 'uk1zpe23xcj',
       jsonPayload: {
-        authAnswer: GCP.arrayAuthAnswer[Math.floor(GCP.arrayAuthAnswer.length * Math.random())],
-        protocol: GCP.arrayProtocol[Math.floor(GCP.arrayProtocol.length * Math.random())],
-        queryName: GCP.arrayQueryName[Math.floor(GCP.arrayQueryName.length * Math.random())],
-        queryType: GCP.arrayQueryType[Math.floor(GCP.arrayQueryType.length * Math.random())],
+        authAnswer:
+          GCP.arrayAuthAnswer[
+            Math.floor(GCP.arrayAuthAnswer.length * Math.random())
+          ],
+        protocol:
+          GCP.arrayProtocol[
+            Math.floor(GCP.arrayProtocol.length * Math.random())
+          ],
+        queryName:
+          GCP.arrayQueryName[
+            Math.floor(GCP.arrayQueryName.length * Math.random())
+          ],
+        queryType:
+          GCP.arrayQueryType[
+            Math.floor(GCP.arrayQueryType.length * Math.random())
+          ],
         responseCode:
-          GCP.arrayResponseCode[Math.floor(GCP.arrayResponseCode.length * Math.random())],
-        sourceIP: GCP.arraySourceIP[Math.floor(GCP.arraySourceIP.length * Math.random())],
+          GCP.arrayResponseCode[
+            Math.floor(GCP.arrayResponseCode.length * Math.random())
+          ],
+        sourceIP:
+          GCP.arraySourceIP[
+            Math.floor(GCP.arraySourceIP.length * Math.random())
+          ],
         vmInstanceId: '4980113928800839680.000000',
         vmInstanceName: '531339229531.instance-1',
       },
@@ -376,14 +461,24 @@ function generateAlert(params) {
       receiveTimestamp: '2019-11-11T02:42:05.05853152Z',
       resource: {
         labels: {
-          location: GCP.arrayLocation[Math.floor(GCP.arrayLocation.length * Math.random())],
-          project_id: GCP.arrayProject[Math.floor(GCP.arrayProject.length * Math.random())],
-          source_type: GCP.arraySourceType[Math.floor(GCP.arraySourceType.length * Math.random())],
+          location:
+            GCP.arrayLocation[
+              Math.floor(GCP.arrayLocation.length * Math.random())
+            ],
+          project_id:
+            GCP.arrayProject[
+              Math.floor(GCP.arrayProject.length * Math.random())
+            ],
+          source_type:
+            GCP.arraySourceType[
+              Math.floor(GCP.arraySourceType.length * Math.random())
+            ],
           target_type: 'external',
         },
         type: GCP.arrayType[Math.floor(GCP.arrayType.length * Math.random())],
       },
-      severity: GCP.arraySeverity[Math.floor(GCP.arraySeverity.length * Math.random())],
+      severity:
+        GCP.arraySeverity[Math.floor(GCP.arraySeverity.length * Math.random())],
       timestamp: '2019-11-11T02:42:04.34921449Z',
     };
 
@@ -459,13 +554,21 @@ function generateAlert(params) {
 
     switch (alertCategory) {
       case 'Rootkit': {
-        const rootkitCategory = randomArrayItem(Object.keys(PolicyMonitoring.rootkits));
-        const rootkit = randomArrayItem(PolicyMonitoring.rootkits[rootkitCategory]);
+        const rootkitCategory = randomArrayItem(
+          Object.keys(PolicyMonitoring.rootkits),
+        );
+        const rootkit = randomArrayItem(
+          PolicyMonitoring.rootkits[rootkitCategory],
+        );
         alert.data = {
-          title: interpolateAlertProps(PolicyMonitoring.rootkitsData.data.title, alert, {
-            _rootkit_category: rootkitCategory,
-            _rootkit_file: rootkit,
-          }),
+          title: interpolateAlertProps(
+            PolicyMonitoring.rootkitsData.data.title,
+            alert,
+            {
+              _rootkit_category: rootkitCategory,
+              _rootkit_file: rootkit,
+            },
+          ),
         };
         alert.rule = { ...PolicyMonitoring.rootkitsData.rule };
         alert.rule.firedtimes = randomIntervalInteger(1, 10);
@@ -480,9 +583,13 @@ function generateAlert(params) {
         };
         alert.rule = { ...PolicyMonitoring.trojansData.rule };
         alert.rule.firedtimes = randomIntervalInteger(1, 10);
-        alert.full_log = interpolateAlertProps(PolicyMonitoring.trojansData.full_log, alert, {
-          _trojan_signature: trojan.signature,
-        });
+        alert.full_log = interpolateAlertProps(
+          PolicyMonitoring.trojansData.full_log,
+          alert,
+          {
+            _trojan_signature: trojan.signature,
+          },
+        );
         break;
       }
       default: {
@@ -497,7 +604,7 @@ function generateAlert(params) {
     alert.syscheck.path = randomArrayItem(
       alert.agent.name === 'Windows'
         ? IntegrityMonitoring.pathsWindows
-        : IntegrityMonitoring.pathsLinux
+        : IntegrityMonitoring.pathsLinux,
     );
     alert.syscheck.uname_after = randomArrayItem(Users);
     alert.syscheck.gname_after = 'root';
@@ -513,10 +620,14 @@ function generateAlert(params) {
         break;
       case 'modified':
         alert.rule = IntegrityMonitoring.regulatory[1];
-        alert.syscheck.mtime_before = new Date(alert.syscheck.mtime_after.getTime() - 1000 * 60);
+        alert.syscheck.mtime_before = new Date(
+          alert.syscheck.mtime_after.getTime() - 1000 * 60,
+        );
         alert.syscheck.inode_before = randomIntervalInteger(0, 100000);
         alert.syscheck.sha1_after = randomElements(40, 'abcdef0123456789');
-        alert.syscheck.changed_attributes = [randomArrayItem(IntegrityMonitoring.attributes)];
+        alert.syscheck.changed_attributes = [
+          randomArrayItem(IntegrityMonitoring.attributes),
+        ];
         alert.syscheck.md5_after = randomElements(32, 'abcdef0123456789');
         alert.syscheck.sha256_after = randomElements(60, 'abcdef0123456789');
         break;
@@ -560,7 +671,10 @@ function generateAlert(params) {
     alert.data.virustotal.source = {
       sha1: randomElements(40, 'abcdef0123456789'),
       file: randomArrayItem(Virustotal.sourceFile),
-      alert_id: `${randomElements(10, '0123456789')}.${randomElements(7, '0123456789')}`,
+      alert_id: `${randomElements(10, '0123456789')}.${randomElements(
+        7,
+        '0123456789',
+      )}`,
       md5: randomElements(32, 'abcdef0123456789'),
     };
 
@@ -571,10 +685,13 @@ function generateAlert(params) {
         alert.data.virustotal.malicious + alert.data.virustotal.positives;
       alert.rule.description = `VirusTotal: Alert - ${alert.data.virustotal.source.file} - ${alert.data.virustotal.positives} engines detected this file`;
       alert.data.virustotal.permalink = randomArrayItem(Virustotal.permalink);
-      alert.data.virustotal.scan_date = new Date(Date.parse(alert.timestamp) - 4 * 60000);
+      alert.data.virustotal.scan_date = new Date(
+        Date.parse(alert.timestamp) - 4 * 60000,
+      );
     } else {
       alert.data.virustotal.malicious = '0';
-      alert.rule.description = 'VirusTotal: Alert - No records in VirusTotal database';
+      alert.rule.description =
+        'VirusTotal: Alert - No records in VirusTotal database';
     }
   }
 
@@ -605,7 +722,9 @@ function generateAlert(params) {
       alert.data.osquery = dataOsquery.osquery;
       alert.data.osquery.calendarTime = alert.timestamp;
       alert.rule.description = dataOsquery.rule.description;
-      randomIntervalInteger(0, 99) === 0 ? (alert.data.osquery.action = 'removed') : null;
+      randomIntervalInteger(0, 99) === 0
+        ? (alert.data.osquery.action = 'removed')
+        : null;
     }
   }
 
@@ -687,39 +806,56 @@ function generateAlert(params) {
       case 'invalidLoginPassword': {
         alert.location = Authentication.invalidLoginPassword.location;
         alert.rule = { ...Authentication.invalidLoginPassword.rule };
-        alert.rule.groups = [...Authentication.invalidLoginPassword.rule.groups];
-        alert.full_log = interpolateAlertProps(Authentication.invalidLoginPassword.full_log, alert);
+        alert.rule.groups = [
+          ...Authentication.invalidLoginPassword.rule.groups,
+        ];
+        alert.full_log = interpolateAlertProps(
+          Authentication.invalidLoginPassword.full_log,
+          alert,
+        );
         break;
       }
       case 'invalidLoginUser': {
         alert.location = Authentication.invalidLoginUser.location;
         alert.rule = { ...Authentication.invalidLoginUser.rule };
         alert.rule.groups = [...Authentication.invalidLoginUser.rule.groups];
-        alert.full_log = interpolateAlertProps(Authentication.invalidLoginUser.full_log, alert);
+        alert.full_log = interpolateAlertProps(
+          Authentication.invalidLoginUser.full_log,
+          alert,
+        );
         break;
       }
       case 'multipleAuthenticationFailures': {
         alert.location = Authentication.multipleAuthenticationFailures.location;
         alert.rule = { ...Authentication.multipleAuthenticationFailures.rule };
-        alert.rule.groups = [...Authentication.multipleAuthenticationFailures.rule.groups];
+        alert.rule.groups = [
+          ...Authentication.multipleAuthenticationFailures.rule.groups,
+        ];
         alert.rule.frequency = randomIntervalInteger(5, 50);
         alert.full_log = interpolateAlertProps(
           Authentication.multipleAuthenticationFailures.full_log,
-          alert
+          alert,
         );
         break;
       }
       case 'windowsInvalidLoginPassword': {
         alert.location = Authentication.windowsInvalidLoginPassword.location;
         alert.rule = { ...Authentication.windowsInvalidLoginPassword.rule };
-        alert.rule.groups = [...Authentication.windowsInvalidLoginPassword.rule.groups];
+        alert.rule.groups = [
+          ...Authentication.windowsInvalidLoginPassword.rule.groups,
+        ];
         alert.rule.frequency = randomIntervalInteger(5, 50);
-        alert.data.win = { ...Authentication.windowsInvalidLoginPassword.data_win };
+        alert.data.win = {
+          ...Authentication.windowsInvalidLoginPassword.data_win,
+        };
         alert.data.win.eventdata.ipAddress = randomArrayItem(IPs);
         alert.data.win.eventdata.ipPort = randomArrayItem(Ports);
         alert.data.win.system.computer = randomArrayItem(Win_Hostnames);
         alert.data.win.system.eventID = `${randomIntervalInteger(1, 600)}`;
-        alert.data.win.system.eventRecordID = `${randomIntervalInteger(10000, 50000)}`;
+        alert.data.win.system.eventRecordID = `${randomIntervalInteger(
+          10000,
+          50000,
+        )}`;
         alert.data.win.system.processID = `${randomIntervalInteger(1, 1200)}`;
         alert.data.win.system.systemTime = alert.timestamp;
         alert.data.win.system.processID = `${randomIntervalInteger(1, 1200)}`;
@@ -727,7 +863,7 @@ function generateAlert(params) {
         alert.data.win.system.threadID = `${randomIntervalInteger(1, 500)}`;
         alert.full_log = interpolateAlertProps(
           Authentication.windowsInvalidLoginPassword.full_log,
-          alert
+          alert,
         );
         break;
       }
@@ -743,7 +879,10 @@ function generateAlert(params) {
           tty: 'ssh',
         };
         alert.decoder = { ...Authentication.userLoginFailed.decoder };
-        alert.full_log = interpolateAlertProps(Authentication.userLoginFailed.full_log, alert);
+        alert.full_log = interpolateAlertProps(
+          Authentication.userLoginFailed.full_log,
+          alert,
+        );
         break;
       }
       case 'passwordCheckFailed': {
@@ -755,23 +894,31 @@ function generateAlert(params) {
         };
         alert.predecoder.program_name = 'unix_chkpwd';
         alert.decoder = { ...Authentication.passwordCheckFailed.decoder };
-        alert.full_log = interpolateAlertProps(Authentication.passwordCheckFailed.full_log, alert);
+        alert.full_log = interpolateAlertProps(
+          Authentication.passwordCheckFailed.full_log,
+          alert,
+        );
         break;
       }
       case 'nonExistentUser': {
         alert.location = Authentication.nonExistentUser.location;
         alert.rule = { ...Authentication.nonExistentUser.rule };
         alert.rule.groups = [...Authentication.nonExistentUser.rule.groups];
-        alert.full_log = interpolateAlertProps(Authentication.nonExistentUser.full_log, alert);
+        alert.full_log = interpolateAlertProps(
+          Authentication.nonExistentUser.full_log,
+          alert,
+        );
         break;
       }
       case 'bruteForceTryingAccessSystem': {
         alert.location = Authentication.bruteForceTryingAccessSystem.location;
         alert.rule = { ...Authentication.bruteForceTryingAccessSystem.rule };
-        alert.rule.groups = [...Authentication.bruteForceTryingAccessSystem.rule.groups];
+        alert.rule.groups = [
+          ...Authentication.bruteForceTryingAccessSystem.rule.groups,
+        ];
         alert.full_log = interpolateAlertProps(
           Authentication.bruteForceTryingAccessSystem.full_log,
-          alert
+          alert,
         );
         break;
       }
@@ -782,25 +929,32 @@ function generateAlert(params) {
         alert.data = {
           srcip: randomArrayItem(IPs),
         };
-        alert.full_log = interpolateAlertProps(Authentication.reverseLoockupError.full_log, alert);
+        alert.full_log = interpolateAlertProps(
+          Authentication.reverseLoockupError.full_log,
+          alert,
+        );
       }
       case 'insecureConnectionAttempt': {
         alert.location = Authentication.insecureConnectionAttempt.location;
         alert.rule = { ...Authentication.insecureConnectionAttempt.rule };
-        alert.rule.groups = [...Authentication.insecureConnectionAttempt.rule.groups];
+        alert.rule.groups = [
+          ...Authentication.insecureConnectionAttempt.rule.groups,
+        ];
         alert.data = {
           srcip: randomArrayItem(IPs),
           srcport: randomArrayItem(Ports),
         };
         alert.full_log = interpolateAlertProps(
           Authentication.insecureConnectionAttempt.full_log,
-          alert
+          alert,
         );
       }
       case 'authenticationSuccess': {
         alert.location = Authentication.authenticationSuccess.location;
         alert.rule = { ...Authentication.authenticationSuccess.rule };
-        alert.rule.groups = [...Authentication.authenticationSuccess.rule.groups];
+        alert.rule.groups = [
+          ...Authentication.authenticationSuccess.rule.groups,
+        ];
         alert.data = {
           srcip: randomArrayItem(IPs),
           srcport: randomArrayItem(Ports),
@@ -808,13 +962,18 @@ function generateAlert(params) {
         };
         alert.full_log = interpolateAlertProps(
           Authentication.authenticationSuccess.full_log,
-          alert
+          alert,
         );
       }
       case 'maximumAuthenticationAttemptsExceeded': {
-        alert.location = Authentication.maximumAuthenticationAttemptsExceeded.location;
-        alert.rule = { ...Authentication.maximumAuthenticationAttemptsExceeded.rule };
-        alert.rule.groups = [...Authentication.maximumAuthenticationAttemptsExceeded.rule.groups];
+        alert.location =
+          Authentication.maximumAuthenticationAttemptsExceeded.location;
+        alert.rule = {
+          ...Authentication.maximumAuthenticationAttemptsExceeded.rule,
+        };
+        alert.rule.groups = [
+          ...Authentication.maximumAuthenticationAttemptsExceeded.rule.groups,
+        ];
         alert.data = {
           srcip: randomArrayItem(IPs),
           srcport: randomArrayItem(Ports),
@@ -822,7 +981,7 @@ function generateAlert(params) {
         };
         alert.full_log = interpolateAlertProps(
           Authentication.maximumAuthenticationAttemptsExceeded.full_log,
-          alert
+          alert,
         );
       }
       default: {
@@ -915,7 +1074,10 @@ function generateAlert(params) {
     alert.decoder = { ...Apache.decoder };
 
     alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
-      _timestamp_apache: formatDate(new Date(alert.timestamp), 'E N D h:m:s.l Y'),
+      _timestamp_apache: formatDate(
+        new Date(alert.timestamp),
+        'E N D h:m:s.l Y',
+      ),
       _pi_id: randomIntervalInteger(10000, 30000),
     });
   }
@@ -951,35 +1113,49 @@ function generateAlert(params) {
           interpolateAlertProps(typeAlert.full_log, alert, {
             _user_agent: userAgent,
             _date: formatDate(new Date(beforeDate), 'D/N/Y:h:m:s +0000'),
-          })
+          }),
         );
       }
       alert.previous_output = previousOutput.join('\n');
     }
   }
 
-  if (params.github){
+  if (params.github) {
     alert.location = GitHub.LOCATION;
     alert.decoder = GitHub.DECODER;
     const alertType = randomArrayItem(GitHub.ALERT_TYPES);
     const actor = randomArrayItem(GitHub.ACTORS);
     alert.data = {
-      github : { ...alertType.data.github }
+      github: { ...alertType.data.github },
     };
     alert.data.github.org = randomArrayItem(GitHub.ORGANIZATION_NAMES);
-    alert.data.github.repo && (alert.data.github.repo = `${alert.data.github.org}/${randomArrayItem(GitHub.REPOSITORY_NAMES)}`);
-    alert.data.github.repository && (alert.data.github.repository = `${alert.data.github.org}/${randomArrayItem(GitHub.REPOSITORY_NAMES)}`);
+    alert.data.github.repo &&
+      (alert.data.github.repo = `${alert.data.github.org}/${randomArrayItem(
+        GitHub.REPOSITORY_NAMES,
+      )}`);
+    alert.data.github.repository &&
+      (alert.data.github.repository = `${
+        alert.data.github.org
+      }/${randomArrayItem(GitHub.REPOSITORY_NAMES)}`);
     alert.data.github.actor = actor.name;
-    alert.data.github.actor_location && alert.data.github.actor_location.country_code && (alert.data.github.actor_location.country_code = actor.country_code);
-    alert.data.github.user && (alert.data.github.user = randomArrayItem(GitHub.USER_NAMES));
-    alert.data.github.config && alert.data.github.config.url && (alert.data.github.config.url = randomArrayItem(GitHub.SERVER_ADDRESS_WEBHOOK));
+    alert.data.github.actor_location &&
+      alert.data.github.actor_location.country_code &&
+      (alert.data.github.actor_location.country_code = actor.country_code);
+    alert.data.github.user &&
+      (alert.data.github.user = randomArrayItem(GitHub.USER_NAMES));
+    alert.data.github.config &&
+      alert.data.github.config.url &&
+      (alert.data.github.config.url = randomArrayItem(
+        GitHub.SERVER_ADDRESS_WEBHOOK,
+      ));
     alert.data.github['@timestamp'] = alert.timestamp;
-    alert.data.github.created_at && (alert.data.github.created_at = alert.timestamp);
+    alert.data.github.created_at &&
+      (alert.data.github.created_at = alert.timestamp);
     alert.rule = {
-      ...alertType.rule
+      ...alertType.rule,
     };
   }
-  
+
   return alert;
 }
 
@@ -1037,7 +1213,8 @@ function randomDate(inf, sup) {
   return formatDate(lastWeek, 'Y-M-DTh:m:s.l+0000');
 }
 
-const formatterNumber = (number, zeros = 0) => ('0'.repeat(zeros) + `${number}`).slice(-zeros);
+const formatterNumber = (number, zeros = 0) =>
+  ('0'.repeat(zeros) + `${number}`).slice(-zeros);
 const monthNames = {
   long: [
     'January',
@@ -1053,28 +1230,49 @@ const monthNames = {
     'November',
     'December',
   ],
-  short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  short: [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ],
 };
 
 const dayNames = {
-  long: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  long: [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ],
   short: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 };
 
 function formatDate(date, format) {
   // It could use "moment" library to format strings too
   const tokens = {
-    D: (d) => formatterNumber(d.getDate(), 2), // 01-31
-    A: (d) => dayNames.long[d.getDay()], // 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-    E: (d) => dayNames.short[d.getDay()], // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
-    M: (d) => formatterNumber(d.getMonth() + 1, 2), // 01-12
-    J: (d) => monthNames.long[d.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-    N: (d) => monthNames.short[d.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    Y: (d) => d.getFullYear(), // 2020
-    h: (d) => formatterNumber(d.getHours(), 2), // 00-23
-    m: (d) => formatterNumber(d.getMinutes(), 2), // 00-59
-    s: (d) => formatterNumber(d.getSeconds(), 2), // 00-59
-    l: (d) => formatterNumber(d.getMilliseconds(), 3), // 000-999
+    D: d => formatterNumber(d.getDate(), 2), // 01-31
+    A: d => dayNames.long[d.getDay()], // 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    E: d => dayNames.short[d.getDay()], // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+    M: d => formatterNumber(d.getMonth() + 1, 2), // 01-12
+    J: d => monthNames.long[d.getMonth()], // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+    N: d => monthNames.short[d.getMonth()], // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    Y: d => d.getFullYear(), // 2020
+    h: d => formatterNumber(d.getHours(), 2), // 00-23
+    m: d => formatterNumber(d.getMinutes(), 2), // 00-59
+    s: d => formatterNumber(d.getSeconds(), 2), // 00-59
+    l: d => formatterNumber(d.getMilliseconds(), 3), // 000-999
   };
 
   return format.split('').reduce((accum, token) => {
@@ -1098,7 +1296,9 @@ function interpolateAlertProps(str, alert, extra = {}) {
       matches.reduce((accum, cur) => {
         const match = cur.match(/{([\w\._]+)}/);
         const items = match[1].split('.');
-        const value = items.reduce((a, c) => (a && a[c]) || extra[c] || undefined, alert) || cur;
+        const value =
+          items.reduce((a, c) => (a && a[c]) || extra[c] || undefined, alert) ||
+          cur;
         return accum.replace(cur, value);
       }, str)) ||
     str
