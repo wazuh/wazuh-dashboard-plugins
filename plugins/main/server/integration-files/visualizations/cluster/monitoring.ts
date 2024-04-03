@@ -14,9 +14,9 @@ export default [
     _id: 'Wazuh-App-Cluster-monitoring-Overview',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Cluster Overview',
+      title: 'App Cluster Overview',
       visState: JSON.stringify({
-        title: 'Wazuh App Cluster Overview',
+        title: 'App Cluster Overview',
         type: 'timelion',
         params: { expression: '.es(*)', interval: 'auto' },
         aggs: [],
@@ -37,9 +37,9 @@ export default [
     _id: 'Wazuh-App-Cluster-monitoring-Overview-Manager',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Cluster Overview Manager',
+      title: 'App Cluster Overview Manager',
       visState: JSON.stringify({
-        title: 'Wazuh App Cluster Overview Manager',
+        title: 'App Cluster Overview Manager',
         type: 'timelion',
         params: { expression: '.es(q=agent.id:000)', interval: 'auto' },
         aggs: [],
@@ -59,9 +59,9 @@ export default [
   {
     _id: 'Wazuh-App-Cluster-monitoring-Overview-Node',
     _source: {
-      title: 'Wazuh App Cluster Overview Node',
+      title: 'App Cluster Overview Node',
       visState: JSON.stringify({
-        title: 'Wazuh App Cluster Overview Node',
+        title: 'App Cluster Overview Node',
         type: 'histogram',
         params: {
           type: 'histogram',
@@ -145,9 +145,9 @@ export default [
     _id: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Cluster Overview Node Pie',
+      title: 'App Cluster Overview Node Pie',
       visState: JSON.stringify({
-        title: 'Wazuh App Cluster Overview Node Pie',
+        title: 'App Cluster Overview Node Pie',
         type: 'pie',
         params: {
           type: 'pie',

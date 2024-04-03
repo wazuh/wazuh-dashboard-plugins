@@ -136,7 +136,7 @@ export const OverviewWelcome = compose(
                           <EuiFlexGrid columns={2}>
                             {apps.map(app => (
                               <EuiFlexItem key={app.id}>
-                                <RedirectAppLinks
+                                <RedirectAppLinks className='flex-redirect-app-links'
                                   application={getCore().application}
                                 >
                                   <EuiCard

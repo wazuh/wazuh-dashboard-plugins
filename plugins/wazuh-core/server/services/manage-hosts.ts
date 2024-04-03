@@ -405,7 +405,7 @@ export class ManageHosts {
     }
     if (registryHost.allow_run_as === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED) {
       throw new Error(
-        `API host with host ID [${apiId}] misconfigured. The configurated Wazuh API user is not allowed to use [run_as]. Allow it in the API user configuration or set [run_as] host setting with [false] value.`,
+        `API host with host ID [${apiId}] misconfigured. The configurated API user is not allowed to use [run_as]. Allow it in the API user configuration or set [run_as] host setting with [false] value.`,
       );
     }
     return registryHost.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED;

@@ -19,7 +19,7 @@ describe('SettingsAbout component', () => {
           'app-version': '4.8.0',
           revision: '01',
         }}
-        pluginAppName='Wazuh dashboard'
+        pluginAppName='Dashboard'
       />,
     );
 
