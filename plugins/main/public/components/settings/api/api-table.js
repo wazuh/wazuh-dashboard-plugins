@@ -233,9 +233,8 @@ export const ApiTable = compose(
             currentDefault,
           });
         },
-        checkApi: this.checkApi,
+        checkApi: this.checkApi.bind(this),
         showAddApi: this.props.showAddApi,
-        getApisAvailableUpdates: this.getApisAvailableUpdates,
         viewApiAvailableUpdateDetails: api =>
           this.setState({
             apiAvailableUpdateDetails: api,
