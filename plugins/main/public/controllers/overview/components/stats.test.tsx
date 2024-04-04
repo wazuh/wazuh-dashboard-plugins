@@ -24,7 +24,7 @@ jest.mock(
   }),
 );
 
-jest.mock('react-use/lib/useObservable', () => () => {});
+jest.mock('react-use/lib/useObservable', () => () => { });
 jest.mock('./last-alerts-stat/last-alerts-service', () => ({
   getLast24HoursAlerts: jest.fn().mockReturnValue({
     count: 100,
@@ -42,12 +42,15 @@ jest.mock('../../../kibana-services', () => ({
       navigateToApp: () => 'http://url',
       getUrlForApp: () => 'http://url',
     },
+    uiSettings: {
+      get: () => true
+    }
   }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => {},
+    handleError: options => { },
   }),
 }));
 
