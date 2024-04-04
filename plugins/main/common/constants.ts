@@ -338,6 +338,15 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
 export const PLUGIN_APP_NAME = 'Wazuh dashboard';
 
 // UI
+export const UI_COLOR_STATUS = {
+  success: '#007871',
+  danger: '#BD271E',
+  warning: '#FEC514',
+  disabled: '#646A77',
+  info: '#6092C0',
+  default: '#000000',
+} as const;
+
 export const API_NAME_AGENT_STATUS = {
   ACTIVE: 'active',
   DISCONNECTED: 'disconnected',
@@ -346,11 +355,11 @@ export const API_NAME_AGENT_STATUS = {
 } as const;
 
 export const UI_COLOR_AGENT_STATUS = {
-  [API_NAME_AGENT_STATUS.ACTIVE]: '#007871',
-  [API_NAME_AGENT_STATUS.DISCONNECTED]: '#BD271E',
-  [API_NAME_AGENT_STATUS.PENDING]: '#FEC514',
-  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: '#646A77',
-  default: '#000000',
+  [API_NAME_AGENT_STATUS.ACTIVE]: UI_COLOR_STATUS.success,
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: UI_COLOR_STATUS.danger,
+  [API_NAME_AGENT_STATUS.PENDING]: UI_COLOR_STATUS.warning,
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: UI_COLOR_STATUS.disabled,
+  default: UI_COLOR_STATUS.default,
 } as const;
 
 export const UI_LABEL_NAME_AGENT_STATUS = {
