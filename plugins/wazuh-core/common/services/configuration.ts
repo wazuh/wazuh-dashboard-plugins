@@ -93,7 +93,7 @@ export type TConfigurationSetting = {
   type: EpluginSettingType;
   // Default value.
   defaultValue: any;
-  // Default value if it is not set. It has preference over `default`.
+  /* Special: This is used for the settings of customization to get the hidden default value, because the default value is empty to not to be displayed on the App Settings. */
   defaultValueIfNotSet?: any;
   // Configurable from the configuration file.
   isConfigurableFromSettings: boolean;
@@ -168,6 +168,7 @@ export interface IConfiguration {
     }
   >;
   getSettingValue(settingKey: string, value?: any): any;
+  getSettingValueIfNotSet(settingKey: string, value?: any): any;
 }
 
 export class Configuration implements IConfiguration {
@@ -229,8 +230,36 @@ export class Configuration implements IConfiguration {
   }
 
   /**
+   * Special: Get the value for a setting from a value or someone of the default values. This is used for the settings of customization to get the hidden default value, because the default value is empty to not to be displayed on the App Settings
+   * It retunts defaultValueIfNotSet or defaultValue
+   * @param settingKey
+   * @param value
+   * @returns
+   */
+  getSettingValueIfNotSet(settingKey: string, value?: any) {
+    this.logger.debug(
+      `Getting value for [${settingKey}]: stored [${JSON.stringify(value)}]`,
+    );
+    if (!this._settings.has(settingKey)) {
+      throw new Error(`${settingKey} is not registered`);
+    }
+    if (typeof value !== 'undefined') {
+      return value;
+    }
+    const setting = this._settings.get(settingKey);
+    const finalValue =
+      typeof setting.defaultValueIfNotSet !== 'undefined'
+        ? setting.defaultValueIfNotSet
+        : setting.defaultValue;
+    this.logger.debug(
+      `Value for [${settingKey}]: [${JSON.stringify(finalValue)}]`,
+    );
+    return finalValue;
+  }
+
+  /**
    * Get the value for a setting from a value or someone of the default values:
-   * defaultValueIfNotSet or defaultValue
+   * It returns defaultValue
    * @param settingKey
    * @param value
    * @returns
@@ -246,10 +275,7 @@ export class Configuration implements IConfiguration {
       return value;
     }
     const setting = this._settings.get(settingKey);
-    const finalValue =
-      typeof setting.defaultValueIfNotSet !== 'undefined'
-        ? setting.defaultValueIfNotSet
-        : setting.defaultValue;
+    const finalValue = setting.defaultValue;
     this.logger.debug(
       `Value for [${settingKey}]: [${JSON.stringify(finalValue)}]`,
     );

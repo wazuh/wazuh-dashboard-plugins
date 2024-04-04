@@ -477,7 +477,7 @@ export type TPluginSetting = {
   };
   // Default value.
   defaultValue: any;
-  // Default value if it is not set. It has preference over `default`.
+  /* Special: This is used for the settings of customization to get the hidden default value, because the default value is empty to not to be displayed on the App Settings. */
   defaultValueIfNotSet?: any;
   // Configurable from the App Settings app.
   isConfigurableFromSettings: boolean;

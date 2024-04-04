@@ -1,7 +1,4 @@
-import { PLUGIN_PLATFORM_NAME } from '../../common/constants';
 import { IConfiguration } from '../../common/services/configuration';
-import yml from 'js-yaml';
-
 /**
  * Returns the default value if not set when the setting is an empty string
  * @param settingKey plugin setting
@@ -16,16 +13,12 @@ function resolveEmptySetting(
   return typeof value === 'string' &&
     value.length === 0 &&
     configurationService._settings.get(settingKey).defaultValueIfNotSet
-    ? configurationService.getSettingValue(settingKey)
+    ? configurationService.getSettingValueIfNotSet(settingKey)
     : value;
 }
 
 export interface IConfigurationEnhanced extends IConfiguration {
-  getCustomizationSetting(
-    currentConfiguration: { [key: string]: any },
-    settingKey: string,
-  ): any;
-  importFile(fileContent: string | Buffer): any;
+  getCustomizationSetting(...settingKeys: string[]): { [key: string]: any };
 }
 
 function getCustomizationSetting(
@@ -33,11 +26,8 @@ function getCustomizationSetting(
   currentConfiguration: { [key: string]: any },
   settingKey: string,
 ) {
-  const isCustomizationEnabled =
-    typeof currentConfiguration['customization.enabled'] === 'undefined'
-      ? configuration.getSettingValue('customization.enabled')
-      : currentConfiguration['customization.enabled'];
-  const defaultValue = configuration.getSettingValue(settingKey);
+  const isCustomizationEnabled = currentConfiguration['customization.enabled'];
+  const defaultValue = configuration.getSettingValueIfNotSet(settingKey);
 
   if (
     isCustomizationEnabled &&
@@ -57,12 +47,27 @@ function getCustomizationSetting(
 }
 
 export function enhanceConfiguration(configuration: IConfiguration) {
-  configuration.getCustomizationSetting = async function (settingKey: string) {
+  /**
+   * Get the customiztion settings taking into account if this is enabled
+   * @param settingKeys
+   * @returns
+   */
+  configuration.getCustomizationSetting = async function (
+    ...settingKeys: string[]
+  ) {
+    if (!settingKeys.length) {
+      throw new Error('No settings defined');
+    }
     const currentConfiguration = await this.get(
       'customization.enabled',
-      settingKey,
+      ...settingKeys,
     );
 
-    return getCustomizationSetting(this, currentConfiguration, settingKey);
+    return Object.fromEntries(
+      settingKeys.map(settingKey => [
+        settingKey,
+        getCustomizationSetting(this, currentConfiguration, settingKey),
+      ]),
+    );
   };
 }
