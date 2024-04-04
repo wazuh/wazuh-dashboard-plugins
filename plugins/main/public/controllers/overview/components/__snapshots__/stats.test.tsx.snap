@@ -159,13 +159,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       <div
                         class="euiText euiText--small euiStat__description"
                       >
-                        <p
+                        <h2
                           aria-hidden="true"
                         >
-                          <h2>
-                            Critical severity
-                          </h2>
-                        </p>
+                          Critical severity
+                        </h2>
                       </div>
                       <p
                         aria-hidden="true"
@@ -190,11 +188,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       class="euiText euiText--small"
                       css="margin-top: 0.7vh"
                     >
-                      <div
-                        class="euiTextColor"
-                      >
-                        Rule level 15 or higher
-                      </div>
+                      Rule level 15 or higher
                     </div>
                   </div>
                 </div>
@@ -210,13 +204,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       <div
                         class="euiText euiText--small euiStat__description"
                       >
-                        <p
+                        <h2
                           aria-hidden="true"
                         >
-                          <h2>
-                            High severity
-                          </h2>
-                        </p>
+                          High severity
+                        </h2>
                       </div>
                       <p
                         aria-hidden="true"
@@ -241,11 +233,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       class="euiText euiText--small"
                       css="margin-top: 0.7vh"
                     >
-                      <div
-                        class="euiTextColor"
-                      >
-                        Rule level 12 to 14
-                      </div>
+                      Rule level 12 to 14
                     </div>
                   </div>
                 </div>
@@ -261,13 +249,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       <div
                         class="euiText euiText--small euiStat__description"
                       >
-                        <p
+                        <h2
                           aria-hidden="true"
                         >
-                          <h2>
-                            Medium severity
-                          </h2>
-                        </p>
+                          Medium severity
+                        </h2>
                       </div>
                       <p
                         aria-hidden="true"
@@ -292,11 +278,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       class="euiText euiText--small"
                       css="margin-top: 0.7vh"
                     >
-                      <div
-                        class="euiTextColor"
-                      >
-                        Rule level 7 to 11
-                      </div>
+                      Rule level 7 to 11
                     </div>
                   </div>
                 </div>
@@ -312,13 +294,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       <div
                         class="euiText euiText--small euiStat__description"
                       >
-                        <p
+                        <h2
                           aria-hidden="true"
                         >
-                          <h2>
-                            Low severity
-                          </h2>
-                        </p>
+                          Low severity
+                        </h2>
                       </div>
                       <p
                         aria-hidden="true"
@@ -343,11 +323,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       class="euiText euiText--small"
                       css="margin-top: 0.7vh"
                     >
-                      <div
-                        class="euiTextColor"
-                      >
-                        Rule level 0 to 6
-                      </div>
+                      Rule level 0 to 6
                     </div>
                   </div>
                 </div>
