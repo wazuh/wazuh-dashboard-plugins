@@ -60,9 +60,28 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           severityLabel[severity].ruleLevelRange,
         );
         setCountLastAlerts(count);
+        const core = getCore();
+
+        // Check if the new discover is enabled to build the URL
+        const v2Enabled = await core.uiSettings.get<boolean>('discover:v2');
+
+        let discoverLocation = {
+          app: 'data-explorer',
+          basePath: 'discover',
+        };
+
+        if (!v2Enabled) {
+          discoverLocation = {
+            app: 'discoverLegacy',
+            basePath: '',
+          };
+        }
+
         // TODO: find a better way to get the query discover URL
-        const destURL = getCore().application.getUrlForApp('data-explorer', {
-          path: `discover#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:${
+        const destURL = core.application.getUrlForApp(discoverLocation.app, {
+          path: `${
+            discoverLocation.basePath
+          }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:${
             cluster.field
           },negate:!f,params:(query:${
             cluster.name
@@ -78,7 +97,6 @@ export function LastAlertsStat({ severity }: { severity: string }) {
             severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
           })))),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))&_q=(filters:!(),query:(language:kuery,query:''))`,
         });
-        console.log(destURL);
         setDiscoverLocation(destURL);
       } catch (error) {
         const searchError = ErrorFactory.create(HttpError, {
@@ -120,11 +138,12 @@ export function LastAlertsStat({ severity }: { severity: string }) {
               </EuiLink>
             </EuiToolTip>
           }
-          description={<h2>{`${severityLabel[severity].label} severity`}</h2>}
+          description={`${severityLabel[severity].label} severity`}
+          descriptionElement='h2'
           titleColor={severityLabel[severity].color}
           textAlign='center'
         />
-        <EuiText size='s' color='#646A77' css='margin-top: 0.7vh'>
+        <EuiText size='s' css='margin-top: 0.7vh'>
           {'Rule level ' +
             severityLabel[severity].ruleLevelRange.minRuleLevel +
             (severityLabel[severity].ruleLevelRange.maxRuleLevel

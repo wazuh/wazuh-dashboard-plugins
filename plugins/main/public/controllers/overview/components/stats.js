@@ -82,28 +82,30 @@ export const Stats = withErrorBoundary(
         <EuiPage>
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <EuiCard betaBadgeLabel='Agents summary'>
+              <EuiCard betaBadgeLabel='Agents summary' title=''>
                 <VisualizationBasic
                   isLoading={this.state.loadingSummary}
                   type='donut'
                   size={{ width: '100%', height: '150px' }}
                   showLegend
-                  data={this.agentStatus.map(({ status, label, color }) => ({
-                    label,
-                    value:
-                      typeof this.props[status] !== 'undefined'
-                        ? this.props[status]
-                        : 0,
-                    color,
-                    onClick: () => this.filterAgentByStatus(status),
-                  }))}
+                  data={this.agentStatus.map(
+                    ({ status, label, color, onClick }) => ({
+                      onClick,
+                      label,
+                      value:
+                        typeof this.props[status] !== 'undefined'
+                          ? this.props[status]
+                          : 0,
+                      color,
+                    }),
+                  )}
                   noDataTitle='No results'
                   noDataMessage='No results were found.'
                 />
               </EuiCard>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiCard betaBadgeLabel='Last 24 hours alerts'>
+              <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
                 <EuiFlexGroup className='vulnerabilites-summary-card'>
                   <LastAlertsStat severity='critical' />
                   <LastAlertsStat severity='high' />
