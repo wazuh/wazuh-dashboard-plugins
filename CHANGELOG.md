@@ -26,6 +26,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
 - Move AngularJS controller and view for manage groups to ReactJS [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
 - Move AngularJS controllers and views of Tools and Dev Tools to ReactJS [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
+- Move the AngularJS controller and template of blank screen to ReactJS component [#6538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6538)
+- Moved the registry data to in-memory cache [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
+- Remove AngularJS controller for manage groups [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
+- Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
 
 ### Fixed
 
@@ -34,6 +38,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Removed
 
 - Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
+- Removed API endpoint GET /api/timestamp [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
+- Removed API endpoint PUT /api/update-hostname/{id} [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
+- Removed API endpoint DELETE /hosts/remove-orphan-entries [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 
 ## Wazuh v4.8.2 - OpenSearch Dashboards 2.10.0 - Revision 00
 

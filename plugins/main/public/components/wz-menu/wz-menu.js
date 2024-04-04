@@ -354,22 +354,6 @@ export const WzMenu = withWindowSize(
       });
     };
 
-    /**
-     * @param {String} id
-     * @param {Object} clusterInfo
-     * Updates the wazuh registry of an specific api id
-     */
-    updateClusterInfoInRegistry = async (id, clusterInfo) => {
-      try {
-        const url = `/hosts/update-hostname/${id}`;
-        await this.genericReq.request('PUT', url, {
-          cluster_info: clusterInfo,
-        });
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    };
-
     changeAPI = async event => {
       try {
         const apiId = event.target[event.target.selectedIndex];
@@ -382,7 +366,6 @@ export const WzMenu = withWindowSize(
           return item.id === apiId.value;
         });
 
-        this.updateClusterInfoInRegistry(apiId.value, clusterInfo);
         apiData[0].cluster_info = clusterInfo;
 
         AppState.setClusterInfo(apiData[0].cluster_info);

@@ -36,8 +36,8 @@ export default {
       );
 
       if (savedObjectIsCreated) {
-        logger.info(
-          `The saved object exists so the configuration defined at the file [${configurationFileLocation}] will not be migrated. Skip.`,
+        logger.warn(
+          `The configuration saved object exists so the configuration defined at the file [${configurationFileLocation}] will not be migrated. Skip.`,
         );
         return;
       }
