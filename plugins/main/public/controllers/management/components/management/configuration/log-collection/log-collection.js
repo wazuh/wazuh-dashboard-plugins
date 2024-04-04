@@ -20,6 +20,7 @@ import WzConfigurationLogCollectionCommands from './log-collection-commands';
 import WzConfigurationLogCollectionWindowsEvents from './log-collection-windowsevents';
 import WzConfigurationLogCollectionMacOSEvents from './log-collection-macosevents';
 import WzConfigurationLogCollectionSockets from './log-collection-sockets';
+import WzConfigurationLogCollectionJournald from './log-collection-journald';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString } from '../utils/utils';
 import {
@@ -28,6 +29,7 @@ import {
   LOCALFILE_WINDOWSEVENT_PROP,
   LOGCOLLECTOR_LOCALFILE_PROP,
   LOCALFILE_MACOSEVENT_PROP,
+  LOCALFILE_JOURNALDT_PROP,
 } from './types';
 
 class WzConfigurationLogCollection extends Component {
@@ -130,6 +132,17 @@ class WzConfigurationLogCollection extends Component {
         component: (
           <WzTabSelectorTab label='Sockets'>
             <WzConfigurationLogCollectionSockets
+              currentConfig={currentConfig}
+              agent={agent}
+            />
+          </WzTabSelectorTab>
+        ),
+      },
+      {
+        condition: true, // Will always render
+        component: (
+          <WzTabSelectorTab label='Journald'>
+            <WzConfigurationLogCollectionJournald
               currentConfig={currentConfig}
               agent={agent}
             />
