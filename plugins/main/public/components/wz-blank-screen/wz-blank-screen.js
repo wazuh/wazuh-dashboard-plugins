@@ -21,10 +21,11 @@ import {
 import { webDocumentationLink } from '../../../common/services/web_documentation';
 import { AppState } from '../../react-services/app-state';
 import { WzMisc } from '../../factories/misc';
-import { getAngularModule } from '../../kibana-services';
+import { getCore } from '../../kibana-services';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { overview } from '../../utils/applications';
 
 export class WzBlankScreen extends Component {
   constructor(props) {
@@ -32,10 +33,6 @@ export class WzBlankScreen extends Component {
     this.state = {
       errorToShow: null,
     };
-
-    // Get $location forom AngularJS
-    const $injector = getAngularModule().$injector;
-    this.$location = $injector.get('$location');
 
     // Create instance of WzMisc that stores the error
     this.wzMisc = new WzMisc();
@@ -73,7 +70,7 @@ export class WzBlankScreen extends Component {
    * This navigate to overview
    */
   goOverview() {
-    this.$location.path('/overview');
+    getCore().application.navigateToApp(overview.id);
   }
 
   render() {
