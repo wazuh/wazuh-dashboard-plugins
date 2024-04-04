@@ -26,6 +26,7 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { overview } from '../../utils/applications';
+import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export class WzBlankScreen extends Component {
   constructor(props) {
@@ -107,9 +108,16 @@ export class WzBlankScreen extends Component {
             </p>
             <EuiSpacer />
 
-            <EuiButton onClick={() => this.goOverview()} color='primary' fill>
-              Refresh
-            </EuiButton>
+            <RedirectAppLinks application={getCore().application}>
+              <EuiButton
+                href={getCore().application.getUrlForApp(overview.id)}
+                style={{ cursor: 'pointer' }}
+                color='primary'
+                fill
+              >
+                Go to {overview.title}
+              </EuiButton>
+            </RedirectAppLinks>
           </>
         }
       />
