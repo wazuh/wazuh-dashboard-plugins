@@ -35,7 +35,7 @@ export const getLastAlertsQuery = (
         range: {
           'rule.level': {
             gte: ruleLevelRange.minRuleLevel,
-            lte: ruleLevelRange.maxRuleLevel || 15,
+            lte: ruleLevelRange.maxRuleLevel,
           },
         },
       },

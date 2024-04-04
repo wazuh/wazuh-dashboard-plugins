@@ -7,7 +7,7 @@ import {
   EuiText,
 } from '@elastic/eui';
 import { getLast24HoursAlerts } from './last-alerts-service';
-import { UI_COLOR_AGENT_STATUS } from '../../../../../common/constants';
+import { UI_COLOR_STATUS } from '../../../../../common/constants';
 import { getCore } from '../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import {
@@ -22,7 +22,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
   const severityLabel = {
     low: {
       label: 'Low',
-      color: UI_COLOR_AGENT_STATUS.active,
+      color: UI_COLOR_STATUS.success,
       ruleLevelRange: {
         minRuleLevel: 0,
         maxRuleLevel: 6,
@@ -30,7 +30,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
     },
     medium: {
       label: 'Medium',
-      color: '#6092C0',
+      color: UI_COLOR_STATUS.info,
       ruleLevelRange: {
         minRuleLevel: 7,
         maxRuleLevel: 11,
@@ -38,7 +38,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
     },
     high: {
       label: 'High',
-      color: UI_COLOR_AGENT_STATUS.pending,
+      color: UI_COLOR_STATUS.warning,
       ruleLevelRange: {
         minRuleLevel: 12,
         maxRuleLevel: 14,
@@ -46,7 +46,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
     },
     critical: {
       label: 'Critical',
-      color: UI_COLOR_AGENT_STATUS.disconnected,
+      color: UI_COLOR_STATUS.danger,
       ruleLevelRange: {
         minRuleLevel: 15,
       },
