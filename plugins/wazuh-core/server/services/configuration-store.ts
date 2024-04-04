@@ -8,6 +8,7 @@ import fs from 'fs';
 import yml from 'js-yaml';
 import { createDataDirectoryIfNotExists } from './filesystem';
 import { webDocumentationLink } from '../../common/services/web_documentation';
+import { TPluginSettingWithKey } from '../../common/constants';
 
 interface IConfigurationStoreOptions {
   cache_seconds: number;
@@ -137,7 +138,7 @@ export class ConfigurationStore implements IConfigurationStore {
 #
 # Find more information about this on the LICENSE file.
 #
-${printSection('Wazuh app configuration file', { prefix: '# ', fill: '=' })}
+${printSection('App configuration file', { prefix: '# ', fill: '=' })}
 #
 # Please check the documentation for more information about configuration options:
 # ${webDocumentationLink('user-manual/wazuh-dashboard/config-file.html')}
@@ -145,7 +146,7 @@ ${printSection('Wazuh app configuration file', { prefix: '# ', fill: '=' })}
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-dashboard-plugins`;
 
-    const hostsConfiguration = `${printSection('Wazuh hosts', {
+    const hostsConfiguration = `${printSection('API connections', {
       prefix: '# ',
       fill: '-',
     })}
