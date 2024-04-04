@@ -78,8 +78,11 @@ export const Stats = withErrorBoundary(
     }
 
     render() {
+      const hasResults = this.agentStatus.some(
+        ({ status }) => this.props[status],
+      );
       return (
-        <EuiPage>
+        <>
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiCard betaBadgeLabel='Agents summary' title=''>
@@ -88,17 +91,20 @@ export const Stats = withErrorBoundary(
                   type='donut'
                   size={{ width: '100%', height: '150px' }}
                   showLegend
-                  data={this.agentStatus.map(
-                    ({ status, label, color, onClick }) => ({
-                      onClick,
-                      label,
-                      value:
-                        typeof this.props[status] !== 'undefined'
-                          ? this.props[status]
-                          : 0,
-                      color,
-                    }),
-                  )}
+                  data={
+                    hasResults &&
+                    this.agentStatus.map(
+                      ({ status, label, color, onClick }) => ({
+                        onClick,
+                        label,
+                        value:
+                          typeof this.props[status] !== 'undefined'
+                            ? this.props[status]
+                            : 0,
+                        color,
+                      }),
+                    )
+                  }
                   noDataTitle='No results'
                   noDataMessage='No results were found.'
                 />
@@ -106,7 +112,7 @@ export const Stats = withErrorBoundary(
             </EuiFlexItem>
             <EuiFlexItem>
               <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
-                <EuiFlexGroup className='vulnerabilites-summary-card'>
+                <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
                   <LastAlertsStat severity='critical' />
                   <LastAlertsStat severity='high' />
                   <LastAlertsStat severity='medium' />
@@ -115,7 +121,7 @@ export const Stats = withErrorBoundary(
               </EuiCard>
             </EuiFlexItem>
           </EuiFlexGroup>
-        </EuiPage>
+        </>
       );
     }
   },
