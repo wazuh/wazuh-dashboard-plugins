@@ -13,10 +13,10 @@ export class SettingsValidator {
         const result = fn(value);
         if (typeof result === 'string' && result.length > 0) {
           return result;
-        };
-      };
+        }
+      }
     };
-  };
+  }
 
   /**
    * Check the value is a string
@@ -24,8 +24,8 @@ export class SettingsValidator {
    * @returns
    */
   static isString(value: unknown): string | undefined {
-    return typeof value === 'string' ? undefined : "Value is not a string.";
-  };
+    return typeof value === 'string' ? undefined : 'Value is not a string.';
+  }
 
   /**
    * Check the string has no spaces
@@ -33,8 +33,8 @@ export class SettingsValidator {
    * @returns
    */
   static hasNoSpaces(value: string): string | undefined {
-    return /^\S*$/.test(value) ? undefined : "No whitespaces allowed.";
-  };
+    return /^\S*$/.test(value) ? undefined : 'No whitespaces allowed.';
+  }
 
   /**
    * Check the string has no empty
@@ -44,32 +44,37 @@ export class SettingsValidator {
   static isNotEmptyString(value: string): string | undefined {
     if (typeof value === 'string') {
       if (value.length === 0) {
-        return "Value can not be empty."
+        return 'Value can not be empty.';
       } else {
         return undefined;
       }
-    };
-  };
+    }
+  }
 
   /**
    * Check the number of string lines is limited
    * @param options
    * @returns
    */
-  static multipleLinesString(options: { minRows?: number, maxRows?: number, maxLength?: number } = {}) {
-    return function (value: number) {
+  static multipleLinesString(
+    options: { minRows?: number; maxRows?: number; maxLength?: number } = {},
+  ) {
+    return function (value: string) {
       const lines = value.split(/\r\n|\r|\n/).length;
-      if (typeof options.maxLength !== 'undefined' && value.split('\n').some(line => line.length > options.maxLength)) {
+      if (
+        typeof options.maxLength !== 'undefined' &&
+        value.split('\n').some(line => line.length > options.maxLength)
+      ) {
         return `The maximum length of a line is ${options.maxLength} characters.`;
-      };
+      }
       if (typeof options.minRows !== 'undefined' && lines < options.minRows) {
         return `The string should have more or ${options.minRows} line/s.`;
-      };
+      }
       if (typeof options.maxRows !== 'undefined' && lines > options.maxRows) {
         return `The string should have less or equal to ${options.maxRows} line/s.`;
-      };
-    }
-  };
+      }
+    };
+  }
 
   /**
    * Creates a function that checks the string does not contain some characters
@@ -78,11 +83,15 @@ export class SettingsValidator {
    */
   static hasNotInvalidCharacters(...invalidCharacters: string[]) {
     return function (value: string): string | undefined {
-      return invalidCharacters.some(invalidCharacter => value.includes(invalidCharacter))
-        ? `It can't contain invalid characters: ${invalidCharacters.join(', ')}.`
+      return invalidCharacters.some(invalidCharacter =>
+        value.includes(invalidCharacter),
+      )
+        ? `It can't contain invalid characters: ${invalidCharacters.join(
+            ', ',
+          )}.`
         : undefined;
     };
-  };
+  }
 
   /**
    * Creates a function that checks the string does not start with a substring
@@ -91,11 +100,13 @@ export class SettingsValidator {
    */
   static noStartsWithString(...invalidStartingCharacters: string[]) {
     return function (value: string): string | undefined {
-      return invalidStartingCharacters.some(invalidStartingCharacter => value.startsWith(invalidStartingCharacter))
+      return invalidStartingCharacters.some(invalidStartingCharacter =>
+        value.startsWith(invalidStartingCharacter),
+      )
         ? `It can't start with: ${invalidStartingCharacters.join(', ')}.`
         : undefined;
     };
-  };
+  }
 
   /**
    * Creates a function that checks the string is not equals to some values
@@ -108,7 +119,7 @@ export class SettingsValidator {
         ? `It can't be: ${invalidLiterals.join(', ')}.`
         : undefined;
     };
-  };
+  }
 
   /**
    * Check the value is a boolean
@@ -118,35 +129,43 @@ export class SettingsValidator {
   static isBoolean(value: string): string | undefined {
     return typeof value === 'boolean'
       ? undefined
-      : "It should be a boolean. Allowed values: true or false.";
-  };
+      : 'It should be a boolean. Allowed values: true or false.';
+  }
+
+  /**
+   * Check the value is a number
+   * @param value
+   * @returns
+   */
+  static isNumber(value: string): string | undefined {
+    return typeof value === 'number' ? undefined : 'Value is not a number.';
+  }
 
   /**
    * Check the value is a number between some optional limits
    * @param options
    * @returns
    */
-  static number(options: { min?: number, max?: number, integer?: boolean } = {}) {
+  static number(
+    options: { min?: number; max?: number; integer?: boolean } = {},
+  ) {
     return function (value: number) {
-      if (options.integer
-        && (
-          (typeof value === 'string' ? ['.', ','].some(character => value.includes(character)) : false)
-          || !Number.isInteger(Number(value))
-        )
-      ) {
-        return 'Number should be an integer.'
-      };
+      if (typeof value !== 'number') {
+        return 'Value is not a number.';
+      }
 
-      const valueNumber = typeof value === 'string' ? Number(value) : value;
+      if (options.integer && !Number.isInteger(Number(value))) {
+        return 'Number should be an integer.';
+      }
 
-      if (typeof options.min !== 'undefined' && valueNumber < options.min) {
+      if (typeof options.min !== 'undefined' && value < options.min) {
         return `Value should be greater or equal than ${options.min}.`;
-      };
-      if (typeof options.max !== 'undefined' && valueNumber > options.max) {
+      }
+      if (typeof options.max !== 'undefined' && value > options.max) {
         return `Value should be lower or equal than ${options.max}.`;
-      };
+      }
     };
-  };
+  }
 
   /**
    * Creates a function that checks if the value is a json
@@ -161,11 +180,11 @@ export class SettingsValidator {
         jsonObject = JSON.parse(value);
       } catch (error) {
         return "Value can't be parsed. There is some error.";
-      };
+      }
 
       return validateParsed ? validateParsed(jsonObject) : undefined;
     };
-  };
+  }
 
   /**
    * Creates a function that checks is the value is an array and optionally validates each element
@@ -177,24 +196,24 @@ export class SettingsValidator {
       // Check the JSON is an array
       if (!Array.isArray(value)) {
         return 'Value is not a valid list.';
-      };
+      }
 
       return validationElement
         ? value.reduce((accum, elementValue) => {
-          if (accum) {
+            if (accum) {
+              return accum;
+            }
+
+            const resultValidationElement = validationElement(elementValue);
+            if (resultValidationElement) {
+              return resultValidationElement;
+            }
+
             return accum;
-          };
-
-          const resultValidationElement = validationElement(elementValue);
-          if (resultValidationElement) {
-            return resultValidationElement;
-          };
-
-          return accum;
-        }, undefined)
+          }, undefined)
         : undefined;
     };
-  };
+  }
 
   /**
    * Creates a function that checks if the value is equal to list of values
@@ -203,33 +222,61 @@ export class SettingsValidator {
    */
   static literal(literals: unknown[]) {
     return function (value: any): string | undefined {
-      return literals.includes(value) ? undefined : `Invalid value. Allowed values: ${literals.map(String).join(', ')}.`;
+      return literals.includes(value)
+        ? undefined
+        : `Invalid value. Allowed values: ${literals.map(String).join(', ')}.`;
     };
-  };
+  }
 
   // FilePicker
-  static filePickerSupportedExtensions = (extensions: string[]) => (options: { name: string }) => {
-    if (typeof options === 'undefined' || typeof options.name === 'undefined') {
-      return;
-    }
-    if (!extensions.includes(path.extname(options.name))) {
-      return `File extension is invalid. Allowed file extensions: ${extensions.join(', ')}.`;
+  static filePickerSupportedExtensions =
+    (extensions: string[]) => (options: { name: string }) => {
+      if (
+        typeof options === 'undefined' ||
+        typeof options.name === 'undefined'
+      ) {
+        return;
+      }
+      if (!extensions.includes(path.extname(options.name))) {
+        return `File extension is invalid. Allowed file extensions: ${extensions.join(
+          ', ',
+        )}.`;
+      }
     };
-  };
 
   /**
    * filePickerFileSize
    * @param options
    */
-  static filePickerFileSize = (options: { maxBytes?: number, minBytes?: number, meaningfulUnit?: boolean }) => (value: { size: number }) => {
-    if (typeof value === 'undefined' || typeof value.size === 'undefined') {
-      return;
+  static filePickerFileSize =
+    (options: {
+      maxBytes?: number;
+      minBytes?: number;
+      meaningfulUnit?: boolean;
+    }) =>
+    (value: { size: number }) => {
+      if (typeof value === 'undefined' || typeof value.size === 'undefined') {
+        return;
+      }
+      if (
+        typeof options.minBytes !== 'undefined' &&
+        value.size <= options.minBytes
+      ) {
+        return `File size should be greater or equal than ${
+          options.meaningfulUnit
+            ? formatBytes(options.minBytes)
+            : `${options.minBytes} bytes`
+        }.`;
+      }
+      if (
+        typeof options.maxBytes !== 'undefined' &&
+        value.size >= options.maxBytes
+      ) {
+        return `File size should be lower or equal than ${
+          options.meaningfulUnit
+            ? formatBytes(options.maxBytes)
+            : `${options.maxBytes} bytes`
+        }.`;
+      }
     };
-    if (typeof options.minBytes !== 'undefined' && value.size <= options.minBytes) {
-      return `File size should be greater or equal than ${options.meaningfulUnit ? formatBytes(options.minBytes) : `${options.minBytes} bytes`}.`;
-    };
-    if (typeof options.maxBytes !== 'undefined' && value.size >= options.maxBytes) {
-      return `File size should be lower or equal than ${options.meaningfulUnit ? formatBytes(options.maxBytes) : `${options.maxBytes} bytes`}.`;
-    };
-  };
-};
+}

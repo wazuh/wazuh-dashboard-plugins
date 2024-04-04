@@ -911,17 +911,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         return value;
       }
     },
-    validateUIForm: SettingsValidator.json(
-      SettingsValidator.compose(
-        SettingsValidator.array(
-          SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-            SettingsValidator.hasNoSpaces,
-          ),
-        ),
-      ),
-    ),
+    validateUIForm: function (value) {
+      return SettingsValidator.json(this.validate)(value);
+    },
     validate: SettingsValidator.compose(
       SettingsValidator.array(
         SettingsValidator.compose(
@@ -1042,7 +1034,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate(
+        this.uiFormTransformInputValueToConfigurationValue(value),
+      );
     },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
@@ -1077,7 +1071,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate(
+        this.uiFormTransformInputValueToConfigurationValue(value),
+      );
     },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
@@ -1098,13 +1094,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromSettings: true,
     requiresRestartingPluginPlatform: true,
     // Workaround: this need to be defined in the frontend side and backend side because an optimization error in the frontend side related to some module can not be loaded.
-    // validate: function (value: string) {
-    //   return validateNodeCronInterval(value)
-    //     ? undefined
-    //     : 'Interval is not valid.';
+    // validateUIForm: function (value) {
     // },
-    // validate: function (schema) {
-    //   return schema.string({ validate: this.validateUIForm });
+    // validate: function (value) {
     // },
   },
   'cron.statistics.status': {
@@ -1329,10 +1321,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return this.validate(value);
     },
     validate: function (value) {
-      return SettingsValidator.multipleLinesString({
-        maxRows: this.options?.maxRows,
-        maxLength: this.options?.maxLength,
-      })(value);
+      return SettingsValidator.compose(
+        SettingsValidator.isString,
+        SettingsValidator.multipleLinesString({
+          maxRows: this.options?.maxRows,
+          maxLength: this.options?.maxLength,
+        }),
+      )(value);
     },
   },
   'customization.reports.header': {
@@ -1353,10 +1348,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return this.validate(value);
     },
     validate: function (value) {
-      return SettingsValidator.multipleLinesString({
-        maxRows: this.options?.maxRows,
-        maxLength: this.options?.maxLength,
-      })(value);
+      return SettingsValidator.compose(
+        SettingsValidator.isString,
+        SettingsValidator.multipleLinesString({
+          maxRows: this.options?.maxRows,
+          maxLength: this.options?.maxLength,
+        }),
+      )(value);
     },
   },
   'enrollment.dns': {
@@ -1393,7 +1391,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     validateUIForm: function (value) {
       return this.validate(value);
     },
-    validate: SettingsValidator.isNotEmptyString,
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+    ),
   },
   hideManagerAlerts: {
     title: 'Hide manager alerts',
@@ -1453,7 +1454,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           validateUIForm: function (value) {
             return this.validate(value);
           },
-          validate: SettingsValidator.isNotEmptyString,
+          validate: SettingsValidator.compose(
+            SettingsValidator.isString,
+            SettingsValidator.isNotEmptyString,
+          ),
         },
         url: {
           title: 'URL',
@@ -1464,7 +1468,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           validateUIForm: function (value) {
             return this.validate(value);
           },
-          validate: SettingsValidator.isNotEmptyString,
+          validate: SettingsValidator.compose(
+            SettingsValidator.isString,
+            SettingsValidator.isNotEmptyString,
+          ),
         },
         port: {
           title: 'Port',
@@ -1490,7 +1497,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
             return Number(value);
           },
           validateUIForm: function (value) {
-            return this.validate(value);
+            return this.validate(
+              this.uiFormTransformInputValueToConfigurationValue(value),
+            );
           },
           validate: function (value) {
             return SettingsValidator.number(this.options.number)(value);
@@ -1505,7 +1514,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           validateUIForm: function (value) {
             return this.validate(value);
           },
-          validate: SettingsValidator.isNotEmptyString,
+          validate: SettingsValidator.compose(
+            SettingsValidator.isString,
+            SettingsValidator.isNotEmptyString,
+          ),
         },
         password: {
           title: 'Password',
@@ -1516,7 +1528,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
           validateUIForm: function (value) {
             return this.validate(value);
           },
-          validate: SettingsValidator.isNotEmptyString,
+          validate: SettingsValidator.compose(
+            SettingsValidator.isString,
+            SettingsValidator.isNotEmptyString,
+          ),
         },
         run_as: {
           title: 'Run as',
@@ -1587,30 +1602,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       }
     },
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validateUIForm: SettingsValidator.json(
-      SettingsValidator.compose(
-        SettingsValidator.array(
-          SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-            SettingsValidator.hasNoSpaces,
-            SettingsValidator.noLiteralString('.', '..'),
-            SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-            SettingsValidator.hasNotInvalidCharacters(
-              '\\',
-              '/',
-              '?',
-              '"',
-              '<',
-              '>',
-              '|',
-              ',',
-              '#',
-            ),
-          ),
-        ),
-      ),
-    ),
+    validateUIForm: function (value) {
+      return SettingsValidator.json(this.validate)(value);
+    },
     validate: SettingsValidator.compose(
       SettingsValidator.array(
         SettingsValidator.compose(
@@ -1730,7 +1724,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate(
+        this.uiFormTransformInputValueToConfigurationValue(value),
+      );
     },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
@@ -1840,7 +1836,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate(
+        this.uiFormTransformInputValueToConfigurationValue(value),
+      );
     },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
@@ -1863,6 +1861,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return this.validate(value);
     },
     validate: SettingsValidator.compose(
+      SettingsValidator.isString,
       SettingsValidator.isNotEmptyString,
       SettingsValidator.hasNoSpaces,
       SettingsValidator.noLiteralString('.', '..'),
@@ -1909,7 +1908,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate(
+        this.uiFormTransformInputValueToConfigurationValue(value),
+      );
     },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
@@ -1944,7 +1945,9 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return Number(value);
     },
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate(
+        this.uiFormTransformInputValueToConfigurationValue(value),
+      );
     },
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
@@ -1967,6 +1970,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       return this.validate(value);
     },
     validate: SettingsValidator.compose(
+      SettingsValidator.isString,
       SettingsValidator.isNotEmptyString,
       SettingsValidator.hasNoSpaces,
       SettingsValidator.noLiteralString('.', '..'),
