@@ -3,345 +3,290 @@
 exports[`Stats component renders correctly to match the snapshot 1`] = `
 <div>
   <div
-    class="euiPage euiPage--paddingMedium euiPage--grow"
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
   >
     <div
-      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+      class="euiFlexItem euiFlexItem--flexGrowZero"
     >
       <div
-        class="euiFlexItem euiFlexItem--flexGrowZero"
+        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge"
       >
         <div
-          class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge"
+          class="euiCard__content"
         >
+          <span
+            class="euiTitle euiTitle--small euiCard__title"
+            id="htmlIdTitle"
+          />
           <div
-            class="euiCard__content"
+            class="euiCard__children"
           >
-            <span
-              class="euiTitle euiTitle--small euiCard__title"
-              id="htmlIdTitle"
-            />
             <div
-              class="euiCard__children"
+              style="width: 100%; height: 150px;"
             >
               <div
-                style="width: 100%; height: 150px;"
+                class="euiEmptyPrompt"
               >
+                <svg
+                  aria-hidden="true"
+                  class="euiIcon euiIcon--xxLarge euiIcon--subdued euiIcon-isLoading"
+                  focusable="false"
+                  height="16"
+                  role="img"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                />
                 <div
-                  class="euiFlexGroup euiFlexGroup--directionRow"
-                  style="height: 100%;"
+                  class="euiSpacer euiSpacer--m"
+                />
+                <h4
+                  class="euiTitle euiTitle--medium"
+                >
+                  No results
+                </h4>
+                <span
+                  class="euiTextColor euiTextColor--subdued"
                 >
                   <div
-                    class="euiFlexItem"
-                    style="align-items: flex-end; padding-right: 1em;"
-                  >
-                    <svg
-                      height="0"
-                      width="0"
-                    >
-                      <g
-                        transform="translate(0,0)"
-                      />
-                    </svg>
-                  </div>
+                    class="euiSpacer euiSpacer--m"
+                  />
                   <div
-                    class="euiFlexItem"
-                    style="height: 100%; padding-left: 1em;"
+                    class="euiText euiText--medium"
                   >
-                    <ul
-                      class="euiListGroup euiListGroup-flush euiListGroup--gutterSmall euiListGroup-maxWidthDefault chart-legend"
-                    >
-                      <li
-                        class="euiListGroupItem euiListGroupItem--medium euiListGroupItem--text euiListGroupItem-isClickable"
-                      >
-                        <button
-                          class="euiListGroupItem__button"
-                          type="button"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            class="euiIcon euiIcon--large euiIcon--customColor euiIcon-isLoading euiListGroupItem__icon"
-                            focusable="false"
-                            height="16"
-                            role="img"
-                            style="color: rgb(0, 120, 113);"
-                            viewBox="0 0 16 16"
-                            width="16"
-                            xmlns="http://www.w3.org/2000/svg"
-                          />
-                          <span
-                            class="euiListGroupItem__label"
-                          >
-                            <div
-                              style="font-size: 0.875rem;"
-                            >
-                              Active (0)
-                            </div>
-                          </span>
-                        </button>
-                      </li>
-                      <li
-                        class="euiListGroupItem euiListGroupItem--medium euiListGroupItem--text euiListGroupItem-isClickable"
-                      >
-                        <button
-                          class="euiListGroupItem__button"
-                          type="button"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            class="euiIcon euiIcon--large euiIcon--customColor euiIcon-isLoading euiListGroupItem__icon"
-                            focusable="false"
-                            height="16"
-                            role="img"
-                            style="color: rgb(189, 39, 30);"
-                            viewBox="0 0 16 16"
-                            width="16"
-                            xmlns="http://www.w3.org/2000/svg"
-                          />
-                          <span
-                            class="euiListGroupItem__label"
-                          >
-                            <div
-                              style="font-size: 0.875rem;"
-                            >
-                              Disconnected (0)
-                            </div>
-                          </span>
-                        </button>
-                      </li>
-                    </ul>
+                    No results were found.
                   </div>
-                </div>
+                </span>
               </div>
             </div>
           </div>
-          <span
-            class="euiCard__betaBadgeWrapper"
-          >
-            <span
-              class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
-              id="htmlIdBetaBadge"
-              title="Agents summary"
-            >
-              Agents summary
-            </span>
-          </span>
         </div>
+        <span
+          class="euiCard__betaBadgeWrapper"
+        >
+          <span
+            class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
+            id="htmlIdBetaBadge"
+            title="Agents summary"
+          >
+            Agents summary
+          </span>
+        </span>
       </div>
+    </div>
+    <div
+      class="euiFlexItem"
+    >
       <div
-        class="euiFlexItem"
+        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge"
       >
         <div
-          class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge"
+          class="euiCard__content"
         >
+          <span
+            class="euiTitle euiTitle--small euiCard__title"
+            id="htmlIdTitle"
+          />
           <div
-            class="euiCard__content"
+            class="euiCard__children"
           >
-            <span
-              class="euiTitle euiTitle--small euiCard__title"
-              id="htmlIdTitle"
-            />
             <div
-              class="euiCard__children"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap vulnerabilites-summary-card"
             >
               <div
-                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive vulnerabilites-summary-card"
+                class="euiFlexItem"
               >
                 <div
-                  class="euiFlexItem"
+                  class="osdRedirectCrossAppLinks"
                 >
                   <div
-                    class="osdRedirectCrossAppLinks"
+                    class="euiStat euiStat--centerAligned"
                   >
                     <div
-                      class="euiStat euiStat--centerAligned"
+                      class="euiText euiText--small euiStat__description"
                     >
-                      <div
-                        class="euiText euiText--small euiStat__description"
-                      >
-                        <h2
-                          aria-hidden="true"
-                        >
-                          Critical severity
-                        </h2>
-                      </div>
-                      <p
+                      <h2
                         aria-hidden="true"
-                        class="euiTitle euiTitle--large euiStat__title"
-                        style="color: rgb(189, 39, 30);"
                       >
-                        <span
-                          class="euiToolTipAnchor"
-                        >
-                          <a
-                            class="euiLink euiLink--primary statWithLink"
-                            href=""
-                            rel="noreferrer"
-                            style="font-weight: normal; color: rgb(189, 39, 30);"
-                          >
-                            -
-                          </a>
-                        </span>
-                      </p>
+                        Critical severity
+                      </h2>
                     </div>
-                    <div
-                      class="euiText euiText--small"
-                      css="margin-top: 0.7vh"
+                    <p
+                      aria-hidden="true"
+                      class="euiTitle euiTitle--large euiStat__title"
+                      style="color: rgb(189, 39, 30);"
                     >
-                      Rule level 15 or higher
-                    </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <a
+                          class="euiLink euiLink--primary statWithLink"
+                          href=""
+                          rel="noreferrer"
+                          style="font-weight: normal; color: rgb(189, 39, 30);"
+                        >
+                          -
+                        </a>
+                      </span>
+                    </p>
+                  </div>
+                  <div
+                    class="euiText euiText--small"
+                    css="margin-top: 0.7vh"
+                  >
+                    Rule level 15 or higher
                   </div>
                 </div>
+              </div>
+              <div
+                class="euiFlexItem"
+              >
                 <div
-                  class="euiFlexItem"
+                  class="osdRedirectCrossAppLinks"
                 >
                   <div
-                    class="osdRedirectCrossAppLinks"
+                    class="euiStat euiStat--centerAligned"
                   >
                     <div
-                      class="euiStat euiStat--centerAligned"
+                      class="euiText euiText--small euiStat__description"
                     >
-                      <div
-                        class="euiText euiText--small euiStat__description"
-                      >
-                        <h2
-                          aria-hidden="true"
-                        >
-                          High severity
-                        </h2>
-                      </div>
-                      <p
+                      <h2
                         aria-hidden="true"
-                        class="euiTitle euiTitle--large euiStat__title"
-                        style="color: rgb(254, 197, 20);"
                       >
-                        <span
-                          class="euiToolTipAnchor"
-                        >
-                          <a
-                            class="euiLink euiLink--primary statWithLink"
-                            href=""
-                            rel="noreferrer"
-                            style="font-weight: normal; color: rgb(254, 197, 20);"
-                          >
-                            -
-                          </a>
-                        </span>
-                      </p>
+                        High severity
+                      </h2>
                     </div>
-                    <div
-                      class="euiText euiText--small"
-                      css="margin-top: 0.7vh"
+                    <p
+                      aria-hidden="true"
+                      class="euiTitle euiTitle--large euiStat__title"
+                      style="color: rgb(254, 197, 20);"
                     >
-                      Rule level 12 to 14
-                    </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <a
+                          class="euiLink euiLink--primary statWithLink"
+                          href=""
+                          rel="noreferrer"
+                          style="font-weight: normal; color: rgb(254, 197, 20);"
+                        >
+                          -
+                        </a>
+                      </span>
+                    </p>
+                  </div>
+                  <div
+                    class="euiText euiText--small"
+                    css="margin-top: 0.7vh"
+                  >
+                    Rule level 12 to 14
                   </div>
                 </div>
+              </div>
+              <div
+                class="euiFlexItem"
+              >
                 <div
-                  class="euiFlexItem"
+                  class="osdRedirectCrossAppLinks"
                 >
                   <div
-                    class="osdRedirectCrossAppLinks"
+                    class="euiStat euiStat--centerAligned"
                   >
                     <div
-                      class="euiStat euiStat--centerAligned"
+                      class="euiText euiText--small euiStat__description"
                     >
-                      <div
-                        class="euiText euiText--small euiStat__description"
-                      >
-                        <h2
-                          aria-hidden="true"
-                        >
-                          Medium severity
-                        </h2>
-                      </div>
-                      <p
+                      <h2
                         aria-hidden="true"
-                        class="euiTitle euiTitle--large euiStat__title"
-                        style="color: rgb(96, 146, 192);"
                       >
-                        <span
-                          class="euiToolTipAnchor"
-                        >
-                          <a
-                            class="euiLink euiLink--primary statWithLink"
-                            href=""
-                            rel="noreferrer"
-                            style="font-weight: normal; color: rgb(96, 146, 192);"
-                          >
-                            -
-                          </a>
-                        </span>
-                      </p>
+                        Medium severity
+                      </h2>
                     </div>
-                    <div
-                      class="euiText euiText--small"
-                      css="margin-top: 0.7vh"
+                    <p
+                      aria-hidden="true"
+                      class="euiTitle euiTitle--large euiStat__title"
+                      style="color: rgb(96, 146, 192);"
                     >
-                      Rule level 7 to 11
-                    </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <a
+                          class="euiLink euiLink--primary statWithLink"
+                          href=""
+                          rel="noreferrer"
+                          style="font-weight: normal; color: rgb(96, 146, 192);"
+                        >
+                          -
+                        </a>
+                      </span>
+                    </p>
+                  </div>
+                  <div
+                    class="euiText euiText--small"
+                    css="margin-top: 0.7vh"
+                  >
+                    Rule level 7 to 11
                   </div>
                 </div>
+              </div>
+              <div
+                class="euiFlexItem"
+              >
                 <div
-                  class="euiFlexItem"
+                  class="osdRedirectCrossAppLinks"
                 >
                   <div
-                    class="osdRedirectCrossAppLinks"
+                    class="euiStat euiStat--centerAligned"
                   >
                     <div
-                      class="euiStat euiStat--centerAligned"
+                      class="euiText euiText--small euiStat__description"
                     >
-                      <div
-                        class="euiText euiText--small euiStat__description"
-                      >
-                        <h2
-                          aria-hidden="true"
-                        >
-                          Low severity
-                        </h2>
-                      </div>
-                      <p
+                      <h2
                         aria-hidden="true"
-                        class="euiTitle euiTitle--large euiStat__title"
-                        style="color: rgb(0, 120, 113);"
                       >
-                        <span
-                          class="euiToolTipAnchor"
-                        >
-                          <a
-                            class="euiLink euiLink--primary statWithLink"
-                            href=""
-                            rel="noreferrer"
-                            style="font-weight: normal; color: rgb(0, 120, 113);"
-                          >
-                            -
-                          </a>
-                        </span>
-                      </p>
+                        Low severity
+                      </h2>
                     </div>
-                    <div
-                      class="euiText euiText--small"
-                      css="margin-top: 0.7vh"
+                    <p
+                      aria-hidden="true"
+                      class="euiTitle euiTitle--large euiStat__title"
+                      style="color: rgb(0, 120, 113);"
                     >
-                      Rule level 0 to 6
-                    </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <a
+                          class="euiLink euiLink--primary statWithLink"
+                          href=""
+                          rel="noreferrer"
+                          style="font-weight: normal; color: rgb(0, 120, 113);"
+                        >
+                          -
+                        </a>
+                      </span>
+                    </p>
+                  </div>
+                  <div
+                    class="euiText euiText--small"
+                    css="margin-top: 0.7vh"
+                  >
+                    Rule level 0 to 6
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <span
-            class="euiCard__betaBadgeWrapper"
-          >
-            <span
-              class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
-              id="htmlIdBetaBadge"
-              title="Last 24 hours alerts"
-            >
-              Last 24 hours alerts
-            </span>
-          </span>
         </div>
+        <span
+          class="euiCard__betaBadgeWrapper"
+        >
+          <span
+            class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
+            id="htmlIdBetaBadge"
+            title="Last 24 hours alerts"
+          >
+            Last 24 hours alerts
+          </span>
+        </span>
       </div>
     </div>
   </div>
