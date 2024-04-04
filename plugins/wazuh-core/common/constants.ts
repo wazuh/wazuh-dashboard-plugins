@@ -1372,8 +1372,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromSettings: true,
     validateUIForm: function (value) {
       return this.validate(value);
-    }, // TODO: replace by the validator of Deploy new agent
-    validate: SettingsValidator.hasNoSpaces,
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
+    ),
   },
   'enrollment.password': {
     title: 'Enrollment password',
