@@ -45,7 +45,6 @@ type tUseDataSourceNotLoadedReturns = {
 
 export function useDataSource<T extends tParsedIndexPattern, K extends PatternDataSource>(props: tUseDataSourceProps<T, K>): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
     const { 
-        filterManager,
         filters: defaultFilters = [],
         DataSource: DataSourceConstructor,
         repository,

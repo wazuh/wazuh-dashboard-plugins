@@ -93,6 +93,7 @@ const DashboardVulsComponent: React.FC = () => {
                   showDatePicker={false}
                   showQueryInput={true}
                   showQueryBar={true}
+                  showSaveQuery={true}
                 />
               </div>
           }

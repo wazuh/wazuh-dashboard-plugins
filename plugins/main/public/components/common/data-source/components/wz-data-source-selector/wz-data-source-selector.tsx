@@ -29,9 +29,8 @@ type tWzDataSourceSelector<T extends tParsedIndexPattern, K extends tDataSource>
 
 const WzDataSourceSelector = (props: tWzDataSourceSelector<tParsedIndexPattern, PatternDataSource>) => {
     const { onChange, name = 'data source', dataSourceSelector: defaultDataSourceSelector } = props;
-    const [dataSourceList, setDataSourceList] = useState<tDataSource[] | []>([]);
+    const [dataSourceList, setDataSourceList] = useState<tDataSource[]>([]);
     const [selectedPattern, setSelectedPattern] = useState<tDataSource>();
-    const [isLoading, setIsLoading] = useState(false);
     const [dataSourceSelector, setDataSourceSelector] = useState<tDataSourceSelector<PatternDataSource> | undefined>(defaultDataSourceSelector);
 
     useEffect(() => {
@@ -41,7 +40,6 @@ const WzDataSourceSelector = (props: tWzDataSourceSelector<tParsedIndexPattern, 
     async function init() {
         let selector;
         let dataSources;
-        setIsLoading(true);
         if(!dataSourceSelector){
             const factory = new PatternDataSourceFactory();
             const repository = new AlertsDataSourceRepository();
@@ -53,7 +51,6 @@ const WzDataSourceSelector = (props: tWzDataSourceSelector<tParsedIndexPattern, 
         dataSources = await selector.getAllDataSources();
         setSelectedPattern(defaultIndexPattern);
         setDataSourceList(dataSources);
-        setIsLoading(false);
     }
 
     async function selectDataSource(e) {

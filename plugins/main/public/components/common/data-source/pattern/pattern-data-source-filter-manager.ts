@@ -1,10 +1,11 @@
 import store from '../../../../redux/store';
 import { AppState } from '../../../../react-services/app-state';
-import { FilterManager } from '../../../../../../../src/plugins/data/public';
 import { getDataPlugin } from '../../../../kibana-services';
 import { FilterHandler } from '../../../../utils/filter-handler';
 import { tDataSourceFilterManager, tFilter, tSearchParams, tDataSource, tFilterManager } from '../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT, DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER, AUTHORIZED_AGENTS } from '../../../../../common/constants';
+const MANAGER_AGENT_ID = '000';
+const AGENT_ID_KEY = 'agent.id';
 
 /**
  * Get the filter that excludes the data related to Wazuh servers
@@ -16,14 +17,14 @@ export function getFilterExcludeManager(indexPatternTitle: string) {
     meta: {
       alias: null,
       disabled: false,
-      key: 'agent.id',
+      key: AGENT_ID_KEY,
       negate: true,
-      params: { query: '000' },
+      params: { query: MANAGER_AGENT_ID },
       type: 'phrase',
       index: indexPatternTitle,
       controlledBy: DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
     },
-    query: { match_phrase: { 'agent.id': '000' } },
+    query: { match_phrase: { [AGENT_ID_KEY]: MANAGER_AGENT_ID } },
     $state: { store: 'appState' },
   };
 }
@@ -38,7 +39,7 @@ export function getFilterAllowedAgents(
   agentsIds: string[],
   indexPatternTitle: string,
 ) {
-  const field = 'agent.id';
+  const field = AGENT_ID_KEY;
   return {
     meta: {
       index: indexPatternTitle,
@@ -262,7 +263,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
         meta: {
           alias: null,
           disabled: false,
-          key: 'agent.id',
+          key: AGENT_ID_KEY,
           negate: false,
           params: { query: agentId || agentValueUrl },
           type: 'phrase',
@@ -271,8 +272,8 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
         },
         query: {
           match: {
-            'agent.id': {
-              query: agentId,
+            [AGENT_ID_KEY]: {
+              query: agentId || agentValueUrl,
               type: 'phrase',
             },
           },

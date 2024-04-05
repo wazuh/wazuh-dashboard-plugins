@@ -22,8 +22,8 @@ import {
 import { SearchResponse } from '../../../../../../src/core/server';
 import { useDocViewer } from '../doc-viewer';
 import DocViewer from '../doc-viewer/doc-viewer';
-import { DiscoverNoResults } from '../../overview/vulnerabilities/common/components/no_results';
-import { LoadingSpinner } from '../../overview/vulnerabilities/common/components/loading_spinner';
+import { DiscoverNoResults } from '../no-results/no-results';
+import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../data-grid';
 import {
   ErrorHandler,
@@ -253,7 +253,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                         <HitsCounter
                           hits={results?.hits?.total}
                           showResetButton={false}
-                          onResetQuery={() => {}}
                           tooltip={
                             results?.hits?.total &&
                             results?.hits?.total > MAX_ENTRIES_PER_QUERY

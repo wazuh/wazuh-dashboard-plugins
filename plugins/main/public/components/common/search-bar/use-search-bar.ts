@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useLayoutEffect } from 'react';
 import {
   SearchBarProps,
   TimeRange,
@@ -61,7 +61,7 @@ const useSearchBarConfiguration = (
     }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setTimeout(() => {
       // this is a workaround to hide the close button on fixed filters via vanilla js
       hideRemoveFilter();

@@ -1,15 +1,12 @@
 import { useDataSource } from './use-data-source';
 import { renderHook } from '@testing-library/react-hooks';
 import { 
-    tDataSource, 
     tDataSourceRepository,
     tFilter, 
-    tSearchParams, 
     PatternDataSource, 
     tParsedIndexPattern 
 } from '../index';
 import { IndexPatternsService, IndexPattern } from '../../../../../../../src/plugins/data/common';
-import { getDataPlugin } from '../../../../kibana-services';
 
 jest.mock('../../../../kibana-services', () => ({
     ...(jest.requireActual('../../../../kibana-services') as object),

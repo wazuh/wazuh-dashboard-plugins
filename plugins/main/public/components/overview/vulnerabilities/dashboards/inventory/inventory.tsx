@@ -184,6 +184,7 @@ const InventoryVulsComponent = () => {
                   showDatePicker={false}
                   showQueryInput={true}
                   showQueryBar={true}
+                  showSaveQuery={true}
                 />
               </div>
             )}
@@ -200,7 +201,6 @@ const InventoryVulsComponent = () => {
                       <HitsCounter
                         hits={results?.hits?.total}
                         showResetButton={false}
-                        onResetQuery={() => { }}
                         tooltip={
                           results?.hits?.total &&
                             results?.hits?.total > MAX_ENTRIES_PER_QUERY

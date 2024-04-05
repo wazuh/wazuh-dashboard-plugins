@@ -87,19 +87,19 @@ export class PatternDataSourceRepository implements tDataSourceRepository<tParse
         };
     }
     
-    setDefault(dataSource: tParsedIndexPattern): Promise<void> {
+    setDefault(dataSource: tParsedIndexPattern): void {
         if(!dataSource){
             throw new Error('Index pattern is required');
         }
         AppState.setCurrentPattern(dataSource.id);
-        return Promise.resolve();
+        return;
     }
-    getDefault(): Promise<tParsedIndexPattern> | tParsedIndexPattern | null {
+    async getDefault(): Promise<tParsedIndexPattern | null> {
         const currentPattern = AppState.getCurrentPattern();
         if(!currentPattern){
-            return null;
+            return Promise.resolve(null);
         }
-        return this.get(currentPattern);
+        return await this.get(currentPattern);
     }
 
 }
