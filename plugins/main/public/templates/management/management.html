@@ -36,34 +36,11 @@
     ng-if="mctrl.tab === 'monitoring'"
     style="padding: 16px"
   >
-    <!-- Cluster disabled or not running -->
-    <div ng-if="!authorized">
-      <react-component
-        name="WzEmptyPromptNoPermissions"
-        props="{permissions}"
-      ></react-component>
-    </div>
-
-    <!-- Cluster disabled or not running -->
-    <div ng-if="!isClusterEnabled || !isClusterRunning">
-      <react-component
-        name="ClusterDisabled"
-        props="{enabled: isClusterEnabled, running: isClusterRunning}"
-      ></react-component>
-    </div>
-
     <!-- Cluster enabled -->
     <div
       ng-show="isClusterEnabled && isClusterRunning && authorized"
       class="monitoring-discover"
     >
-      <div ng-show="loading" style="padding: 16px">
-        <react-component
-          name="EuiProgress"
-          props="{size: 'xs', color: 'primary'}"
-        ></react-component>
-      </div>
-
       <!-- Discover search bar section -->
       <kbn-dis
         class="hide-filter-control"
@@ -537,7 +514,7 @@
     </div>
     <!-- end nodes-detail -->
   </div>
-
+  <react-component name="Cluster"></react-component>
   <!-- end monitoring -->
   <!-- statistics -->
   <div ng-if="mctrl.tab === 'statistics'">

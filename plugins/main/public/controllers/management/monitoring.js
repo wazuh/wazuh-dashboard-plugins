@@ -232,17 +232,6 @@ export function ClusterController(
     }
   };
 
-  const clusterStatus = async () => {
-    try {
-      const status = await WzRequest.apiReq('GET', '/cluster/status', {});
-      $scope.authorized = true;
-      return status;
-    } catch (error) {
-      if (error === '3013 - Permission denied: Resource type: *:*')
-        $scope.authorized = false;
-    }
-  };
-
   /**
    * This set some required settings at init
    */
@@ -252,19 +241,6 @@ export function ClusterController(
       discoverPendingUpdates.removeAll();
       rawVisualizations.removeAll();
       loadedVisualizations.removeAll();
-      const status = await clusterStatus();
-      if (!status) {
-        $scope.permissions = [{ action: 'cluster:status', resource: '*:*:*' }];
-        $scope.loading = false;
-        $scope.$applyAsync();
-        return;
-      }
-      $scope.status = status.data.data.running;
-      if ($scope.status === 'no') {
-        $scope.isClusterRunning = false;
-        $scope.loading = false;
-        return;
-      }
 
       const data = await Promise.all([
         WzRequest.apiReq('GET', '/cluster/nodes', {}),

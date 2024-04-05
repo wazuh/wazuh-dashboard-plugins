@@ -20,13 +20,13 @@ body,
 button:not(.fa):not(.fa-times),
 textarea,
 input,
-select{
+select {
   //font-size: 14px;
 }
 
 .wz-headline-title:not(.wz-dev-title) {
-  padding: 8px!important;
-  justify-content: start!important;
+  padding: 8px !important;
+  justify-content: start !important;
   font-size: 12px;
 }
 
@@ -145,7 +145,7 @@ select{
 /* Class for linkable text elements */
 .wz-text-link {
   cursor: pointer !important;
-  color: #006bb4 !important;
+  color: #077774 !important;
 
   &:hover {
     text-decoration: underline !important;
@@ -154,7 +154,7 @@ select{
 
 .wz-text-link-add {
   cursor: pointer !important;
-  color: #006bb4 !important;
+  color: #077774 !important;
 
   &:hover {
     text-decoration: none !important;
