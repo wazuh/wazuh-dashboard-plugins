@@ -94,14 +94,9 @@ export class WazuhCorePlugin
 
     this.services.configuration.setup();
 
-    this.services.updateRegistry = new UpdateRegistry(
-      this.logger.get('update-registry'),
-    );
-
     this.services.manageHosts = new ManageHosts(
       this.logger.get('manage-hosts'),
       this.services.configuration,
-      this.services.updateRegistry,
     );
 
     this.services.serverAPIClient = new ServerAPIClient(
@@ -145,6 +140,7 @@ export class WazuhCorePlugin
     setCore(core);
 
     await this.services.configuration.start();
+    await this.services.manageHosts.start();
 
     return {
       ...this.services,

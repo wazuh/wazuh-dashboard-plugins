@@ -278,7 +278,7 @@ export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © 2023 Wazuh, Inc.';
 export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 
 // Plugin platform
-export const PLUGIN_PLATFORM_NAME = 'Wazuh dashboard';
+export const PLUGIN_PLATFORM_NAME = 'dashboard';
 export const PLUGIN_PLATFORM_INSTALLATION_USER = 'wazuh-dashboard';
 export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'wazuh-dashboard';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_UPGRADE_PLATFORM =
@@ -296,7 +296,7 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
 };
 
 // Plugin app
-export const PLUGIN_APP_NAME = 'Wazuh dashboard';
+export const PLUGIN_APP_NAME = 'Dashboard';
 
 // UI
 export const API_NAME_AGENT_STATUS = {
@@ -370,7 +370,7 @@ export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
 export const ELASTIC_NAME = 'elastic';
 
 // Default Wazuh indexer name
-export const WAZUH_INDEXER_NAME = 'Wazuh indexer';
+export const WAZUH_INDEXER_NAME = 'indexer';
 
 // Not timeFieldName on index pattern
 export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =

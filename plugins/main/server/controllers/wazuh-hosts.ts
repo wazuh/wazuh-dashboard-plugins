@@ -16,7 +16,6 @@ import {
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
 import { ErrorResponse } from '../lib/error-response';
-import { routeDecoratorProtectedAdministrator } from './decorators';
 
 export class WazuhHostsCtrl {
   constructor() {}
@@ -43,73 +42,6 @@ export class WazuhHostsCtrl {
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 2001, 500, response);
-    }
-  }
-
-  /**
-   * This update an API hostname
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * Status response or ErrorResponse
-   */
-  async updateClusterInfo(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const { id } = request.params;
-      const { cluster_info } = request.body;
-      await context.wazuh_core.updateRegistry.updateClusterInfo(
-        id,
-        cluster_info,
-      );
-      context.wazuh.logger.info(`Server API host entry ${id} updated`);
-      return response.ok({
-        body: { statusCode: 200, message: 'ok' },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(
-        `Could not update data in wazuh-registry.json due to ${
-          error.message || error
-        }`,
-        2012,
-        500,
-        response,
-      );
-    }
-  }
-
-  /**
-   * Remove the orphan host entries in the registry
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   */
-  async removeOrphanEntries(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const { entries } = request.body;
-      context.wazuh.logger.debug('Cleaning registry file');
-      await context.wazuh_core.updateRegistry.removeOrphanEntries(entries);
-      return response.ok({
-        body: { statusCode: 200, message: 'ok' },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(
-        `Could not clean entries in the wazuh-registry.json due to ${
-          error.message || error
-        }`,
-        2013,
-        500,
-        response,
-      );
     }
   }
 }

@@ -47,7 +47,7 @@ import {
   DataSourceSelector,
   PatternDataSource,
   AlertsDataSourceRepository,
-  PatternDataSourceFactory
+  PatternDataSourceFactory,
 } from '../common/data-source';
 
 import WzDataSourceSelector from '../common/data-source/wz-data-source-selector/wz-data-source-selector';
@@ -80,7 +80,10 @@ export const WzMenu = withWindowSize(
         currentSelectedPattern: '',
         isManagementPopoverOpen: false,
         isOverviewPopoverOpen: false,
-        dataSourceSelector: new DataSourceSelector(new AlertsDataSourceRepository(), new PatternDataSourceFactory())
+        dataSourceSelector: new DataSourceSelector(
+          new AlertsDataSourceRepository(),
+          new PatternDataSourceFactory(),
+        ),
       };
       this.store = store;
       this.genericReq = GenericRequest;
@@ -170,7 +173,7 @@ export const WzMenu = withWindowSize(
           ));
 
         // When not exists patterns, not show the selector
-        if(list.length === 1) return;
+        if (list.length === 1) return;
 
         let filtered = false;
         // If there is no current pattern, fetch it
@@ -351,22 +354,6 @@ export const WzMenu = withWindowSize(
       });
     };
 
-    /**
-     * @param {String} id
-     * @param {Object} clusterInfo
-     * Updates the wazuh registry of an specific api id
-     */
-    updateClusterInfoInRegistry = async (id, clusterInfo) => {
-      try {
-        const url = `/hosts/update-hostname/${id}`;
-        await this.genericReq.request('PUT', url, {
-          cluster_info: clusterInfo,
-        });
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    };
-
     changeAPI = async event => {
       try {
         const apiId = event.target[event.target.selectedIndex];
@@ -379,7 +366,6 @@ export const WzMenu = withWindowSize(
           return item.id === apiId.value;
         });
 
-        this.updateClusterInfoInRegistry(apiId.value, clusterInfo);
         apiData[0].cluster_info = clusterInfo;
 
         AppState.setClusterInfo(apiData[0].cluster_info);
@@ -427,7 +413,7 @@ export const WzMenu = withWindowSize(
                 </EuiFlexItem>
               )}
             {this.props.state.wazuhNotReadyYet ===
-              'Wazuh could not be recovered.' && (
+              'Server could not be recovered.' && (
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
@@ -496,7 +482,7 @@ export const WzMenu = withWindowSize(
         if (this.state.currentMenuTab !== 'wazuh-dev') {
           this.router.reload();
         }
-        await this.updatePatternAndApi(); 
+        await this.updatePatternAndApi();
       } catch (error) {
         const options = {
           context: `${WzMenu.name}.onChangePattern`,
@@ -527,10 +513,11 @@ export const WzMenu = withWindowSize(
           </EuiFlexItem>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
-              <WzDataSourceSelector 
-                onChange={this.onChangePattern} 
+              <WzDataSourceSelector
+                onChange={this.onChangePattern}
                 dataSourceSelector={this.state.dataSourceSelector}
-                name="index pattern"/>
+                name='index pattern'
+              />
             </div>
           </EuiFlexItem>
         </>

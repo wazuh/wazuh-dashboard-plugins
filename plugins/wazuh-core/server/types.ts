@@ -4,7 +4,6 @@ import {
   ServerAPIClient,
   ServerAPIInternalUserClient,
   ServerAPIScopedUserClient,
-  UpdateRegistry,
 } from './services';
 import { IConfigurationEnhanced } from './services/enhance-configuration';
 
@@ -14,7 +13,6 @@ export interface WazuhCorePluginSetup {
   configuration: IConfigurationEnhanced;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
-  updateRegistry: UpdateRegistry;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
@@ -28,7 +26,6 @@ export interface WazuhCorePluginStart {
   configuration: IConfigurationEnhanced;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
-  updateRegistry: UpdateRegistry;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;

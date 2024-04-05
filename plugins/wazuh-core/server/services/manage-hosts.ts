@@ -11,8 +11,9 @@
  */
 import { Logger } from 'opensearch-dashboards/server';
 import { IConfiguration } from '../../common/services/configuration';
-import { CacheAPIUserAllowRunAs } from './cache-api-user-has-run-as';
 import { ServerAPIClient } from './server-api-client';
+import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
+import { HTTP_STATUS_CODES } from '../../common/constants';
 
 interface IAPIHost {
   id: string;
@@ -22,25 +23,28 @@ interface IAPIHost {
   run_as: boolean;
 }
 
+interface IAPIHostRegistry {
+  manager: string | null;
+  node: string | null;
+  status: string;
+  cluster: string;
+  allow_run_as: API_USER_STATUS_RUN_AS;
+}
+
 /**
  * This service manages the API connections.
  * Get API hosts configuration
- * Get API host entries (combine configuration and registry file)
- * Set API host
+ * Get API host entries (combine configuration and registry data)
+ * Create API host
+ * Update API host
  * Delete API host
- * Cache the allow_run_as value for API ID and username
+ * Cache the registry data for API hosts
  * Ability to get if the configured user is allowed to use run as
  */
 export class ManageHosts {
-  public cacheAPIUserAllowRunAs: CacheAPIUserAllowRunAs;
   public serverAPIClient: ServerAPIClient | null = null;
-  constructor(
-    private logger: Logger,
-    private configuration: IConfiguration,
-    private updateRegistry,
-  ) {
-    this.cacheAPIUserAllowRunAs = new CacheAPIUserAllowRunAs(this.logger, this);
-  }
+  private cacheRegistry: Map<string, IAPIHostRegistry> = new Map();
+  constructor(private logger: Logger, private configuration: IConfiguration) {}
 
   setServerAPIClient(client: ServerAPIClient) {
     this.serverAPIClient = client;
@@ -126,40 +130,178 @@ export class ManageHosts {
     options: { excludePassword: boolean } = { excludePassword: false },
   ) {
     try {
-      const hosts = await this.get(undefined, options);
-      const registry = await this.updateRegistry.getHosts();
-      const result = await this.joinHostRegistry(hosts, registry);
-      return result;
-    } catch (error) {
-      this.logger.error(error);
-      throw error;
-    }
-  }
-
-  /**
-   * Joins the hosts with the related information in the registry
-   * @param {Object} hosts
-   * @param {Object} registry
-   * @param {Boolean} removePassword
-   */
-  private async joinHostRegistry(hosts: any, registry: any) {
-    try {
-      if (!Array.isArray(hosts)) {
-        throw new Error('API connections is not a list');
-      }
-
-      return await Promise.all(
-        hosts.map(async h => {
-          const { id } = h;
-          const host = { ...h, ...registry[id] };
-          // Add to run_as from API user. Use the cached value or get it doing a request
-          host.allow_run_as = await this.cacheAPIUserAllowRunAs.check(id);
-          return host;
-        }),
-      );
+      this.logger.debug('Getting the API connections');
+      const hosts = (await this.get(undefined, options)) as IAPIHost[];
+      this.logger.debug('Getting registry');
+      const registry = Object.entries(this.cacheRegistry.entries());
+      return hosts.map(host => {
+        const { id } = host;
+        return { ...host, ...registry[id] };
+      });
     } catch (error) {
       this.logger.error(error.message);
       throw error;
     }
+  }
+
+  private isServerAPIClientResponseOk(response: { status: number }) {
+    return response.status === HTTP_STATUS_CODES.OK;
+  }
+
+  /**
+   * Get the cluster info and allow_run_as values for the API host and store into the registry cache
+   * @param host
+   * @returns
+   */
+  private async getRegistryDataByHost(
+    host: IAPIHost,
+  ): Promise<IAPIHostRegistry> {
+    const apiHostID = host.id;
+    this.logger.debug(`Getting registry data from host [${apiHostID}]`);
+    // Get cluster info data
+
+    let manager = null,
+      node = null,
+      status = 'disabled',
+      cluster = 'Disabled',
+      allow_run_as = API_USER_STATUS_RUN_AS.ALL_DISABLED;
+
+    try {
+      const responseAgents = await this.serverAPIClient.asInternalUser.request(
+        'GET',
+        `/agents`,
+        { params: { agents_list: '000' } },
+        { apiHostID },
+      );
+
+      if (this.isServerAPIClientResponseOk(responseAgents)) {
+        manager = responseAgents.data.data.affected_items[0].manager;
+      }
+
+      // Get allow_run_as
+      if (!host.run_as) {
+        allow_run_as = API_USER_STATUS_RUN_AS.HOST_DISABLED;
+      } else {
+        const responseAllowRunAs =
+          await this.serverAPIClient.asInternalUser.request(
+            'GET',
+            '/security/users/me',
+            {},
+            { apiHostID },
+          );
+        if (this.isServerAPIClientResponseOk(responseAllowRunAs)) {
+          allow_run_as = responseAllowRunAs.data.data.affected_items[0]
+            .allow_run_as
+            ? API_USER_STATUS_RUN_AS.ENABLED
+            : API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED;
+        }
+      }
+
+      const responseClusterStatus =
+        await this.serverAPIClient.asInternalUser.request(
+          'GET',
+          `/cluster/status`,
+          {},
+          { apiHostID },
+        );
+
+      if (this.isServerAPIClientResponseOk(responseClusterStatus)) {
+        status = 'enabled';
+
+        const responseClusterLocal =
+          await this.serverAPIClient.asInternalUser.request(
+            'GET',
+            `/cluster/local/info`,
+            {},
+            { apiHostID },
+          );
+
+        if (this.isServerAPIClientResponseOk(responseClusterStatus)) {
+          node = responseClusterLocal.data.data.affected_items[0].node;
+          cluster = responseClusterLocal.data.data.affected_items[0].cluster;
+        }
+      }
+    } catch (error) {}
+
+    const data = {
+      manager,
+      node,
+      status,
+      cluster,
+      allow_run_as,
+    };
+    this.updateRegistryByHost(apiHostID, data);
+    return data;
+  }
+
+  /**
+   * Initialize the service on plugin start.
+   * - Get the registry data for the configured API hosts and store into the in memory cache
+   * @returns
+   */
+  async start() {
+    try {
+      this.logger.debug('Start');
+      const hosts = (await this.get(undefined, {
+        excludePassword: true,
+      })) as IAPIHost[];
+      if (!hosts.length) {
+        this.logger.debug('No hosts found. Skip.');
+        return;
+      }
+
+      await Promise.all(
+        hosts.map(host =>
+          (async () => [host.id, await this.getRegistryDataByHost(host)])(),
+        ),
+      );
+      this.logger.debug('API hosts data stored in the registry');
+    } catch (error) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  }
+
+  private getRegistryByHost(hostID: string) {
+    this.logger.debug(`Getting cache for API host [${hostID}]`);
+    const result = this.cacheRegistry.get(hostID);
+    this.logger.debug(`Get cache for APIhost [${hostID}]`);
+    return result;
+  }
+
+  private updateRegistryByHost(hostID: string, data: any) {
+    this.logger.debug(`Updating cache for APIhost [${hostID}]`);
+    const result = this.cacheRegistry.set(hostID, data);
+    this.logger.debug(`Updated cache for APIhost [${hostID}]`);
+    return result;
+  }
+
+  private deleteRegistryByHost(hostID: string) {
+    this.logger.debug(`Deleting cache for API host [${hostID}]`);
+    const result = this.cacheRegistry.delete(hostID);
+    this.logger.debug(`Deleted cache for API host [${hostID}]`);
+    return result;
+  }
+
+  /**
+   * Check if the authentication with run_as is enabled and the API user can use it
+   * @param apiId
+   * @returns
+   */
+  isEnabledAuthWithRunAs(apiId: string): boolean {
+    this.logger.debug(`Checking if the API host [${apiId}] can use the run_as`);
+
+    const registryHost = this.getRegistryByHost(apiId);
+    if (!registryHost) {
+      throw new Error(
+        `API host with ID [${apiId}] was not found in the registry. This could be caused by a problem getting and storing the registry data or the API host was removed.`,
+      );
+    }
+    if (registryHost.allow_run_as === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED) {
+      throw new Error(
+        `API host with host ID [${apiId}] misconfigured. The configurated API user is not allowed to use [run_as]. Allow it in the API user configuration or set [run_as] host setting with [false] value.`,
+      );
+    }
+    return registryHost.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED;
   }
 }
