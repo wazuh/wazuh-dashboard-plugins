@@ -49,8 +49,7 @@ import {
   AlertsDataSourceRepository,
   PatternDataSourceFactory,
 } from '../common/data-source';
-
-import WzDataSourceSelector from '../common/data-source/wz-data-source-selector/wz-data-source-selector';
+import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
 
 const sections = {
   overview: 'overview',
@@ -80,10 +79,6 @@ export const WzMenu = withWindowSize(
         currentSelectedPattern: '',
         isManagementPopoverOpen: false,
         isOverviewPopoverOpen: false,
-        dataSourceSelector: new DataSourceSelector(
-          new AlertsDataSourceRepository(),
-          new PatternDataSourceFactory(),
-        ),
       };
       this.store = store;
       this.genericReq = GenericRequest;
@@ -513,11 +508,9 @@ export const WzMenu = withWindowSize(
           </EuiFlexItem>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
-              <WzDataSourceSelector
-                onChange={this.onChangePattern}
-                dataSourceSelector={this.state.dataSourceSelector}
-                name='index pattern'
-              />
+              <WzDataSourceSelector 
+                onChange={this.onChangePattern} 
+                name="index pattern"/>
             </div>
           </EuiFlexItem>
         </>
