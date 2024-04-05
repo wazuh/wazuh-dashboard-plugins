@@ -199,22 +199,18 @@ describe('[endpoint] PUT /utils/configuration', () => {
     'customization.enabled': {
       defaultValueIfNotSet: true,
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.boolean(),
     },
     'customization.logo.reports': {
       defaultValueIfNotSet: 'images/logo_reports.png',
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.boolean(),
     },
     'customization.reports.header': {
       defaultValueIfNotSet: 'Original header',
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.string(),
     },
     'customization.reports.footer': {
       defaultValueIfNotSet: 'Original footer',
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.string(),
     },
   };
   beforeAll(() => {
