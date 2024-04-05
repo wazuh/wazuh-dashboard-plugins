@@ -2077,3 +2077,6 @@ export const WAZUH_CORE_ENCRYPTION_PASSWORD = 'secretencryptionkey!';
 // Configuration backend service
 export const WAZUH_CORE_CONFIGURATION_INSTANCE = 'wazuh-dashboard';
 export const WAZUH_CORE_CONFIGURATION_CACHE_SECONDS = 10;
+
+// API connection permissions
+export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;

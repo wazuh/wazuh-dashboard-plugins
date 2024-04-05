@@ -248,36 +248,4 @@ export class WazuhUtilsCtrl {
     },
     3023,
   );
-
-  /**
-   * Get the plugin scoped account
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} Scoped user account or ErrorResponse
-   */
-  async getPluginScopedAccount(
-    context: RequestHandlerContext,
-    request: KibanaRequest,
-    response: KibanaResponseFactory,
-  ) {
-    try {
-      await context.wazuh_core.dashboardSecurity.isAdministratorUser(
-        context,
-        request,
-      );
-      return response.ok({
-        body: {
-          administrator: true,
-        },
-      });
-    } catch (error) {
-      return response.ok({
-        body: {
-          administrator: false,
-          administrator_error_message: error.message,
-        },
-      });
-    }
-  }
 }
