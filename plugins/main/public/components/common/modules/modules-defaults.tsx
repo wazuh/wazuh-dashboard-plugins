@@ -47,6 +47,7 @@ import { malwareDetectionColumns } from '../../overview/malware-detection/events
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
 import { AlertsVulnerabilitiesDataSource } from '../data-source';
+import { AlertsPCIDSSDataSource } from '../data-source/pattern/alerts/alerts-pci-dss/alerts-pci-dss-data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -271,8 +272,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardPCIDSS || withPinnedAgent(DashboardPCIDSS), // TODO: use withPinnedAgent
-        // component: () => <div>HELLO</div>,
+        component: DashboardPCIDSS,
       },
       {
         id: 'inventory',
@@ -280,7 +280,10 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: ComplianceTable,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, pciColumns),
+      renderDiscoverTab({
+        tableColumns: pciColumns,
+        DataSource: AlertsPCIDSSDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
