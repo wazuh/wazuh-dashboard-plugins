@@ -105,7 +105,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
                   viewMode: ViewMode.VIEW,
                   panels: getDashboardPanels(
                     dataSource?.id,
-                    Boolean(dataSource.getPinnedAgentFilter()),
+                    Boolean(dataSource.getPinnedAgentFilter()?.length),
                   ),
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
