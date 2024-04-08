@@ -61,7 +61,7 @@ export class WazuhCorePlugin
       this._internal.configurationStore,
     );
 
-    // Enhance configurationService
+    // Enhance configuration service
     enhanceConfiguration(this.services.configuration);
 
     // Register the plugin settings
