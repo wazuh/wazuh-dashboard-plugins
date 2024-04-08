@@ -19,10 +19,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import { renderValueOrNoValue, isString } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
-import {
-  LOGCOLLECTOR_LOCALFILE_PROP,
-  LOCALFILE_MACOSEVENT_PROP,
-} from './types';
+import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_JOURNALDT_PROP } from './types';
 
 /**
  *
@@ -54,10 +51,10 @@ const panelsLabel = item =>
   `${item.logformat} - ${renderTargetField(item.target)}`;
 
 const mainSettings = [
-  { field: 'logformat', label: 'Log format' },
-  { field: 'query', label: 'Query value', render: queryValue },
-  { field: 'query.level', label: 'Query level', render: renderValueOrNoValue },
-  { field: 'query.type', label: 'Query type', render: renderValueOrNoValue },
+  { field: 'journald', label: 'Log format' },
+  { field: 'journald', label: 'Location' },
+  { field: 'query.level', label: 'Query level' },
+  { field: 'query.type', label: 'Query type' },
   {
     field: 'ignore_binaries',
     label: 'Ignore binaries',
@@ -77,10 +74,10 @@ class WzConfigurationLogCollectionJournald extends Component {
   render() {
     const { currentConfig } = this.props;
     const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-      LOCALFILE_MACOSEVENT_PROP
+      LOCALFILE_JOURNALDT_PROP
     ]
       ? settingsListBuilder(
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_MACOSEVENT_PROP],
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_JOURNALDT_PROP],
           panelsLabel,
         )
       : [];
@@ -94,12 +91,12 @@ class WzConfigurationLogCollectionJournald extends Component {
           />
         )}
         {!currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_MACOSEVENT_PROP
+          LOCALFILE_JOURNALDT_PROP
         ]?.length ? (
           <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_MACOSEVENT_PROP
+          LOCALFILE_JOURNALDT_PROP
         ]?.length > 1 ? (
           <WzConfigurationSettingsHeader
             title='macOS events logs'
@@ -113,7 +110,7 @@ class WzConfigurationLogCollectionJournald extends Component {
           </WzConfigurationSettingsHeader>
         ) : null}
         {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_MACOSEVENT_PROP
+          LOCALFILE_JOURNALDT_PROP
         ]?.length === 1 ? (
           <WzConfigurationSettingsGroup
             config={items[0].data}

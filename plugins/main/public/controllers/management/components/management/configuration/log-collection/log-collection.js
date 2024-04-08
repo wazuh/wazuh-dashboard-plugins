@@ -58,6 +58,9 @@ class WzConfigurationLogCollection extends Component {
               [LOCALFILE_MACOSEVENT_PROP]: currentConfig[
                 LOGCOLLECTOR_LOCALFILE_PROP
               ].localfile.filter(item => item.logformat === 'macos'),
+              [LOCALFILE_JOURNALDT_PROP]: currentConfig[
+                LOGCOLLECTOR_LOCALFILE_PROP
+              ].localfile.filter(item => item.logformat === 'journald'),
               [LOCALFILE_COMMANDS_PROP]: currentConfig[
                 LOGCOLLECTOR_LOCALFILE_PROP
               ].localfile.filter(
