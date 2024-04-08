@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { IntlProvider } from 'react-intl';
 import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
 import { DashboardContainerInput } from '../../../../../../src/plugins/dashboard/public';
+import { SearchResponse } from '../../../../../../src/core/server';
+import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { getCore, getDataPlugin, getPlugins } from '../../../kibana-services';
 import useSearchBar from '../../common/search-bar/use-search-bar';
-import { AppState, WzRequest } from '../../../react-services';
+import { search } from '../../common/search-bar/search-bar-service';
+import { AppState, ErrorHandler, WzRequest } from '../../../react-services';
 import { WzEmptyPromptNoPermissions } from '../../common/permissions/prompt';
 import { ClusterDisabled } from './cluster-disabled';
 import { compose } from 'redux';
@@ -19,24 +22,31 @@ import {
   EuiButtonEmpty,
   EuiSpacer,
   EuiToolTip,
+  EuiCallOut,
 } from '@elastic/eui';
 import { endpointSummary } from '../../../utils/applications';
-import { ClusterTimelions } from './cluster-timelions';
 import { withErrorBoundary } from '../../common/hocs';
 import { getDashboardPanels } from './visualizations/visualization-panels';
+import {
+  ErrorFactory,
+  HttpError,
+} from '../../../react-services/error-management';
 
 const ClusterComponent: React.FC = () => {
   const DashboardByRenderer =
     getPlugins().dashboard.DashboardContainerByValueRenderer;
   const clusterEnabled =
     AppState.getClusterInfo() && AppState.getClusterInfo().status === 'enabled';
-  const [authorized, setAuthorized] = useState(true);
-  const [isClusterRunning, setIsClusterRunning] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [nodesCount, setNodesCount] = useState(0);
-  const [configuration, setConfiguration] = useState({});
-  const [version, setVersion] = useState('');
-  const [agentsCount, setAgentsCount] = useState(0);
+  const [authorized, setAuthorized] = useState<boolean>(true);
+  const [isClusterRunning, setIsClusterRunning] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [nodesCount, setNodesCount] = useState<number>(0);
+  const [queryTimelionNodesNames, setQueryTimelionNodesNames] =
+    useState<string>('');
+  const [queryTimelionCluster, setQueryTimelionCluster] = useState<string>('');
+  const [configuration, setConfiguration] = useState<object>({});
+  const [version, setVersion] = useState<string>('');
+  const [agentsCount, setAgentsCount] = useState<number>(0);
 
   const SearchBar = getPlugins().data.ui.SearchBar;
   const { searchBarProps } = useSearchBar({
@@ -80,13 +90,24 @@ const ClusterComponent: React.FC = () => {
       const api_version = data[2]?.data?.data?.api_version || '';
       const agents = data[3]?.data?.data || {};
 
+      const nodesNamesList = nodeList?.affected_items?.map(node => node.name);
+
+      const clusterName = AppState.getClusterInfo().cluster;
+      const indexPattern = AppState.getCurrentPattern();
+
+      let queryTimelion = '';
+      for (const nodeName of nodesNamesList) {
+        queryTimelion += `.es(index=${indexPattern},q="cluster.name: ${clusterName} AND cluster.node: ${nodeName}").label("${nodeName}"),`;
+      }
+      queryTimelion = queryTimelion.substring(0, queryTimelion.length - 1);
+
+      const queryTimelionClusterManager = `.es(index=${indexPattern},q="cluster.name: ${clusterName}").label("${clusterName} cluster")`;
+      setQueryTimelionCluster(queryTimelionClusterManager);
+      setQueryTimelionNodesNames(queryTimelion);
       setNodesCount(nodeList?.total_affected_items);
       setConfiguration(clusterConfig?.affected_items?.[0]);
       setVersion(api_version);
       setAgentsCount(agents?.total_affected_items - 1);
-
-      nodeList.name = configuration?.name;
-      nodeList.master_node = configuration?.node_name;
 
       setLoading(false);
     }
@@ -102,6 +123,36 @@ const ClusterComponent: React.FC = () => {
     return; // TODO: adapt to the data source
     updateFiltersStorage(newInput.filters);
   };
+
+  // TODO: add the hidden filters: allowed agents and hideManagerAlerts
+  const fetchFilters = searchBarProps.filters;
+
+  const { isLoading, query, indexPatterns } = searchBarProps;
+
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+
+  useEffect(() => {
+    if (!isLoading) {
+      search({
+        indexPattern: indexPatterns?.[0] as IndexPattern,
+        filters: fetchFilters,
+        query,
+      })
+        .then(results => {
+          setResults(results);
+          setIsSearching(false);
+        })
+        .catch(error => {
+          const searchError = ErrorFactory.create(HttpError, {
+            error,
+            message: 'Error fetching alerts',
+          });
+          ErrorHandler.handleError(searchError);
+          setIsSearching(false);
+        });
+    }
+  }, [JSON.stringify(searchBarProps), JSON.stringify(fetchFilters)]);
 
   const goConfiguration = () => {
     return console.log('first');
@@ -220,11 +271,24 @@ const ClusterComponent: React.FC = () => {
                 </EuiPanel>
               </EuiFlexItem>
             </EuiFlexGroup>
-            <div className='aws-dashboard-responsive'>
+            {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+              <EuiCallOut
+                title='There are no results for selected time range. Try another
+                    one.'
+                color='warning'
+                iconType='help'
+              ></EuiCallOut>
+            ) : null}
+
+            {!isLoading && !isSearching && results?.hits?.total > 0 && (
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(AppState.getCurrentPattern()),
+                  panels: getDashboardPanels(
+                    AppState.getCurrentPattern(),
+                    queryTimelionNodesNames,
+                    queryTimelionCluster,
+                  ),
                   isFullScreenMode: false,
                   filters: searchBarProps.filters ?? [],
                   useMargins: true,
@@ -244,8 +308,7 @@ const ClusterComponent: React.FC = () => {
                 }}
                 onInputUpdated={handleFilterByVisualization}
               />
-            </div>
-            {/* <ClusterTimelions /> */}
+            )}
           </>
         )}
       </EuiPage>

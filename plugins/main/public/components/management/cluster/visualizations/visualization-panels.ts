@@ -1,15 +1,17 @@
 import { DashboardPanelState } from '../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '/../../../../../../src/plugins/embeddable/public';
 
-const getVisStateMonitoringOverview = (indexPatternId: string) => {
+const getVisStateMonitoringOverview = (
+  indexPatternId: string,
+  expressionTimelionNodesNames: string,
+) => {
   return {
     id: 'Wazuh-App-Cluster-monitoring-Overview',
-    title: 'App Cluster Overview',
+    title: 'Alerts by node summary',
     type: 'timelion',
     params: {
       type: 'timelion',
-      expression: '.es(*)',
-      interval: 'auto',
+      expression: expressionTimelionNodesNames,
     },
     data: {
       searchSource: {
@@ -32,13 +34,16 @@ const getVisStateMonitoringOverview = (indexPatternId: string) => {
   };
 };
 
-const getVisStateMonitoringOverviewManager = (indexPatternId: string) => {
+const getVisStateMonitoringOverviewManager = (
+  indexPatternId: string,
+  queryTimelionCluster: string,
+) => {
   return {
     id: 'Wazuh-App-Cluster-monitoring-Overview-Manager',
-    title: 'App Cluster Overview Manager',
+    title: 'Cluster alerts summary',
     type: 'timelion',
     params: {
-      expression: '.es(q=agent.id:000)',
+      expression: queryTimelionCluster,
       interval: 'auto',
     },
     data: {
@@ -202,6 +207,8 @@ const getVisStateMonitoringOverviewNodePie = (indexPatternId: string) => {
 
 export const getDashboardPanels = (
   indexPatternId: string,
+  expressionTimelionNodesNames: string,
+  queryTimelionCluster: string,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }
@@ -219,7 +226,10 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g1',
-        savedVis: getVisStateMonitoringOverview(indexPatternId),
+        savedVis: getVisStateMonitoringOverviewManager(
+          indexPatternId,
+          queryTimelionCluster,
+        ),
       },
     },
     g2: {
@@ -233,7 +243,10 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g2',
-        savedVis: getVisStateMonitoringOverviewManager(indexPatternId),
+        savedVis: getVisStateMonitoringOverview(
+          indexPatternId,
+          expressionTimelionNodesNames,
+        ),
       },
     },
   };
