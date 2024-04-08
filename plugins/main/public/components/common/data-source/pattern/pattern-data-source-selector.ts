@@ -1,28 +1,19 @@
-import { DataSourceRepository } from './data-source-repository';
-import { tDataSourceFactory } from './data-source-factory';
-import { tDataSource } from "./data-source";
+import { tDataSourceSelector, tDataSourceRepository, tParsedIndexPattern } from '../index';
+import { PatternDataSource } from './index';
 
-export type tDataSourceSelector = {
-    existsDataSource: (id: string) => Promise<boolean>;
-    getFirstValidDataSource: () => Promise<tDataSource>;
-    getAllDataSources: () => Promise<tDataSource[]>;
-    getDataSource: (id: string) => Promise<tDataSource>;
-    getSelectedDataSource: () => Promise<tDataSource>;
-    selectDataSource: (id: string) => Promise<void>;
-}
-
-
-export class DataSourceSelector implements tDataSourceSelector {
+export class PatternDataSourceSelector implements tDataSourceSelector<PatternDataSource> {
     // add a map to store locally the data sources
-    private dataSources: Map<string, tDataSource> = new Map();
+    private dataSources: Map<string, PatternDataSource> = new Map();
 
-    constructor(private repository: DataSourceRepository, private factory: tDataSourceFactory) {
+    constructor(dataSourcesList: PatternDataSource[], private repository: tDataSourceRepository<tParsedIndexPattern>) {
         if (!repository) {
             throw new Error('Data source repository is required');
         }
-        if (!factory) {
-            throw new Error('Data source factory is required');
+        if(!dataSourcesList || dataSourcesList?.length === 0) {
+            throw new Error('Data sources list is required');
         }
+
+        this.dataSources = new Map(dataSourcesList.map(dataSource => [dataSource.id, dataSource]));
     }
 
     /**
@@ -46,19 +37,18 @@ export class DataSourceSelector implements tDataSourceSelector {
      * Loop through the data sources and return the first valid data source.
      * Break the while when the valid data source is found
      */
-    async getFirstValidDataSource(): Promise<tDataSource> {
-        const dataSources = await this.getAllDataSources();
-        if (dataSources.length === 0) {
+    async getFirstValidDataSource(): Promise<PatternDataSource> {
+        if (this.dataSources.size === 0) {
             throw new Error('No data sources found');
         }
         let index = 0;
         do {
-            const dataSource = dataSources[index];
+            const dataSource = Array.from(this.dataSources.values())[index];
             if (await this.existsDataSource(dataSource.id)) {
                 return dataSource;
             }
             index++;
-        } while (index < dataSources.length);
+        } while (index < this.dataSources.size);
         throw new Error('No valid data sources found');
     }
 
@@ -67,12 +57,9 @@ export class DataSourceSelector implements tDataSourceSelector {
      * When the map of the data sources is empty, get all the data sources from the repository.
     */
 
-    async getAllDataSources(): Promise<tDataSource[]> {
+    async getAllDataSources(): Promise<PatternDataSource[]> {
         if (this.dataSources.size === 0) {
-            const dataSources = await this.factory.createAll(await this.repository.getAll());
-            dataSources.forEach(dataSource => {
-                this.dataSources.set(dataSource.id, dataSource);
-            });
+            throw new Error('No data sources found');
         }
         return Array.from(this.dataSources.values());
     }
@@ -83,11 +70,7 @@ export class DataSourceSelector implements tDataSourceSelector {
      * When the data source is not found, an error is thrown.
      * @param id 
      */
-    async getDataSource(id: string): Promise<tDataSource> {
-        // when the map of the data sources is empty, get all the data sources from the repository
-        if (this.dataSources.size === 0) {
-            await this.getAllDataSources();
-        }
+    async getDataSource(id: string): Promise<PatternDataSource> {
         const dataSource = this.dataSources.get(id);
         if (!dataSource) {
             throw new Error('Data source not found');
@@ -110,7 +93,7 @@ export class DataSourceSelector implements tDataSourceSelector {
             throw new Error('Data source not found');
         }
         await dataSource.select();
-        await this.repository.setDefault(dataSource);
+        await this.repository.setDefault(dataSource.toJSON());
     }
 
     /**
@@ -119,7 +102,7 @@ export class DataSourceSelector implements tDataSourceSelector {
      * When the repository does not have a selected data source, return the first valid data source.
      * When the repository throws an error, return the first valid data source.
      */
-    async getSelectedDataSource(): Promise<tDataSource> {
+    async getSelectedDataSource(): Promise<PatternDataSource> {
         try {
             const defaultDataSource = await this.repository.getDefault();
             if (!defaultDataSource) {
@@ -127,7 +110,8 @@ export class DataSourceSelector implements tDataSourceSelector {
                 await this.selectDataSource(validDataSource.id);
                 return validDataSource;
             }
-            return defaultDataSource;
+            
+            return await this.getDataSource(defaultDataSource.id);
         } catch (error) {
             const validateDataSource = await this.getFirstValidDataSource();
             await this.selectDataSource(validateDataSource.id);
