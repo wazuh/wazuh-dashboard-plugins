@@ -1,5 +1,4 @@
-import { tDataSource } from "../data-source";
-import { DataSourceRepository } from "../data-source-repository";
+import { tDataSourceRepository } from "../index";
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services';
 
@@ -39,12 +38,10 @@ export type tParsedIndexPattern = {
     updated_at: string;
     version: string;
     _fields: any[];
-    //ToDo: make sure that the following properties are not required
-    select: () => Promise<void>
-}
+} & object;
 
-export class PatternDataSourceRepository implements DataSourceRepository {
-    async get(id: string): Promise<tDataSource> {
+export class PatternDataSourceRepository implements tDataSourceRepository<tParsedIndexPattern>{
+    async get(id: string): Promise<tParsedIndexPattern> {
         try {
             const savedObjectResponse = await GenericRequest.request(
                 'GET',
@@ -64,7 +61,7 @@ export class PatternDataSourceRepository implements DataSourceRepository {
             throw new Error(`Error getting index pattern: ${error.message}`);
         }
     }
-    async getAll(): Promise<tDataSource[]> {
+    async getAll(): Promise<tParsedIndexPattern[]> {
         try {
             const savedObjects = await GenericRequest.request(
                 'GET',
@@ -90,19 +87,19 @@ export class PatternDataSourceRepository implements DataSourceRepository {
         };
     }
     
-    setDefault(dataSource: tDataSource): Promise<void> {
+    setDefault(dataSource: tParsedIndexPattern): void {
         if(!dataSource){
             throw new Error('Index pattern is required');
         }
         AppState.setCurrentPattern(dataSource.id);
-        return Promise.resolve();
+        return;
     }
-    getDefault(): Promise<tDataSource | null> | tDataSource | null {
+    async getDefault(): Promise<tParsedIndexPattern | null> {
         const currentPattern = AppState.getCurrentPattern();
         if(!currentPattern){
-            return null;
+            return Promise.resolve(null);
         }
-        return this.get(currentPattern);
+        return await this.get(currentPattern);
     }
 
 }

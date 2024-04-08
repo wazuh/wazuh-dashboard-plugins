@@ -52,7 +52,7 @@ export const EditAgentsGroupsModalResult = ({
           sortable: true,
         },
       ]}
-      pagination={agents.length > 10}
+      pagination={true}
       sorting={{
         sort: {
           field: 'id',
@@ -88,12 +88,12 @@ export const EditAgentsGroupsModalResult = ({
         },
         {
           field: 'id',
-          name: 'Agent Ids',
+          name: 'Agent IDs',
           align: 'left',
           render: ids => ids.join(', '),
         },
       ]}
-      pagination={errors.length > 10}
+      pagination={true}
     />
   );
 

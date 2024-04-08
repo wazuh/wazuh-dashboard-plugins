@@ -158,7 +158,7 @@ export const WAZUH_MODULES = {
   devTools: {
     title: 'API console',
     appId: 'api-console',
-    description: 'Test the Wazuh API endpoints.',
+    description: 'Test the API endpoints.',
   },
   logtest: {
     title: 'Test your logs',

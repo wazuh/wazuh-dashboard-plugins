@@ -197,7 +197,7 @@ export function TableWzAPI({
     <>
       <EuiFlexGroup wrap alignItems='center' responsive={false}>
         <EuiFlexItem>
-          <EuiFlexGroup alignItems='center' responsive={false}>
+          <EuiFlexGroup wrap alignItems='center' responsive={false}>
             <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
               {rest.title && (
                 <EuiTitle size='s'>

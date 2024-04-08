@@ -161,7 +161,7 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
                   class="euiFlexItem"
                 >
                   <div
-                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                   >
                     <div
                       class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"

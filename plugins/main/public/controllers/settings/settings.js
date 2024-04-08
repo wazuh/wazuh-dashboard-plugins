@@ -125,8 +125,6 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry),
       getHosts: () => this.getHosts(),
       testApi: (entry, force) => ApiCheck.checkApi(entry, force),
-      updateClusterInfoInRegistry: (id, clusterInfo) =>
-        this.updateClusterInfoInRegistry(id, clusterInfo),
       copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
 
@@ -306,26 +304,7 @@ export class SettingsController {
       };
       getErrorOrchestrator().handleError(options);
     }
-    // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
-    await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {
-      entries: this.apiEntries,
-    });
     return;
-  }
-
-  /**
-   * @param {String} id
-   * @param {Object} clusterInfo
-   */
-  async updateClusterInfoInRegistry(id, clusterInfo) {
-    try {
-      const url = `/hosts/update-hostname/${id}`;
-      await this.genericReq.request('PUT', url, {
-        cluster_info: clusterInfo,
-      });
-    } catch (error) {
-      return Promise.reject(error);
-    }
   }
 
   // Check manager connectivity
@@ -351,7 +330,6 @@ export class SettingsController {
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry
-      await this.updateClusterInfoInRegistry(id, cluster_info);
       this.$scope.$emit('updateAPI', { cluster_info });
       this.apiEntries[index].cluster_info = cluster_info;
       this.apiEntries[index].status = 'online';
@@ -399,7 +377,6 @@ export class SettingsController {
       const response = data.data.data;
       this.appInfo = {
         'app-version': response['app-version'],
-        installationDate: response['installationDate'],
         revision: response['revision'],
       };
 

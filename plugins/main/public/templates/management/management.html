@@ -46,23 +46,4 @@
     ></react-component>
   </div>
   <!-- end management -->
-  <!-- groups -->
-  <div
-    ng-class="{'cursor-wait': multipleSelectorLoading}"
-    ng-controller="groupsPreviewController as gp"
-    ng-if="mctrl.tab == 'groups'"
-  >
-    <!-- TODO -
-        - remove GroupsPreviewController
-        - add 'Manage agents' section to the Groups component
-    -->
-    <div ng-if="gp.currentGroup && gp.addingAgents">
-      <react-component
-        name="MultipleAgentSelector"
-        props="gp.multipleAgentSelectorProps"
-        ng-init="gp.groupsSelectedTab='agents'"
-      ></react-component>
-    </div>
-  </div>
-  <!-- end groups -->
 </div>
