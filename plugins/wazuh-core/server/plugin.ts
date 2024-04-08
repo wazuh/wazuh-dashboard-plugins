@@ -50,7 +50,7 @@ export class WazuhCorePlugin
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
 
     this._internal.configurationStore = new ConfigurationStore(
-      this.logger.get('configuration-saved-object'),
+      this.logger.get('configuration-store'),
       {
         cache_seconds: WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
         file: WAZUH_DATA_CONFIG_APP_PATH,
