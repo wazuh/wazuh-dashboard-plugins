@@ -9,6 +9,7 @@ import yml from 'js-yaml';
 import { createDataDirectoryIfNotExists } from './filesystem';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { TPluginSettingWithKey } from '../../common/constants';
+import path from 'path';
 
 interface IConfigurationStoreOptions {
   cache_seconds: number;
@@ -34,8 +35,7 @@ export class ConfigurationStore implements IConfigurationStore {
       throw error;
     }
 
-    /* The ttl cache is used to support sharing configuration through different instances of the
-    platfrom */
+    /* The in-memory ttl cache is used to reduce the access to the persistence */
     this._cache = new CacheTTL<any>(this.logger.get('cache'), {
       ttlSeconds: options.cache_seconds,
     });
@@ -58,13 +58,13 @@ export class ConfigurationStore implements IConfigurationStore {
   }
   private readConfigurationFile() {
     const content = this.readContentConfigurationFile();
-    const contentAsJSON = yml.load(content);
+    const contentAsObject = yml.load(content) || {}; // Ensure the contentAsObject is an object
     this.logger.debug(
-      `Content file [${this.file}]: ${JSON.stringify(contentAsJSON)}`,
+      `Content file [${this.file}]: ${JSON.stringify(contentAsObject)}`,
     );
     // Transform value for key in the configuration file
     return Object.fromEntries(
-      Object.entries(contentAsJSON).map(([key, value]) => {
+      Object.entries(contentAsObject).map(([key, value]) => {
         const setting = this.configuration._settings.get(key);
         return [key, setting?.store?.file?.transformFrom?.(value) ?? value];
       }),
@@ -94,8 +94,8 @@ export class ConfigurationStore implements IConfigurationStore {
         return accum.replace(re, '');
       }
 
-      const formatedValue = formatSettingValueToFile(value);
-      const updateSettingEntry = `${key}: ${formatedValue}`;
+      const formattedValue = formatSettingValueToFile(value);
+      const updateSettingEntry = `${key}: ${formattedValue}`;
       return match
         ? /* Replace the setting if it is defined */
           accum.replace(re, `${updateSettingEntry}`)
@@ -218,9 +218,11 @@ hosts:
   }
   ensureConfigurationFileIsCreated() {
     try {
-      this.logger.debug('Ensuring the configuration file is created');
-      createDataDirectoryIfNotExists();
-      createDataDirectoryIfNotExists('config');
+      this.logger.debug(
+        `Ensuring the configuration file is created [${this.file}]`,
+      );
+      const dirname = path.resolve(path.dirname(this.file));
+      createDataDirectoryIfNotExists(dirname);
       if (!fs.existsSync(this.file)) {
         this.writeContentConfigurationFile(
           this.getDefaultConfigurationFileContent(),
