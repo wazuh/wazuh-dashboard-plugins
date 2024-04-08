@@ -5,7 +5,7 @@ import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/
 
 /* Overview visualizations */
 
-const getVisStateTop5Nodes = (indexPatternId: string) => {
+const getVisStateTop5Nodes = (indexPatternId?: string) => {
   return {
     id: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie',
     title: 'Top 5 nodes',
@@ -61,7 +61,7 @@ const getVisStateTop5Nodes = (indexPatternId: string) => {
 /* Definition of panels */
 
 export const getDashboardConfigurationPanels = (
-  indexPatternId: string,
+  indexPatternId?: string,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }

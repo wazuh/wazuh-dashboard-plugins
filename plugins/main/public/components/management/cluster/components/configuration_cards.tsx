@@ -11,16 +11,18 @@ import {
 } from '@elastic/eui';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../kibana-services';
-import { DiscoverNoResults } from './no_results';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { getDashboardConfigurationPanels } from '../dashboard/dashboard_configuration_panels';
 import '../dashboard/cluster_dashboard.scss';
+import { tFilter } from '../../../common/data-source';
 
 interface ConfigurationCardsProps {
   goBack: () => void;
   configuration: any;
   searchBarProps: any;
   results: any;
-  indexPatternId: string;
+  indexPatternId?: string;
+  filters: tFilter[];
 }
 
 const plugins = getPlugins();
@@ -33,6 +35,7 @@ export const ConfigurationCards = ({
   searchBarProps,
   results,
   indexPatternId,
+  filters,
 }: ConfigurationCardsProps) => {
   return (
     <EuiFlexGroup direction='column' gutterSize='s'>
@@ -73,7 +76,7 @@ export const ConfigurationCards = ({
                   viewMode: ViewMode.VIEW,
                   panels: getDashboardConfigurationPanels(indexPatternId),
                   isFullScreenMode: false,
-                  filters: searchBarProps.filters ?? [],
+                  filters: filters,
                   useMargins: true,
                   id: 'ct-dashboard-configuration-tab',
                   timeRange: {

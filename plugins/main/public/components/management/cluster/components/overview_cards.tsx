@@ -13,7 +13,8 @@ import { getDashboardPanels } from '../dashboard/dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import '../dashboard/cluster_dashboard.scss';
 import { getPlugins } from '../../../../kibana-services';
-import { DiscoverNoResults } from './no_results';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
+import { tFilter } from '../../../common/data-source';
 
 interface OverviewCardsProps {
   goAgents: () => void;
@@ -29,6 +30,7 @@ interface OverviewCardsProps {
   results: any;
   indexPatternId: string;
   clusterName?: string;
+  filters: tFilter[];
 }
 
 const plugins = getPlugins();
@@ -49,6 +51,7 @@ export const OverviewCards = ({
   results,
   indexPatternId,
   clusterName,
+  filters,
 }: OverviewCardsProps) => {
   return (
     <>
@@ -205,7 +208,7 @@ export const OverviewCards = ({
               viewMode: ViewMode.VIEW,
               panels: getDashboardPanels(indexPatternId, nodeList, clusterName),
               isFullScreenMode: false,
-              filters: searchBarProps.filters ?? [],
+              filters: filters,
               useMargins: true,
               id: 'ct-dashboard-tab',
               timeRange: {

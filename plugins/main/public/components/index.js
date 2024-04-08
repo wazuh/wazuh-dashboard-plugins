@@ -15,13 +15,10 @@ import { WzVisualize } from './visualize/wz-visualize';
 import { WzMenuWrapper } from '../components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from '../components/wz-agent-selector/wz-agent-selector-wrapper';
 import { WzBlankScreen } from '../components/wz-blank-screen/wz-blank-screen';
-import { ClusterDisabled } from '../components/management/cluster/cluster-disabled';
-import { ClusterTimelions } from '../components/management/cluster/cluster-timelions';
 import { KibanaVisWrapper } from '../components/management/cluster/cluster-visualization';
 import { ToastNotificationsModal } from '../components/notifications/modal';
 import { getAngularModule } from '../kibana-services';
 import { WzUpdatesNotification } from './wz-updates-notification';
-import { ClusterOverview } from '../controllers/management/components/management/cluster/cluster-overview';
 
 const app = getAngularModule();
 

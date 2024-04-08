@@ -4,14 +4,12 @@ import { SearchResponse } from '../../../../../../../src/core/server';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
-import { search } from '../../../common/search-bar/search-bar-service';
 import {
   ErrorFactory,
   ErrorHandler,
   HttpError,
 } from '../../../../react-services/error-management';
-import { LoadingSpinner } from '../../../overview/vulnerabilities/common/components/loading_spinner';
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import { EuiSpacer, EuiFlexItem } from '@elastic/eui';
 
@@ -20,6 +18,13 @@ import { endpointSummary } from '../../../../utils/applications';
 import { WzRequest } from '../../../../react-services';
 import { ConfigurationCards } from '../components/configuration_cards';
 import { NodeList } from '../node-list';
+import {
+  AlertsDataSource,
+  AlertsDataSourceRepository,
+  PatternDataSource,
+  tParsedIndexPattern,
+  useDataSource,
+} from '../../../common/data-source';
 
 const SearchBar = getPlugins().data.ui.SearchBar;
 
@@ -38,16 +43,18 @@ interface ClusterDashboardState {
 }
 
 const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
-  /* TODO: Analyze whether to use the new index pattern handler https://github.com/wazuh/wazuh-dashboard-plugins/issues/6434
-  Replace WAZUH_ALERTS_PATTERN with appState.getCurrentPattern... */
-  const CT_INDEX_PATTERN_ID = WAZUH_ALERTS_PATTERN;
-
-  const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: CT_INDEX_PATTERN_ID,
+  const {
+    filters,
+    dataSource,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+    setFilters,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    DataSource: AlertsDataSource,
+    repository: new AlertsDataSourceRepository(),
   });
 
-  const { isLoading, query, indexPatterns } = searchBarProps;
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [state, setState] = useState<ClusterDashboardState>({
     showConfig: false,
     showNodes: false,
@@ -59,6 +66,36 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
   });
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+
+  const { searchBarProps } = useSearchBar({
+    indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters,
+  });
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useEffect(() => {
+    if (isDataSourceLoading) {
+      return;
+    }
+    fetchData({
+      query,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
+    })
+      .then(results => {
+        setResults(results);
+      })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching vulnerabilities',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
 
   const setBooleans = (component: string | null) => {
     setState({
@@ -85,32 +122,6 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
   const goConfiguration = () => {
     setBooleans('showConfig');
   };
-
-  useEffect(() => {
-    if (!isLoading) {
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters: searchBarProps.filters ?? [],
-        query,
-        dateRange: {
-          from: searchBarProps.dateRangeFrom,
-          to: searchBarProps.dateRangeTo,
-        },
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching results',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
-    }
-  }, [JSON.stringify(searchBarProps)]);
 
   useEffect(() => {
     const getData = async () => {
@@ -141,19 +152,24 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
   return (
     <I18nProvider>
       <EuiFlexItem style={{ padding: '0 16px' }}>
-        {isLoading ? <LoadingSpinner /> : null}
-        {!isLoading && !state.showNodes ? (
-          <SearchBar
-            appName='ct-searchbar'
-            {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={true}
-            showQueryBar={true}
-          />
-        ) : null}
-        {isSearching ? <LoadingSpinner /> : null}
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSpinner />
+        ) : (
+          <div className='wz-search-bar'>
+            <SearchBar
+              appName='ct-searchbar'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+            />
+          </div>
+        )}
         <EuiSpacer size='m' />
-        {!isLoading && !isSearching && !state.showConfig && !state.showNodes ? (
+        {!isDataSourceLoading &&
+        dataSource &&
+        !state.showConfig &&
+        !state.showNodes ? (
           <OverviewCards
             goNodes={goNodes}
             goAgents={goAgents}
@@ -167,7 +183,8 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
             agentsCount={state?.agentsCount}
             searchBarProps={searchBarProps}
             results={results}
-            indexPatternId={CT_INDEX_PATTERN_ID}
+            indexPatternId={dataSource?.id}
+            filters={fetchFilters ?? []}
           />
         ) : null}
         {state.showConfig ? (
@@ -176,7 +193,8 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
             configuration={state?.configuration}
             searchBarProps={searchBarProps}
             results={results}
-            indexPatternId={CT_INDEX_PATTERN_ID}
+            indexPatternId={dataSource?.id}
+            filters={fetchFilters ?? []}
           />
         ) : null}
         {state.showNodes ? <NodeList goBack={goBack} /> : null}
