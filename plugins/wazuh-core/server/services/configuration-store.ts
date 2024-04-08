@@ -6,7 +6,7 @@ import {
 import { CacheTTL } from '../../common/services/cache';
 import fs from 'fs';
 import yml from 'js-yaml';
-import { createDataDirectoryIfNotExists } from './filesystem';
+import { createDirectoryIfNotExists } from './filesystem';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { TPluginSettingWithKey } from '../../common/constants';
 import path from 'path';
@@ -222,7 +222,7 @@ hosts:
         `Ensuring the configuration file is created [${this.file}]`,
       );
       const dirname = path.resolve(path.dirname(this.file));
-      createDataDirectoryIfNotExists(dirname);
+      createDirectoryIfNotExists(dirname);
       if (!fs.existsSync(this.file)) {
         this.writeContentConfigurationFile(
           this.getDefaultConfigurationFileContent(),
