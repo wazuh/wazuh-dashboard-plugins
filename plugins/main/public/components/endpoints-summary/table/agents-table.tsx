@@ -18,6 +18,7 @@ import {
   EuiPanel,
   EuiCallOut,
   EuiButton,
+  EuiToolTip,
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { withErrorBoundary } from '../../common/hocs';
@@ -45,6 +46,8 @@ import { getOutdatedAgents } from '../services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
+import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
+import { WzButton } from '../../common/buttons';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -66,6 +69,9 @@ interface AgentsTableProps {
   filters: any;
   updateCurrentAgentData: (agent) => void;
   externalReload?: boolean;
+  showOnlyOutdated: boolean;
+  setShowOnlyOutdated: (newValue: boolean) => void;
+  totalOutdated?: number;
   setExternalReload?: (newValue: number) => void;
 }
 
@@ -93,7 +99,17 @@ export const AgentsTable = compose(
   const [denyEditGroups] = useUserPermissionsRequirements([
     { action: 'group:modify_assignments', resource: 'group:id:*' },
   ]);
+  const [denyUpgrade] = useUserPermissionsRequirements([
+    { action: 'agent:upgrade', resource: 'agent:id:*' },
+  ]);
+  const [denyGetTasks] = useUserPermissionsRequirements([
+    { action: 'task:status', resource: '*:*:*' },
+  ]);
+
   const [outdatedAgents, setOutdatedAgents] = useState<Agent[]>([]);
+  const [isUpgradeTasksModalVisible, setIsUpgradeTasksModalVisible] =
+    useState(false);
+  const [isUpgradePanelClosed, setIsUpgradePanelClosed] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
@@ -166,7 +182,9 @@ export const AgentsTable = compose(
     const agentIds = data?.items?.map(agent => agent.id);
 
     try {
-      const outdatedAgents = await getOutdatedAgents(agentIds);
+      const outdatedAgents = agentIds?.length
+        ? (await getOutdatedAgents({ agentIds })).affected_items
+        : [];
       setOutdatedAgents(outdatedAgents);
     } catch (error) {
       setOutdatedAgents([]);
@@ -194,31 +212,49 @@ export const AgentsTable = compose(
     ? agentList.totalItems
     : selectedItems.length;
 
-  const selectedtemsRenderer = selectedItems.length ? (
-    <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
-      <EuiFlexItem grow={false}>
-        <EuiCallOut
-          size='s'
-          title={`${totalSelected} ${
-            totalSelected === 1 ? 'agent' : 'agents'
-          } selected`}
-        />
-      </EuiFlexItem>
-      {showSelectAllItems ? (
+  const selectedtemsRenderer = (
+    <EuiFlexGroup alignItems='center'>
+      {selectedItems.length ? (
         <EuiFlexItem grow={false}>
-          <EuiButton
-            size='s'
-            onClick={handleOnClickSelectAllAgents}
-            color={!allAgentsSelected ? 'primary' : 'danger'}
-          >
-            {!allAgentsSelected
-              ? `Select all ${agentList.totalItems} agents`
-              : `Clear ${agentList.totalItems} agents selected`}
-          </EuiButton>
+          <EuiFlexGroup alignItems='center' gutterSize='s'>
+            <EuiFlexItem grow={false}>
+              <EuiCallOut
+                size='s'
+                title={`${totalSelected} ${
+                  totalSelected === 1 ? 'agent' : 'agents'
+                } selected`}
+              />
+            </EuiFlexItem>
+            {showSelectAllItems ? (
+              <EuiFlexItem grow={false}>
+                <EuiButton
+                  size='s'
+                  onClick={handleOnClickSelectAllAgents}
+                  color={!allAgentsSelected ? 'primary' : 'danger'}
+                >
+                  {!allAgentsSelected
+                    ? `Select all ${agentList.totalItems} agents`
+                    : `Clear ${agentList.totalItems} agents selected`}
+                </EuiButton>
+              </EuiFlexItem>
+            ) : null}
+          </EuiFlexGroup>
         </EuiFlexItem>
       ) : null}
+      <EuiFlexItem grow={false}>
+        <WzButton
+          buttonType='switch'
+          label='Show only outdated'
+          checked={props.showOnlyOutdated}
+          disabled={!props.totalOutdated}
+          tooltip={
+            !props.totalOutdated && { content: 'There are no outdated agents' }
+          }
+          onChange={() => props.setShowOnlyOutdated(!props.showOnlyOutdated)}
+        />
+      </EuiFlexItem>
     </EuiFlexGroup>
-  ) : null;
+  );
 
   const tableRender = () => {
     // The EuiBasicTable tableLayout is set to "auto" to improve the use of empty space in the component.
@@ -230,41 +266,49 @@ export const AgentsTable = compose(
           <TableWzAPI
             title='Agents'
             addOnTitle={selectedtemsRenderer}
-            extra={<AgentUpgradesInProgress reload={props.externalReload} />}
-            actionButtons={({ filters }) => (
-              <>
-                <EuiFlexItem grow={false}>
-                  <WzButtonPermissions
-                    buttonType='empty'
-                    permissions={[
-                      { action: 'agent:create', resource: '*:*:*' },
-                    ]}
-                    iconType='plusInCircle'
-                    href={getCore().application.getUrlForApp(
-                      endpointSummary.id,
-                      {
-                        path: `#${endpointSummary.redirectTo()}deploy`,
-                      },
-                    )}
-                  >
-                    Deploy new agent
-                  </WzButtonPermissions>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <AgentsTableGlobalActions
-                    selectedAgents={selectedItems}
-                    allAgentsSelected={allAgentsSelected}
-                    allAgentsCount={agentList.totalItems}
-                    filters={filters?.q}
-                    allowEditGroups={!denyEditGroups}
-                    reloadAgents={() => reloadAgents()}
-                  />
-                </EuiFlexItem>
-              </>
+            extra={
+              <AgentUpgradesInProgress
+                reload={props.externalReload}
+                setIsModalVisible={setIsUpgradeTasksModalVisible}
+                isPanelClosed={isUpgradePanelClosed}
+                setIsPanelClosed={setIsUpgradePanelClosed}
+                allowGetTasks={!denyGetTasks}
+              />
+            }
+            actionButtons={
+              <EuiFlexItem grow={false}>
+                <WzButtonPermissions
+                  buttonType='empty'
+                  permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
+                  iconType='plusInCircle'
+                  href={getCore().application.getUrlForApp(endpointSummary.id, {
+                    path: `#${endpointSummary.redirectTo()}deploy`,
+                  })}
+                >
+                  Deploy new agent
+                </WzButtonPermissions>
+              </EuiFlexItem>
+            }
+            postActionButtons={({ filters }) => (
+              <EuiFlexItem grow={false}>
+                <AgentsTableGlobalActions
+                  selectedAgents={selectedItems}
+                  allAgentsSelected={allAgentsSelected}
+                  allAgentsCount={agentList.totalItems}
+                  filters={filters?.q}
+                  allowEditGroups={!denyEditGroups}
+                  allowUpgrade={!denyUpgrade}
+                  allowGetTasks={!denyGetTasks}
+                  reloadAgents={() => reloadAgents()}
+                  setIsUpgradeTasksModalVisible={setIsUpgradeTasksModalVisible}
+                  setIsUpgradePanelClosed={setIsUpgradePanelClosed}
+                />
+              </EuiFlexItem>
             )}
-            endpoint='/agents'
+            endpoint={props.showOnlyOutdated ? '/agents/outdated' : '/agents'}
             tableColumns={agentsTableColumns(
               !denyEditGroups,
+              !denyUpgrade,
               setAgent,
               setIsEditGroupsVisible,
               setIsUpgradeModalVisible,
@@ -307,7 +351,7 @@ export const AgentsTable = compose(
                       label: 'dateAdd',
                       description: 'filter by registration date',
                     },
-                    { label: 'id', description: 'filter by id' },
+                    { label: 'id', description: 'filter by ID' },
                     { label: 'ip', description: 'filter by IP address' },
                     { label: 'group', description: 'filter by group' },
                     {
@@ -464,6 +508,12 @@ export const AgentsTable = compose(
             setIsEditGroupsVisible(false);
             setAgent(undefined);
           }}
+          setIsUpgradePanelClosed={setIsUpgradePanelClosed}
+        />
+      ) : null}
+      {isUpgradeTasksModalVisible ? (
+        <AgentUpgradesTaskDetailsModal
+          onClose={() => setIsUpgradeTasksModalVisible(false)}
         />
       ) : null}
     </div>

@@ -147,10 +147,6 @@ export const ApiTable = compose(
           true,
         );
         APIConnection.cluster_info = response.data;
-        // Updates the cluster-information in the registry
-        await GenericRequest.request('PUT', `/hosts/update-hostname/${id}`, {
-          cluster_info: APIConnection.cluster_info,
-        });
         APIConnection.status = 'online';
         APIConnection.allow_run_as = response.data.allow_run_as;
         !silent && ErrorHandler.info('Connection success', 'Settings');
@@ -218,14 +214,7 @@ export const ApiTable = compose(
         const clusterInfo = data.data || {};
         APIconnection.status = 'online';
         APIconnection.cluster_info = clusterInfo;
-        //Updates the cluster info in the registry
-        await GenericRequest.request(
-          'PUT',
-          `/hosts/update-hostname/${APIconnection.id}`,
-          {
-            cluster_info: clusterInfo,
-          },
-        );
+        APIconnection.allow_run_as = clusterInfo.allow_run_as;
         if (options?.selectAPIHostOnAvailable) {
           this.setDefault(entry);
         }
@@ -657,6 +646,7 @@ export const ApiTable = compose(
                       id: item.id,
                       url: item.url,
                       port: item.port,
+                      run_as: item.run_as,
                       username: item.username,
                       password: '',
                       password_confirm: '',

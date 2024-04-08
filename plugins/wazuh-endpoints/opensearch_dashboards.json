@@ -1,9 +1,0 @@
-{
-  "id": "wazuhEndpoints",
-  "version": "4.9.0-00",
-  "opensearchDashboardsVersion": "opensearchDashboards",
-  "server": true,
-  "ui": true,
-  "requiredPlugins": ["navigation"],
-  "optionalPlugins": []
-}

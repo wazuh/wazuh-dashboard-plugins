@@ -26,12 +26,16 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Active response documentation',
-    href: webDocumentationLink('user-manual/capabilities/active-response/index.html')
+    href: webDocumentationLink(
+      'user-manual/capabilities/active-response/index.html',
+    ),
   },
   {
     text: 'Commands reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/commands.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/commands.html',
+    ),
+  },
 ];
 
 const mainSettings = [
@@ -42,8 +46,8 @@ const mainSettings = [
   {
     field: 'timeout_allowed',
     label: 'Allow this command to be reverted',
-    render: renderValueNoThenEnabled
-  }
+    render: renderValueNoThenEnabled,
+  },
 ];
 
 class WzConfigurationActiveResponseCommands extends Component {
@@ -71,19 +75,19 @@ class WzConfigurationActiveResponseCommands extends Component {
           !isString(currentConfig['analysis-command']) &&
           currentConfig['analysis-command'].command &&
           !currentConfig['analysis-command'].command.length && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['analysis-command']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {currentConfig['analysis-command'] &&
         !isString(currentConfig['analysis-command']) &&
         currentConfig['analysis-command'].command &&
         currentConfig['analysis-command'].command.length ? (
           <WzConfigurationSettingsHeader
-            title="Command definitions"
-            description="Find here all the currently defined commands used for Active response"
+            title='Command definitions'
+            description='Find here all the currently defined commands used for Active response'
             help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
@@ -98,11 +102,11 @@ class WzConfigurationActiveResponseCommands extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationActiveResponseCommands.propTypes = {
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default connect(mapStateToProps)(WzConfigurationActiveResponseCommands);
