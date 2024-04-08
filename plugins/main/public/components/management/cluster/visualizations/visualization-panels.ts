@@ -156,7 +156,7 @@ const getVisStateMonitoringOverviewNode = (indexPatternId: string) => {
 const getVisStateMonitoringOverviewNodePie = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie',
-    title: 'App Cluster Overview Node Pie',
+    title: 'Top 5 nodes',
     type: 'pie',
     params: {
       type: 'pie',
@@ -247,6 +247,33 @@ export const getDashboardPanels = (
           indexPatternId,
           expressionTimelionNodesNames,
         ),
+      },
+    },
+  };
+
+  return overviewDashboardPanels;
+};
+
+export const getDashboardOverviewNodePanels = (
+  indexPatternId: string,
+): {
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
+} => {
+  const overviewDashboardPanels = {
+    o1: {
+      gridData: {
+        w: 48,
+        h: 13,
+        x: 0,
+        y: 0,
+        i: 'o1',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'o1',
+        savedVis: getVisStateMonitoringOverviewNodePie(indexPatternId),
       },
     },
   };
