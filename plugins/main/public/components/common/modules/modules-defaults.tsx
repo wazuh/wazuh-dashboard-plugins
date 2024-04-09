@@ -43,8 +43,8 @@ import { mitreAttackColumns } from '../../overview/mitre/framework/events/mitre-
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
-import { withPinnedAgent } from '../hocs/withPinnedAgent';
 import { AlertsVulnerabilitiesDataSource } from '../data-source';
+import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -57,7 +57,6 @@ const DashboardTab = {
 };
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
-  const { DataSource, tableColumns } = props;
   return {
     id: 'events',
     name: 'Events',
@@ -238,7 +237,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: withPinnedAgent(DashboardMITRE),
+        component: DashboardMITRE,
       },
       {
         id: 'intelligence',
@@ -251,7 +250,10 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainMitre,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, mitreAttackColumns),
+      renderDiscoverTab({
+        DataSource: MitreAttackDataSource,
+        tableColumns: mitreAttackColumns,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },

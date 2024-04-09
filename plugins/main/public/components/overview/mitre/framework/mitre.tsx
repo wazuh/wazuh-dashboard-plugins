@@ -78,7 +78,7 @@ export const Mitre = withErrorBoundary(
     async componentDidMount() {
       this._isMount = true;
       this.indexPattern = await getIndexPattern();
-      const scope = await ModulesHelper.getDiscoverScope();
+      const scope = await ModulesHelper.getDiscoverScope(); // remove this
       const query = scope.state.query;
       const { filters, time } = this.state.filterParams;
       this.setState({ filterParams: { query, filters, time } });

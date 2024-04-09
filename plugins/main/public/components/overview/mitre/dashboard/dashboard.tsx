@@ -4,20 +4,19 @@ import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
 import { Filter } from '../../../../../../../src/plugins/data/common';
 import { SampleDataWarning } from '../../../visualize/components';
-import { search } from '../../../common/search-bar/search-bar-service';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import {
   ErrorFactory,
   ErrorHandler,
   HttpError,
 } from '../../../../react-services/error-management';
-import { LoadingSpinner, DiscoverNoResults } from './components';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { SearchResponse } from '../../../../../../../src/core/server';
-import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../react-services/data-sources';
 import './mitre_dashboard_filters.scss';
+import { AlertsDataSourceRepository, MitreAttackDataSource, PatternDataSource, tParsedIndexPattern, useDataSource } from '../../../common/data-source';
 
 interface DashboardThreatHuntingProps {
   pinnedAgent: Filter;
@@ -30,61 +29,68 @@ const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
   pinnedAgent,
 }) => {
-  const MITRE_INDEX_PATTERN_ID = WAZUH_ALERTS_PATTERN;
-  const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: MITRE_INDEX_PATTERN_ID,
+  const {
+    filters,
+    dataSource,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+    setFilters
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    DataSource: MitreAttackDataSource,
+    repository: new AlertsDataSourceRepository(),
   });
-  const { isLoading, query, indexPatterns } = searchBarProps;
-  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  //TODO: add the hidden filters; alowed agents and hideManagerAlerts
-  const fetchFilters = DataSourceFilterManagerVulnerabilitiesStates.getFilters(
-    searchBarProps.filters,
-    MITRE_INDEX_PATTERN_ID,
-  );
+  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+
+  const { searchBarProps } = useSearchBar({
+    indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters,
+  });
+  const { query } = searchBarProps;
 
   useEffect(() => {
-    if (!isLoading) {
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters: fetchFilters,
-        query,
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching MITRE',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
+    if (isDataSourceLoading) {
+      return;
     }
-  }, [JSON.stringify(searchBarProps), JSON.stringify(fetchFilters)]);
+    fetchData({ query }).then(results => {
+      setResults(results);
+    })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching vulnerabilities',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+  ])
 
   return (
     <>
       <I18nProvider>
         <>
-          {isLoading ? <LoadingSpinner /> : null}
-          {!isLoading ? (
-            <SearchBar
-              appName='mitre-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-            />
-          ) : null}
-          {isSearching ? <LoadingSpinner /> : null}
-          {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+          {
+            isDataSourceLoading && !dataSource ?
+              <LoadingSpinner /> :
+              <div className="wz-search-bar">
+                <SearchBar
+                  appName='vulnerability-detector-searchbar'
+                  {...searchBarProps}
+                  showDatePicker={false}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                  showSaveQuery={true}
+                />
+              </div>
+          }
+          {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
-          {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+          {dataSource && results?.hits?.total > 0 ? (
             <div className='mitre-dashboard-responsive'>
               <SampleDataWarning />
               <div className='mitre-dashboard-filters-wrapper'>
@@ -92,8 +98,8 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
                   input={{
                     viewMode: ViewMode.VIEW,
                     panels: getDashboardPanels(
-                      MITRE_INDEX_PATTERN_ID,
-                      !!pinnedAgent,
+                      dataSource?.id,
+                      dataSource?.getPinnedAgentFilter().length > 0,
                     ),
                     isFullScreenMode: false,
                     filters: searchBarProps.filters ?? [],
