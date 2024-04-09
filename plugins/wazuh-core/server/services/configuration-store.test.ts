@@ -49,10 +49,10 @@ describe(`[service] ConfigurationStore`, () => {
   // Ensure the configuration file is created
   describe('Ensure the file is created', () => {
     it.each`
-      title                                          | file            | exist
+      title                                          | file            | createFile
       ${'Ensure the file is created'}                | ${'config.yml'} | ${false}
       ${'Ensure the file is created. Already exist'} | ${'config.yml'} | ${true}
-    `('$title', ({ file, exist }) => {
+    `('$title', ({ file, createFile }) => {
       const configurationStore = new ConfigurationStore(createMockLogger(), {
         file,
         cache_seconds: 10,
@@ -63,10 +63,10 @@ describe(`[service] ConfigurationStore`, () => {
         groupSettingsByCategory: () => [],
       });
 
-      if (exist) {
+      if (createFile) {
         fs.writeFileSync(configurationStore.file, '', { encoding: 'utf8' });
       }
-      expect(fs.existsSync(configurationStore.file)).toBe(exist);
+      expect(fs.existsSync(configurationStore.file)).toBe(createFile);
       configurationStore.ensureConfigurationFileIsCreated();
       expect(fs.existsSync(configurationStore.file)).toBe(true);
 
@@ -101,8 +101,8 @@ describe(`[service] ConfigurationStore`, () => {
       configurationStore.setConfiguration({
         groupSettingsByCategory: () => [],
         _settings: new Map([
-          ['key1', { store: { file: { configurable: true } } }],
-          ['key2', { store: { file: { configurable: true } } }],
+          ['key1', { store: { file: { configurableManaged: true } } }],
+          ['key2', { store: { file: { configurableManaged: true } } }],
         ]),
       });
 
