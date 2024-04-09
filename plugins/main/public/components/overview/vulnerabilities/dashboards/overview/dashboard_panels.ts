@@ -269,8 +269,8 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
   indexPatternId: string,
 ) => {
   return {
-    id: 'published_vulnerabilities_severity',
-    title: 'Published vulnerabilities severity',
+    id: 'vulnerabilities_by_year_of_publication',
+    title: 'Vulnerabilities by year of publication',
     type: 'histogram',
     params: {
       type: 'histogram',
