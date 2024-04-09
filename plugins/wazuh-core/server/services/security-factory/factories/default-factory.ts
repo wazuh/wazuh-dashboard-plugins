@@ -21,5 +21,7 @@ export class DefaultFactory implements ISecurityFactory {
   async isAdministratorUser(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
-  ) {}
+  ) {
+    // This is replaced after creating the instance
+  }
 }
