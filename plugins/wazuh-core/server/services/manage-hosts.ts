@@ -79,15 +79,19 @@ export class ManageHosts {
         ? this.logger.debug(`Getting API connection with ID [${hostID}]`)
         : this.logger.debug('Getting API connections');
       const hosts = await this.configuration.get('hosts');
+      this.logger.debug(`API connections: [${JSON.stringify(hosts)}]`);
       if (hostID) {
         const host = hosts.find(({ id }: { id: string }) => id === hostID);
         if (host) {
+          this.logger.debug(`API connection with ID [${hostID}] found`);
           return this.filterAPIHostData(
             host,
             options.excludePassword ? ['password'] : undefined,
           );
         }
-        throw new Error(`API connection with ID [${hostID}] not found`);
+        const APIConnectionNotFound = `API connection with ID [${hostID}] not found`;
+        this.logger.debug(APIConnectionNotFound);
+        throw new Error(APIConnectionNotFound);
       }
       return hosts.map(host =>
         this.filterAPIHostData(

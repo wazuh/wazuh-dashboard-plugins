@@ -74,10 +74,10 @@ export class ConfigurationStore implements IConfigurationStore {
     // Plugin settings configurables in the configuration file.
     const pluginSettingsConfigurableFile = Object.fromEntries(
       Object.entries(attributes)
-        .filter(
-          ([key]) =>
-            this.configuration._settings.get(key)?.store?.file?.configurable,
-        )
+        .filter(([key]) => {
+          const setting = this.configuration._settings.get(key);
+          return setting?.store?.file?.configurableManaged;
+        })
         .map(([key, value]) => [key, value]),
     );
 
@@ -146,46 +146,10 @@ ${printSection('App configuration file', { prefix: '# ', fill: '=' })}
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-dashboard-plugins`;
 
-    const hostsConfiguration = `${printSection('API connections', {
-      prefix: '# ',
-      fill: '-',
-    })}
-#
-# The following configuration is the default structure to define a host.
-#
-# hosts:
-#   # Host ID / name,
-#   - env-1:
-#       # Host URL
-#       url: https://env-1.example
-#       # Host / API port
-#       port: 55000
-#       # Host / API username
-#       username: wazuh-wui
-#       # Host / API password
-#       password: wazuh-wui
-#       # Use RBAC or not. If set to true, the username must be "wazuh-wui".
-#       run_as: true
-#   - env-2:
-#       url: https://env-2.example
-#       port: 55000
-#       username: wazuh-wui
-#       password: wazuh-wui
-#       run_as: true
-
-hosts:
-  - default:
-      url: https://localhost
-      port: 55000
-      username: wazuh-wui
-      password: wazuh-wui
-      run_as: false
-`;
-
     const pluginSettingsConfigurationFileGroupByCategory =
       this.configuration.groupSettingsByCategory(
         null,
-        setting => setting?.store?.file?.configurable,
+        setting => setting?.store?.file,
       );
 
     const pluginSettingsConfiguration =
@@ -212,9 +176,7 @@ hosts:
         })
         .join('\n#\n');
 
-    return [header, pluginSettingsConfiguration, hostsConfiguration].join(
-      '\n#\n',
-    );
+    return `${[header, pluginSettingsConfiguration].join('\n#\n')}\n\n`;
   }
   ensureConfigurationFileIsCreated() {
     try {
@@ -265,7 +227,7 @@ hosts:
       this.logger.debug(
         `Getting settings: [${JSON.stringify(
           settings,
-        )}] with store get options [${storeGetOptions}]`,
+        )}] with store get options [${JSON.stringify(storeGetOptions)}]`,
       );
       const stored = await this.storeGet(storeGetOptions);
       return settings.length
@@ -308,11 +270,16 @@ hosts:
   }
   async clear(...settings: string[]): Promise<any> {
     try {
+      this.logger.debug(`Clearing settings: [${settings.join(',')}]`);
+      const stored = await this.storeGet({ ignoreCache: true });
+      const newSettings = {
+        ...stored,
+      };
       const removedSettings = {};
       settings.forEach(setting => {
-        removedSettings[setting] = null;
+        removedSettings[setting] = newSettings[setting] = null;
       });
-      await this.storeSet(removedSettings);
+      await this.storeSet(newSettings);
       return removedSettings;
     } catch (error) {
       const enhancedError = new Error(
@@ -371,11 +338,12 @@ export function printSettingValue(value: unknown): any {
 export function printSetting(setting: TPluginSettingWithKey): string {
   /*
   # {setting description}
-  # {settingKey}: {settingDefaultValue}
+  # ?{{settingDefaultBlock} || {{settingKey}: {settingDefaultValue}}}
   */
   return [
     splitDescription(setting.description),
-    `# ${setting.key}: ${printSettingValue(setting.defaultValue)}`,
+    setting?.store?.file?.defaultBlock ||
+      `# ${setting.key}: ${printSettingValue(setting.defaultValue)}`,
   ].join('\n');
 }
 

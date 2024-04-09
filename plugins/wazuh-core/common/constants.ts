@@ -388,6 +388,7 @@ export enum SettingCategory {
   VULNERABILITIES,
   SECURITY,
   CUSTOMIZATION,
+  API_CONNECTION,
 }
 
 type TPluginSettingOptionsTextArea = {
@@ -471,7 +472,12 @@ export type TPluginSetting = {
   // Store
   store: {
     file: {
-      configurable?: boolean;
+      // Define if the setting is managed by the ConfigurationStore service
+      configurableManaged?: boolean;
+      // Define a text to print as the default in the configuration block
+      defaultBlock?: string;
+      /* Transform the value defined in the configuration file to be consumed by the Configuration
+        service */
       transformFrom?: (value: any) => any;
     };
   };
@@ -559,6 +565,11 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
     documentationLink: 'user-manual/wazuh-dashboard/white-labeling.html',
     renderOrder: SettingCategory.CUSTOMIZATION,
   },
+  [SettingCategory.API_CONNECTION]: {
+    title: 'API connections',
+    description: 'Options related to the API connections.',
+    renderOrder: SettingCategory.API_CONNECTION,
+  },
 };
 
 export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
@@ -568,7 +579,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.GENERAL,
@@ -604,7 +615,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Enable or disable the API health check when opening the app.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.HEALTH_CHECK,
@@ -635,7 +646,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Enable or disable the known fields health check when opening the app.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.HEALTH_CHECK,
@@ -666,7 +677,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Change the default value of the plugin platform max buckets configuration.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.HEALTH_CHECK,
@@ -697,7 +708,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Change the default value of the plugin platform metaField configuration.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.HEALTH_CHECK,
@@ -728,7 +739,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Enable or disable the index pattern health check when opening the app.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.HEALTH_CHECK,
@@ -759,7 +770,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Enable or disable the setup health check when opening the app.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.HEALTH_CHECK,
@@ -790,7 +801,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Enable or disable the template health check when opening the app.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.HEALTH_CHECK,
@@ -821,7 +832,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Change the default value of the plugin platform timeFilter configuration.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.HEALTH_CHECK,
@@ -851,7 +862,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Define the index prefix of predefined jobs.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.GENERAL,
@@ -887,7 +898,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.STATISTICS,
@@ -929,7 +940,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Define the interval in which a new index will be created.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.STATISTICS,
@@ -972,7 +983,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Define the name of the index in which the documents will be saved.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.STATISTICS,
@@ -1009,7 +1020,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Define the number of replicas to use for the statistics indices.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.STATISTICS,
@@ -1048,7 +1059,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Define the number of shards to use for the statistics indices.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.STATISTICS,
@@ -1085,7 +1096,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Define the frequency of task execution using cron schedule expressions.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.STATISTICS,
@@ -1104,7 +1115,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Enable or disable the statistics tasks.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.STATISTICS,
@@ -1134,7 +1145,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Enable or disable the customization.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.CUSTOMIZATION,
@@ -1165,7 +1176,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: `This logo is used as loading indicator while the user is logging into Wazuh API.`,
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.CUSTOMIZATION,
@@ -1213,7 +1224,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: `This logo is displayed during the Healthcheck routine of the app.`,
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.CUSTOMIZATION,
@@ -1261,7 +1272,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: `This logo is used in the PDF reports generated by the app. It's placed at the top left corner of every page of the PDF.`,
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.CUSTOMIZATION,
@@ -1308,7 +1319,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Set the footer of the reports.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.CUSTOMIZATION,
@@ -1335,7 +1346,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Set the header of the reports.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.CUSTOMIZATION,
@@ -1363,7 +1374,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Specifies the Wazuh registration server, used for the agent enrollment.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.GENERAL,
@@ -1384,7 +1395,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Specifies the password used to authenticate during the agent enrollment.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.GENERAL,
@@ -1404,7 +1415,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Hide the alerts of the manager in every dashboard.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.GENERAL,
@@ -1432,12 +1443,42 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   },
   hosts: {
     title: 'Server hosts',
-    description: 'Configure the server hosts.',
-    category: SettingCategory.GENERAL,
+    description: 'Configure the API connections.',
+    category: SettingCategory.API_CONNECTION,
     type: EpluginSettingType.arrayOf,
     defaultValue: [],
     store: {
       file: {
+        configurableManaged: false,
+        defaultBlock: `# The following configuration is the default structure to define a host.
+#
+# hosts:
+#   # Host ID / name,
+#   - env-1:
+#       # Host URL
+#       url: https://env-1.example
+#       # Host / API port
+#       port: 55000
+#       # Host / API username
+#       username: wazuh-wui
+#       # Host / API password
+#       password: wazuh-wui
+#       # Use RBAC or not. If set to true, the username must be "wazuh-wui".
+#       run_as: true
+#   - env-2:
+#       url: https://env-2.example
+#       port: 55000
+#       username: wazuh-wui
+#       password: wazuh-wui
+#       run_as: true
+
+hosts:
+  - default:
+      url: https://localhost
+      port: 55000
+      username: wazuh-wui
+      password: wazuh-wui
+      run_as: false`,
         transformFrom: value => {
           return value.map(hostData => {
             const key = Object.keys(hostData)?.[0];
@@ -1580,7 +1621,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Disable certain index pattern names from being available in index pattern selector.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.GENERAL,
@@ -1637,7 +1678,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Define if the user is allowed to change the selected index pattern directly from the top menu bar.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.GENERAL,
@@ -1666,7 +1707,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Index pattern',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     description:
@@ -1703,7 +1744,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     title: 'Request timeout',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     description:
@@ -1741,7 +1782,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Define the interval in which a new wazuh-monitoring index will be created.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.MONITORING,
@@ -1784,7 +1825,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Enable or disable the wazuh-monitoring index creation and/or visualization.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.MONITORING,
@@ -1816,7 +1857,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.MONITORING,
@@ -1852,7 +1893,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Default index pattern to use for Wazuh monitoring.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.MONITORING,
@@ -1888,7 +1929,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Define the number of replicas to use for the wazuh-monitoring-* indices.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.MONITORING,
@@ -1925,7 +1966,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       'Define the number of shards to use for the wazuh-monitoring-* indices.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.MONITORING,
@@ -1961,7 +2002,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     description: 'Default index pattern to use for vulnerabilities.',
     store: {
       file: {
-        configurable: true,
+        configurableManaged: true,
       },
     },
     category: SettingCategory.VULNERABILITIES,

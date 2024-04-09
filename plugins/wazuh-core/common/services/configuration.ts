@@ -114,8 +114,13 @@ export type TConfigurationSetting = {
     | TConfigurationSettingOptionsTextArea;
   store?: {
     file: {
-      configurable?: boolean;
-      transfromFrom?: (value: any) => any;
+      // Define if the setting is managed by the ConfigurationStore service
+      configurableManaged?: boolean;
+      // Define a text to print as the default in the configuration block
+      defaultBlock?: string;
+      /* Transform the value defined in the configuration file to be consumed by the Configuration
+        service */
+      transformFrom?: (value: any) => any;
     };
   };
   // Transform the input value. The result is saved in the form global state of Settings/Configuration
@@ -287,6 +292,11 @@ export class Configuration implements IConfiguration {
    * @returns
    */
   async get(...settings: string[]) {
+    this.logger.debug(
+      settings.length
+        ? `Getting settings [${settings.join(',')}]`
+        : 'Getting settings',
+    );
     const stored = await this.store.get(...settings);
     this.logger.debug(`configuration stored: ${JSON.stringify({ stored })}`);
 
