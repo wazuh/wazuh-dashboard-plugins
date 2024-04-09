@@ -39,12 +39,6 @@ export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
   ) {
-    const response = await context.security_plugin.esClient
-      .asScoped(request)
-      .callAsCurrentUser('opensearch_security.restapiinfo');
-
-    if (!response.has_api_access) {
-      throw new Error(`User has no permission for rest API access.`);
-    }
+    // This is replaced after creating the instance
   }
 }
