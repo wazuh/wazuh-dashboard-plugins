@@ -23,6 +23,7 @@ import {
   StatisticsDataSource,
   StatisticsDataSourceRepository,
 } from '../../../common/data-source/pattern/statistics';
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 
 const plugins = getPlugins();
 
@@ -41,10 +42,11 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
   clusterNodeSelected,
   onSelectNode,
 }) => {
-  const { dataSource, setFilters } = useDataSource<
-    tParsedIndexPattern,
-    PatternDataSource
-  >({
+  const {
+    dataSource,
+    setFilters,
+    isLoading: isDataSourceLoading,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: StatisticsDataSource,
     repository: new StatisticsDataSourceRepository(),
   });
@@ -111,30 +113,34 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
           }
           iconType='iInCircle'
         />
-        <div className='server-management-statistics-dashboard-responsive'>
-          <DashboardByRenderer
-            input={{
-              viewMode: ViewMode.VIEW,
-              panels: getDashboardPanelsListenerEngine(dataSource?.id),
-              isFullScreenMode: false,
-              filters: searchBarProps.filters ?? [],
-              useMargins: true,
-              id: 'listener-engine-statistics-dashboard',
-              timeRange: {
-                from: searchBarProps.dateRangeFrom,
-                to: searchBarProps.dateRangeTo,
-              },
-              title: 'Listener Engine Statistics dashboard',
-              description: 'Dashboard of the Listener Engine Statistics',
-              query: searchBarProps.query,
-              refreshConfig: {
-                pause: false,
-                value: 15,
-              },
-              hidePanelTitles: false,
-            }}
-          />
-        </div>
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSpinner />
+        ) : (
+          <div className='server-management-statistics-dashboard-responsive'>
+            <DashboardByRenderer
+              input={{
+                viewMode: ViewMode.VIEW,
+                panels: getDashboardPanelsListenerEngine(dataSource?.id),
+                isFullScreenMode: false,
+                filters: searchBarProps.filters ?? [],
+                useMargins: true,
+                id: 'listener-engine-statistics-dashboard',
+                timeRange: {
+                  from: searchBarProps.dateRangeFrom,
+                  to: searchBarProps.dateRangeTo,
+                },
+                title: 'Listener Engine Statistics dashboard',
+                description: 'Dashboard of the Listener Engine Statistics',
+                query: searchBarProps.query,
+                refreshConfig: {
+                  pause: false,
+                  value: 15,
+                },
+                hidePanelTitles: false,
+              }}
+            />
+          </div>
+        )}
       </>
     </I18nProvider>
   );

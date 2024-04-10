@@ -105,24 +105,6 @@ export class ManageHosts {
     }
   }
 
-  private checkHostExistence(
-    hosts: IAPIHost[],
-    hostID: string,
-    { shouldExist }: { shouldExist?: boolean },
-  ) {
-    const hostExistIndex = hosts.findIndex(({ id }) => id === hostID);
-    if (shouldExist && hostExistIndex === -1) {
-      const message = `API connection with ID [${hostID}] was not found`;
-      this.logger.debug(message);
-      throw new Error(message);
-    } else if (!shouldExist && hostExistIndex !== -1) {
-      const message = `API connection with ID [${hostID}] was found`;
-      this.logger.debug(message);
-      throw new Error(message);
-    }
-    return hostExistIndex;
-  }
-
   /**
    * This get all hosts entries in the plugins configuration and the related info in the wazuh-registry.json
    * @param {Object} context
@@ -137,10 +119,10 @@ export class ManageHosts {
       this.logger.debug('Getting the API connections');
       const hosts = (await this.get(undefined, options)) as IAPIHost[];
       this.logger.debug('Getting registry');
-      const registry = Object.entries(this.cacheRegistry.entries());
+      const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
       return hosts.map(host => {
         const { id } = host;
-        return { ...host, ...registry[id] };
+        return { ...host, cluster_info: registry[id] };
       });
     } catch (error) {
       this.logger.error(error.message);
