@@ -12,8 +12,9 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-
+import { EuiBasicTable } from '@elastic/eui';
 import { EuiFieldText, EuiSpacer, EuiTextAlign } from '@elastic/eui';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 
 class WzConfigurationSetting extends Component {
   constructor(props) {
@@ -53,10 +54,12 @@ class WzConfigurationSetting extends Component {
                 : { justifySelf: 'flex-end', margin: '1em', width: '35%' }
             }
           >
-            <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>{label}</EuiTextAlign>
+            <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>
+              {label}
+            </EuiTextAlign>
           </div>
           <div style={isMobile ? { width: '100%' } : { width: '65%' }}>
-            {Array.isArray(value) ? (
+            {Array.isArray(value) && typeof value[0] === 'string' ? (
               <ul>
                 {value.map((v, key) => (
                   <li key={`${keyItem}-${label}-${key}`}>
@@ -64,16 +67,30 @@ class WzConfigurationSetting extends Component {
                   </li>
                 ))}
               </ul>
+            ) : Array.isArray(value) ? (
+              <Fragment>
+                <WzConfigurationSettingsHeader title='Filters' />
+                <EuiBasicTable
+                  items={value.flat()}
+                  columns={[
+                    { field: 'field', name: 'Field' },
+                    { field: 'expression', name: 'expression' },
+                    { field: 'ignore_if_missing', name: 'Ignore If Missing' },
+                  ]}
+                />
+              </Fragment>
             ) : (
               <EuiFieldText
-                data-testid={`${String(label).toLowerCase().replace(/\s/g, '-')}`}
+                data-testid={`${String(label)
+                  .toLowerCase()
+                  .replace(/\s/g, '-')}`}
                 value={String(value)}
                 readOnly
               />
             )}
           </div>
         </div>
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
       </Fragment>
     ) : null;
   }

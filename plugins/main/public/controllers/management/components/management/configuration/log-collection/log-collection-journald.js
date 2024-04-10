@@ -64,15 +64,6 @@ const mainSettings = [
   },
   {
     field: 'filters',
-    label: 'Kernel device',
-  },
-  {
-    field: 'filters',
-    label: 'SYSTEMD UNIT',
-  },
-  {
-    field: 'filters',
-    label: 'CUSTOM',
   },
 ];
 
