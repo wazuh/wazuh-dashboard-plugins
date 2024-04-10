@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiFacetButton,
   EuiFlexGroup,
@@ -44,102 +44,69 @@ import { getErrorOrchestrator } from '../../../../../../react-services/common-se
 
 const MITRE_ATTACK = 'mitre-attack';
 
+type tTechniquesProps = {
+  tacticsObject: ITactic;
+  selectedTactics: any;
+  indexPattern: any;
+  filterParams: IFilterParams;
+  isLoading: boolean;
+};
+
+type tTechniquesState = {
+  techniquesCount: { key: string; doc_count: number }[];
+  isFlyoutVisible: Boolean;
+  currentTechnique: string;
+  hideAlerts: boolean;
+  actionsOpen: string;
+  filteredTechniques: boolean | [string];
+  mitreTechniques: [];
+  hover: string;
+};
+
 export const Techniques = withWindowSize(
-  class Techniques extends Component {
-    _isMount = false;
+  (props: tTechniquesProps) => {
+    const {
+      tacticsObject,
+      selectedTactics,
+      indexPattern,
+      filterParams,
+      isLoading,
+    } = props;
 
-    props!: {
-      tacticsObject: ITactic;
-      selectedTactics: any;
-      indexPattern: any;
-      filterParams: IFilterParams;
-    };
+    const [state, setState] = useState<tTechniquesState>({
+      isFlyoutVisible: false,
+      techniquesCount: [],
+      currentTechnique: '',
+      hideAlerts: false,
+      actionsOpen: '',
+      filteredTechniques: false,
+      mitreTechniques: [],
+      hover: '',
+    });
 
-    state: {
-      techniquesCount: { key: string; doc_count: number }[];
-      isFlyoutVisible: Boolean;
-      currentTechnique: string;
-      hideAlerts: boolean;
-      actionsOpen: string;
-      filteredTechniques: boolean | [string];
-      mitreTechniques: [];
-      isSearching: boolean;
-    };
+    const [isSearching, setIsSearching] = useState(false);
+    const [loadingAlerts, setLoadingAlerts] = useState(false);
 
-    constructor(props) {
-      super(props);
+    const { 
+      isFlyoutVisible,
+      techniquesCount,
+      currentTechnique,
+    } = state;
 
-      this.state = {
-        isFlyoutVisible: false,
-        techniquesCount: [],
-        currentTechnique: '',
-        hideAlerts: false,
-        actionsOpen: '',
-        filteredTechniques: false,
-        mitreTechniques: [],
-        isSearching: false,
-      };
-      this.onChangeFlyout.bind(this);
-    }
+    useEffect(() => {
+      buildMitreTechniquesFromApi();
+    }, [])
 
-    async componentDidMount() {
-      this._isMount = true;
-      await this.buildMitreTechniquesFromApi();
-    }
 
-    shouldComponentUpdate(nextProps, nextState) {
-      const { filterParams, indexPattern, selectedTactics, isLoading } =
-        this.props;
-      if (nextProps.isLoading !== isLoading) return true;
-      if (
-        JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams)
-      )
-        return true;
-      if (
-        JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern)
-      )
-        return true;
-      if (
-        JSON.stringify(nextState.selectedTactics) !==
-        JSON.stringify(selectedTactics)
-      )
-        return true;
-      return false;
-    }
+    useEffect(() => {
+      if (isLoading) return;
+      if (!tacticsObject) return;
+      if (!filterParams) return;
+      getTechniquesCount();
+    }, [tacticsObject, isLoading, filterParams]);
 
-    componentDidUpdate(prevProps) {
-      const { isLoading, tacticsObject, filters } = this.props;
-      if (
-        JSON.stringify(prevProps.tacticsObject) !==
-          JSON.stringify(tacticsObject) ||
-        isLoading !== prevProps.isLoading ||
-        JSON.stringify(prevProps.filterParams) !==
-          JSON.stringify(this.props.filterParams)
-      )
-        this.getTechniquesCount();
-    }
-
-    componentWillUnmount() {
-      this._isMount = false;
-    }
-
-    showToast(
-      color: string,
-      title: string = '',
-      text: string = '',
-      time: number = 3000,
-    ) {
-      getToasts().add({
-        color: color,
-        title: title,
-        text: text,
-        toastLifeTimeMs: time,
-      });
-    }
-
-    async getTechniquesCount() {
+    const getTechniquesCount = async () =>  {
       try {
-        const { indexPattern, filters } = this.props;
         if (!indexPattern) {
           return;
         }
@@ -151,17 +118,20 @@ export const Techniques = withWindowSize(
             },
           },
         };
-        this._isMount && this.setState({ loadingAlerts: true });
+        setLoadingAlerts(true);
         // TODO: use `status` and `statusText`  to show errors
         // @ts-ignore
         const { data, status, statusText } = await getElasticAlerts(
           indexPattern,
-          filters,
+          filterParams,
           aggs,
         );
         const buckets = data?.aggregations?.techniques?.buckets || [];
-        this._isMount &&
-          this.setState({ techniquesCount: buckets, loadingAlerts: false });
+        setState({
+          ...state,
+          techniquesCount: buckets,
+        });
+        setLoadingAlerts(false);
       } catch (error) {
         const options = {
           context: `${Techniques.name}.getTechniquesCount`,
@@ -176,11 +146,11 @@ export const Techniques = withWindowSize(
           },
         };
         getErrorOrchestrator().handleError(options);
-        this._isMount && this.setState({ loadingAlerts: false });
+        setLoadingAlerts(false);
       }
     }
 
-    buildPanel(techniqueID) {
+    const buildPanel = (techniqueID) => {
       return [
         {
           id: 0,
@@ -190,8 +160,8 @@ export const Techniques = withWindowSize(
               name: 'Filter for value',
               icon: <EuiIcon type='magnifyWithPlus' size='m' />,
               onClick: () => {
-                this.closeActionsMenu();
-                this.addFilter({
+                closeActionsMenu();
+                addFilter({
                   key: 'rule.mitre.id',
                   value: techniqueID,
                   negate: false,
@@ -202,8 +172,8 @@ export const Techniques = withWindowSize(
               name: 'Filter out value',
               icon: <EuiIcon type='magnifyWithMinus' size='m' />,
               onClick: () => {
-                this.closeActionsMenu();
-                this.addFilter({
+                closeActionsMenu();
+                addFilter({
                   key: 'rule.mitre.id',
                   value: techniqueID,
                   negate: true,
@@ -214,8 +184,8 @@ export const Techniques = withWindowSize(
               name: 'View technique details',
               icon: <EuiIcon type='filebeatApp' size='m' />,
               onClick: () => {
-                this.closeActionsMenu();
-                this.showFlyout(techniqueID);
+                closeActionsMenu();
+                showFlyout(techniqueID);
               },
             },
           ],
@@ -223,11 +193,11 @@ export const Techniques = withWindowSize(
       ];
     }
 
-    techniqueColumnsResponsive() {
-      if (this.props && this.props.windowSize) {
-        return this.props.windowSize.width < 930
+    const techniqueColumnsResponsive = () => {
+      if (props && props?.windowSize) {
+        return props.windowSize.width < 930
           ? 2
-          : this.props.windowSize.width < 1200
+          : props.windowSize.width < 1200
           ? 3
           : 4;
       } else {
@@ -235,7 +205,7 @@ export const Techniques = withWindowSize(
       }
     }
 
-    async getMitreTechniques(params) {
+    const getMitreTechniques = async (params) => {
       try {
         return await WzRequest.apiReq('GET', '/mitre/techniques', { params });
       } catch (error) {
@@ -256,11 +226,11 @@ export const Techniques = withWindowSize(
       }
     }
 
-    async buildMitreTechniquesFromApi() {
+    const buildMitreTechniquesFromApi = async () => {
       const limitResults = 500;
       const params = { limit: limitResults };
-      this.setState({ isSearching: true });
-      const output = await this.getMitreTechniques(params);
+      setIsSearching(true);
+      const output = await getMitreTechniques(params);
       const totalItems = (((output || {}).data || {}).data || {})
         .total_affected_items;
       let mitreTechniques = [];
@@ -275,7 +245,7 @@ export const Techniques = withWindowSize(
           Array(Math.ceil((totalItems - params.limit) / params.limit))
             .fill()
             .map(async (_, index) => {
-              const response = await this.getMitreTechniques({
+              const response = await getMitreTechniques({
                 ...params,
                 offset: limitResults * (1 + index),
               });
@@ -284,13 +254,14 @@ export const Techniques = withWindowSize(
         );
         mitreTechniques.push(...extraResults.flat());
       }
-      this.setState({ mitreTechniques: mitreTechniques, isSearching: false });
+      setState({ ...state, mitreTechniques });
+      setIsSearching(false);
     }
 
-    buildObjTechniques(techniques) {
+    const buildObjTechniques = (techniques) => {
       const techniquesObj = [];
       techniques.forEach(element => {
-        const mitreObj = this.state.mitreTechniques.find(
+        const mitreObj = state.mitreTechniques.find(
           item => item.id === element,
         );
         if (mitreObj) {
@@ -311,19 +282,17 @@ export const Techniques = withWindowSize(
       return techniquesObj;
     }
 
-    renderFacet() {
-      const { tacticsObject } = this.props;
-      const { techniquesCount } = this.state;
+    const renderFacet = () => {
       let hash = {};
       let tacticsToRender: Array<any> = [];
       const currentTechniques = Object.keys(tacticsObject)
         .map(tacticsKey => ({
           tactic: tacticsKey,
-          techniques: this.buildObjTechniques(
+          techniques: buildObjTechniques(
             tacticsObject[tacticsKey].techniques,
           ),
         }))
-        .filter(tactic => this.props.selectedTactics[tactic.tactic])
+        .filter(tactic => selectedTactics[tactic.tactic])
         .map(tactic => tactic.techniques)
         .flat()
         .filter(
@@ -331,8 +300,8 @@ export const Techniques = withWindowSize(
         );
       tacticsToRender = currentTechniques
         .filter(technique =>
-          this.state.filteredTechniques
-            ? this.state.filteredTechniques.includes(technique.id)
+          state.filteredTechniques
+            ? state.filteredTechniques.includes(technique.id)
             : technique.id && hash[technique.id]
             ? false
             : (hash[technique.id] = true),
@@ -347,7 +316,7 @@ export const Techniques = withWindowSize(
           };
         })
         .filter(technique =>
-          this.state.hideAlerts ? technique.quantity !== 0 : true,
+          state.hideAlerts ? technique.quantity !== 0 : true,
         );
       const tacticsToRenderOrdered = tacticsToRender
         .sort((a, b) => b.quantity - a.quantity)
@@ -355,11 +324,11 @@ export const Techniques = withWindowSize(
           const tooltipContent = `View details of ${item.label} (${item.id})`;
           const toolTipAnchorClass =
             'wz-display-inline-grid' +
-            (this.state.hover === item.id ? ' wz-mitre-width' : ' ');
+            (state.hover === item.id ? ' wz-mitre-width' : ' ');
           return (
             <EuiFlexItem
-              onMouseEnter={() => this.setState({ hover: item.id })}
-              onMouseLeave={() => this.setState({ hover: '' })}
+              onMouseEnter={() => setState({ ...state, hover: item.id })}
+              onMouseLeave={() => setState({ ...state, hover: '' })}
               key={idx}
               style={{
                 border: '1px solid #8080804a',
@@ -380,7 +349,7 @@ export const Techniques = withWindowSize(
                     }}
                     quantity={item.quantity}
                     className={'module-table'}
-                    onClick={() => this.showFlyout(item.id)}
+                    onClick={() => showFlyout(item.id)}
                   >
                     <EuiToolTip
                       position='top'
@@ -399,7 +368,7 @@ export const Techniques = withWindowSize(
                       </span>
                     </EuiToolTip>
 
-                    {this.state.hover === item.id && (
+                    {state.hover === item.id && (
                       <span style={{ float: 'right', position: 'fixed' }}>
                         <EuiToolTip
                           position='top'
@@ -407,7 +376,7 @@ export const Techniques = withWindowSize(
                         >
                           <EuiIcon
                             onClick={e => {
-                              this.openDashboard(e, item.id);
+                              openDashboard(e, item.id);
                               e.stopPropagation();
                             }}
                             color='primary'
@@ -421,7 +390,7 @@ export const Techniques = withWindowSize(
                         >
                           <EuiIcon
                             onClick={e => {
-                              this.openDiscover(e, item.id);
+                              openDiscover(e, item.id);
                               e.stopPropagation();
                             }}
                             color='primary'
@@ -432,24 +401,24 @@ export const Techniques = withWindowSize(
                     )}
                   </EuiFacetButton>
                 }
-                isOpen={this.state.actionsOpen === item.id}
-                closePopover={() => this.closeActionsMenu()}
+                isOpen={state.actionsOpen === item.id}
+                closePopover={() => closeActionsMenu()}
                 panelPaddingSize='none'
                 style={{ width: '100%' }}
                 anchorPosition='downLeft'
               >
                 <EuiContextMenu
                   initialPanelId={0}
-                  panels={this.buildPanel(item.id)}
+                  panels={buildPanel(item.id)}
                 />
               </EuiPopover>
             </EuiFlexItem>
           );
         });
       if (
-        this.state.isSearching ||
-        this.state.loadingAlerts ||
-        this.props.isLoading
+        isSearching ||
+        loadingAlerts ||
+        isLoading
       ) {
         return (
           <EuiFlexItem
@@ -462,7 +431,7 @@ export const Techniques = withWindowSize(
       if (tacticsToRender.length) {
         return (
           <EuiFlexGrid
-            columns={this.techniqueColumnsResponsive()}
+            columns={techniqueColumnsResponsive()}
             gutterSize='s'
             style={{
               maxHeight: 'calc(100vh - 420px)',
@@ -485,29 +454,29 @@ export const Techniques = withWindowSize(
       }
     }
 
-    openDiscover(e, techniqueID) {
-      this.addFilter({
+    const openDiscover = (e, techniqueID) => {
+      addFilter({
         key: 'rule.mitre.id',
         value: techniqueID,
         negate: false,
       });
-      this.props.onSelectedTabChanged('events');
+      onSelectedTabChanged('events');
     }
 
-    openDashboard(e, techniqueID) {
-      this.addFilter({
+    const openDashboard = (e, techniqueID) => {
+      addFilter({
         key: 'rule.mitre.id',
         value: techniqueID,
         negate: false,
       });
-      this.props.onSelectedTabChanged('dashboard');
+      onSelectedTabChanged('dashboard');
     }
 
     /**
      * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
      * @param filter
      */
-    addFilter(filter) {
+    const addFilter = (filter) => {
       const { filterManager } = getDataPlugin().query;
       const matchPhrase = {};
       matchPhrase[filter.key] = filter.value;
@@ -528,17 +497,17 @@ export const Techniques = withWindowSize(
       filterManager.addFilters([newFilter]);
     }
 
-    onChange = searchValue => {
+    const onChange = searchValue => {
       if (!searchValue) {
-        this._isMount &&
-          this.setState({ filteredTechniques: false, isSearching: false });
+          setState({ ...state, filteredTechniques: false });
+          setIsSearching(false);
       }
     };
 
-    onSearch = async searchValue => {
+    const onSearch = async searchValue => {
       try {
         if (searchValue) {
-          this._isMount && this.setState({ isSearching: true });
+          setIsSearching(true);
           const response = await WzRequest.apiReq('GET', '/mitre/techniques', {
             params: {
               search: searchValue,
@@ -551,11 +520,14 @@ export const Techniques = withWindowSize(
               [item].filter(reference => reference.source === MITRE_ATTACK)[0]
                 .external_id,
           );
-          this._isMount &&
-            this.setState({ filteredTechniques, isSearching: false });
+          setState({
+            ...state,
+            filteredTechniques,
+          });
+          setIsSearching(false);
         } else {
-          this._isMount &&
-            this.setState({ filteredTechniques: false, isSearching: false });
+          setState({ ...state, filteredTechniques: false });
+          setIsSearching(false);
         }
       } catch (error) {
         const options = {
@@ -571,36 +543,40 @@ export const Techniques = withWindowSize(
           },
         };
         getErrorOrchestrator().handleError(options);
-        this._isMount &&
-          this.setState({ filteredTechniques: false, isSearching: false });
+        setState({ ...state, filteredTechniques: false });
+        setIsSearching(false);
       }
     };
-    async closeActionsMenu() {
-      this.setState({ actionsOpen: false });
+
+    const closeActionsMenu = () => {
+      setState({ ...state, actionsOpen: false });
     }
 
-    async showActionsMenu(techniqueData) {
-      this.setState({ actionsOpen: techniqueData });
+    const showActionsMenu = (techniqueData) => {
+      setState({ ...state, actionsOpen: techniqueData });
     }
 
-    async showFlyout(techniqueData) {
-      this.setState({ isFlyoutVisible: true, currentTechnique: techniqueData });
+    const showFlyout = (techniqueData) => {
+      setState({
+        ...state,
+        isFlyoutVisible: true,
+        currentTechnique: techniqueData,
+      });
     }
 
-    closeFlyout() {
-      this.setState({ isFlyoutVisible: false });
+    const closeFlyout = () => {
+      setState({ ...state, isFlyoutVisible: false });
     }
 
-    onChangeFlyout = (isFlyoutVisible: boolean) => {
-      this.setState({ isFlyoutVisible });
+    const onChangeFlyout = (isFlyoutVisible: boolean) => {
+      setState({ ...state, isFlyoutVisible });
     };
 
-    hideAlerts() {
-      this.setState({ hideAlerts: !this.state.hideAlerts });
+    const hideAlerts = () => {
+      setState({ ...state, hideAlerts: !state.hideAlerts });
     }
 
-    render() {
-      const { isFlyoutVisible, currentTechnique } = this.state;
+    
       return (
         <div style={{ padding: 10 }}>
           <EuiFlexGroup>
@@ -617,8 +593,8 @@ export const Techniques = withWindowSize(
                     <span>Hide techniques with no alerts </span> &nbsp;
                     <EuiSwitch
                       label=''
-                      checked={this.state.hideAlerts}
-                      onChange={e => this.hideAlerts()}
+                      checked={state.hideAlerts}
+                      onChange={e => hideAlerts()}
                     />
                   </EuiText>
                 </EuiFlexItem>
@@ -630,25 +606,24 @@ export const Techniques = withWindowSize(
           <WzFieldSearchDelay
             fullWidth={true}
             placeholder='Filter techniques of selected tactic/s'
-            onChange={this.onChange}
-            onSearch={this.onSearch}
+            onChange={onChange}
+            onSearch={onSearch}
             isClearable={true}
             aria-label='Use aria labels when no actual label is in use'
           />
           <EuiSpacer size='s' />
 
-          <div>{this.renderFacet()}</div>
+          <div>{renderFacet()}</div>
 
           {isFlyoutVisible && (
             <FlyoutTechnique
-              openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-              openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-              onChangeFlyout={this.onChangeFlyout}
+              openDashboard={(e, itemId) => openDashboard(e, itemId)}
+              openDiscover={(e, itemId) => openDiscover(e, itemId)}
+              onChangeFlyout={onChangeFlyout}
               currentTechnique={currentTechnique}
             />
           )}
         </div>
       );
     }
-  },
 );

@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import MarkdownIt from 'markdown-it';
 import $ from 'jquery';
 
@@ -46,77 +46,93 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../../../react-services/erro
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../../components/common/flyouts';
 
-export class FlyoutTechnique extends Component {
-  _isMount = false;
-  clusterFilter: object;
+type tFlyoutTechniqueProps = {
+  currentTechnique: string;
+  onChangeFlyout: (value: boolean) => void;
+  openDashboard: (e: any, id: string) => void;
+  openDiscover: (e: any, id: string) => void;
+  implicitFilters?: object[];
+  view?: string;
+};
 
-  state: {
-    techniqueData: {
-      [key: string]: any;
-    };
-    loading: boolean;
+type tFlyoutTechniqueState = {
+  techniqueData: {
+    [key: string]: any;
   };
+  totalHits?: number;
+};
 
-  props!: {
-    currentTechnique: string;
-  };
+export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
+  let filterManager: FilterManager = new FilterManager(getUiSettings());
 
-  filterManager: FilterManager;
+  const [state, setState] = React.useState<tFlyoutTechniqueState>({
+    techniqueData: {}
+  });
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      techniqueData: {
-        // description: ''
-      },
-      loading: false,
-    };
-    this.filterManager = new FilterManager(getUiSettings());
-  }
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [clusterFilter, setClusterFilter] = useState<object>();
 
-  async componentDidMount() {
-    this._isMount = true;
+  const {
+    currentTechnique,
+    onChangeFlyout,
+    openDashboard,
+    openDiscover,
+    implicitFilters,
+    view,
+  } = props;
+
+  const { techniqueData } = state;
+
+  useEffect(() => {
+    initialize();
+  }, [])
+
+  const initialize = async () => {
     const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
     const clusterFilter = isCluster
       ? { 'cluster.name': AppState.getClusterInfo().cluster }
       : { 'manager.name': AppState.getClusterInfo().manager };
-    this.clusterFilter = clusterFilter;
-    await this.getTechniqueData();
-    this.addListenersToCitations();
+    setClusterFilter(clusterFilter);
+    await getTechniqueData();
+    addListenersToCitations();
   }
 
-  async componentDidUpdate(prevProps) {
-    const { currentTechnique } = this.props;
-    if (prevProps.currentTechnique !== currentTechnique) {
-      await this.getTechniqueData();
+  useEffect(() => {
+    const componentDidUpdate = async (prevProps) => {
+      const { currentTechnique } = props;
+      if (prevProps.currentTechnique !== currentTechnique) {
+        await getTechniqueData();
+      }
+      addListenersToCitations();
     }
-    this.addListenersToCitations();
-  }
 
-  componentWillUnmount() {
-    // remove listeners of citations if these exist
-    if (
-      this.state.techniqueData &&
-      this.state.techniqueData.replaced_external_references &&
-      this.state.techniqueData.replaced_external_references.length > 0
-    ) {
-      this.state.techniqueData.replaced_external_references.forEach(
-        reference => {
-          $(`.technique-reference-${reference.index}`).each(function () {
-            $(this).off();
-          });
-        },
-      );
+    componentDidUpdate(props);
+
+    return () => {
+      // remove listeners of citations if these exist
+      if (
+        state.techniqueData &&
+        state.techniqueData.replaced_external_references &&
+        state.techniqueData.replaced_external_references.length > 0
+      ) {
+        state.techniqueData.replaced_external_references.forEach(
+          reference => {
+            $(`.technique-reference-${reference.index}`).each(function () {
+              $(this).off();
+            });
+          },
+        );
+      }
     }
-  }
+  }, [props.currentTechnique]);
 
-  addListenersToCitations() {
+  const addListenersToCitations = () => {
     if (
-      this.state.techniqueData &&
-      this.state.techniqueData.replaced_external_references &&
-      this.state.techniqueData.replaced_external_references.length > 0
+      state.techniqueData &&
+      state.techniqueData.replaced_external_references &&
+      state.techniqueData.replaced_external_references.length > 0
     ) {
-      this.state.techniqueData.replaced_external_references.forEach(
+      state.techniqueData.replaced_external_references.forEach(
         reference => {
           $(`.technique-reference-citation-${reference.index}`).each(
             function () {
@@ -134,10 +150,11 @@ export class FlyoutTechnique extends Component {
     }
   }
 
-  async getTechniqueData() {
+  const getTechniqueData = async () => {
     try {
-      this.setState({ loading: true, techniqueData: {} });
-      const { currentTechnique } = this.props;
+      setIsLoading(true);
+      setState({ techniqueData: {} });
+      const { currentTechnique } = props;
       const techniqueResponse = await WzRequest.apiReq(
         'GET',
         '/mitre/techniques',
@@ -166,11 +183,12 @@ export class FlyoutTechnique extends Component {
           return { id: tactic.external_id, name: tactic.name };
         }));
       const { name, mitre_version, tactics } = techniqueData;
-      this._isMount &&
-        this.setState({
+      
+        setState({
           techniqueData: { name, mitre_version, tactics },
-          loading: false,
         });
+
+        setIsLoading(false);
     } catch (error) {
       const options = {
         context: `${FlyoutTechnique.name}.getTechniqueData`,
@@ -185,12 +203,12 @@ export class FlyoutTechnique extends Component {
         },
       };
       getErrorOrchestrator().handleError(options);
-      this.setState({ loading: false });
+      setIsLoading(false);
     }
   }
 
-  renderHeader() {
-    const { techniqueData } = this.state;
+  const renderHeader = () => {
+    const { techniqueData } = state;
     return (
       <EuiFlyoutHeader hasBorder style={{ padding: '12px 16px' }}>
         {(Object.keys(techniqueData).length === 0 && (
@@ -206,15 +224,15 @@ export class FlyoutTechnique extends Component {
     );
   }
 
-  renderBody() {
-    const { currentTechnique } = this.props;
-    const { techniqueData } = this.state;
+  const renderBody = () => {
+    const { currentTechnique } = props;
+    const { techniqueData } = state;
     const implicitFilters = [
       { 'rule.mitre.id': currentTechnique },
-      this.clusterFilter,
+      clusterFilter,
     ];
-    if (this.props.implicitFilters) {
-      this.props.implicitFilters.forEach(item => implicitFilters.push(item));
+    if (implicitFilters) {
+      implicitFilters.forEach(item => implicitFilters.push(item));
     }
 
     const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
@@ -320,14 +338,14 @@ export class FlyoutTechnique extends Component {
           className='events-accordion'
           extraAction={
             <div style={{ marginBottom: 5 }}>
-              <strong>{this.state.totalHits || 0}</strong> hits
+              <strong>{state.totalHits || 0}</strong> hits
             </div>
           }
           buttonContent={
             <EuiTitle size='s'>
               <h3>
                 Recent events
-                {this.props.view !== 'events' && (
+                {view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>
                     <span>
                       <EuiToolTip
@@ -336,7 +354,7 @@ export class FlyoutTechnique extends Component {
                       >
                         <EuiIcon
                           onMouseDown={e => {
-                            this.props.openDashboard(e, currentTechnique);
+                            openDashboard(e, currentTechnique);
                             e.stopPropagation();
                           }}
                           color='primary'
@@ -350,7 +368,7 @@ export class FlyoutTechnique extends Component {
                       >
                         <EuiIcon
                           onMouseDown={e => {
-                            this.props.openDiscover(e, currentTechnique);
+                            openDiscover(e, currentTechnique);
                             e.stopPropagation();
                           }}
                           color='primary'
@@ -370,7 +388,7 @@ export class FlyoutTechnique extends Component {
             <EuiFlexItem>
               <Discover
                 kbnSearchBar
-                shareFilterManager={this.filterManager}
+                shareFilterManager={filterManager}
                 initialColumns={[
                   { field: 'icon' },
                   { field: 'timestamp' },
@@ -393,7 +411,7 @@ export class FlyoutTechnique extends Component {
                 ]}
                 implicitFilters={implicitFilters}
                 initialFilters={[]}
-                updateTotalHits={total => this.updateTotalHits(total)}
+                updateTotalHits={total => updateTotalHits(total)}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -402,11 +420,11 @@ export class FlyoutTechnique extends Component {
     );
   }
 
-  updateTotalHits = total => {
-    this.setState({ totalHits: total });
+  const updateTotalHits = total => {
+    setState({ ...state, totalHits: total });
   };
 
-  renderLoading() {
+  const renderLoading = () => {
     return (
       <EuiFlyoutBody>
         <EuiLoadingContent lines={2} />
@@ -415,9 +433,7 @@ export class FlyoutTechnique extends Component {
     );
   }
 
-  render() {
-    const { techniqueData } = this.state;
-    const { onChangeFlyout } = this.props;
+
     return (
       <WzFlyout
         onClose={() => onChangeFlyout(false)}
@@ -427,10 +443,9 @@ export class FlyoutTechnique extends Component {
           'aria-labelledby': 'flyoutSmallTitle',
         }}
       >
-        {techniqueData && this.renderHeader()}
-        {this.renderBody()}
-        {this.state.loading && this.renderLoading()}
+        {techniqueData && renderHeader()}
+        {renderBody()}
+        {isLoading && renderLoading()}
       </WzFlyout>
     );
-  }
 }

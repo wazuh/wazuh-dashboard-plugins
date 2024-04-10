@@ -11,7 +11,7 @@
  */
 
 import React, { Component } from 'react';
-import { Mitre } from '../../../components/overview/mitre/framework/mitre';
+import { Mitre } from '../../../components/overview/mitre/framework';
 import { withUserAuthorizationPrompt, withAgentSupportModule } from '../hocs';
 import { compose } from 'redux';
 

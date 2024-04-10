@@ -9,204 +9,222 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
+import { I18nProvider } from '@osd/i18n/react';
 import { Tactics, Techniques } from './components';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { IFilterParams, getIndexPattern } from './lib';
 
 import {
-  FilterManager,
-  Filter,
+    FilterManager,
+    Filter,
 } from '../../../../../../../src/plugins/data/public/';
 //@ts-ignore
 import { KbnSearchBar } from '../../../kbn-search-bar';
-import { TimeRange, Query } from '../../../../../../../src/plugins/data/common';
+import { TimeRange, Query, IndexPattern } from '../../../../../../../src/plugins/data/common';
 import { ModulesHelper } from '../../../common/modules/modules-helper';
-import { getDataPlugin, getToasts } from '../../../../kibana-services';
+import { getDataPlugin, getPlugins, getToasts } from '../../../../kibana-services';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import useSearchBar from '../../../common/search-bar/use-search-bar';
+import { useDataSource, MitreAttackDataSource, AlertsDataSourceRepository, tParsedIndexPattern, PatternDataSource } from '../../../common/data-source';
 export interface ITactic {
-  [key: string]: string[];
+    [key: string]: string[];
 }
 
-export const Mitre = withErrorBoundary(
-  class Mitre extends Component {
-    _isMount = false;
-    timefilter: {
-      getTime(): TimeRange;
-      setTime(time: TimeRange): void;
-      _history: { history: { items: { from: string; to: string }[] } };
-    };
+const SearchBar = getPlugins().data.ui.SearchBar;
 
-    PluginPlatformServices: { [key: string]: any };
-    filterManager: FilterManager;
-    indexPattern: any;
-    destroyWatcher: any;
-    state: {
-      tacticsObject: ITactic;
-      selectedTactics: Object;
-      filterParams: IFilterParams;
-      isLoading: boolean;
-    };
+type tTimefilter = {
+    getTime(): TimeRange;
+    setTime(time: TimeRange): void;
+    _history: { history: { items: { from: string; to: string }[] } };
+};
 
-    props: any;
+type tPluginPlatformServices = { [key: string]: any };
+type tMitreState = {
+    tacticsObject: ITactic;
+    selectedTactics: Object;
+    filterParams: IFilterParams;
+};
 
-    constructor(props) {
-      super(props);
-      this.PluginPlatformServices = getDataPlugin().query;
-      this.filterManager = this.PluginPlatformServices.filterManager;
-      this.timefilter = this.PluginPlatformServices.timefilter.timefilter;
-      this.state = {
+const MitreComponent = (props) => {
+    const { onSelectedTabChanged } = props;
+    let PluginPlatformServices: tPluginPlatformServices = getDataPlugin().query;
+    let filterManager: FilterManager = PluginPlatformServices.filterManager;
+    let timefilter: tTimefilter = PluginPlatformServices.timefilter.timefilter;
+    const [isLoading, setIsLoading] = useState(true);
+    const [mitreState, setMitreState] = useState<tMitreState>({
         tacticsObject: {},
         selectedTactics: {},
-        isLoading: true,
         filterParams: {
-          filters: this.filterManager.getFilters() || [],
-          query: { language: 'kuery', query: '' },
-          time: this.timefilter.getTime(),
-        },
-      };
-      this.onChangeSelectedTactics.bind(this);
-      this.onQuerySubmit.bind(this);
-      this.onFiltersUpdated.bind(this);
+            filters: filterManager.getFilters() || [],
+            query: { language: 'kuery', query: '' },
+            time: timefilter.getTime(),
+        }
+    })
+    const [filtersSubscriber, setFiltersSubscriber] = useState<any>(); //Todo: Add correct ype
+    const [indexPattern, setIndexPattern] = useState<any>(); //Todo: Add correct type
+
+    const {
+        filters,
+        dataSource,
+        fetchFilters,
+        isLoading: isDataSourceLoading,
+        fetchData,
+        setFilters
+    } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+        DataSource: MitreAttackDataSource,
+        repository: new AlertsDataSourceRepository(),
+    });
+
+    const { searchBarProps } = useSearchBar({
+        indexPattern: dataSource?.indexPattern as IndexPattern,
+        filters,
+        setFilters,
+    });
+
+    const initialize = async () => {
+        setIndexPattern(await getIndexPattern());
+        const scope = await ModulesHelper.getDiscoverScope(); // remove this
+        const query = scope.state.query;
+        const { filters, time } = mitreState.filterParams;
+        const filterParams = { query, time, filters };
+        setMitreState({ ...mitreState, filterParams });
+        setFiltersSubscriber(filterManager
+            .getUpdates$()
+            .subscribe(() => {
+                onFiltersUpdated(filterManager.getFilters());
+            })
+        );
+
+        await buildTacticsObject();
     }
 
-    async componentDidMount() {
-      this._isMount = true;
-      this.indexPattern = await getIndexPattern();
-      const scope = await ModulesHelper.getDiscoverScope(); // remove this
-      const query = scope.state.query;
-      const { filters, time } = this.state.filterParams;
-      this.setState({ filterParams: { query, filters, time } });
-      this.filtersSubscriber = this.filterManager
-        .getUpdates$()
-        .subscribe(() => {
-          this.onFiltersUpdated(this.filterManager.getFilters());
-        });
+    useEffect(() => {
+        initialize();
 
-      await this.buildTacticsObject();
+        return () => {
+            filtersSubscriber && filtersSubscriber.unsubscribe();
+        }
+    }, []);
+
+
+
+    const onQuerySubmit = (payload: { dateRange: TimeRange; query: Query }) => {
+        const { query, dateRange } = payload;
+        const { filters } = mitreState.filterParams;
+        const filterParams = { query, time: dateRange, filters };
+        setMitreState({ ...mitreState, filterParams });
+        setIsLoading(true);
+    };
+
+    const onFiltersUpdated = (filters: Filter[]) => {
+        const { query, time } = mitreState.filterParams;
+        const filterParams = { query, time, filters };
+        setMitreState({ ...mitreState, filterParams });
+        setIsLoading(true);
+    };
+
+    const buildTacticsObject = async () => {
+        try {
+            const data = await WzRequest.apiReq('GET', '/mitre/tactics', {});
+            const result = (((data || {}).data || {}).data || {}).affected_items;
+            const tacticsObject = {};
+            result &&
+                result.forEach(item => {
+                    tacticsObject[item.name] = item;
+                });
+            setMitreState({ ...mitreState, tacticsObject });
+            setIsLoading(false);
+        } catch (error) {
+            setIsLoading(false);
+            const options = {
+                context: `${Mitre.name}.buildTacticsObject`,
+                level: UI_LOGGER_LEVELS.ERROR,
+                severity: UI_ERROR_SEVERITIES.BUSINESS,
+                store: true,
+                display: true,
+                error: {
+                    error: error,
+                    message: error.message || error,
+                    title: `Mitre data could not be fetched`,
+                },
+            };
+            getErrorOrchestrator().handleError(options);
+        }
     }
 
-    componentWillUnmount() {
-      this.filtersSubscriber.unsubscribe();
-      this._isMount = false;
-    }
-
-    onQuerySubmit = (payload: { dateRange: TimeRange; query: Query }) => {
-      const { query, dateRange } = payload;
-      const { filters } = this.state.filterParams;
-      const filterParams = { query, time: dateRange, filters };
-      this.setState({ filterParams, isLoading: true }, () =>
-        this.setState({ isLoading: false }),
-      );
+    const onChangeSelectedTactics = selectedTactics => {
+        setMitreState({ ...mitreState, selectedTactics });
     };
 
-    onFiltersUpdated = (filters: Filter[]) => {
-      const { query, time } = this.state.filterParams;
-      const filterParams = { query, time, filters };
-      this.setState({ filterParams, isLoading: true }, () =>
-        this.setState({ isLoading: false }),
-      );
-    };
-
-    showToast = (color, title, text, time) => {
-      getToasts().add({
-        color: color,
-        title: title,
-        text: text,
-        toastLifeTimeMs: time,
-      });
-    };
-
-    async buildTacticsObject() {
-      try {
-        const data = await WzRequest.apiReq('GET', '/mitre/tactics', {});
-        const result = (((data || {}).data || {}).data || {}).affected_items;
-        const tacticsObject = {};
-        result &&
-          result.forEach(item => {
-            tacticsObject[item.name] = item;
-          });
-        this._isMount && this.setState({ tacticsObject, isLoading: false });
-      } catch (error) {
-        this.setState({ isLoading: false });
-        const options = {
-          context: `${Mitre.name}.buildTacticsObject`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          display: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Mitre data could not be fetched`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    }
-
-    onChangeSelectedTactics = selectedTactics => {
-      this.setState({ selectedTactics });
-    };
-
-    render() {
-      const { isLoading } = this.state;
-
-      return (
+    return (
         <div>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <div className='wz-discover hide-filter-control'>
-                <KbnSearchBar
-                  onQuerySubmit={this.onQuerySubmit}
-                  onFiltersUpdated={this.onFiltersUpdated}
-                  isLoading={isLoading}
-                />
-              </div>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-
-          <EuiFlexGroup style={{ margin: '0 8px' }}>
-            <EuiFlexItem>
-              <EuiPanel paddingSize='none'>
+            <I18nProvider>
                 <EuiFlexGroup>
-                  <EuiFlexItem
-                    grow={false}
-                    style={{
-                      width: '15%',
-                      minWidth: 145,
-                      height: 'calc(100vh - 325px)',
-                      overflowX: 'hidden',
-                    }}
-                  >
-                    <Tactics
-                      indexPattern={this.indexPattern}
-                      onChangeSelectedTactics={this.onChangeSelectedTactics}
-                      filters={this.state.filterParams}
-                      {...this.state}
-                    />
-                  </EuiFlexItem>
-                  <EuiFlexItem>
-                    <Techniques
-                      indexPattern={this.indexPattern}
-                      filters={this.state.filterParams}
-                      onSelectedTabChanged={id =>
-                        this.props.onSelectedTabChanged(id)
-                      }
-                      {...this.state}
-                    />
-                  </EuiFlexItem>
+                    <EuiFlexItem>
+                        {isDataSourceLoading && !dataSource ?
+                            <LoadingSpinner /> :
+                            <div className="wz-discover hide-filter-control wz-search-bar">
+                                <SearchBar
+                                    appName='vulnerability-detector-searchbar'
+                                    {...searchBarProps}
+                                    showDatePicker={false}
+                                    showQueryInput={true}
+                                    showQueryBar={true}
+                                    showSaveQuery={true}
+                                    onQuerySubmit={onQuerySubmit}
+                                    onFiltersUpdated={onFiltersUpdated}
+                                />
+                            </div>
+                        }
+                    </EuiFlexItem>
                 </EuiFlexGroup>
-              </EuiPanel>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+
+                <EuiFlexGroup style={{ margin: '0 8px' }}>
+                    <EuiFlexItem>
+                        <EuiPanel paddingSize='none'>
+                            <EuiFlexGroup>
+                                <EuiFlexItem
+                                    grow={false}
+                                    style={{
+                                        width: '15%',
+                                        minWidth: 145,
+                                        height: 'calc(100vh - 325px)',
+                                        overflowX: 'hidden',
+                                    }}
+                                >
+                                    <Tactics
+                                        indexPattern={indexPattern}
+                                        onChangeSelectedTactics={onChangeSelectedTactics}
+                                        filters={mitreState.filterParams}
+                                        {...mitreState}
+                                    />
+                                </EuiFlexItem>
+                                <EuiFlexItem>
+                                    <Techniques
+                                        indexPattern={indexPattern}
+                                        filters={mitreState.filterParams}
+                                        onSelectedTabChanged={id =>
+                                            onSelectedTabChanged(id)
+                                        }
+                                        {...mitreState}
+                                    />
+                                </EuiFlexItem>
+                            </EuiFlexGroup>
+                        </EuiPanel>
+                    </EuiFlexItem>
+                </EuiFlexGroup>
+            </I18nProvider>
         </div>
-      );
-    }
-  },
-);
+    );
+
+}
+
+
+export const Mitre = withErrorBoundary(MitreComponent);
