@@ -11,8 +11,6 @@ describe('AvailableUpdatesFlyout component', () => {
   test('should return the AvailableUpdatesFlyout component', async () => {
     const { container, getByText, getByRole } = render(
       <AvailableUpdatesFlyout
-        isVisible
-        onClose={() => {}}
         api={{
           api_id: 'api id',
           current_version: '4.3.1',
@@ -30,12 +28,11 @@ describe('AvailableUpdatesFlyout component', () => {
             title: 'Wazuh v4.3.8',
           },
         }}
-      />
+      />,
     );
 
     expect(container).toMatchSnapshot();
 
-    expect(getByText('Available updates')).toBeInTheDocument();
     expect(getByText('api id')).toBeInTheDocument();
     expect(getByText('4.3.1')).toBeInTheDocument();
   });

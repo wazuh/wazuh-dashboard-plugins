@@ -4,16 +4,25 @@ import { AgentSynced } from '../../agents/agent-synced';
 import { AgentStatus } from '../../agents/agent-status';
 import { formatUIDate } from '../../../react-services/time-service';
 import { GroupTruncate } from '../../common/util';
-import { EuiFlexGroup, EuiFlexItem, EuiIconTip } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiIconTip,
+  EuiHealth,
+  EuiToolTip,
+} from '@elastic/eui';
 import { Agent } from '../types';
 
 // Columns with the property truncateText: true won't wrap the text
 // This is added to prevent the wrap because of the table-layout: auto
 export const agentsTableColumns = (
   allowEditGroups: boolean,
+  allowUpgrade: boolean,
   setAgent: (agents: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
+  setIsUpgradeModalVisible: (visible: boolean) => void,
   setFilters: (filters) => void,
+  outdatedAgents: Agent[],
 ) => [
   {
     field: 'id',
@@ -66,7 +75,29 @@ export const agentsTableColumns = (
     sortable: true,
     show: true,
     searchable: true,
-    width: '10%',
+    width: '100px',
+    render: (version, agent) => {
+      const isOutdated = !!outdatedAgents.find(
+        outdatedAgent => outdatedAgent.id === agent.id,
+      );
+      return (
+        <EuiFlexGroup
+          wrap={false}
+          responsive={false}
+          gutterSize='xs'
+          alignItems='center'
+        >
+          <EuiFlexItem grow={false}>{version}</EuiFlexItem>
+          {isOutdated ? (
+            <EuiFlexItem grow={false}>
+              <EuiToolTip content={<p>Outdated</p>}>
+                <EuiHealth className='wz-flex' color='danger'></EuiHealth>
+              </EuiToolTip>
+            </EuiFlexItem>
+          ) : null}
+        </EuiFlexGroup>
+      );
+    },
   },
   {
     field: 'dateAdd',
@@ -126,8 +157,11 @@ export const agentsTableColumns = (
     show: true,
     actions: agentsTableActions(
       allowEditGroups,
+      allowUpgrade,
       setAgent,
       setIsEditGroupsVisible,
+      setIsUpgradeModalVisible,
+      outdatedAgents,
     ),
   },
 ];

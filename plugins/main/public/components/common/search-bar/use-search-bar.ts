@@ -1,45 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useLayoutEffect } from 'react';
 import {
   SearchBarProps,
-  FilterManager,
   TimeRange,
   Query,
   Filter,
-  IIndexPattern,
+  IndexPattern,
   IndexPatternsContract,
 } from '../../../../../../src/plugins/data/public';
 import { getDataPlugin } from '../../../kibana-services';
-import { useFilterManager, useQueryManager, useTimeFilter } from '../hooks';
-import {
-  AUTHORIZED_AGENTS,
-  DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
-} from '../../../../common/constants';
-
+import { useQueryManager, useTimeFilter } from '../hooks';
+import { hideCloseButtonOnFixedFilters } from './search-bar-service';
 // Input - types
 type tUseSearchBarCustomInputs = {
-  defaultIndexPatternID: IIndexPattern['id'];
+  indexPattern: IndexPattern;
+  setFilters: (filters: Filter[]) => void;
   onFiltersUpdated?: (filters: Filter[]) => void;
   onQuerySubmitted?: (
     payload: { dateRange: TimeRange; query?: Query },
     isUpdate?: boolean,
-  ) => void;
-  onMount?: (
-    filterManager: FilterManager,
-    defaultIndexPatternID: string,
-  ) => void;
-  onUpdate?: (filters: Filter[], filterManager: FilterManager) => void;
-  onUnMount?: (
-    previousFilters: Filter[],
-    toIndexPattern: string | null,
-    filterManager: FilterManager,
-    defaultIndexPatternID: string,
   ) => void;
 };
 type tUseSearchBarProps = Partial<SearchBarProps> & tUseSearchBarCustomInputs;
 
 // Output types
 type tUserSearchBarResponse = {
-  searchBarProps: Partial<SearchBarProps>;
+  searchBarProps: Partial<SearchBarProps>
 };
 
 /**
@@ -48,45 +33,49 @@ type tUserSearchBarResponse = {
  * @returns
  */
 const useSearchBarConfiguration = (
-  props?: tUseSearchBarProps,
+  props: tUseSearchBarProps,
 ): tUserSearchBarResponse => {
+  const { indexPattern, filters: defaultFilters, setFilters } = props;
   // dependencies
-  const SESSION_STORAGE_FILTERS_NAME = 'wazuh_persistent_searchbar_filters';
-  const SESSION_STORAGE_PREV_FILTER_NAME = 'wazuh_persistent_current_filter';
-  const filterManager = useFilterManager().filterManager as FilterManager;
-  const filters = props?.filters ? props.filters : filterManager.getFilters();
+  const filters = defaultFilters ? defaultFilters : [];
   const [query, setQuery] = props?.query
     ? useState(props?.query)
     : useQueryManager();
   const { timeFilter, timeHistory, setTimeFilter } = useTimeFilter();
   // states
-  const [isLoading, setIsLoading] = useState(false);
-  const [indexPatternSelected, setIndexPatternSelected] =
-    useState<IIndexPattern>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [indexPatternSelected, setIndexPatternSelected] = useState<IndexPattern>(indexPattern);
+  const TIMEOUT_MILISECONDS = 100;
+
+  const hideRemoveFilter = (retry: number = 0) => {
+    let elements = document.querySelectorAll('.wz-search-bar .globalFilterItem');
+    if ((!elements || !filters.length) && retry < 10) {
+      // the setTimeout is used to wait for the DOM elements to be rendered
+      setTimeout(() => {
+        // this is a workaround to hide the close button on fixed filters via vanilla js
+        hideRemoveFilter(++retry);
+      }, TIMEOUT_MILISECONDS);
+
+    }else{
+      hideCloseButtonOnFixedFilters(filters, elements);
+    }
+  }
+
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      // this is a workaround to hide the close button on fixed filters via vanilla js
+      hideRemoveFilter();
+    }, TIMEOUT_MILISECONDS);
+  }, [filters]);
+
+  useEffect(() => {
+    if (indexPattern) {
+      setIndexPatternSelected(indexPattern);
+    }
+  }, [indexPattern]);
 
   useEffect(() => {
     initSearchBar();
-    return () => {
-      /* Upon unmount, the previous filters are restored */
-      const prevStoragePattern = sessionStorage.getItem(
-        SESSION_STORAGE_PREV_FILTER_NAME,
-      );
-      sessionStorage.removeItem(SESSION_STORAGE_PREV_FILTER_NAME);
-      const storagePreviousFilters = sessionStorage.getItem(
-        SESSION_STORAGE_FILTERS_NAME,
-      );
-      if (storagePreviousFilters) {
-        const previousFilters = JSON.parse(storagePreviousFilters);
-        if (props?.onUnMount) {
-          props.onUnMount(
-            previousFilters,
-            prevStoragePattern,
-            filterManager,
-            props?.defaultIndexPatternID,
-          );
-        }
-      }
-    };
   }, []);
 
   /**
@@ -94,12 +83,11 @@ const useSearchBarConfiguration = (
    */
   const initSearchBar = async () => {
     setIsLoading(true);
-    const indexPattern = await getIndexPattern(props?.defaultIndexPatternID);
-    setIndexPatternSelected(indexPattern);
-    if (props?.onMount) {
-      props.onMount(filterManager, props?.defaultIndexPatternID);
+    if (!indexPattern) {
+      const defaultIndexPattern = await getDefaultIndexPattern();
+      setIndexPatternSelected(defaultIndexPattern);
     } else {
-      filterManager.setFilters(filters);
+      setIndexPatternSelected(indexPattern);
     }
     setIsLoading(false);
   };
@@ -109,54 +97,25 @@ const useSearchBarConfiguration = (
    * If not receive a ID return the default index from the index pattern service
    * @returns
    */
-  const getIndexPattern = async (indexPatternID?: string) => {
-    const indexPatternService = getDataPlugin()
-      .indexPatterns as IndexPatternsContract;
-    if (indexPatternID) {
-      try {
-        return await indexPatternService.get(indexPatternID);
-      } catch (error) {
-        // when the index pattern id not exists will get the default
-        console.error(error);
-        return await indexPatternService.getDefault();
-      }
-    } else {
-      return await indexPatternService.getDefault();
-    }
+  const getDefaultIndexPattern = async (): Promise<IndexPattern> => {
+    const indexPatternService = getDataPlugin().indexPatterns as IndexPatternsContract;
+    return await indexPatternService.getDefault();
   };
 
   /**
    * Search bar properties necessary to render and initialize the osd search bar component
    */
-  const searchBarProps: Partial<SearchBarProps> = {
+  const searchBarProps: Partial<SearchBarProps & { useDefaultBehaviors: boolean }> = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
-    filters: filters
-      .filter(
-        (filter: Filter) =>
-          ![
-            AUTHORIZED_AGENTS,
-            DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
-          ].includes(filter?.meta?.controlledBy), // remove auto loaded agent.id filters
-      )
-      .sort((a: Filter, b: Filter) => {
-        return a?.$state?.isImplicit && !(a?.meta?.key === 'agent.id')
-          ? -1
-          : b?.$state?.isImplicit
-          ? 1
-          : -1;
-      }),
+    filters: filters,
     query,
     timeHistory,
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (filters: Filter[]) => {
-      if (props?.onUpdate) {
-        props.onUpdate(filters, filterManager, props?.onFiltersUpdated);
-      } else {
-        filterManager.setFilters(filters);
-        props?.onFiltersUpdated && props?.onFiltersUpdated(filters);
-      }
+      setFilters ? setFilters(filters) : console.warn('setFilters function is not defined');
+      props?.onFiltersUpdated && props?.onFiltersUpdated(filters);
     },
     onQuerySubmit: (
       payload: { dateRange: TimeRange; query?: Query },

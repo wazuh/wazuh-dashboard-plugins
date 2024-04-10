@@ -8,10 +8,9 @@ import {
   OverviewVisualizations,
 } from '../../integration-files/visualizations';
 import * as TimSort from 'timsort';
-import { getConfiguration } from '../get-configuration';
 import { REPORTS_PRIMARY_COLOR } from '../../../common/constants';
-import { getCustomizationSetting } from '../../../common/services/settings';
 import { Logger } from 'opensearch-dashboards/server';
+import { IConfigurationEnhanced } from '../../../../wazuh-core/server';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR,
@@ -130,7 +129,10 @@ const fonts = {
 export class ReportPrinter {
   private _content: any[];
   private _printer: PdfPrinter;
-  constructor(public logger: Logger) {
+  constructor(
+    public logger: Logger,
+    private configuration: IConfigurationEnhanced,
+  ) {
     this._printer = new PdfPrinter(fonts);
     this._content = [];
   }
@@ -604,35 +606,34 @@ export class ReportPrinter {
 
   async print(reportPath: string) {
     return new Promise((resolve, reject) => {
-      try {
-        const configuration = getConfiguration();
-
-        const pathToLogo = getCustomizationSetting(
-          configuration,
+      // Get configuration settings
+      this.configuration
+        .getCustomizationSetting(
           'customization.logo.reports',
-        );
-        const pageHeader = getCustomizationSetting(
-          configuration,
           'customization.reports.header',
-        );
-        const pageFooter = getCustomizationSetting(
-          configuration,
           'customization.reports.footer',
-        );
+        )
+        .then(configuration => {
+          try {
+            const {
+              'customization.logo.reports': pathToLogo,
+              'customization.reports.header': pageHeader,
+              'customization.reports.footer': pageFooter,
+            } = configuration;
+            const document = this._printer.createPdfKitDocument({
+              ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }),
+              content: this._content,
+            });
 
-        const document = this._printer.createPdfKitDocument({
-          ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }),
-          content: this._content,
+            document.on('error', reject);
+            document.on('end', resolve);
+
+            document.pipe(fs.createWriteStream(reportPath));
+            document.end();
+          } catch (error) {
+            reject(error);
+          }
         });
-
-        document.on('error', reject);
-        document.on('end', resolve);
-
-        document.pipe(fs.createWriteStream(reportPath));
-        document.end();
-      } catch (ex) {
-        reject(ex);
-      }
     });
   }
 

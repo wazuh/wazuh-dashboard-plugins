@@ -34,7 +34,7 @@ interface IWzButtonPermissionsProps
 export const WzButtonPermissions = ({
   buttonType = 'default',
   permissions,
-  roles,
+  administrator,
   tooltip,
   ...rest
 }: IWzButtonPermissionsProps) => {
@@ -52,7 +52,7 @@ export const WzButtonPermissions = ({
   return (
     <WzElementPermissions
       permissions={permissions}
-      roles={roles}
+      administrator={administrator}
       tooltip={tooltip}
       getAdditionalProps={disabled => {
         const additionalProps = {
@@ -70,6 +70,7 @@ export const WzButtonPermissions = ({
 
         return additionalProps;
       }}
+      {...rest}
     >
       <Button {...rest} />
     </WzElementPermissions>

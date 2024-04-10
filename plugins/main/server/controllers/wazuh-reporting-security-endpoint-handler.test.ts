@@ -52,6 +52,9 @@ const mockContext = (username: string) => ({
       })),
     },
   },
+  wazuh_core: {
+    configuration: {},
+  },
 });
 
 const mockResponse = () => ({

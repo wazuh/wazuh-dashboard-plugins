@@ -11,23 +11,22 @@
  */
 import { Base } from './base-query';
 import AuditMap from './audit-map';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
-   * Returns top 3 agents that execute sudo commands without success
-   * @param {*} context Endpoint context
-   * @param {*} gte
-   * @param {*} lte
-   * @param {*} filters
-   * @param {*} pattern
-   */
+ * Returns top 3 agents that execute sudo commands without success
+ * @param {*} context Endpoint context
+ * @param {*} gte
+ * @param {*} lte
+ * @param {*} filters
+ * @param {*} pattern
+ */
 export const getTop3AgentsSudoNonSuccessful = async (
   context,
   gte,
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
   try {
     const base = {};
@@ -40,46 +39,46 @@ export const getTop3AgentsSudoNonSuccessful = async (
           field: 'agent.id',
           size: 3,
           order: {
-            _count: 'desc'
-          }
-        }
-      }
+            _count: 'desc',
+          },
+        },
+      },
     });
 
     base.query.bool.must.push({
       match_phrase: {
         'data.audit.uid': {
-          query: '0'
-        }
-      }
+          query: '0',
+        },
+      },
     });
 
     base.query.bool.must.push({
       match_phrase: {
         'data.audit.success': {
-          query: 'no'
-        }
-      }
+          query: 'no',
+        },
+      },
     });
 
     base.query.bool.must_not.push({
       match_phrase: {
         'data.audit.auid': {
-          query: '0'
-        }
-      }
+          query: '0',
+        },
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['3'];
     return buckets.map(item => item.key);
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Returns the most failed syscall in the top 3 agents with failed system calls
@@ -95,7 +94,7 @@ export const getTop3AgentsFailedSyscalls = async (
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
   try {
     const base = {};
@@ -108,8 +107,8 @@ export const getTop3AgentsFailedSyscalls = async (
           field: 'agent.id',
           size: 3,
           order: {
-            _count: 'desc'
-          }
+            _count: 'desc',
+          },
         },
         aggs: {
           '4': {
@@ -117,49 +116,51 @@ export const getTop3AgentsFailedSyscalls = async (
               field: 'data.audit.syscall',
               size: 1,
               order: {
-                _count: 'desc'
-              }
-            }
-          }
-        }
-      }
+                _count: 'desc',
+              },
+            },
+          },
+        },
+      },
     });
 
     base.query.bool.must.push({
       match_phrase: {
         'data.audit.success': {
-          query: 'no'
-        }
-      }
+          query: 'no',
+        },
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['3'];
 
-    return buckets.map(bucket => {
-      try {
-        const agent = bucket.key;
-        const syscall = {
-          id: bucket['4'].buckets[0].key,
-          syscall:
-            AuditMap[bucket['4'].buckets[0].key] ||
-            'Warning: Unknown system call'
-        };
-        return {
-          agent,
-          syscall
-        };
-      } catch (error) {
-        return undefined;
-      }
-    }).filter(bucket => bucket);
+    return buckets
+      .map(bucket => {
+        try {
+          const agent = bucket.key;
+          const syscall = {
+            id: bucket['4'].buckets[0].key,
+            syscall:
+              AuditMap[bucket['4'].buckets[0].key] ||
+              'Warning: Unknown system call',
+          };
+          return {
+            agent,
+            syscall,
+          };
+        } catch (error) {
+          return undefined;
+        }
+      })
+      .filter(bucket => bucket);
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};
 
 /**
  * Returns the top failed syscalls
@@ -175,7 +176,7 @@ export const getTopFailedSyscalls = async (
   lte,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern')
+  pattern,
 ) => {
   try {
     const base = {};
@@ -188,31 +189,31 @@ export const getTopFailedSyscalls = async (
           field: 'data.audit.syscall',
           size: 10,
           order: {
-            _count: 'desc'
-          }
-        }
-      }
+            _count: 'desc',
+          },
+        },
+      },
     });
 
     base.query.bool.must.push({
       match_phrase: {
         'data.audit.success': {
-          query: 'no'
-        }
-      }
+          query: 'no',
+        },
+      },
     });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['2'];
 
     return buckets.map(item => ({
       id: item.key,
-      syscall: AuditMap[item.key]
+      syscall: AuditMap[item.key],
     }));
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};

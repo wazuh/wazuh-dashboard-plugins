@@ -16,6 +16,7 @@ import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
 import { WzRequest } from '../../../../../react-services';
 import { ErrorHandler } from '../../../../../react-services/error-management/error-handler/error-handler';
+import { WzButtonPermissions } from '../../../../common/permissions/button';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -147,7 +148,9 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
       </EuiFlexGroup>
       <EuiFlexGroup wrap>
         <EuiFlexItem grow={false}>
-          <EuiSwitch
+          <WzButtonPermissions
+            buttonType='switch'
+            administrator
             disabled={rememberToggleIsDisabled()}
             label='Remember server address'
             checked={rememberServerAddress}

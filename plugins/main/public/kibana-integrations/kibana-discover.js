@@ -25,6 +25,7 @@ import {
   getDiscoverModule,
   getPlugins,
   getToasts,
+  getWazuhCorePlugin,
 } from '../kibana-services';
 import {
   getRequestInspectorStats,
@@ -93,7 +94,6 @@ import {
   UI_SETTINGS,
 } from '../../../../src/plugins/data/public';
 import { addFatalError } from '../../../../src/plugins/opensearch_dashboards_legacy/public';
-import { WAZUH_ALERTS_PATTERN } from '../../common/constants';
 import {
   DEFAULT_COLUMNS_SETTING,
   SAMPLE_SIZE_SETTING,
@@ -106,7 +106,6 @@ import { createFixedScroll } from './discover/application/angular/directives/fix
 
 import './discover/application/index.scss';
 import { getFilterWithAuthorizedAgents } from '../react-services/filter-authorization-agents';
-import { getSettingDefaultValue } from '../../common/services/settings';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -568,7 +567,9 @@ function discoverController(
                         type: 'phrase',
                         index:
                           AppState.getCurrentPattern() ||
-                          getSettingDefaultValue('pattern'),
+                          getWazuhCorePlugin().configuration.getSettingValue(
+                            'pattern',
+                          ),
                       },
                       query: { match_phrase: { 'agent.id': '000' } },
                       $state: { store: 'appState' },
@@ -1122,14 +1123,6 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  $scope.$watch('fetchStatus', () => {
-    if ($scope.fetchStatus !== fetchStatuses.UNINITIALIZED) {
-      setTimeout(() => {
-        modulesHelper.hideCloseButtons();
-      }, 100);
-    }
-  });
 
   $scope.loadFilters = async (wzCurrentFilters, tab) => {
     filterManager.removeAll();

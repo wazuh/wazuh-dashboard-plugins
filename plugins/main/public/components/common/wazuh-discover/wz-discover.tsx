@@ -17,14 +17,13 @@ import {
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
 import {
-  Filter,
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { useDocViewer } from '../doc-viewer';
 import DocViewer from '../doc-viewer/doc-viewer';
-import { DiscoverNoResults } from '../../overview/vulnerabilities/common/components/no_results';
-import { LoadingSpinner } from '../../overview/vulnerabilities/common/components/loading_spinner';
+import { DiscoverNoResults } from '../no-results/no-results';
+import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../data-grid';
 import {
   ErrorHandler,
@@ -34,7 +33,6 @@ import {
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
 import useSearchBar from '../search-bar/use-search-bar';
-import { search } from '../search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
 import { getWazuhCorePlugin } from '../../../kibana-services';
@@ -42,25 +40,48 @@ const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 import { withErrorBoundary } from '../hocs';
+import { 
+  IDataSourceFactoryConstructor,
+  useDataSource, 
+  tParsedIndexPattern, 
+  PatternDataSource, 
+  AlertsDataSourceRepository,
+} from '../data-source';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
-type WazuhDiscoverProps = {
-  indexPatternName: string;
+export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
+  DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
-  const { indexPatternName, tableColumns: defaultTableColumns } = props;
+  const { DataSource, tableColumns: defaultTableColumns } = props;
+
+  if (!DataSource) {
+    throw new Error('DataSource is required');
+  }
+
   const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
   );
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
+
+  const {
+    dataSource,
+    filters,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+    setFilters,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
+    DataSource
+  });
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
@@ -86,13 +107,12 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   };
 
   const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: indexPatternName,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters
   });
   const {
-    isLoading,
-    filters,
     query,
-    indexPatterns,
     dateRangeFrom,
     dateRangeTo,
   } = searchBarProps;
@@ -118,38 +138,34 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   });
 
   useEffect(() => {
-    if (!isLoading) {
-      setIsSearching(true);
-      setIndexPattern(indexPatterns?.[0] as IndexPattern);
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters,
-        query,
-        pagination,
-        sorting,
-        dateRange: {
-          from: dateRangeFrom,
-          to: dateRangeTo,
-        },
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching data',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
+    if (isDataSourceLoading) {
+      return;
     }
+    setIndexPattern(dataSource?.indexPattern);
+    fetchData({ 
+      query, 
+      pagination, 
+      sorting,  
+      dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
+    })
+      .then(results => {
+        setResults(results);
+      })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching vulnerabilities',
+        });
+        ErrorHandler.handleError(searchError);
+      });
   }, [
-    JSON.stringify(searchBarProps),
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
-  ]);
+    dateRangeFrom,
+    dateRangeTo,
+  ])
 
   const timeField = indexPattern?.timeFieldName
     ? indexPattern.timeFieldName
@@ -157,8 +173,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const onClickExportResults = async () => {
     const params = {
-      indexPattern: indexPatterns?.[0] as IndexPattern,
-      filters,
+      indexPattern: indexPattern as IndexPattern,
+      fetchFilters,
       query,
       fields: columnVisibility.visibleColumns,
       pagination: {
@@ -190,19 +206,21 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         grow
       >
         <>
-          {isLoading ? (
+          {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-            <SearchBar
-              appName='wazuh-discover-search-bar'
-              {...searchBarProps}
-              showSaveQuery={true}
-            />
+            <div className="wz-search-bar">
+              <SearchBar
+                appName='wazuh-discover-search-bar'
+                {...searchBarProps}
+                showSaveQuery={true}
+              />
+            </div>
           )}
-          {!isLoading && results?.hits?.total === 0 ? (
+          {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
-          {!isLoading && results?.hits?.total > 0 ? (
+          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
             <>
               <EuiFlexItem grow={false} className='discoverChartContainer'>
                 <EuiPanel
@@ -214,8 +232,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   <EuiPanel>
                     <DashboardByRenderer
                       input={histogramChartInput(
-                        indexPatternName,
-                        filters,
+                        dataSource?.title,
+                        fetchFilters,
                         query,
                         dateRangeFrom,
                         dateRangeTo,
@@ -235,7 +253,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                         <HitsCounter
                           hits={results?.hits?.total}
                           showResetButton={false}
-                          onResetQuery={() => {}}
                           tooltip={
                             results?.hits?.total &&
                             results?.hits?.total > MAX_ENTRIES_PER_QUERY

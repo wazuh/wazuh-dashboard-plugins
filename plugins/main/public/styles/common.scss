@@ -1602,28 +1602,14 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
 }
 
 @media (min-width: 1600px) {
-  .agents-evolution-visualization {
-    width: 35vw;
-  }
-
   .agents-details-card {
-    width: 55vw;
+    width: 80vw;
   }
 }
 
 @media (max-width: 1599px) {
-  .agents-evolution-visualization {
-    width: 30vw;
-  }
-
   .agents-details-card {
-    width: 45vw;
-  }
-}
-
-@media (max-width: 1439px) {
-  .agents-evolution-visualization {
-    width: 25vw;
+    width: 70vw;
   }
 }
 
@@ -1631,11 +1617,6 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
   .agents-evolution-visualization-group {
     flex-wrap: wrap;
   }
-
-  .agents-evolution-visualization {
-    width: 100vw;
-  }
-
   .agents-details-card {
     width: 100vw;
   }
@@ -1876,5 +1857,14 @@ iframe.width-changed {
 .dataGridDockedNav {
   &.euiDataGrid--fullScreen {
     left: 320px;
+  }
+}
+
+.wz-app {
+  .euiPage {
+    background-color: transparent;
+  }
+  [name='OverviewWelcome'] .euiIcon--app .euiIcon__fillSecondary {
+    fill: #000000bb;
   }
 }

@@ -42,12 +42,14 @@ import './controllers';
 import './factories';
 
 // Imports to update currentPlatform when app starts
-import { checkCurrentSecurityPlatform } from './controllers/management/components/management/configuration/utils/wz-fetch';
 import store from './redux/store';
-import { updateCurrentPlatform } from './redux/actions/appStateActions';
+import {
+  updateCurrentPlatform,
+  updateUserAccount,
+} from './redux/actions/appStateActions';
 import { WzAuthentication, loadAppConfig } from './react-services';
 
-import { getAngularModule, getHttp } from './kibana-services';
+import { getAngularModule, getWazuhCorePlugin } from './kibana-services';
 
 const app = getAngularModule();
 
@@ -73,11 +75,12 @@ app.run([
     app.$injector = _$injector;
 
     // Set currentSecurity platform in Redux when app starts.
-    checkCurrentSecurityPlatform()
+    getWazuhCorePlugin()
+      .dashboardSecurity.fetchCurrentPlatform()
       .then(item => {
         store.dispatch(updateCurrentPlatform(item));
       })
-      .catch(() => { });
+      .catch(() => {});
 
     // Init the process of refreshing the user's token when app start.
     checkPluginVersion().finally(WzAuthentication.refresh);
@@ -100,7 +103,6 @@ app.run(function ($rootElement) {
       <react-component name="ToastNotificationsModal" props=""></react-component>
       <react-component name="WzUpdatesNotification" props=""></react-component>
     </div>`);
-
 
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(

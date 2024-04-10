@@ -31,18 +31,9 @@ import {
 } from '../../common/hocs';
 import {
   EpluginSettingType,
-  PLUGIN_SETTINGS,
-  PLUGIN_SETTINGS_CATEGORIES,
   UI_LOGGER_LEVELS,
-  WAZUH_ROLE_ADMINISTRATOR_NAME,
 } from '../../../../common/constants';
 import { compose } from 'redux';
-import {
-  getPluginSettingDescription,
-  getSettingsDefaultList,
-  groupSettingsByCategory,
-  getCategorySettingByTitle,
-} from '../../../../common/services/settings';
 import { Category } from './components/categories/components';
 import { WzRequest } from '../../../react-services';
 import {
@@ -60,6 +51,7 @@ import {
   toastRequiresRunningHealthcheck,
   toastSuccessUpdateConfiguration,
 } from './components/categories/components/show-toasts';
+import { getWazuhCorePlugin } from '../../../kibana-services';
 
 export type ISetting = {
   key: string;
@@ -71,59 +63,109 @@ export type ISetting = {
   form: { type: string; params: {} };
 };
 
-const pluginSettingConfigurableUI = getSettingsDefaultList()
-  .filter(categorySetting => categorySetting.isConfigurableFromUI)
-  .map(setting => ({
-    ...setting,
-    category: PLUGIN_SETTINGS_CATEGORIES[setting.category].title,
-  }));
-
-const settingsCategoriesSearchBarFilters = [
-  ...new Set(pluginSettingConfigurableUI.map(({ category }) => category)),
-]
-  .sort()
-  .map(category => ({ value: category }));
-
-const trasnsfromPluginSettingsToFormFields = configuration =>
-  Object.fromEntries(
-    getSettingsDefaultList()
-      .filter(pluginSetting => pluginSetting.isConfigurableFromUI)
-      .map(
-        ({
-          key,
-          type,
-          validate,
-          defaultValue: initialValue,
-          uiFormTransformChangedInputValue,
-          uiFormTransformConfigurationValueToInputValue,
-          uiFormTransformInputValueToConfigurationValue,
-          ...rest
-        }) => [
+const transformPluginSettingsToFormFields = (configuration, pluginSettings) => {
+  return Object.entries(pluginSettings)
+    .filter(([_, { isConfigurableFromSettings }]) => isConfigurableFromSettings)
+    .reduce(
+      (
+        accum,
+        [
           key,
           {
             type,
-            validate: validate?.bind?.(rest),
-            transformChangedInputValue:
-              uiFormTransformChangedInputValue?.bind?.(rest),
-            transformChangedOutputValue:
-              uiFormTransformInputValueToConfigurationValue?.bind?.(rest),
-            initialValue: uiFormTransformConfigurationValueToInputValue
-              ? uiFormTransformConfigurationValueToInputValue.bind(rest)(
-                  configuration?.[key] ?? initialValue,
-                )
-              : configuration?.[key] ?? initialValue,
+            validateUIForm,
+            defaultValue: initialValue,
+            uiFormTransformChangedInputValue,
+            uiFormTransformConfigurationValueToInputValue,
+
+            ...rest
           },
         ],
-      ),
-  );
+      ) => {
+        return {
+          ...accum,
+          [key]: ['arrayOf'].includes(type)
+            ? {
+                type,
+                initialValue: configuration[key].map(config => config),
+                fields: transformPluginSettingsToFormFields(
+                  configuration[key],
+                  rest.options.arrayOf,
+                ),
+              }
+            : {
+                type,
+                validate: validateUIForm?.bind?.(rest),
+                transformChangedInputValue:
+                  uiFormTransformChangedInputValue?.bind?.(rest),
+                initialValue: uiFormTransformConfigurationValueToInputValue
+                  ? uiFormTransformConfigurationValueToInputValue.bind(rest)(
+                      configuration?.[key] ?? initialValue,
+                    )
+                  : configuration?.[key] ?? initialValue,
+                defaultValue: uiFormTransformConfigurationValueToInputValue
+                  ? uiFormTransformConfigurationValueToInputValue.bind(rest)(
+                      initialValue,
+                    )
+                  : initialValue,
+                options: rest.options,
+              },
+        };
+      },
+      {},
+    );
+};
+
+/**
+ * Group the settings by category
+ * @param settings
+ * @returns
+ */
+function groupSettingsByCategory(settings: any[], categories: any[]) {
+  const settingsSortedByCategories = settings
+    .sort((settingA, settingB) => settingA.key?.localeCompare?.(settingB.key))
+    .reduce(
+      (accum, pluginSettingConfiguration) => ({
+        ...accum,
+        [pluginSettingConfiguration.category]: [
+          ...(accum[pluginSettingConfiguration.category] || []),
+          { ...pluginSettingConfiguration },
+        ],
+      }),
+      {},
+    );
+
+  return Object.entries(settingsSortedByCategories)
+    .map(([category, settings]) => ({ category, settings }))
+    .filter(categoryEntry => categoryEntry.settings.length)
+    .sort(
+      (a, b) =>
+        (categories.find(({ title }) => title === a.category)?.renderOrder ||
+          0) -
+        (categories.find(({ title }) => title === b.category)?.renderOrder ||
+          0),
+    );
+}
 
 const WzConfigurationSettingsProvider = props => {
   const [loading, setLoading] = useKbnLoadingIndicator();
   const [query, setQuery] = useState('');
   const currentConfiguration = useSelector(state => state.appConfig.data);
 
-  const { fields, changed, errors, doChanges, undoChanges } = useForm(
-    trasnsfromPluginSettingsToFormFields(currentConfiguration),
+  const {
+    fields,
+    changed,
+    errors,
+    doChanges,
+    undoChanges,
+    forEach: formForEach,
+  } = useForm(
+    transformPluginSettingsToFormFields(
+      currentConfiguration,
+      Object.fromEntries(
+        getWazuhCorePlugin().configuration._settings.entries(),
+      ),
+    ),
   );
   const dispatch = useDispatch();
 
@@ -132,16 +174,23 @@ const WzConfigurationSettingsProvider = props => {
   };
 
   const visibleSettings = Object.entries(fields).map(
-    ([fieldKey, fieldForm]) => ({
-      ...fieldForm,
-      key: fieldKey,
-      category:
-        PLUGIN_SETTINGS_CATEGORIES[PLUGIN_SETTINGS[fieldKey].category].title,
-      type: PLUGIN_SETTINGS[fieldKey].type,
-      options: PLUGIN_SETTINGS[fieldKey]?.options,
-      title: PLUGIN_SETTINGS[fieldKey]?.title,
-      description: getPluginSettingDescription(PLUGIN_SETTINGS[fieldKey]),
-    }),
+    ([fieldKey, fieldForm]) => {
+      const pluginSetting =
+        getWazuhCorePlugin().configuration._settings.get(fieldKey);
+      const _categoryMeta = getWazuhCorePlugin().configuration._categories.get(
+        String(pluginSetting.category),
+      );
+      return {
+        ...fieldForm,
+        key: fieldKey,
+        category: _categoryMeta.title,
+        _categoryMeta,
+        type: pluginSetting.type,
+        options: pluginSetting?.options,
+        title: pluginSetting?.title,
+        description: pluginSetting.description,
+      };
+    },
   );
 
   // https://github.com/elastic/eui/blob/aa4cfd7b7c34c2d724405a3ecffde7fe6cf3b50f/src/components/search_bar/query/query.ts#L138-L163
@@ -151,35 +200,38 @@ const WzConfigurationSettingsProvider = props => {
     'title',
   ]);
 
-  const visibleCategories = groupSettingsByCategory(search || visibleSettings)
-    // Sort categories to render them in their enum definition order
-    .sort(
-      (a, b) =>
-        (getCategorySettingByTitle(a.category)?.renderOrder || 0) -
-        (getCategorySettingByTitle(b.category)?.renderOrder || 0),
-    );
+  const visibleCategories = groupSettingsByCategory(
+    search || visibleSettings,
+    Array.from(getWazuhCorePlugin().configuration._categories.values()),
+  );
 
   const onSave = async () => {
     setLoading(true);
     try {
       const settingsToUpdate = Object.entries(changed).reduce(
         (accum, [pluginSettingKey, currentValue]) => {
+          const pluginSetting =
+            getWazuhCorePlugin().configuration._settings.get(pluginSettingKey);
+
+          const transformedValue =
+            pluginSetting?.uiFormTransformInputValueToConfigurationValue?.(
+              currentValue,
+            ) ?? currentValue;
           if (
-            PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile &&
-            PLUGIN_SETTINGS[pluginSettingKey].type ===
-              EpluginSettingType.filepicker
+            pluginSetting.isConfigurableFromSettings &&
+            pluginSetting.type === EpluginSettingType.filepicker
           ) {
             accum.fileUpload = {
               ...accum.fileUpload,
               [pluginSettingKey]: {
-                file: currentValue,
-                extension: path.extname(currentValue.name),
+                file: transformedValue,
+                extension: path.extname(transformedValue.name),
               },
             };
-          } else if (PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile) {
+          } else if (pluginSetting.isConfigurableFromSettings) {
             accum.saveOnConfigurationFile = {
               ...accum.saveOnConfigurationFile,
-              [pluginSettingKey]: currentValue,
+              [pluginSettingKey]: transformedValue,
             };
           }
           return accum;
@@ -300,33 +352,21 @@ const WzConfigurationSettingsProvider = props => {
   };
 
   const onCancel = () => {
-    const updatedSettingsUseFilePicker = Object.entries(changed).reduce(
-      (accum, [pluginSettingKey]) => {
-        if (
-          PLUGIN_SETTINGS[pluginSettingKey].isConfigurableFromFile &&
-          PLUGIN_SETTINGS[pluginSettingKey].type ===
-            EpluginSettingType.filepicker
-        ) {
-          accum.push(pluginSettingKey);
-        }
-        return accum;
-      },
-      [],
-    );
-
-    updatedSettingsUseFilePicker.forEach(settingKey => {
-      try {
-        fields[settingKey].inputRef.removeFiles(
-          // This method uses some methods of a DOM event.
-          // Because we want to remove the files when the configuration is saved,
-          // there is no event, so we create a object that contains the
-          // methods used to remove the files. Of this way, we can skip the errors
-          // due to missing methods.
-          // This workaround is based in @elastic/eui v29.3.2
-          // https://github.com/elastic/eui/blob/v29.3.2/src/components/form/file_picker/file_picker.tsx#L107-L108
-          { stopPropagation: () => {}, preventDefault: () => {} },
-        );
-      } catch (error) {}
+    formForEach((state, _, { fieldDefinition }) => {
+      if (fieldDefinition?.options?.file) {
+        try {
+          state.inputRef.removeFiles(
+            // This method uses some methods of a DOM event.
+            // Because we want to remove the files when the configuration is saved,
+            // there is no event, so we create a object that contains the
+            // methods used to remove the files. Of this way, we can skip the errors
+            // due to missing methods.
+            // This workaround is based in @elastic/eui v29.3.2
+            // https://github.com/elastic/eui/blob/v29.3.2/src/components/form/file_picker/file_picker.tsx#L107-L108
+            { stopPropagation: () => {}, preventDefault: () => {} },
+          );
+        } catch (error) {}
+      }
     });
     undoChanges();
   };
@@ -344,7 +384,9 @@ const WzConfigurationSettingsProvider = props => {
                 field: 'category',
                 name: 'Categories',
                 multiSelect: 'or',
-                options: settingsCategoriesSearchBarFilters,
+                options: getWazuhCorePlugin()
+                  .configuration.getUniqueCategories()
+                  .map(({ title }) => ({ value: title })),
               },
             ]}
           />
@@ -352,12 +394,13 @@ const WzConfigurationSettingsProvider = props => {
         <EuiFlexGroup direction='column'>
           {visibleCategories &&
             visibleCategories.map(({ category, settings }) => {
-              const { description, documentationLink } =
-                getCategorySettingByTitle(category);
+              const { description, documentationLink, title } = Array.from(
+                getWazuhCorePlugin().configuration._categories.values(),
+              ).find(({ title: categoryTitle }) => categoryTitle === category);
               return (
                 <Category
-                  key={`configuration_category_${category}`}
-                  title={category}
+                  key={`configuration_category_${title}`}
+                  title={title}
                   description={description}
                   documentationLink={documentationLink}
                   items={settings}
@@ -382,5 +425,5 @@ const WzConfigurationSettingsProvider = props => {
 export const WzConfigurationSettings = compose(
   withErrorBoundary,
   withReduxProvider,
-  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME]),
+  withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
 )(WzConfigurationSettingsProvider);

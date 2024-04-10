@@ -8,6 +8,7 @@ import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../.
 
 export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
   platform: string = WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY;
+  constructor() {}
 
   async getCurrentUser(
     request: OpenSearchDashboardsRequest,
@@ -32,5 +33,12 @@ export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
 
   getUserName(authContext: any) {
     return authContext['user_name'];
+  }
+
+  async isAdministratorUser(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+  ) {
+    // This is replaced after creating the instance
   }
 }

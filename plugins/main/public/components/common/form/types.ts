@@ -1,4 +1,4 @@
-import { TPluginSettingWithKey } from '../../../../common/constants';
+import { TPluginSettingWithKey } from '../../../../../wazuh-core/common/constants';
 
 export interface IInputFormType {
   field: TPluginSettingWithKey;
@@ -33,7 +33,6 @@ interface FieldConfiguration {
   initialValue: any;
   validate?: (value: any) => string | undefined;
   transformChangedInputValue?: (value: any) => any;
-  transformChangedOutputValue?: (value: any) => any;
 }
 
 export interface DefaultFieldConfiguration extends FieldConfiguration {
@@ -46,8 +45,18 @@ interface CustomFieldConfiguration extends FieldConfiguration {
   component: (props: any) => JSX.Element;
 }
 
+interface ArrayOfFieldConfiguration extends FieldConfiguration {
+  type: 'arrayOf';
+  fields: {
+    [key: string]: any; // TODO: enhance this type
+  };
+}
+
 export interface FormConfiguration {
-  [key: string]: DefaultFieldConfiguration | CustomFieldConfiguration;
+  [key: string]:
+    | DefaultFieldConfiguration
+    | CustomFieldConfiguration
+    | ArrayOfFieldConfiguration;
 }
 
 interface EnhancedField {
@@ -70,7 +79,9 @@ interface EnhancedCustomField extends EnhancedField {
   component: (props: any) => JSX.Element;
 }
 
-export type EnhancedFieldConfiguration = EnhancedDefaultField | EnhancedCustomField;
+export type EnhancedFieldConfiguration =
+  | EnhancedDefaultField
+  | EnhancedCustomField;
 export interface EnhancedFields {
   [key: string]: EnhancedFieldConfiguration;
 }
@@ -81,4 +92,15 @@ export interface UseFormReturn {
   errors: { [key: string]: string };
   undoChanges: () => void;
   doChanges: () => void;
+  forEach: (
+    value: any,
+    key: string,
+    form: {
+      formDefinition: any;
+      formState: any;
+      pathFieldFormDefinition: string[];
+      pathFormState: string[];
+      fieldDefinition: FormConfiguration;
+    },
+  ) => { [key: string]: any };
 }
