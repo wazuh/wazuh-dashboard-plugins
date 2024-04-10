@@ -51,10 +51,7 @@ const panelsLabel = item =>
   `${item.logformat} - ${renderTargetField(item.target)}`;
 
 const mainSettings = [
-  { field: 'journald', label: 'Log format' },
-  { field: 'journald', label: 'Location' },
-  { field: 'query.level', label: 'Query level' },
-  { field: 'query.type', label: 'Query type' },
+  { field: 'logformat', label: 'Log format' },
   {
     field: 'ignore_binaries',
     label: 'Ignore binaries',
@@ -64,6 +61,18 @@ const mainSettings = [
     field: 'only-future-events',
     label: 'Only future events',
     render: renderValueOrNoValue,
+  },
+  {
+    field: 'filters',
+    label: 'Kernel device',
+  },
+  {
+    field: 'filters',
+    label: 'SYSTEMD UNIT',
+  },
+  {
+    field: 'filters',
+    label: 'CUSTOM',
   },
 ];
 

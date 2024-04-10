@@ -5,12 +5,12 @@
         "logformat": "journald",
         "ignore_binaries": "no",
         "only-future-events": "no",
-        "target": ["agent"],
+        "target": ["agent1"],
         "filters": [
           [
             {
               "field": "_KERNEL_DEVICE",
-              "expression": ".",
+              "expression": ".kernel1",
               "ignore_if_missing": false
             }
           ],
@@ -33,13 +33,13 @@
         "logformat": "journald",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"]
+        "target": ["agent2"]
       },
       {
         "logformat": "journald",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"],
+        "target": ["agent3"],
         "filters": [
           {
             "field": "_KERNEL_DEVICE",
