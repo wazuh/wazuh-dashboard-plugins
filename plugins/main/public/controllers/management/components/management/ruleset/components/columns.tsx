@@ -48,7 +48,7 @@ export default class RulesetColumns {
               for (const oldValue of result) {
                 let newValue = oldValue.replace(
                   '$(',
-                  `<strong style="color:#006BB4">`,
+                  `<strong class="euiButtonEmpty--primary">`,
                 );
                 newValue = newValue.replace(')', ' </strong>');
                 value = value.replace(oldValue, newValue);

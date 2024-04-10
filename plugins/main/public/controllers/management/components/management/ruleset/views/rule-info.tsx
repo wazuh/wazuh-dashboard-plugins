@@ -105,7 +105,7 @@ export default class WzRuleInfo extends Component {
             for (const oldValue of result) {
               let newValue = oldValue.replace(
                 '$(',
-                `<strong style="color:#006BB4">`,
+                `<strong class="euiButtonEmpty--primary">`,
               );
               newValue = newValue.replace(')', ' </strong>');
               value = value.replace(oldValue, newValue);
@@ -702,7 +702,10 @@ export default class WzRuleInfo extends Component {
     let result = value.match(regex);
     if (result !== null) {
       for (const oldValue of result) {
-        let newValue = oldValue.replace('$(', `<span style="color:#006BB4">`);
+        let newValue = oldValue.replace(
+          '$(',
+          `<span class="euiButtonEmpty--primary">`,
+        );
         newValue = newValue.replace(')', ' </span>');
         value = value.replace(oldValue, newValue);
       }

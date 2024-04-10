@@ -107,6 +107,7 @@ export class MainModuleAgent extends Component {
                 <EuiTitle size='s' className='wz-module-header-agent-title-btn'>
                   <h1>
                     <span
+                      className='euiButtonEmpty--primary'
                       onClick={() => {
                         window.location.href = `#/agents?agent=${this.props.agent.id}`;
                         this.router.reload();
