@@ -58,7 +58,15 @@ class WzConfigurationSetting extends Component {
               {label}
             </EuiTextAlign>
           </div>
-          <div style={isMobile ? { width: '100%' } : { width: '65%' }}>
+          <div
+            style={
+              Array.isArray(value) && typeof value[0] != 'string'
+                ? {}
+                : isMobile
+                ? { width: '100%' }
+                : { width: '65%' }
+            }
+          >
             {Array.isArray(value) && typeof value[0] === 'string' ? (
               <ul>
                 {value.map((v, key) => (
@@ -69,13 +77,23 @@ class WzConfigurationSetting extends Component {
               </ul>
             ) : Array.isArray(value) ? (
               <Fragment>
+                <EuiSpacer></EuiSpacer>
                 <WzConfigurationSettingsHeader title='Filters' />
                 <EuiBasicTable
                   items={value.flat()}
                   columns={[
-                    { field: 'field', name: 'Field' },
-                    { field: 'expression', name: 'expression' },
-                    { field: 'ignore_if_missing', name: 'Ignore If Missing' },
+                    {
+                      field: 'field',
+                      name: 'Field',
+                    },
+                    {
+                      field: 'expression',
+                      name: 'Expression',
+                    },
+                    {
+                      field: 'ignore_if_missing',
+                      name: 'Ignore If Missing',
+                    },
                   ]}
                 />
               </Fragment>

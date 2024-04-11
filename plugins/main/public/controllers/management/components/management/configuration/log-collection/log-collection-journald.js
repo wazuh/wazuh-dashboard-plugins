@@ -22,19 +22,6 @@ import helpLinks from './help-links';
 import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_JOURNALDT_PROP } from './types';
 
 /**
- *
- * @param {*} data => all log data
- * @returns string => value to show in query input
- */
-const queryValue = data => {
-  return typeof data === 'undefined'
-    ? '-'
-    : typeof data === 'object'
-    ? data.value
-    : data;
-};
-
-/**
  * Returns targets array parsed in one string
  * @param {*} item
  * @returns string => target
@@ -99,8 +86,8 @@ class WzConfigurationLogCollectionJournald extends Component {
           LOCALFILE_JOURNALDT_PROP
         ]?.length > 1 ? (
           <WzConfigurationSettingsHeader
-            title='macOS events logs'
-            description='List of macOS logs that will be processed'
+            title='Journald events logs'
+            description='List of journald logs that will be processed'
             help={helpLinks}
           >
             <WzConfigurationListSelector
