@@ -2,8 +2,6 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST } from '../../../../../../../common/constants';
 import { AlertsDataSource } from '../alerts-data-source';
 
-DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST;
-
 const KEY_EXIST = 'rule.tsc';
 
 export class AlertsTSCDataSource extends AlertsDataSource {
