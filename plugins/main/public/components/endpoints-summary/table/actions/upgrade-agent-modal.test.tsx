@@ -1,10 +1,10 @@
 import React from 'react';
-import { render, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { UpgradeAgentModal } from './upgrade-agent-modal';
 
 jest.mock('../../services', () => ({
-  upgradeAgentsService: jest.fn(),
+  upgradeAgentService: jest.fn(),
 }));
 
 jest.mock('../../../../react-services/common-services', () => ({
@@ -24,6 +24,7 @@ describe('UpgradeAgentModal component', () => {
         }}
         onClose={() => {}}
         reloadAgents={() => {}}
+        setIsUpgradePanelClosed={() => {}}
       />,
     );
 
@@ -40,7 +41,7 @@ describe('UpgradeAgentModal component', () => {
   });
 
   test('should send to upgrade', async () => {
-    const { getByText, getByRole } = render(
+    const { getByRole } = render(
       <UpgradeAgentModal
         agent={{
           id: '001',
@@ -49,6 +50,7 @@ describe('UpgradeAgentModal component', () => {
         }}
         onClose={() => {}}
         reloadAgents={() => {}}
+        setIsUpgradePanelClosed={() => {}}
       />,
     );
 

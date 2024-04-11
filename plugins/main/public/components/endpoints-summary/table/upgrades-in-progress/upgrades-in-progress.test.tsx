@@ -24,34 +24,44 @@ describe('AgentUpgradesInProgress component', () => {
     });
 
     const { container, getByText } = render(
-      <AgentUpgradesInProgress reload={0} />,
+      <AgentUpgradesInProgress
+        reload={0}
+        setIsModalVisible={() => {}}
+        isPanelClosed={false}
+        setIsPanelClosed={() => {}}
+        allowGetTasks={true}
+      />,
     );
 
     expect(container).toMatchSnapshot();
 
     const inProgressValue = getByText('5');
     expect(inProgressValue).toBeInTheDocument();
-    const inProgressText = getByText('Upgrade tasks in progress');
+    const inProgressText = getByText('In progress');
     expect(inProgressText).toBeInTheDocument();
 
     const failedValue = getByText('2');
     expect(failedValue).toBeInTheDocument();
-    const failedText = getByText('Failed upgrade tasks');
+    const failedText = getByText('Failed');
     expect(failedText).toBeInTheDocument();
   });
 
   test('should show upgrade tasks modal', async () => {
-    const { getByRole, getByText } = render(
-      <AgentUpgradesInProgress reload={0} />,
+    const { getByRole } = render(
+      <AgentUpgradesInProgress
+        reload={0}
+        setIsModalVisible={() => {}}
+        isPanelClosed={false}
+        setIsPanelClosed={() => {}}
+        allowGetTasks={true}
+      />,
     );
 
-    const openModalButton = getByRole('button');
+    const openModalButton = getByRole('button', { name: 'Task details' });
     expect(openModalButton).toBeInTheDocument();
 
     act(() => {
       fireEvent.click(openModalButton);
     });
-
-    await waitFor(() => expect(getByRole('table')).toBeInTheDocument());
   });
 });
