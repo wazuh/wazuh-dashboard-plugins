@@ -49,6 +49,7 @@ const mainSettings = [
     label: 'Only future events',
     render: renderValueOrNoValue,
   },
+  { field: 'filters_disabled', label: 'Filters Disabled' },
   {
     field: 'filters',
   },

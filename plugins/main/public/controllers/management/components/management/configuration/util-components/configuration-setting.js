@@ -47,24 +47,25 @@ class WzConfigurationSetting extends Component {
             flexDirection: isMobile ? 'column' : 'row',
           }}
         >
+          {!label ? (
+            []
+          ) : (
+            <div
+              style={
+                isMobile
+                  ? { margin: '1em', width: '100%' }
+                  : { justifySelf: 'flex-end', margin: '1em', width: '35%' }
+              }
+            >
+              <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>
+                {label}
+              </EuiTextAlign>
+            </div>
+          )}
+
           <div
             style={
-              isMobile
-                ? { margin: '1em', width: '100%' }
-                : { justifySelf: 'flex-end', margin: '1em', width: '35%' }
-            }
-          >
-            <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>
-              {label}
-            </EuiTextAlign>
-          </div>
-          <div
-            style={
-              Array.isArray(value) && typeof value[0] != 'string'
-                ? {}
-                : isMobile
-                ? { width: '100%' }
-                : { width: '65%' }
+              !label ? {} : isMobile ? { width: '100%' } : { width: '65%' }
             }
           >
             {Array.isArray(value) && typeof value[0] === 'string' ? (
@@ -75,7 +76,7 @@ class WzConfigurationSetting extends Component {
                   </li>
                 ))}
               </ul>
-            ) : Array.isArray(value) ? (
+            ) : Array.isArray(value) && typeof value[0] === 'object' ? (
               <Fragment>
                 <EuiSpacer></EuiSpacer>
                 <WzConfigurationSettingsHeader title='Filters' />
