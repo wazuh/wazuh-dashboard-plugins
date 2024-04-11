@@ -47,6 +47,7 @@ import { malwareDetectionColumns } from '../../overview/malware-detection/events
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardGitHub } from '../../overview/github/dashboards/dashboard';
 import { AlertsVulnerabilitiesDataSource } from '../data-source';
+import { AlertsGitHubDataSource } from '../data-source/pattern/alerts/alerts-github/alerts-github-data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -179,12 +180,11 @@ export const ModulesDefaults = {
   github: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
       {
         id: 'dashboard2',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardGitHub || withPinnedAgent(DashboardGitHub), // TODO: use withPinnedAgent
+        component: DashboardGitHub,
       },
       {
         id: 'inventory',
@@ -192,7 +192,10 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: GitHubPanel,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
+      renderDiscoverTab({
+        tableColumns: githubColumns,
+        DataSource: AlertsGitHubDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
