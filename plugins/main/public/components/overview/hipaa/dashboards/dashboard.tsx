@@ -98,7 +98,7 @@ const DashboardHIPAAComponent: React.FC = () => {
             <DiscoverNoResults />
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
-            <div className='tsc-dashboard-responsive'>
+            <div className='hipaa-dashboard-responsive'>
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
