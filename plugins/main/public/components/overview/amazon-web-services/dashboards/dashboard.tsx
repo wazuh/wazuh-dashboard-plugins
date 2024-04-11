@@ -52,13 +52,19 @@ const DashboardAWSComponents: React.FC = ({}) => {
     setFilters,
   });
 
-  const { query } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
       return;
     }
-    fetchData({ query })
+    fetchData({
+      query,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
+    })
       .then(results => setResults(results))
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
@@ -67,7 +73,12 @@ const DashboardAWSComponents: React.FC = ({}) => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
+  ]);
   return (
     <>
       <I18nProvider>
@@ -103,8 +114,8 @@ const DashboardAWSComponents: React.FC = ({}) => {
                   useMargins: true,
                   id: 'aws-dashboard-tab',
                   timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
+                    from: dateRangeFrom,
+                    to: dateRangeTo,
                   },
                   title: 'AWS dashboard',
                   description: 'Dashboard of the AWS',
