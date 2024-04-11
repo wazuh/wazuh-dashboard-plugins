@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiToolTip, EuiBadge } from '@elastic/eui';
+import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 import {
   resourceDictionary,
   ResourcesHandler,
@@ -48,7 +49,7 @@ export default class RulesetColumns {
               for (const oldValue of result) {
                 let newValue = oldValue.replace(
                   '$(',
-                  `<strong class="euiButtonEmpty--primary">`,
+                  `<strong style="color:${euiThemeVars.euiColorPrimaryText}">`,
                 );
                 newValue = newValue.replace(')', ' </strong>');
                 value = value.replace(oldValue, newValue);
