@@ -223,8 +223,11 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   ABOUT = 'about',
 }
 
-export const AUTHORIZED_AGENTS = 'authorized-agents';
-export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER = 'exclude-server';
+export const AUTHORIZED_AGENTS = 'hidden-authorized-agents';
+export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER = 'hidden-exclude-server';
+export const DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT = 'pinned-agent';
+export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
+export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP = 'vulnerabilities-rule-group';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
@@ -275,13 +278,11 @@ export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
 export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH =
   'images/logo_reports.png';
 export const REPORTS_PRIMARY_COLOR = '#256BD1';
-export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © 2023 Wazuh, Inc.';
+export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © 2024 Wazuh, Inc.';
 export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 
 // Plugin platform
-export const PLUGIN_PLATFORM_NAME = 'Wazuh dashboard';
-export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH =
-  '/usr/share/wazuh-dashboard/data/wazuh/';
+export const PLUGIN_PLATFORM_NAME = 'dashboard';
 export const PLUGIN_PLATFORM_INSTALLATION_USER = 'wazuh-dashboard';
 export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'wazuh-dashboard';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_UPGRADE_PLATFORM =
@@ -299,7 +300,7 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
 };
 
 // Plugin app
-export const PLUGIN_APP_NAME = 'Wazuh dashboard';
+export const PLUGIN_APP_NAME = 'dashboard';
 
 // UI
 export const API_NAME_AGENT_STATUS = {
@@ -370,13 +371,22 @@ export const API_NAME_TASK_STATUS = {
   DONE: 'Done',
   IN_PROGRESS: 'In progress',
   FAILED: 'Failed',
+  TIMEOUT: 'Timeout',
 } as const;
 
 export const UI_TASK_STATUS = [
   API_NAME_TASK_STATUS.DONE,
   API_NAME_TASK_STATUS.IN_PROGRESS,
   API_NAME_TASK_STATUS.FAILED,
+  API_NAME_TASK_STATUS.TIMEOUT,
 ];
+
+export const UI_TASK_STATUS_COLORS = {
+  [API_NAME_TASK_STATUS.DONE]: 'success',
+  [API_NAME_TASK_STATUS.IN_PROGRESS]: 'warning',
+  [API_NAME_TASK_STATUS.FAILED]: 'danger',
+  [API_NAME_TASK_STATUS.TIMEOUT]: 'subdued',
+};
 
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
@@ -385,7 +395,7 @@ export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
 export const ELASTIC_NAME = 'elastic';
 
 // Default Wazuh indexer name
-export const WAZUH_INDEXER_NAME = 'Wazuh indexer';
+export const WAZUH_INDEXER_NAME = 'indexer';
 
 // Not timeFieldName on index pattern
 export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =

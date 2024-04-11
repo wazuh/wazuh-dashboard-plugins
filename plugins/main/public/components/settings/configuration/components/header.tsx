@@ -20,10 +20,12 @@ import {
   EuiToolTip,
   EuiButtonIcon,
   EuiSearchBar,
+  EuiText,
 } from '@elastic/eui';
 import { EuiFormErrorText } from '@elastic/eui';
 import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION } from '../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import { getWazuhCorePlugin } from '../../../../kibana-services';
 
 export const Header = ({ query, setQuery, searchBarFilters }) => {
   return (
@@ -31,6 +33,7 @@ export const Header = ({ query, setQuery, searchBarFilters }) => {
       <EuiFlexItem>
         <EuiFlexGroup gutterSize='none' direction='column'>
           <Title />
+          <SubTitle />
         </EuiFlexGroup>
       </EuiFlexItem>
       <EuiFlexItem>
@@ -66,6 +69,17 @@ const Title = () => {
           </EuiToolTip>
         </h2>
       </EuiTitle>
+    </EuiFlexItem>
+  );
+};
+
+const SubTitle = () => {
+  return (
+    <EuiFlexItem grow={false}>
+      <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
+        Configuration file located at{' '}
+        {getWazuhCorePlugin().configuration.store.file}
+      </EuiText>
     </EuiFlexItem>
   );
 };

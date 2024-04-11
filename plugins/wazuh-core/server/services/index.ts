@@ -10,11 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-export * from './cache-api-user-has-run-as';
 export * from './configuration-store';
 export * from './cookie';
 export * from './filesystem';
 export * from './manage-hosts';
 export * from './security-factory';
 export * from './server-api-client';
-export * from './update-registry';

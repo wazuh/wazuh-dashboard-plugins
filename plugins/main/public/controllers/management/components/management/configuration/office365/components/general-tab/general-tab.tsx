@@ -23,28 +23,39 @@ export type GeneralTableProps = {
 };
 
 const mainSettings = [
-  { field: 'enabled', label: 'Service status', render: renderValueYesThenEnabled },
+  {
+    field: 'enabled',
+    label: 'Service status',
+    render: renderValueYesThenEnabled,
+  },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since Wazuh manager is initialized',
+    label: 'Collect events generated since manager is initialized',
   },
   {
     field: 'interval',
-    label:
-      'Interval between Office 365 wodle executions in seconds',
+    label: 'Interval between Office 365 wodle executions in seconds',
   },
-  { field: 'curl_max_size', label: 'Maximum size allowed for the Office 365 API response' },
+  {
+    field: 'curl_max_size',
+    label: 'Maximum size allowed for the Office 365 API response',
+  },
 ];
 
-export const GeneralTab = ({ agent, wodleConfiguration }: GeneralTableProps) => {
-
+export const GeneralTab = ({
+  agent,
+  wodleConfiguration,
+}: GeneralTableProps) => {
   return (
     <WzConfigurationSettingsHeader
-      title="Main settings"
-      description="Configuration for the Office 365 module"
+      title='Main settings'
+      description='Configuration for the Office 365 module'
       help={HELP_LINKS}
     >
-      <WzConfigurationSettingsGroup config={wodleConfiguration[OFFICE_365]} items={mainSettings} />
+      <WzConfigurationSettingsGroup
+        config={wodleConfiguration[OFFICE_365]}
+        items={mainSettings}
+      />
     </WzConfigurationSettingsHeader>
   );
 };

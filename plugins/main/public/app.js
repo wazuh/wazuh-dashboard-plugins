@@ -82,14 +82,6 @@ app.run([
       })
       .catch(() => {});
 
-    // Set user account data in Redux when app starts.
-    getWazuhCorePlugin()
-      .dashboardSecurity.fetchAccount()
-      .then(response => {
-        store.dispatch(updateUserAccount(response));
-      })
-      .catch(() => {});
-
     // Init the process of refreshing the user's token when app start.
     checkPluginVersion().finally(WzAuthentication.refresh);
 
