@@ -130,7 +130,6 @@ export const EditAgentGroupsModal = compose(
       </EuiFormRow>
       <EuiFormRow
         label='Groups'
-        isRequired
         isInvalid={!selectedGroups?.length}
         error={['You must add at least one group']}
       >
