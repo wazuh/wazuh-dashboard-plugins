@@ -181,7 +181,7 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       {
-        id: 'dashboard2',
+        id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
         component: DashboardGitHub,
