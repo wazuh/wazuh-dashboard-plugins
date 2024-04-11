@@ -1026,6 +1026,7 @@ export class WazuhApiCtrl {
           data: {
             'app-version': pluginVersion,
             revision: pluginRevision,
+            configuration_file: context.wazuh_core.configuration.store.file,
           },
         },
       });
