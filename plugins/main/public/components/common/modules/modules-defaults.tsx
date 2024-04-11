@@ -47,6 +47,7 @@ import { malwareDetectionColumns } from '../../overview/malware-detection/events
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardGDPR } from '../../overview/gdpr/dashboards/dashboard';
 import { AlertsVulnerabilitiesDataSource } from '../data-source';
+import { AlertsGDPRDataSource } from '../data-source/pattern/alerts/alerts-gdpr/alerts-gdpr-data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -282,20 +283,24 @@ export const ModulesDefaults = {
   gdpr: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
       {
-        id: 'dashboard2',
+        id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardGDPR || withPinnedAgent(DashboardGDPR), // TODO: use withPinnedAgent
+        component: DashboardGDPR,
       },
       {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
-        component: ComplianceTable,
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsGDPRDataSource} />
+        ),
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, gdprColumns),
+      renderDiscoverTab({
+        tableColumns: gdprColumns,
+        DataSource: AlertsGDPRDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
