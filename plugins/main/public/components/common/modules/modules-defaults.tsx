@@ -278,7 +278,9 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
-        component: ComplianceTable,
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsPCIDSSDataSource} />
+        ),
       },
       renderDiscoverTab({
         tableColumns: pciColumns,

@@ -26,7 +26,6 @@ import {
   EuiIcon,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout';
 import {
@@ -82,34 +81,17 @@ export class ComplianceSubrequirements extends Component {
   }
 
   getRequirementKey() {
-    if (this.props.section === 'pci') {
-      return 'rule.pci_dss';
-    }
-    if (this.props.section === 'gdpr') {
-      return 'rule.gdpr';
-    }
-    if (this.props.section === 'nist') {
-      return 'rule.nist_800_53';
-    }
-    if (this.props.section === 'hipaa') {
-      return 'rule.hipaa';
-    }
-    if (this.props.section === 'tsc') {
-      return 'rule.tsc';
-    }
-    return 'pci_dss';
+    const mapKeys = {
+      pci: 'rule.pci_dss',
+      gdpr: 'rule.gdpr',
+      nist: 'rule.nist_800_53',
+      hipaa: 'rule.hipaa',
+      tsc: 'rule.tsc',
+    };
+    return mapKeys[this.props.section];
   }
 
-  openDashboardCurrentWindow(requirementId) {
-    this.addFilter({
-      key: this.getRequirementKey(),
-      value: requirementId,
-      negate: false,
-    });
-    this.props.onSelectedTabChanged('dashboard');
-  }
-
-  openDiscoverCurrentWindow(requirementId) {
+  openDiscover(e, requirementId) {
     this.addFilter({
       key: this.getRequirementKey(),
       value: requirementId,
@@ -118,26 +100,13 @@ export class ComplianceSubrequirements extends Component {
     this.props.onSelectedTabChanged('events');
   }
 
-  openDiscover(e, requirementId) {
-    const filters = {};
-    filters[this.getRequirementKey()] = requirementId;
-    AppNavigate.navigateToModule(
-      e,
-      'overview',
-      { tab: this.props.section, tabView: 'discover', filters },
-      () => this.openDiscoverCurrentWindow(requirementId),
-    );
-  }
-
   openDashboard(e, requirementId) {
-    const filters = {};
-    filters[this.getRequirementKey()] = requirementId;
-    AppNavigate.navigateToModule(
-      e,
-      'overview',
-      { tab: this.props.section, tabView: 'panels', filters },
-      () => this.openDashboardCurrentWindow(requirementId),
-    );
+    this.addFilter({
+      key: this.getRequirementKey(),
+      value: requirementId,
+      negate: false,
+    });
+    this.props.onSelectedTabChanged('dashboard');
   }
 
   renderFacet() {
@@ -234,7 +203,7 @@ export class ComplianceSubrequirements extends Component {
                     <span style={{ float: 'right', position: 'fixed' }}>
                       <EuiToolTip
                         position='top'
-                        content={'Show ' + item.id + ' in Dashboard'}
+                        content={'Show' + item.id + ' in Dashboard'}
                       >
                         <EuiIcon
                           onMouseDown={e => {
