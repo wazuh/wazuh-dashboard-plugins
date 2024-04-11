@@ -47,6 +47,7 @@ import { malwareDetectionColumns } from '../../overview/malware-detection/events
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
 import { AlertsVulnerabilitiesDataSource } from '../data-source';
+import { AlertsNIST80053DataSource } from '../data-source/pattern/alerts/alerts-nist-800-53/alerts-nist-800-53-data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -281,15 +282,20 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardNIST80053 || withPinnedAgent(DashboardNIST80053), // TODO: use withPinnedAgent
+        component: DashboardNIST80053,
       },
       {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
-        component: ComplianceTable,
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsNIST80053DataSource} />
+        ),
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, nistColumns),
+      renderDiscoverTab({
+        tableColumns: nistColumns,
+        DataSource: AlertsNIST80053DataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
