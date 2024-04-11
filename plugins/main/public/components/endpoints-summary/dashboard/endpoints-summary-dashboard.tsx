@@ -9,6 +9,8 @@ interface EndpointsSummaryDashboardProps {
   filterAgentByStatus: (data: any) => void;
   filterAgentByOS: (data: any) => void;
   filterAgentByGroup: (data: any) => void;
+  outdatedAgents: number;
+  isLoadingOutdatedAgents: boolean;
   filterByOutdatedAgent: (data: any) => void;
   reloadDashboard?: number;
 }
@@ -17,6 +19,8 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
   filterAgentByStatus,
   filterAgentByOS,
   filterAgentByGroup,
+  outdatedAgents,
+  isLoadingOutdatedAgents,
   filterByOutdatedAgent,
   reloadDashboard,
 }) => {
@@ -41,8 +45,9 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
         reload={reloadDashboard}
       />
       <OutdatedAgentsCard
-        onClick={filterByOutdatedAgent}
-        reload={reloadDashboard}
+        outdatedAgents={outdatedAgents}
+        isLoading={isLoadingOutdatedAgents}
+        filterByOutdatedAgent={filterByOutdatedAgent}
       />
     </div>
   );

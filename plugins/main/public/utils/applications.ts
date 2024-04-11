@@ -40,7 +40,7 @@ export const overview = {
   }),
   description: i18n.translate('wz-app-overview-description', {
     defaultMessage:
-      'This application provides you with an overview of Wazuh applications.',
+      'This application provides you with an overview of applications.',
   }),
   euiIconType: 'lensApp',
   order: 1,
@@ -65,7 +65,7 @@ export const fileIntegrityMonitoring = {
     defaultMessage:
       'Alerts related to file changes, including permissions, content, ownership, and attributes.',
   }),
-  euiIconType: 'indexRollupApp',
+  euiIconType: 'sqlApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
   order: 202,
@@ -231,10 +231,10 @@ export const virustotal = {
   category: 'wz-category-threat-intelligence',
   id: 'virustotal',
   title: i18n.translate('wz-app-virustotal-title', {
-    defaultMessage: 'Virustotal',
+    defaultMessage: 'VirusTotal',
   }),
   breadcrumbLabel: i18n.translate('wz-app-virustotal-breadcrumbLabel', {
-    defaultMessage: 'Virustotal',
+    defaultMessage: 'VirusTotal',
   }),
   description: i18n.translate('wz-app-virustotal-description', {
     defaultMessage:
@@ -265,7 +265,7 @@ const pciDss = {
     defaultMessage:
       'Global security standard for entities that process, store, or transmit payment cardholder data.',
   }),
-  euiIconType: 'sqlApp',
+  euiIconType: 'visTagCloud',
   order: 400,
   showInOverviewApp: true,
   showInAgentMenu: true,
@@ -315,7 +315,7 @@ const gdpr = {
     defaultMessage:
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
   }),
-  euiIconType: 'sqlApp',
+  euiIconType: 'visBarVertical',
   order: 401,
   showInOverviewApp: true,
   showInAgentMenu: true,
@@ -514,7 +514,7 @@ export const rules = {
     defaultMessage: 'Rules',
   }),
   description: i18n.translate('wz-app-rules-description', {
-    defaultMessage: 'Manage your Wazuh cluster rules.',
+    defaultMessage: 'Manage your cluster rules.',
   }),
   euiIconType: 'indexRollupApp',
   order: 602,
@@ -533,7 +533,7 @@ export const decoders = {
     defaultMessage: 'Decoders',
   }),
   description: i18n.translate('wz-app-decoders-description', {
-    defaultMessage: 'Manage your Wazuh cluster decoders.',
+    defaultMessage: 'Manage your cluster decoders.',
   }),
   euiIconType: 'indexRollupApp',
   order: 603,
@@ -552,7 +552,7 @@ export const cdbLists = {
     defaultMessage: 'CDB Lists',
   }),
   description: i18n.translate('wz-app-cdb-lists-description', {
-    defaultMessage: 'Manage your Wazuh cluster CDB list.',
+    defaultMessage: 'Manage your cluster CDB list.',
   }),
   euiIconType: 'indexRollupApp',
   order: 604,
@@ -590,7 +590,7 @@ export const serverStatus = {
     defaultMessage: 'Status',
   }),
   description: i18n.translate('wz-app-server-status-description', {
-    defaultMessage: 'Manage your Wazuh cluster status.',
+    defaultMessage: 'Manage your cluster status.',
   }),
   euiIconType: 'indexRollupApp',
   order: 605,
@@ -609,7 +609,7 @@ export const cluster = {
     defaultMessage: 'Cluster',
   }),
   description: i18n.translate('wz-app-cluster-description', {
-    defaultMessage: 'Manage your Wazuh cluster.',
+    defaultMessage: 'Manage your cluster.',
   }),
   euiIconType: 'indexRollupApp',
   order: 606,
@@ -628,7 +628,7 @@ export const statistics = {
     defaultMessage: 'Statistics',
   }),
   description: i18n.translate('wz-app-statistics-description', {
-    defaultMessage: 'Information about the Wazuh enviroment.',
+    defaultMessage: 'Information about the enviroment.',
   }),
   euiIconType: 'indexRollupApp',
   order: 607,
@@ -647,7 +647,7 @@ export const logs = {
     defaultMessage: 'Logs',
   }),
   description: i18n.translate('wz-app-logs-description', {
-    defaultMessage: 'Logs from your Wazuh cluster.',
+    defaultMessage: 'Logs from your cluster.',
   }),
   euiIconType: 'indexRollupApp',
   order: 608,
@@ -666,10 +666,10 @@ export const reporting = {
     defaultMessage: 'Reporting',
   }),
   description: i18n.translate('wz-app-reporting-description', {
-    defaultMessage: 'Check your stored Wazuh reports.',
+    defaultMessage: 'Check your stored reports.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 702,
+  order: 10002,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=reporting',
@@ -685,7 +685,7 @@ export const settings = {
     defaultMessage: 'Settings',
   }),
   description: i18n.translate('wz-app-settings-description', {
-    defaultMessage: 'Manage your Wazuh cluster configuration.',
+    defaultMessage: 'Manage your cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
   order: 609,
@@ -704,7 +704,7 @@ export const devTools = {
     defaultMessage: 'Dev Tools',
   }),
   description: i18n.translate('wz-app-dev-tools-description', {
-    defaultMessage: 'Test the Wazuh API endpoints.',
+    defaultMessage: 'Test the API endpoints.',
   }),
   euiIconType: 'devToolsApp',
   order: 610,
@@ -765,7 +765,7 @@ export const serverApis = {
     defaultMessage: 'Manage and configure the API entries.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 703,
+  order: 10003,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=api',
@@ -800,10 +800,10 @@ export const appSettings = {
     defaultMessage: 'App Settings',
   }),
   description: i18n.translate('wz-app-settings-description', {
-    defaultMessage: 'Manage your Wazuh cluster configuration.',
+    defaultMessage: 'Manage your cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 704,
+  order: 10004,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=configuration',
@@ -822,7 +822,7 @@ const about = {
     defaultMessage: 'Show information about App Versions and community links.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 706,
+  order: 10006,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=about',
@@ -931,7 +931,7 @@ export const Categories = [
     label: i18n.translate('wz-app-category-dashboard-management', {
       defaultMessage: 'Dashboard management',
     }),
-    order: 700,
+    order: 6e3,
     euiIconType: 'dashboardApp',
   },
   {

@@ -37,25 +37,29 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
       validate: {
         // body: schema.any(),
         body: (value, response) => {
-          const validationSchema = Array.from(
-            services.configuration._settings.entries(),
-          )
-            .filter(
-              ([, { isConfigurableFromSettings }]) =>
-                isConfigurableFromSettings,
-            )
-            .reduce(
-              (accum, [pluginSettingKey, pluginSettingConfiguration]) => ({
-                ...accum,
-                [pluginSettingKey]: schema.maybe(
-                  pluginSettingConfiguration.validateBackend
-                    ? pluginSettingConfiguration.validateBackend(schema)
-                    : schema.any(),
-                ),
-              }),
-              {},
-            );
           try {
+            const validationSchema = Array.from(
+              services.configuration._settings.entries(),
+            )
+              .filter(
+                ([, { isConfigurableFromSettings }]) =>
+                  isConfigurableFromSettings,
+              )
+              .reduce(
+                (accum, [pluginSettingKey, pluginSettingConfiguration]) => ({
+                  ...accum,
+                  [pluginSettingKey]: schema.maybe(
+                    schema.any({
+                      validate: pluginSettingConfiguration.validate
+                        ? pluginSettingConfiguration.validate.bind(
+                            pluginSettingConfiguration,
+                          )
+                        : () => {},
+                    }),
+                  ),
+                }),
+                {},
+              );
             const validation = schema.object(validationSchema).validate(value);
             return response.ok(validation);
           } catch (error) {
@@ -138,46 +142,5 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
     },
     async (context, request, response) =>
       ctrl.deleteFile(context, request, response),
-  );
-
-  // Clear the configuration
-  router.post(
-    {
-      path: '/utils/configuration/clear',
-      validate: false,
-    },
-    async (context, request, response) =>
-      ctrl.clearConfiguration(context, request, response),
-  );
-
-  // Import the configuration file
-  router.post(
-    {
-      path: '/utils/configuration/import',
-      validate: {
-        body: schema.object({
-          // file: buffer
-          file: schema.buffer(),
-        }),
-      },
-      options: {
-        body: {
-          maxBytes:
-            CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
-        },
-      },
-    },
-    async (context, request, response) =>
-      ctrl.importConfiguration(context, request, response),
-  );
-
-  // Get if the current user is an administrator
-  router.get(
-    {
-      path: '/utils/account',
-      validate: false,
-    },
-    async (context, request, response) =>
-      ctrl.getPluginScopedAccount(context, request, response),
   );
 }

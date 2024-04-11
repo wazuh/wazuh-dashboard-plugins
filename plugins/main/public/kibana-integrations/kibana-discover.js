@@ -1124,14 +1124,6 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  $scope.$watch('fetchStatus', () => {
-    if ($scope.fetchStatus !== fetchStatuses.UNINITIALIZED) {
-      setTimeout(() => {
-        modulesHelper.hideCloseButtons();
-      }, 100);
-    }
-  });
-
   $scope.loadFilters = async (wzCurrentFilters, tab) => {
     filterManager.removeAll();
     const appState = appStateContainer.getState();
