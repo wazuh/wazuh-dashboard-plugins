@@ -388,7 +388,7 @@ export class WazuhElasticCtrl {
         const visState = JSON.parse(bulk_content.visualization.visState);
         const title = visState.title;
 
-        if (title.startsWith('Wazuh App Statistics')) {
+        if (title.startsWith('App Statistics')) {
           const filter =
             bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON.replace(
               '"filter":[]',
@@ -405,12 +405,12 @@ export class WazuhElasticCtrl {
 
         if (visState.type && visState.type === 'timelion') {
           let query = '';
-          if (title === 'Wazuh App Cluster Overview') {
+          if (title === 'App Cluster Overview') {
             for (const node of nodes) {
               query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${node.name}").label("${node.name}"),`;
             }
             query = query.substring(0, query.length - 1);
-          } else if (title === 'Wazuh App Cluster Overview Manager') {
+          } else if (title === 'App Cluster Overview Manager') {
             query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`;
           }
 

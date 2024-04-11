@@ -24,7 +24,7 @@ const settings = [
   },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since Wazuh agent was started',
+    label: 'Collect events generated since agent was started',
   },
   {
     field: 'time_delay',

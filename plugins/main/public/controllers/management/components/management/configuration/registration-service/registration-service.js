@@ -16,18 +16,22 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
-import { isString, renderValueNoThenEnabled, renderValueYesThenEnabled } from '../utils/utils';
+import {
+  isString,
+  renderValueNoThenEnabled,
+  renderValueYesThenEnabled,
+} from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
-    text: 'Wazuh agent enrollment',
-    href: webDocumentationLink('user-manual/agent-enrollment/index.html')
+    text: 'Agent enrollment',
+    href: webDocumentationLink('user-manual/agent-enrollment/index.html'),
   },
   {
     text: 'Registration service reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/auth.html')
-  }
+    href: webDocumentationLink('user-manual/reference/ossec-conf/auth.html'),
+  },
 ];
 
 const mainSettings = [
@@ -97,8 +101,14 @@ const keyRequestSettings = [
 ];
 
 const sslSettings = [
-  { field: 'ssl_verify_host', label: 'Verify host when a CA certificate is specified' },
-  { field: 'ssl_agent_ca', label: 'Path to the CA certificate used to verify clients' },
+  {
+    field: 'ssl_verify_host',
+    label: 'Verify host when a CA certificate is specified',
+  },
+  {
+    field: 'ssl_agent_ca',
+    label: 'Path to the CA certificate used to verify clients',
+  },
   {
     field: 'ssl_auto_negotiate',
     label: 'Auto-select the SSL negotiation method',
@@ -134,8 +144,8 @@ class WzRegistrationService extends Component {
           currentConfig['auth-auth'].auth &&
           !isString(currentConfig['auth-auth'].auth) && (
             <WzConfigurationSettingsHeader
-              title="Main settings"
-              description="General settings applied to the registration service"
+              title='Main settings'
+              description='General settings applied to the registration service'
               help={helpLinks}
             >
               <WzConfigurationSettingsGroup
@@ -143,14 +153,14 @@ class WzRegistrationService extends Component {
                 items={mainSettings}
               />
               <WzConfigurationSettingsGroup
-                title="Key request settings"
-                description="The key request feature allows to fetch agent keys from an external source, for example, a database"
+                title='Key request settings'
+                description='The key request feature allows to fetch agent keys from an external source, for example, a database'
                 config={currentConfig['auth-auth'].auth}
                 items={keyRequestSettings}
               />
               <WzConfigurationSettingsGroup
-                title="SSL settings"
-                description="Applied when the registration service uses SSL certificates"
+                title='SSL settings'
+                description='Applied when the registration service uses SSL certificates'
                 config={currentConfig['auth-auth'].auth}
                 items={sslSettings}
               />
@@ -161,4 +171,6 @@ class WzRegistrationService extends Component {
   }
 }
 
-export default withWzConfig([{ component: 'auth', configuration: 'auth' }])(WzRegistrationService);
+export default withWzConfig([{ component: 'auth', configuration: 'auth' }])(
+  WzRegistrationService,
+);

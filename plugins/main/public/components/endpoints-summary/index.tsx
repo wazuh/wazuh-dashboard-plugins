@@ -56,7 +56,7 @@ export const MainEndpointsSummary = compose(
     return (
       <EuiEmptyPrompt
         iconType='watchesApp'
-        title={<h2>No agents were added to this manager.</h2>}
+        title={<h2>No agents were added to the manager</h2>}
         body={<p>Add agents to fleet to start monitoring</p>}
         actions={
           <WzButtonPermissions

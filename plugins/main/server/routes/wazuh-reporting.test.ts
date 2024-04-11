@@ -199,22 +199,18 @@ describe('[endpoint] PUT /utils/configuration', () => {
     'customization.enabled': {
       defaultValueIfNotSet: true,
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.boolean(),
     },
     'customization.logo.reports': {
       defaultValueIfNotSet: 'images/logo_reports.png',
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.boolean(),
     },
     'customization.reports.header': {
       defaultValueIfNotSet: 'Original header',
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.string(),
     },
     'customization.reports.footer': {
       defaultValueIfNotSet: 'Original footer',
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.string(),
     },
   };
   beforeAll(() => {
@@ -291,12 +287,18 @@ describe('[endpoint] PUT /utils/configuration', () => {
       context.wazuh_core.configuration.get.mockReturnValueOnce(initialConfig);
 
       context.wazuh_core.configuration.getCustomizationSetting.mockImplementation(
-        setting => {
-          return (
-            afterUpdateConfiguration?.[setting] ??
-            SettingsDefinitions?.[setting]?.defaultValueIfNotSet
-          );
-        },
+        (...settings) => ({
+          then: fn =>
+            fn(
+              Object.fromEntries(
+                settings.map(setting => [
+                  setting,
+                  afterUpdateConfiguration?.[setting] ??
+                    SettingsDefinitions?.[setting]?.defaultValueIfNotSet,
+                ]),
+              ),
+            ),
+        }),
       );
 
       context.wazuh_core.dashboardSecurity.isAdministratorUser.mockImplementation(
@@ -324,6 +326,8 @@ describe('[endpoint] PUT /utils/configuration', () => {
         .set('x-test-username', USER_NAME)
         .send(reportBody);
       // .expect(200);
+
+      console.log({ responseReport });
 
       const fileName =
         responseReport.body?.message.match(/([A-Z-0-9]*\.pdf)/gi)[0];
