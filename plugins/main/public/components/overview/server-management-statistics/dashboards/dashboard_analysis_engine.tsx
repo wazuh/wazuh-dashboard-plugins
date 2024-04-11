@@ -45,6 +45,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
   onSelectNode,
 }) => {
   const {
+    fetchFilters,
     dataSource,
     setFilters,
     isLoading: isDataSourceLoading,
@@ -127,7 +128,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
                   isClusterMode,
                 ),
                 isFullScreenMode: false,
-                filters: searchBarProps.filters ?? [],
+                filters: fetchFilters ?? [],
                 useMargins: true,
                 id: 'analysis-engine-statistics-dashboard',
                 timeRange: {

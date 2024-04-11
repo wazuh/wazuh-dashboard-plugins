@@ -43,6 +43,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
   onSelectNode,
 }) => {
   const {
+    fetchFilters,
     dataSource,
     setFilters,
     isLoading: isDataSourceLoading,
@@ -122,7 +123,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
                 viewMode: ViewMode.VIEW,
                 panels: getDashboardPanelsListenerEngine(dataSource?.id),
                 isFullScreenMode: false,
-                filters: searchBarProps.filters ?? [],
+                filters: fetchFilters ?? [],
                 useMargins: true,
                 id: 'listener-engine-statistics-dashboard',
                 timeRange: {
