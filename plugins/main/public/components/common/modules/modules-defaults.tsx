@@ -47,6 +47,7 @@ import { malwareDetectionColumns } from '../../overview/malware-detection/events
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
 import { AlertsVulnerabilitiesDataSource } from '../data-source';
+import { AlertsHIPAADataSource } from '../data-source/pattern/alerts/alerts-hipaa/alerts-hipaa-data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -276,15 +277,20 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardHIPAA || withPinnedAgent(DashboardHIPAA), // TODO: use withPinnedAgent
+        component: DashboardHIPAA,
       },
       {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
-        component: ComplianceTable,
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsHIPAADataSource} />
+        ),
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, hipaaColumns),
+      renderDiscoverTab({
+        tableColumns: hipaaColumns,
+        DataSource: AlertsHIPAADataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
