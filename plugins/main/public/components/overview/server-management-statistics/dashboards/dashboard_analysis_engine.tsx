@@ -45,6 +45,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
   onSelectNode,
 }) => {
   const {
+    filters,
     fetchFilters,
     dataSource,
     setFilters,
@@ -81,7 +82,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
 
   const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
-    filters: clusterNodeSelected !== 'all' ? [selectedNodeFilter] : [],
+    filters,
     setFilters,
   });
 
@@ -128,7 +129,10 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
                   isClusterMode,
                 ),
                 isFullScreenMode: false,
-                filters: fetchFilters ?? [],
+                filters:
+                  clusterNodeSelected !== 'all'
+                    ? [...fetchFilters, selectedNodeFilter]
+                    : [...(fetchFilters ?? [])],
                 useMargins: true,
                 id: 'analysis-engine-statistics-dashboard',
                 timeRange: {
