@@ -21,7 +21,7 @@
       ng-if="mctrl.tab === 'groups' && mctrl.currentGroup && mctrl.currentGroup.name"
     >
       <span
-        class="wz-text-link cursor-pointer"
+        class="euiLink euiLink--primary wz-font-weight-normal cursor-pointer"
         ng-click="mctrl.switchTab('groups', true)"
         >{{ mctrl.tabNames[mctrl.tab] }}</span
       >
@@ -147,13 +147,13 @@
           >
             <span
               flex="25"
-              class="wz-text-link"
+              class="euiLink euiLink--primary wz-font-weight-normal"
               tooltip="Click to open the list of nodes"
               tooltip-placement="left"
               >Nodes</span
             >
             <span
-              class="wz-text-link"
+              class="euiLink euiLink--primary wz-font-weight-normal"
               tooltip="Click to open the list of nodes"
               tooltip-placement="right"
               >{{nodesCount}}</span
@@ -167,13 +167,13 @@
           >
             <span
               flex="25"
-              class="wz-text-link"
+              class="euiLink euiLink--primary wz-font-weight-normal"
               tooltip="Click to open the list of agents"
               tooltip-placement="left"
               >Agents</span
             >
             <span
-              class="wz-text-link"
+              class="euiLink euiLink--primary wz-font-weight-normal"
               tooltip="Click to open the list of agents"
               tooltip-placement="right"
               >{{agentsCount}}</span
