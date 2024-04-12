@@ -97,7 +97,7 @@ export const extractMessage = error => {
     const isFromAPI =
       origin.includes('/api/request') || origin.includes('/api/csv');
     return isFromAPI
-      ? 'Wazuh API is not reachable. Reason: timeout.'
+      ? 'API is not reachable. Reason: timeout.'
       : 'Server did not respond';
   }
   if ((((error || {}).data || {}).errorData || {}).message)
@@ -136,7 +136,7 @@ export const handleError = async (
   const messageIsString = typeof message === 'string';
   try {
     if (messageIsString && message.includes('ERROR3099')) {
-      updateWazuhNotReadyYet('Wazuh not ready yet.');
+      updateWazuhNotReadyYet('Server not ready yet.');
       await makePing(updateWazuhNotReadyYet, isCluster);
       return;
     }
@@ -195,7 +195,7 @@ export const checkDaemons = async isCluster => {
     if (isValid) {
       return { isValid };
     } else {
-      console.warn('Wazuh not ready yet');
+      console.warn('Server not ready yet');
     }
   } catch (error) {
     throw error;
@@ -233,7 +233,7 @@ export const makePing = async (
     }
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
-    throw new Error('Wazuh could not be recovered.');
+    throw new Error('Server could not be recovered.');
   }
 };
 

@@ -6,7 +6,6 @@ import { SettingsAboutGeneralInfo } from './generalInfo';
 interface SettingsAboutProps {
   appInfo?: {
     'app-version': string;
-    installationDate: string;
     revision: string;
   };
   pluginAppName: string;
@@ -16,10 +15,10 @@ export const SettingsAbout = (props: SettingsAboutProps) => {
   const { appInfo, pluginAppName } = props;
 
   return (
-    <EuiPage paddingSize="m">
+    <EuiPage paddingSize='m'>
       <EuiPageBody>
         <SettingsAboutAppInfo appInfo={appInfo} />
-        <EuiSpacer size="l" />
+        <EuiSpacer size='l' />
         <SettingsAboutGeneralInfo pluginAppName={pluginAppName} />
       </EuiPageBody>
     </EuiPage>
