@@ -1,5 +1,4 @@
 import {
-  TConfigurationSetting,
   IConfigurationStore,
   ILogger,
   IConfiguration,
@@ -7,21 +6,29 @@ import {
 
 export class ConfigurationStore implements IConfigurationStore {
   private _stored: any;
-  constructor(private logger: ILogger) {
+  file: string = '';
+  configuration: IConfiguration | null = null;
+  constructor(private logger: ILogger, private http: any) {
     this._stored = {};
-  }
-  async setup(settings: { [key: string]: TConfigurationSetting }) {
-    try {
-      this.logger.debug('Setup');
-    } catch (error) {
-      this.logger.error(error.message);
-    }
   }
   setConfiguration(configuration: IConfiguration) {
     this.configuration = configuration;
   }
-  async start() {}
-  async stop() {}
+  async setup() {
+    this.logger.debug('Setup');
+  }
+  async start() {
+    try {
+      this.logger.debug('Start');
+      const response = await this.http.get('/api/setup');
+      this.file = response.data.configuration_file;
+    } catch (error) {
+      this.logger.error(`Error on start: ${error.message}`);
+    }
+  }
+  async stop() {
+    this.logger.debug('Stop');
+  }
   private storeGet() {
     return this._stored;
   }

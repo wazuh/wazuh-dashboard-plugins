@@ -18,9 +18,10 @@ import {
   updateUserPermissions,
   updateWithUserLogged,
   updateAllowedAgents,
+  updateUserAccount,
 } from '../redux/actions/appStateActions';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
-import { getToasts } from '../kibana-services';
+import { getWazuhCorePlugin } from '../kibana-services';
 import { getAuthorizedAgents } from '../react-services/wz-agents';
 import {
   UI_ERROR_SEVERITIES,
@@ -91,8 +92,16 @@ export class WzAuthentication {
       }
       store.dispatch(updateAllowedAgents(allowedAgents));
 
-      // Dispatch actions to set permissions and roles
+      // Dispatch actions to set permissions and administrator consideration
       store.dispatch(updateUserPermissions(userPolicies));
+
+      store.dispatch(
+        updateUserAccount(
+          getWazuhCorePlugin().dashboardSecurity.getAccountFromJWTAPIDecodedToken(
+            jwtPayload,
+          ),
+        ),
+      );
       store.dispatch(updateWithUserLogged(true));
     } catch (error) {
       const options: UIErrorLog = {
@@ -106,6 +115,13 @@ export class WzAuthentication {
         },
       };
       getErrorOrchestrator().handleError(options);
+      store.dispatch(
+        updateUserAccount(
+          getWazuhCorePlugin().dashboardSecurity.getAccountFromJWTAPIDecodedToken(
+            {}, // This value should cause the user is not considered as an administrator
+          ),
+        ),
+      );
       store.dispatch(updateWithUserLogged(true));
       return Promise.reject(error);
     }

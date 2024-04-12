@@ -33,13 +33,10 @@ import {
 } from '../../../../common/hocs';
 import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
-import {
-  validateServerAddress,
-  validateAgentName,
-} from '../../utils/validations';
+import { validateAgentName } from '../../utils/validations';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
-import { getCore } from '../../../../../kibana-services';
+import { getCore, getWazuhCorePlugin } from '../../../../../kibana-services';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 export const RegisterAgent = compose(
@@ -80,7 +77,9 @@ export const RegisterAgent = compose(
     serverAddress: {
       type: 'text',
       initialValue: configuration['enrollment.dns'] || '',
-      validate: validateServerAddress,
+      validate:
+        getWazuhCorePlugin().configuration._settings.get('enrollment.dns')
+          .validate,
     },
     agentName: {
       type: 'text',

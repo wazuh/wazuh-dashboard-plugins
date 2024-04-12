@@ -65,30 +65,6 @@ export class WazuhUtilsCtrl {
   }
 
   /**
-   * Clear the configuration
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object}
-   */
-  clearConfiguration = routeDecoratorProtectedAdministrator(
-    async (
-      context: RequestHandlerContext,
-      request: OpenSearchDashboardsRequest,
-      response: OpenSearchDashboardsResponseFactory,
-    ) => {
-      context.wazuh.logger.debug('Clearing configuration');
-      await context.wazuh_core.configuration.clear();
-      return response.ok({
-        body: {
-          message: 'Configuration was cleared',
-        },
-      });
-    },
-    3020,
-  );
-
-  /**
    * Update the configuration
    * @param {Object} context
    * @param {Object} request
@@ -248,63 +224,4 @@ export class WazuhUtilsCtrl {
     },
     3023,
   );
-
-  /**
-   * Import the configuration from a configuration file
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} Configuration File or ErrorResponse
-   */
-  importConfiguration = routeDecoratorProtectedAdministrator(
-    async (
-      context: RequestHandlerContext,
-      request: KibanaRequest,
-      response: KibanaResponseFactory,
-    ) => {
-      const { file: fileBuffer } = request.body;
-      const responseImportFile =
-        await context.wazuh_core.configuration.importFile(fileBuffer);
-
-      return response.ok({
-        body: {
-          message: 'Configuration was imported',
-          ...responseImportFile,
-        },
-      });
-    },
-    3024,
-  );
-
-  /**
-   * Get the plugin scoped account
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} Scoped user account or ErrorResponse
-   */
-  async getPluginScopedAccount(
-    context: RequestHandlerContext,
-    request: KibanaRequest,
-    response: KibanaResponseFactory,
-  ) {
-    try {
-      await context.wazuh_core.dashboardSecurity.isAdministratorUser(
-        context,
-        request,
-      );
-      return response.ok({
-        body: {
-          administrator: true,
-        },
-      });
-    } catch (error) {
-      return response.ok({
-        body: {
-          administrator: false,
-          administrator_error_message: error.message,
-        },
-      });
-    }
-  }
 }
