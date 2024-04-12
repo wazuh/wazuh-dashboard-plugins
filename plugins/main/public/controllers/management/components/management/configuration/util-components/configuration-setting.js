@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EuiBasicTable } from '@elastic/eui';
 import { EuiFieldText, EuiSpacer, EuiTextAlign } from '@elastic/eui';
@@ -37,9 +37,9 @@ class WzConfigurationSetting extends Component {
   }
   render() {
     const { isMobile } = this.state;
-    const { keyItem, label, value } = this.props;
+    const { keyItem, label, value, columns } = this.props;
     return value || typeof value === 'number' || typeof value === 'boolean' ? (
-      <Fragment>
+      <>
         <div
           style={{
             display: 'flex',
@@ -47,7 +47,7 @@ class WzConfigurationSetting extends Component {
             flexDirection: isMobile ? 'column' : 'row',
           }}
         >
-          {!label ? (
+          {columns ? (
             []
           ) : (
             <div
@@ -65,7 +65,7 @@ class WzConfigurationSetting extends Component {
 
           <div
             style={
-              !label ? {} : isMobile ? { width: '100%' } : { width: '65%' }
+              columns ? {} : isMobile ? { width: '100%' } : { width: '65%' }
             }
           >
             {Array.isArray(value) && typeof value[0] === 'string' ? (
@@ -76,28 +76,12 @@ class WzConfigurationSetting extends Component {
                   </li>
                 ))}
               </ul>
-            ) : Array.isArray(value) && typeof value[0] === 'object' ? (
-              <Fragment>
+            ) : Array.isArray(value) && columns ? (
+              <>
                 <EuiSpacer></EuiSpacer>
-                <WzConfigurationSettingsHeader title='Filters' />
-                <EuiBasicTable
-                  items={value.flat()}
-                  columns={[
-                    {
-                      field: 'field',
-                      name: 'Field',
-                    },
-                    {
-                      field: 'expression',
-                      name: 'Expression',
-                    },
-                    {
-                      field: 'ignore_if_missing',
-                      name: 'Ignore If Missing',
-                    },
-                  ]}
-                />
-              </Fragment>
+                <WzConfigurationSettingsHeader title={label} />
+                <EuiBasicTable items={value} columns={columns} />
+              </>
             ) : (
               <EuiFieldText
                 data-testid={`${String(label)
@@ -110,7 +94,7 @@ class WzConfigurationSetting extends Component {
           </div>
         </div>
         <EuiSpacer size='s' />
-      </Fragment>
+      </>
     ) : null;
   }
 }

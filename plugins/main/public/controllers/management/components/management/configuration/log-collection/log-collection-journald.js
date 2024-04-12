@@ -52,6 +52,25 @@ const mainSettings = [
   { field: 'filters_disabled', label: 'Filters Disabled' },
   {
     field: 'filters',
+    label: 'Filters',
+    name: 'Filters',
+    render: value => {
+      if (Array.isArray(value)) return value.flat();
+    },
+    columns: [
+      {
+        field: 'field',
+        name: 'Field',
+      },
+      {
+        field: 'expression',
+        name: 'Expression',
+      },
+      {
+        field: 'ignore_if_missing',
+        name: 'Ignore If Missing',
+      },
+    ],
   },
 ];
 
