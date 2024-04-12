@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { getPlugins } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { I18nProvider } from '@osd/i18n/react';
@@ -11,6 +11,7 @@ import {
   EuiSelect,
   EuiSpacer,
   EuiCallOut,
+  EuiPanel,
 } from '@elastic/eui';
 import './statistics_dashboard.scss';
 import {
@@ -19,11 +20,18 @@ import {
   useDataSource,
 } from '../../../common/data-source';
 import { IndexPattern } from '../../../../../../../src/plugins/data/public';
+import { SearchResponse } from '../../../../../../../src/core/server';
 import {
   StatisticsDataSource,
   StatisticsDataSourceRepository,
 } from '../../../common/data-source/pattern/statistics';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import {
+  ErrorFactory,
+  ErrorHandler,
+  HttpError,
+} from '../../../../react-services/error-management';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
 
 const plugins = getPlugins();
 
@@ -48,12 +56,15 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
     filters,
     fetchFilters,
     dataSource,
+    fetchData,
     setFilters,
     isLoading: isDataSourceLoading,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: StatisticsDataSource,
     repository: new StatisticsDataSourceRepository(),
   });
+
+  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
   const selectedNodeFilter = {
     meta: {
@@ -86,40 +97,78 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
     setFilters,
   });
 
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useEffect(() => {
+    if (isDataSourceLoading) {
+      return;
+    }
+    fetchData({
+      query,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
+    })
+      .then(results => {
+        setResults(results);
+      })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching statistics',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    dateRangeFrom,
+    dateRangeTo,
+  ]);
+
   return (
     <I18nProvider>
       <>
-        <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
-          {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
-            <EuiFlexItem grow={false}>
-              <EuiSelect
-                id='selectNode'
-                options={clusterNodes}
-                value={clusterNodeSelected}
-                onChange={onSelectNode}
-                aria-label='Select node'
-              />
-            </EuiFlexItem>
-          )}
-          <SearchBar
-            appName='analysis-engine-statistics-searchbar'
-            {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={false}
-            showQueryBar={true}
-            showFilterBar={false}
-          />
-        </EuiFlexGroup>
-        <EuiSpacer size={'m'} />
-        <EuiCallOut
-          title={
-            'Remoted statistics are cumulative, this means that the information shown is since the data exists.'
-          }
-          iconType='iInCircle'
-        />
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
+          <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
+            {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
+              <EuiFlexItem grow={false}>
+                <EuiSelect
+                  id='selectNode'
+                  options={clusterNodes}
+                  value={clusterNodeSelected}
+                  onChange={onSelectNode}
+                  aria-label='Select node'
+                />
+              </EuiFlexItem>
+            )}
+            <SearchBar
+              appName='analysis-engine-statistics-searchbar'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={false}
+              showQueryBar={true}
+              showFilterBar={false}
+            />
+          </EuiFlexGroup>
+        )}
+        <EuiSpacer size={'m'} />
+        <EuiPanel hasBorder={false} hasShadow={false} color='transparent'>
+          <EuiCallOut
+            title={
+              'Remoted statistics are cumulative, this means that the information shown is since the data exists.'
+            }
+            iconType='iInCircle'
+          />
+        </EuiPanel>
+
+        {dataSource && results?.hits?.total === 0 ? (
+          <DiscoverNoResults />
+        ) : null}
+        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
           <div className='server-management-statistics-dashboard-responsive'>
             <DashboardByRenderer
               input={{
@@ -150,7 +199,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
               }}
             />
           </div>
-        )}
+        ) : null}
       </>
     </I18nProvider>
   );

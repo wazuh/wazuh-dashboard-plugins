@@ -19,18 +19,13 @@ import {
   EuiTitle,
   EuiPage,
   EuiText,
-  EuiCallOut,
   EuiTabs,
   EuiTab,
   EuiSpacer,
-  EuiSelect,
   EuiProgress,
 } from '@elastic/eui';
 
 import { clusterReq, clusterNodes } from '../configuration/utils/wz-fetch';
-import { WzStatisticsRemoted } from './statistics-dashboard-remoted';
-import { WzStatisticsAnalysisd } from './statistics-dashboard-analysisd';
-import { WzDatePicker } from '../../../../../components/wz-date-picker/wz-date-picker';
 import { compose } from 'redux';
 import {
   withGuard,
@@ -170,12 +165,6 @@ export class WzStatisticsOverview extends Component {
   };
 
   render() {
-    const search = {
-      box: {
-        incremental: true,
-        schema: true,
-      },
-    };
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
