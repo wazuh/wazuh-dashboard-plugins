@@ -44,7 +44,7 @@ import {
   getWazuhCorePlugin,
 } from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
-import { AddAPIHostForm } from './add-api';
+import { AddApi } from './add-api';
 import {
   WzButtonOpenFlyout,
   WzButtonPermissionsOpenFlyout,
@@ -147,10 +147,6 @@ export const ApiTable = compose(
           true,
         );
         APIConnection.cluster_info = response.data;
-        // Updates the cluster-information in the registry
-        await GenericRequest.request('PUT', `/hosts/update-hostname/${id}`, {
-          cluster_info: APIConnection.cluster_info,
-        });
         APIConnection.status = 'online';
         APIConnection.allow_run_as = response.data.allow_run_as;
         !silent && ErrorHandler.info('Connection success', 'Settings');
@@ -218,14 +214,7 @@ export const ApiTable = compose(
         const clusterInfo = data.data || {};
         APIconnection.status = 'online';
         APIconnection.cluster_info = clusterInfo;
-        //Updates the cluster info in the registry
-        await GenericRequest.request(
-          'PUT',
-          `/hosts/update-hostname/${APIconnection.id}`,
-          {
-            cluster_info: clusterInfo,
-          },
-        );
+        APIconnection.allow_run_as = clusterInfo.allow_run_as;
         if (options?.selectAPIHostOnAvailable) {
           this.setDefault(entry);
         }
@@ -327,29 +316,6 @@ export const ApiTable = compose(
           },
         };
 
-        getErrorOrchestrator().handleError(options);
-      }
-    }
-
-    async deleteAPIHost(id) {
-      try {
-        const response = await GenericRequest.request(
-          'DELETE',
-          `/hosts/apis/${id}`,
-        );
-        ErrorHandler.info(response.data.message);
-        await this.refresh();
-      } catch (error) {
-        const options = {
-          context: `${ApiTable.name}.deleteAPIHost`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error removing the API host ${id}`,
-          },
-        };
         getErrorOrchestrator().handleError(options);
       }
     }
@@ -647,50 +613,6 @@ export const ApiTable = compose(
                   color='success'
                 />
               </EuiToolTip>
-              <WzButtonPermissionsOpenFlyout
-                flyoutTitle={`Edit API connection: ${item.id} `}
-                flyoutBody={({ onClose, onUpdateCanClose }) => (
-                  <AddAPIHostForm
-                    mode='EDIT'
-                    onUpdateCanClose={onUpdateCanClose}
-                    initialValue={{
-                      id: item.id,
-                      url: item.url,
-                      port: item.port,
-                      run_as: item.run_as,
-                      username: item.username,
-                      password: '',
-                      password_confirm: '',
-                    }}
-                    apiId={item.id}
-                    onSave={async () => {
-                      onClose();
-                      await this.refresh();
-                    }}
-                  />
-                )}
-                buttonProps={{
-                  administrator: true,
-                  buttonType: 'icon',
-                  iconType: 'pencil',
-                  tooltip: {
-                    content: 'Edit',
-                  },
-                }}
-              ></WzButtonPermissionsOpenFlyout>
-              <WzButtonPermissionsModalConfirm
-                administrator={true}
-                buttonType='icon'
-                tooltip={{
-                  content: 'Delete',
-                }}
-                modalTitle={`Do you want to delete the ${item.id} API connection?`}
-                onConfirm={() => this.deleteAPIHost(item.id)}
-                modalProps={{ buttonColor: 'danger' }}
-                iconType='trash'
-                color='danger'
-                aria-label='Delete API connection'
-              />
             </EuiFlexGroup>
           ),
         },
@@ -732,16 +654,7 @@ export const ApiTable = compose(
               <EuiFlexItem grow={false}>
                 <WzButtonPermissionsOpenFlyout
                   flyoutTitle='Add API connection'
-                  flyoutBody={({ onClose, onUpdateCanClose }) => (
-                    <AddAPIHostForm
-                      mode='CREATE'
-                      onUpdateCanClose={onUpdateCanClose}
-                      onSave={async () => {
-                        onClose();
-                        await this.refresh();
-                      }}
-                    />
-                  )}
+                  flyoutBody={() => <AddApi />}
                   buttonProps={{
                     administrator: true,
                     buttonType: 'empty',

@@ -40,11 +40,11 @@ export class CheckDaemonsStatus {
       this.tries = 10;
 
       const updateNotReadyYet = updateWazuhNotReadyYet(
-        'Wazuh could not be recovered.'
+        'Server could not be recovered.',
       );
       store.dispatch(updateNotReadyYet);
 
-      this.$rootScope.wazuhNotReadyYet = 'Wazuh could not be recovered.';
+      this.$rootScope.wazuhNotReadyYet = 'Server could not be recovered.';
       this.$rootScope.$applyAsync();
       throw error;
     }

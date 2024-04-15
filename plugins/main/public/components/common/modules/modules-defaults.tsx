@@ -20,7 +20,10 @@ import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent } from '../hocs';
-import { WazuhDiscover } from '../wazuh-discover/wz-discover';
+import {
+  WazuhDiscover,
+  WazuhDiscoverProps,
+} from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
@@ -43,8 +46,7 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
-import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
-import { withPinnedAgent } from '../hocs/withPinnedAgent';
+import { AlertsVulnerabilitiesDataSource } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -56,14 +58,13 @@ const DashboardTab = {
   component: Dashboard,
 };
 
-const renderDiscoverTab = (columns, indexPattern) => {
+const renderDiscoverTab = (props: WazuhDiscoverProps) => {
+  const { DataSource, tableColumns } = props;
   return {
     id: 'events',
     name: 'Events',
     buttons: [ButtonModuleExploreAgent],
-    component: () => (
-      <WazuhDiscover defaultIndexPattern={indexPattern} tableColumns={columns} />
-    ),
+    component: () => <WazuhDiscover {...props} />,
   };
 };
 
@@ -75,7 +76,7 @@ const RegulatoryComplianceTabs = columns => [
     buttons: [ButtonModuleExploreAgent],
     component: ComplianceTable,
   },
-  renderDiscoverTab(columns),
+  renderDiscoverTab(DEFAULT_INDEX_PATTERN, columns),
 ];
 
 export const ModulesDefaults = {
@@ -83,7 +84,7 @@ export const ModulesDefaults = {
     init: 'events',
     tabs: [
       DashboardTab,
-      renderDiscoverTab(threatHuntingColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -102,7 +103,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: InventoryFim,
       },
-      renderDiscoverTab(fileIntegrityMonitoringColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, fileIntegrityMonitoringColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -110,7 +111,7 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       DashboardTab,
-      renderDiscoverTab(amazonWebServicesColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, amazonWebServicesColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -118,7 +119,7 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       DashboardTab,
-      renderDiscoverTab(googleCloudColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, googleCloudColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -146,7 +147,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
-      renderDiscoverTab(configurationAssessmentColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, configurationAssessmentColumns),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
@@ -167,11 +168,9 @@ export const ModulesDefaults = {
         component: withModuleNotForAgent(OfficePanel),
       },
       {
-        ...renderDiscoverTab(office365Columns),
+        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
         component: withModuleNotForAgent(() => (
-          <WazuhDiscover
-            tableColumns={office365Columns}
-          />
+          <WazuhDiscover tableColumns={office365Columns} />
         )),
       },
     ],
@@ -187,7 +186,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: GitHubPanel,
       },
-      renderDiscoverTab(githubColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -222,14 +221,10 @@ export const ModulesDefaults = {
           ),
         ],
       },
-      {
-        ...renderDiscoverTab(vulnerabilitiesColumns),
-        component: withVulnerabilitiesStateDataSource(() => (
-          <WazuhDiscover
-            tableColumns={vulnerabilitiesColumns}
-          />
-        )),
-      },
+      renderDiscoverTab({
+        tableColumns: vulnerabilitiesColumns,
+        DataSource: AlertsVulnerabilitiesDataSource,
+      }),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
@@ -265,7 +260,7 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       DashboardTab,
-      renderDiscoverTab(dockerColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, dockerColumns),
     ],
     availableFor: ['manager', 'agent'],
   },

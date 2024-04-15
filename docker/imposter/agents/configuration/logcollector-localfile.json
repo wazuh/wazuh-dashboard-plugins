@@ -2,11 +2,30 @@
   "data": {
     "localfile": [
       {
+        "logformat": "macos",
+        "query": {
+          "value": "(process == \"sudo\") or (process == \"sessionlogoutd\" and message contains \"logout is complete.\") or (process == \"sshd\") or (process == \"tccd\" and message contains \"Update Access Record\") or (message contains \"SessionAgentNotificationCenter\") or (process == \"screensharingd\" and message contains \"Authentication\") or (process == \"securityd\" and eventMessage contains \"Session\" and subsystem == \"com.apple.securityd\")",
+          "level": "info",
+          "type": [
+            "log",
+            "activity",
+            "trace"
+          ]
+        },
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": [
+          "agent"
+        ]
+      },
+      {
         "logformat": "command",
         "command": "df -P",
         "alias": "df -P",
         "ignore_binaries": "no",
-        "target": ["agent"],
+        "target": [
+          "agent"
+        ],
         "frequency": 360
       },
       {
@@ -14,7 +33,9 @@
         "command": "netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ \\+[[:digit:]]\\+\\ \\+[[:digit:]]\\+\\ \\+\\(.*\\):\\([[:digit:]]*\\)\\ \\+\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/' | sort -k 4 -g | sed 's/ == \\(.*\\) ==/:\\1/' | sed 1,2d",
         "alias": "netstat listening ports",
         "ignore_binaries": "no",
-        "target": ["agent"],
+        "target": [
+          "agent"
+        ],
         "frequency": 360
       },
       {
@@ -22,7 +43,9 @@
         "command": "last -n 20",
         "alias": "last -n 20",
         "ignore_binaries": "no",
-        "target": ["agent"],
+        "target": [
+          "agent"
+        ],
         "frequency": 360
       },
       {
@@ -30,56 +53,139 @@
         "logformat": "syslog",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"]
+        "target": [
+          "agent"
+        ]
       },
       {
         "file": "/var/log/nginx/access.log",
         "logformat": "apache",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"]
+        "target": [
+          "agent"
+        ]
       },
       {
         "file": "/var/log/nginx/error.log",
         "logformat": "apache",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"]
+        "target": [
+          "agent"
+        ]
       },
       {
         "file": "/var/ossec/logs/active-responses.log",
         "logformat": "syslog",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"]
+        "target": [
+          "agent"
+        ]
       },
       {
         "file": "/var/log/auth.log",
         "logformat": "syslog",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"]
+        "target": [
+          "agent"
+        ]
       },
       {
         "file": "/var/log/syslog",
         "logformat": "syslog",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"]
+        "target": [
+          "agent"
+        ]
       },
       {
         "file": "/var/log/dpkg.log",
         "logformat": "syslog",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"]
+        "target": [
+          "agent"
+        ]
       },
       {
         "file": "/var/log/kern.log",
         "logformat": "syslog",
         "ignore_binaries": "no",
         "only-future-events": "yes",
-        "target": ["agent"]
+        "target": [
+          "agent"
+        ]
+      },
+      {
+        "channel": "Application",
+        "logformat": "eventlog",
+        "ignore_binaries": "no",
+        "target": [
+          "agent"
+        ]
+      },
+      {
+        "channel": "Security",
+        "logformat": "eventchannel",
+        "query": {
+          "value": "Event/System[EventID != 5145 and EventID != 5156 and EventID != 5447 and EventID != 4656 and EventID != 4658 and EventID != 4663 and EventID != 4660 and EventID != 4670 and EventID != 4690 and EventID != 4703 and EventID != 4907]"
+        },
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": [
+          "agent"
+        ],
+        "reconnect_time": 5
+      },
+      {
+        "channel": "System",
+        "logformat": "eventlog",
+        "ignore_binaries": "no",
+        "target": [
+          "agent"
+        ]
+      },
+      {
+        "file": "active-response\\active-responses.log",
+        "logformat": "syslog",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": [
+          "agent"
+        ]
+      },
+      {
+        "channel": "Microsoft-Windows-Sysmon/Operational",
+        "logformat": "eventchannel",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": [
+          "agent"
+        ],
+        "reconnect_time": 5
+      },
+      {
+        "channel": "Microsoft-Windows-Windows Defender/Operational",
+        "logformat": "eventchannel",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": [
+          "agent"
+        ],
+        "reconnect_time": 5
+      },
+      {
+        "file": "C:\\inetpub\\logs\\LogFiles\\W3SVC1\\u_ex240321.log",
+        "logformat": "iis",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": [
+          "agent"
+        ]
       }
     ]
   },

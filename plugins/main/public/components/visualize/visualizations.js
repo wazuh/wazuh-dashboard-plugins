@@ -781,8 +781,8 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: 'Emotet malware activity',
-            id: 'Wazuh-App-Overview-PM-Emotet-Malware-Activity',
+            title: 'Malware activity',
+            id: 'Wazuh-App-Overview-PM-Malware-Activity',
             width: 30,
           },
           {
@@ -792,9 +792,8 @@ export const visualizations = {
           },
         ],
       },
-
       {
-        height: 400,
+        height: 560,
         vis: [
           {
             title: 'Security alerts',
