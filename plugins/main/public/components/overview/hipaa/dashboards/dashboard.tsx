@@ -31,10 +31,6 @@ const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-/* The vulnerabilities dashboard is made up of 3 dashboards because the filters need
-a wrapper for visual adjustments, while the Kpi, the Open vs Close visualization and
-the rest of the visualizations have different configurations at the dashboard level. */
-
 const DashboardHIPAAComponent: React.FC = () => {
   const {
     filters,
