@@ -254,7 +254,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: withPinnedAgent(DashboardVirustotal),
+        component: DashboardVirustotal,
       },
       renderDiscoverTab(DEFAULT_INDEX_PATTERN, virustotalColumns),
     ],

@@ -6,20 +6,25 @@ import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
 import { getKPIsPanel } from './dashboard_panels_kpis';
 import { Filter } from '../../../../../../../src/plugins/data/common';
-import { search } from '../../../common/search-bar/search-bar-service';
 import {
   ErrorFactory,
   ErrorHandler,
   HttpError,
 } from '../../../../react-services/error-management';
-import { LoadingSpinner } from '../../vulnerabilities/common/components/loading_spinner';
-import { DiscoverNoResults } from '../components/no_results';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import './virustotal_dashboard.scss';
 import { SampleDataWarning } from '../../../visualize/components/sample-data-warning';
+import {
+  AlertsDataSourceRepository,
+  PatternDataSource,
+  tParsedIndexPattern,
+  useDataSource,
+} from '../../../common/data-source';
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
+import { AlertsVirustotalDataSource } from '../../../common/data-source/pattern/alerts/alerts-virustotal/alerts-virustotal-data-source';
 
 const plugins = getPlugins();
 
@@ -32,71 +37,77 @@ interface DashboardVTProps {
 }
 
 const DashboardVT: React.FC<DashboardVTProps> = ({ pinnedAgent }) => {
-  /* TODO: Analyze whether to use the new index pattern handler https://github.com/wazuh/wazuh-dashboard-plugins/issues/6434
-  Replace WAZUH_ALERTS_PATTERN with appState.getCurrentPattern... */
-  const VT_INDEX_PATTERN_ID = WAZUH_ALERTS_PATTERN;
-
-  const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: VT_INDEX_PATTERN_ID,
+  const {
+    filters,
+    dataSource,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+    setFilters,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    DataSource: AlertsVirustotalDataSource,
+    repository: new AlertsDataSourceRepository(),
   });
-
-  const { isLoading, query, indexPatterns } = searchBarProps;
-  const [isSearching, setIsSearching] = useState<boolean>(false);
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
+  const { searchBarProps } = useSearchBar({
+    indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters,
+  });
+  const { query } = searchBarProps;
+
   useEffect(() => {
-    if (!isLoading) {
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters: searchBarProps.filters ?? [],
-        query,
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching results',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
+    if (isDataSourceLoading) {
+      return;
     }
-  }, [JSON.stringify(searchBarProps)]);
+    fetchData({ query })
+      .then(results => {
+        setResults(results);
+      })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching vulnerabilities',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
 
   return (
     <I18nProvider>
       <>
-        {isLoading ? <LoadingSpinner /> : null}
-        {!isLoading ? (
-          <SearchBar
-            appName='vt-searchbar'
-            {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={true}
-            showQueryBar={true}
-          />
-        ) : null}
-        {isSearching ? <LoadingSpinner /> : null}
-        {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSpinner />
+        ) : (
+          <div className='wz-search-bar'>
+            <SearchBar
+              appName='virustotal-searchbar'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
+          </div>
+        )}
+        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
           <SampleDataWarning />
         ) : null}
-        {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+        {dataSource && results?.hits?.total === 0 ? (
           <DiscoverNoResults />
         ) : null}
-        {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-          <div className='th-dashboard-responsive'>
+        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+          <div className='virustotal-dashboard-responsive'>
             <DashboardByRenderer
               input={{
                 viewMode: ViewMode.VIEW,
-                panels: getKPIsPanel(VT_INDEX_PATTERN_ID),
+                panels: getKPIsPanel(dataSource?.id),
                 isFullScreenMode: false,
-                filters: searchBarProps.filters ?? [],
+                filters: fetchFilters ?? [],
                 useMargins: true,
-                id: 'kpis-vt-dashboard-tab',
+                id: 'kpis-virustotal-dashboard-tab',
                 timeRange: {
                   from: searchBarProps.dateRangeFrom,
                   to: searchBarProps.dateRangeTo,
@@ -114,11 +125,11 @@ const DashboardVT: React.FC<DashboardVTProps> = ({ pinnedAgent }) => {
             <DashboardByRenderer
               input={{
                 viewMode: ViewMode.VIEW,
-                panels: getDashboardPanels(VT_INDEX_PATTERN_ID, !!pinnedAgent),
+                panels: getDashboardPanels(dataSource?.id, !!pinnedAgent),
                 isFullScreenMode: false,
-                filters: searchBarProps.filters ?? [],
+                filters: fetchFilters ?? [],
                 useMargins: true,
-                id: 'vt-dashboard-tab',
+                id: 'virustotal-dashboard-tab',
                 timeRange: {
                   from: searchBarProps.dateRangeFrom,
                   to: searchBarProps.dateRangeTo,
