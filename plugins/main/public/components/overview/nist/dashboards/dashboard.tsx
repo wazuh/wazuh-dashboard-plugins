@@ -51,7 +51,7 @@ const DashboardNIST80053Component: React.FC = () => {
     setFilters,
   });
 
-  const { query } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -59,6 +59,10 @@ const DashboardNIST80053Component: React.FC = () => {
     }
     fetchData({
       query,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
     })
       .then(results => {
         setResults(results);
@@ -70,7 +74,12 @@ const DashboardNIST80053Component: React.FC = () => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
+  ]);
 
   return (
     <>
