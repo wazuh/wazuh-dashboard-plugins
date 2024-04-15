@@ -16,7 +16,6 @@ import fim from './overview-fim';
 import general from './overview-general';
 import oscap from './overview-oscap';
 import ciscat from './overview-ciscat';
-import pci from './overview-pci';
 import gdpr from './overview-gdpr';
 import hipaa from './overview-hipaa';
 import nist from './overview-nist';
@@ -37,7 +36,6 @@ export {
   general,
   oscap,
   ciscat,
-  pci,
   gdpr,
   hipaa,
   nist,
@@ -48,5 +46,5 @@ export {
   office,
   osquery,
   docker,
-  github
+  github,
 };
