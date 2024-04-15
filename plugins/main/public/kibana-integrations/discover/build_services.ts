@@ -103,6 +103,9 @@ export async function buildServices(
     getEmbeddableInjector,
     /* getSavedSearchById: async (id: string) => savedObjectService.get(id),
     getSavedSearchUrlById: async (id: string) => savedObjectService.urlFor(id), */
+    /* Discover currently uses two history instances:
+    one from Opensearch Dashboards Platform and another from history package.
+    getHistory is replaced by the following function that is used each time the Discover application is loaded to synchronise both instances */
     history: syncHistoryLocations,
     indexPatterns: getDataPlugin().indexPatterns,
     inspector: plugins.inspector,
