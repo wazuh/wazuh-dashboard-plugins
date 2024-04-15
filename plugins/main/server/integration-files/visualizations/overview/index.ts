@@ -20,7 +20,6 @@ import pci from './overview-pci';
 import gdpr from './overview-gdpr';
 import hipaa from './overview-hipaa';
 import nist from './overview-nist';
-import tsc from './overview-tsc';
 import pm from './overview-pm';
 import virustotal from './overview-virustotal';
 import mitre from './overview-mitre';
@@ -41,12 +40,11 @@ export {
   gdpr,
   hipaa,
   nist,
-  tsc,
   pm,
   virustotal,
   mitre,
   office,
   osquery,
   docker,
-  github
+  github,
 };

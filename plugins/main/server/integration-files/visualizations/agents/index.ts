@@ -20,7 +20,6 @@ import gdpr from './agents-gdpr';
 import hipaa from './agents-hipaa';
 import mitre from './agents-mitre';
 import nist from './agents-nist';
-import tsc from './agents-tsc';
 import pm from './agents-pm';
 import virustotal from './agents-virustotal';
 import osquery from './agents-osquery';
@@ -40,7 +39,6 @@ export {
   gdpr,
   hipaa,
   nist,
-  tsc,
   pm,
   virustotal,
   osquery,
@@ -48,5 +46,5 @@ export {
   docker,
   welcome,
   aws,
-  github
+  github,
 };
