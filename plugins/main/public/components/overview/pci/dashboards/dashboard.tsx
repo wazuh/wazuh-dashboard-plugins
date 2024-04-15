@@ -52,7 +52,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
     setFilters,
   });
 
-  const { query } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -60,6 +60,10 @@ const DashboardPCIDSSComponent: React.FC = () => {
     }
     fetchData({
       query,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
     })
       .then(results => {
         setResults(results);
@@ -71,7 +75,12 @@ const DashboardPCIDSSComponent: React.FC = () => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
+  ]);
 
   return (
     <>
