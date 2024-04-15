@@ -1,5 +1,6 @@
 import { PatternDataSourceRepository } from '../pattern-data-source-repository';
-import { tDataSource, tParsedIndexPattern } from '../../index';
+import { tParsedIndexPattern } from '../../index';
+import { StatisticsDataSource } from './statistics-data-source';
 
 export class StatisticsDataSourceRepository extends PatternDataSourceRepository {
   constructor() {
@@ -23,11 +24,14 @@ export class StatisticsDataSourceRepository extends PatternDataSourceRepository 
   validate(dataSource): boolean {
     // check if the dataSource has the id or the title have the statistics word
     const fieldsToCheck = ['id', 'attributes.title'];
+    /* Keep in mind that the identifier is compared with id and title since it is currently not defined that the id is the only one that validates. But this can generate a problem in which the title matches more than one index. */
+    const STATISTICS_PATTERN_IDENTIFIER =
+      StatisticsDataSource.getIdentifierDataSourcePattern();
     // must check in the object and the attributes
     for (const field of fieldsToCheck) {
       if (
         dataSource[field] &&
-        dataSource[field].toLowerCase().includes('statistics')
+        dataSource[field].toLowerCase().includes(STATISTICS_PATTERN_IDENTIFIER)
       ) {
         return true;
       }

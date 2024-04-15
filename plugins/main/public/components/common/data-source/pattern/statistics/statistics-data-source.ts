@@ -1,10 +1,17 @@
 import { AppState } from '../../../../../react-services';
 import { tFilter } from '../../index';
 import { PatternDataSource } from '../pattern-data-source';
+import store from '../../../../../redux/store';
 
 export class StatisticsDataSource extends PatternDataSource {
   constructor(id: string, title: string) {
     super(id, title);
+  }
+
+  static getIdentifierDataSourcePattern(): string {
+    // Return Statistics Identifier Index Pattern
+    const appConfig = store.getState().appConfig;
+    return `${appConfig.data['cron.prefix']}-${appConfig.data['cron.statistics.index.name']}-*`;
   }
 
   getFetchFilters(): tFilter[] {
@@ -38,6 +45,6 @@ export class StatisticsDataSource extends PatternDataSource {
         store: 'appState',
       },
     };
-    return parsedCurrentApi ? [apiNameFilter] : [];
+    return [apiNameFilter];
   }
 }

@@ -10,20 +10,25 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import store from "../../../../../../redux/store";
-import { TabVisualizations } from "../../../../../../factories/tab-visualizations";
-import { LoadedVisualizations } from "../../../../../../factories/loaded-visualizations";
-import { DiscoverPendingUpdates } from "../../../../../../factories/discover-pending-updates";
-import { RawVisualizations } from "../../../../../../factories/raw-visualizations";
-import { GenericRequest } from "../../../../../../react-services/generic-request";
-import { updateVis } from "../../../../../../redux/actions/visualizationsActions";
-import { AppState } from "../../../../../../react-services/app-state";
+import store from '../../../../../../redux/store';
+import { TabVisualizations } from '../../../../../../factories/tab-visualizations';
+import { LoadedVisualizations } from '../../../../../../factories/loaded-visualizations';
+import { DiscoverPendingUpdates } from '../../../../../../factories/discover-pending-updates';
+import { RawVisualizations } from '../../../../../../factories/raw-visualizations';
+import { GenericRequest } from '../../../../../../react-services/generic-request';
+import { updateVis } from '../../../../../../redux/actions/visualizationsActions';
+import { AppState } from '../../../../../../react-services/app-state';
 import { WazuhConfig } from '../../../../../../react-services/wazuh-config.js';
+import { StatisticsDataSource } from '../../../../../../components/common/data-source/pattern/statistics/index.js';
 
-export const useBuildStatisticsVisualizations = (clusterNodeSelected, refreshVisualizations) => {
-  const { 'cron.prefix': indexPrefix, 'cron.statistics.index.name': indexName } = new WazuhConfig().getConfig();
+export const useBuildStatisticsVisualizations = (
+  clusterNodeSelected,
+  refreshVisualizations,
+) => {
+  const STATISTICS_PATTERN_IDENTIFIER =
+    StatisticsDataSource.getIdentifierDataSourcePattern();
   useEffect(() => {
     const tabVisualizations = new TabVisualizations();
     const rawVisualizations = new RawVisualizations();
@@ -33,27 +38,34 @@ export const useBuildStatisticsVisualizations = (clusterNodeSelected, refreshVis
     rawVisualizations.removeAll();
     tabVisualizations.removeAll();
     loadedVisualizations.removeAll();
-    tabVisualizations.setTab("statistics");
+    tabVisualizations.setTab('statistics');
     tabVisualizations.assign({
       statistics: 2,
     });
     const buildStatisticsVisualizations = async () => {
-      discoverPendingUpdates.addItem({ query: "", language: "lucene" }, []);
-      const patternIDTitle = `${indexPrefix}-${indexName}-*`;
+      discoverPendingUpdates.addItem({ query: '', language: 'lucene' }, []);
+      const patternIDTitle = STATISTICS_PATTERN_IDENTIFIER;
       const pattern = {
         id: patternIDTitle,
-        title: patternIDTitle
+        title: patternIDTitle,
       };
       const visData = await GenericRequest.request(
-        "POST",
+        'POST',
         `/elastic/visualizations/cluster-statistics/${patternIDTitle}`,
-        { nodes: { affected_items: [{}], master_node: JSON.parse(AppState.getCurrentAPI()).id, name: clusterNodeSelected }, pattern }
+        {
+          nodes: {
+            affected_items: [{}],
+            master_node: JSON.parse(AppState.getCurrentAPI()).id,
+            name: clusterNodeSelected,
+          },
+          pattern,
+        },
       );
       await rawVisualizations.assignItems(visData.data.raw);
       store.dispatch(
-        updateVis({ update: true, raw: rawVisualizations.getList() })
+        updateVis({ update: true, raw: rawVisualizations.getList() }),
       );
     };
     buildStatisticsVisualizations();
   }, [refreshVisualizations]);
-}
+};

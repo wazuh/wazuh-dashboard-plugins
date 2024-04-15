@@ -41,8 +41,7 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
 import { getCore } from '../../../../../kibana-services';
 import { appSettings, statistics } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { DashboardListenerEngineStatistics } from '../../../../../components/overview/server-management-statistics/dashboards/dashboard_listener_engine';
-import { DashboardAnalysisEngineStatistics } from '../../../../../components/overview/server-management-statistics/dashboards/dashboard_analysis_engine';
+import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
 
 const wzConfig = new WazuhConfig();
 
@@ -155,7 +154,10 @@ export class WzStatisticsOverview extends Component {
         loadingNode: true,
       },
       () => {
-        this.setState({ clusterNodeSelected: newValue, loadingNode: false });
+        this.setState({
+          clusterNodeSelected: newValue,
+          loadingNode: false,
+        });
       },
     );
   };
@@ -205,29 +207,14 @@ export class WzStatisticsOverview extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size={'m'} />
-          {
-            <>
-              {this.state.selectedTabId === 'remoted' &&
-                !this.state.loadingNode && (
-                  <div>
-                    <DashboardListenerEngineStatistics
-                      clusterNodes={this.state.clusterNodes}
-                      clusterNodeSelected={this.state.clusterNodeSelected}
-                      onSelectNode={this.onSelectNode}
-                    />
-                  </div>
-                )}
-              {this.state.selectedTabId === 'analysisd' &&
-                !this.state.loadingNode && (
-                  <DashboardAnalysisEngineStatistics
-                    isClusterMode={this.state.isClusterMode}
-                    clusterNodes={this.state.clusterNodes}
-                    clusterNodeSelected={this.state.clusterNodeSelected}
-                    onSelectNode={this.onSelectNode}
-                  />
-                )}
-            </>
-          }
+          <DashboardTabsPanels
+            selectedTab={this.state.selectedTabId}
+            loadingNode={this.state.loadingNode}
+            isClusterMode={this.state.isClusterMode}
+            clusterNodes={this.state.clusterNodes}
+            clusterNodeSelected={this.state.clusterNodeSelected}
+            onSelectNode={this.onSelectNode}
+          />
         </EuiPanel>
       </EuiPage>
     );
