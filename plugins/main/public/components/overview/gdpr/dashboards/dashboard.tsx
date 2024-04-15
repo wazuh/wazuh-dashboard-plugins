@@ -51,7 +51,7 @@ const DashboardGDPRComponent: React.FC = () => {
     setFilters,
   });
 
-  const { query } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -59,6 +59,10 @@ const DashboardGDPRComponent: React.FC = () => {
     }
     fetchData({
       query,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
     })
       .then(results => {
         setResults(results);
@@ -70,7 +74,12 @@ const DashboardGDPRComponent: React.FC = () => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
+  ]);
 
   return (
     <>
