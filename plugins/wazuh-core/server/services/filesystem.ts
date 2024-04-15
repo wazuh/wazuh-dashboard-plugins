@@ -8,12 +8,6 @@ export const createDirectoryIfNotExists = (directory: string): void => {
   }
 };
 
-export const createLogFileIfNotExists = (filePath: string): void => {
-  if (!fs.existsSync(filePath)) {
-    fs.closeSync(fs.openSync(filePath, 'w'));
-  }
-};
-
 export const createDataDirectoryIfNotExists = (directory?: string) => {
   const absoluteRoute = directory
     ? path.join(WAZUH_DATA_ABSOLUTE_PATH, directory)

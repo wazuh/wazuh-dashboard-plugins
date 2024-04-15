@@ -7,29 +7,44 @@ import {
   EuiFlexItem,
   EuiIconTip,
   EuiSpacer,
+  EuiButtonEmpty,
+  EuiButtonIcon,
 } from '@elastic/eui';
 import { useGetUpgradeTasks } from '../../hooks';
-import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import {
+  API_NAME_TASK_STATUS,
+  UI_LOGGER_LEVELS,
+} from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { AgentUpgradesTaskDetailsButton } from './taskDetailsButton';
 
 interface AgentUpgradesInProgress {
   reload: any;
+  setIsModalVisible: (isModalVisible: boolean) => void;
+  isPanelClosed: boolean;
+  setIsPanelClosed: (isPanelClosed: boolean) => void;
+  allowGetTasks: boolean;
 }
 
 export const AgentUpgradesInProgress = ({
   reload,
+  setIsModalVisible,
+  isPanelClosed,
+  setIsPanelClosed,
+  allowGetTasks,
 }: AgentUpgradesInProgress) => {
   const [isUpgrading, setIsUpgrading] = useState(false);
+
   const {
-    totalInProgressTasks,
-    getInProgressError,
-    totalSuccessTasks,
-    getSuccessError,
-    totalErrorUpgradeTasks,
-    getErrorTasksError,
-  } = useGetUpgradeTasks(reload);
+    totalInProgressTasks = 0,
+    getInProgressError = undefined,
+    totalSuccessTasks = 0,
+    getSuccessError = undefined,
+    totalErrorUpgradeTasks = 0,
+    getErrorTasksError = undefined,
+    totalTimeoutUpgradeTasks = 0,
+    getTimeoutError = undefined,
+  } = allowGetTasks ? useGetUpgradeTasks(reload) : {};
 
   useEffect(() => {
     if (totalInProgressTasks > 0) {
@@ -37,59 +52,75 @@ export const AgentUpgradesInProgress = ({
     }
   }, [totalInProgressTasks]);
 
-  if (getInProgressError) {
+  const showErrorToast = (status: string, error: any) => {
+    API_NAME_TASK_STATUS;
     const options = {
       context: `AgentUpgradesInProgress.useGetUpgradeTasks`,
       level: UI_LOGGER_LEVELS.ERROR,
       severity: UI_ERROR_SEVERITIES.BUSINESS,
       store: true,
       error: {
-        error: getInProgressError,
-        message: getInProgressError.message || getInProgressError,
-        title: `Could not get upgrade progress tasks`,
+        error,
+        message: error.message || error,
+        title: `Could not get upgrade tasks: ${status}`,
       },
     };
     getErrorOrchestrator().handleError(options);
+  };
+
+  if (getInProgressError) {
+    showErrorToast(API_NAME_TASK_STATUS.IN_PROGRESS, getInProgressError);
   }
 
   if (getSuccessError) {
-    const options = {
-      context: `AgentUpgradesInProgress.useGetUpgradeTasks`,
-      level: UI_LOGGER_LEVELS.ERROR,
-      severity: UI_ERROR_SEVERITIES.BUSINESS,
-      store: true,
-      error: {
-        error: getSuccessError,
-        message: getSuccessError.message || getSuccessError,
-        title: `Could not get upgrade success tasks`,
-      },
-    };
-    getErrorOrchestrator().handleError(options);
+    showErrorToast(API_NAME_TASK_STATUS.DONE, getSuccessError);
   }
 
   if (getErrorTasksError) {
-    const options = {
-      context: `AgentUpgradesInProgress.useGetUpgradeTasks`,
-      level: UI_LOGGER_LEVELS.ERROR,
-      severity: UI_ERROR_SEVERITIES.BUSINESS,
-      store: true,
-      error: {
-        error: getErrorTasksError,
-        message: getErrorTasksError.message || getErrorTasksError,
-        title: `Could not get upgrade error tasks`,
-      },
-    };
-    getErrorOrchestrator().handleError(options);
+    showErrorToast(API_NAME_TASK_STATUS.FAILED, getErrorTasksError);
   }
 
-  return isUpgrading || totalSuccessTasks || totalErrorUpgradeTasks ? (
+  if (getTimeoutError) {
+    showErrorToast(API_NAME_TASK_STATUS.TIMEOUT, getTimeoutError);
+  }
+
+  const showTasks = isUpgrading || totalSuccessTasks || totalErrorUpgradeTasks;
+  if (isPanelClosed || !showTasks) return null;
+
+  return (
     <EuiPanel color='subdued'>
-      <EuiFlexGroup gutterSize='s' alignItems='center'>
+      <EuiFlexGroup
+        gutterSize='s'
+        alignItems='flexStart'
+        wrap={false}
+        responsive={false}
+      >
+        <EuiFlexGroup
+          gutterSize='s'
+          alignItems='center'
+          wrap={false}
+          responsive={false}
+        >
+          <EuiFlexItem grow={false}>
+            <EuiText>Upgrade tasks</EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+              color='primary'
+              onClick={() => setIsModalVisible(true)}
+              iconType='eye'
+            >
+              Task details
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiFlexItem grow={false}>
-          <EuiText>Upgrade tasks</EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <AgentUpgradesTaskDetailsButton />
+          <EuiButtonIcon
+            onClick={() => setIsPanelClosed(true)}
+            color='text'
+            iconType='cross'
+            aria-label='Close'
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='s' />
@@ -100,9 +131,7 @@ export const AgentUpgradesInProgress = ({
               <EuiProgress size='xs' color='warning' position='absolute' />
               <EuiText size='s'>
                 <b>{totalInProgressTasks}</b>
-                {totalInProgressTasks === 1
-                  ? ' Upgrade task in progress'
-                  : ' Upgrade tasks in progress'}
+                {` ${API_NAME_TASK_STATUS.IN_PROGRESS}`}
               </EuiText>
             </EuiPanel>
           </EuiFlexItem>
@@ -120,9 +149,7 @@ export const AgentUpgradesInProgress = ({
               <span>
                 <EuiText size='s'>
                   <b>{totalSuccessTasks}</b>
-                  {totalSuccessTasks === 1
-                    ? ' Success upgrade task '
-                    : ' Success upgrade tasks '}
+                  {` ${API_NAME_TASK_STATUS.DONE} `}
                   <EuiIconTip content='Last 60 minutes' color='primary' />
                 </EuiText>
               </span>
@@ -142,10 +169,27 @@ export const AgentUpgradesInProgress = ({
               <span>
                 <EuiText size='s'>
                   <b>{totalErrorUpgradeTasks}</b>
-                  {totalErrorUpgradeTasks === 1
-                    ? ' Failed upgrade task '
-                    : ' Failed upgrade tasks '}
-
+                  {` ${API_NAME_TASK_STATUS.FAILED} `}
+                  <EuiIconTip content='Last 60 minutes' color='primary' />
+                </EuiText>
+              </span>
+            </EuiPanel>
+          </EuiFlexItem>
+        ) : null}
+        {totalTimeoutUpgradeTasks > 0 ? (
+          <EuiFlexItem grow={false}>
+            <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
+              <EuiProgress
+                value={100}
+                max={100}
+                size='xs'
+                color='subdued'
+                position='absolute'
+              />
+              <span>
+                <EuiText size='s'>
+                  <b>{totalTimeoutUpgradeTasks}</b>
+                  {` ${API_NAME_TASK_STATUS.TIMEOUT} `}
                   <EuiIconTip content='Last 60 minutes' color='primary' />
                 </EuiText>
               </span>
@@ -154,5 +198,5 @@ export const AgentUpgradesInProgress = ({
         ) : null}
       </EuiFlexGroup>
     </EuiPanel>
-  ) : null;
+  );
 };

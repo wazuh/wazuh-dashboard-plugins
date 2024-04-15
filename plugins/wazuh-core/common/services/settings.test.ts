@@ -1,4 +1,4 @@
-import { formatLabelValuePair, getCustomizationSetting } from './settings';
+import { formatLabelValuePair } from './settings';
 
 describe('[settings] Methods', () => {
   describe('formatLabelValuePair: Format the label-value pairs used to display the allowed values', () => {

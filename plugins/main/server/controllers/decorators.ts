@@ -6,13 +6,13 @@ export function routeDecoratorProtectedAdministrator(
 ) {
   return async (context, request, response) => {
     try {
-      try {
+      const { administrator, administrator_requirements } =
         await context.wazuh_core.dashboardSecurity.isAdministratorUser(
           context,
           request,
         );
-      } catch (error) {
-        return ErrorResponse(error.message, 403, 403, response);
+      if (!administrator) {
+        return ErrorResponse(administrator_requirements, 403, 403, response);
       }
       return await routeHandler(context, request, response);
     } catch (error) {

@@ -117,7 +117,6 @@ const settingsSuite = {
       'text2',
       {
         type: 'text',
-        defaultValueIfNotSet: 'defaultValueIfNotSet2',
         defaultValue: 'defaultValue2',
       },
     ],
@@ -149,13 +148,11 @@ describe('Configuration service', () => {
   );
 
   it.each`
-    title                                                                     | settings
-    ${'get setting defaultValue'}                                             | ${[{ key: 'text1', value: 'defaultValue1', store: undefined }]}
-    ${'get setting defaultValueIfNotSet'}                                     | ${[{ key: 'text2', value: 'defaultValueIfNotSet2', store: undefined }]}
-    ${'get setting stored value from a setting with defaultValueIfNotSet'}    | ${[{ key: 'text2', value: 'storedValue2', store: 'storedValue2' }]}
-    ${'get setting stored value from a setting without defaultValueIfNotSet'} | ${[{ key: 'text1', value: 'storedValue1', store: 'storedValue1' }]}
-    ${'get multiple settings combining without stored values'}                | ${[{ key: 'text1', value: 'defaultValue1', store: undefined }, { key: 'text2', value: 'defaultValueIfNotSet2', store: undefined }]}
-    ${'get multiple settings combining stored values and defaults'}           | ${[{ key: 'text1', value: 'defaultValue1', store: undefined }, { key: 'text2', value: 'storedValue', store: 'storedValue' }]}
+    title                                                           | settings
+    ${'get setting defaultValue1'}                                  | ${[{ key: 'text1', value: 'defaultValue1', store: undefined }]}
+    ${'get setting defaultValue2'}                                  | ${[{ key: 'text2', value: 'defaultValue2', store: undefined }]}
+    ${'get multiple settings combining without stored values'}      | ${[{ key: 'text1', value: 'defaultValue1', store: undefined }, { key: 'text2', value: 'defaultValue2', store: undefined }]}
+    ${'get multiple settings combining stored values and defaults'} | ${[{ key: 'text1', value: 'defaultValue1', store: undefined }, { key: 'text2', value: 'storedValue', store: 'storedValue' }]}
   `('$title ', async ({ settings }) => {
     const configurationStore = createMockConfigurationStore();
     const configuration = new Configuration(mockLogger, configurationStore);
@@ -199,8 +196,8 @@ describe('Configuration service', () => {
     store: 'storedValue1',
   }, {
     key: 'text2',
-    initialValue: 'defaultValueIfNotSet2',
-    finalValue: 'defaultValueIfNotSet2',
+    initialValue: 'defaultValue2',
+    finalValue: 'defaultValue2',
     store: undefined,
   }]}
   `(
@@ -242,8 +239,8 @@ describe('Configuration service', () => {
     clear: true,
   }, {
     key: 'text2',
-    initialValue: 'defaultValueIfNotSet2',
-    afterSetValue: 'defaultValueIfNotSet2',
+    initialValue: 'defaultValue2',
+    afterSetValue: 'defaultValue2',
     afterCleanValue: 'defaultValue1',
     store: undefined,
     clear: false,
@@ -293,9 +290,9 @@ describe('Configuration service', () => {
     clear: true,
   }, {
     key: 'text2',
-    initialValue: 'defaultValueIfNotSet2',
-    afterSetValue: 'defaultValueIfNotSet2',
-    afterCleanValue: 'defaultValueIfNotSet2',
+    initialValue: 'defaultValue2',
+    afterSetValue: 'defaultValue2',
+    afterCleanValue: 'defaultValue2',
     store: undefined,
     clear: false,
   }]} | ${true}
@@ -308,9 +305,9 @@ describe('Configuration service', () => {
     clear: true,
   }, {
     key: 'text2',
-    initialValue: 'defaultValueIfNotSet2',
-    afterSetValue: 'defaultValueIfNotSet2',
-    afterCleanValue: 'defaultValueIfNotSet2',
+    initialValue: 'defaultValue2',
+    afterSetValue: 'defaultValue2',
+    afterCleanValue: 'defaultValue2',
     store: undefined,
     clear: false,
   }]} | ${false}
@@ -367,9 +364,9 @@ describe('Configuration service', () => {
     clear: true,
   }, {
     key: 'text2',
-    initialValue: 'defaultValueIfNotSet2',
-    afterSetValue: 'defaultValueIfNotSet2',
-    afterCleanValue: 'defaultValueIfNotSet2',
+    initialValue: 'defaultValue2',
+    afterSetValue: 'defaultValue2',
+    afterCleanValue: 'defaultValue2',
     store: undefined,
     clear: false,
   }]} | ${true}
@@ -382,9 +379,9 @@ describe('Configuration service', () => {
     clear: true,
   }, {
     key: 'text2',
-    initialValue: 'defaultValueIfNotSet2',
-    afterSetValue: 'defaultValueIfNotSet2',
-    afterCleanValue: 'defaultValueIfNotSet2',
+    initialValue: 'defaultValue2',
+    afterSetValue: 'defaultValue2',
+    afterCleanValue: 'defaultValue2',
     store: undefined,
     clear: false,
   }]} | ${false}

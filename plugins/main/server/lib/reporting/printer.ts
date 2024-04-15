@@ -10,7 +10,7 @@ import {
 import * as TimSort from 'timsort';
 import { REPORTS_PRIMARY_COLOR } from '../../../common/constants';
 import { Logger } from 'opensearch-dashboards/server';
-import { IConfiguration } from '../../../../wazuh-core/common/services/configuration';
+import { IConfigurationEnhanced } from '../../../../wazuh-core/server';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR,
@@ -129,7 +129,10 @@ const fonts = {
 export class ReportPrinter {
   private _content: any[];
   private _printer: PdfPrinter;
-  constructor(public logger: Logger, private configuration: IConfiguration) {
+  constructor(
+    public logger: Logger,
+    private configuration: IConfigurationEnhanced,
+  ) {
     this._printer = new PdfPrinter(fonts);
     this._content = [];
   }
@@ -604,28 +607,33 @@ export class ReportPrinter {
   async print(reportPath: string) {
     return new Promise((resolve, reject) => {
       // Get configuration settings
-      Promise.all(
-        [
+      this.configuration
+        .getCustomizationSetting(
           'customization.logo.reports',
           'customization.reports.header',
           'customization.reports.footer',
-        ].map(key => this.configuration.getCustomizationSetting(key)),
-      ).then(([pathToLogo, pageHeader, pageFooter]) => {
-        try {
-          const document = this._printer.createPdfKitDocument({
-            ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }),
-            content: this._content,
-          });
+        )
+        .then(configuration => {
+          try {
+            const {
+              'customization.logo.reports': pathToLogo,
+              'customization.reports.header': pageHeader,
+              'customization.reports.footer': pageFooter,
+            } = configuration;
+            const document = this._printer.createPdfKitDocument({
+              ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }),
+              content: this._content,
+            });
 
-          document.on('error', reject);
-          document.on('end', resolve);
+            document.on('error', reject);
+            document.on('end', resolve);
 
-          document.pipe(fs.createWriteStream(reportPath));
-          document.end();
-        } catch (error) {
-          reject(error);
-        }
-      });
+            document.pipe(fs.createWriteStream(reportPath));
+            document.end();
+          } catch (error) {
+            reject(error);
+          }
+        });
     });
   }
 
