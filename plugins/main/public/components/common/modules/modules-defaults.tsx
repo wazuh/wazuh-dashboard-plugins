@@ -46,7 +46,10 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
-import { AlertsVulnerabilitiesDataSource } from '../data-source';
+import {
+  AlertsVulnerabilitiesDataSource,
+  AlertsMalwareDetectionDataSource,
+} from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -131,11 +134,12 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component:
-          DashboardMalwareDetection ||
-          withPinnedAgent(DashboardMalwareDetection), // TODO: use withPinnedAgent
+        component: DashboardMalwareDetection,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, malwareDetectionColumns),
+      renderDiscoverTab({
+        tableColumns: malwareDetectionColumns,
+        DataSource: AlertsMalwareDetectionDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
