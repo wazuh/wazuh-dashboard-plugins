@@ -80,7 +80,6 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
                 <SearchBar
                   appName='vulnerability-detector-searchbar'
                   {...searchBarProps}
-                  showDatePicker={false}
                   showQueryInput={true}
                   showQueryBar={true}
                   showSaveQuery={true}
