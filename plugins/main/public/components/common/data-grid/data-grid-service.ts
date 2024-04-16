@@ -5,6 +5,7 @@ import { SearchParams, search } from '../search-bar/search-bar-service';
 import { IFieldType } from '../../../../../../src/plugins/data/common';
 export const MAX_ENTRIES_PER_QUERY = 10000;
 import { EuiDataGridColumn } from '@elastic/eui';
+import { tDataGridColumn } from './use-data-grid';
 
 export const parseData = (
   resultsHits: SearchResponse['hits']['hits'],
@@ -168,20 +169,22 @@ export const exportSearchToCSV = async (
   }
 };
 
-export const parseColumns = (fields: IFieldType[]): EuiDataGridColumn[] => {
+export const parseColumns = (fields: IFieldType[], defaultColumns: tDataGridColumn[] = []): EuiDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
   fields = fields.filter(field => field.name !== '_source');
-  return (
-    fields.map(field => {
-      return {
-        ...field,
-        id: field.name,
-        display: field.name,
-        schema: field.type,
-        actions: {
-          showHide: true,
-        },
-      };
-    }) || []
-  );
+  // merge the properties of the field with the default columns
+  const columns = fields.map(field => {
+    const defaultColumn = defaultColumns.find(column => column.id === field.name);
+    return {
+      ...field,
+      id: field.name,
+      display: field.name,
+      schema: field.type,
+      actions: {
+        showHide: true,
+      },
+      ...defaultColumn,
+    };
+  }) || []
+  return columns;
 };

@@ -20,7 +20,7 @@ type tUseSearchBarCustomInputs = {
     isUpdate?: boolean,
   ) => void;
 };
-type tUseSearchBarProps = Partial<SearchBarProps> & tUseSearchBarCustomInputs;
+export type tUseSearchBarProps = Partial<SearchBarProps> & tUseSearchBarCustomInputs;
 
 // Output types
 type tUserSearchBarResponse = {
