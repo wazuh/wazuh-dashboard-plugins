@@ -9,7 +9,6 @@ import {
   EuiButtonIcon,
   EuiDataGridCellValueElementProps,
   EuiFlexGroup,
-  EuiFlexItem,
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
@@ -18,7 +17,6 @@ import {
 } from '@elastic/eui';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../../../src/core/server';
-import DocViewer from '../../doc_viewer/doc_viewer';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
 import { useDataGrid } from '../../data_grid/use_data_grid';
@@ -44,6 +42,7 @@ import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
+import { DocumentViewTableAndJson } from '../../common/components/document-view-table-and-json';
 
 const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
@@ -241,9 +240,10 @@ const InventoryVulsComponent = () => {
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
                   <EuiFlexGroup direction='column'>
-                    <EuiFlexItem>
-                      <DocViewer {...docViewerProps} />
-                    </EuiFlexItem>
+                    <DocumentViewTableAndJson
+                      document={inspectedHit}
+                      indexPattern={indexPattern}
+                    />
                   </EuiFlexGroup>
                 </EuiFlyoutBody>
               </EuiFlyout>
