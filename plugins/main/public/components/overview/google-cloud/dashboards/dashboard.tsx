@@ -81,7 +81,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
               <SearchBar
                 appName='google-cloud-searchbar'
                 {...searchBarProps}
-                showDatePicker={false}
+                showDatePicker={true}
                 showQueryInput={true}
                 showQueryBar={true}
                 showSaveQuery={true}
