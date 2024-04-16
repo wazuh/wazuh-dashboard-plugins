@@ -42,7 +42,7 @@ import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
-import { DocumentViewTableAndJson } from '../../common/components/document_view_table_and_json';
+import { DocumentViewTableAndJson } from '../../common/components/document-view-table-and-json';
 
 const InventoryVulsComponent = () => {
   const appConfig = useAppConfig();
