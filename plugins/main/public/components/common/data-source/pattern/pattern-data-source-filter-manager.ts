@@ -232,8 +232,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
           isCluster
               ? AppState.getClusterInfo().cluster
               : AppState.getClusterInfo().manager,
-          true,
-          key
+          isCluster,
       );
       managerFilter.meta = {
           ...managerFilter.meta,
