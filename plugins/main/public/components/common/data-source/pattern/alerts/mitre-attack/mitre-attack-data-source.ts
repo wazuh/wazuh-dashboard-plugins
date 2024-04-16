@@ -1,5 +1,5 @@
 import { tFilter } from "../../../index";
-import { DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE } from '../../../../../../../common/constants';
+import { DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE, DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID } from '../../../../../../../common/constants';
 import { AlertsDataSource } from "../alerts-data-source";
 
 const GROUP_KEY = 'rule.mitre.id';
