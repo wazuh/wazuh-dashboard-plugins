@@ -46,7 +46,10 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
-import { AlertsVulnerabilitiesDataSource } from '../data-source';
+import {
+  AlertsOffice365DataSource,
+  AlertsVulnerabilitiesDataSource,
+} from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -158,20 +161,26 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: withPinnedAgent(DashboardOffice365),
+        component: DashboardOffice365,
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
+      renderDiscoverTab({
+        tableColumns: office365Columns,
+        DataSource: AlertsOffice365DataSource,
+      }),
       {
         id: 'inventory',
         name: 'Panel',
         buttons: [ButtonModuleExploreAgent],
         component: withModuleNotForAgent(OfficePanel),
-      },
-      {
-        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
-        component: withModuleNotForAgent(() => (
-          <WazuhDiscover tableColumns={office365Columns} />
-        )),
       },
     ],
     availableFor: ['manager'],
