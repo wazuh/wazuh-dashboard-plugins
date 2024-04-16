@@ -20,8 +20,8 @@ import {
   PatternDataSource,
   tParsedIndexPattern,
   useDataSource,
+  AlertsAWSDataSource,
 } from '../../../common/data-source';
-import { AlertsAWSDataSource } from '../../../common/data-source/pattern/alerts/alerts-aws/alerts-aws-data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 
