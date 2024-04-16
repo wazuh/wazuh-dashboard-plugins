@@ -1,31 +1,14 @@
 import { getPlugins } from '../../../kibana-services';
 import { IndexPattern, Filter, OpenSearchQuerySortValue } from "../../../../../../src/plugins/data/public";
 import { SearchResponse } from "../../../../../../src/core/server";
-import { tFilter } from '../data-source/index';
+import { tFilter, tSearchParams } from '../data-source/index';
 
-export interface SearchParams {
-    indexPattern: IndexPattern;
-    filters?: Filter[];
-    query?: any;
-    pagination?: {
-        pageIndex?: number;
-        pageSize?: number;
-    };
-    fields?: string[],
-    sorting?: {
-        columns: {
-            id: string;
-            direction: 'asc' | 'desc';
-        }[];
-    };
-    dateRange?: {
-        from: string;
-        to: string;
-    };
-}
+export type SearchParams = {
+    indexPattern: IndexPattern; 
+} & tSearchParams;
 
 export const search = async (params: SearchParams): Promise<SearchResponse | void> => {
-    const { indexPattern, filters: defaultFilters = [], query, pagination, sorting, fields } = params;
+    const { indexPattern, filters: defaultFilters = [], query, pagination, sorting, fields, aggs } = params;
     if (!indexPattern) {
         return;
     }
@@ -56,6 +39,10 @@ export const search = async (params: SearchParams): Promise<SearchResponse | voi
         ]
     }
 
+    if(aggs) {
+        searchSource.setField('aggs', aggs);
+    }
+
     const searchParams = searchSource
         .setParent(undefined)
         .setField('filter', filters)
@@ -79,6 +66,8 @@ export const search = async (params: SearchParams): Promise<SearchResponse | voi
     }
 };
 
+
+
 export const hideCloseButtonOnFixedFilters = (filters: tFilter[], elements: NodeListOf<Element>) => {
     const fixedFilters = filters.map((filter, index) => {
         if (filter.meta.controlledBy && !filter.meta.controlledBy.startsWith('hidden')) {
@@ -86,10 +75,12 @@ export const hideCloseButtonOnFixedFilters = (filters: tFilter[], elements: Node
                 index,
                 filter,
                 field: filter.meta?.key,
-                value: filter.meta?.params?.query
+                value: filter.meta?.params?.query || filter.meta?.value
             }
         }
     }).filter((filter) => filter);
+
+    
 
     elements.forEach((element, index) => {
         // the filter badge will be changed only when the field and value are the same and the position in the array is the same
