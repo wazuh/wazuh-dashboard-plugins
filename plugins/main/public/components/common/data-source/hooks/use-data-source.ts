@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
     IDataSourceFactoryConstructor,
-    tDataSource,
     tDataSourceRepository,
     tFilter, 
     tSearchParams, 
@@ -49,13 +48,14 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
         DataSource: DataSourceConstructor,
         repository,
         factory: injectedFactory,
+        filterManager: injectedFilterManager
      } = props;
 
     if (!repository || !DataSourceConstructor) {
         throw new Error('DataSource and repository are required');
     }
 
-    const [dataSource, setDataSource] = useState<tDataSource>();
+    const [dataSource, setDataSource] = useState<PatternDataSource>();
     const [dataSourceFilterManager, setDataSourceFilterManager] = useState<PatternDataSourceFilterManager | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
@@ -77,6 +77,19 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
         return await dataSourceFilterManager?.fetch(params);
     }
 
+    const createFilterManager = (dataSource: PatternDataSource, filters?: tFilter[], filterManager?: tFilterManager) => {
+        return new PatternDataSourceFilterManager(dataSource, filters, filterManager);
+    }
+
+    /*useEffect(() => {
+        if(!dataSource || !defaultFilters || isLoading) {
+            return;
+        }
+        const newFilterManager = createFilterManager(dataSource, defaultFilters, injectedFilterManager);
+        setDataSourceFilterManager(newFilterManager);
+    }, [defaultFilters, injectedFilterManager, dataSource, isLoading]);
+    */
+
     useEffect(() => {
         init();
     }, [])
@@ -92,10 +105,7 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
             throw new Error('No valid data source found');
         }
         setDataSource(dataSource);
-        const dataSourceFilterManager = new PatternDataSourceFilterManager(dataSource, defaultFilters);
-        if (!dataSourceFilterManager) {
-            throw new Error('Error creating filter manager');
-        }
+        const dataSourceFilterManager = createFilterManager(dataSource, defaultFilters, injectedFilterManager);
 
         // what the filters update
         dataSourceFilterManager.getUpdates$().subscribe({
