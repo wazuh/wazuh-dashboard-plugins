@@ -56,11 +56,11 @@ describe('[settings] Input validation', () => {
     ${'cron.prefix'}                    | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
     ${'cron.prefix'}                    | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
     ${'cron.prefix'}                    | ${'test*'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'cron.statistics.apis'}           | ${['test']}                                                            | ${undefined}
-    ${'cron.statistics.apis'}           | ${['test ']}                                                           | ${'No whitespaces allowed.'}
-    ${'cron.statistics.apis'}           | ${['']}                                                                | ${'Value can not be empty.'}
-    ${'cron.statistics.apis'}           | ${['test', 4]}                                                         | ${'Value is not a string.'}
-    ${'cron.statistics.apis'}           | ${'test space'}                                                        | ${'Value is not a valid list.'}
+    ${'cron.statistics.apis'}           | ${'["test"]'}                                                          | ${undefined}
+    ${'cron.statistics.apis'}           | ${'["test "]'}                                                         | ${'No whitespaces allowed.'}
+    ${'cron.statistics.apis'}           | ${'[""]'}                                                              | ${'Value can not be empty.'}
+    ${'cron.statistics.apis'}           | ${'["test", 4]'}                                                       | ${'Value is not a string.'}
+    ${'cron.statistics.apis'}           | ${'test space'}                                                        | ${"Value can't be parsed. There is some error."}
     ${'cron.statistics.apis'}           | ${true}                                                                | ${'Value is not a valid list.'}
     ${'cron.statistics.index.creation'} | ${'h'}                                                                 | ${undefined}
     ${'cron.statistics.index.creation'} | ${'d'}                                                                 | ${undefined}
@@ -129,29 +129,35 @@ describe('[settings] Input validation', () => {
     ${'customization.reports.header'}   | ${'Testing maximum length of a line of 40 characters\nTest'}           | ${'The maximum length of a line is 40 characters.'}
     ${'enrollment.dns'}                 | ${'test'}                                                              | ${undefined}
     ${'enrollment.dns'}                 | ${''}                                                                  | ${undefined}
-    ${'enrollment.dns'}                 | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'enrollment.dns'}                 | ${'example.fqdn.valid'}                                                | ${undefined}
+    ${'enrollment.dns'}                 | ${'127.0.0.1'}                                                         | ${undefined}
+    ${'enrollment.dns'}                 | ${'2001:0db8:85a3:0000:0000:8a2e:0370:7334'}                           | ${undefined}
+    ${'enrollment.dns'}                 | ${'2001:db8:85a3::8a2e:370:7334'}                                      | ${'It should be a valid hostname, FQDN, IPv4 or uncompressed IPv6'}
+    ${'enrollment.dns'}                 | ${'2001:0db8:85a3:0000:0000:8a2e:0370:7334:KL12'}                      | ${'It should be a valid hostname, FQDN, IPv4 or uncompressed IPv6'}
+    ${'enrollment.dns'}                 | ${'example.'}                                                          | ${'It should be a valid hostname, FQDN, IPv4 or uncompressed IPv6'}
+    ${'enrollment.dns'}                 | ${'127.0.0.1'}                                                         | ${undefined}
     ${'enrollment.password'}            | ${'test'}                                                              | ${undefined}
     ${'enrollment.password'}            | ${''}                                                                  | ${'Value can not be empty.'}
     ${'enrollment.password'}            | ${'test space'}                                                        | ${undefined}
-    ${'ip.ignore'}                      | ${['test']}                                                            | ${undefined}
-    ${'ip.ignore'}                      | ${['test*']}                                                           | ${undefined}
-    ${'ip.ignore'}                      | ${['']}                                                                | ${'Value can not be empty.'}
-    ${'ip.ignore'}                      | ${['test space']}                                                      | ${'No whitespaces allowed.'}
+    ${'ip.ignore'}                      | ${'["test"]'}                                                          | ${undefined}
+    ${'ip.ignore'}                      | ${'["test*"]'}                                                         | ${undefined}
+    ${'ip.ignore'}                      | ${'[""]'}                                                              | ${'Value can not be empty.'}
+    ${'ip.ignore'}                      | ${'["test space"]'}                                                    | ${'No whitespaces allowed.'}
     ${'ip.ignore'}                      | ${true}                                                                | ${'Value is not a valid list.'}
-    ${'ip.ignore'}                      | ${['-test']}                                                           | ${"It can't start with: -, _, +, .."}
-    ${'ip.ignore'}                      | ${['_test']}                                                           | ${"It can't start with: -, _, +, .."}
-    ${'ip.ignore'}                      | ${['+test']}                                                           | ${"It can't start with: -, _, +, .."}
-    ${'ip.ignore'}                      | ${['.test']}                                                           | ${"It can't start with: -, _, +, .."}
-    ${'ip.ignore'}                      | ${['test\\']}                                                          | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                      | ${['test/']}                                                           | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                      | ${['test?']}                                                           | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                      | ${['test"']}                                                           | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                      | ${['test<']}                                                           | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                      | ${['test>']}                                                           | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                      | ${['test|']}                                                           | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                      | ${['test,']}                                                           | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                      | ${['test#']}                                                           | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                      | ${['test', 'test#']}                                                   | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                      | ${'["-test"]'}                                                         | ${"It can't start with: -, _, +, .."}
+    ${'ip.ignore'}                      | ${'["_test"]'}                                                         | ${"It can't start with: -, _, +, .."}
+    ${'ip.ignore'}                      | ${'["+test"]'}                                                         | ${"It can't start with: -, _, +, .."}
+    ${'ip.ignore'}                      | ${'[".test"]'}                                                         | ${"It can't start with: -, _, +, .."}
+    ${'ip.ignore'}                      | ${'["test\\""]'}                                                       | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                      | ${'["test/"]'}                                                         | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                      | ${'["test?"]'}                                                         | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                      | ${'["test"\']'}                                                        | ${"Value can't be parsed. There is some error."}
+    ${'ip.ignore'}                      | ${'["test<"]'}                                                         | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                      | ${'["test>"]'}                                                         | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                      | ${'["test|"]'}                                                         | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                      | ${'["test,"]'}                                                         | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                      | ${'["test#"]'}                                                         | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                      | ${'["test", "test#"]'}                                                 | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'ip.selector'}                    | ${true}                                                                | ${undefined}
     ${'ip.selector'}                    | ${''}                                                                  | ${'It should be a boolean. Allowed values: true or false.'}
     ${'pattern'}                        | ${'test'}                                                              | ${undefined}
@@ -231,21 +237,11 @@ describe('[settings] Input validation', () => {
     ({ setting, value, expectedValidation }) => {
       // FIXME: use the plugins definition
       if (setting === 'cron.statistics.interval') {
-        expect(
-          validateCronStatisticsInterval(
-            PLUGIN_SETTINGS[
-              setting
-            ]?.uiFormTransformConfigurationValueToInputValue?.(value) ?? value,
-          ),
-        ).toBe(expectedValidation);
+        expect(validateCronStatisticsInterval(value)).toBe(expectedValidation);
       } else {
-        expect(
-          PLUGIN_SETTINGS[setting].validate(
-            PLUGIN_SETTINGS[
-              setting
-            ]?.uiFormTransformConfigurationValueToInputValue?.(value) ?? value,
-          ),
-        ).toBe(expectedValidation);
+        expect(PLUGIN_SETTINGS[setting].validateUIForm(value)).toBe(
+          expectedValidation,
+        );
       }
     },
   );

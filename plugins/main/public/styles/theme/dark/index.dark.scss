@@ -464,3 +464,9 @@ svg .legend text {
 .copy-codeblock-wrapper .euiToolTipAnchor {
   background-color: rgba(0, 0, 0, 0.7);
 }
+
+.wz-app {
+  [name='OverviewWelcome'] .euiIcon--app .euiIcon__fillSecondary {
+    fill: #dfe5ef;
+  }
+}
