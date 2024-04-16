@@ -44,6 +44,7 @@ const getFilters = filters => {
 
 export function TableWzAPI({
   actionButtons,
+  postActionButtons,
   addOnTitle,
   extra,
   setReload,
@@ -53,6 +54,11 @@ export function TableWzAPI({
     | ReactNode
     | ReactNode[]
     | (({ filters }: { filters }) => ReactNode);
+  postActionButtons?:
+    | ReactNode
+    | ReactNode[]
+    | (({ filters }: { filters }) => ReactNode);
+
   title?: string;
   addOnTitle?: ReactNode;
   description?: string;
@@ -147,7 +153,7 @@ export function TableWzAPI({
   },
   []);
 
-  const renderActionButtons = filters => {
+  const renderActionButtons = (actionButtons, filters) => {
     if (Array.isArray(actionButtons)) {
       return actionButtons.map((button, key) => (
         <EuiFlexItem key={key} grow={false}>
@@ -191,7 +197,7 @@ export function TableWzAPI({
     <>
       <EuiFlexGroup wrap alignItems='center' responsive={false}>
         <EuiFlexItem>
-          <EuiFlexGroup alignItems='center' responsive={false}>
+          <EuiFlexGroup wrap alignItems='center' responsive={false}>
             <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
               {rest.title && (
                 <EuiTitle size='s'>
@@ -216,7 +222,7 @@ export function TableWzAPI({
         <EuiFlexItem grow={false}>
           <EuiFlexGroup wrap alignItems={'center'} responsive={false}>
             {/* Render optional custom action button */}
-            {renderActionButtons(filters)}
+            {renderActionButtons(actionButtons, filters)}
             {/* Render optional reload button */}
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}
@@ -232,6 +238,8 @@ export function TableWzAPI({
                 }
               />
             )}
+            {/* Render optional post custom action button */}
+            {renderActionButtons(postActionButtons, filters)}
             {rest.showFieldSelector && (
               <EuiFlexItem grow={false}>
                 <EuiToolTip content='Select visible fields' position='left'>
