@@ -14,17 +14,8 @@ import { I18nProvider } from '@osd/i18n/react';
 import { Tactics, Techniques } from './components';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
-import { IFilterParams, getIndexPattern } from './lib';
-
-import {
-    FilterManager,
-    Filter,
-} from '../../../../../../../src/plugins/data/public/';
-//@ts-ignore
-import { KbnSearchBar } from '../../../kbn-search-bar';
-import { TimeRange, Query, IndexPattern } from '../../../../../../../src/plugins/data/common';
-import { ModulesHelper } from '../../../common/modules/modules-helper';
-import { getDataPlugin, getPlugins, getToasts } from '../../../../kibana-services';
+import { Query, IndexPattern } from '../../../../../../../src/plugins/data/common';
+import { getPlugins } from '../../../../kibana-services';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
@@ -32,44 +23,29 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { useDataSource, MitreAttackDataSource, AlertsDataSourceRepository, tParsedIndexPattern, PatternDataSource } from '../../../common/data-source';
+import { useDataSource, MitreAttackDataSource, AlertsDataSourceRepository, tParsedIndexPattern, PatternDataSource, tFilter } from '../../../common/data-source';
 export interface ITactic {
     [key: string]: string[];
 }
 
 const SearchBar = getPlugins().data.ui.SearchBar;
 
-type tTimefilter = {
-    getTime(): TimeRange;
-    setTime(time: TimeRange): void;
-    _history: { history: { items: { from: string; to: string }[] } };
-};
+export type tFilterParams = {
+    filters: tFilter[];
+    query: Query | undefined;
+    time: {
+        to: string | undefined,
+        from: string | undefined
+    };
+}
 
-type tPluginPlatformServices = { [key: string]: any };
 type tMitreState = {
     tacticsObject: ITactic;
     selectedTactics: Object;
-    filterParams: IFilterParams;
 };
 
 const MitreComponent = (props) => {
     const { onSelectedTabChanged } = props;
-    let PluginPlatformServices: tPluginPlatformServices = getDataPlugin().query;
-    let filterManager: FilterManager = PluginPlatformServices.filterManager;
-    let timefilter: tTimefilter = PluginPlatformServices.timefilter.timefilter;
-    const [isLoading, setIsLoading] = useState(true);
-    const [mitreState, setMitreState] = useState<tMitreState>({
-        tacticsObject: {},
-        selectedTactics: {},
-        filterParams: {
-            filters: filterManager.getFilters() || [],
-            query: { language: 'kuery', query: '' },
-            time: timefilter.getTime(),
-        }
-    })
-    const [filtersSubscriber, setFiltersSubscriber] = useState<any>(); //Todo: Add correct ype
-    const [indexPattern, setIndexPattern] = useState<any>(); //Todo: Add correct type
-
     const {
         filters,
         dataSource,
@@ -85,50 +61,50 @@ const MitreComponent = (props) => {
     const { searchBarProps } = useSearchBar({
         indexPattern: dataSource?.indexPattern as IndexPattern,
         filters,
-        setFilters,
+        setFilters: setFilters,
     });
+    const [mitreState, setMitreState] = useState<tMitreState>({
+        tacticsObject: {},
+        selectedTactics: {},
+    })
+
+    const [filterParams, setFilterParams] = useState<tFilterParams>({
+        filters: fetchFilters,
+        query: searchBarProps?.query,
+        time: {
+            from: searchBarProps?.dateRangeFrom,
+            to: searchBarProps?.dateRangeTo
+        }
+    });
+    const [filtersSubscriber, setFiltersSubscriber] = useState<any>(); //Todo: Add correct ype
+    const [indexPattern, setIndexPattern] = useState<any>(); //Todo: Add correct type
+    const [isLoading, setIsLoading] = useState(true);
 
     const initialize = async () => {
-        setIndexPattern(await getIndexPattern());
-        const scope = await ModulesHelper.getDiscoverScope(); // remove this
-        const query = scope.state.query;
-        const { filters, time } = mitreState.filterParams;
-        const filterParams = { query, time, filters };
-        setMitreState({ ...mitreState, filterParams });
-        setFiltersSubscriber(filterManager
-            .getUpdates$()
-            .subscribe(() => {
-                onFiltersUpdated(filterManager.getFilters());
-            })
-        );
-
+        setIndexPattern(dataSource?.indexPattern);
+        let filterParams = {
+            filters: fetchFilters, // pass the fetchFilters to use it as initial filters in the technique flyout
+            query: searchBarProps?.query,
+            time: {
+                from: searchBarProps?.dateRangeFrom,
+                to: searchBarProps?.dateRangeTo
+            }
+        };
+        setFilterParams(filterParams);
+        setIsLoading(true);
         await buildTacticsObject();
     }
 
     useEffect(() => {
+        if (isDataSourceLoading || !dataSource) return;
         initialize();
-
-        return () => {
-            filtersSubscriber && filtersSubscriber.unsubscribe();
-        }
-    }, []);
-
-
-
-    const onQuerySubmit = (payload: { dateRange: TimeRange; query: Query }) => {
-        const { query, dateRange } = payload;
-        const { filters } = mitreState.filterParams;
-        const filterParams = { query, time: dateRange, filters };
-        setMitreState({ ...mitreState, filterParams });
-        setIsLoading(true);
-    };
-
-    const onFiltersUpdated = (filters: Filter[]) => {
-        const { query, time } = mitreState.filterParams;
-        const filterParams = { query, time, filters };
-        setMitreState({ ...mitreState, filterParams });
-        setIsLoading(true);
-    };
+    }, [
+        isDataSourceLoading, 
+        dataSource, 
+        searchBarProps.query, 
+        searchBarProps.dateRangeFrom, 
+        searchBarProps.dateRangeTo, 
+        JSON.stringify(filters)]);
 
     const buildTacticsObject = async () => {
         try {
@@ -142,6 +118,7 @@ const MitreComponent = (props) => {
             setMitreState({ ...mitreState, tacticsObject });
             setIsLoading(false);
         } catch (error) {
+            setMitreState({ ...mitreState });
             setIsLoading(false);
             const options = {
                 context: `${Mitre.name}.buildTacticsObject`,
@@ -163,10 +140,14 @@ const MitreComponent = (props) => {
         setMitreState({ ...mitreState, selectedTactics });
     };
 
+    const flexGroupStyle = {
+        margin: '0 8px'
+    }
+
     return (
         <div>
             <I18nProvider>
-                <EuiFlexGroup>
+                <EuiFlexGroup style={flexGroupStyle}>
                     <EuiFlexItem>
                         {isDataSourceLoading && !dataSource ?
                             <LoadingSpinner /> :
@@ -174,19 +155,15 @@ const MitreComponent = (props) => {
                                 <SearchBar
                                     appName='vulnerability-detector-searchbar'
                                     {...searchBarProps}
-                                    showDatePicker={false}
                                     showQueryInput={true}
                                     showQueryBar={true}
                                     showSaveQuery={true}
-                                    onQuerySubmit={onQuerySubmit}
-                                    onFiltersUpdated={onFiltersUpdated}
                                 />
                             </div>
                         }
                     </EuiFlexItem>
                 </EuiFlexGroup>
-
-                <EuiFlexGroup style={{ margin: '0 8px' }}>
+                <EuiFlexGroup style={flexGroupStyle}>
                     <EuiFlexItem>
                         <EuiPanel paddingSize='none'>
                             <EuiFlexGroup>
@@ -200,20 +177,25 @@ const MitreComponent = (props) => {
                                     }}
                                 >
                                     <Tactics
-                                        indexPattern={indexPattern}
                                         onChangeSelectedTactics={onChangeSelectedTactics}
-                                        filters={mitreState.filterParams}
-                                        {...mitreState}
+                                        filterParams={filterParams}
+                                        tacticsObject={mitreState.tacticsObject}
+                                        selectedTactics={mitreState.selectedTactics}
+                                        fetchData={fetchData}
+                                        isLoading={isLoading}
                                     />
                                 </EuiFlexItem>
                                 <EuiFlexItem>
                                     <Techniques
-                                        indexPattern={indexPattern}
-                                        filters={mitreState.filterParams}
+                                        indexPatternId={dataSource?.id}
+                                        filterParams={filterParams}
                                         onSelectedTabChanged={id =>
                                             onSelectedTabChanged(id)
                                         }
-                                        {...mitreState}
+                                        tacticsObject={mitreState.tacticsObject}
+                                        selectedTactics={mitreState.selectedTactics}
+                                        fetchData={fetchData}
+                                        isLoading={isLoading}
                                     />
                                 </EuiFlexItem>
                             </EuiFlexGroup>

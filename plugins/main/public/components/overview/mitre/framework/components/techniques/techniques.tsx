@@ -27,29 +27,25 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
-import { getElasticAlerts, IFilterParams } from '../../lib';
+import { IFilterParams } from '../../lib';
 import { ITactic } from '../../';
 import { withWindowSize } from '../../../../../common/hocs/withWindowSize';
 import { WzRequest } from '../../../../../../react-services/wz-request'
-import { AppState } from '../../../../../../react-services/app-state';
 import { WzFieldSearchDelay } from '../../../../../common/search';
-import {
-  getDataPlugin,
-  getToasts,
-  getWazuhCorePlugin,
-} from '../../../../../../kibana-services';
-import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID, UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { AlertsDataSourceRepository, MitreAttackDataSource, tFilter, tSearchParams, useDataSource } from '../../../../../common/data-source';
 
 const MITRE_ATTACK = 'mitre-attack';
 
 type tTechniquesProps = {
+  indexPatternId: string;
   tacticsObject: ITactic;
   selectedTactics: any;
-  indexPattern: any;
   filterParams: IFilterParams;
   isLoading: boolean;
+  fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
 };
 
 type tTechniquesState = {
@@ -68,9 +64,10 @@ export const Techniques = withWindowSize(
     const {
       tacticsObject,
       selectedTactics,
-      indexPattern,
       filterParams,
       isLoading,
+      fetchData,
+      indexPatternId
     } = props;
 
     const [state, setState] = useState<tTechniquesState>({
@@ -87,27 +84,60 @@ export const Techniques = withWindowSize(
     const [isSearching, setIsSearching] = useState(false);
     const [loadingAlerts, setLoadingAlerts] = useState(false);
 
-    const { 
+    const {
       isFlyoutVisible,
       techniquesCount,
       currentTechnique,
     } = state;
 
+    const getMitreRuleIdFilter = (value: string) => {
+      const GROUP_KEY = 'rule.mitre.id';
+      if (!value) return [];
+      return [{
+        meta: {
+          index: indexPatternId,
+          negate: false,
+          disabled: false,
+          alias: null,
+          type: 'phrase',
+          key: GROUP_KEY,
+          value: value,
+          params: {
+            query: value,
+            type: 'phrase',
+          },
+          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID,
+        },
+        query: {
+          match: {
+            [GROUP_KEY]: {
+              query: value,
+              type: 'phrase',
+            },
+          },
+        },
+        $state: {
+          store: 'appState',
+        },
+      } as tFilter];
+    }
+
     useEffect(() => {
+      if (isLoading) {
+        return;
+      }
       buildMitreTechniquesFromApi();
-    }, [])
+    }, [isLoading])
 
 
     useEffect(() => {
-      if (isLoading) return;
-      if (!tacticsObject) return;
-      if (!filterParams) return;
+      if (isLoading || isSearching) return;
       getTechniquesCount();
-    }, [tacticsObject, isLoading, filterParams]);
+    }, [tacticsObject, isLoading, filterParams, isSearching]);
 
-    const getTechniquesCount = async () =>  {
+    const getTechniquesCount = async () => {
       try {
-        if (!indexPattern) {
+        if (!fetchData) {
           return;
         }
         const aggs = {
@@ -121,12 +151,11 @@ export const Techniques = withWindowSize(
         setLoadingAlerts(true);
         // TODO: use `status` and `statusText`  to show errors
         // @ts-ignore
-        const { data, status, statusText } = await getElasticAlerts(
-          indexPattern,
-          filterParams,
-          aggs,
-        );
-        const buckets = data?.aggregations?.techniques?.buckets || [];
+        const results = await fetchData({
+          query: filterParams.query,
+          aggs
+        })
+        const buckets = results.aggregations?.techniques?.buckets || [];
         setState({
           ...state,
           techniquesCount: buckets,
@@ -161,11 +190,6 @@ export const Techniques = withWindowSize(
               icon: <EuiIcon type='magnifyWithPlus' size='m' />,
               onClick: () => {
                 closeActionsMenu();
-                addFilter({
-                  key: 'rule.mitre.id',
-                  value: techniqueID,
-                  negate: false,
-                });
               },
             },
             {
@@ -173,11 +197,6 @@ export const Techniques = withWindowSize(
               icon: <EuiIcon type='magnifyWithMinus' size='m' />,
               onClick: () => {
                 closeActionsMenu();
-                addFilter({
-                  key: 'rule.mitre.id',
-                  value: techniqueID,
-                  negate: true,
-                });
               },
             },
             {
@@ -198,8 +217,8 @@ export const Techniques = withWindowSize(
         return props.windowSize.width < 930
           ? 2
           : props.windowSize.width < 1200
-          ? 3
-          : 4;
+            ? 3
+            : 4;
       } else {
         return 4;
       }
@@ -270,12 +289,12 @@ export const Techniques = withWindowSize(
             mitreObj.source === MITRE_ATTACK
               ? mitreObj.external_id
               : mitreObj.references.find(item => item.source === MITRE_ATTACK)
-                  .external_id;
+                .external_id;
           mitreTechniqueID
             ? techniquesObj.push({
-                id: mitreTechniqueID,
-                name: mitreTechniqueName,
-              })
+              id: mitreTechniqueID,
+              name: mitreTechniqueName,
+            })
             : '';
         }
       });
@@ -303,8 +322,8 @@ export const Techniques = withWindowSize(
           state.filteredTechniques
             ? state.filteredTechniques.includes(technique.id)
             : technique.id && hash[technique.id]
-            ? false
-            : (hash[technique.id] = true),
+              ? false
+              : (hash[technique.id] = true),
         )
         .map(technique => {
           return {
@@ -454,53 +473,10 @@ export const Techniques = withWindowSize(
       }
     }
 
-    const openDiscover = (e, techniqueID) => {
-      addFilter({
-        key: 'rule.mitre.id',
-        value: techniqueID,
-        negate: false,
-      });
-      onSelectedTabChanged('events');
-    }
-
-    const openDashboard = (e, techniqueID) => {
-      addFilter({
-        key: 'rule.mitre.id',
-        value: techniqueID,
-        negate: false,
-      });
-      onSelectedTabChanged('dashboard');
-    }
-
-    /**
-     * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
-     * @param filter
-     */
-    const addFilter = (filter) => {
-      const { filterManager } = getDataPlugin().query;
-      const matchPhrase = {};
-      matchPhrase[filter.key] = filter.value;
-      const newFilter = {
-        meta: {
-          disabled: false,
-          key: filter.key,
-          params: { query: filter.value },
-          type: 'phrase',
-          negate: filter.negate || false,
-          index:
-            AppState.getCurrentPattern() ||
-            getWazuhCorePlugin().configuration.getSettingValue('pattern'),
-        },
-        query: { match_phrase: matchPhrase },
-        $state: { store: 'appState' },
-      };
-      filterManager.addFilters([newFilter]);
-    }
-
     const onChange = searchValue => {
       if (!searchValue) {
-          setState({ ...state, filteredTechniques: false });
-          setIsSearching(false);
+        setState({ ...state, filteredTechniques: false });
+        setIsSearching(false);
       }
     };
 
@@ -564,10 +540,6 @@ export const Techniques = withWindowSize(
       });
     }
 
-    const closeFlyout = () => {
-      setState({ ...state, isFlyoutVisible: false });
-    }
-
     const onChangeFlyout = (isFlyoutVisible: boolean) => {
       setState({ ...state, isFlyoutVisible });
     };
@@ -576,54 +548,53 @@ export const Techniques = withWindowSize(
       setState({ ...state, hideAlerts: !state.hideAlerts });
     }
 
-    
-      return (
-        <div style={{ padding: 10 }}>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={true}>
-              <EuiTitle size='m'>
-                <h1>Techniques</h1>
-              </EuiTitle>
-            </EuiFlexItem>
 
-            <EuiFlexItem grow={false}>
-              <EuiFlexGroup>
-                <EuiFlexItem grow={false}>
-                  <EuiText grow={false}>
-                    <span>Hide techniques with no alerts </span> &nbsp;
-                    <EuiSwitch
-                      label=''
-                      checked={state.hideAlerts}
-                      onChange={e => hideAlerts()}
-                    />
-                  </EuiText>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer size='xs' />
+    return (
+      <div style={{ padding: 10 }}>
+        <EuiFlexGroup>
+          <EuiFlexItem grow={true}>
+            <EuiTitle size='m'>
+              <h1>Techniques</h1>
+            </EuiTitle>
+          </EuiFlexItem>
 
-          <WzFieldSearchDelay
-            fullWidth={true}
-            placeholder='Filter techniques of selected tactic/s'
-            onChange={onChange}
-            onSearch={onSearch}
-            isClearable={true}
-            aria-label='Use aria labels when no actual label is in use'
+          <EuiFlexItem grow={false}>
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiText grow={false}>
+                  <span>Hide techniques with no alerts </span> &nbsp;
+                  <EuiSwitch
+                    label=''
+                    checked={state.hideAlerts}
+                    onChange={e => hideAlerts()}
+                  />
+                </EuiText>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer size='xs' />
+
+        <WzFieldSearchDelay
+          fullWidth={true}
+          placeholder='Filter techniques of selected tactic/s'
+          onChange={onChange}
+          onSearch={onSearch}
+          isClearable={true}
+          aria-label='Use aria labels when no actual label is in use'
+        />
+        <EuiSpacer size='s' />
+
+        <div>{renderFacet()}</div>
+
+        {isFlyoutVisible && (
+          <FlyoutTechnique
+            onChangeFlyout={onChangeFlyout}
+            currentTechnique={currentTechnique}
+            initialFetchFilters={[...filterParams.filters, ...getMitreRuleIdFilter(currentTechnique)]}
           />
-          <EuiSpacer size='s' />
-
-          <div>{renderFacet()}</div>
-
-          {isFlyoutVisible && (
-            <FlyoutTechnique
-              openDashboard={(e, itemId) => openDashboard(e, itemId)}
-              openDiscover={(e, itemId) => openDiscover(e, itemId)}
-              onChangeFlyout={onChangeFlyout}
-              currentTechnique={currentTechnique}
-            />
-          )}
-        </div>
-      );
-    }
+        )}
+      </div>
+    );
+  }
 );

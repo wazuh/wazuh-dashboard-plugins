@@ -11,17 +11,10 @@
  */
 import React, { useEffect, useState } from 'react';
 import MarkdownIt from 'markdown-it';
+import { Subject } from 'rxjs';
 import $ from 'jquery';
-
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  breaks: true,
-  typographer: true,
-});
-
+import { FilterHandler } from '../../../../../../../../utils/filter-handler';
 import {
-  EuiFlyout,
   EuiFlyoutHeader,
   EuiLoadingContent,
   EuiTitle,
@@ -38,21 +31,39 @@ import {
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
 import { AppState } from '../../../../../../../../react-services/app-state';
 import { AppNavigate } from '../../../../../../../../react-services/app-navigate';
-import { Discover } from '../../../../../../../common/modules/discover';
-import { getUiSettings } from '../../../../../../../../kibana-services';
-import { FilterManager } from '../../../../../../../../../../../src/plugins/data/public/';
-import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
+import { getPlugins, getUiSettings } from '../../../../../../../../kibana-services';
+import { FilterManager, IndexPattern } from '../../../../../../../../../../../src/plugins/data/public/';
+import { DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID, UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../../components/common/flyouts';
+import { WazuhDiscover } from '../../../../../../../common/wazuh-discover/wz-discover';
+import { techniquesColumns } from './flyout-technique-columns';
+import { AlertsDataSourceRepository, MitreAttackDataSource, PatternDataSource, tFilter, tParsedIndexPattern, useDataSource } from '../../../../../../../../components/common/data-source';
+import useSearchBar from '../../../../../../../common/search-bar/use-search-bar';
+import { LoadingSpinner } from '../../../../../../../common/loading-spinner/loading-spinner';
+import { useDataGrid } from '../../../../../../../common/data-grid';
+import { WazuhFlyoutDiscover } from '../../../../../../../common/wazuh-discover/wz-flyout-discover';
+import RuleDetails from '../rule-details';
+
+const SearchBar = getPlugins().data.ui.SearchBar;
+
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  breaks: true,
+  typographer: true,
+});
 
 type tFlyoutTechniqueProps = {
+  indexPattern: IndexPattern;
   currentTechnique: string;
   onChangeFlyout: (value: boolean) => void;
   openDashboard: (e: any, id: string) => void;
   openDiscover: (e: any, id: string) => void;
   implicitFilters?: object[];
   view?: string;
+  initialFetchFilters?: tFilter[];
 };
 
 type tFlyoutTechniqueState = {
@@ -62,37 +73,62 @@ type tFlyoutTechniqueState = {
   totalHits?: number;
 };
 
-export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
-  let filterManager: FilterManager = new FilterManager(getUiSettings());
+class FakeFilterManager {
+  filters: tFilter[] = [];
+  private updated$: Subject<void> = new Subject();
+  constructor(){}
 
-  const [state, setState] = React.useState<tFlyoutTechniqueState>({
+  addFilters = (filters: tFilter[]) => {
+    this.handleStateUpdate([ ...this.filters, ...filters ])
+  }
+
+  setFilters = (filters: tFilter[]) => {
+    this.handleStateUpdate(filters);
+  }
+
+  getFilters = () => {
+    return this.filters;
+  }
+
+  removeAll = () => {
+    this.handleStateUpdate([]);
+  }
+
+  getUpdates$() {
+    return this.updated$.asObservable();
+  }
+
+  private handleStateUpdate(newFilters: tFilter[]) {
+    this.filters = newFilters;
+    this.updated$.next();
+  }
+}
+
+export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
+  const filterManager = new FakeFilterManager();
+  const [state, setState] = useState<tFlyoutTechniqueState>({
     techniqueData: {}
   });
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [clusterFilter, setClusterFilter] = useState<object>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [mitreIdFilter, setMitreIdFilter] = useState<tFilter[]>([])
 
   const {
     currentTechnique,
     onChangeFlyout,
     openDashboard,
     openDiscover,
-    implicitFilters,
     view,
+    initialFetchFilters
   } = props;
 
   const { techniqueData } = state;
 
   useEffect(() => {
     initialize();
-  }, [])
+  }, []);
 
   const initialize = async () => {
-    const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
-    const clusterFilter = isCluster
-      ? { 'cluster.name': AppState.getClusterInfo().cluster }
-      : { 'manager.name': AppState.getClusterInfo().manager };
-    setClusterFilter(clusterFilter);
     await getTechniqueData();
     addListenersToCitations();
   }
@@ -140,7 +176,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
               $(this).click(() => {
                 $(`.euiFlyoutBody__overflow`).scrollTop(
                   $(`#technique-reference-${reference.index}`).position().top -
-                    150,
+                  150,
                 );
               });
             },
@@ -183,12 +219,14 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           return { id: tactic.external_id, name: tactic.name };
         }));
       const { name, mitre_version, tactics } = techniqueData;
-      
-        setState({
-          techniqueData: { name, mitre_version, tactics },
-        });
 
-        setIsLoading(false);
+      setState({
+        techniqueData: { name, mitre_version, tactics },
+      });
+
+      console.log('techniqueData', techniqueData);
+
+      setIsLoading(false);
     } catch (error) {
       const options = {
         context: `${FlyoutTechnique.name}.getTechniqueData`,
@@ -216,25 +254,27 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
             <EuiLoadingContent lines={1} />
           </div>
         )) || (
-          <EuiTitle size='m'>
-            <h2 id='flyoutSmallTitle'>{techniqueData.name}</h2>
-          </EuiTitle>
-        )}
+            <EuiTitle size='m'>
+              <h2 id='flyoutSmallTitle'>{techniqueData.name}</h2>
+            </EuiTitle>
+          )}
       </EuiFlyoutHeader>
     );
+  }
+
+  const expandedRow = (item: any) => {
+    return (
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <RuleDetails item={item} />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    )
   }
 
   const renderBody = () => {
     const { currentTechnique } = props;
     const { techniqueData } = state;
-    const implicitFilters = [
-      { 'rule.mitre.id': currentTechnique },
-      clusterFilter,
-    ];
-    if (implicitFilters) {
-      implicitFilters.forEach(item => implicitFilters.push(item));
-    }
-
     const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
     const formattedDescription = techniqueData.description ? (
       <div
@@ -274,30 +314,30 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         title: 'Tactics',
         description: techniqueData.tactics
           ? techniqueData.tactics.map(tactic => {
-              return (
-                <>
-                  <EuiToolTip
-                    position='top'
-                    content={`Open ${tactic.name} details in the Intelligence section`}
+            return (
+              <>
+                <EuiToolTip
+                  position='top'
+                  content={`Open ${tactic.name} details in the Intelligence section`}
+                >
+                  <EuiLink
+                    onClick={e => {
+                      AppNavigate.navigateToModule(e, 'overview', {
+                        tab: 'mitre',
+                        tabView: 'intelligence',
+                        tabRedirect: 'tactics',
+                        idToRedirect: tactic.id,
+                      });
+                      e.stopPropagation();
+                    }}
                   >
-                    <EuiLink
-                      onClick={e => {
-                        AppNavigate.navigateToModule(e, 'overview', {
-                          tab: 'mitre',
-                          tabView: 'intelligence',
-                          tabRedirect: 'tactics',
-                          idToRedirect: tactic.id,
-                        });
-                        e.stopPropagation();
-                      }}
-                    >
-                      {tactic.name}
-                    </EuiLink>
-                  </EuiToolTip>
-                  <br />
-                </>
-              );
-            })
+                    {tactic.name}
+                  </EuiLink>
+                </EuiToolTip>
+                <br />
+              </>
+            );
+          })
           : '',
       },
       {
@@ -324,10 +364,10 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                 <EuiLoadingContent lines={3} />
               </div>
             )) || (
-              <div style={{ marginBottom: 30 }}>
-                <EuiDescriptionList listItems={data} />
-              </div>
-            )}
+                <div style={{ marginBottom: 30 }}>
+                  <EuiDescriptionList listItems={data} />
+                </div>
+              )}
           </div>
         </EuiAccordion>
 
@@ -336,11 +376,6 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           style={{ textDecoration: 'none' }}
           id={'recent_events'}
           className='events-accordion'
-          extraAction={
-            <div style={{ marginBottom: 5 }}>
-              <strong>{state.totalHits || 0}</strong> hits
-            </div>
-          }
           buttonContent={
             <EuiTitle size='s'>
               <h3>
@@ -384,34 +419,12 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           paddingSize='none'
           initialIsOpen={true}
         >
-          <EuiFlexGroup className='flyout-row'>
-            <EuiFlexItem>
-              <Discover
-                kbnSearchBar
-                shareFilterManager={filterManager}
-                initialColumns={[
-                  { field: 'icon' },
-                  { field: 'timestamp' },
-                  { field: 'agent.id', label: 'Agent' },
-                  { field: 'agent.name', label: 'Agent Name' },
-                  { field: 'rule.mitre.id', label: 'Technique(s)' },
-                  { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
-                  { field: 'rule.description', label: 'Description' },
-                ]}
-                initialAgentColumns={[
-                  { field: 'icon' },
-                  { field: 'timestamp' },
-                  { field: 'rule.mitre.id', label: 'Technique(s)' },
-                  { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
-                  { field: 'rule.description', label: 'Description' },
-                ]}
-                implicitFilters={implicitFilters}
-                initialFilters={[]}
-                updateTotalHits={total => updateTotalHits(total)}
+          <EuiFlexGroup>
+            <EuiFlexItem> 
+              <WazuhFlyoutDiscover
+                DataSource={PatternDataSource}
+                tableColumns={techniquesColumns}
+                filterManager={filterManager}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -419,10 +432,6 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       </EuiFlyoutBody>
     );
   }
-
-  const updateTotalHits = total => {
-    setState({ ...state, totalHits: total });
-  };
 
   const renderLoading = () => {
     return (
@@ -434,18 +443,18 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   }
 
 
-    return (
-      <WzFlyout
-        onClose={() => onChangeFlyout(false)}
-        flyoutProps={{
-          size: 'l',
-          className: 'flyout-no-overlap wz-inventory wzApp',
-          'aria-labelledby': 'flyoutSmallTitle',
-        }}
-      >
-        {techniqueData && renderHeader()}
-        {renderBody()}
-        {isLoading && renderLoading()}
-      </WzFlyout>
-    );
+  return (
+    <WzFlyout
+      onClose={() => onChangeFlyout(false)}
+      flyoutProps={{
+        size: 'l',
+        className: 'flyout-no-overlap wz-inventory wzApp',
+        'aria-labelledby': 'flyoutSmallTitle',
+      }}
+    >
+      {techniqueData && renderHeader()}
+      {renderBody()}
+      {isLoading && renderLoading()}
+    </WzFlyout>
+  );
 }

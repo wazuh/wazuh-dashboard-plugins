@@ -22,11 +22,12 @@ import {
     EuiContextMenu,
     EuiIcon,
 } from '@elastic/eui';
-import { IFilterParams, getElasticAlerts } from '../../lib';
-import { getToasts } from '../../../../../../kibana-services';
+import { IFilterParams } from '../../lib';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { tSearchParams } from '../../../../../common/data-source';
+import { tFilterParams } from '../../mitre';
 
 type tTacticsState = {
     tacticsList: Array<any>;
@@ -38,15 +39,15 @@ type tTacticsState = {
 
 type tTacticsProps = {
     tacticsObject: object;
-    selectedTactics: Array<any>;
-    filterParams: IFilterParams;
-    indexPattern: any;
+    selectedTactics: object;
+    filterParams: tFilterParams;
     isLoading: boolean;
     onChangeSelectedTactics(selectedTactics): void;
+    fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
 }
 
 export const Tactics = (props: tTacticsProps) => {
-    const { filterParams, indexPattern, selectedTactics, isLoading, tacticsObject, onChangeSelectedTactics } =
+    const { filterParams, selectedTactics, isLoading, tacticsObject, onChangeSelectedTactics, fetchData } =
         props;
     const [state, setState] = useState<tTacticsState>({
         tacticsList: [],
@@ -68,37 +69,18 @@ export const Tactics = (props: tTacticsProps) => {
     }
 
     useEffect(() => {
-        if (isLoadingAlerts !== isLoadingAlerts) return;
-        if (isLoading !== isLoading) return;
-        if (JSON.stringify(filterParams) !== JSON.stringify(filterParams))
-            return;
-        if (JSON.stringify(indexPattern) !== JSON.stringify(indexPattern))
-            return;
-        if (JSON.stringify(tacticsCount) !== JSON.stringify(tacticsCount))
-            return;
-        if (
-            JSON.stringify(selectedTactics) !==
-            JSON.stringify(selectedTactics)
-        )
-            return;
-    }, [filterParams, indexPattern, selectedTactics, isLoading, isLoadingAlerts, tacticsCount]);
-
-    useEffect(() => {
         if (isLoading) {
             return;
         }
         getTacticsCount();
-    }, [isLoading, tacticsObject]);
+    }, [isLoading]);
 
 
     const getTacticsCount = async () => {
         setIsLoadingAlerts(true);
         const { firstTime } = state;
         try {
-            const { indexPattern, filterParams } = props;
-            if (!indexPattern) {
-                return;
-            }
+            const { filterParams } = props;
             const aggs = {
                 tactics: {
                     terms: {
@@ -107,11 +89,12 @@ export const Tactics = (props: tTacticsProps) => {
                     },
                 },
             };
-
-            // TODO: use `status` and `statusText`  to show errors
-            // @ts-ignore
-            const { data } = await getElasticAlerts(indexPattern, filterParams, aggs);
-            const buckets = data?.aggregations?.tactics?.buckets || [];
+            const results = await fetchData({
+                query: filterParams.query,
+                time: filterParams.time,
+                aggs,
+            });
+            const buckets = results.aggregations?.tactics?.buckets || [];
             if (firstTime) {
                 initTactics(); // top tactics are checked on component mount
             }
@@ -182,26 +165,6 @@ export const Tactics = (props: tTacticsProps) => {
                     })}
             </>
         );
-    }
-
-    const checkAllChecked = (tacticList: any[]) => {
-        let allSelected = true;
-        tacticList.forEach(item => {
-            if (!selectedTactics[item.id]) allSelected = false;
-        });
-
-        if (allSelected !== state.allSelected) {
-            setState({ ...state, allSelected });
-        }
-    }
-
-    const onCheckAllClick = () => {
-        const allSelected = !state.allSelected;
-        Object.keys(selectedTactics).map(item => {
-            selectedTactics[item] = allSelected;
-        });
-        setState({ ...state, allSelected });
-        onChangeSelectedTactics(selectedTactics);
     }
 
     const onGearButtonClick = () => {
