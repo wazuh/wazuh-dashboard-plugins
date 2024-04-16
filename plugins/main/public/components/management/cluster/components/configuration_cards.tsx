@@ -37,6 +37,41 @@ export const ConfigurationCards = ({
   indexPatternId,
   filters,
 }: ConfigurationCardsProps) => {
+  const configurationItemsList = [
+    {
+      title: 'Disabled',
+      description: String(configuration?.disabled),
+    },
+    {
+      title: 'Hidden',
+      description: String(configuration?.hidden),
+    },
+    {
+      title: 'Name',
+      description: configuration?.name,
+    },
+    {
+      title: 'Node name',
+      description: configuration?.node_name,
+    },
+    {
+      title: 'Node type',
+      description: configuration?.node_type,
+    },
+    {
+      title: 'Bind address',
+      description: configuration?.bind_addr,
+    },
+    {
+      title: 'IP',
+      description: configuration?.nodes[0] || '-',
+    },
+    {
+      title: 'Port',
+      description: configuration?.port,
+    },
+  ];
+
   return (
     <EuiFlexGroup direction='column' gutterSize='s'>
       <EuiFlexItem>
@@ -114,72 +149,14 @@ export const ConfigurationCards = ({
                 type='column'
                 compressed={true}
                 align='left'
-                listItems={[
-                  {
-                    title: (
-                      <span style={{ fontWeight: 400, fontSize: '1rem' }}>
-                        Disabled
-                      </span>
-                    ),
-                    description: configuration?.disabled ? 'true' : 'false',
-                  },
-                  {
-                    title: (
-                      <span style={{ fontWeight: 400, fontSize: '1rem' }}>
-                        Hidden
-                      </span>
-                    ),
-                    description: configuration?.hidden ? 'true' : 'false',
-                  },
-                  {
-                    title: (
-                      <span style={{ fontWeight: 400, fontSize: '1rem' }}>
-                        Name
-                      </span>
-                    ),
-                    description: configuration?.name,
-                  },
-                  {
-                    title: (
-                      <span style={{ fontWeight: 400, fontSize: '1rem' }}>
-                        Node name
-                      </span>
-                    ),
-                    description: configuration?.node_name,
-                  },
-                  {
-                    title: (
-                      <span style={{ fontWeight: 400, fontSize: '1rem' }}>
-                        Node type
-                      </span>
-                    ),
-                    description: configuration?.node_type,
-                  },
-                  {
-                    title: (
-                      <span style={{ fontWeight: 400, fontSize: '1rem' }}>
-                        Bind address
-                      </span>
-                    ),
-                    description: configuration?.bind_addr,
-                  },
-                  {
-                    title: (
-                      <span style={{ fontWeight: 400, fontSize: '1rem' }}>
-                        IP
-                      </span>
-                    ),
-                    description: configuration?.nodes[0] || '-',
-                  },
-                  {
-                    title: (
-                      <span style={{ fontWeight: 400, fontSize: '1rem' }}>
-                        Port
-                      </span>
-                    ),
-                    description: configuration?.port,
-                  },
-                ]}
+                listItems={configurationItemsList.map(item => ({
+                  title: (
+                    <span style={{ fontWeight: 400, fontSize: '1rem' }}>
+                      {item.title}
+                    </span>
+                  ),
+                  description: item.description,
+                }))}
                 titleProps={{
                   className: 'cluster-descriptionList-title',
                 }}

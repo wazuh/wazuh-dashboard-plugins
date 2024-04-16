@@ -12,11 +12,9 @@ import { ClusterDisabled } from '../../../../../components/management/cluster/cl
 import { ClusterDashboard } from '../../../../../components/management/cluster/dashboard/dashboard';
 
 interface ClusterOverviewState {
-  authorized: boolean;
   clusterEnabled: boolean;
   isClusterRunning: boolean;
   statusRunning: string;
-  permissions: any;
 }
 
 export const ClusterOverview = compose(
@@ -33,28 +31,11 @@ export const ClusterOverview = compose(
     constructor(props) {
       super(props);
       this.state = {
-        authorized: true,
         clusterEnabled: false,
         isClusterRunning: false,
         statusRunning: 'no',
-        permissions: undefined,
       };
     }
-
-    clusterStatus = async () => {
-      try {
-        const status = await WzRequest.apiReq('GET', '/cluster/status', {});
-        this.setState({
-          authorized: true,
-        });
-        return status;
-      } catch (error) {
-        if (error === '3013 - Permission denied: Resource type: *:*')
-          this.setState({
-            authorized: false,
-          });
-      }
-    };
 
     async componentDidMount() {
       this._isMount = true;
@@ -62,7 +43,7 @@ export const ClusterOverview = compose(
         AppState.getClusterInfo() &&
         AppState.getClusterInfo().status === 'enabled';
 
-      const status: any = await this.clusterStatus();
+      const status: any = await WzRequest.apiReq('GET', '/cluster/status', {});
       const statusRunning = status?.data?.data?.running;
       this.setState({
         clusterEnabled: clusterEnabled,
@@ -79,18 +60,14 @@ export const ClusterOverview = compose(
       return (
         <>
           <div style={{ padding: '16px' }}>
-            {!this.state?.clusterEnabled ||
-            !this.state?.isClusterRunning ||
-            !this.state?.authorized ? (
+            {!this.state?.clusterEnabled || !this.state?.isClusterRunning ? (
               <ClusterDisabled
                 enabled={this.state?.clusterEnabled}
                 running={this.state?.isClusterRunning}
               />
             ) : null}
           </div>
-          {this.state?.clusterEnabled &&
-          this.state?.isClusterRunning &&
-          this.state?.authorized ? (
+          {this.state?.clusterEnabled && this.state?.isClusterRunning ? (
             <ClusterDashboard statusRunning={this.state?.statusRunning} />
           ) : null}
         </>

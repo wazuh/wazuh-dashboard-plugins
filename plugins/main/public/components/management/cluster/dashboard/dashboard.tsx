@@ -133,13 +133,13 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         WzRequest.apiReq('GET', '/cluster/healthcheck', {}),
       ]);
 
-      const nodeList = ((data[0] || {}).data || {}).data || {} || false;
-      const clusterConfig = ((data[1] || {}).data || {}).data || {} || false;
-      const agents = ((data[3] || {}).data || {}).data || {} || false;
+      const nodeList = data[0]?.data?.data || {} || false;
+      const clusterConfig = data[1]?.data?.data || {} || false;
+      const agents = data[3]?.data?.data || {} || false;
       setState({
         ...state,
         configuration: clusterConfig.affected_items[0],
-        version: (((data[2] || {}).data || {}).data || {}).api_version || false,
+        version: data[2]?.data?.data?.api_version || false,
         nodesCount: nodeList.total_affected_items,
         agentsCount: agents.total_affected_items - 1,
         nodeList: nodeList?.affected_items ?? [],
@@ -154,7 +154,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
       <EuiFlexItem style={{ padding: '0 16px' }}>
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
-        ) : (
+        ) : !state.showNodes ? (
           <div className='wz-search-bar'>
             <SearchBar
               appName='ct-searchbar'
@@ -164,7 +164,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
               showQueryBar={true}
             />
           </div>
-        )}
+        ) : null}
         <EuiSpacer size='m' />
         {!isDataSourceLoading &&
         dataSource &&
