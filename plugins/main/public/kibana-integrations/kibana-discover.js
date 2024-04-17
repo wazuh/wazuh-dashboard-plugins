@@ -204,7 +204,7 @@ function discoverController(
     filterManager,
     timefilter,
     toastNotifications,
-    history: getHistory,
+    history: syncHistoryLocations,
     uiSettings: config,
     visualizations,
   } = getServices();
@@ -218,7 +218,7 @@ function discoverController(
       : undefined;
   };
 
-  const history = getHistory();
+  const history = syncHistoryLocations();
 
   const {
     appStateContainer,

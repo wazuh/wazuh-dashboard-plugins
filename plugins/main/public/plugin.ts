@@ -44,7 +44,6 @@ import {
   unregisterInterceptor,
 } from './services/request-handler';
 import { Applications, Categories } from './utils/applications';
-import { syncHistoryLocations } from './kibana-integrations/discover/kibana_services';
 import { euiPaletteColorBlind } from '@elastic/eui';
 
 const innerAngularName = 'app/wazuh';
@@ -149,10 +148,6 @@ export class WazuhPlugin
             setScopedHistory(params.history);
             // This allows you to add the selectors to the navbar
             setHeaderActionMenuMounter(params.setHeaderActionMenu);
-            // Discover currently uses two history instances:
-            // one from Kibana Platform and another from history package.
-            // Below function is used every time Discover app is loaded to synchronize both instances
-            syncHistoryLocations();
             // Load application bundle
             const { renderApp } = await import('./application');
             // Get start services as specified in kibana.json
