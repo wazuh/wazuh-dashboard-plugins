@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
+import { EuiProgress } from '@elastic/eui';
+import { Tabs } from '../../components/common/tabs/tabs.js';
 import { TabNames } from '../../utils/tab-names';
 import { pluginPlatform } from '../../../package.json';
 import { AppState } from '../../react-services/app-state';
@@ -26,18 +28,24 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getAssetURL } from '../../utils/assets';
 import { getHttp, getWzCurrentAppID } from '../../kibana-services';
+import { ApiTable } from '../../components/settings/api/api-table';
+import { WzConfigurationSettings } from '../../components/settings/configuration/configuration';
+import { SettingsMiscellaneous } from '../../components/settings/miscellaneous/miscellaneous';
+import { WzSampleDataWrapper } from '../../components/add-modules-data/WzSampleDataWrapper';
+import { SettingsAbout } from '../../components/settings/about';
+
 import {
   Applications,
   serverApis,
-  appSettings,
+  // appSettings,
 } from '../../utils/applications';
 
-export class SettingsController extends React.Component{
+export class Settings extends React.Component {
   constructor(props) {
     super(props);
+
     this.pluginPlatformVersion = (pluginPlatform || {}).version || false;
     this.pluginAppName = PLUGIN_APP_NAME;
-    this.$scope = $scope;
 
     this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
@@ -57,13 +65,23 @@ export class SettingsController extends React.Component{
     this.tabNames = TabNames;
     this.indexPatterns = [];
     this.apiEntries = [];
-    this.$scope.googleGroupsSVG = getHttp().basePath.prepend(
+    this.googleGroupsSVG = getHttp().basePath.prepend(
       getAssetURL('images/icons/google_groups.svg'),
     );
     this.tabsConfiguration = [
       { id: 'configuration', name: 'Configuration' },
       { id: 'miscellaneous', name: 'Miscellaneous' },
     ];
+  }
+
+  /**
+   * Parses the tab query param and returns the tab value
+   * @returns string
+   */
+  _getTabFromUrl() {
+    const regex = new RegExp('tab=' + '[^&]*');
+    const match = window.location.href.match(regex);
+    return match?.[0]?.split('=')?.[1] ?? '';
   }
 
   componentDidMount(): void {
@@ -74,8 +92,9 @@ export class SettingsController extends React.Component{
    */
   async onInit() {
     try {
-      const location = location?.search;
-      if (location?.tab) {
+      const tab = this._getTabFromUrl();
+
+      if (tab) {
         this.tab = location.tab;
         const tabActiveName = Applications.find(
           ({ id }) => getWzCurrentAppID() === id,
@@ -95,7 +114,7 @@ export class SettingsController extends React.Component{
       await this.getAppInfo();
     } catch (error) {
       const options = {
-        context: `${SettingsController.name}.$onInit`,
+        context: `${SettingsController.name}.onInit`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -134,8 +153,13 @@ export class SettingsController extends React.Component{
    * @param {Object} tab
    */
   switchTab(tab) {
+    const regex = new RegExp('tab=' + '[^&]*');
     this.tab = tab;
-    location?.search('tab', this.tab);
+    window.location.href = window.location.href.replace(
+      regex,
+      `tab=${this.tab}`,
+    );
+    // location?.search('tab', this.tab);
   }
 
   // Get current API index
@@ -429,67 +453,55 @@ export class SettingsController extends React.Component{
     ErrorHandler.info('Error copied to the clipboard');
   }
 
-  render(){
+  render() {
+    return (
+      <div>
+        <div ng-show='ctrl.load' style={{ padding: '16px' }}>
+          <EuiProgress size='xs' color='primary' />
+        </div>
 
-return <div ng-cloak ng-controller="settingsController as ctrl">
-  <div ng-show="ctrl.load" style="padding: 16px">
-    <react-component
-      name="EuiProgress"
-      props="{size: 'xs', color: 'primary'}"
-    ></react-component>
-  </div>
+        {/* It must get renderized only in configuration app to show Miscellaneous tab in configuration App */}
+        <div
+          ng-if='!ctrl.load && ctrl.settingsTabsProps && !ctrl.apiIsDown && ctrl.apiTableProps.apiEntries.length && ctrl.settingsTabsProps.tabs'
+          className='wz-margin-top-16 md-margin-h'
+        >
+          <Tabs props={{ ...this.settingsTabsProps }} />
+        </div>
 
-  <!-- It must get renderized only in configuration app to show Miscellaneous tab in configuration App -->
-  <div
-    ng-if="!ctrl.load && ctrl.settingsTabsProps && !ctrl.apiIsDown && ctrl.apiTableProps.apiEntries.length && ctrl.settingsTabsProps.tabs"
-    class="wz-margin-top-16 md-margin-h"
-  >
-    <react-component
-      name="Tabs"
-      props="ctrl.settingsTabsProps"
-    ></react-component>
-  </div>
-
-  <!-- end head -->
-  <!-- api -->
-  <div ng-if="ctrl.tab === 'api' && !ctrl.load">
-    <!-- API table section-->
-    <div>
-      <react-component
-        name="ApiTable"
-        props="ctrl.apiTableProps"
-      ></react-component>
-    </div>
-  </div>
-  <!-- End API configuration card section -->
-  <!-- end api -->
-  <!-- configuration -->
-  <div ng-if="ctrl.tab === 'configuration' && !ctrl.load">
-    <react-component
-      name="WzConfigurationSettings"
-      props="ctrl.settingsTabsProps"
-    ></react-component>
-  </div>
-  <!-- end configuration -->
-  <!-- miscellaneous -->
-  <div ng-if="ctrl.tab === 'miscellaneous' && !ctrl.load">
-    <react-component name="SettingsMiscelaneous" props="{}"></react-component>
-  </div>
-  <!-- end miscellaneous -->
-  <!-- about -->
-  <div ng-if="ctrl.tab === 'about' && !ctrl.load">
-    <react-component
-      name="SettingsAbout"
-      props="{appInfo: ctrl.appInfo, pluginAppName: ctrl.pluginAppName}"
-    ></react-component>
-  </div>
-  <!-- end about -->
-  <!-- sample data -->
-  <div ng-if="ctrl.tab === 'sample_data' && !ctrl.load">
-    <react-component name="WzSampleDataWrapper" props="{}"></react-component>
-  </div>
-  <!-- end sample data -->
-</div>
-
+        {/* end head */}
+        {/* api */}
+        <div ng-if="ctrl.tab === 'api' && !ctrl.load">
+          {/* API table section */}
+          <div>
+            <ApiTable props={{ ...this.apiTableProps }} />
+          </div>
+        </div>
+        {/* End API configuration card section */}
+        {/* end api */}
+        {/* configuration */}
+        <div ng-if="ctrl.tab === 'configuration' && !ctrl.load">
+          <WzConfigurationSettings props={{ ...this.settingsTabsProps }} />
+        </div>
+        {/* end configuration */}
+        {/* miscellaneous */}
+        <div ng-if="ctrl.tab === 'miscellaneous' && !ctrl.load">
+          <SettingsMiscellaneous />
+        </div>
+        {/* end miscellaneous */}
+        {/* about */}
+        <div ng-if="ctrl.tab === 'about' && !ctrl.load">
+          <SettingsAbout
+            appInfo={this.appInfo}
+            pluginAppName={this.pluginAppName}
+          />
+        </div>
+        {/* end about */}
+        {/* sample data */}
+        <div ng-if="ctrl.tab === 'sample_data' && !ctrl.load">
+          <WzSampleDataWrapper />
+        </div>
+        {/* end sample data */}
+      </div>
+    );
   }
 }

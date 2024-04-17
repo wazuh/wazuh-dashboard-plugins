@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { SettingsController } from './settings';
+import { Settings } from './settings';
 import { ApiTable } from '../../components/settings/api/api-table';
 import { WzConfigurationSettings } from '../../components/settings/configuration/configuration';
 import { SettingsMiscellaneous } from '../../components/settings/miscellaneous/miscellaneous';
@@ -19,16 +19,17 @@ import { SettingsAbout } from '../../components/settings/about';
 
 const app = getAngularModule();
 
-WzSampleDataWrapper.displayName = 'WzSampleDataWrapper';
-WzConfigurationSettings.displayName = 'WzConfigurationSettings';
-SettingsMiscellaneous.displayName = 'SettingsMiscellaneous';
-ApiTable.displayName = 'ApiTable';
-SettingsAbout.displayName = 'SettingsAbout';
+// WzSampleDataWrapper.displayName = 'WzSampleDataWrapper';
+// WzConfigurationSettings.displayName = 'WzConfigurationSettings';
+// SettingsMiscellaneous.displayName = 'SettingsMiscellaneous';
+// ApiTable.displayName = 'ApiTable';
+// SettingsAbout.displayName = 'SettingsAbout';
 
 app
-  .controller('settingsController', SettingsController)
+  // .controller('settingsController', SettingsController)
   .value('WzSampleDataWrapper', WzSampleDataWrapper)
   .value('WzConfigurationSettings', WzConfigurationSettings)
   .value('SettingsMiscelaneous', SettingsMiscellaneous)
   .value('ApiTable', ApiTable)
-  .value('SettingsAbout', SettingsAbout);
+  .value('SettingsAbout', SettingsAbout)
+  .value('SettingsController', Settings);
