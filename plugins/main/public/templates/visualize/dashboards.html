@@ -1,6 +1,7 @@
+<react-component name="Overview"></react-component>
 <div ng-controller="overviewController as octrl">
   <!-- Navigation section -->
-  <div ng-show="octrl.tab && octrl.tab !== 'welcome'">
+  <!-- <div ng-show="octrl.tab && octrl.tab !== 'welcome'">
     <react-component
       ng-if="octrl.tab && ctrl.tab !== 'welcome' && octrl.overviewModuleReady"
       name="MainModule"
@@ -12,7 +13,7 @@
       name="WzCurrentOverviewSectionWrapper"
       props="octrl.currentOverviewSectionProps"
     ></react-component>
-  </div>
+  </div> -->
 
   <div ng-class="{'no-opacity': !moduleDiscoverReady}">
     <!-- Discover search bar section -->
@@ -24,26 +25,6 @@
   </div>
 
   <!-- End loading status section -->
-  <!-- Report status section -->
-  <div
-    ng-if="reportBusy && reportStatus && showModuleDashboard"
-    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
-  >
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center"
-    >
-      <div class="euiSpacer euiSpacer--m"></div>
-      <span class="euiLoadingChart euiLoadingChart--large">
-        <span class="euiLoadingChart__bar"></span>
-        <span class="euiLoadingChart__bar"></span>
-        <span class="euiLoadingChart__bar"></span>
-        <span class="euiLoadingChart__bar"></span>
-      </span>
-      <div class="euiSpacer euiSpacer--m"></div>
-      <div class="percentage">{{reportStatus}}</div>
-      <div class="euiSpacer euiSpacer--l"></div>
-    </div>
-  </div>
   <!-- No results section -->
   <div
     layout="row"
@@ -76,24 +57,4 @@
     </div>
   </div>
   <!-- end dashboards -->
-  <!-- welcome -->
-  <div
-    layout="column"
-    layout-align="start stretch"
-    ng-if="octrl.tab === 'welcome'"
-  >
-    <div layout="row" layout-padding>
-      <react-component
-        name="StatsOverview"
-        style="padding-bottom: 0"
-        flex
-        props="octrl.agentsCount"
-      />
-    </div>
-    <react-component
-      name="OverviewWelcome"
-      props="octrl.welcomeCardsProps"
-    ></react-component>
-  </div>
-  <!-- end welcome -->
 </div>
