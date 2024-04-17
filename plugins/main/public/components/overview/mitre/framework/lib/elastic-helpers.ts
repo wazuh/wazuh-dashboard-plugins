@@ -44,7 +44,7 @@ export async function getElasticAlerts(
   indexPattern,
   filterParams: IFilterParams,
   aggs: any = null,
-  kargs = {},
+  kargs = {}
 ) {
   const wazuhConfig = new WazuhConfig();
   const extraFilters = [];
@@ -72,7 +72,7 @@ export async function getElasticAlerts(
   const query = buildQuery(indexPattern, queryFilters);
   const filters = ((query || {}).bool || {}).filter;
   if (filters && Array.isArray(filters)) {
-    filters.forEach(item => {
+    filters.forEach((item) => {
       if (item.range && item.range.timestamp && item.range.timestamp.mode) {
         //range filters can contain a "mode" field that causes an error in an Elasticsearch request
         delete item.range.timestamp['mode'];
@@ -90,22 +90,18 @@ export async function getElasticAlerts(
   const searchResponse: IWzResponse = await GenericRequest.request(
     'POST',
     '/elastic/alerts',
-    search,
+    search
   );
   return searchResponse;
 }
 
 function buildQuery(indexPattern, filterParams: IFilterParams) {
   const { filters, query, time } = filterParams;
-  const timeFilter = buildRangeFilter(
-    { name: 'timestamp', type: 'date' },
-    time,
-    indexPattern,
-  );
+  const timeFilter = buildRangeFilter({ name: 'timestamp', type: 'date' }, time, indexPattern);
   return buildOpenSearchQuery(
     indexPattern,
     query,
     [...filters, timeFilter],
-    getOpenSearchQueryConfig(getUiSettings()),
+    getOpenSearchQueryConfig(getUiSettings())
   );
 }
