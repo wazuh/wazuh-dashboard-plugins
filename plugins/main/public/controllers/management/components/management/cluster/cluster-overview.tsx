@@ -22,10 +22,8 @@ interface ClusterOverviewState {
 
 const checkClusterIsEnabledAndRunning = async () => {
   try {
-    const clusterEnabled =
-      AppState.getClusterInfo() &&
-      AppState.getClusterInfo().status === 'enabled';
     const status: any = await WzRequest.apiReq('GET', '/cluster/status', {});
+    const clusterEnabled = status?.data?.data?.enabled;
     const statusRunning = status?.data?.data?.running;
     const isClusterRunning = statusRunning === 'yes';
     return {
