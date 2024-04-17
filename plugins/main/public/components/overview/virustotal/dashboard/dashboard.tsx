@@ -7,36 +7,31 @@ import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import { getKPIsPanel } from './dashboard_panels_kpis';
-import { Filter } from '../../../../../../../src/plugins/data/common';
 import {
   ErrorFactory,
   ErrorHandler,
   HttpError,
 } from '../../../../react-services/error-management';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
-import './virustotal_dashboard.scss';
 import { SampleDataWarning } from '../../../visualize/components/sample-data-warning';
 import {
   AlertsDataSourceRepository,
   PatternDataSource,
+  PatternDataSourceFilterManager,
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { AlertsVirustotalDataSource } from '../../../common/data-source/pattern/alerts/alerts-virustotal/alerts-virustotal-data-source';
+import './virustotal_dashboard.scss';
 
 const plugins = getPlugins();
 
 const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
-
-interface DashboardVTProps {
-  pinnedAgent: Filter;
-}
-
-const DashboardVT: React.FC<DashboardVTProps> = ({ pinnedAgent }) => {
+const DashboardVT: React.FC = () => {
   const {
     filters,
     dataSource,
@@ -125,7 +120,12 @@ const DashboardVT: React.FC<DashboardVTProps> = ({ pinnedAgent }) => {
             <DashboardByRenderer
               input={{
                 viewMode: ViewMode.VIEW,
-                panels: getDashboardPanels(dataSource?.id, !!pinnedAgent),
+                panels: getDashboardPanels(
+                  dataSource?.id,
+                  PatternDataSourceFilterManager.getPinnedAgentFilter(
+                    dataSource?.title,
+                  ).length > 0,
+                ),
                 isFullScreenMode: false,
                 filters: fetchFilters ?? [],
                 useMargins: true,
