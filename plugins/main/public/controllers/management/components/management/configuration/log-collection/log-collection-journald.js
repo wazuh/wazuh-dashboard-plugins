@@ -40,11 +40,6 @@ const panelsLabel = item =>
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
   {
-    field: 'ignore_binaries',
-    label: 'Ignore binaries',
-    render: renderValueOrNoValue,
-  },
-  {
     field: 'only-future-events',
     label: 'Only future events',
     render: renderValueOrNoValue,
@@ -53,11 +48,23 @@ const mainSettings = [
   {
     field: 'filters',
     label: 'Filters',
-    name: 'Filters',
     render: value => {
-      if (Array.isArray(value)) return value.flat();
+      if (Array.isArray(value)) {
+        const flatArray = value.flat();
+        const groupedFilters = flatArray.map((filter, index) => {
+          return {
+            ...filter,
+            filters_group: `Group ${Math.floor(index / value.length) + 1}`,
+          };
+        });
+        return groupedFilters;
+      }
     },
     columns: [
+      {
+        field: 'filters_group',
+        name: 'Filters Group',
+      },
       {
         field: 'field',
         name: 'Field',
