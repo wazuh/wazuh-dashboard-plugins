@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { compose } from 'redux';
 import {
   withErrorBoundary,
@@ -8,7 +8,7 @@ import {
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
 import { cluster } from '../../../../../utils/applications';
-import { AppState, WzRequest } from '../../../../../react-services';
+import { WzRequest } from '../../../../../react-services';
 import { ClusterDisabled } from '../../../../../components/management/cluster/cluster-disabled';
 import { ClusterDashboard } from '../../../../../components/management/cluster/dashboard/dashboard';
 import { LoadingSpinner } from '../../../../../components/common/loading-spinner/loading-spinner';
@@ -38,7 +38,7 @@ const checkClusterIsEnabledAndRunning = async () => {
     return {
       ok: true,
       data: {
-        error,
+        error: { title: 'There was a problem', message: error.message },
       },
     };
   }
@@ -68,45 +68,17 @@ export const ClusterOverview = compose(
     ),
   ),
 )(
-  class ClusterOverview extends Component<ClusterOverviewState> {
-    _isMount = false;
-
-    constructor(props) {
-      super(props);
-      this.state = {
-        clusterEnabled: false,
-        isClusterRunning: false,
-        statusRunning: 'no',
-      };
-    }
-
-    async componentDidMount() {
-      this._isMount = true;
-      const clusterEnabled =
-        AppState.getClusterInfo() &&
-        AppState.getClusterInfo().status === 'enabled';
-
-      const status: any = await WzRequest.apiReq('GET', '/cluster/status', {});
-      const statusRunning = status?.data?.data?.running;
-      this.setState({
-        clusterEnabled: clusterEnabled,
-        isClusterRunning: statusRunning === 'no' ? false : true,
-        statusRunning,
-      });
-    }
-
-    componentWillUnmount() {
-      this._isMount = false;
-    }
-
-    render() {
-      return (
-        <>
-          {this.props?.clusterEnabled && this.props?.isClusterRunning ? (
-            <ClusterDashboard statusRunning={this.props?.statusRunning} />
-          ) : null}
-        </>
-      );
-    }
+  ({
+    clusterEnabled,
+    isClusterRunning,
+    statusRunning,
+  }: ClusterOverviewState) => {
+    return (
+      <>
+        {clusterEnabled && isClusterRunning ? (
+          <ClusterDashboard statusRunning={statusRunning} />
+        ) : null}
+      </>
+    );
   },
 );
