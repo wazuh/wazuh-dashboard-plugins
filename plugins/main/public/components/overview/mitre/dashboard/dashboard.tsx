@@ -7,16 +7,18 @@ import useSearchBar from '../../../common/search-bar/use-search-bar';
 import { Filter } from '../../../../../../../src/plugins/data/common';
 import { SampleDataWarning } from '../../../visualize/components';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
-import {
-  ErrorFactory,
-  ErrorHandler,
-  HttpError,
-} from '../../../../react-services/error-management';
+import { ErrorFactory, ErrorHandler, HttpError } from '../../../../react-services/error-management';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { SearchResponse } from '../../../../../../../src/core/server';
 import './mitre_dashboard_filters.scss';
-import { AlertsDataSourceRepository, MitreAttackDataSource, PatternDataSource, tParsedIndexPattern, useDataSource } from '../../../common/data-source';
+import {
+  AlertsDataSourceRepository,
+  MitreAttackDataSource,
+  PatternDataSource,
+  tParsedIndexPattern,
+  useDataSource,
+} from '../../../common/data-source';
 
 interface DashboardThreatHuntingProps {
   pinnedAgent: Filter;
@@ -26,16 +28,14 @@ const plugins = getPlugins();
 const SearchBar = getPlugins().data.ui.SearchBar;
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
-  pinnedAgent,
-}) => {
+export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({ pinnedAgent }) => {
   const {
     filters,
     dataSource,
     fetchFilters,
     isLoading: isDataSourceLoading,
     fetchData,
-    setFilters
+    setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: MitreAttackDataSource,
     repository: new AlertsDataSourceRepository(),
@@ -54,51 +54,47 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
     if (isDataSourceLoading) {
       return;
     }
-    fetchData({ query }).then(results => {
-      setResults(results);
-    })
-      .catch(error => {
+    fetchData({ query })
+      .then((results) => {
+        setResults(results);
+      })
+      .catch((error) => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: 'Error fetching vulnerabilities',
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [
-    JSON.stringify(fetchFilters),
-    JSON.stringify(query),
-  ])
+  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
 
   return (
     <>
       <I18nProvider>
         <>
-          {
-            isDataSourceLoading && !dataSource ?
-              <LoadingSpinner /> :
-              <div className="wz-search-bar">
-                <SearchBar
-                  appName='vulnerability-detector-searchbar'
-                  {...searchBarProps}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                  showSaveQuery={true}
-                />
-              </div>
-          }
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
+          {isDataSourceLoading && !dataSource ? (
+            <LoadingSpinner />
+          ) : (
+            <div className="wz-search-bar">
+              <SearchBar
+                appName="vulnerability-detector-searchbar"
+                {...searchBarProps}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+            </div>
+          )}
+          {dataSource && results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
           {dataSource && results?.hits?.total > 0 ? (
-            <div className='mitre-dashboard-responsive'>
+            <div className="mitre-dashboard-responsive">
               <SampleDataWarning />
-              <div className='mitre-dashboard-filters-wrapper'>
+              <div className="mitre-dashboard-filters-wrapper">
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,
                     panels: getDashboardPanels(
                       dataSource?.id,
-                      dataSource?.getPinnedAgentFilter().length > 0,
+                      dataSource?.getPinnedAgentFilter().length > 0
                     ),
                     isFullScreenMode: false,
                     filters: searchBarProps.filters ?? [],
