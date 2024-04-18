@@ -5,7 +5,6 @@ import {
   EuiFlexItem,
   EuiIcon,
   EuiLink,
-  EuiSpacer,
   EuiTitle,
   EuiFlexGrid,
   EuiToolTip,

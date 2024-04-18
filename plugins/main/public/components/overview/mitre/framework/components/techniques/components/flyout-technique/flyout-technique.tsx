@@ -25,11 +25,10 @@ import {
   EuiAccordion,
   EuiToolTip,
   EuiIcon,
-  EuiPanel,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
 import { AppNavigate } from '../../../../../../../../react-services/app-navigate';
-import { getPlugins, getUiSettings } from '../../../../../../../../kibana-services';
+import { getUiSettings } from '../../../../../../../../kibana-services';
 import {
   FilterManager,
   IndexPattern,
@@ -39,7 +38,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../../../react-services/erro
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../../components/common/flyouts';
 import { techniquesColumns, agentTechniquesColumns } from './flyout-technique-columns';
-import { PatternDataSource, tFilter } from '../../../../../../../../components/common/data-source';
+import { PatternDataSource } from '../../../../../../../../components/common/data-source';
 import { WazuhFlyoutDiscover } from '../../../../../../../common/wazuh-discover/wz-flyout-discover';
 import { tFilterParams } from '../../../../mitre';
 import TechniqueRowDetails from './technique-row-details';

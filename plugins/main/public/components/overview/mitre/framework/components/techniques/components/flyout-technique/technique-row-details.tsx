@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { EuiCodeBlock, EuiFlexGroup, EuiTabbedContent, EuiFlexItem } from '@elastic/eui';
+import { EuiCodeBlock, EuiFlexGroup, EuiTabbedContent } from '@elastic/eui';
 import { useDocViewer } from '../../../../../../../common/doc-viewer/use-doc-viewer';
 import DocViewer from '../../../../../../../common/doc-viewer/doc-viewer';
 import RuleDetails from '../rule-details';
