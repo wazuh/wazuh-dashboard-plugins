@@ -95,7 +95,12 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    dateRangeFrom,
+    dateRangeTo,
+  ]);
 
   const setBooleans = (component: string | null) => {
     setState({
