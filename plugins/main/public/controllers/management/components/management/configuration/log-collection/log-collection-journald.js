@@ -16,7 +16,11 @@ import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import { renderValueOrNoValue, isString } from '../utils/utils';
+import {
+  renderValueOrNoValue,
+  isString,
+  renderValueOrDefault,
+} from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
 import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_JOURNALDT_PROP } from './types';
@@ -44,27 +48,15 @@ const mainSettings = [
     label: 'Only future events',
     render: renderValueOrNoValue,
   },
-  { field: 'filters_disabled', label: 'Filters Disabled' },
+  {
+    field: 'filters_disabled',
+    label: 'Filters Disabled',
+    render: renderValueOrDefault('true'),
+  },
   {
     field: 'filters',
     label: 'Filters',
-    render: value => {
-      if (Array.isArray(value)) {
-        const flatArray = value.flat();
-        const groupedFilters = flatArray.map((filter, index) => {
-          return {
-            ...filter,
-            filters_group: `Group ${Math.floor(index / value.length) + 1}`,
-          };
-        });
-        return groupedFilters;
-      }
-    },
     columns: [
-      {
-        field: 'filters_group',
-        name: 'Filters Group',
-      },
       {
         field: 'field',
         name: 'Field',

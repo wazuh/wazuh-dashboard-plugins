@@ -12,9 +12,11 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiBasicTable } from '@elastic/eui';
+import { EuiAccordion, EuiBasicTable } from '@elastic/eui';
 import { EuiFieldText, EuiSpacer, EuiTextAlign } from '@elastic/eui';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import helpLinks from '../log-collection/help-links';
 
 class WzConfigurationSetting extends Component {
   constructor(props) {
@@ -78,9 +80,36 @@ class WzConfigurationSetting extends Component {
               </ul>
             ) : Array.isArray(value) && columns ? (
               <>
-                <EuiSpacer></EuiSpacer>
-                <WzConfigurationSettingsHeader title={label} />
-                <EuiBasicTable items={value} columns={columns} />
+                <WzConfigurationSettingsHeader
+                  title={label}
+                  info={
+                    'The configuration options within the same group work with each other like an AND logic. Whereas the configuration between different groups works like an OR logic.'
+                  }
+                />
+                {value.map((group, groupIndex) => (
+                  <EuiAccordion
+                    key={`accordion_${groupIndex}`}
+                    id={`accordionId_${groupIndex}`}
+                    buttonContent={`Group ${groupIndex + 1}`}
+                    paddingSize='l'
+                  >
+                    <div>
+                      {Array.isArray(group) ? (
+                        <EuiBasicTable
+                          items={group}
+                          columns={columns}
+                          rowHeader='field'
+                        />
+                      ) : (
+                        <EuiBasicTable
+                          items={[group]}
+                          columns={columns}
+                          rowHeader='field'
+                        />
+                      )}
+                    </div>
+                  </EuiAccordion>
+                ))}
               </>
             ) : (
               <EuiFieldText
