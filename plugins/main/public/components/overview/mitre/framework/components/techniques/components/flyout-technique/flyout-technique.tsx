@@ -25,6 +25,7 @@ import {
   EuiAccordion,
   EuiToolTip,
   EuiIcon,
+  EuiPanel,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
 import { AppNavigate } from '../../../../../../../../react-services/app-navigate';
@@ -37,12 +38,13 @@ import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../../components/common/flyouts';
-import { techniquesColumns } from './flyout-technique-columns';
+import { techniquesColumns, agentTechniquesColumns } from './flyout-technique-columns';
 import { PatternDataSource, tFilter } from '../../../../../../../../components/common/data-source';
 import { WazuhFlyoutDiscover } from '../../../../../../../common/wazuh-discover/wz-flyout-discover';
 import { tFilterParams } from '../../../../mitre';
 import TechniqueRowDetails from './technique-row-details';
 import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/data/common';
+import store from '../../../../../../../../redux/store';
 
 const md = new MarkdownIt({
   html: true,
@@ -75,7 +77,6 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { onChangeFlyout, openDashboard, openDiscover, filterParams } = props;
   const { techniqueData } = state;
-  const [filters, setFilters] = useState<tFilter[]>([]);
 
   useEffect(() => {
     initialize();
@@ -210,16 +211,17 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     // add filters to the filter state
     // generate the filter
     const newFilter = getFilters(value, indexPattern);
-    setFilters([...filters, newFilter]);
+    filterManager.addFilters(newFilter);
   };
 
   const expandedRow = (props: { doc: any; item: any; indexPattern: any }) => {
-    return (
-      <TechniqueRowDetails
-        {...props}
-        onRuleItemClick={(value) => onItemClick(value, indexPattern)}
-      />
-    );
+    return <TechniqueRowDetails {...props} onRuleItemClick={onItemClick} />;
+  };
+
+  const getDiscoverColums = () => {
+    // when the agent is pinned
+    const agentId = store.getState().appStateReducers?.currentAgentData?.id;
+    return agentId ? agentTechniquesColumns : techniquesColumns;
   };
 
   const renderBody = () => {
@@ -296,28 +298,29 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       },
     ];
     return (
-      <EuiFlyoutBody className="flyout-body">
+      <EuiFlyoutBody>
         <EuiAccordion
-          id={'details'}
+          id="details"
           buttonContent={
             <EuiTitle size="s">
               <h3>Technique details</h3>
             </EuiTitle>
           }
-          paddingSize="none"
           initialIsOpen={true}
         >
           <div className="flyout-row details-row">
-            {(Object.keys(techniqueData).length === 0 && (
-              <div>
-                <EuiLoadingContent lines={2} />
-                <EuiLoadingContent lines={3} />
-              </div>
-            )) || (
-              <div style={{ marginBottom: 30 }}>
-                <EuiDescriptionList listItems={data} />
-              </div>
-            )}
+            <EuiFlexGroup direction="column" gutterSize="none">
+              {(Object.keys(techniqueData).length === 0 && (
+                <EuiFlexItem>
+                  <EuiLoadingContent lines={2} />
+                  <EuiLoadingContent lines={3} />
+                </EuiFlexItem>
+              )) || (
+                <EuiFlexItem style={{ marginBottom: 30 }}>
+                  <EuiDescriptionList listItems={data} />
+                </EuiFlexItem>
+              )}
+            </EuiFlexGroup>
           </div>
         </EuiAccordion>
 
@@ -367,19 +370,15 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           paddingSize="none"
           initialIsOpen={true}
         >
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              {JSON.stringify(filters)}
-              <WazuhFlyoutDiscover
-                DataSource={PatternDataSource}
-                tableColumns={techniquesColumns}
-                filterManager={filterManager}
-                initialFilters={filters}
-                initialFetchFilters={filterParams.filters}
-                expandedRowComponent={expandedRow}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
+          <div className="details-row">
+            <WazuhFlyoutDiscover
+              DataSource={PatternDataSource}
+              tableColumns={getDiscoverColums()}
+              filterManager={filterManager}
+              initialFetchFilters={filterParams.filters}
+              expandedRowComponent={expandedRow}
+            />
+          </div>
         </EuiAccordion>
       </EuiFlyoutBody>
     );

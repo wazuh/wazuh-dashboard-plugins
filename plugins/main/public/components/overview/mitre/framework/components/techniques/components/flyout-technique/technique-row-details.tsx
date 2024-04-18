@@ -28,13 +28,18 @@ const TechniqueRowDetails = ({ doc, item, indexPattern, onRuleItemClick }) => {
     setRuleData(ruleData);
   };
 
+  const onAddFilter = (filter: { [key: string]: string }) => {
+    onRuleItemClick(filter, indexPattern);
+  };
+
   useEffect(() => {
     getRuleData();
   }, []);
 
   return (
-    <EuiFlexGroup direction="column" style={{ width: '100%' }}>
+    <EuiFlexGroup style={{ margin: '-8px' }}>
       <EuiTabbedContent
+        style={{ width: '100%' }}
         tabs={[
           {
             id: 'table',
@@ -62,7 +67,7 @@ const TechniqueRowDetails = ({ doc, item, indexPattern, onRuleItemClick }) => {
           {
             id: 'rule',
             name: 'Rule',
-            content: <RuleDetails data={ruleData} onClick={onRuleItemClick} />,
+            content: <RuleDetails data={ruleData} onClick={onAddFilter} />,
           },
         ]}
       />
