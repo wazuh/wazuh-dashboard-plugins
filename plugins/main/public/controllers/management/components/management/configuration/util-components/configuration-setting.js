@@ -15,7 +15,6 @@ import PropTypes from 'prop-types';
 import { EuiAccordion, EuiBasicTable } from '@elastic/eui';
 import { EuiFieldText, EuiSpacer, EuiTextAlign } from '@elastic/eui';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 import helpLinks from '../log-collection/help-links';
 
 class WzConfigurationSetting extends Component {
@@ -39,7 +38,7 @@ class WzConfigurationSetting extends Component {
   }
   render() {
     const { isMobile } = this.state;
-    const { keyItem, label, value, columns } = this.props;
+    const { keyItem, label, value, columns, info } = this.props;
     return value || typeof value === 'number' || typeof value === 'boolean' ? (
       <>
         <div
@@ -82,9 +81,8 @@ class WzConfigurationSetting extends Component {
               <>
                 <WzConfigurationSettingsHeader
                   title={label}
-                  info={
-                    'The configuration options within the same group work with each other like an AND logic. Whereas the configuration between different groups works like an OR logic.'
-                  }
+                  info={info}
+                  help={helpLinks}
                 />
                 {value.map((group, groupIndex) => (
                   <EuiAccordion

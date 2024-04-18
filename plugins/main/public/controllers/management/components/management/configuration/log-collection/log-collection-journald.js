@@ -70,6 +70,7 @@ const mainSettings = [
         name: 'Ignore If Missing',
       },
     ],
+    info: 'The configuration filters within the same group are processed with an AND logic operator. Whereas the different filter groups are processed with an OR like logic operator.',
   },
 ];
 

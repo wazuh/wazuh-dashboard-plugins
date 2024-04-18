@@ -49,6 +49,7 @@ class WzSettingsGroup extends Component {
                   }
                   value={item.render ? item.render(value) : value}
                   columns={item.columns}
+                  info={item.info}
                 />
               );
             })}
