@@ -39,6 +39,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orch
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import { tFilter, tSearchParams } from '../../../../../common/data-source';
 import { tFilterParams } from '../../mitre';
+import { getDataPlugin } from '../../../../../../kibana-services';
 
 const MITRE_ATTACK = 'mitre-attack';
 
@@ -49,6 +50,7 @@ type tTechniquesProps = {
   filterParams: tFilterParams;
   isLoading: boolean;
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
+  onSelectedTabChanged: (tabId: string) => void;
 };
 
 type tTechniquesState = {
@@ -63,8 +65,15 @@ type tTechniquesState = {
 };
 
 export const Techniques = withWindowSize((props: tTechniquesProps) => {
-  const { tacticsObject, selectedTactics, filterParams, isLoading, fetchData, indexPatternId } =
-    props;
+  const {
+    tacticsObject,
+    selectedTactics,
+    filterParams,
+    isLoading,
+    fetchData,
+    indexPatternId,
+    onSelectedTabChanged,
+  } = props;
 
   const [state, setState] = useState<tTechniquesState>({
     isFlyoutVisible: false,
@@ -283,6 +292,43 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       }
     });
     return techniquesObj;
+  };
+
+  const addFilter = (filter) => {
+    const { filterManager } = getDataPlugin().query;
+    const matchPhrase = {};
+    matchPhrase[filter.key] = filter.value;
+    const newFilter = {
+      meta: {
+        disabled: false,
+        key: filter.key,
+        params: { query: filter.value },
+        type: 'phrase',
+        negate: filter.negate || false,
+        index: indexPatternId,
+      },
+      query: { match_phrase: matchPhrase },
+      $state: { store: 'appState' },
+    };
+    filterManager.addFilters([newFilter]);
+  };
+
+  const openDiscover = (e, techniqueID) => {
+    addFilter({
+      key: 'rule.mitre.id',
+      value: techniqueID,
+      negate: false,
+    });
+    onSelectedTabChanged('events');
+  };
+
+  const openDashboard = (e, techniqueID) => {
+    addFilter({
+      key: 'rule.mitre.id',
+      value: techniqueID,
+      negate: false,
+    });
+    onSelectedTabChanged('dashboard');
   };
 
   const renderFacet = () => {
@@ -544,6 +590,8 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
             query: filterParams.query,
             time: filterParams.time,
           }}
+          openDashboard={(e) => openDashboard(e, currentTechnique)}
+          openDiscover={(e) => openDiscover(e, currentTechnique)}
         />
       )}
     </div>

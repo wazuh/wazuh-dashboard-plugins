@@ -12,7 +12,7 @@ import {
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
 import { IntlProvider } from 'react-intl';
-import { IndexPattern } from '../../../../../../src/plugins/data/common';
+import { IndexPattern } from '../../../../../../src/plugins/data/public';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
@@ -237,7 +237,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   return (
     <IntlProvider locale="en">
-      <EuiPageTemplate restrictWidth="100%" fullHeight={true} grow>
+      <EuiPageTemplate restrictWidth="100%" fullHeight={true} grow paddingSize="m">
         <>
           {isDataSourceLoading ? (
             <LoadingSpinner />
@@ -254,38 +254,36 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
           {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-            <EuiFlexGroup direction="column" style={{ width: '100%' }}>
-              <EuiFlexItem>
-                <EuiPanel color="subdued" borderRadius="none" hasShadow={false} paddingSize="s">
-                  <HitsCounter
-                    hits={results?.hits?.total}
-                    showResetButton={false}
-                    tooltip={
-                      results?.hits?.total && results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                        ? {
-                            ariaLabel: 'Warning',
-                            content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                              MAX_ENTRIES_PER_QUERY
-                            )} hits.`,
-                            iconType: 'alert',
-                            position: 'top',
-                          }
-                        : undefined
-                    }
-                  />
-                </EuiPanel>
-                <EuiBasicTable
-                  items={parsedItems}
-                  itemId={INDEX_FIELD_NAME}
-                  itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-                  isExpandable={isExpanded}
-                  columns={getColumns()}
-                  pagination={pagination}
-                  sorting={sorting}
-                  onChange={onTableChange}
+            <>
+              <EuiPanel color="subdued" borderRadius="none" hasShadow={false} paddingSize="s">
+                <HitsCounter
+                  hits={results?.hits?.total}
+                  showResetButton={false}
+                  tooltip={
+                    results?.hits?.total && results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                      ? {
+                          ariaLabel: 'Warning',
+                          content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY
+                          )} hits.`,
+                          iconType: 'alert',
+                          position: 'top',
+                        }
+                      : undefined
+                  }
                 />
-              </EuiFlexItem>
-            </EuiFlexGroup>
+              </EuiPanel>
+              <EuiBasicTable
+                items={parsedItems}
+                itemId={INDEX_FIELD_NAME}
+                itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+                isExpandable={isExpanded}
+                columns={getColumns()}
+                pagination={pagination}
+                sorting={sorting}
+                onChange={onTableChange}
+              />
+            </>
           ) : null}
         </>
       </EuiPageTemplate>

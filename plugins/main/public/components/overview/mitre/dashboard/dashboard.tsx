@@ -48,13 +48,13 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({ pinnedAg
     filters,
     setFilters,
   });
-  const { query } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
       return;
     }
-    fetchData({ query })
+    fetchData({ query, dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' } })
       .then((results) => {
         setResults(results);
       })
@@ -65,7 +65,7 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({ pinnedAg
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [JSON.stringify(fetchFilters), JSON.stringify(query), dateRangeFrom, dateRangeTo]);
 
   return (
     <>
