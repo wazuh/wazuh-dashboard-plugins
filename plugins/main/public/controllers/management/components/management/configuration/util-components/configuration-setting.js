@@ -12,8 +12,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiAccordion, EuiBasicTable } from '@elastic/eui';
-import { EuiFieldText, EuiSpacer, EuiTextAlign } from '@elastic/eui';
+import { EuiFieldText, EuiSpacer, EuiTextAlign, EuiAccordion, EuiBasicTable } from '@elastic/eui';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import helpLinks from '../log-collection/help-links';
 
