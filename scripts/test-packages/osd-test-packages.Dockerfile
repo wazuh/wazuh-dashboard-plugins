@@ -1,4 +1,4 @@
-# docker build --build-arg OSD_VERSION=2.12.0 --build-arg PACKAGE_NAME=wazuh-2.12.0.zip -t test-packages -f osd-test-packages.Dockerfile ./
+# docker build --build-arg OSD_VERSION=2.13.0 --build-arg PACKAGE_NAME=wazuh-2.13.0.zip -t test-packages -f osd-test-packages.Dockerfile ./
 
 ARG OSD_VERSION
 
