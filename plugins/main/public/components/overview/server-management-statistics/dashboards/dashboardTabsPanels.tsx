@@ -65,6 +65,13 @@ export const DashboardTabsPanels = ({
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
+  const infoMessage = {
+    remoted:
+      'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
+    analysisd:
+      "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
+  };
+
   const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
@@ -155,12 +162,7 @@ export const DashboardTabsPanels = ({
 
       <EuiSpacer size={'m'} />
       <EuiPanel hasBorder={false} hasShadow={false} color='transparent'>
-        <EuiCallOut
-          title={
-            'Remoted statistics are cumulative, this means that the information shown is since the data exists.'
-          }
-          iconType='iInCircle'
-        />
+        <EuiCallOut title={infoMessage[selectedTab]} iconType='iInCircle' />
       </EuiPanel>
       {dataSource && results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
       {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
