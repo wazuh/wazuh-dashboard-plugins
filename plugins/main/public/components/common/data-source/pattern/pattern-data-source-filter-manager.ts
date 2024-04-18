@@ -172,10 +172,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
    * @returns
    */
   getFilters() {
-    return [
-      //...this.getDefaultFilters(this.filterManager.getFilters())
-      ...this.filterManager.getFilters(),
-    ];
+    return [...this.filterManager.getFilters()];
   }
 
   /**
@@ -249,7 +246,8 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
     const isCluster = AppState.getClusterInfo().status == 'enabled';
     const managerFilter = filterHandler.managerQuery(
       isCluster ? AppState.getClusterInfo().cluster : AppState.getClusterInfo().manager,
-      isCluster
+      isCluster,
+      key
     );
     managerFilter.meta = {
       ...managerFilter.meta,
