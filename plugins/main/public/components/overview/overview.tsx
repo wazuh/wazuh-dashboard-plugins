@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { getAngularModule } from '../../kibana-services';
 import { Stats } from '../../controllers/overview/components/stats';
 import { WzRequest } from '../../react-services';
 import { OverviewWelcome } from '../common/welcome/overview-welcome';
-import { getWzCurrentAppID } from '../../kibana-services';
 import { MainModule } from '../common/modules/main';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
@@ -11,12 +11,20 @@ import { WzCurrentOverviewSectionWrapper } from '../common/modules/overview-curr
 
 export const Overview: React.FC = () => {
   const [agentsCounts, setAgentsCounts] = useState({});
-  const [appActive, setAppActive] = useState('');
+  const [tabActive, setTabActive] = useState('welcome');
+  const [tabViewActive, setTabViewActive] = useState('panels');
+  const [agentSelected, setAgentSelected] = useState({});
 
   useEffect(() => {
-    getSummary();
-    const appActiveID = getWzCurrentAppID();
-    setAppActive(appActiveID);
+    const tab = getAngularModule().$injector.get('$location').search().tab;
+    const tabView = getAngularModule()
+      .$injector.get('$location')
+      .search().tabView;
+    setTabActive(tab || 'welcome');
+    setTabViewActive(tabView || 'panels');
+    if (tab === 'welcome' || tab === undefined) {
+      getSummary();
+    }
   }, []);
 
   /**
@@ -35,9 +43,12 @@ export const Overview: React.FC = () => {
     }
   };
 
-  function switchTab(tab: any, force: any) {
+  function switchTab(newTab: any, force: any) {
     try {
-      console.log(tab, force);
+      if (tabActive === newTab && !force) {
+        return;
+      }
+      setTabActive(newTab);
     } catch (error) {
       const options = {
         context: `${Overview.name}.switchTab`,
@@ -54,25 +65,69 @@ export const Overview: React.FC = () => {
     }
   }
 
+  const switchSubTab = (subTab: string) => {
+    try {
+      if (tabViewActive !== subTab) {
+        setTabViewActive(subTab);
+      }
+    } catch (error) {
+      const options = {
+        context: `${Overview.name}.switchSubtab`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
+    }
+  };
+
+  const updateSelectedAgents = (agentList: Array<any>) => {
+    try {
+      if (typeof agentList.length) {
+        setAgentSelected(agentList[0]);
+      }
+    } catch (error) {
+      const options = {
+        context: `${Overview.name}.updateSelectedAgents`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+
+      getErrorOrchestrator().handleError(options);
+    }
+  };
+
   return (
     <>
-      {appActive !== 'wz-home' && (
+      {tabActive && tabActive !== 'welcome' && (
         <>
           <MainModule
-            section={appActive}
-            // disabledReport={resultState !== 'ready'}
+            section={tabActive}
             agentsSelectionProps={{
-              tab: appActive,
-              subtab: 'panel',
+              tab: tabActive,
+              subtab: tabViewActive,
+              setAgent: (agentList: Array<any>) =>
+                updateSelectedAgents(agentList),
             }}
+            switchSubTab={subTab => switchSubTab(subTab)}
           />
           <WzCurrentOverviewSectionWrapper
             switchTab={(tab, force) => switchTab(tab, force)}
-            currentTab={appActive}
+            currentTab={tabActive}
           />
         </>
       )}
-      {appActive === 'wz-home' && (
+      {tabActive === 'welcome' && (
         <>
           <Stats {...agentsCounts} />
           <OverviewWelcome {...agentsCounts} />
