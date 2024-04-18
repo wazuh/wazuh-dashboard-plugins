@@ -6,9 +6,7 @@ import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
 import { getKPIsPanel } from './dashboard_panels_kpis';
-import { Filter } from '../../../../../../../src/plugins/data/common';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -46,6 +44,14 @@ import {
   threatHuntingTableAgentColumns,
   threatHuntingTableDefaultColumns,
 } from '../config';
+import {
+  AlertsDataSource,
+  AlertsDataSourceRepository,
+  PatternDataSource,
+  PatternDataSourceFilterManager,
+  tParsedIndexPattern,
+  useDataSource,
+} from '../../../common/data-source';
 
 const plugins = getPlugins();
 
@@ -53,30 +59,30 @@ const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-interface DashboardThreatHuntingProps {
-  pinnedAgent: Filter;
-}
-
-const DashboardTH: React.FC<DashboardThreatHuntingProps> = ({
-  pinnedAgent,
-}) => {
-  /* TODO: Analyze whether to use the new index pattern handler https://github.com/wazuh/wazuh-dashboard-plugins/issues/6434
-  Replace WAZUH_ALERTS_PATTERN with appState.getCurrentPattern... */
-  const TH_INDEX_PATTERN_ID = WAZUH_ALERTS_PATTERN;
-
-  const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: TH_INDEX_PATTERN_ID,
+const DashboardTH: React.FC = () => {
+  const {
+    filters,
+    dataSource,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+    setFilters,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    DataSource: AlertsDataSource,
+    repository: new AlertsDataSourceRepository(),
   });
 
-  const { isLoading, query, indexPatterns } = searchBarProps;
-  const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
-    undefined,
-  );
-  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+
+  const { searchBarProps } = useSearchBar({
+    indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters,
+  });
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [isExporting, setIsExporting] = useState<boolean>(false);
-
-  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
@@ -107,7 +113,7 @@ const DashboardTH: React.FC<DashboardThreatHuntingProps> = ({
     ariaLabelledBy: 'Threat Hunting Table',
     defaultColumns: threatHuntingTableDefaultColumns,
     results,
-    indexPattern: indexPattern as IndexPattern,
+    indexPattern: dataSource?.indexPattern,
     DocViewInspectButton,
   });
 
@@ -115,8 +121,12 @@ const DashboardTH: React.FC<DashboardThreatHuntingProps> = ({
 
   const docViewerProps = useDocViewer({
     doc: inspectedHit,
-    indexPattern: indexPattern as IndexPattern,
+    indexPattern: dataSource?.indexPattern,
   });
+
+  const pinnedAgent =
+    PatternDataSourceFilterManager.getPinnedAgentFilter(dataSource?.id!)
+      .length > 0;
 
   useEffect(() => {
     const currentColumns = !pinnedAgent
@@ -126,38 +136,33 @@ const DashboardTH: React.FC<DashboardThreatHuntingProps> = ({
   }, [pinnedAgent]);
 
   useEffect(() => {
-    if (!isLoading) {
-      setIndexPattern(indexPatterns?.[0] as IndexPattern);
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters: searchBarProps.filters ?? [],
-        query,
-        pagination,
-        sorting,
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching vulnerabilities',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
+    if (isDataSourceLoading) {
+      return;
     }
+    fetchData({ query, pagination, sorting })
+      .then(results => {
+        setResults(results);
+      })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching threat hunting',
+        });
+        ErrorHandler.handleError(searchError);
+      });
   }, [
-    JSON.stringify(searchBarProps),
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
+    dateRangeFrom,
+    dateRangeTo,
   ]);
 
   const onClickExportResults = async () => {
     const params = {
-      indexPattern: indexPatterns?.[0] as IndexPattern,
-      filters: searchBarProps.filters ?? [],
+      indexPattern: dataSource?.indexPattern,
+      filters: fetchFilters ?? [],
       query,
       fields: columnVisibility.visibleColumns,
       pagination: {
@@ -181,31 +186,34 @@ const DashboardTH: React.FC<DashboardThreatHuntingProps> = ({
   };
 
   return (
-    <>
-      <I18nProvider>
-        {isLoading ? <LoadingSpinner /> : null}
-        {!isLoading ? (
-          <SearchBar
-            appName='th-searchbar'
-            {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={true}
-            showQueryBar={true}
-          />
-        ) : null}
-        {isSearching ? <LoadingSpinner /> : null}
-        <SampleDataWarning />
-        {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+    <I18nProvider>
+      <>
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSpinner />
+        ) : (
+          <div className='wz-search-bar'>
+            <SearchBar
+              appName='th-searchbar'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
+          </div>
+        )}
+        {dataSource && results?.hits?.total > 0 ? <SampleDataWarning /> : null}
+        {dataSource && results?.hits?.total === 0 ? (
           <DiscoverNoResults />
         ) : null}
-        {!isLoading && !isSearching && results?.hits?.total > 0 ? (
+        {dataSource && results?.hits?.total > 0 ? (
           <div className='th-dashboard-responsive'>
             <DashboardByRenderer
               input={{
                 viewMode: ViewMode.VIEW,
-                panels: getKPIsPanel(TH_INDEX_PATTERN_ID),
+                panels: getKPIsPanel(dataSource?.id),
                 isFullScreenMode: false,
-                filters: searchBarProps.filters ?? [],
+                filters: fetchFilters ?? [],
                 useMargins: true,
                 id: 'kpis-th-dashboard-tab',
                 timeRange: {
@@ -225,9 +233,9 @@ const DashboardTH: React.FC<DashboardThreatHuntingProps> = ({
             <DashboardByRenderer
               input={{
                 viewMode: ViewMode.VIEW,
-                panels: getDashboardPanels(TH_INDEX_PATTERN_ID, !!pinnedAgent),
+                panels: getDashboardPanels(dataSource?.id, pinnedAgent),
                 isFullScreenMode: false,
-                filters: searchBarProps.filters ?? [],
+                filters: fetchFilters ?? [],
                 useMargins: true,
                 id: 'th-dashboard-tab',
                 timeRange: {
@@ -304,8 +312,8 @@ const DashboardTH: React.FC<DashboardThreatHuntingProps> = ({
             )}
           </div>
         ) : null}
-      </I18nProvider>
-    </>
+      </>
+    </I18nProvider>
   );
 };
 
