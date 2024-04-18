@@ -13,7 +13,7 @@ let urlBodys = [
   { alertCount: 15000, index: 'wazuh-alerts-4.x-sample-threat-detection' },
 ];
 
-Given('The wazuh admin user is logged', () => {
+Given('The admin user is logged', () => {
   if (Cypress.env('type') != 'wzd') {
     navigate('app/wazuh');
   } else {

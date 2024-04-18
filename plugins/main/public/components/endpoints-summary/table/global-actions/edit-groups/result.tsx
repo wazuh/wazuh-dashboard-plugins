@@ -12,7 +12,8 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import { Agent } from '../../../types';
-import { ErrorAgent, GroupResult, RESULT_TYPE } from './edit-groups-modal';
+import { GroupResult, RESULT_TYPE } from './edit-groups-modal';
+import { ErrorAgent } from '../../../services/paginated-agents-group';
 
 interface EditAgentsGroupsModalResultProps {
   addOrRemove: 'add' | 'remove';
@@ -40,7 +41,7 @@ export const EditAgentsGroupsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'ID',
+          name: 'Id',
           align: 'left',
           sortable: true,
         },
@@ -51,7 +52,7 @@ export const EditAgentsGroupsModalResult = ({
           sortable: true,
         },
       ]}
-      pagination={agents.length > 10}
+      pagination={true}
       sorting={{
         sort: {
           field: 'id',
@@ -71,6 +72,7 @@ export const EditAgentsGroupsModalResult = ({
           name: 'Code',
           align: 'left',
           sortable: true,
+          width: '100px',
         },
         {
           field: 'error.message',
@@ -86,12 +88,12 @@ export const EditAgentsGroupsModalResult = ({
         },
         {
           field: 'id',
-          name: 'Agent Ids',
+          name: 'Agent IDs',
           align: 'left',
           render: ids => ids.join(', '),
         },
       ]}
-      pagination={errors.length > 10}
+      pagination={true}
     />
   );
 
@@ -184,7 +186,6 @@ export const EditAgentsGroupsModalResult = ({
                     result,
                     successAgents,
                     errorAgents,
-                    errorMessage,
                     totalErrorAgents,
                   } = groupResult;
 
