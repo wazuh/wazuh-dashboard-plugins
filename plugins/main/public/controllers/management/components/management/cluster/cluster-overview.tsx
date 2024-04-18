@@ -24,10 +24,11 @@ const checkClusterIsEnabledAndRunning = async () => {
   try {
     const status: any = await WzRequest.apiReq('GET', '/cluster/status', {});
     const clusterEnabled = status?.data?.data?.enabled;
+    const isClusterEnabled = clusterEnabled === 'yes';
     const statusRunning = status?.data?.data?.running;
     const isClusterRunning = statusRunning === 'yes';
     return {
-      ok: !Boolean(clusterEnabled && statusRunning),
+      ok: !(isClusterEnabled && isClusterRunning),
       data: {
         clusterEnabled,
         isClusterRunning,
@@ -53,8 +54,12 @@ export const ClusterOverview = compose(
   ]),
   withGuardAsync(
     checkClusterIsEnabledAndRunning,
-    ({ clusterEnabled, isClusterRunning }) => (
-      <ClusterDisabled enabled={clusterEnabled} running={isClusterRunning} />
+    ({ clusterEnabled, isClusterRunning, error }) => (
+      <ClusterDisabled
+        error={error}
+        enabled={clusterEnabled}
+        running={isClusterRunning}
+      />
     ),
     () => (
       <LoadingSpinner

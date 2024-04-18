@@ -15,7 +15,9 @@ export const ClusterDisabled = withErrorBoundary(
           iconType='iInCircle'
           title={
             <h2>
-              {!this.props.enabled
+              {this.props.error
+                ? this.props.error.title
+                : !this.props.enabled
                 ? 'The cluster is disabled'
                 : !this.props.running
                 ? 'The cluster is not running'
@@ -24,7 +26,9 @@ export const ClusterDisabled = withErrorBoundary(
           }
           body={
             <Fragment>
-              {!this.props.enabled ? (
+              {this.props.error ? (
+                this.props.error.message
+              ) : !this.props.enabled ? (
                 <p>
                   Visit the documentation on{' '}
                   <EuiLink
