@@ -45,25 +45,9 @@ class WzHelpButtonPopover extends Component {
           <EuiText color='subdued' style={{ padding: '0 8px' }}>
             More info about this section
           </EuiText>
-          {links && info ? (
-            <>
-              <EuiText style={{ padding: '0 8px' }}>{info}</EuiText>
-              {links.map(link => (
-                <div key={`show-help-${link.text}`}>
-                  <EuiButtonEmpty
-                    rel='noopener noreferrer'
-                    target='_blank'
-                    href={link.href}
-                  >
-                    {link.text}
-                  </EuiButtonEmpty>
-                </div>
-              ))}
-            </>
-          ) : info ? (
+          <>
             <EuiText style={{ padding: '0 8px' }}>{info}</EuiText>
-          ) : links ? (
-            links.map(link => (
+            {links.map(link => (
               <div key={`show-help-${link.text}`}>
                 <EuiButtonEmpty
                   rel='noopener noreferrer'
@@ -73,10 +57,8 @@ class WzHelpButtonPopover extends Component {
                   {link.text}
                 </EuiButtonEmpty>
               </div>
-            ))
-          ) : (
-            []
-          )}
+            ))}
+          </>
         </div>
       </EuiPopover>
     );

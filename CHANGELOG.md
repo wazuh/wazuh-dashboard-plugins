@@ -15,7 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added macOS log collector tab [#6545](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6545)
 - Added journald log collector tab [#6572](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6572)
 
-  ### Changed
+### Changed
 
 - Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6288](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6288) [#6290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6290) [#6289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6289) [#6286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6286) [#6275](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6275) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6297](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6297) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6291](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6459) [#6434](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6434)
 - Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
