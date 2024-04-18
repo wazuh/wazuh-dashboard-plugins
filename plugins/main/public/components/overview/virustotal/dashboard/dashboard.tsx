@@ -17,7 +17,6 @@ import { SampleDataWarning } from '../../../visualize/components/sample-data-war
 import {
   AlertsDataSourceRepository,
   PatternDataSource,
-  PatternDataSourceFilterManager,
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
@@ -51,7 +50,7 @@ const DashboardVT: React.FC = () => {
     filters,
     setFilters,
   });
-  const { query } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -68,7 +67,13 @@ const DashboardVT: React.FC = () => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    isDataSourceLoading,
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    dateRangeFrom,
+    dateRangeTo,
+  ]);
 
   return (
     <I18nProvider>
@@ -122,9 +127,7 @@ const DashboardVT: React.FC = () => {
                 viewMode: ViewMode.VIEW,
                 panels: getDashboardPanels(
                   dataSource?.id,
-                  PatternDataSourceFilterManager.getPinnedAgentFilter(
-                    dataSource?.title,
-                  ).length > 0,
+                  dataSource.getPinnedAgentFilter().length > 0,
                 ),
                 isFullScreenMode: false,
                 filters: fetchFilters ?? [],
