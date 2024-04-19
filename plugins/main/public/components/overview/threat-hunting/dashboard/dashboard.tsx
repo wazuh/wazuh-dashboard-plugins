@@ -20,14 +20,11 @@ import {
   EuiTitle,
   EuiButtonEmpty,
 } from '@elastic/eui';
-import { search } from '../../../common/search-bar/search-bar-service';
 import {
   ErrorFactory,
   ErrorHandler,
   HttpError,
 } from '../../../../react-services/error-management';
-import { LoadingSpinner } from '../../vulnerabilities/common/components/loading_spinner';
-import { DiscoverNoResults } from '../components/no_results';
 import {
   MAX_ENTRIES_PER_QUERY,
   exportSearchToCSV,
@@ -52,6 +49,8 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 
 const plugins = getPlugins();
 
