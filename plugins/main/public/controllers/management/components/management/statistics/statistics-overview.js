@@ -30,6 +30,7 @@ import { compose } from 'redux';
 import {
   withGuard,
   withGlobalBreadcrumb,
+  withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
 import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
@@ -223,6 +224,10 @@ export class WzStatisticsOverview extends Component {
 
 export default compose(
   withGlobalBreadcrumb([{ text: statistics.breadcrumbLabel }]),
+  withUserAuthorizationPrompt([
+    { action: 'cluster:status', resource: '*:*:*' },
+    { action: 'cluster:read', resource: 'node:id:*' },
+  ]),
   withGuard(props => {
     return !(wzConfig.getConfig() || {})['cron.statistics.status']; // if 'cron.statistics.status' is false, then it renders PromptStatisticsDisabled component
   }, PromptStatisticsDisabled),
