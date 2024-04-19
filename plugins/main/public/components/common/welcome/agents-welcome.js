@@ -49,10 +49,10 @@ import {
   updateCurrentAgentData,
 } from '../../../redux/actions/appStateActions';
 import {
-  getAngularModule,
   getChrome,
   getCore,
   getDataPlugin,
+  getAngularModule,
 } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import {
@@ -150,6 +150,9 @@ export const AgentsWelcome = compose(
 
       this.sidebarSizeDefault = 320;
 
+      const $injector = getAngularModule().$injector;
+      this.location = $injector.get('$location');
+
       this.state = {
         lastScans: [],
         isLoading: true,
@@ -200,8 +203,8 @@ export const AgentsWelcome = compose(
       of duplicating it. It was duplicated due to the differences of requirements
       in the Explore agent button for the modules and agent welcome
     */
-    async removeAgentsFilter() {
-      await this.props.setAgent(false);
+    removeAgentsFilter() {
+      this.props.setAgent(false);
       const currentAppliedFilters = getDataPlugin().query.filterManager.filters;
       const agentFilters = currentAppliedFilters.filter(x => {
         return x.meta.key !== 'agent.id';
@@ -227,7 +230,7 @@ export const AgentsWelcome = compose(
         welcome: 8,
       });
       const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-      const $injector = getAngularModule().$injector;
+
       this.drawerLokedSubscribtion = getChrome()
         .getIsNavDrawerLocked$()
         .subscribe(isLocked => {
@@ -235,8 +238,6 @@ export const AgentsWelcome = compose(
             this.updateWidth();
           });
         });
-      this.router = $injector.get('$route');
-      this.location = $injector.get('$location');
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line
       await VisFactoryHandler.buildAgentsVisualizations(
         filterHandler,

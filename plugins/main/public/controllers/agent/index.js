@@ -20,6 +20,7 @@ import { MainSyscollector } from '../../components/agents/syscollector/main';
 import { MainAgentStats } from '../../components/agents/stats';
 import { getAngularModule } from '../../kibana-services';
 import { MainEndpointsSummary } from '../../components/endpoints-summary';
+import { AgentView } from '../../components/endpoints-summary/agent';
 
 const app = getAngularModule();
 
@@ -28,6 +29,7 @@ app
   .value('RegisterAgent', RegisterAgent)
   .value('ExportConfiguration', ExportConfiguration)
   .value('AgentsWelcome', AgentsWelcome)
+  .value('AgentView', AgentView)
   .value('Mitre', Mitre)
   .value('AgentsTable', AgentsTable)
   .value('MainSyscollector', MainSyscollector)
