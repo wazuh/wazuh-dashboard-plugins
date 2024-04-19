@@ -857,6 +857,38 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     },
     validate: SettingsValidator.isBoolean,
   },
+  'configuration.ui_api_editable': {
+    title: 'Configuration UI editable',
+    description:
+      'Enable or disable the ability to edit the configuration from UI or API endpoints. When disabled, this can only be edited from configuration file, the related API endpoints are disabled, and the UI is inaccesible.',
+    store: {
+      file: {
+        configurableManaged: false,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromSettings: false,
+    requiresRestartingPluginPlatform: true,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.isBoolean,
+  },
   'cron.prefix': {
     title: 'Cron prefix',
     description: 'Define the index prefix of predefined jobs.',
