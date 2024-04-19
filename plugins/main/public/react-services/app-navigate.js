@@ -11,7 +11,7 @@
  */
 
 import {} from '../redux/actions/appStateActions';
-import { getIndexPattern } from '../components/overview/mitre/framework/lib';
+import { getIndexPattern } from './elastic_helpers';
 import { buildPhraseFilter } from '../../../../src/plugins/data/common';
 import rison from 'rison-node';
 
@@ -25,21 +25,19 @@ export class AppNavigate {
       sParameterName = sURLVariables[i].split('=');
 
       if (sParameterName[0] === sParam) {
-        return sParameterName[1] === undefined
-          ? true
-          : decodeURIComponent(sParameterName[1]);
+        return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
       }
     }
   }
 
   static buildFilter_w(filters, indexPattern) {
     const filtersArray = [];
-    Object.keys(filters).forEach(currentFilter => {
+    Object.keys(filters).forEach((currentFilter) => {
       filtersArray.push({
         ...buildPhraseFilter(
           { name: currentFilter, type: 'text' },
           filters[currentFilter],
-          indexPattern,
+          indexPattern
         ),
         $state: { isImplicit: false, store: 'appState' },
       });
@@ -56,11 +54,11 @@ export class AppNavigate {
         return;
       }
     }
-    getIndexPattern().then(indexPattern => {
+    getIndexPattern().then((indexPattern) => {
       const urlParams = {};
 
       if (Object.keys(params).length) {
-        Object.keys(params).forEach(key => {
+        Object.keys(params).forEach((key) => {
           if (key === 'filters') {
             urlParams['_w'] = this.buildFilter_w(params[key], indexPattern);
           } else {
@@ -69,7 +67,7 @@ export class AppNavigate {
         });
       }
       const url = Object.entries(urlParams)
-        .map(e => e.join('='))
+        .map((e) => e.join('='))
         .join('&');
       const currentUrl = window.location.href.split('#/')[0];
       const newUrl = currentUrl + `#/${section}?` + url;

@@ -76,7 +76,7 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({ pinnedAg
           ) : (
             <div className="wz-search-bar">
               <SearchBar
-                appName="vulnerability-detector-searchbar"
+                appName="mitre-detector-searchbar"
                 {...searchBarProps}
                 showQueryInput={true}
                 showQueryBar={true}

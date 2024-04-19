@@ -11,23 +11,15 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import {
-  getIndexPattern,
-  getElasticAlerts,
-  IFilterParams,
-} from '../../../../../overview/mitre/framework/lib';
+import { getIndexPattern, getElasticAlerts, IFilterParams } from '../../../../../../react-services';
 import { buildPhraseFilter } from '../../../../../../../../../src/plugins/data/common';
 
 import { AppState } from '../../../../../../react-services/app-state';
 
 function createFilters(agentId, indexPattern) {
-  const filter = filter => {
+  const filter = (filter) => {
     return {
-      ...buildPhraseFilter(
-        { name: filter.name, type: 'text' },
-        filter.value,
-        indexPattern,
-      ),
+      ...buildPhraseFilter({ name: filter.name, type: 'text' }, filter.value, indexPattern),
       $state: { store: 'appState' },
     };
   };
@@ -44,10 +36,7 @@ export function getWazuhFilter() {
   const clusterInfo = AppState.getClusterInfo();
   const wazuhFilter = {
     name: clusterInfo.status === 'enabled' ? 'cluster.name' : 'manager.name',
-    value:
-      clusterInfo.status === 'enabled'
-        ? clusterInfo.cluster
-        : clusterInfo.manager,
+    value: clusterInfo.status === 'enabled' ? clusterInfo.cluster : clusterInfo.manager,
   };
   return wazuhFilter;
 }
@@ -60,11 +49,6 @@ export async function getFimAlerts(agentId, time, sortObj) {
     query: { query: '', language: 'kuery' },
     time,
   };
-  const response = await getElasticAlerts(
-    indexPattern,
-    filterParams,
-    {},
-    { size: 5, sort },
-  );
+  const response = await getElasticAlerts(indexPattern, filterParams, {}, { size: 5, sort });
   return (((response || {}).data || {}).hits || {}).hits;
 }

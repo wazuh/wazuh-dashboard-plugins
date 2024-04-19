@@ -151,8 +151,6 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         },
       };
       setLoadingAlerts(true);
-      // TODO: use `status` and `statusText`  to show errors
-      // @ts-ignore
       const results = await fetchData({
         query: filterParams?.query,
         dateRange: {
@@ -527,10 +525,6 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     setState({ ...state, actionsOpen: false });
   };
 
-  const showActionsMenu = (techniqueData) => {
-    setState({ ...state, actionsOpen: techniqueData });
-  };
-
   const showFlyout = (techniqueData) => {
     setState({
       ...state,
@@ -586,7 +580,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
           onChangeFlyout={onChangeFlyout}
           currentTechnique={currentTechnique}
           filterParams={{
-            filters: [...filterParams.filters, ...getMitreRuleIdFilter(currentTechnique)],
+            filters: [...filterParams.filters, ...getMitreRuleIdFilter(currentTechnique)], // the flyout must receive the filters from the mitre global search bar
             query: filterParams.query,
             time: filterParams.time,
           }}

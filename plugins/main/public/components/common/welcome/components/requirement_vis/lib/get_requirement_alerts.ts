@@ -12,11 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import {
-  IFilterParams,
-  getElasticAlerts,
-  getIndexPattern,
-} from '../../../../../overview/mitre/framework/lib';
+import { IFilterParams, getElasticAlerts, getIndexPattern } from '../../../../../../react-services';
 import { getWazuhFilter } from '../../fim_events_table';
 import {
   buildPhraseFilter,
@@ -48,13 +44,9 @@ export async function getRequirementAlerts(agentId, time, requirement) {
 }
 
 function createFilters(agentId, indexPattern) {
-  const filter = filter => {
+  const filter = (filter) => {
     return {
-      ...buildPhraseFilter(
-        { name: filter.name, type: 'text' },
-        filter.value,
-        indexPattern,
-      ),
+      ...buildPhraseFilter({ name: filter.name, type: 'text' }, filter.value, indexPattern),
       $state: { store: 'appState' },
     };
   };
@@ -64,8 +56,5 @@ function createFilters(agentId, indexPattern) {
 }
 
 function createExistsFilter(requirement, indexPattern) {
-  return buildExistsFilter(
-    { name: `rule.${requirement}`, type: 'nested' },
-    indexPattern,
-  );
+  return buildExistsFilter({ name: `rule.${requirement}`, type: 'nested' }, indexPattern);
 }
