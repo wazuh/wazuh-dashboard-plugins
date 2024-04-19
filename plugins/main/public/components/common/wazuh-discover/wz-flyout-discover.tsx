@@ -200,7 +200,9 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
         name: column.displayAsText,
         sortable: true,
         truncateText: true,
-        render: column.render ? (value) => column?.render?.(value) : (value) => value,
+        render: column.render
+          ? (value, record) => column?.render?.(value, record)
+          : (value, record) => value,
       };
     });
 

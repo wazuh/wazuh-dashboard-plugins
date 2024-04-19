@@ -72,6 +72,7 @@ export const techniquesColumns: tDataGridColumn[] = [
   },
   { id: 'rule.description', displayAsText: 'Description' },
 ];
+
 export const agentTechniquesColumns: tDataGridColumn[] = [
   { id: 'timestamp', displayAsText: 'Time' },
   {
