@@ -603,7 +603,6 @@ const getVisStateTop5Map = (indexPatternId: string) => {
 
 export const getDashboardPanels = (
   indexPatternId: string,
-  pinnedAgent?: boolean,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }
