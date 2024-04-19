@@ -609,79 +609,6 @@ export const getDashboardPanels = (
     EmbeddableInput & { [k: string]: unknown }
   >;
 } => {
-  const pinnedAgentPanels = {
-    '5': {
-      gridData: {
-        w: 48,
-        h: 13,
-        x: 0,
-        y: 0,
-        i: '5',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '5',
-        savedVis: getVisStateEventsOverTime(indexPatternId),
-      },
-    },
-    '6': {
-      gridData: {
-        w: 10,
-        h: 13,
-        x: 0,
-        y: 13,
-        i: '6',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '6',
-        savedVis: getVisStateTopResponseCode(indexPatternId),
-      },
-    },
-    '7': {
-      gridData: {
-        w: 28,
-        h: 13,
-        x: 10,
-        y: 13,
-        i: '7',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '7',
-        savedVis: getVisStateTopResourceTypeProject(indexPatternId),
-      },
-    },
-    '8': {
-      gridData: {
-        w: 10,
-        h: 13,
-        x: 38,
-        y: 13,
-        i: '8',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '8',
-        savedVis: getVisStateTopProjectIdBySource(indexPatternId),
-      },
-    },
-    '9': {
-      gridData: {
-        w: 16,
-        h: 13,
-        x: 32,
-        y: 26,
-        i: '9',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '9',
-        savedVis: getVisStateTop5Map(indexPatternId),
-      },
-    },
-  };
-
   const panels = {
     '5': {
       gridData: {
@@ -754,6 +681,5 @@ export const getDashboardPanels = (
       },
     },
   };
-
-  return pinnedAgent ? pinnedAgentPanels : panels;
+  return panels;
 };
