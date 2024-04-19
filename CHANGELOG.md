@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added propagation of updates from the table to dashboard visualizations in Endpoints summary [#6460](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6460)
 - Handle index pattern selector on new discover [#6499](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6499)
 - Added macOS log collector tab [#6545](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6545)
+- Add ability to disable the edition of configuration through API endpoints and UI [#6557](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6557)
 
 ### Changed
 
