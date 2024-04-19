@@ -12,6 +12,7 @@
 import audit from './agents-audit';
 import fim from './agents-fim';
 import general from './agents-general';
+import gcp from './agents-gcp';
 import oscap from './agents-oscap';
 import ciscat from './agents-ciscat';
 import pci from './agents-pci';
@@ -32,6 +33,7 @@ export {
   audit,
   fim,
   general,
+  gcp,
   oscap,
   ciscat,
   pci,
