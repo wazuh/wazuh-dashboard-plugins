@@ -860,7 +860,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'configuration.ui_api_editable': {
     title: 'Configuration UI editable',
     description:
-      'Enable or disable the ability to edit the configuration from UI or API endpoints. When disabled, this can only be edited from configuration file, the related API endpoints are disabled, and the UI is inaccesible.',
+      'Enable or disable the ability to edit the configuration from UI or API endpoints. When disabled, this can only be edited from the configuration file, the related API endpoints are disabled, and the UI is inaccesible.',
     store: {
       file: {
         configurableManaged: false,
