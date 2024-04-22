@@ -7,7 +7,11 @@ import useSearchBar from '../../../common/search-bar/use-search-bar';
 import { Filter } from '../../../../../../../src/plugins/data/common';
 import { SampleDataWarning } from '../../../visualize/components';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
-import { ErrorFactory, ErrorHandler, HttpError } from '../../../../react-services/error-management';
+import {
+  ErrorFactory,
+  ErrorHandler,
+  HttpError,
+} from '../../../../react-services/error-management';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { SearchResponse } from '../../../../../../../src/core/server';
@@ -28,7 +32,9 @@ const plugins = getPlugins();
 const SearchBar = getPlugins().data.ui.SearchBar;
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({ pinnedAgent }) => {
+export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
+  pinnedAgent,
+}) => {
   const {
     filters,
     dataSource,
@@ -54,18 +60,26 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({ pinnedAg
     if (isDataSourceLoading) {
       return;
     }
-    fetchData({ query, dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' } })
-      .then((results) => {
+    fetchData({
+      query,
+      dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
+    })
+      .then(results => {
         setResults(results);
       })
-      .catch((error) => {
+      .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: 'Error fetching vulnerabilities',
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query), dateRangeFrom, dateRangeTo]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    dateRangeFrom,
+    dateRangeTo,
+  ]);
 
   return (
     <>
@@ -74,9 +88,9 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({ pinnedAg
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className="wz-search-bar">
+            <div className='wz-search-bar'>
               <SearchBar
-                appName="mitre-detector-searchbar"
+                appName='mitre-detector-searchbar'
                 {...searchBarProps}
                 showQueryInput={true}
                 showQueryBar={true}
@@ -84,17 +98,19 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({ pinnedAg
               />
             </div>
           )}
-          {dataSource && results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
+          {dataSource && results?.hits?.total === 0 ? (
+            <DiscoverNoResults />
+          ) : null}
           {dataSource && results?.hits?.total > 0 ? (
-            <div className="mitre-dashboard-responsive">
+            <div className='mitre-dashboard-responsive'>
               <SampleDataWarning />
-              <div className="mitre-dashboard-filters-wrapper">
+              <div className='mitre-dashboard-filters-wrapper'>
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,
                     panels: getDashboardPanels(
                       dataSource?.id,
-                      dataSource?.getPinnedAgentFilter().length > 0
+                      dataSource?.getPinnedAgentFilter().length > 0,
                     ),
                     isFullScreenMode: false,
                     filters: searchBarProps.filters ?? [],
