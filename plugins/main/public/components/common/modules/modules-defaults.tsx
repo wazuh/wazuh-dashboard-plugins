@@ -12,6 +12,7 @@
 import { Dashboard } from './dashboard';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
+import { MainFim } from '../../agents/fim';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
@@ -26,9 +27,7 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
-import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
-import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -102,17 +101,12 @@ export const ModulesDefaults = {
   fim: {
     init: 'dashboard',
     tabs: [
-      {
-        id: 'dashboard',
-        name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent],
-        component: DashboardFim,
-      },
+      DashboardTab,
       {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonModuleExploreAgent],
-        component: InventoryFim,
+        component: MainFim,
       },
       renderDiscoverTab(DEFAULT_INDEX_PATTERN, fileIntegrityMonitoringColumns),
     ],
