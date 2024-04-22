@@ -12,7 +12,7 @@ import WzManagementConfiguration from '../../../controllers/management/component
 import { getAgentsService } from '../services';
 import { ShareAgent } from '../../../factories/share-agent';
 import { FilterHandler } from '../../../utils/filter-handler';
-import { AppState } from '../../../react-services';
+import { AppState, WzRequest } from '../../../react-services';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import store from '../../../redux/store';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
@@ -33,6 +33,8 @@ export const AgentView = () => {
   const tabVisualizations = new TabVisualizations();
 
   const { agent: agentId } = router.current.params;
+
+  const ignoredTabs = ['syscollector', 'welcome', 'configuration', 'stats'];
 
   const [agent, setAgent] = useState<Agent>();
   const [isLoadingAgent, setIsLoadingAgent] = useState(true);
@@ -124,87 +126,97 @@ export const AgentView = () => {
 
   const switchTab = async (tab: string, force = false) => {
     const timefilter = getDataPlugin().query.timefilter.timefilter;
-    setTab(tab);
+    tabVisualizations.setTab(tab);
     // this.$rootScope.rendered = false;
     // this.$rootScope.$applyAsync();
     // this.falseAllExpand();
-    // if (this.ignoredTabs.includes(tab)) {
-    //   this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
-    //   timefilter.setRefreshInterval({
-    //     pause: true,
-    //     value: 0,
-    //   });
-    // } else if (this.ignoredTabs.includes(this.$scope.tab)) {
-    //   timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
-    // }
-    // // Update agent status
-    // if (!force && this.$scope.agent) {
-    //   try {
-    //     const agentInfo = await WzRequest.apiReq('GET', '/agents', {
-    //       params: {
-    //         agents_list: this.$scope.agent.id,
-    //         select: 'status',
-    //       },
-    //     });
-    //     this.$scope.agent.status =
-    //       agentInfo?.data?.data?.affected_items?.[0]?.status ||
-    //       this.$scope.agent.status;
-    //     this.$scope.$applyAsync();
-    //   } catch (error) {
-    //     throw new Error(error);
-    //   }
-    // }
-    // try {
-    //   if (tab === 'configuration') {
-    //     this.$scope.switchConfigurationTab('welcome');
-    //   } else {
-    //     this.configurationHandler.reset(this.$scope);
-    //   }
-    //   if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
-    //   if (this.tabHistory.length > 2)
-    //     this.tabHistory = this.tabHistory.slice(-2);
-    //   if (this.$scope.tab === tab && !force) {
-    //     this.$scope.$applyAsync();
-    //     return;
-    //   }
-    //   const onlyAgent = this.$scope.tab === tab && force;
-    //   const sameTab = this.$scope.tab === tab;
-    //   this.$location.search('tab', tab);
-    //   const preserveDiscover =
-    //     this.tabHistory.length === 2 &&
-    //     this.tabHistory[0] === this.tabHistory[1] &&
-    //     !force;
-    //   this.$scope.tab = tab;
-    //   const targetSubTab =
-    //     this.targetLocation && typeof this.targetLocation === 'object'
-    //       ? this.targetLocation.subTab
-    //       : 'panels';
-    //   if (!this.ignoredTabs.includes(this.$scope.tab)) {
-    //     this.$scope.switchSubtab(
-    //       targetSubTab,
-    //       true,
-    //       onlyAgent,
-    //       sameTab,
-    //       preserveDiscover,
-    //     );
-    //   }
-    //   this.shareAgent.deleteTargetLocation();
-    //   this.targetLocation = null;
-    //   this.$scope.$applyAsync();
-    // } catch (error) {
-    //   const options = {
-    //     context: `${AgentsController.name}.switchTab`,
-    //     level: UI_LOGGER_LEVELS.ERROR,
-    //     severity: UI_ERROR_SEVERITIES.CRITICAL,
-    //     store: true,
-    //     error: {
-    //       error: error,
-    //       message: error.message || error,
-    //       title: error.message || error,
-    //     },
-    //   };
-    //   getErrorOrchestrator().handleError(options);
-    // }
+    if (ignoredTabs.includes(tab)) {
+      commonData.setRefreshInterval(timefilter.getRefreshInterval());
+      timefilter.setRefreshInterval({
+        pause: true,
+        value: 0,
+      });
+    } else if (ignoredTabs.includes(tab)) {
+      timefilter.setRefreshInterval(commonData.getRefreshInterval());
+    }
+
+    // Update agent status
+    if (!force && agent) {
+      try {
+        const agentInfo = await WzRequest.apiReq('GET', '/agents', {
+          params: {
+            agents_list: agent.id,
+            select: 'status',
+          },
+        });
+        setAgent(agentInfo?.data?.data?.affected_items?.[0]);
+
+        //     this.$scope.$applyAsync();
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
+
+    try {
+      if (tab === 'configuration') {
+        //     this.$scope.switchConfigurationTab('welcome');
+      } else {
+        //     this.configurationHandler.reset(this.$scope);
+      }
+
+      if (!ignoredTabs.includes(tab)) {
+        // this.tabHistory.push(tab);
+      }
+      //   if (this.tabHistory.length > 2)
+      //     this.tabHistory = this.tabHistory.slice(-2);
+
+      //   if (this.$scope.tab === tab && !force) {
+      //     this.$scope.$applyAsync();
+      //     return;
+      //   }
+
+      //   const onlyAgent = this.$scope.tab === tab && force;
+      //   const sameTab = this.$scope.tab === tab;
+      //   this.$location.search('tab', tab);
+      //   const preserveDiscover =
+      //     this.tabHistory.length === 2 &&
+      //     this.tabHistory[0] === this.tabHistory[1] &&
+      //     !force;
+      //   this.$scope.tab = tab;
+
+      //   const targetSubTab =
+      //     this.targetLocation && typeof this.targetLocation === 'object'
+      //       ? this.targetLocation.subTab
+      //       : 'panels';
+
+      //   if (!this.ignoredTabs.includes(this.$scope.tab)) {
+      //     this.$scope.switchSubtab(
+      //       targetSubTab,
+      //       true,
+      //       onlyAgent,
+      //       sameTab,
+      //       preserveDiscover,
+      //     );
+      //   }
+
+      //   this.shareAgent.deleteTargetLocation();
+      //   this.targetLocation = null;
+      //   this.$scope.$applyAsync();
+    } catch (error) {
+      const options = {
+        context: `AgentView.switchTab`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.message || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+
     // this.$scope.configurationTabsProps = {};
     // this.$scope.buildProps = tabs => {
     //   const cleanTabs = [];
@@ -216,6 +228,7 @@ export const AgentView = () => {
     //       x.agent.agentPlatform !== 'linux'
     //     )
     //       return;
+
     //     cleanTabs.push({
     //       id: x.id,
     //       name: x.name,
@@ -232,6 +245,8 @@ export const AgentView = () => {
     //     tabs: cleanTabs,
     //   };
     // };
+
+    // this.setTabs();
   };
 
   // if (error) {

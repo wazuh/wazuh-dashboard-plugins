@@ -80,7 +80,7 @@ import {
   malwareDetection,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { EventsCount } from './EventsCount';
+import { EventsCount } from './dashboard/events-count';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,

@@ -1,21 +1,21 @@
 import React from 'react';
-import { AlertsDataSource } from '../data-source/pattern/alerts/alerts-data-source';
-import { AlertsDataSourceRepository } from '../data-source/pattern/alerts/alerts-data-source-repository';
-import { getPlugins } from '../../../kibana-services';
-import { getDashboardPanels } from './dashboard/dashboard_panels';
-import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
-import { useDataSource } from '../data-source/hooks';
-import { PatternDataSource, tParsedIndexPattern } from '../data-source';
+import { AlertsDataSource } from '../../data-source/pattern/alerts/alerts-data-source';
+import { AlertsDataSourceRepository } from '../../data-source/pattern/alerts/alerts-data-source-repository';
+import { getPlugins } from '../../../../kibana-services';
+import { getDashboardPanels } from './dashboard_panels';
+import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
+import { useDataSource } from '../../data-source/hooks';
+import { PatternDataSource, tParsedIndexPattern } from '../../data-source';
 import {
   EuiPanel,
   EuiFlexItem,
   EuiFlexGroup,
   EuiSpacer,
   EuiText,
-  EuiLoadingChart,
 } from '@elastic/eui';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
-import useSearchBar from '../search-bar/use-search-bar';
+import WzReduxProvider from '../../../../redux/wz-redux-provider';
+import { useTimeFilter } from '../../hooks';
+import { LoadingSpinner } from '../../loading-spinner/loading-spinner';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -29,9 +29,7 @@ export const EventsCount = () => {
     repository: new AlertsDataSourceRepository(),
   });
 
-  const { searchBarProps } = useSearchBar({
-    indexPattern: dataSource?.indexPattern as any,
-  });
+  const { timeFilter } = useTimeFilter();
 
   return (
     <EuiPanel paddingSize='s'>
@@ -46,7 +44,7 @@ export const EventsCount = () => {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='s' />
-        {!isLoading && dataSource && (
+        {!isLoading && dataSource ? (
           <WzReduxProvider>
             <DashboardByRenderer
               input={{
@@ -57,8 +55,8 @@ export const EventsCount = () => {
                 useMargins: true,
                 id: 'agent-events-count-evolution',
                 timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
+                  from: timeFilter.from,
+                  to: timeFilter.to,
                 },
                 title: 'Events count evolution',
                 description: 'Dashboard of Events count evolution',
@@ -72,18 +70,9 @@ export const EventsCount = () => {
               }}
             />
           </WzReduxProvider>
+        ) : (
+          <LoadingSpinner />
         )}
-        {/* </div>
-              <div
-                style={{
-                  display:
-                    this.props.resultState === 'loading' ? 'block' : 'none',
-                  alignSelf: 'center',
-                  paddingTop: 100,
-                }}
-              >
-                <EuiLoadingChart size='xl' />
-              </div> */}
       </EuiFlexItem>
     </EuiPanel>
   );
