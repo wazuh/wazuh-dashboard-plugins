@@ -201,11 +201,13 @@ const DashboardTH: React.FC = () => {
             />
           </div>
         )}
-        {dataSource && results?.hits?.total > 0 ? <SampleDataWarning /> : null}
-        {dataSource && results?.hits?.total === 0 ? (
+        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+          <SampleDataWarning />
+        ) : null}
+        {!isDataSourceLoading && dataSource && results?.hits?.total === 0 ? (
           <DiscoverNoResults />
         ) : null}
-        {dataSource && results?.hits?.total > 0 ? (
+        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
           <div className='th-dashboard-responsive'>
             <DashboardByRenderer
               input={{

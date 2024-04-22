@@ -895,9 +895,83 @@ export const getDashboardPanels = (
   >;
 } => {
   const pinnedAgentPanels = {
-    '5': {
+    '9': {
       gridData: {
         w: 24,
+        h: 13,
+        x: 0,
+        y: 0,
+        i: '9',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '9',
+        savedVis:
+          getVisStatePinnedAgentTop10AlertGroupsEvolution(indexPatternId),
+      },
+    },
+    '10': {
+      gridData: {
+        w: 24,
+        h: 13,
+        x: 24,
+        y: 0,
+        i: '10',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '10',
+        savedVis: getVisStateAlertsAgents(indexPatternId),
+      },
+    },
+    '11': {
+      gridData: {
+        w: 16,
+        h: 13,
+        x: 0,
+        y: 13,
+        i: '11',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '11',
+        savedVis: getVisStateTop5AlertsAgents(indexPatternId),
+      },
+    },
+    '12': {
+      gridData: {
+        w: 16,
+        h: 13,
+        x: 16,
+        y: 13,
+        i: '12',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '12',
+        savedVis: getVisStateTop5RuleGroupsAgents(indexPatternId),
+      },
+    },
+    '13': {
+      gridData: {
+        w: 16,
+        h: 13,
+        x: 32,
+        y: 13,
+        i: '13',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '13',
+        savedVis: getVisStateTop5PCIDSSRequirementsAgents(indexPatternId),
+      },
+    },
+  };
+
+  const panels = {
+    '5': {
+      gridData: {
+        w: 28,
         h: 13,
         x: 0,
         y: 0,
@@ -906,28 +980,27 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '5',
-        savedVis:
-          getVisStatePinnedAgentTop10AlertGroupsEvolution(indexPatternId),
+        savedVis: getVisStateTop10AlertLevelEvolution(indexPatternId),
       },
     },
     '6': {
       gridData: {
-        w: 24,
+        w: 20,
         h: 13,
-        x: 24,
+        x: 28,
         y: 0,
         i: '6',
       },
       type: 'visualization',
       explicitInput: {
         id: '6',
-        savedVis: getVisStateAlertsAgents(indexPatternId),
+        savedVis: getVisStateTop10MITREATTACKS(indexPatternId),
       },
     },
     '7': {
       gridData: {
-        w: 16,
-        h: 13,
+        w: 15,
+        h: 12,
         x: 0,
         y: 13,
         i: '7',
@@ -935,93 +1008,20 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '7',
-        savedVis: getVisStateTop5AlertsAgents(indexPatternId),
+        savedVis: getVisStateTop5Agents(indexPatternId),
       },
     },
     '8': {
       gridData: {
-        w: 16,
-        h: 13,
-        x: 16,
+        w: 33,
+        h: 12,
+        x: 15,
         y: 13,
         i: '8',
       },
       type: 'visualization',
       explicitInput: {
         id: '8',
-        savedVis: getVisStateTop5RuleGroupsAgents(indexPatternId),
-      },
-    },
-    '9': {
-      gridData: {
-        w: 16,
-        h: 13,
-        x: 32,
-        y: 13,
-        i: '9',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '9',
-        savedVis: getVisStateTop5PCIDSSRequirementsAgents(indexPatternId),
-      },
-    },
-  };
-
-  const panels = {
-    '1': {
-      gridData: {
-        w: 28,
-        h: 13,
-        x: 0,
-        y: 0,
-        i: '1',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '1',
-        savedVis: getVisStateTop10AlertLevelEvolution(indexPatternId),
-      },
-    },
-    '2': {
-      gridData: {
-        w: 20,
-        h: 13,
-        x: 28,
-        y: 0,
-        i: '2',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '2',
-        savedVis: getVisStateTop10MITREATTACKS(indexPatternId),
-      },
-    },
-    '3': {
-      gridData: {
-        w: 15,
-        h: 12,
-        x: 0,
-        y: 13,
-        i: '3',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '3',
-        savedVis: getVisStateTop5Agents(indexPatternId),
-      },
-    },
-    '4': {
-      gridData: {
-        w: 33,
-        h: 12,
-        x: 15,
-        y: 13,
-        i: '4',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: '4',
         savedVis: getVisStateAlertEvolutionTop5Agents(indexPatternId),
       },
     },
