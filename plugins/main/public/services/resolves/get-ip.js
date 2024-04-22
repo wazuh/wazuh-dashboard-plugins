@@ -19,6 +19,7 @@ import { getWzConfig } from './get-config';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { StatisticsDataSource } from '../../components/common/data-source/pattern/statistics';
 
 export function getIp($q, $window, $location, wzMisc) {
   const deferred = $q.defer();
@@ -26,9 +27,11 @@ export function getIp($q, $window, $location, wzMisc) {
   const checkWazuhPatterns = async indexPatterns => {
     const wazuhConfig = new WazuhConfig();
     const configuration = await getWzConfig($q, GenericRequest, wazuhConfig);
+    const STATISTICS_PATTERN_IDENTIFIER =
+      StatisticsDataSource.getIdentifierDataSourcePattern();
     const wazuhPatterns = [
       `${configuration['wazuh.monitoring.pattern']}`,
-      `${configuration['cron.prefix']}-${configuration['cron.statistics.index.name']}-*`,
+      STATISTICS_PATTERN_IDENTIFIER,
     ];
     return wazuhPatterns.every(pattern => {
       return indexPatterns.find(element => element.id === pattern);

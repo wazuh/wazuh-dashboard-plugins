@@ -45,7 +45,10 @@ export function getFilterExcludeManager(indexPatternTitle: string) {
  * @param indexPatternTitle
  * @returns
  */
-export function getFilterAllowedAgents(agentsIds: string[], indexPatternTitle: string) {
+export function getFilterAllowedAgents(
+  agentsIds: string[],
+  indexPatternTitle: string,
+) {
   const field = AGENT_ID_KEY;
   return {
     meta: {
@@ -61,7 +64,7 @@ export function getFilterAllowedAgents(agentsIds: string[], indexPatternTitle: s
     },
     query: {
       bool: {
-        should: agentsIds.map((id) => {
+        should: agentsIds.map(id => {
           return {
             match_phrase: {
               [field]: id,
@@ -77,14 +80,16 @@ export function getFilterAllowedAgents(agentsIds: string[], indexPatternTitle: s
   };
 }
 
-export class PatternDataSourceFilterManager implements tDataSourceFilterManager {
+export class PatternDataSourceFilterManager
+  implements tDataSourceFilterManager
+{
   private filterManager: tFilterManager;
   private defaultFetchFilters: tFilter[] = [];
   constructor(
     private dataSource: tDataSource,
     filters: tFilter[] = [],
     filterStorage?: tFilterManager,
-    fetchFilters?: tFilter[]
+    fetchFilters?: tFilter[],
   ) {
     if (!dataSource) {
       throw new Error('Data source is required');
@@ -130,7 +135,10 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
    */
   private getDefaultFilters(filters: tFilter[]) {
     const defaultFilters = filters.length ? filters : this.getFilters();
-    return [...this.getFixedFilters(), ...(this.filterUserFilters(defaultFilters) || [])];
+    return [
+      ...this.getFixedFilters(),
+      ...(this.filterUserFilters(defaultFilters) || []),
+    ];
   }
 
   /**
@@ -145,13 +153,13 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
     if (!filters) return [];
     return this.removeRepeatedFilters(
       filters.filter(
-        (filter) =>
+        filter =>
           !(
             filter?.$state?.['isImplicit'] ||
             filter.meta?.controlledBy ||
             filter.meta?.index !== this.dataSource.id
-          )
-      )
+          ),
+      ),
     ) as tFilter[];
   }
 
@@ -172,7 +180,12 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
    * @returns
    */
   getFilters() {
-    return [...this.filterManager.getFilters()];
+    return [
+      // Filters that do not belong to the dataSource are removed
+      ...this.filterManager
+        .getFilters()
+        .filter(filter => filter.meta?.index === this.dataSource.id),
+    ];
   }
 
   /**
@@ -180,7 +193,9 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
    */
   private removeHiddenFilters(filters: tFilter[]) {
     if (!filters) return filters;
-    return filters.filter((filter) => !filter.meta?.controlledBy?.startsWith('hidden-'));
+    return filters.filter(
+      filter => !filter.meta?.controlledBy?.startsWith('hidden-'),
+    );
   }
 
   /**
@@ -205,7 +220,7 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
     if (!filters) return filters;
     const controlledList: string[] = [];
     const cleanedFilters: tFilter[] = [];
-    filters.forEach((filter) => {
+    filters.forEach(filter => {
       const controlledBy = filter.meta?.controlledBy;
       if (!controlledBy || !controlledList.includes(controlledBy as string)) {
         controlledList.push(controlledBy as string);
@@ -240,14 +255,16 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
   static getClusterManagerFilters(
     indexPatternTitle: string,
     controlledByValue: string,
-    key?: string
+    key?: string,
   ): tFilter[] {
     const filterHandler = new FilterHandler();
     const isCluster = AppState.getClusterInfo().status == 'enabled';
     const managerFilter = filterHandler.managerQuery(
-      isCluster ? AppState.getClusterInfo().cluster : AppState.getClusterInfo().manager,
+      isCluster
+        ? AppState.getClusterInfo().cluster
+        : AppState.getClusterInfo().manager,
       isCluster,
-      key
+      key,
     );
     managerFilter.meta = {
       ...managerFilter.meta,
@@ -305,7 +322,9 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
    */
   static getExcludeManagerFilter(indexPatternTitle: string): tFilter[] {
     if (store.getState().appConfig?.data?.hideManagerAlerts) {
-      let excludeManagerFilter = getFilterExcludeManager(indexPatternTitle) as tFilter;
+      let excludeManagerFilter = getFilterExcludeManager(
+        indexPatternTitle,
+      ) as tFilter;
       return [excludeManagerFilter];
     }
     return [];
@@ -316,9 +335,13 @@ export class PatternDataSourceFilterManager implements tDataSourceFilterManager 
       API server
      */
   static getAllowAgentsFilter(indexPatternTitle: string): tFilter[] {
-    const allowedAgents = store.getState().appStateReducers?.allowedAgents || [];
+    const allowedAgents =
+      store.getState().appStateReducers?.allowedAgents || [];
     if (allowedAgents.length > 0) {
-      const allowAgentsFilter = getFilterAllowedAgents(allowedAgents, indexPatternTitle) as tFilter;
+      const allowAgentsFilter = getFilterAllowedAgents(
+        allowedAgents,
+        indexPatternTitle,
+      ) as tFilter;
       return [allowAgentsFilter];
     }
     return [];
