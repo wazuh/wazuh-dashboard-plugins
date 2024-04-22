@@ -80,6 +80,7 @@ import {
   malwareDetection,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { EventsCount } from './EventsCount';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,
@@ -570,44 +571,7 @@ export const AgentsWelcome = compose(
     }
 
     renderEventCountVisualization() {
-      return (
-        <EuiPanel paddingSize='s'>
-          <EuiFlexItem>
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <h2 className='embPanel__title wz-headline-title'>
-                  <EuiText size='xs'>
-                    <h2>Events count evolution</h2>
-                  </EuiText>
-                </h2>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiSpacer size='s' />
-            <div
-              style={{
-                height: this.props.resultState !== 'loading' ? '350px' : 0,
-              }}
-            >
-              <WzReduxProvider>
-                <KibanaVis
-                  visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                  tab={'welcome'}
-                ></KibanaVis>
-              </WzReduxProvider>
-            </div>
-            <div
-              style={{
-                display:
-                  this.props.resultState === 'loading' ? 'block' : 'none',
-                alignSelf: 'center',
-                paddingTop: 100,
-              }}
-            >
-              <EuiLoadingChart size='xl' />
-            </div>
-          </EuiFlexItem>
-        </EuiPanel>
-      );
+      return <EventsCount />;
     }
 
     renderSCALastScan() {

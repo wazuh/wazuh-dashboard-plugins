@@ -1,0 +1,90 @@
+import React from 'react';
+import { AlertsDataSource } from '../data-source/pattern/alerts/alerts-data-source';
+import { AlertsDataSourceRepository } from '../data-source/pattern/alerts/alerts-data-source-repository';
+import { getPlugins } from '../../../kibana-services';
+import { getDashboardPanels } from './dashboard/dashboard_panels';
+import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
+import { useDataSource } from '../data-source/hooks';
+import { PatternDataSource, tParsedIndexPattern } from '../data-source';
+import {
+  EuiPanel,
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiSpacer,
+  EuiText,
+  EuiLoadingChart,
+} from '@elastic/eui';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
+import useSearchBar from '../search-bar/use-search-bar';
+
+const plugins = getPlugins();
+const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
+
+export const EventsCount = () => {
+  const { dataSource, fetchFilters, isLoading } = useDataSource<
+    tParsedIndexPattern,
+    PatternDataSource
+  >({
+    DataSource: AlertsDataSource,
+    repository: new AlertsDataSourceRepository(),
+  });
+
+  const { searchBarProps } = useSearchBar({
+    indexPattern: dataSource?.indexPattern as any,
+  });
+
+  return (
+    <EuiPanel paddingSize='s'>
+      <EuiFlexItem>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <h2 className='embPanel__title wz-headline-title'>
+              <EuiText size='xs'>
+                <h2>Events count evolution</h2>
+              </EuiText>
+            </h2>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer size='s' />
+        {!isLoading && dataSource && (
+          <WzReduxProvider>
+            <DashboardByRenderer
+              input={{
+                viewMode: ViewMode.VIEW,
+                panels: getDashboardPanels(dataSource?.id),
+                isFullScreenMode: false,
+                filters: fetchFilters ?? [],
+                useMargins: true,
+                id: 'agent-events-count-evolution',
+                timeRange: {
+                  from: searchBarProps.dateRangeFrom,
+                  to: searchBarProps.dateRangeTo,
+                },
+                title: 'Events count evolution',
+                description: 'Dashboard of Events count evolution',
+                // query: {},
+                refreshConfig: {
+                  pause: false,
+                  value: 15,
+                },
+                hidePanelTitles: true,
+                isEmptyState: true,
+              }}
+            />
+          </WzReduxProvider>
+        )}
+        {/* </div>
+              <div
+                style={{
+                  display:
+                    this.props.resultState === 'loading' ? 'block' : 'none',
+                  alignSelf: 'center',
+                  paddingTop: 100,
+                }}
+              >
+                <EuiLoadingChart size='xl' />
+              </div> */}
+      </EuiFlexItem>
+    </EuiPanel>
+  );
+};
