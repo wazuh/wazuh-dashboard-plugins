@@ -69,13 +69,6 @@ export class WzStatisticsOverview extends Component {
         name: 'Analysis Engine',
       },
     ];
-
-    this.info = {
-      remoted:
-        'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
-      analysisd:
-        "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
-    };
   }
 
   async componentDidMount() {
