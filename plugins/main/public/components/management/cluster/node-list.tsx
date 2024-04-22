@@ -58,27 +58,23 @@ export const NodeList = withErrorBoundary(
     render() {
       return (
         <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-                  <EuiToolTip position='right' content='Back to cluster'>
-                    <EuiButtonIcon
-                      aria-label='Back'
-                      style={{ paddingTop: 8 }}
-                      color='primary'
-                      iconSize='l'
-                      iconType='arrowLeft'
-                      onClick={() => this.props.goBack()}
-                    />
-                  </EuiToolTip>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <EuiTitle>
-                    <h1>Cluster nodes</h1>
-                  </EuiTitle>
-                </EuiFlexItem>
-              </EuiFlexGroup>
+          <EuiFlexGroup responsive={false} alignItems='center' gutterSize='s'>
+            <EuiFlexItem grow={false}>
+              <EuiToolTip content='Go back' position='bottom'>
+                <EuiButtonIcon
+                  color='primary'
+                  size='m'
+                  display='empty'
+                  iconType='arrowLeft'
+                  aria-label='Back'
+                  onClick={() => this.props.goBack()}
+                />
+              </EuiToolTip>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiTitle>
+                <h2>Cluster nodes</h2>
+              </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup>
