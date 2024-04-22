@@ -54,9 +54,6 @@ export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = {
   disabled: 'wazuh.manager.name',
 };
 
-// Wazuh fim
-export const WAZUH_FIM_PATTERN = 'wazuh-states-fim';
-
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
