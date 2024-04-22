@@ -16,7 +16,11 @@ import { FilterManager } from '../../../../../../src/plugins/data/public/';
 //@ts-ignore
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components/subrequirements';
-import { getElasticAlerts, getIndexPattern, IFilterParams } from '../../../react-services';
+import {
+  getElasticAlerts,
+  getIndexPattern,
+  IFilterParams,
+} from '../../../react-services';
 import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
@@ -79,9 +83,11 @@ export const ComplianceTable = withAgentSupportModule(
 
     async componentDidMount() {
       this._isMount = true;
-      this.filtersSubscriber = this.filterManager.getUpdates$().subscribe(() => {
-        this.onFiltersUpdated(this.filterManager.getFilters());
-      });
+      this.filtersSubscriber = this.filterManager
+        .getUpdates$()
+        .subscribe(() => {
+          this.onFiltersUpdated(this.filterManager.getFilters());
+        });
       this.indexPattern = await getIndexPattern();
       this.buildComplianceObject();
     }
@@ -97,7 +103,7 @@ export const ComplianceTable = withAgentSupportModule(
         let selectedRequirements = {}; // all enabled by default
         if (this.props.section === 'pci') {
           descriptions = pciRequirementsFile;
-          Object.keys(pciRequirementsFile).forEach((item) => {
+          Object.keys(pciRequirementsFile).forEach(item => {
             const currentRequirement = item.split('.')[0];
             if (complianceRequirements[currentRequirement]) {
               complianceRequirements[currentRequirement].push(item);
@@ -110,7 +116,7 @@ export const ComplianceTable = withAgentSupportModule(
         }
         if (this.props.section === 'gdpr') {
           descriptions = gdprRequirementsFile;
-          Object.keys(gdprRequirementsFile).forEach((item) => {
+          Object.keys(gdprRequirementsFile).forEach(item => {
             const currentRequirement = item.split('_')[0];
             if (complianceRequirements[currentRequirement]) {
               complianceRequirements[currentRequirement].push(item);
@@ -124,9 +130,13 @@ export const ComplianceTable = withAgentSupportModule(
 
         if (this.props.section === 'hipaa') {
           descriptions = hipaaRequirementsFile;
-          Object.keys(hipaaRequirementsFile).forEach((item) => {
+          Object.keys(hipaaRequirementsFile).forEach(item => {
             const currentRequirement =
-              item.split('.')[0] + '.' + item.split('.')[1] + '.' + item.split('.')[2];
+              item.split('.')[0] +
+              '.' +
+              item.split('.')[1] +
+              '.' +
+              item.split('.')[2];
             if (complianceRequirements[currentRequirement]) {
               complianceRequirements[currentRequirement].push(item);
             } else {
@@ -139,7 +149,7 @@ export const ComplianceTable = withAgentSupportModule(
 
         if (this.props.section === 'nist') {
           descriptions = nistRequirementsFile;
-          Object.keys(nistRequirementsFile).forEach((item) => {
+          Object.keys(nistRequirementsFile).forEach(item => {
             const currentRequirement = item.split('.')[0];
             if (complianceRequirements[currentRequirement]) {
               complianceRequirements[currentRequirement].push(item);
@@ -152,7 +162,7 @@ export const ComplianceTable = withAgentSupportModule(
         }
         if (this.props.section === 'tsc') {
           descriptions = tscRequirementsFile;
-          Object.keys(tscRequirementsFile).forEach((item) => {
+          Object.keys(tscRequirementsFile).forEach(item => {
             const currentRequirement = item.split('.')[0];
             if (complianceRequirements[currentRequirement]) {
               complianceRequirements[currentRequirement].push(item);
@@ -171,7 +181,7 @@ export const ComplianceTable = withAgentSupportModule(
               selectedRequirements,
               descriptions,
             },
-            () => this.getRequirementsCount()
+            () => this.getRequirementsCount(),
           );
       } catch (error) {
         const options = {
@@ -190,11 +200,14 @@ export const ComplianceTable = withAgentSupportModule(
       }
     }
 
-    onChangeSelectedRequirements = (selectedRequirements) => {
+    onChangeSelectedRequirements = selectedRequirements => {
       this.setState({ selectedRequirements });
     };
 
-    onQuerySubmit = (payload: { dateRange: TimeRange; query: Query | undefined }) => {
+    onQuerySubmit = (payload: {
+      dateRange: TimeRange;
+      query: Query | undefined;
+    }) => {
       const { dateRange, query } = payload;
       const { filters } = this.state.filterParams;
       const filterParams: IFilterParams = { time: dateRange, filters, query };
@@ -210,7 +223,8 @@ export const ComplianceTable = withAgentSupportModule(
     async componentDidUpdate(prevProps) {
       const { filterParams, loadingAlerts } = this.state;
       if (
-        JSON.stringify(prevProps.filterParams) !== JSON.stringify(filterParams) &&
+        JSON.stringify(prevProps.filterParams) !==
+          JSON.stringify(filterParams) &&
         loadingAlerts
       ) {
         this.getRequirementsCount();
@@ -243,7 +257,7 @@ export const ComplianceTable = withAgentSupportModule(
         const { data, status, statusText } = await getElasticAlerts(
           this.indexPattern,
           filterParams,
-          aggs
+          aggs,
         );
 
         const buckets = data?.aggregations?.tactics?.buckets || [];
@@ -274,7 +288,7 @@ export const ComplianceTable = withAgentSupportModule(
       }
     }
 
-    onChangeFlyout = (flyoutOn) => {
+    onChangeFlyout = flyoutOn => {
       this.setState({ flyoutOn });
     };
 
@@ -295,7 +309,7 @@ export const ComplianceTable = withAgentSupportModule(
         <div>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <div className="wz-discover hide-filter-control">
+              <div className='wz-discover hide-filter-control'>
                 <KbnSearchBar
                   onQuerySubmit={this.onQuerySubmit}
                   onFiltersUpdated={this.onFiltersUpdated}
@@ -307,7 +321,7 @@ export const ComplianceTable = withAgentSupportModule(
 
           <EuiFlexGroup style={{ margin: '0 8px' }}>
             <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
-              <EuiPanel paddingSize="none">
+              <EuiPanel paddingSize='none'>
                 {!!Object.keys(complianceObject).length &&
                   this.state.filterParams.time.from !== 'init' && (
                     <EuiFlexGroup>
@@ -323,7 +337,9 @@ export const ComplianceTable = withAgentSupportModule(
                         <ComplianceRequirements
                           indexPattern={this.indexPattern}
                           section={this.props.section}
-                          onChangeSelectedRequirements={this.onChangeSelectedRequirements}
+                          onChangeSelectedRequirements={
+                            this.onChangeSelectedRequirements
+                          }
                           {...this.state}
                         />
                       </EuiFlexItem>
@@ -332,7 +348,9 @@ export const ComplianceTable = withAgentSupportModule(
                           indexPattern={this.indexPattern}
                           filters={this.state.filterParams}
                           section={this.props.section}
-                          onSelectedTabChanged={(id) => this.props.onSelectedTabChanged(id)}
+                          onSelectedTabChanged={id =>
+                            this.props.onSelectedTabChanged(id)
+                          }
                           {...this.state}
                         />
                       </EuiFlexItem>
@@ -344,5 +362,5 @@ export const ComplianceTable = withAgentSupportModule(
         </div>
       );
     }
-  }
+  },
 );

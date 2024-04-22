@@ -14,7 +14,10 @@ import { I18nProvider } from '@osd/i18n/react';
 import { Tactics, Techniques } from './components';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
-import { Query, IndexPattern } from '../../../../../../../src/plugins/data/common';
+import {
+  Query,
+  IndexPattern,
+} from '../../../../../../../src/plugins/data/common';
 import { getPlugins } from '../../../../kibana-services';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -51,7 +54,7 @@ type tMitreState = {
   selectedTactics: Object;
 };
 
-const MitreComponent = (props) => {
+const MitreComponent = props => {
   const { onSelectedTabChanged } = props;
   const {
     filters,
@@ -119,7 +122,7 @@ const MitreComponent = (props) => {
       const result = (((data || {}).data || {}).data || {}).affected_items;
       const tacticsObject = {};
       result &&
-        result.forEach((item) => {
+        result.forEach(item => {
           tacticsObject[item.name] = item;
         });
       setMitreState({ ...mitreState, tacticsObject });
@@ -143,7 +146,7 @@ const MitreComponent = (props) => {
     }
   };
 
-  const onChangeSelectedTactics = (selectedTactics) => {
+  const onChangeSelectedTactics = selectedTactics => {
     setMitreState({ ...mitreState, selectedTactics });
   };
 
@@ -159,9 +162,9 @@ const MitreComponent = (props) => {
             {isDataSourceLoading && !dataSource ? (
               <LoadingSpinner />
             ) : (
-              <div className="wz-discover hide-filter-control wz-search-bar">
+              <div className='wz-discover hide-filter-control wz-search-bar'>
                 <SearchBar
-                  appName="vulnerability-detector-searchbar"
+                  appName='mitre-attack-searchbar'
                   {...searchBarProps}
                   showQueryInput={true}
                   showQueryBar={true}
@@ -173,7 +176,7 @@ const MitreComponent = (props) => {
         </EuiFlexGroup>
         <EuiFlexGroup style={flexGroupStyle}>
           <EuiFlexItem>
-            <EuiPanel paddingSize="none">
+            <EuiPanel paddingSize='none'>
               <EuiFlexGroup>
                 <EuiFlexItem
                   grow={false}
@@ -197,7 +200,7 @@ const MitreComponent = (props) => {
                   <Techniques
                     indexPatternId={indexPattern?.id}
                     filterParams={filterParams}
-                    onSelectedTabChanged={(id) => onSelectedTabChanged(id)}
+                    onSelectedTabChanged={id => onSelectedTabChanged(id)}
                     tacticsObject={mitreState.tacticsObject}
                     selectedTactics={mitreState.selectedTactics}
                     fetchData={fetchData}

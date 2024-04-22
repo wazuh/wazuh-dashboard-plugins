@@ -10,5 +10,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-//export { Mitre, ITactic } from './mitre';
 export { Mitre, ITactic } from './mitre';

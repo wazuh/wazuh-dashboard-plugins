@@ -16,12 +16,20 @@ import {
 } from '../../../../../../../../../src/plugins/data/common';
 
 import { AppState } from '../../../../../../react-services/app-state';
-import { getIndexPattern, getElasticAlerts, IFilterParams } from '../../../../../../react-services';
+import {
+  getIndexPattern,
+  getElasticAlerts,
+  IFilterParams,
+} from '../../../../../../react-services';
 
 function createFilters(indexPattern, agentId, tactic: string | undefined) {
-  const filter = (filter) => {
+  const filter = filter => {
     return {
-      ...buildPhraseFilter({ name: filter.name, type: 'text' }, filter.value, indexPattern),
+      ...buildPhraseFilter(
+        { name: filter.name, type: 'text' },
+        filter.value,
+        indexPattern,
+      ),
       $state: { store: 'appState' },
     };
   };
@@ -35,14 +43,20 @@ function createFilters(indexPattern, agentId, tactic: string | undefined) {
 }
 
 function createExistsFilter(indexPattern) {
-  return buildExistsFilter({ name: `rule.mitre.id`, type: 'nested' }, indexPattern);
+  return buildExistsFilter(
+    { name: `rule.mitre.id`, type: 'nested' },
+    indexPattern,
+  );
 }
 
 function getWazuhFilter() {
   const clusterInfo = AppState.getClusterInfo();
   const wazuhFilter = {
     name: clusterInfo.status === 'enabled' ? 'cluster.name' : 'manager.name',
-    value: clusterInfo.status === 'enabled' ? clusterInfo.cluster : clusterInfo.manager,
+    value:
+      clusterInfo.status === 'enabled'
+        ? clusterInfo.cluster
+        : clusterInfo.manager,
   };
   return wazuhFilter;
 }
@@ -50,7 +64,10 @@ function getWazuhFilter() {
 export async function getMitreCount(agentId, time, tactic: string | undefined) {
   const indexPattern = await getIndexPattern();
   const filterParams: IFilterParams = {
-    filters: [...createFilters(indexPattern, agentId, tactic), createExistsFilter(indexPattern)],
+    filters: [
+      ...createFilters(indexPattern, agentId, tactic),
+      createExistsFilter(indexPattern),
+    ],
     query: { query: '', language: 'kuery' },
     time,
   };
@@ -65,5 +82,8 @@ export async function getMitreCount(agentId, time, tactic: string | undefined) {
   const response = await getElasticAlerts(indexPattern, filterParams, args, {
     size: 0,
   });
-  return ((((response || {}).data || {}).aggregations || {}).tactics || {}).buckets || [];
+  return (
+    ((((response || {}).data || {}).aggregations || {}).tactics || {})
+      .buckets || []
+  );
 }
