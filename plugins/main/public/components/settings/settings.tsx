@@ -45,7 +45,6 @@ export class Settings extends React.Component {
     load: boolean;
     loadingLogs: boolean;
     settingsTabsProps?;
-    apiTableProps?;
     currentApiEntryIndex;
     indexPatterns;
     apiEntries;
@@ -63,6 +62,7 @@ export class Settings extends React.Component {
   googleGroupsSVG;
   currentDefault;
   appInfo;
+  urlTabRegex;
 
   constructor(props) {
     super(props);
@@ -78,7 +78,7 @@ export class Settings extends React.Component {
       window.sessionStorage.removeItem('healthCheck');
       this.wzMisc.setWizard(false);
     }
-
+    this.urlTabRegex = new RegExp('tab=' + '[^&]*');
     this.tabNames = TabNames;
     this.apiIsDown = this.wzMisc.getApiIsDown();
     this.state = {
@@ -104,9 +104,15 @@ export class Settings extends React.Component {
    * @returns string
    */
   _getTabFromUrl() {
-    const regex = new RegExp('tab=' + '[^&]*');
-    const match = window.location.href.match(regex);
+    const match = window.location.href.match(this.urlTabRegex);
     return match?.[0]?.split('=')?.[1] ?? '';
+  }
+
+  _setTabFromUrl(tab?) {
+    window.location.href = window.location.href.replace(
+      this.urlTabRegex,
+      tab ? `tab=${tab}` : '',
+    );
   }
 
   componentDidMount(): void {
@@ -117,10 +123,9 @@ export class Settings extends React.Component {
    */
   async onInit() {
     try {
-      const tab = this._getTabFromUrl();
+      const urlTab = this._getTabFromUrl();
 
-      if (tab) {
-        this.setState({ tab });
+      if (urlTab) {
         const tabActiveName = Applications.find(
           ({ id }) => getWzCurrentAppID() === id,
         ).breadcrumbLabel;
@@ -132,7 +137,8 @@ export class Settings extends React.Component {
       }
 
       // Set component props
-      this.setComponentProps();
+      this.setComponentProps(urlTab);
+
       // Loading data
       await this.getSettings();
 
@@ -156,27 +162,12 @@ export class Settings extends React.Component {
   /**
    * Sets the component props
    */
-  setComponentProps() {
-    const apiTableProps = {
-      currentDefault: this.currentDefault,
-      apiEntries: this.state.apiEntries,
-      compressed: true,
-      setDefault: entry => this.setDefault(entry),
-      checkManager: entry => this.checkManager(entry),
-      getHosts: () => this.getHosts(),
-      testApi: (entry, force) => ApiCheck.checkApi(entry, force),
-      copyToClipBoard: msg => this.copyToClipBoard(msg),
-    };
-
-    const addApiProps = {
-      closeAddApi: () => this.closeAddApi(),
-    };
-
+  setComponentProps(currentTab = 'api') {
     const settingsTabsProps = {
       clickAction: tab => {
-        this.switchTab(tab, true);
+        this.switchTab(tab);
       },
-      selectedTab: this.state.tab || 'api',
+      selectedTab: currentTab,
       // Define tabs for Wazuh plugin settings application
       tabs:
         getWzCurrentAppID() === appSettings.id ? this.tabsConfiguration : null,
@@ -184,8 +175,7 @@ export class Settings extends React.Component {
     };
 
     this.setState({
-      apiTableProps,
-      addApiProps,
+      tab: currentTab,
       settingsTabsProps,
     });
   }
@@ -195,10 +185,8 @@ export class Settings extends React.Component {
    * @param {Object} tab
    */
   switchTab(tab) {
-    const regex = new RegExp('tab=' + '[^&]*');
     this.setState({ tab });
-    window.location.href = window.location.href.replace(regex, `tab=${tab}`);
-    // location?.search('tab', this.tab);
+    this._setTabFromUrl(tab);
   }
 
   // Get current API index
@@ -225,7 +213,7 @@ export class Settings extends React.Component {
    * @param {Object} api
    */
   getApiIndex(api) {
-    return this.apiEntries.map(entry => entry.id).indexOf(api.id);
+    return this.state.apiEntries.map(entry => entry.id).indexOf(api.id);
   }
 
   /**
@@ -234,10 +222,10 @@ export class Settings extends React.Component {
   async checkApisStatus() {
     try {
       let numError = 0;
-      for (let idx in this.apiEntries) {
+      for (let idx in this.state.apiEntries) {
         try {
-          await this.checkManager(this.apiEntries[idx], false, true);
-          this.apiEntries[idx].status = 'online';
+          await this.checkManager(this.state.apiEntries[idx], false, true);
+          this.state.apiEntries[idx].status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
           const downReason =
@@ -247,9 +235,9 @@ export class Settings extends React.Component {
                 ((error || {}).data || {}).message ||
                 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
-          this.apiEntries[idx].status = { status, downReason };
+          this.state.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
-          if (this.apiEntries[idx].id === this.currentDefault) {
+          if (this.state.apiEntries[idx].id === this.currentDefault) {
             // if the selected API is down, we remove it so a new one will selected
             AppState.removeCurrentAPI();
           }
@@ -290,11 +278,8 @@ export class Settings extends React.Component {
         }),
       );
 
-      // this.$scope.$emit('updateAPI', {}); CHECK THIS
-
       const currentApi = AppState.getCurrentAPI();
       this.currentDefault = JSON.parse(currentApi).id;
-      this.state.apiTableProps.currentDefault = this.currentDefault;
       const idApi = api.id;
 
       ErrorHandler.info(`API with id ${idApi} set as default`);
@@ -321,12 +306,13 @@ export class Settings extends React.Component {
   async getSettings() {
     try {
       try {
-        this.indexPatterns =
-          await SavedObject.getListOfWazuhValidIndexPatterns();
+        this.setState({
+          indexPatterns: await SavedObject.getListOfWazuhValidIndexPatterns(),
+        });
       } catch (error) {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-        location?.search('tab', null);
-        location?.path('/blank-screen');
+        this._setTabFromUrl(null);
+        location.hash = '#/blank-screen';
         return;
       }
 
@@ -338,8 +324,6 @@ export class Settings extends React.Component {
         const { id } = JSON.parse(currentApi);
         this.currentDefault = id;
       }
-
-      this.state.apiTableProps.currentDefault = this.currentDefault;
       this.getCurrentAPIIndex();
 
       if (
@@ -365,7 +349,7 @@ export class Settings extends React.Component {
   }
 
   // Check manager connectivity
-  async checkManager(item, isIndex, silent = false) {
+  async checkManager(item, isIndex?, silent = false) {
     try {
       // Get the index of the API in the entries
       const index = isIndex ? item : this.getApiIndex(item);
@@ -387,7 +371,6 @@ export class Settings extends React.Component {
       tmpData.cluster_info = data?.data;
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry
-      // this.$scope.$emit('updateAPI', { cluster_info }); <---- CHECK THIS
       this.state.apiEntries[index].cluster_info = cluster_info;
       this.state.apiEntries[index].status = 'online';
       this.state.apiEntries[index].allow_run_as = data?.data.allow_run_as;
@@ -448,7 +431,6 @@ export class Settings extends React.Component {
       ) {
         await this.checkManager(this.state.currentApiEntryIndex, true, true);
       }
-      // this.$scope.$applyAsync();
     } catch (error) {
       AppState.removeNavigation();
       const options = {
@@ -474,7 +456,6 @@ export class Settings extends React.Component {
       const hosts = result.data || [];
       this.setState({
         apiEntries: hosts,
-        apiTableProps: { ...this.state.apiTableProps, apiEntries: hosts },
       });
       return hosts;
     } catch (error) {
@@ -506,12 +487,10 @@ export class Settings extends React.Component {
         ) : null}
         {/* It must get renderized only in configuration app to show Miscellaneous tab in configuration App */}
         {!this.state.load &&
-        this.state.settingsTabsProps &&
         !this.apiIsDown &&
-        this.state.apiTableProps.apiEntries.length &&
-        this.state.settingsTabsProps.tabs ? (
+        this.state.settingsTabsProps?.tabs ? (
           <div className='wz-margin-top-16 md-margin-h'>
-            <Tabs props={{ ...this.state.settingsTabsProps }} />
+            <Tabs {...this.state.settingsTabsProps} />
           </div>
         ) : null}
         {/* end head */}
@@ -521,7 +500,7 @@ export class Settings extends React.Component {
           <div>
             {/* API table section */}
             <div>
-              <ApiTable props={{ ...this.state.apiTableProps }} />
+              <ApiTable />
             </div>
           </div>
         ) : null}
@@ -531,9 +510,7 @@ export class Settings extends React.Component {
         {/* configuration */}
         {this.state.tab === 'configuration' && !this.state.load ? (
           <div>
-            <WzConfigurationSettings
-              props={{ ...this.state.settingsTabsProps }}
-            />
+            <WzConfigurationSettings />
           </div>
         ) : null}
         {/* end configuration */}
