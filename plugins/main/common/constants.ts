@@ -54,9 +54,6 @@ export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = {
   disabled: 'wazuh.manager.name',
 };
 
-// Wazuh fim
-export const WAZUH_FIM_PATTERN = 'wazuh-states-fim';
-
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
@@ -230,7 +227,6 @@ export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
 export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP = 'vulnerabilities-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE = 'mitre-attack-rule';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID = 'hidden-mitre-attack-rule-id';
-
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
 export const WAZUH_LINK_GOOGLE_GROUPS =
