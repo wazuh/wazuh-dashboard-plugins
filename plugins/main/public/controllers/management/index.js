@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ClusterController } from './monitoring';
 import WzManagement from './components/management/management-provider';
 import WzManagementConfiguration from './components/management/configuration/configuration-main';
 import { getAngularModule } from '../../kibana-services';
@@ -20,6 +19,5 @@ WzManagement.displayName = 'WzManagement';
 WzManagementConfiguration.displayName = 'WzManagementConfiguration';
 
 app
-  .controller('clusterController', ClusterController)
   .value('WzManagement', WzManagement)
   .value('WzManagementConfiguration', WzManagementConfiguration);

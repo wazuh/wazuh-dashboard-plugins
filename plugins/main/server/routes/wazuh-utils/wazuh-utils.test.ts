@@ -121,18 +121,15 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
     context.wazuh_core.configuration._settings = new Map();
     context.wazuh_core.configuration._settings.set('pattern', {
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.string(),
     });
     context.wazuh_core.configuration._settings.set('hosts', {
       isConfigurableFromSettings: true,
     });
     context.wazuh_core.configuration._settings.set('timeout', {
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.number(),
     });
     context.wazuh_core.configuration._settings.set('cron.statistics.apis', {
       isConfigurableFromSettings: true,
-      validateBackend: schema => schema.arrayOf(schema.string()),
     });
   });
 
