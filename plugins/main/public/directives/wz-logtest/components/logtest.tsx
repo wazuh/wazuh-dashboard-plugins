@@ -49,7 +49,7 @@ type LogstestProps = {
 export const Logtest = compose(
   withErrorBoundary,
   withReduxProvider,
-  withUserAuthorizationPrompt([{ action: 'logtest:run', resource: `*:*:*` }]),
+  withUserAuthorizationPrompt([{ action: 'logtest:run', resource: '*:*:*' }]),
 )((props: LogstestProps) => {
   const [events, setEvents] = useState([]);
   const [testing, setTesting] = useState(false);
@@ -336,22 +336,7 @@ export const Logtest = compose(
             </EuiFlexGroup>
           </EuiPanel>
         </EuiPage>
-      )) /*|| (
-        <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={() => props.openCloseFlyout()}>
-          <EuiFlyoutHeader hasBorder={false}>
-            <EuiTitle size="m">
-              {props.isRuleset.includes('rules') ? <h2>Ruleset Test</h2> : <h2>Decoders Test</h2>}
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody style={{ margin: '20px' }}>
-            <EuiFlexGroup gutterSize="m">
-              <EuiFlexItem />
-            </EuiFlexGroup>
-            <EuiSpacer size="s" />
-            {buildLogtest()}
-          </EuiFlyoutBody>
-        </WzFlyout>
-      )*/ || (
+      )) || (
         <>
           <EuiFlexGroup gutterSize='m'>
             <EuiFlexItem />
@@ -363,5 +348,3 @@ export const Logtest = compose(
     </Fragment>
   );
 });
-
-//TODO: add `wzApp` className to the flyout or research if needed
