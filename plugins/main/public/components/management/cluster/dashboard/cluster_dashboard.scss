@@ -1,0 +1,21 @@
+.ct-dashboard-responsive {
+  margin: 0 -8px;
+  @media (max-width: 767px) {
+    .react-grid-layout {
+      height: auto !important;
+    }
+    .dshLayout-isMaximizedPanel {
+      height: 100% !important;
+    }
+  }
+}
+
+.cluster-descriptionList-title {
+  width: 25% !important;
+  margin-top: 8px !important;
+}
+
+.cluster-descriptionList-description {
+  width: 75% !important;
+  margin-top: 8px !important;
+}
