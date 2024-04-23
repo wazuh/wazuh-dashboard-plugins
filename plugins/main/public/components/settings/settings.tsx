@@ -373,7 +373,7 @@ export class Settings extends React.Component {
       // Updates the cluster-information in the registry
       this.state.apiEntries[index].cluster_info = cluster_info;
       this.state.apiEntries[index].status = 'online';
-      this.state.apiEntries[index].allow_run_as = data?.data.allow_run_as;
+      this.state.apiEntries[index].allow_run_as = data.data.allow_run_as;
       this.wzMisc.setApiIsDown(false);
       !silent && ErrorHandler.info('Connection success', 'Settings');
     } catch (error) {
