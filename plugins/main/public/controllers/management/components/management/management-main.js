@@ -85,6 +85,7 @@ export const ManagementRouter = compose(
   withReduxProvider,
   withGuardAsync(
     () => {
+      // This uses AngularJS to get the tab query parameter
       const section = getAngularModule()
         .$injector.get('$location')
         .search().tab;
