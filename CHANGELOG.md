@@ -41,7 +41,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed API endpoint GET /api/timestamp [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Removed API endpoint PUT /api/update-hostname/{id} [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Removed API endpoint DELETE /hosts/remove-orphan-entries [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
-- Remove AngularJS function `click-action` [#6613](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6613)
+- Remove AngularJS component `click-action` [#6613](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6613)
 
 ## Wazuh v4.8.2 - OpenSearch Dashboards 2.10.0 - Revision 00
 
