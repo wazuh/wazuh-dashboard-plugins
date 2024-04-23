@@ -14,7 +14,7 @@ exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
         <h2
           class="euiTitle euiTitle--medium"
         >
-          Welcome to the Wazuh dashboard
+          Welcome to the dashboard
         </h2>
         <div
           class="euiSpacer euiSpacer--l"
@@ -23,8 +23,7 @@ exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
           class="euiText euiText--medium"
         >
           <p>
-            Wazuh dashboard
-             provides management and monitoring capabilities, giving users control over the Wazuh infrastructure. You can monitor your agents status and configuration, query and visualize your alert data and monitor manager rules and configuration.
+            Dashboard provides management and monitoring capabilities, giving users control over the infrastructure. You can monitor your agents status and configuration, query and visualize your alert data and monitor manager rules and configuration.
           </p>
         </div>
       </div>
@@ -48,7 +47,7 @@ exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
             class="euiText euiText--medium"
           >
             <p>
-              Enjoy your Wazuh experience and please don't hesitate to give us your feedback.
+              Enjoy your experience and please don't hesitate to give us your feedback.
             </p>
           </div>
           <div

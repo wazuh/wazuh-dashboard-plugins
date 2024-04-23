@@ -12,6 +12,7 @@
 import { Dashboard } from './dashboard';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
+import { MainFim } from '../../agents/fim';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
@@ -20,11 +21,12 @@ import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { withModuleNotForAgent } from '../hocs';
-import { WazuhDiscover } from '../wazuh-discover/wz-discover';
+import {
+  WazuhDiscover,
+  WazuhDiscoverProps,
+} from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
-import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
-import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -42,7 +44,7 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
-import { withVulnerabilitiesStateDataSource } from '../../overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { AlertsVulnerabilitiesDataSource } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -54,14 +56,13 @@ const DashboardTab = {
   component: Dashboard,
 };
 
-const renderDiscoverTab = (columns, indexPattern) => {
+const renderDiscoverTab = (props: WazuhDiscoverProps) => {
+  const { DataSource, tableColumns } = props;
   return {
     id: 'events',
     name: 'Events',
     buttons: [ButtonModuleExploreAgent],
-    component: () => (
-      <WazuhDiscover defaultIndexPattern={indexPattern} tableColumns={columns} />
-    ),
+    component: () => <WazuhDiscover {...props} />,
   };
 };
 
@@ -73,7 +74,7 @@ const RegulatoryComplianceTabs = columns => [
     buttons: [ButtonModuleExploreAgent],
     component: ComplianceTable,
   },
-  renderDiscoverTab(columns),
+  renderDiscoverTab(DEFAULT_INDEX_PATTERN, columns),
 ];
 
 export const ModulesDefaults = {
@@ -81,26 +82,21 @@ export const ModulesDefaults = {
     init: 'events',
     tabs: [
       DashboardTab,
-      renderDiscoverTab(threatHuntingColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
   fim: {
     init: 'dashboard',
     tabs: [
-      {
-        id: 'dashboard',
-        name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent],
-        component: DashboardFim,
-      },
+      DashboardTab,
       {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonModuleExploreAgent],
-        component: InventoryFim,
+        component: MainFim,
       },
-      renderDiscoverTab(fileIntegrityMonitoringColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, fileIntegrityMonitoringColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -108,7 +104,7 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       DashboardTab,
-      renderDiscoverTab(amazonWebServicesColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, amazonWebServicesColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -116,7 +112,7 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       DashboardTab,
-      renderDiscoverTab(googleCloudColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, googleCloudColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -144,7 +140,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
-      renderDiscoverTab(configurationAssessmentColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, configurationAssessmentColumns),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
@@ -165,11 +161,9 @@ export const ModulesDefaults = {
         component: withModuleNotForAgent(OfficePanel),
       },
       {
-        ...renderDiscoverTab(office365Columns),
+        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
         component: withModuleNotForAgent(() => (
-          <WazuhDiscover
-            tableColumns={office365Columns}
-          />
+          <WazuhDiscover tableColumns={office365Columns} />
         )),
       },
     ],
@@ -185,7 +179,7 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: GitHubPanel,
       },
-      renderDiscoverTab(githubColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -220,14 +214,10 @@ export const ModulesDefaults = {
           ),
         ],
       },
-      {
-        ...renderDiscoverTab(vulnerabilitiesColumns),
-        component: withVulnerabilitiesStateDataSource(() => (
-          <WazuhDiscover
-            tableColumns={vulnerabilitiesColumns}
-          />
-        )),
-      },
+      renderDiscoverTab({
+        tableColumns: vulnerabilitiesColumns,
+        DataSource: AlertsVulnerabilitiesDataSource,
+      }),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
@@ -263,7 +253,7 @@ export const ModulesDefaults = {
     init: 'dashboard',
     tabs: [
       DashboardTab,
-      renderDiscoverTab(dockerColumns),
+      renderDiscoverTab(DEFAULT_INDEX_PATTERN, dockerColumns),
     ],
     availableFor: ['manager', 'agent'],
   },
