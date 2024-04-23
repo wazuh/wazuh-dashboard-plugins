@@ -81,7 +81,6 @@ const getVisStateEventsCountEvolution = (indexPatternId: string) => ({
         language: 'kuery',
         query: '',
       },
-      filter: [],
       index: indexPatternId,
     },
     references: [

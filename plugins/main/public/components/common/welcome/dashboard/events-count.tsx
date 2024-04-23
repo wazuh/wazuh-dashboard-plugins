@@ -13,7 +13,6 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
-import WzReduxProvider from '../../../../redux/wz-redux-provider';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSpinner } from '../../loading-spinner/loading-spinner';
 
@@ -21,10 +20,11 @@ const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 export const EventsCount = () => {
-  const { dataSource, fetchFilters, isLoading } = useDataSource<
-    tParsedIndexPattern,
-    PatternDataSource
-  >({
+  const {
+    dataSource,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: AlertsDataSource,
     repository: new AlertsDataSourceRepository(),
   });
@@ -44,32 +44,29 @@ export const EventsCount = () => {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='s' />
-        {!isLoading && dataSource ? (
-          <WzReduxProvider>
-            <DashboardByRenderer
-              input={{
-                viewMode: ViewMode.VIEW,
-                panels: getDashboardPanels(dataSource?.id),
-                isFullScreenMode: false,
-                filters: fetchFilters ?? [],
-                useMargins: true,
-                id: 'agent-events-count-evolution',
-                timeRange: {
-                  from: timeFilter.from,
-                  to: timeFilter.to,
-                },
-                title: 'Events count evolution',
-                description: 'Dashboard of Events count evolution',
-                // query: {},
-                refreshConfig: {
-                  pause: false,
-                  value: 15,
-                },
-                hidePanelTitles: true,
-                isEmptyState: true,
-              }}
-            />
-          </WzReduxProvider>
+        {!isDataSourceLoading && dataSource ? (
+          <DashboardByRenderer
+            input={{
+              viewMode: ViewMode.VIEW,
+              panels: getDashboardPanels(dataSource?.id),
+              isFullScreenMode: false,
+              filters: fetchFilters ?? [],
+              useMargins: true,
+              id: 'agent-events-count-evolution',
+              timeRange: {
+                from: timeFilter.from,
+                to: timeFilter.to,
+              },
+              title: 'Events count evolution',
+              description: 'Dashboard of Events count evolution',
+              // query: {},
+              refreshConfig: {
+                pause: false,
+                value: 15,
+              },
+              hidePanelTitles: true,
+            }}
+          />
         ) : (
           <LoadingSpinner />
         )}

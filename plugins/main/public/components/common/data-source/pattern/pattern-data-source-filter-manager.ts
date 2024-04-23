@@ -257,7 +257,7 @@ export class PatternDataSourceFilterManager
       isCluster
         ? AppState.getClusterInfo().cluster
         : AppState.getClusterInfo().manager,
-      true,
+      isCluster,
       key,
     );
     managerFilter.meta = {
