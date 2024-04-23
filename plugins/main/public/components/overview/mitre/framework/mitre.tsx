@@ -162,7 +162,7 @@ const MitreComponent = props => {
             {isDataSourceLoading && !dataSource ? (
               <LoadingSpinner />
             ) : (
-              <div className='wz-discover hide-filter-control wz-search-bar'>
+              <div className='wz-search-bar hide-filter-control'>
                 <SearchBar
                   appName='mitre-attack-searchbar'
                   {...searchBarProps}
