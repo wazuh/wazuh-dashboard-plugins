@@ -201,117 +201,117 @@ const DashboardTH: React.FC = () => {
             />
           </div>
         )}
-        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-          <SampleDataWarning />
-        ) : null}
         {!isDataSourceLoading && dataSource && results?.hits?.total === 0 ? (
           <DiscoverNoResults />
         ) : null}
         {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-          <div className='th-dashboard-responsive'>
-            <DashboardByRenderer
-              input={{
-                viewMode: ViewMode.VIEW,
-                panels: getKPIsPanel(dataSource?.id),
-                isFullScreenMode: false,
-                filters: fetchFilters ?? [],
-                useMargins: true,
-                id: 'kpis-th-dashboard-tab',
-                timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
-                },
-                title: 'KPIs Threat Hunting dashboard',
-                description: 'KPIs Dashboard of the Threat Hunting',
-                query: searchBarProps.query,
-                refreshConfig: {
-                  pause: false,
-                  value: 15,
-                },
-                hidePanelTitles: true,
-              }}
-            />
-            <DashboardByRenderer
-              input={{
-                viewMode: ViewMode.VIEW,
-                panels: getDashboardPanels(dataSource?.id, pinnedAgent),
-                isFullScreenMode: false,
-                filters: fetchFilters ?? [],
-                useMargins: true,
-                id: 'th-dashboard-tab',
-                timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
-                },
-                title: 'Threat Hunting dashboard',
-                description: 'Dashboard of the Threat Hunting',
-                query: searchBarProps.query,
-                refreshConfig: {
-                  pause: false,
-                  value: 15,
-                },
-                hidePanelTitles: false,
-              }}
-            />
-            <EuiDataGrid
-              {...dataGridProps}
-              className={sideNavDocked ? 'dataGridDockedNav' : ''}
-              toolbarVisibility={{
-                additionalControls: (
-                  <>
-                    <HitsCounter
-                      hits={results?.hits?.total}
-                      showResetButton={false}
-                      onResetQuery={() => {}}
-                      tooltip={
-                        results?.hits?.total &&
-                        results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                          ? {
-                              ariaLabel: 'Warning',
-                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                MAX_ENTRIES_PER_QUERY,
-                              )} hits.`,
-                              iconType: 'alert',
-                              position: 'top',
-                            }
-                          : undefined
-                      }
-                    />
-                    <EuiButtonEmpty
-                      disabled={
-                        results?.hits?.total === 0 ||
-                        !columnVisibility?.visibleColumns?.length
-                      }
-                      size='xs'
-                      iconType='exportAction'
-                      color='primary'
-                      isLoading={isExporting}
-                      className='euiDataGrid__controlBtn'
-                      onClick={onClickExportResults}
-                    >
-                      Export Formated
-                    </EuiButtonEmpty>
-                  </>
-                ),
-              }}
-            />
-            {inspectedHit && (
-              <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-                <EuiFlyoutHeader>
-                  <EuiTitle>
-                    <h2>Document details</h2>
-                  </EuiTitle>
-                </EuiFlyoutHeader>
-                <EuiFlyoutBody>
-                  <EuiFlexGroup direction='column'>
-                    <EuiFlexItem>
-                      <DocViewer {...docViewerProps} />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiFlyoutBody>
-              </EuiFlyout>
-            )}
-          </div>
+          <>
+            <SampleDataWarning />
+            <div className='th-dashboard-responsive'>
+              <DashboardByRenderer
+                input={{
+                  viewMode: ViewMode.VIEW,
+                  panels: getKPIsPanel(dataSource?.id),
+                  isFullScreenMode: false,
+                  filters: fetchFilters ?? [],
+                  useMargins: true,
+                  id: 'kpis-th-dashboard-tab',
+                  timeRange: {
+                    from: searchBarProps.dateRangeFrom,
+                    to: searchBarProps.dateRangeTo,
+                  },
+                  title: 'KPIs Threat Hunting dashboard',
+                  description: 'KPIs Dashboard of the Threat Hunting',
+                  query: searchBarProps.query,
+                  refreshConfig: {
+                    pause: false,
+                    value: 15,
+                  },
+                  hidePanelTitles: true,
+                }}
+              />
+              <DashboardByRenderer
+                input={{
+                  viewMode: ViewMode.VIEW,
+                  panels: getDashboardPanels(dataSource?.id, pinnedAgent),
+                  isFullScreenMode: false,
+                  filters: fetchFilters ?? [],
+                  useMargins: true,
+                  id: 'th-dashboard-tab',
+                  timeRange: {
+                    from: searchBarProps.dateRangeFrom,
+                    to: searchBarProps.dateRangeTo,
+                  },
+                  title: 'Threat Hunting dashboard',
+                  description: 'Dashboard of the Threat Hunting',
+                  query: searchBarProps.query,
+                  refreshConfig: {
+                    pause: false,
+                    value: 15,
+                  },
+                  hidePanelTitles: false,
+                }}
+              />
+              <EuiDataGrid
+                {...dataGridProps}
+                className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                toolbarVisibility={{
+                  additionalControls: (
+                    <>
+                      <HitsCounter
+                        hits={results?.hits?.total}
+                        showResetButton={false}
+                        onResetQuery={() => {}}
+                        tooltip={
+                          results?.hits?.total &&
+                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                            ? {
+                                ariaLabel: 'Warning',
+                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                  MAX_ENTRIES_PER_QUERY,
+                                )} hits.`,
+                                iconType: 'alert',
+                                position: 'top',
+                              }
+                            : undefined
+                        }
+                      />
+                      <EuiButtonEmpty
+                        disabled={
+                          results?.hits?.total === 0 ||
+                          !columnVisibility?.visibleColumns?.length
+                        }
+                        size='xs'
+                        iconType='exportAction'
+                        color='primary'
+                        isLoading={isExporting}
+                        className='euiDataGrid__controlBtn'
+                        onClick={onClickExportResults}
+                      >
+                        Export Formated
+                      </EuiButtonEmpty>
+                    </>
+                  ),
+                }}
+              />
+              {inspectedHit && (
+                <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+                  <EuiFlyoutHeader>
+                    <EuiTitle>
+                      <h2>Document details</h2>
+                    </EuiTitle>
+                  </EuiFlyoutHeader>
+                  <EuiFlyoutBody>
+                    <EuiFlexGroup direction='column'>
+                      <EuiFlexItem>
+                        <DocViewer {...docViewerProps} />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlyoutBody>
+                </EuiFlyout>
+              )}
+            </div>
+          </>
         ) : null}
       </>
     </I18nProvider>
