@@ -113,7 +113,7 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
                       dataSource?.getPinnedAgentFilter().length > 0,
                     ),
                     isFullScreenMode: false,
-                    filters: searchBarProps.filters ?? [],
+                    filters: fetchFilters ?? [],
                     useMargins: true,
                     id: 'mitre-dashboard-tab-filters',
                     timeRange: {
