@@ -155,7 +155,7 @@ export class ReportingService {
         filters: dataSourceContext.filters,
         time: {
           to: dateMath.parse(dataSourceContext.time.to),
-          from: dateMath.parse(dataSourceContext.time.to),
+          from: dateMath.parse(dataSourceContext.time.from),
         },
         searchBar: dataSourceContext?.query?.query || '',
         tables: [], // TODO: check is this is used
