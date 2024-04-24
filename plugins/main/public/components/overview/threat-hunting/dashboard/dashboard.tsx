@@ -138,7 +138,15 @@ const DashboardTH: React.FC = () => {
     if (isDataSourceLoading) {
       return;
     }
-    fetchData({ query, pagination, sorting })
+    fetchData({
+      query,
+      pagination,
+      sorting,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
+    })
       .then(results => {
         setResults(results);
       })
@@ -190,7 +198,7 @@ const DashboardTH: React.FC = () => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
-          <div className='wz-search-bar'>
+          <div className='wz-search-bar wz-discover hide-filter-control'>
             <SearchBar
               appName='th-searchbar'
               {...searchBarProps}
@@ -217,12 +225,12 @@ const DashboardTH: React.FC = () => {
                   useMargins: true,
                   id: 'kpis-th-dashboard-tab',
                   timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
+                    from: dateRangeFrom,
+                    to: dateRangeTo,
                   },
                   title: 'KPIs Threat Hunting dashboard',
                   description: 'KPIs Dashboard of the Threat Hunting',
-                  query: searchBarProps.query,
+                  query: query,
                   refreshConfig: {
                     pause: false,
                     value: 15,
@@ -239,12 +247,12 @@ const DashboardTH: React.FC = () => {
                   useMargins: true,
                   id: 'th-dashboard-tab',
                   timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
+                    from: dateRangeFrom,
+                    to: dateRangeTo,
                   },
                   title: 'Threat Hunting dashboard',
                   description: 'Dashboard of the Threat Hunting',
-                  query: searchBarProps.query,
+                  query: query,
                   refreshConfig: {
                     pause: false,
                     value: 15,
