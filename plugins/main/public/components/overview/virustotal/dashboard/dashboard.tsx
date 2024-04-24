@@ -56,7 +56,13 @@ const DashboardVT: React.FC = () => {
     if (isDataSourceLoading) {
       return;
     }
-    fetchData({ query })
+    fetchData({
+      query,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
+    })
       .then(results => {
         setResults(results);
       })
