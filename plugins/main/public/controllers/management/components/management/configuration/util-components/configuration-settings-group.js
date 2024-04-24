@@ -13,13 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiSpacer,
-} from '@elastic/eui';
-
+import { EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import WzConfigurationSetting from './configuration-setting';
 import WzConfigurationSettingsHeader from './configuration-settings-header';
 
@@ -28,13 +22,7 @@ class WzSettingsGroup extends Component {
     super(props);
   }
   render() {
-    const {
-      config,
-      description,
-      items,
-      help,
-      title
-    } = this.props;
+    const { config, description, items, help, title } = this.props;
     return (
       <Fragment>
         <WzConfigurationSettingsHeader
@@ -42,7 +30,7 @@ class WzSettingsGroup extends Component {
           description={description}
           help={help}
         />
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
         <EuiFlexGroup>
           <EuiFlexItem>
             {items.map((item, key) => {
@@ -59,11 +47,9 @@ class WzSettingsGroup extends Component {
                       ? item.renderLabel(value, item, config)
                       : item.label
                   }
-                  value={
-                    item.render
-                      ? item.render(value)
-                      : value
-                  }
+                  value={item.render ? item.render(value) : value}
+                  columns={item.columns}
+                  info={item.info}
                 />
               );
             })}
@@ -76,7 +62,7 @@ class WzSettingsGroup extends Component {
 
 WzSettingsGroup.propTypes = {
   ...WzConfigurationSettingsHeader.propTypes,
-  items: PropTypes.array.isRequired
+  items: PropTypes.array.isRequired,
 };
 
 export default WzSettingsGroup;
