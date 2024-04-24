@@ -1,4 +1,4 @@
-import { EuiFlexItem, EuiLink, EuiFlexGroup } from '@elastic/eui';
+import { EuiLink } from '@elastic/eui';
 import { formatUIDate, AppNavigate } from '../../../../react-services';
 import { tDataGridColumn } from '../../../common/data-grid';
 import React from 'react';
@@ -10,24 +10,24 @@ const navigateTo = (ev, section, params) => {
 const renderTechniques = (value: []) => {
   return (
     <div style={{ display: 'flex', gap: 10 }}>
-      {value.map(technique => (
-        <div>
-          <EuiLink
-            key={technique}
-            onClick={e =>
-              navigateTo(e, 'overview', {
-                tab: 'mitre',
-                tabView: 'intelligence',
-                tabRedirect: 'techniques',
-                idToRedirect: technique,
-              })
-            }
-          >
-            {technique}
-          </EuiLink>
-        </div>
-      ))
-      }
+      {value &&
+        value.map(technique => (
+          <div>
+            <EuiLink
+              key={technique}
+              onClick={e =>
+                navigateTo(e, 'overview', {
+                  tab: 'mitre',
+                  tabView: 'intelligence',
+                  tabRedirect: 'techniques',
+                  idToRedirect: technique,
+                })
+              }
+            >
+              {technique}
+            </EuiLink>
+          </div>
+        ))}
     </div>
   );
 };
