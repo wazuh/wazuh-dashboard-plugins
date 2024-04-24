@@ -130,7 +130,6 @@ export class CommonData {
       const tabFilters = {
         general: { group: '' },
         welcome: { group: '' },
-        fim: { group: 'syscheck' },
         pm: { group: 'rootcheck' },
         vuls: { group: 'vulnerability-detector' },
         oscap: { group: 'oscap' },
