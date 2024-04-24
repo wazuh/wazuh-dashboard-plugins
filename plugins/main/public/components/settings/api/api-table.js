@@ -225,7 +225,7 @@ export const ApiTable = compose(
             ? error
             : (error || {}).message ||
               ((error || {}).data || {}).message ||
-              'Wazuh is not reachable';
+              'API is not reachable';
         const status = code === 3099 ? 'down' : 'unknown';
         APIconnection.status = { status, downReason };
         if (APIconnection.id === this.state.selectedAPIConnection) {
@@ -292,7 +292,7 @@ export const ApiTable = compose(
               ? error
               : (error || {}).message ||
                 ((error || {}).data || {}).message ||
-                'Wazuh is not reachable';
+                'API is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
           throw error;
