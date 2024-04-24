@@ -109,12 +109,12 @@ const DashboardVT: React.FC = () => {
                 useMargins: true,
                 id: 'kpis-virustotal-dashboard-tab',
                 timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
+                  from: dateRangeFrom,
+                  to: dateRangeTo,
                 },
                 title: 'KPIs Virustotal dashboard',
                 description: 'KPIs Dashboard of the Virustotal',
-                query: searchBarProps.query,
+                query: query,
                 refreshConfig: {
                   pause: false,
                   value: 15,
@@ -134,12 +134,12 @@ const DashboardVT: React.FC = () => {
                 useMargins: true,
                 id: 'virustotal-dashboard-tab',
                 timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
+                  from: dateRangeFrom,
+                  to: dateRangeTo,
                 },
                 title: 'Virustotal dashboard',
                 description: 'Dashboard of the Virustotal',
-                query: searchBarProps.query,
+                query: query,
                 refreshConfig: {
                   pause: false,
                   value: 15,
