@@ -1,7 +1,8 @@
 import { EuiLink } from '@elastic/eui';
-import { formatUIDate, AppNavigate } from '../../../../react-services';
+import { AppNavigate } from '../../../../react-services';
 import { tDataGridColumn } from '../../../common/data-grid';
 import React from 'react';
+import dompurify from 'dompurify';
 
 const navigateTo = (ev, section, params) => {
   AppNavigate.navigateToModule(ev, section, params);
@@ -10,7 +11,7 @@ const navigateTo = (ev, section, params) => {
 const renderTechniques = (value: []) => {
   return (
     <div style={{ display: 'flex', gap: 10 }}>
-      {value &&
+      {value.length &&
         value.map(technique => (
           <div>
             <EuiLink
@@ -36,7 +37,10 @@ export const mitreAttackColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
     displayAsText: 'Time',
-    render: value => formatUIDate(value),
+    render: (value, row, cellFormatted) => {
+      const sanitizedCellValue = dompurify.sanitize(cellFormatted);
+      return <span dangerouslySetInnerHTML={{ __html: sanitizedCellValue }} />;
+    },
   },
   {
     id: 'agent.name',
