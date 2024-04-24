@@ -16,26 +16,14 @@ import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import { renderValueOrNoValue, isString } from '../utils/utils';
+import {
+  renderValueOrNoValue,
+  isString,
+  renderValueOrDefault,
+} from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
-import {
-  LOGCOLLECTOR_LOCALFILE_PROP,
-  LOCALFILE_MACOSEVENT_PROP,
-} from './types';
-
-/**
- *
- * @param {*} data => all log data
- * @returns string => value to show in query input
- */
-const queryValue = data => {
-  return typeof data === 'undefined'
-    ? '-'
-    : typeof data === 'object'
-    ? data.value
-    : data;
-};
+import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_JOURNALDT_PROP } from './types';
 
 /**
  * Returns targets array parsed in one string
@@ -55,32 +43,48 @@ const panelsLabel = item =>
 
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
-  { field: 'query', label: 'Query value', render: queryValue },
-  { field: 'query.level', label: 'Query level', render: renderValueOrNoValue },
-  { field: 'query.type', label: 'Query type', render: renderValueOrNoValue },
-  {
-    field: 'ignore_binaries',
-    label: 'Ignore binaries',
-    render: renderValueOrNoValue,
-  },
   {
     field: 'only-future-events',
     label: 'Only future events',
     render: renderValueOrNoValue,
   },
+  {
+    field: 'filters_disabled',
+    label: 'Filters Disabled',
+    render: renderValueOrDefault('true'),
+  },
+  {
+    field: 'filters',
+    label: 'Filters',
+    columns: [
+      {
+        field: 'field',
+        name: 'Field',
+      },
+      {
+        field: 'expression',
+        name: 'Expression',
+      },
+      {
+        field: 'ignore_if_missing',
+        name: 'Ignore If Missing',
+      },
+    ],
+    info: 'The configuration filters within the same group are processed with an AND logic operator. Whereas the different filter groups are processed with an OR like logic operator.',
+  },
 ];
 
-class WzConfigurationLogCollectionMacOSEvents extends Component {
+class WzConfigurationLogCollectionJournald extends Component {
   constructor(props) {
     super(props);
   }
   render() {
     const { currentConfig } = this.props;
     const items = currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-      LOCALFILE_MACOSEVENT_PROP
+      LOCALFILE_JOURNALDT_PROP
     ]
       ? settingsListBuilder(
-          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_MACOSEVENT_PROP],
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_JOURNALDT_PROP],
           panelsLabel,
         )
       : [];
@@ -94,16 +98,16 @@ class WzConfigurationLogCollectionMacOSEvents extends Component {
           />
         )}
         {!currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_MACOSEVENT_PROP
+          LOCALFILE_JOURNALDT_PROP
         ]?.length ? (
           <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_MACOSEVENT_PROP
+          LOCALFILE_JOURNALDT_PROP
         ]?.length > 1 ? (
           <WzConfigurationSettingsHeader
-            title='macOS events logs'
-            description='List of macOS logs that will be processed'
+            title='Journald events logs'
+            description='List of journald logs that will be processed'
             help={helpLinks}
           >
             <WzConfigurationListSelector
@@ -113,11 +117,11 @@ class WzConfigurationLogCollectionMacOSEvents extends Component {
           </WzConfigurationSettingsHeader>
         ) : null}
         {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
-          LOCALFILE_MACOSEVENT_PROP
+          LOCALFILE_JOURNALDT_PROP
         ]?.length === 1 ? (
           <WzConfigurationSettingsHeader
-            title='macOS events logs'
-            description='Logs that will be processed'
+            title='Journald events logs'
+            description='List of journald logs that will be processed'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
@@ -131,4 +135,4 @@ class WzConfigurationLogCollectionMacOSEvents extends Component {
   }
 }
 
-export default WzConfigurationLogCollectionMacOSEvents;
+export default WzConfigurationLogCollectionJournald;

@@ -19,7 +19,7 @@ import {
   EuiHorizontalRule,
   EuiSpacer,
   EuiText,
-  EuiTitle
+  EuiTitle,
 } from '@elastic/eui';
 
 import WzHelpButtonPopover from './help-button-popover';
@@ -29,38 +29,33 @@ class WzConfigurationSettingsHeader extends Component {
     super(props);
   }
   render() {
-    const {
-      title,
-      description,
-      help,
-      children
-    } = this.props;
+    const { title, description, help, children, info } = this.props;
     return (
       <Fragment>
-        <EuiFlexGroup alignItems="center">
+        <EuiFlexGroup alignItems='center'>
           <EuiFlexItem>
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h2>{title}</h2>
             </EuiTitle>
-            {description && <EuiText color="subdued">{description}</EuiText>}
+            {description && <EuiText color='subdued'>{description}</EuiText>}
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiFlexGroup
-              alignItems="center"
-              gutterSize="none"
-              justifyContent="flexEnd"
+              alignItems='center'
+              gutterSize='none'
+              justifyContent='flexEnd'
             >
-              {help && (
+              {(help || info) && (
                 <span>
-                  <WzHelpButtonPopover links={help} />
+                  <WzHelpButtonPopover links={help} info={info} />
                 </span>
               )}
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer size="xs" />
+        <EuiSpacer size='xs' />
         {title && (
-          <EuiHorizontalRule margin="none" style={{ marginBottom: 16 }} />
+          <EuiHorizontalRule margin='none' style={{ marginBottom: 16 }} />
         )}
         {children}
       </Fragment>
@@ -70,7 +65,7 @@ class WzConfigurationSettingsHeader extends Component {
 
 WzConfigurationSettingsHeader.propTypes = {
   title: PropTypes.string,
-  description: PropTypes.string
+  description: PropTypes.string,
 };
 
 export default WzConfigurationSettingsHeader;

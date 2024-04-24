@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added propagation of updates from the table to dashboard visualizations in Endpoints summary [#6460](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6460)
 - Handle index pattern selector on new discover [#6499](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6499)
 - Added macOS log collector tab [#6545](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6545)
+- Added journald log collector tab [#6572](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6572)
 
 ### Changed
 
@@ -23,6 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Change the view of API is down and check connection to Server APIs application [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Changed the usage of the endpoint GET /groups/{group_id}/files/{file_name} [#6385](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6385)
 - Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
+- Move AngularJS settings controller to ReactJS [#6580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6580)
 - Move AngularJS controller and view for manage groups to ReactJS [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
 - Move AngularJS controllers and views of Tools and Dev Tools to ReactJS [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
 - Move the AngularJS controller and template of blank screen to ReactJS component [#6538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6538)
