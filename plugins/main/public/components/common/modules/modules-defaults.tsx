@@ -45,8 +45,10 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
-import { AlertsVulnerabilitiesDataSource } from '../data-source';
-import { AlertsVirustotalDataSource } from '../data-source';
+import {
+  AlertsVulnerabilitiesDataSource,
+  AlertsVirustotalDataSource,
+} from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
