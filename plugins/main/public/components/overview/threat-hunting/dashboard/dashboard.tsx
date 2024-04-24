@@ -198,7 +198,7 @@ const DashboardTH: React.FC = () => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
-          <div className='wz-search-bar wz-discover hide-filter-control'>
+          <div className='wz-search-bar hide-filter-control'>
             <SearchBar
               appName='th-searchbar'
               {...searchBarProps}
