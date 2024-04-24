@@ -10,10 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
-import { EuiFieldText, EuiSpacer, EuiTextAlign } from '@elastic/eui';
+import { EuiFieldText, EuiSpacer, EuiTextAlign, EuiAccordion, EuiBasicTable } from '@elastic/eui';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
+import helpLinks from '../log-collection/help-links';
 
 class WzConfigurationSetting extends Component {
   constructor(props) {
@@ -36,9 +37,9 @@ class WzConfigurationSetting extends Component {
   }
   render() {
     const { isMobile } = this.state;
-    const { keyItem, label, value } = this.props;
+    const { keyItem, label, value, columns, info } = this.props;
     return value || typeof value === 'number' || typeof value === 'boolean' ? (
-      <Fragment>
+      <>
         <div
           style={{
             display: 'flex',
@@ -46,17 +47,28 @@ class WzConfigurationSetting extends Component {
             flexDirection: isMobile ? 'column' : 'row',
           }}
         >
+          {columns ? (
+            []
+          ) : (
+            <div
+              style={
+                isMobile
+                  ? { margin: '1em', width: '100%' }
+                  : { justifySelf: 'flex-end', margin: '1em', width: '35%' }
+              }
+            >
+              <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>
+                {label}
+              </EuiTextAlign>
+            </div>
+          )}
+
           <div
             style={
-              isMobile
-                ? { margin: '1em', width: '100%' }
-                : { justifySelf: 'flex-end', margin: '1em', width: '35%' }
+              columns ? {} : isMobile ? { width: '100%' } : { width: '65%' }
             }
           >
-            <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>{label}</EuiTextAlign>
-          </div>
-          <div style={isMobile ? { width: '100%' } : { width: '65%' }}>
-            {Array.isArray(value) ? (
+            {Array.isArray(value) && typeof value[0] === 'string' ? (
               <ul>
                 {value.map((v, key) => (
                   <li key={`${keyItem}-${label}-${key}`}>
@@ -64,17 +76,51 @@ class WzConfigurationSetting extends Component {
                   </li>
                 ))}
               </ul>
+            ) : Array.isArray(value) && columns ? (
+              <>
+                <WzConfigurationSettingsHeader
+                  title={label}
+                  info={info}
+                  help={helpLinks}
+                />
+                {value.map((group, groupIndex) => (
+                  <EuiAccordion
+                    key={`accordion_${groupIndex}`}
+                    id={`accordionId_${groupIndex}`}
+                    buttonContent={`Group ${groupIndex + 1}`}
+                    paddingSize='l'
+                  >
+                    <div>
+                      {Array.isArray(group) ? (
+                        <EuiBasicTable
+                          items={group}
+                          columns={columns}
+                          rowHeader='field'
+                        />
+                      ) : (
+                        <EuiBasicTable
+                          items={[group]}
+                          columns={columns}
+                          rowHeader='field'
+                        />
+                      )}
+                    </div>
+                  </EuiAccordion>
+                ))}
+              </>
             ) : (
               <EuiFieldText
-                data-testid={`${String(label).toLowerCase().replace(/\s/g, '-')}`}
+                data-testid={`${String(label)
+                  .toLowerCase()
+                  .replace(/\s/g, '-')}`}
                 value={String(value)}
                 readOnly
               />
             )}
           </div>
         </div>
-        <EuiSpacer size="s" />
-      </Fragment>
+        <EuiSpacer size='s' />
+      </>
     ) : null;
   }
 }

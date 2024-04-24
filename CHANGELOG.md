@@ -13,27 +13,29 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added propagation of updates from the table to dashboard visualizations in Endpoints summary [#6460](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6460)
 - Handle index pattern selector on new discover [#6499](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6499)
 - Added macOS log collector tab [#6545](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6545)
+- Added journald log collector tab [#6572](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6572)
 
 ### Changed
 
 - Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6288](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6288) [#6290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6290) [#6289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6289) [#6286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6286) [#6275](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6275) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6297](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6297) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6291](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6459) [#6434](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6434)
 - Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
 - Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
-- Change how the configuration is managed in the backend side [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337) [#6519](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6519) [#6570](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6570)
+- Change how the configuration is managed in the backend side [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337) [#6519](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6519) [#6573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6573)
 - Change the view of API is down and check connection to Server APIs application [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Changed the usage of the endpoint GET /groups/{group_id}/files/{file_name} [#6385](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6385)
 - Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
+- Move AngularJS settings controller to ReactJS [#6580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6580)
 - Move AngularJS controller and view for manage groups to ReactJS [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
 - Move AngularJS controllers and views of Tools and Dev Tools to ReactJS [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
 - Move the AngularJS controller and template of blank screen to ReactJS component [#6538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6538)
 - Moved the registry data to in-memory cache [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
+- Enhance the validation for `enrollment.dns` on App Settings application [#6573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6573)
 - Remove AngularJS controller for manage groups [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
 - Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
 
 ### Fixed
 
 - Fixed the scripted fields disappear when the fields of the events index pattern was refreshed [#6237](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6237)
-- Fixed the validation for `enrollment.dns` on App Settings application [#6570](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6570)
 
 ### Removed
 
@@ -41,6 +43,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed API endpoint GET /api/timestamp [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Removed API endpoint PUT /api/update-hostname/{id} [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Removed API endpoint DELETE /hosts/remove-orphan-entries [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
+- Remove AngularJS component `click-action` [#6613](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6613)
 
 ## Wazuh v4.8.2 - OpenSearch Dashboards 2.10.0 - Revision 00
 

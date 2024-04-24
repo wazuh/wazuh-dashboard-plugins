@@ -19,7 +19,7 @@ class WzHelpButtonPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showHelp: false
+      showHelp: false,
     };
   }
   toggleShowHelp() {
@@ -27,14 +27,14 @@ class WzHelpButtonPopover extends Component {
   }
   render() {
     const { showHelp } = this.state;
-    const { children, links } = this.props;
+    const { children, links, info } = this.props;
     return (
       <EuiPopover
-        id="show-help"
+        id='show-help'
         button={
           <EuiButtonEmpty
-            iconSide="left"
-            iconType="questionInCircle"
+            iconSide='left'
+            iconType='questionInCircle'
             onClick={() => this.toggleShowHelp()}
           />
         }
@@ -42,16 +42,27 @@ class WzHelpButtonPopover extends Component {
         closePopover={() => this.toggleShowHelp()}
       >
         <div style={{ width: '300px' }}>
-          <EuiText color="subdued" style={{ padding: '0 8px' }}>
+          <EuiText color='subdued' style={{ padding: '0 8px' }}>
             More info about this section
           </EuiText>
-          {links.map(link => (
-            <div key={`show-help-${link.text}`}>
-              <EuiButtonEmpty rel="noopener noreferrer" target="_blank" href={link.href}>
-                {link.text}
-              </EuiButtonEmpty>
-            </div>
-          ))}
+          <>
+            {info ? (
+              <EuiText style={{ padding: '0 8px' }}>{info}</EuiText>
+            ) : null}
+            {Array.isArray(links)
+              ? links.map(link => (
+                  <div key={`show-help-${link.text}`}>
+                    <EuiButtonEmpty
+                      rel='noopener noreferrer'
+                      target='_blank'
+                      href={link.href}
+                    >
+                      {link.text}
+                    </EuiButtonEmpty>
+                  </div>
+                ))
+              : null}
+          </>
         </div>
       </EuiPopover>
     );
@@ -59,7 +70,7 @@ class WzHelpButtonPopover extends Component {
 }
 
 WzHelpButtonPopover.propTypes = {
-  links: PropTypes.array
+  links: PropTypes.array,
 };
 
 export default WzHelpButtonPopover;
