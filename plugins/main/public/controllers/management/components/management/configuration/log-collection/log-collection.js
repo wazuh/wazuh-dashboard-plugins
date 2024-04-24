@@ -106,10 +106,24 @@ class WzConfigurationLogCollection extends Component {
         condition:
           currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
           currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_MACOSEVENT_PROP]
-            .length > 0,
+            ?.length > 0,
         component: (
           <WzTabSelectorTab label='macOS Events'>
             <WzConfigurationLogCollectionMacOSEvents
+              currentConfig={currentConfig}
+              agent={agent}
+            />
+          </WzTabSelectorTab>
+        ),
+      },
+      {
+        condition:
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_JOURNALDT_PROP]
+            ?.length > 0,
+        component: (
+          <WzTabSelectorTab label='Journald'>
+            <WzConfigurationLogCollectionJournald
               currentConfig={currentConfig}
               agent={agent}
             />
@@ -135,17 +149,6 @@ class WzConfigurationLogCollection extends Component {
         component: (
           <WzTabSelectorTab label='Sockets'>
             <WzConfigurationLogCollectionSockets
-              currentConfig={currentConfig}
-              agent={agent}
-            />
-          </WzTabSelectorTab>
-        ),
-      },
-      {
-        condition: true, // Will always render
-        component: (
-          <WzTabSelectorTab label='Journald'>
-            <WzConfigurationLogCollectionJournald
               currentConfig={currentConfig}
               agent={agent}
             />
