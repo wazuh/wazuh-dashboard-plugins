@@ -150,9 +150,9 @@ export class WazuhPlugin
                   ? undefined
                   : 'Interval is not valid.';
               });
+            setWzCurrentAppID(id);
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
-            setWzCurrentAppID(id);
             initializeInterceptor(core);
             if (!this.initializeInnerAngular) {
               throw Error(
