@@ -63,7 +63,7 @@ const DashboardVT: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching alerts',
         });
         ErrorHandler.handleError(searchError);
       });
