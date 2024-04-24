@@ -118,11 +118,17 @@ class WzConfigurationLogCollectionJournald extends Component {
         ) : null}
         {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
           LOCALFILE_JOURNALDT_PROP
-        ]?.length ? (
-          <WzConfigurationSettingsGroup
-            config={items[0].data}
-            items={mainSettings}
-          />
+        ]?.length === 1 ? (
+          <WzConfigurationSettingsHeader
+            title='Journald events logs'
+            description='List of journald logs that will be processed'
+            help={helpLinks}
+          >
+            <WzConfigurationSettingsGroup
+              config={items[0].data}
+              items={mainSettings}
+            />
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );

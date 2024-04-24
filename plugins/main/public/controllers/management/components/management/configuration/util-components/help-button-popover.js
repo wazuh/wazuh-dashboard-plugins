@@ -46,7 +46,9 @@ class WzHelpButtonPopover extends Component {
             More info about this section
           </EuiText>
           <>
-            <EuiText style={{ padding: '0 8px' }}>{info}</EuiText>
+            {info ? (
+              <EuiText style={{ padding: '0 8px' }}>{info}</EuiText>
+            ) : null}
             {Array.isArray(links)
               ? links.map(link => (
                   <div key={`show-help-${link.text}`}>
