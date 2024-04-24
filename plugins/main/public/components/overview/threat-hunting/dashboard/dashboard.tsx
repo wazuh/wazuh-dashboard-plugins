@@ -40,7 +40,7 @@ import { SampleDataWarning } from '../../../visualize/components/sample-data-war
 import {
   threatHuntingTableAgentColumns,
   threatHuntingTableDefaultColumns,
-} from '../config';
+} from '../events/threat-hunting-columns';
 import {
   AlertsDataSource,
   AlertsDataSourceRepository,
