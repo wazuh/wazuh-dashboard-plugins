@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added propagation of updates from the table to dashboard visualizations in Endpoints summary [#6460](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6460)
 - Handle index pattern selector on new discover [#6499](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6499)
 - Added macOS log collector tab [#6545](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6545)
+- Added journald log collector tab [#6572](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6572)
 
 ### Changed
 
