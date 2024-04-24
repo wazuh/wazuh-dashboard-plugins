@@ -11,6 +11,46 @@ export type SearchParams = {
   indexPattern: IndexPattern;
 } & tSearchParams;
 
+import { parse } from 'query-string';
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// This methods are used to use correcty the forceNow setting in the date range picker
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Parse the query string and return an object with the query parameters
+ */
+function parseQueryString() {
+  // window.location.search is an empty string
+  // get search from href
+  const hrefSplit = window.location.href.split('?');
+  if (hrefSplit.length <= 1) {
+    return {};
+  }
+
+  return parse(hrefSplit[1], { sort: false });
+}
+
+/**
+ * Get the forceNow query parameter
+ */
+function getForceNow() {
+  const forceNow = parseQueryString().forceNow as string;
+  if (!forceNow) {
+    return;
+  }
+
+  const ticks = Date.parse(forceNow);
+  if (isNaN(ticks)) {
+    throw new Error(
+      `forceNow query parameter, ${forceNow}, can't be parsed by Date.parse`,
+    );
+  }
+  return new Date(ticks);
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
 export const search = async (
   params: SearchParams,
 ): Promise<SearchResponse | void> => {
@@ -39,15 +79,6 @@ export const search = async (
 
   // check if dateRange is defined
   if (params.dateRange && params.dateRange?.from && params.dateRange?.to) {
-    // when the from and to are equal, the to is now
-    /* ToDo: Search the OSD date range parser, to prevent this change and fix
-        when the fllter is "Today" and "This week". In those ranges the filter to and from are the same
-        Today: from: now/d, to: now/d
-        This Week: from: now/w to:now/w
-    */
-    if (params.dateRange.from === params.dateRange.to) {
-      params.dateRange.to = 'now';
-    }
     const { from, to } = params.dateRange;
 
     filters = [
@@ -57,16 +88,22 @@ export const search = async (
         range: {
           [indexPattern.timeFieldName || 'timestamp']: {
             gte: dateMath.parse(from).toISOString(),
-            lte: dateMath.parse(to).toISOString(),
+            /* roundUp: true is used to transform the osd dateform to a generic date format
+              For instance: the "This week" date range in the date picker.
+              To: now/w 
+              From: now/w
+              Without the roundUp the to and from date will be the same and the search will return no results or error
+
+              - src/plugins/data/common/query/timefilter/get_time.ts
+            */
+            lte: dateMath
+              .parse(to, { roundUp: true, forceNow: getForceNow() })
+              .toISOString(),
             format: 'strict_date_optional_time',
           },
         },
       },
     ];
-  }
-
-  if (aggs) {
-    searchSource.setField('aggs', aggs);
   }
 
   const searchParams = searchSource
@@ -78,9 +115,12 @@ export const search = async (
     .setField('from', fromField)
     .setField('index', indexPattern);
 
-  // add fields
   if (fields && Array.isArray(fields) && fields.length > 0) {
     searchParams.setField('fields', fields);
+  }
+
+  if (aggs) {
+    searchSource.setField('aggs', aggs);
   }
   try {
     return await searchParams.fetch();
