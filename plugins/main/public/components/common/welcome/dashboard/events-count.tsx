@@ -59,7 +59,6 @@ export const EventsCount = () => {
               },
               title: 'Events count evolution',
               description: 'Dashboard of Events count evolution',
-              // query: {},
               refreshConfig: {
                 pause: false,
                 value: 15,

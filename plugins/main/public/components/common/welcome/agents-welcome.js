@@ -22,7 +22,6 @@ import {
   EuiButtonEmpty,
   EuiPage,
   EuiPopover,
-  EuiLoadingChart,
   EuiToolTip,
   EuiButtonIcon,
   EuiPageBody,
@@ -39,7 +38,6 @@ import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
-import KibanaVis from '../../../kibana-integrations/kibana-vis';
 import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
 import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
@@ -356,7 +354,6 @@ export const AgentsWelcome = compose(
                       closePopover={() => {
                         this.setState({ switchModule: false });
                       }}
-                      switchTab={module => this.props.switchTab(module)}
                     ></MenuAgent>
                   </div>
                 </WzReduxProvider>
@@ -368,7 +365,6 @@ export const AgentsWelcome = compose(
     }
 
     renderTitle() {
-      const notNeedStatus = true;
       const thereAreAgentSelected = Boolean(this.props.agent?.id);
       // Calculate if the header buttons should display the name or only the icon to be responsive
 
@@ -413,7 +409,6 @@ export const AgentsWelcome = compose(
                             closePopover={() => {
                               this.setState({ switchModule: false });
                             }}
-                            switchTab={module => this.props.switchTab(module)}
                           ></MenuAgent>
                         </div>
                       </WzReduxProvider>
@@ -462,9 +457,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='inspect'
-                  onClick={() =>
-                    this.props.switchTab('syscollector', notNeedStatus)
-                  }
+                  onClick={() => this.props.switchTab('syscollector')}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -479,7 +472,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='stats'
-                  onClick={() => this.props.switchTab('stats', notNeedStatus)}
+                  onClick={() => this.props.switchTab('stats')}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -494,9 +487,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='gear'
-                  onClick={() =>
-                    this.props.switchTab('configuration', notNeedStatus)
-                  }
+                  onClick={() => this.props.switchTab('configuration')}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -577,7 +568,7 @@ export const AgentsWelcome = compose(
     renderSCALastScan() {
       return (
         <EuiFlexGroup direction='column'>
-          <ScaScan switchTab={this.props.switchTab} {...this.props} />
+          <ScaScan {...this.props} />
         </EuiFlexGroup>
       );
     }
