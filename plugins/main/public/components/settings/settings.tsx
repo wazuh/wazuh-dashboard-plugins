@@ -10,10 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
-import { EuiProgress } from '@elastic/eui';
-import { Tabs } from '../common/tabs/tabs';
-import { TabNames } from '../../utils/tab-names';
-import { pluginPlatform } from '../../../package.json';
+import { EuiProgress, EuiTabs, EuiTab } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
@@ -42,20 +39,15 @@ import {
 export class Settings extends React.Component {
   state: {
     tab: string;
+    tabs: { id: string; name: string }[] | null;
     load: boolean;
-    loadingLogs: boolean;
-    settingsTabsProps?;
     currentApiEntryIndex;
     indexPatterns;
     apiEntries;
   };
-  pluginAppName: string;
-  pluginPlatformVersion: string | boolean;
-  genericReq;
-  wzMisc;
+  wzMisc: WzMisc;
   wazuhConfig;
-  tabNames;
-  tabsConfiguration;
+  tabsConfiguration: { id: string; name: string }[];
   apiIsDown;
   googleGroupsSVG;
   currentDefault;
@@ -65,9 +57,6 @@ export class Settings extends React.Component {
   constructor(props) {
     super(props);
 
-    this.pluginPlatformVersion = (pluginPlatform || {}).version || false;
-    this.pluginAppName = PLUGIN_APP_NAME;
-
     this.wzMisc = new WzMisc();
     this.wazuhConfig = new WazuhConfig();
 
@@ -76,13 +65,12 @@ export class Settings extends React.Component {
       this.wzMisc.setWizard(false);
     }
     this.urlTabRegex = new RegExp('tab=' + '[^&]*');
-    this.tabNames = TabNames;
     this.apiIsDown = this.wzMisc.getApiIsDown();
     this.state = {
       currentApiEntryIndex: false,
       tab: 'api',
+      tabs: null,
       load: true,
-      loadingLogs: true,
       indexPatterns: [],
       apiEntries: [],
     };
@@ -112,7 +100,7 @@ export class Settings extends React.Component {
     );
   }
 
-  async componentDidMount(): void {
+  async componentDidMount(): Promise<void> {
     try {
       const urlTab = this._getTabFromUrl();
 
@@ -154,20 +142,10 @@ export class Settings extends React.Component {
    * Sets the component props
    */
   setComponentProps(currentTab = 'api') {
-    const settingsTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab);
-      },
-      selectedTab: currentTab,
-      // Define tabs for Wazuh plugin settings application
-      tabs:
-        getWzCurrentAppID() === appSettings.id ? this.tabsConfiguration : null,
-      wazuhConfig: this.wazuhConfig,
-    };
-
     this.setState({
       tab: currentTab,
-      settingsTabsProps,
+      tabs:
+        getWzCurrentAppID() === appSettings.id ? this.tabsConfiguration : null,
     });
   }
 
@@ -222,6 +200,7 @@ export class Settings extends React.Component {
       }
       this.getCurrentAPIIndex();
 
+      // TODO: what is the purpose of this?
       if (
         !this.state.currentApiEntryIndex &&
         this.state.currentApiEntryIndex !== 0
@@ -357,11 +336,19 @@ export class Settings extends React.Component {
           </div>
         ) : null}
         {/* It must get renderized only in configuration app to show Miscellaneous tab in configuration App */}
-        {!this.state.load &&
-        !this.apiIsDown &&
-        this.state.settingsTabsProps?.tabs ? (
+        {!this.state.load && !this.apiIsDown && this.state.tabs ? (
           <div className='wz-margin-top-16 md-margin-h'>
-            <Tabs {...this.state.settingsTabsProps} />
+            <EuiTabs>
+              {this.state.tabs.map(tab => (
+                <EuiTab
+                  key={`settings-tab-${tab.name}`}
+                  isSelected={tab.id === this.state.tab}
+                  onClick={() => this.switchTab(tab.id)}
+                >
+                  {tab.name}
+                </EuiTab>
+              ))}
+            </EuiTabs>
           </div>
         ) : null}
         {/* end head */}
@@ -395,10 +382,7 @@ export class Settings extends React.Component {
         {/* about */}
         {this.state.tab === 'about' && !this.state.load ? (
           <div>
-            <SettingsAbout
-              appInfo={this.appInfo}
-              pluginAppName={this.pluginAppName}
-            />
+            <SettingsAbout appInfo={this.appInfo} />
           </div>
         ) : null}
         {/* end about */}
