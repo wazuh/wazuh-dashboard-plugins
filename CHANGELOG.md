@@ -49,6 +49,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed minor style issues [#6484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6484) [#6489](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6489)
 - Fixed "View alerts of this Rule" link [#6553](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6553)
 - Fixed minor color styles [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6587)
+- Fixed disconnected agent configuration error [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6617)
 
 ### Removed
 
