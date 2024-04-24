@@ -47,17 +47,19 @@ class WzHelpButtonPopover extends Component {
           </EuiText>
           <>
             <EuiText style={{ padding: '0 8px' }}>{info}</EuiText>
-            {links.map(link => (
-              <div key={`show-help-${link.text}`}>
-                <EuiButtonEmpty
-                  rel='noopener noreferrer'
-                  target='_blank'
-                  href={link.href}
-                >
-                  {link.text}
-                </EuiButtonEmpty>
-              </div>
-            ))}
+            {Array.isArray(links)
+              ? links.map(link => (
+                  <div key={`show-help-${link.text}`}>
+                    <EuiButtonEmpty
+                      rel='noopener noreferrer'
+                      target='_blank'
+                      href={link.href}
+                    >
+                      {link.text}
+                    </EuiButtonEmpty>
+                  </div>
+                ))
+              : null}
           </>
         </div>
       </EuiPopover>

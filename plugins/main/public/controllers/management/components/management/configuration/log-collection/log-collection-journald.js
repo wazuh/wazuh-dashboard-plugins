@@ -118,7 +118,7 @@ class WzConfigurationLogCollectionJournald extends Component {
         ) : null}
         {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
           LOCALFILE_JOURNALDT_PROP
-        ]?.length === 1 ? (
+        ]?.length ? (
           <WzConfigurationSettingsGroup
             config={items[0].data}
             items={mainSettings}
