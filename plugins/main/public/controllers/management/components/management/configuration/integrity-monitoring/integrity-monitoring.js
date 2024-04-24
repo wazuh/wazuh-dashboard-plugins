@@ -34,8 +34,6 @@ class WzConfigurationIntegrityMonitoring extends Component {
     super(props);
   }
   componentDidMount() {
-    if (!isString(this.props.currentConfig['syscheck-syscheck']))
-      this.props.currentConfig['syscheck-syscheck'].syscheck.disabled = 'no';
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
