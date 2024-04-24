@@ -9,6 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import React from 'react';
+import { EuiProgress } from '@elastic/eui';
+import { Tabs } from '../common/tabs/tabs';
 import { TabNames } from '../../utils/tab-names';
 import { pluginPlatform } from '../../../package.json';
 import { AppState } from '../../react-services/app-state';
@@ -18,7 +21,6 @@ import { WzMisc } from '../../factories/misc';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { SavedObject } from '../../react-services/saved-objects';
 import { ErrorHandler } from '../../react-services/error-handler';
-import { formatUIDate } from '../../react-services/time-service';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { UI_LOGGER_LEVELS, PLUGIN_APP_NAME } from '../../../common/constants';
@@ -26,45 +28,69 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getAssetURL } from '../../utils/assets';
 import { getHttp, getWzCurrentAppID } from '../../kibana-services';
+import { ApiTable } from '../settings/api/api-table';
+import { WzConfigurationSettings } from '../settings/configuration/configuration';
+import { SettingsMiscellaneous } from '../settings/miscellaneous/miscellaneous';
+import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
+import { SettingsAbout } from '../settings/about/index';
 import {
   Applications,
   serverApis,
   appSettings,
 } from '../../utils/applications';
 
-export class SettingsController {
-  /**
-   * Class constructor
-   * @param {*} $scope
-   * @param {*} $window
-   * @param {*} $location
-   * @param {*} errorHandler
-   */
-  constructor($scope, $window, $location, errorHandler) {
+export class Settings extends React.Component {
+  state: {
+    tab: string;
+    load: boolean;
+    loadingLogs: boolean;
+    settingsTabsProps?;
+    currentApiEntryIndex;
+    indexPatterns;
+    apiEntries;
+  };
+  pluginAppName: string;
+  pluginPlatformVersion: string | boolean;
+  genericReq;
+  wzMisc;
+  wazuhConfig;
+  tabNames;
+  tabsConfiguration;
+  apiIsDown;
+  messageError;
+  messageErrorUpdate;
+  googleGroupsSVG;
+  currentDefault;
+  appInfo;
+  urlTabRegex;
+
+  constructor(props) {
+    super(props);
+
     this.pluginPlatformVersion = (pluginPlatform || {}).version || false;
     this.pluginAppName = PLUGIN_APP_NAME;
-    this.$scope = $scope;
-    this.$window = $window;
-    this.$location = $location;
+
     this.genericReq = GenericRequest;
-    this.errorHandler = errorHandler;
     this.wzMisc = new WzMisc();
     this.wazuhConfig = new WazuhConfig();
 
     if (this.wzMisc.getWizard()) {
-      $window.sessionStorage.removeItem('healthCheck');
+      window.sessionStorage.removeItem('healthCheck');
       this.wzMisc.setWizard(false);
     }
-
-    this.apiIsDown = this.wzMisc.getApiIsDown();
-    this.currentApiEntryIndex = false;
-    this.tab = 'api';
-    this.load = true;
-    this.loadingLogs = true;
+    this.urlTabRegex = new RegExp('tab=' + '[^&]*');
     this.tabNames = TabNames;
-    this.indexPatterns = [];
-    this.apiEntries = [];
-    this.$scope.googleGroupsSVG = getHttp().basePath.prepend(
+    this.apiIsDown = this.wzMisc.getApiIsDown();
+    this.state = {
+      currentApiEntryIndex: false,
+      tab: 'api',
+      load: true,
+      loadingLogs: true,
+      indexPatterns: [],
+      apiEntries: [],
+    };
+
+    this.googleGroupsSVG = getHttp().basePath.prepend(
       getAssetURL('images/icons/google_groups.svg'),
     );
     this.tabsConfiguration = [
@@ -74,13 +100,32 @@ export class SettingsController {
   }
 
   /**
-   * On controller loads
+   * Parses the tab query param and returns the tab value
+   * @returns string
    */
-  async $onInit() {
+  _getTabFromUrl() {
+    const match = window.location.href.match(this.urlTabRegex);
+    return match?.[0]?.split('=')?.[1] ?? '';
+  }
+
+  _setTabFromUrl(tab?) {
+    window.location.href = window.location.href.replace(
+      this.urlTabRegex,
+      tab ? `tab=${tab}` : '',
+    );
+  }
+
+  componentDidMount(): void {
+    this.onInit();
+  }
+  /**
+   * On load
+   */
+  async onInit() {
     try {
-      const location = this.$location.search();
-      if (location?.tab) {
-        this.tab = location.tab;
+      const urlTab = this._getTabFromUrl();
+
+      if (urlTab) {
         const tabActiveName = Applications.find(
           ({ id }) => getWzCurrentAppID() === id,
         ).breadcrumbLabel;
@@ -92,14 +137,15 @@ export class SettingsController {
       }
 
       // Set component props
-      this.setComponentProps();
+      this.setComponentProps(urlTab);
+
       // Loading data
       await this.getSettings();
 
       await this.getAppInfo();
     } catch (error) {
       const options = {
-        context: `${SettingsController.name}.$onInit`,
+        context: `${Settings.name}.onInit`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -116,32 +162,22 @@ export class SettingsController {
   /**
    * Sets the component props
    */
-  setComponentProps() {
-    this.apiTableProps = {
-      currentDefault: this.currentDefault,
-      apiEntries: this.apiEntries,
-      compressed: true,
-      setDefault: entry => this.setDefault(entry),
-      checkManager: entry => this.checkManager(entry),
-      getHosts: () => this.getHosts(),
-      testApi: (entry, force) => ApiCheck.checkApi(entry, force),
-      copyToClipBoard: msg => this.copyToClipBoard(msg),
-    };
-
-    this.addApiProps = {
-      closeAddApi: () => this.closeAddApi(),
-    };
-
-    this.settingsTabsProps = {
+  setComponentProps(currentTab = 'api') {
+    const settingsTabsProps = {
       clickAction: tab => {
-        this.switchTab(tab, true);
+        this.switchTab(tab);
       },
-      selectedTab: this.tab || 'api',
+      selectedTab: currentTab,
       // Define tabs for Wazuh plugin settings application
       tabs:
         getWzCurrentAppID() === appSettings.id ? this.tabsConfiguration : null,
       wazuhConfig: this.wazuhConfig,
     };
+
+    this.setState({
+      tab: currentTab,
+      settingsTabsProps,
+    });
   }
 
   /**
@@ -149,17 +185,17 @@ export class SettingsController {
    * @param {Object} tab
    */
   switchTab(tab) {
-    this.tab = tab;
-    this.$location.search('tab', this.tab);
+    this.setState({ tab });
+    this._setTabFromUrl(tab);
   }
 
   // Get current API index
   getCurrentAPIIndex() {
-    if (this.apiEntries.length) {
-      const idx = this.apiEntries
+    if (this.state.apiEntries.length) {
+      const idx = this.state.apiEntries
         .map(entry => entry.id)
         .indexOf(this.currentDefault);
-      this.currentApiEntryIndex = idx;
+      this.setState({ currentApiEntryIndex: idx });
     }
   }
 
@@ -177,7 +213,7 @@ export class SettingsController {
    * @param {Object} api
    */
   getApiIndex(api) {
-    return this.apiEntries.map(entry => entry.id).indexOf(api.id);
+    return this.state.apiEntries.map(entry => entry.id).indexOf(api.id);
   }
 
   /**
@@ -186,10 +222,10 @@ export class SettingsController {
   async checkApisStatus() {
     try {
       let numError = 0;
-      for (let idx in this.apiEntries) {
+      for (let idx in this.state.apiEntries) {
         try {
-          await this.checkManager(this.apiEntries[idx], false, true);
-          this.apiEntries[idx].status = 'online';
+          await this.checkManager(this.state.apiEntries[idx], false, true);
+          this.state.apiEntries[idx].status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
           const downReason =
@@ -199,9 +235,9 @@ export class SettingsController {
                 ((error || {}).data || {}).message ||
                 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
-          this.apiEntries[idx].status = { status, downReason };
+          this.state.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
-          if (this.apiEntries[idx].id === this.currentDefault) {
+          if (this.state.apiEntries[idx].id === this.currentDefault) {
             // if the selected API is down, we remove it so a new one will selected
             AppState.removeCurrentAPI();
           }
@@ -210,7 +246,7 @@ export class SettingsController {
       return numError;
     } catch (error) {
       const options = {
-        context: `${SettingsController.name}.checkApisStatus`,
+        context: `${Settings.name}.checkApisStatus`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -228,7 +264,7 @@ export class SettingsController {
     try {
       await this.checkManager(item, false, true);
       const index = this.getApiIndex(item);
-      const api = this.apiEntries[index];
+      const api = this.state.apiEntries[index];
       const { cluster_info, id } = api;
       const { manager, cluster, status } = cluster_info;
 
@@ -242,23 +278,18 @@ export class SettingsController {
         }),
       );
 
-      this.$scope.$emit('updateAPI', {});
-
       const currentApi = AppState.getCurrentAPI();
       this.currentDefault = JSON.parse(currentApi).id;
-      this.apiTableProps.currentDefault = this.currentDefault;
-      this.$scope.$applyAsync();
       const idApi = api.id;
 
       ErrorHandler.info(`API with id ${idApi} set as default`);
 
       this.getCurrentAPIIndex();
 
-      this.$scope.$applyAsync();
       return this.currentDefault;
     } catch (error) {
       const options = {
-        context: `${SettingsController.name}.setDefault`,
+        context: `${Settings.name}.setDefault`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -275,12 +306,13 @@ export class SettingsController {
   async getSettings() {
     try {
       try {
-        this.indexPatterns =
-          await SavedObject.getListOfWazuhValidIndexPatterns();
+        this.setState({
+          indexPatterns: await SavedObject.getListOfWazuhValidIndexPatterns(),
+        });
       } catch (error) {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-        this.$location.search('tab', null);
-        this.$location.path('/blank-screen');
+        this._setTabFromUrl(null);
+        location.hash = '#/blank-screen';
         return;
       }
 
@@ -292,19 +324,17 @@ export class SettingsController {
         const { id } = JSON.parse(currentApi);
         this.currentDefault = id;
       }
-
-      this.$scope.$applyAsync();
-      this.apiTableProps.currentDefault = this.currentDefault;
       this.getCurrentAPIIndex();
 
-      if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) {
+      if (
+        !this.state.currentApiEntryIndex &&
+        this.state.currentApiEntryIndex !== 0
+      ) {
         return;
       }
-
-      this.$scope.$applyAsync();
     } catch (error) {
       const options = {
-        context: `${SettingsController.name}.getSettings`,
+        context: `${Settings.name}.getSettings`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -319,13 +349,13 @@ export class SettingsController {
   }
 
   // Check manager connectivity
-  async checkManager(item, isIndex, silent = false) {
+  async checkManager(item, isIndex?, silent = false) {
     try {
       // Get the index of the API in the entries
       const index = isIndex ? item : this.getApiIndex(item);
 
       // Get the Api information
-      const api = this.apiEntries[index];
+      const api = this.state.apiEntries[index];
       const { username, url, port, id } = api;
       const tmpData = {
         username: username,
@@ -338,22 +368,19 @@ export class SettingsController {
 
       // Test the connection
       const data = await ApiCheck.checkApi(tmpData, true);
-      tmpData.cluster_info = data.data;
+      tmpData.cluster_info = data?.data;
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry
-      this.$scope.$emit('updateAPI', { cluster_info });
-      this.apiEntries[index].cluster_info = cluster_info;
-      this.apiEntries[index].status = 'online';
-      this.apiEntries[index].allow_run_as = data.data.allow_run_as;
+      this.state.apiEntries[index].cluster_info = cluster_info;
+      this.state.apiEntries[index].status = 'online';
+      this.state.apiEntries[index].allow_run_as = data.data.allow_run_as;
       this.wzMisc.setApiIsDown(false);
       !silent && ErrorHandler.info('Connection success', 'Settings');
-      this.$scope.$applyAsync();
     } catch (error) {
-      this.load = false;
-      this.$scope.$applyAsync();
+      this.setState({ load: false });
       if (!silent) {
         const options = {
-          context: `${SettingsController.name}.checkManager`,
+          context: `${Settings.name}.checkManager`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
@@ -391,24 +418,23 @@ export class SettingsController {
         revision: response['revision'],
       };
 
-      this.load = false;
+      this.setState({ load: false });
       const config = this.wazuhConfig.getConfig();
       AppState.setPatternSelector(config['ip.selector']);
       const pattern = AppState.getCurrentPattern();
-      this.selectedIndexPattern = pattern || config['pattern'];
 
       this.getCurrentAPIIndex();
       if (
-        (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) &&
-        this.currentApiEntryIndex >= 0
+        (this.state.currentApiEntryIndex ||
+          this.state.currentApiEntryIndex === 0) &&
+        this.state.currentApiEntryIndex >= 0
       ) {
-        await this.checkManager(this.currentApiEntryIndex, true, true);
+        await this.checkManager(this.state.currentApiEntryIndex, true, true);
       }
-      this.$scope.$applyAsync();
     } catch (error) {
       AppState.removeNavigation();
       const options = {
-        context: `${SettingsController.name}.getAppInfo`,
+        context: `${Settings.name}.getAppInfo`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -428,7 +454,9 @@ export class SettingsController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      this.apiEntries = this.apiTableProps.apiEntries = hosts;
+      this.setState({
+        apiEntries: hosts,
+      });
       return hosts;
     } catch (error) {
       return Promise.reject(error);
@@ -447,5 +475,70 @@ export class SettingsController {
     document.execCommand('copy');
     document.body.removeChild(el);
     ErrorHandler.info('Error copied to the clipboard');
+  }
+
+  render() {
+    return (
+      <div>
+        {this.state.load ? (
+          <div style={{ padding: '16px' }}>
+            <EuiProgress size='xs' color='primary' />
+          </div>
+        ) : null}
+        {/* It must get renderized only in configuration app to show Miscellaneous tab in configuration App */}
+        {!this.state.load &&
+        !this.apiIsDown &&
+        this.state.settingsTabsProps?.tabs ? (
+          <div className='wz-margin-top-16 md-margin-h'>
+            <Tabs {...this.state.settingsTabsProps} />
+          </div>
+        ) : null}
+        {/* end head */}
+
+        {/* api */}
+        {this.state.tab === 'api' && !this.state.load ? (
+          <div>
+            {/* API table section */}
+            <div>
+              <ApiTable />
+            </div>
+          </div>
+        ) : null}
+        {/* End API configuration card section */}
+        {/* end api */}
+
+        {/* configuration */}
+        {this.state.tab === 'configuration' && !this.state.load ? (
+          <div>
+            <WzConfigurationSettings />
+          </div>
+        ) : null}
+        {/* end configuration */}
+        {/* miscellaneous */}
+        {this.state.tab === 'miscellaneous' && !this.state.load ? (
+          <div>
+            <SettingsMiscellaneous />
+          </div>
+        ) : null}
+        {/* end miscellaneous */}
+        {/* about */}
+        {this.state.tab === 'about' && !this.state.load ? (
+          <div>
+            <SettingsAbout
+              appInfo={this.appInfo}
+              pluginAppName={this.pluginAppName}
+            />
+          </div>
+        ) : null}
+        {/* end about */}
+        {/* sample data */}
+        {this.state.tab === 'sample_data' && !this.state.load ? (
+          <div>
+            <WzSampleDataWrapper />
+          </div>
+        ) : null}
+        {/* end sample data */}
+      </div>
+    );
   }
 }
