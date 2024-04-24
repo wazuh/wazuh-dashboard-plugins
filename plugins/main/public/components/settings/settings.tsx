@@ -57,8 +57,6 @@ export class Settings extends React.Component {
   tabNames;
   tabsConfiguration;
   apiIsDown;
-  messageError;
-  messageErrorUpdate;
   googleGroupsSVG;
   currentDefault;
   appInfo;
@@ -70,7 +68,6 @@ export class Settings extends React.Component {
     this.pluginPlatformVersion = (pluginPlatform || {}).version || false;
     this.pluginAppName = PLUGIN_APP_NAME;
 
-    this.genericReq = GenericRequest;
     this.wzMisc = new WzMisc();
     this.wazuhConfig = new WazuhConfig();
 
@@ -115,13 +112,7 @@ export class Settings extends React.Component {
     );
   }
 
-  componentDidMount(): void {
-    this.onInit();
-  }
-  /**
-   * On load
-   */
-  async onInit() {
+  async componentDidMount(): void {
     try {
       const urlTab = this._getTabFromUrl();
 
@@ -200,106 +191,11 @@ export class Settings extends React.Component {
   }
 
   /**
-   * Compare the string param with currentAppID
-   * @param {string} appToCompare
-   * It use into plugins/main/public/templates/settings/settings.html to show tabs into expecified App
-   */
-  compareCurrentAppID(appToCompare) {
-    return getWzCurrentAppID() === appToCompare;
-  }
-
-  /**
    * Returns the index of the API in the entries array
    * @param {Object} api
    */
   getApiIndex(api) {
     return this.state.apiEntries.map(entry => entry.id).indexOf(api.id);
-  }
-
-  /**
-   * Checks the API entries status in order to set if there are online, offline or unknown.
-   */
-  async checkApisStatus() {
-    try {
-      let numError = 0;
-      for (let idx in this.state.apiEntries) {
-        try {
-          await this.checkManager(this.state.apiEntries[idx], false, true);
-          this.state.apiEntries[idx].status = 'online';
-        } catch (error) {
-          const code = ((error || {}).data || {}).code;
-          const downReason =
-            typeof error === 'string'
-              ? error
-              : (error || {}).message ||
-                ((error || {}).data || {}).message ||
-                'Wazuh is not reachable';
-          const status = code === 3099 ? 'down' : 'unknown';
-          this.state.apiEntries[idx].status = { status, downReason };
-          numError = numError + 1;
-          if (this.state.apiEntries[idx].id === this.currentDefault) {
-            // if the selected API is down, we remove it so a new one will selected
-            AppState.removeCurrentAPI();
-          }
-        }
-      }
-      return numError;
-    } catch (error) {
-      const options = {
-        context: `${Settings.name}.checkApisStatus`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
-  // Set default API
-  async setDefault(item) {
-    try {
-      await this.checkManager(item, false, true);
-      const index = this.getApiIndex(item);
-      const api = this.state.apiEntries[index];
-      const { cluster_info, id } = api;
-      const { manager, cluster, status } = cluster_info;
-
-      // Check the connection before set as default
-      AppState.setClusterInfo(cluster_info);
-      const clusterEnabled = status === 'disabled';
-      AppState.setCurrentAPI(
-        JSON.stringify({
-          name: clusterEnabled ? manager : cluster,
-          id: id,
-        }),
-      );
-
-      const currentApi = AppState.getCurrentAPI();
-      this.currentDefault = JSON.parse(currentApi).id;
-      const idApi = api.id;
-
-      ErrorHandler.info(`API with id ${idApi} set as default`);
-
-      this.getCurrentAPIIndex();
-
-      return this.currentDefault;
-    } catch (error) {
-      const options = {
-        context: `${Settings.name}.setDefault`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
   }
 
   // Get settings function
@@ -396,22 +292,11 @@ export class Settings extends React.Component {
   }
 
   /**
-   * This set the error, and checks if is updating
-   * @param {*} error
-   * @param {*} updating
-   */
-  printError(error, updating) {
-    const text = ErrorHandler.handle(error, 'Settings');
-    if (!updating) this.messageError = text;
-    else this.messageErrorUpdate = text;
-  }
-
-  /**
    * Returns Wazuh app info
    */
   async getAppInfo() {
     try {
-      const data = await this.genericReq.request('GET', '/api/setup');
+      const data = await GenericRequest.request('GET', '/api/setup');
       const response = data.data.data;
       this.appInfo = {
         'app-version': response['app-version'],
@@ -452,7 +337,7 @@ export class Settings extends React.Component {
    */
   async getHosts() {
     try {
-      const result = await this.genericReq.request('GET', '/hosts/apis', {});
+      const result = await GenericRequest.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
       this.setState({
         apiEntries: hosts,
@@ -461,20 +346,6 @@ export class Settings extends React.Component {
     } catch (error) {
       return Promise.reject(error);
     }
-  }
-
-  /**
-   * Copy to the clickboard the string passed
-   * @param {String} msg
-   */
-  copyToClipBoard(msg) {
-    const el = document.createElement('textarea');
-    el.value = msg;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    ErrorHandler.info('Error copied to the clipboard');
   }
 
   render() {
