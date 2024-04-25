@@ -27,6 +27,7 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
+import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
 import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
@@ -46,6 +47,7 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import {
+  AlertsDataSource,
   AlertsVulnerabilitiesDataSource,
   AlertsVirustotalDataSource,
 } from '../data-source';
@@ -85,8 +87,16 @@ export const ModulesDefaults = {
   general: {
     init: 'events',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardThreatHunting,
+      },
+      renderDiscoverTab({
+        tableColumns: threatHuntingColumns,
+        DataSource: AlertsDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
