@@ -8,7 +8,6 @@ import { IIndexPattern } from '../../../../../../src/plugins/data/public';
  * @param context
  */
 export function useReportingCommunicateSearchContext(context: {
-  isLoading: boolean;
   isSearching: boolean;
   totalResults: number;
   indexPattern: IIndexPattern;

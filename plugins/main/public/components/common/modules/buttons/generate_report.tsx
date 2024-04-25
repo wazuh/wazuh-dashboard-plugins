@@ -25,7 +25,6 @@ const mapStateToProps = state => ({
 export const ButtonModuleGenerateReport = connect(mapStateToProps)(
   ({ agent, moduleID, dataSourceSearchContext }) => {
     const disabledReport = ![
-      !dataSourceSearchContext?.isLoading,
       !dataSourceSearchContext?.isSearching,
       dataSourceSearchContext?.totalResults,
       dataSourceSearchContext?.indexPattern,
