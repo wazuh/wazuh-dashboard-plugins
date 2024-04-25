@@ -507,7 +507,7 @@ function generateAlert(params) {
                 alert.syscheck.sha1_after = randomElements(40, 'abcdef0123456789');
                 alert.syscheck.changed_attributes = [randomArrayItem(IntegrityMonitoring.attributes)];
                 alert.syscheck.md5_after = randomElements(32, 'abcdef0123456789');
-                alert.syscheck.sha256_after = randomElements(60, 'abcdef0123456789');
+                alert.syscheck.sha256_after = randomElements(64, 'abcdef0123456789');
                 break;
             case 'deleted':
                 alert.rule = IntegrityMonitoring.regulatory[2];
@@ -533,7 +533,7 @@ function generateAlert(params) {
                     },
                 };
                 alert.syscheck.md5_after = randomElements(32, 'abcdef0123456789');
-                alert.syscheck.sha256_after = randomElements(60, 'abcdef0123456789');
+                alert.syscheck.sha256_after = randomElements(64, 'abcdef0123456789');
                 break;
             default: {
             }
