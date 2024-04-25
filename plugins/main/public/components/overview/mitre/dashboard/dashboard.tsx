@@ -117,12 +117,12 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
                     useMargins: true,
                     id: 'mitre-dashboard-tab-filters',
                     timeRange: {
-                      from: searchBarProps.dateRangeFrom,
-                      to: searchBarProps.dateRangeTo,
+                      from: dateRangeFrom,
+                      to: dateRangeTo,
                     },
                     title: 'MITRE dashboard filters',
                     description: 'Dashboard of the MITRE filters',
-                    query: searchBarProps.query,
+                    query: query,
                     refreshConfig: {
                       pause: false,
                       value: 15,
