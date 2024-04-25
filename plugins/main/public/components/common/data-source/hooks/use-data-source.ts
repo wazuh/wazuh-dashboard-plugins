@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   IDataSourceFactoryConstructor,
-  tDataSource,
   tDataSourceRepository,
   tFilter,
   tSearchParams,
@@ -19,6 +18,7 @@ type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   factory?: PatternDataSourceFactory;
   filterManager?: tFilterManager;
   filters?: tFilter[];
+  fetchFilters?: tFilter[];
 };
 
 type tUseDataSourceLoadedReturns<K> = {
@@ -43,24 +43,23 @@ type tUseDataSourceNotLoadedReturns = {
   filterManager: null;
 };
 
-export function useDataSource<
-  T extends tParsedIndexPattern,
-  K extends PatternDataSource,
->(
-  props: tUseDataSourceProps<T, K>,
+export function useDataSource<T extends tParsedIndexPattern, K extends PatternDataSource>(
+  props: tUseDataSourceProps<T, K>
 ): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
   const {
-    filters: defaultFilters = [],
+    filters: initialFilters = [],
+    fetchFilters: initialFetchFilters = [],
     DataSource: DataSourceConstructor,
     repository,
     factory: injectedFactory,
+    filterManager: injectedFilterManager,
   } = props;
 
   if (!repository || !DataSourceConstructor) {
     throw new Error('DataSource and repository are required');
   }
 
-  const [dataSource, setDataSource] = useState<tDataSource>();
+  const [dataSource, setDataSource] = useState<PatternDataSource>();
   const [dataSourceFilterManager, setDataSourceFilterManager] =
     useState<PatternDataSourceFilterManager | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -84,45 +83,39 @@ export function useDataSource<
   };
 
   useEffect(() => {
+
     let subscription;
     (async () => {
-      setIsLoading(true);
-      const factory = injectedFactory || new PatternDataSourceFactory();
-      const patternsData = await repository.getAll();
-      const dataSources = await factory.createAll(
-        DataSourceConstructor,
-        patternsData,
-      );
-      const selector = new PatternDataSourceSelector(dataSources, repository);
-      const dataSource = await selector.getSelectedDataSource();
-      if (!dataSource) {
-        throw new Error('No valid data source found');
-      }
-      setDataSource(dataSource);
-      const dataSourceFilterManager = new PatternDataSourceFilterManager(
-        dataSource,
-        defaultFilters,
-      );
-      if (!dataSourceFilterManager) {
-        throw new Error('Error creating filter manager');
-      }
-
-      // what the filters update
-      subscription = dataSourceFilterManager.getUpdates$().subscribe({
-        next: () => {
-          // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-          dataSourceFilterManager.setFilters(
-            dataSourceFilterManager.getFilters(),
-          );
-          setAllFilters(dataSourceFilterManager.getFilters());
-          setFetchFilters(dataSourceFilterManager.getFetchFilters());
-        },
-      });
-      setAllFilters(dataSourceFilterManager.getFilters());
-      setFetchFilters(dataSourceFilterManager.getFetchFilters());
-      setDataSourceFilterManager(dataSourceFilterManager);
-      setIsLoading(false);
-    })();
+    setIsLoading(true);
+    const factory = injectedFactory || new PatternDataSourceFactory();
+    const patternsData = await repository.getAll();
+    const dataSources = await factory.createAll(DataSourceConstructor, patternsData);
+    const selector = new PatternDataSourceSelector(dataSources, repository);
+    const dataSource = await selector.getSelectedDataSource();
+    if (!dataSource) {
+      throw new Error('No valid data source found');
+    }
+    setDataSource(dataSource);
+    const dataSourceFilterManager = new PatternDataSourceFilterManager(
+      dataSource,
+      initialFilters,
+      injectedFilterManager,
+      initialFetchFilters
+    );
+    // what the filters update
+    subscription = dataSourceFilterManager.getUpdates$().subscribe({
+      next: () => {
+        // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
+        dataSourceFilterManager.setFilters(dataSourceFilterManager.getFilters());
+        setAllFilters(dataSourceFilterManager.getFilters());
+        setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      },
+    });
+    setAllFilters(dataSourceFilterManager.getFilters());
+    setFetchFilters(dataSourceFilterManager.getFetchFilters());
+    setDataSourceFilterManager(dataSourceFilterManager);
+    setIsLoading(false);
+  })();
     return () => subscription.unsubscribe();
   }, []);
 
