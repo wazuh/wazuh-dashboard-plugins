@@ -87,7 +87,7 @@ const DashboardDockerComponent: React.FC = ({}) => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar'>
+            <div className='wz-search-bar hide-filter-control'>
               <SearchBar
                 appName='docker-searchbar'
                 {...searchBarProps}
@@ -97,38 +97,40 @@ const DashboardDockerComponent: React.FC = ({}) => {
               />
             </div>
           )}
-          <SampleDataWarning />
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
-            <div className='docker-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    dataSource?.id,
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'docker-dashboard-tab',
-                  timeRange: {
-                    from: dateRangeFrom,
-                    to: dateRangeTo,
-                  },
-                  title: 'Docker dashboard',
-                  description: 'Dashboard of Docker',
-                  query: query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
-            </div>
+            <>
+              <SampleDataWarning />
+              <div className='docker-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      dataSource?.id,
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'docker-dashboard-tab',
+                    timeRange: {
+                      from: dateRangeFrom,
+                      to: dateRangeTo,
+                    },
+                    title: 'Docker dashboard',
+                    description: 'Dashboard of Docker',
+                    query: query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
+            </>
           ) : null}
         </>
       </I18nProvider>
