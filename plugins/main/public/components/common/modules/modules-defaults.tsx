@@ -51,7 +51,7 @@ import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attac
 import {
   AlertsDataSource,
   AlertsVulnerabilitiesDataSource,
-  AlertsVirustotalDataSource,
+  VirusTotalDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -274,7 +274,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: virustotalColumns,
-        DataSource: AlertsVirustotalDataSource,
+        DataSource: VirusTotalDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],

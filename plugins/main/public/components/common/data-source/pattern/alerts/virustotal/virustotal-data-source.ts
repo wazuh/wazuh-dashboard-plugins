@@ -5,7 +5,7 @@ import { AlertsDataSource } from '../alerts-data-source';
 const VIRUSTOTAL_GROUP_KEY = 'rule.groups';
 const VIRUSTOTAL_GROUP_VALUE = 'virustotal';
 
-export class AlertsVirustotalDataSource extends AlertsDataSource {
+export class VirusTotalDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }
