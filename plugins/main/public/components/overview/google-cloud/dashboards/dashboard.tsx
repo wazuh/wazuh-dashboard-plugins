@@ -77,7 +77,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar'>
+            <div className='wz-search-bar hide-filter-control'>
               <SearchBar
                 appName='google-cloud-searchbar'
                 {...searchBarProps}
@@ -90,10 +90,11 @@ const DashboardGoogleCloudComponent: React.FC = () => {
           )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
-          ) : null}
+          ) : (
+            <SampleDataWarning />
+          )}
           {dataSource && results?.hits?.total > 0 ? (
             <div className='google-cloud-dashboard-responsive'>
-              <SampleDataWarning />
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
