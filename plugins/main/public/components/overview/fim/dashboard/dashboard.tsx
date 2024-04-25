@@ -97,10 +97,11 @@ const DashboardFIMComponent: React.FC = ({}) => {
               />
             </div>
           )}
-          <SampleDataWarning />
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
-          ) : null}
+          ) : (
+            <SampleDataWarning />
+          )}
           {dataSource && results?.hits?.total > 0 ? (
             <div className='fim-dashboard-responsive'>
               <DashboardByRenderer
