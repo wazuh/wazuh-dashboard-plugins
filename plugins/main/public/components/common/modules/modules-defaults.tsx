@@ -117,15 +117,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardGoogleCloud,
-        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
-        buttons: [
-          ({ ...props }) => (
-            <ButtonModuleExploreAgent
-              {...props}
-              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
-            />
-          ),
-        ],
+        buttons: [ButtonModuleExploreAgent],
       },
       renderDiscoverTab({
         tableColumns: googleCloudColumns,
