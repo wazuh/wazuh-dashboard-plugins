@@ -128,7 +128,6 @@ export class CommonData {
   async af(filterHandler, tab, agent = false) {
     try {
       const tabFilters = {
-        general: { group: '' },
         welcome: { group: '' },
         fim: { group: 'syscheck' },
         pm: { group: 'rootcheck' },
