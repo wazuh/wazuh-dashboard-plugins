@@ -178,7 +178,7 @@ export class WzStatisticsOverview extends Component {
               <RedirectAppLinks application={getCore().application}>
                 <EuiButtonEmpty
                   href={getCore().application.getUrlForApp(appSettings.id, {
-                    path: '#/settings?tab=configuration&category=task:statistics',
+                    path: '#/settings?tab=configuration&category=Task:Statistics',
                   })}
                   iconType='gear'
                   iconSide='left'
