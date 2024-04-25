@@ -96,10 +96,11 @@ const DashboardAWSComponents: React.FC = ({}) => {
               />
             </div>
           )}
-          <SampleDataWarning />
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
-          ) : null}
+          ) : (
+            <SampleDataWarning />
+          )}
           {dataSource && results?.hits?.total > 0 ? (
             <div className='aws-dashboard-responsive'>
               <DashboardByRenderer
