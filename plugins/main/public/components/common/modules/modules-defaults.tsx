@@ -27,6 +27,8 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
+import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
+import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -46,8 +48,10 @@ import { malwareDetectionColumns } from '../../overview/malware-detection/events
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardDocker } from '../../overview/docker/dashboards';
 import {
-  AlertsVulnerabilitiesDataSource,
   AlertsDockerDataSource,
+  AlertsDataSource,
+  AlertsVulnerabilitiesDataSource,
+  AlertsVirustotalDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -85,8 +89,16 @@ export const ModulesDefaults = {
   general: {
     init: 'events',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardThreatHunting,
+      },
+      renderDiscoverTab({
+        tableColumns: threatHuntingColumns,
+        DataSource: AlertsDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -246,10 +258,17 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   virustotal: {
-    init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, virustotalColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardVirustotal,
+      },
+      renderDiscoverTab({
+        tableColumns: virustotalColumns,
+        DataSource: AlertsVirustotalDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
