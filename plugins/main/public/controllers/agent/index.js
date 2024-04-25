@@ -9,10 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AgentsController } from './agents';
 import { RegisterAgent } from '../../components/endpoints-summary/register-agent/containers/register-agent/register-agent';
-import { ExportConfiguration } from './components/export-configuration';
-import { AgentsWelcome } from '../../components/common/welcome/agents-welcome';
+import { ExportConfiguration } from '../../components/agents/export-configuration';
 import { Mitre } from '../../components/overview';
 import { AgentsTable } from '../../components/endpoints-summary/table/agents-table';
 import { MainModule } from '../../components/common/modules/main';
@@ -25,10 +23,8 @@ import { AgentView } from '../../components/endpoints-summary/agent';
 const app = getAngularModule();
 
 app
-  .controller('agentsController', AgentsController)
   .value('RegisterAgent', RegisterAgent)
   .value('ExportConfiguration', ExportConfiguration)
-  .value('AgentsWelcome', AgentsWelcome)
   .value('AgentView', AgentView)
   .value('Mitre', Mitre)
   .value('AgentsTable', AgentsTable)
