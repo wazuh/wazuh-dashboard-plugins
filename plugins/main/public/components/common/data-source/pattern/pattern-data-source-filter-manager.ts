@@ -84,15 +84,17 @@ export class PatternDataSourceFilterManager
   implements tDataSourceFilterManager
 {
   private filterManager: tFilterManager;
+  private defaultFetchFilters: tFilter[] = [];
   constructor(
     private dataSource: tDataSource,
     filters: tFilter[] = [],
     filterStorage?: tFilterManager,
+    fetchFilters?: tFilter[],
   ) {
     if (!dataSource) {
       throw new Error('Data source is required');
     }
-
+    this.defaultFetchFilters = fetchFilters || [];
     // when the filterManager is not received get the global filterManager
     this.filterManager = filterStorage || getDataPlugin().query.filterManager;
     if (!this.filterManager) {
@@ -201,7 +203,11 @@ export class PatternDataSourceFilterManager
    * @returns
    */
   getFetchFilters(): tFilter[] {
-    return [...this.dataSource.getFetchFilters(), ...this.getFilters()];
+    return [
+      ...this.defaultFetchFilters,
+      ...this.dataSource.getFetchFilters(),
+      ...this.getFilters(),
+    ];
   }
 
   /**
@@ -257,7 +263,7 @@ export class PatternDataSourceFilterManager
       isCluster
         ? AppState.getClusterInfo().cluster
         : AppState.getClusterInfo().manager,
-      true,
+      isCluster,
       key,
     );
     managerFilter.meta = {

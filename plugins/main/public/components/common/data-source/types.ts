@@ -19,6 +19,7 @@ export type tSearchParams = {
         from: string;
         to: string;
     };
+    aggs?: any;
 }
 
 export type tFilter = Filter;
