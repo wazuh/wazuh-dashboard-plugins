@@ -27,6 +27,8 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
+import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
+import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -44,11 +46,13 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
-import {
-  AlertsFIMDataSource,
-  AlertsVulnerabilitiesDataSource,
-} from '../data-source';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
+import {
+  AlertsDataSource,
+  AlertsVulnerabilitiesDataSource,
+  AlertsVirustotalDataSource,
+  AlertsFIMDataSource,
+} from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
 const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
@@ -85,8 +89,16 @@ export const ModulesDefaults = {
   general: {
     init: 'events',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardThreatHunting,
+      },
+      renderDiscoverTab({
+        tableColumns: threatHuntingColumns,
+        DataSource: AlertsDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -254,10 +266,17 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   virustotal: {
-    init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, virustotalColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardVirustotal,
+      },
+      renderDiscoverTab({
+        tableColumns: virustotalColumns,
+        DataSource: AlertsVirustotalDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
