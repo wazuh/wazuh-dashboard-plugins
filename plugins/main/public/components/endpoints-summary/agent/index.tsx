@@ -15,14 +15,11 @@ import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
 import { getAgentsService } from '../services';
 import { ShareAgent } from '../../../factories/share-agent';
-import { AppState } from '../../../react-services';
 import store from '../../../redux/store';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
 import { endpointSummary } from '../../../utils/applications';
 
 export const AgentView = () => {
-  AppState.removeSessionStorageItem('configSubTab');
-
   const $injector = getAngularModule().$injector;
 
   const $router = $injector.get('$route');
@@ -31,25 +28,17 @@ export const AgentView = () => {
 
   const shareAgent = new ShareAgent();
 
-  const targetLocation = shareAgent.getTargetLocation();
+  const savedTimefilter = $commonData.getTimefilter();
+  if (savedTimefilter) {
+    getDataPlugin().query.timefilter.timefilter.setTime(savedTimefilter);
+    $commonData.removeTimefilter();
+  }
 
   const { agent: agentId } = $router.current.params;
 
   const [agent, setAgent] = useState<Agent>();
   const [isLoadingAgent, setIsLoadingAgent] = useState(true);
-  const [tab, setTab] = useState<string>();
-
-  const init = async () => {
-    const savedTimefilter = $commonData.getTimefilter();
-    if (savedTimefilter) {
-      getDataPlugin().query.timefilter.timefilter.setTime(savedTimefilter);
-      $commonData.removeTimefilter();
-    }
-
-    setTab(targetLocation?.tab || $commonData.checkTabLocation());
-
-    await getAgent();
-  };
+  const [tab, setTab] = useState<string>($commonData.checkTabLocation());
 
   const getAgent = async () => {
     try {
@@ -93,8 +82,8 @@ export const AgentView = () => {
   };
 
   useEffect(() => {
-    init();
-  }, []);
+    getAgent();
+  }, [tab]);
 
   const exportConfiguration = enabledComponents => {
     $reportingService.startConfigReport(
