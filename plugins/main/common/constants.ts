@@ -221,12 +221,18 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
 }
 
 export const AUTHORIZED_AGENTS = 'hidden-authorized-agents';
-export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER = 'hidden-exclude-server';
+export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER =
+  'hidden-exclude-server';
 export const DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT = 'pinned-agent';
 export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
-export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP = 'vulnerabilities-rule-group';
-export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE = 'mitre-attack-rule';
-export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID = 'hidden-mitre-attack-rule-id';
+export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
+  'vulnerabilities-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
+  'mitre-attack-rule';
+export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID =
+  'hidden-mitre-attack-rule-id';
+export const DATA_SOURCE_FILTER_CONTROLLED_VIRUSTOTAL_RULE_GROUP =
+  'virustotal-rule-group';
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
 export const WAZUH_LINK_GOOGLE_GROUPS =
