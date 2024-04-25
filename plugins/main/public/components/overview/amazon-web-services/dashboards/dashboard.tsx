@@ -98,37 +98,38 @@ const DashboardAWSComponents: React.FC = ({}) => {
           )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
-          ) : (
-            <SampleDataWarning />
-          )}
-          {dataSource && results?.hits?.total > 0 ? (
-            <div className='aws-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    dataSource?.id,
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters || [],
-                  useMargins: true,
-                  id: 'aws-dashboard-tab',
-                  timeRange: {
-                    from: dateRangeFrom,
-                    to: dateRangeTo,
-                  },
-                  title: 'AWS dashboard',
-                  description: 'Dashboard of the AWS',
-                  query: query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
-            </div>
+          ) : null}
+          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+            <>
+              <SampleDataWarning />
+              <div className='aws-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      dataSource?.id,
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters || [],
+                    useMargins: true,
+                    id: 'aws-dashboard-tab',
+                    timeRange: {
+                      from: dateRangeFrom,
+                      to: dateRangeTo,
+                    },
+                    title: 'AWS dashboard',
+                    description: 'Dashboard of the AWS',
+                    query: query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
+            </>
           ) : null}
         </>
       </I18nProvider>
