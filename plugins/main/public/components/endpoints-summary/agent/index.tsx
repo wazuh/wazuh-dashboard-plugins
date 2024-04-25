@@ -32,14 +32,12 @@ export const AgentView = () => {
   const shareAgent = new ShareAgent();
 
   const targetLocation = shareAgent.getTargetLocation();
-  // const ignoreTabs = ['syscollector', 'welcome', 'configuration', 'stats'];
 
   const { agent: agentId } = $router.current.params;
 
   const [agent, setAgent] = useState<Agent>();
   const [isLoadingAgent, setIsLoadingAgent] = useState(true);
   const [tab, setTab] = useState<string>();
-  // const [tabHistory, setTabHistory] = useState<string[]>([]);
 
   const init = async () => {
     const savedTimefilter = $commonData.getTimefilter();

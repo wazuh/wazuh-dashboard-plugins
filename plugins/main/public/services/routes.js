@@ -20,7 +20,6 @@ import { settingsWizard, getSavedSearch, getIp, getWzConfig } from './resolves';
 // HTML templates
 import healthCheckTemplate from '../templates/health-check/health-check.html';
 import agentsTemplate from '../templates/agents/dashboards.html';
-// import agentsTemplate from '../templates/agents/dashboards copy.html';
 import agentDeployTemplate from '../templates/agents/deploy/agent-deploy.html';
 import agentsPrevTemplate from '../templates/agents-prev/agents-prev.html';
 import managementTemplate from '../templates/management/management.html';
