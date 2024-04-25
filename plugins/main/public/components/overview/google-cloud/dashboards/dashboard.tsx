@@ -50,25 +50,34 @@ const DashboardGoogleCloudComponent: React.FC = () => {
     filters,
     setFilters,
   });
-  const { query } = searchBarProps;
+
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
       return;
     }
-    //TODO: Add time range
-    fetchData({ query })
-      .then(results => {
-        setResults(results);
-      })
+    fetchData({
+      query,
+      dateRange: {
+        to: dateRangeTo,
+        from: dateRangeFrom,
+      },
+    })
+      .then(results => setResults(results))
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching alerts',
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
+  ]);
 
   return (
     <>
@@ -100,7 +109,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
                   viewMode: ViewMode.VIEW,
                   panels: getDashboardPanels(
                     dataSource?.id,
-                    dataSource?.getPinnedAgentFilter().length > 0,
+                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
                   ),
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
