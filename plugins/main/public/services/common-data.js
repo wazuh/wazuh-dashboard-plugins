@@ -128,7 +128,6 @@ export class CommonData {
   async af(filterHandler, tab, agent = false) {
     try {
       const tabFilters = {
-        general: { group: '' },
         welcome: { group: '' },
         fim: { group: 'syscheck' },
         pm: { group: 'rootcheck' },
@@ -143,7 +142,6 @@ export class CommonData {
         tsc: { group: 'tsc' },
         gcp: { group: 'gcp' },
         office: { group: 'office365' },
-        virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
         sca: { group: 'sca' },
         docker: { group: 'docker' },
