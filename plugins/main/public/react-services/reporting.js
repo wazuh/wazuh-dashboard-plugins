@@ -20,9 +20,9 @@ import { VisHandlers } from '../factories/vis-handlers';
 import {
   getAngularModule,
   getCore,
-  getDataPlugin,
   getHttp,
   getToasts,
+  getUiSettings,
 } from '../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
@@ -34,6 +34,11 @@ import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiButton, EuiLink } from '@elastic/eui';
 import { reporting } from '../utils/applications';
 import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
+import {
+  buildOpenSearchQuery,
+  buildRangeFilter,
+  getOpenSearchQueryConfig,
+} from '../../../../src/plugins/data/common';
 
 const app = getAngularModule();
 
@@ -145,14 +150,33 @@ export class ReportingService {
       const dataSourceContext =
         searchContext || (await this.getDataSourceSearchContext());
       const visualizations = await this.getVisualizationsFromDOM();
-      const dataplugin = await getDataPlugin();
-      const serverSideQuery = dataplugin.query.getOpenSearchQuery();
+
+      const timeFilter =
+        dataSourceContext.time && dataSourceContext.indexPattern.timeFieldName
+          ? buildRangeFilter(
+              {
+                name: dataSourceContext.indexPattern.timeFieldName,
+                type: 'date',
+              },
+              dataSourceContext.time,
+              dataSourceContext.indexPattern,
+            )
+          : null;
+      // Build the filters to use in the server side
+      // Based on https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.13.0/src/plugins/data/public/query/query_service.ts#L103-L113
+      const serverSideQuery = buildOpenSearchQuery(
+        dataSourceContext.indexPattern,
+        dataSourceContext.query,
+        [...dataSourceContext.filters, ...(timeFilter ? [timeFilter] : [])],
+        getOpenSearchQueryConfig(getUiSettings()),
+      );
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
         array: visualizations,
         serverSideQuery, // Used for applying the same filters on the server side requests
         filters: dataSourceContext.filters,
+        // TODO: review for Today or This week
         time: {
           to: dateMath.parse(dataSourceContext.time.to),
           from: dateMath.parse(dataSourceContext.time.from),
