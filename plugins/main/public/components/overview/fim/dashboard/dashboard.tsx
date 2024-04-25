@@ -99,37 +99,38 @@ const DashboardFIMComponent: React.FC = ({}) => {
           )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
-          ) : (
-            <SampleDataWarning />
-          )}
-          {dataSource && results?.hits?.total > 0 ? (
-            <div className='fim-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    dataSource?.id,
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'fim-dashboard-tab',
-                  timeRange: {
-                    from: dateRangeFrom,
-                    to: dateRangeTo,
-                  },
-                  title: 'File Integrity Monitoring dashboard',
-                  description: 'Dashboard of the File Integrity Monitoring',
-                  query: query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
-            </div>
+          ) : null}
+          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+            <>
+              <SampleDataWarning />
+              <div className='fim-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      dataSource?.id,
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'fim-dashboard-tab',
+                    timeRange: {
+                      from: dateRangeFrom,
+                      to: dateRangeTo,
+                    },
+                    title: 'File Integrity Monitoring dashboard',
+                    description: 'Dashboard of the File Integrity Monitoring',
+                    query: query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
+            </>
           ) : null}
         </>
       </I18nProvider>
