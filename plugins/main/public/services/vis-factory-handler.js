@@ -29,7 +29,7 @@ export class VisFactoryService {
     rawVisualizations,
     loadedVisualizations,
     commonData,
-    visHandlers
+    visHandlers,
   ) {
     this.$rootScope = $rootScope;
     this.genericReq = GenericRequest;
@@ -71,19 +71,18 @@ export class VisFactoryService {
     filterHandler,
     tab,
     subtab,
-    fromDiscover = false
+    fromDiscover = false,
   ) {
     try {
       const currentPattern = AppState.getCurrentPattern();
       const data = await this.genericReq.request(
         'GET',
-        `/elastic/visualizations/overview-${tab}/${currentPattern}`
+        `/elastic/visualizations/overview-${tab}/${currentPattern}`,
       );
       this.rawVisualizations.assignItems(data.data.raw);
-      if (!fromDiscover) this.commonData.assignFilters(filterHandler, tab);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
       this.$rootScope.$broadcast('updateVis', {
-        raw: this.rawVisualizations.getList()
+        raw: this.rawVisualizations.getList(),
       });
       return;
     } catch (error) {
@@ -101,15 +100,13 @@ export class VisFactoryService {
    */
   async buildAgentsVisualizations(filterHandler, tab, subtab, id) {
     try {
-      const data =
-        (!['sca', 'office'].some(moduleID => tab !== moduleID))
-          ? await this.genericReq.request(
-              'GET',
-              `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`
-            )
-          : false;
+      const data = !['sca', 'office'].some(moduleID => tab !== moduleID)
+        ? await this.genericReq.request(
+            'GET',
+            `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`,
+          )
+        : false;
       data && this.rawVisualizations.assignItems(data.data.raw);
-      this.commonData.assignFilters(filterHandler, tab, id);
       this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
       this.$rootScope.$broadcast('updateVis');
       return;
