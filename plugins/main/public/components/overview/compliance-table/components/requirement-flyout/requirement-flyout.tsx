@@ -34,7 +34,7 @@ import {
 import { WzFlyout } from '../../../../../components/common/flyouts';
 import { WazuhFlyoutDiscover } from '../../../../common/wazuh-discover/wz-flyout-discover';
 import { PatternDataSource } from '../../../../common/data-source';
-import { AppNavigate, formatUIDate } from '../../../../../react-services';
+import { formatUIDate } from '../../../../../react-services';
 import TechniqueRowDetails from '../../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
 import { connect } from 'react-redux';
