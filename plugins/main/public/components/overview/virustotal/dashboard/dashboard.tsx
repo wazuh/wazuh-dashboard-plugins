@@ -22,7 +22,7 @@ import {
 } from '../../../common/data-source';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { AlertsVirustotalDataSource } from '../../../common/data-source/pattern/alerts/alerts-virustotal/alerts-virustotal-data-source';
+import { VirusTotalDataSource } from '../../../common/data-source/pattern/alerts/virustotal/virustotal-data-source';
 import './virustotal_dashboard.scss';
 
 const plugins = getPlugins();
@@ -39,7 +39,7 @@ const DashboardVT: React.FC = () => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsVirustotalDataSource,
+    DataSource: VirusTotalDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
