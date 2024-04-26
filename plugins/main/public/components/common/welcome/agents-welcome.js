@@ -38,9 +38,6 @@ import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
-import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
-import { AppState } from '../../../react-services/app-state';
-import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import {
   showExploreAgentModalGlobal,
@@ -104,11 +101,11 @@ export const AgentsWelcome = compose(
       },
       ...(agent?.name
         ? [
-            {
-              text: `${agent.name}`,
-              truncate: true,
-            },
-          ]
+          {
+            text: `${agent.name}`,
+            truncate: true,
+          },
+        ]
         : []),
     ];
   }),
@@ -228,7 +225,6 @@ export const AgentsWelcome = compose(
       tabVisualizations.assign({
         welcome: 8,
       });
-      const filterHandler = new FilterHandler(AppState.getCurrentPattern());
 
       this.drawerLokedSubscribtion = getChrome()
         .getIsNavDrawerLocked$()
@@ -238,12 +234,6 @@ export const AgentsWelcome = compose(
           });
         });
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line
-      await VisFactoryHandler.buildAgentsVisualizations(
-        filterHandler,
-        'welcome',
-        null,
-        this.props.agent.id,
-      );
     }
 
     componentDidUpdate(prevProps) {
@@ -268,13 +258,13 @@ export const AgentsWelcome = compose(
         )
           ? JSON.parse(window.localStorage.getItem('wz-menu-agent-apps-pinned'))
           : [
-              // Default pinned applications
-              threatHunting.id,
-              fileIntegrityMonitoring.id,
-              configurationAssessment.id,
-              mitreAttack.id,
-              malwareDetection.id,
-            ];
+            // Default pinned applications
+            threatHunting.id,
+            fileIntegrityMonitoring.id,
+            configurationAssessment.id,
+            mitreAttack.id,
+            malwareDetection.id,
+          ];
       }
 
       // Ensure the pinned applications are supported
@@ -611,7 +601,7 @@ export const AgentsWelcome = compose(
                   >
                     {' '}
                     {/* DatePicker */}
-                    <WzDatePicker condensed={true} onTimeChange={() => {}} />
+                    <WzDatePicker condensed={true} onTimeChange={() => { }} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 {(this.state.widthWindow < 1150 && (
@@ -644,33 +634,33 @@ export const AgentsWelcome = compose(
                     </EuiFlexGroup>
                   </Fragment>
                 )) || (
-                  <Fragment>
-                    <EuiFlexGrid columns={2}>
-                      <EuiFlexItem>
-                        <EuiFlexGroup>
-                          <EuiFlexItem
-                            key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                          >
-                            {this.renderMitrePanel()}
-                          </EuiFlexItem>
-                          {this.renderCompliancePanel()}
-                        </EuiFlexGroup>
-                      </EuiFlexItem>
-                      <FimEventsTable agent={this.props.agent} />
-                    </EuiFlexGrid>
-                    <EuiSpacer size='l' />
-                    <EuiFlexGroup>
-                      <EuiFlexItem
-                        key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                      >
-                        {' '}
-                        {/* Events count evolution */}
-                        {this.renderEventCountVisualization()}
-                      </EuiFlexItem>
-                      <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
-                    </EuiFlexGroup>
-                  </Fragment>
-                )}
+                    <Fragment>
+                      <EuiFlexGrid columns={2}>
+                        <EuiFlexItem>
+                          <EuiFlexGroup>
+                            <EuiFlexItem
+                              key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
+                            >
+                              {this.renderMitrePanel()}
+                            </EuiFlexItem>
+                            {this.renderCompliancePanel()}
+                          </EuiFlexGroup>
+                        </EuiFlexItem>
+                        <FimEventsTable agent={this.props.agent} />
+                      </EuiFlexGrid>
+                      <EuiSpacer size='l' />
+                      <EuiFlexGroup>
+                        <EuiFlexItem
+                          key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                        >
+                          {' '}
+                          {/* Events count evolution */}
+                          {this.renderEventCountVisualization()}
+                        </EuiFlexItem>
+                        <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
+                      </EuiFlexGroup>
+                    </Fragment>
+                  )}
               </EuiPageBody>
             </EuiPage>
           </div>
