@@ -26,7 +26,7 @@ import {
 } from '@elastic/eui';
 import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
-import { getUiSettings } from '../../../../../kibana-services';
+import { getCore, getUiSettings } from '../../../../../kibana-services';
 import {
   FilterManager,
   IndexPattern,
@@ -38,6 +38,8 @@ import { AppNavigate, formatUIDate } from '../../../../../react-services';
 import TechniqueRowDetails from '../../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
 import { connect } from 'react-redux';
+import { rules } from '../../../../../utils/applications';
+import { endpointSummary } from '../../../../../utils/applications';
 
 const renderRequirements = (value: []) => {
   return (
@@ -93,12 +95,11 @@ export const RequirementFlyout = connect(mapStateToProps)(
               displayAsText: 'Rule ID',
               render: value => (
                 <EuiLink
-                  onClick={e =>
-                    AppNavigate.navigateToModule(e, 'manager', {
-                      tab: 'rules',
-                      redirectRule: value,
-                    })
-                  }
+                  onClick={e => {
+                    getCore().application.navigateToApp(rules.id, {
+                      path: `#/manager/?tab=rules&redirectRule=${value}`,
+                    });
+                  }}
                 >
                   {value}
                 </EuiLink>
@@ -116,12 +117,11 @@ export const RequirementFlyout = connect(mapStateToProps)(
               displayAsText: 'Agent',
               render: value => (
                 <EuiLink
-                  onClick={e =>
-                    AppNavigate.navigateToModule(e, 'agents', {
-                      tab: 'welcome',
-                      agent: value,
-                    })
-                  }
+                  onClick={e => {
+                    getCore().application.navigateToApp(endpointSummary.id, {
+                      path: `#/agents/?tab=welcome&agent=${value}`,
+                    });
+                  }}
                 >
                   {value}
                 </EuiLink>
@@ -143,12 +143,11 @@ export const RequirementFlyout = connect(mapStateToProps)(
               displayAsText: 'Rule ID',
               render: value => (
                 <EuiLink
-                  onClick={e =>
-                    AppNavigate.navigateToModule(e, 'manager', {
-                      tab: 'rules',
-                      redirectRule: value,
-                    })
-                  }
+                  onClick={e => {
+                    getCore().application.navigateToApp(rules.id, {
+                      path: `#/manager/?tab=rules&redirectRule=${value}`,
+                    });
+                  }}
                 >
                   {value}
                 </EuiLink>
