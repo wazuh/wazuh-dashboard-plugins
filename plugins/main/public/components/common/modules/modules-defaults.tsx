@@ -12,14 +12,15 @@
 import { Dashboard } from './dashboard';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
+import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { MainFim } from '../../agents/fim';
-import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
+import { DashboardMITRE } from '../../overview/mitre/dashboard';
 import { withModuleNotForAgent } from '../hocs';
 import {
   WazuhDiscover,
@@ -27,6 +28,8 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
+import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
+import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
 import { DashboardGoogleCloud } from '../../overview/google-cloud/dashboards';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
@@ -45,8 +48,11 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
+  AlertsDataSource,
   AlertsVulnerabilitiesDataSource,
+  VirusTotalDataSource,
   AlertsGoogleCloudDataSource,
 } from '../data-source';
 
@@ -61,7 +67,6 @@ const DashboardTab = {
 };
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
-  const { DataSource, tableColumns } = props;
   return {
     id: 'events',
     name: 'Events',
@@ -85,8 +90,16 @@ export const ModulesDefaults = {
   general: {
     init: 'events',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardThreatHunting,
+      },
+      renderDiscoverTab({
+        tableColumns: threatHuntingColumns,
+        DataSource: AlertsDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -237,7 +250,12 @@ export const ModulesDefaults = {
   mitre: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardMITRE,
+      },
       {
         id: 'intelligence',
         name: 'Intelligence',
@@ -249,15 +267,25 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainMitre,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, mitreAttackColumns),
+      renderDiscoverTab({
+        DataSource: MitreAttackDataSource,
+        tableColumns: mitreAttackColumns,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
   virustotal: {
-    init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, virustotalColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardVirustotal,
+      },
+      renderDiscoverTab({
+        tableColumns: virustotalColumns,
+        DataSource: VirusTotalDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },

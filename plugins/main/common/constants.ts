@@ -227,6 +227,12 @@ export const DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT = 'pinned-agent';
 export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
 export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
   'vulnerabilities-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
+  'mitre-attack-rule';
+export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID =
+  'hidden-mitre-attack-rule-id';
+export const DATA_SOURCE_FILTER_CONTROLLED_VIRUSTOTAL_RULE_GROUP =
+  'virustotal-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_GOOGLE_CLOUD_RULE_GROUP =
   'gcp-rule-group';
 
