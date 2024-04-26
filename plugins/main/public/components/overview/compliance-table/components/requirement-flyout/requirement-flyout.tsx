@@ -129,7 +129,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
             },
             {
               id: 'agent.name',
-              displayAsText: 'Agent Name',
+              displayAsText: 'Agent name',
             },
             {
               id: this.props.getRequirementKey(),
