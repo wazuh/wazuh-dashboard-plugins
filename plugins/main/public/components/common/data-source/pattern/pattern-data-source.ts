@@ -61,7 +61,7 @@ export class PatternDataSource implements tDataSource {
 
     async fetch(params: tSearchParams){
         const indexPattern = await this.patternService.get(this.id);
-        const { filters: defaultFilters = [], query, pagination, sorting, fields, dateRange } = params;
+        const { filters: defaultFilters = [], query, pagination, sorting, fields, dateRange, aggs } = params;
         if(!indexPattern){
             return;
         }
@@ -74,7 +74,8 @@ export class PatternDataSource implements tDataSource {
                     pagination,
                     sorting,
                     fields: fields,
-                    dateRange
+                    dateRange,
+                    aggs
                 }
             );
 
