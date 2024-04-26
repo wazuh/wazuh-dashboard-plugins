@@ -235,6 +235,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_VIRUSTOTAL_RULE_GROUP =
   'virustotal-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_MALWARE_DETECTION_RULE_GROUP =
   'malware-detection-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
 
 
 // Wazuh links

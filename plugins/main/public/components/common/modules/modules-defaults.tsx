@@ -48,12 +48,14 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
+import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
   AlertsDataSource,
   AlertsVulnerabilitiesDataSource,
   VirusTotalDataSource,
   AlertsMalwareDetectionDataSource,
+  AlertsFIMDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -106,14 +108,22 @@ export const ModulesDefaults = {
   fim: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardFIM,
+      },
       {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonModuleExploreAgent],
         component: MainFim,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, fileIntegrityMonitoringColumns),
+      renderDiscoverTab({
+        tableColumns: fileIntegrityMonitoringColumns,
+        DataSource: AlertsFIMDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
