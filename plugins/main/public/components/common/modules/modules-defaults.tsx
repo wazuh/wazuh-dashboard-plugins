@@ -11,6 +11,7 @@
  */
 import { Dashboard } from './dashboard';
 import { MainSca } from '../../agents/sca';
+import { DashboardAWS } from '../../overview/amazon-web-services/dashboards';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { MainFim } from '../../agents/fim';
@@ -53,6 +54,7 @@ import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attac
 import {
   AlertsDataSource,
   AlertsVulnerabilitiesDataSource,
+  AlertsAWSDataSource,
   VirusTotalDataSource,
   AlertsMalwareDetectionDataSource,
   AlertsFIMDataSource,
@@ -130,8 +132,16 @@ export const ModulesDefaults = {
   aws: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, amazonWebServicesColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardAWS,
+      },
+      renderDiscoverTab({
+        tableColumns: amazonWebServicesColumns,
+        DataSource: AlertsAWSDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },

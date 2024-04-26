@@ -138,7 +138,6 @@ export class CommonData {
         hipaa: { group: 'hipaa' },
         nist: { group: 'nist' },
         tsc: { group: 'tsc' },
-        aws: { group: 'amazon' },
         gcp: { group: 'gcp' },
         office: { group: 'office365' },
         osquery: { group: 'osquery' },
