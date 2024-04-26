@@ -21,7 +21,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-import { AlertsPCIDSSDataSource } from '../../../common/data-source/pattern/alerts/alerts-pci-dss/alerts-pci-dss-data-source';
+import { AlertsPCIDSSDataSource } from '../../../common/data-source/pattern/alerts/pci-dss/alerts-pci-dss-data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 

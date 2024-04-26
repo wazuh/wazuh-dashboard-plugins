@@ -2,6 +2,8 @@ import { getAngularModule, getDataPlugin } from '../../../kibana-services';
 import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from '../../../../common/constants';
+import { useFilterManager } from '../hooks';
+import { FilterStateStore } from '../../../../../../src/plugins/data/common';
 
 export class ModulesHelper {
   static async getDiscoverScope() {

@@ -11,16 +11,19 @@
  */
 import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect } from 'react';
-//@ts-ignore
 
 export function useTimeFilter() {
   const { timefilter } = getDataPlugin().query.timefilter;
   const [timeFilter, setTimeFilter] = useState(timefilter.getTime());
   const [timeHistory, setTimeHistory] = useState(timefilter._history);
   useEffect(() => {
-    const subscription = timefilter.getTimeUpdate$().subscribe(
-      () => { setTimeFilter(timefilter.getTime()); setTimeHistory(timefilter._history) });
-    return () => { subscription.unsubscribe(); }
+    const subscription = timefilter.getTimeUpdate$().subscribe(() => {
+      setTimeFilter(timefilter.getTime());
+      setTimeHistory(timefilter._history);
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
   return { timeFilter, setTimeFilter: timefilter.setTime, timeHistory };
 }

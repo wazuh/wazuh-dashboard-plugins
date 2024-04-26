@@ -21,7 +21,7 @@ import {
   EuiLoadingChart,
   EuiEmptyPrompt,
 } from '@elastic/eui';
-import { FlyoutTechnique } from '../../../../overview/mitre/components/techniques/components/flyout-technique';
+import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
 import { getMitreCount } from './lib';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';
@@ -41,15 +41,12 @@ const MitreTopTacticsTactics = ({
   setSelectedTactic,
   timeFilter,
 }) => {
-  const getData = useAsyncActionRunOnStart(getTacticsData, [
-    agentId,
-    timeFilter,
-  ]);
+  const getData = useAsyncActionRunOnStart(getTacticsData, [agentId, timeFilter]);
 
   if (getData.running) {
     return (
       <div style={{ display: 'block', textAlign: 'center', paddingTop: 100 }}>
-        <EuiLoadingChart size='xl' />
+        <EuiLoadingChart size="xl" />
       </div>
     );
   }
@@ -59,8 +56,8 @@ const MitreTopTacticsTactics = ({
   }
   return (
     <>
-      <div className='wz-agents-mitre'>
-        <EuiText size='xs'>
+      <div className="wz-agents-mitre">
+        <EuiText size="xs">
           <EuiFlexGroup>
             <EuiFlexItem style={{ margin: 0, padding: '12px 0px 0px 10px' }}>
               <h3>Top Tactics</h3>
@@ -69,7 +66,7 @@ const MitreTopTacticsTactics = ({
         </EuiText>
         <EuiFlexGroup>
           <EuiFlexItem>
-            {getData?.data?.map(tactic => (
+            {getData?.data?.map((tactic) => (
               <EuiFacetButton
                 key={tactic.key}
                 quantity={tactic.doc_count}
@@ -95,11 +92,7 @@ const MitreTopTacticsTechniques = ({
   setView,
   timeFilter,
 }) => {
-  const getData = useAsyncActionRunOnStart(getTechniques, [
-    agentId,
-    timeFilter,
-    selectedTactic,
-  ]);
+  const getData = useAsyncActionRunOnStart(getTechniques, [agentId, timeFilter, selectedTactic]);
 
   const [showTechniqueDetails, setShowTechniqueDetails] = useState<string>('');
 
@@ -138,7 +131,7 @@ const MitreTopTacticsTechniques = ({
   if (getData.running) {
     return (
       <div style={{ display: 'block', textAlign: 'center', paddingTop: 100 }}>
-        <EuiLoadingChart size='xl' />
+        <EuiLoadingChart size="xl" />
       </div>
     );
   }
@@ -148,7 +141,7 @@ const MitreTopTacticsTechniques = ({
   }
   return (
     <>
-      <EuiText size='xs'>
+      <EuiText size="xs">
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiButtonIcon
@@ -157,8 +150,8 @@ const MitreTopTacticsTechniques = ({
               onClick={() => {
                 setView('tactics');
               }}
-              iconType='sortLeft'
-              aria-label='Back Top Tactics'
+              iconType="sortLeft"
+              aria-label="Back Top Tactics"
             />
           </EuiFlexItem>
           <EuiFlexItem>
@@ -168,7 +161,7 @@ const MitreTopTacticsTechniques = ({
       </EuiText>
       <EuiFlexGroup>
         <EuiFlexItem>
-          {getData.data.map(tactic => (
+          {getData.data.map((tactic) => (
             <EuiFacetButton
               key={tactic.key}
               quantity={tactic.doc_count}
@@ -196,11 +189,9 @@ export const MitreTopTactics = ({ agentId }) => {
 
   const renderEmpty = () => (
     <EuiEmptyPrompt
-      iconType='stats'
+      iconType="stats"
       title={<h4>No results</h4>}
-      body={
-        <p>No MITRE ATT&CK results were found in the selected time range.</p>
-      }
+      body={<p>No MITRE ATT&CK results were found in the selected time range.</p>}
     />
   );
 

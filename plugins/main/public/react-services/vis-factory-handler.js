@@ -79,10 +79,6 @@ export class VisFactoryHandler {
           )
         : false;
       data && rawVisualizations.assignItems(data.data.raw);
-      /* For the vuls component only, it is not necessary to call the assignFilters method since it is handled by the same module due to its particular characteristics. Only the condition for vuls is added so as not to alter the rest. This functionality should be applied in a higher hierarchy in the future. */
-      if (tab !== 'vuls' && !fromDiscover) {
-        commonData.assignFilters(filterHandler, tab);
-      }
       store.dispatch(
         updateVis({ update: true, raw: rawVisualizations.getList() }),
       );
@@ -120,11 +116,6 @@ export class VisFactoryHandler {
             `/elastic/visualizations/agents-${tab}/${AppState.getCurrentPattern()}`,
           )
         : false;
-      data && rawVisualizations.assignItems(data.data.raw);
-      /* For the vuls component only, it is not necessary to call the assignFilters method since it is handled by the same module due to its particular characteristics. Only the condition for vuls is added so as not to alter the rest. This functionality should be applied in a higher hierarchy in the future. */
-      if (tab !== 'vuls' && !fromDiscover) {
-        commonData.assignFilters(filterHandler, tab, id);
-      }
       store.dispatch(updateVis({ update: true }));
     } catch (error) {
       throw error;
