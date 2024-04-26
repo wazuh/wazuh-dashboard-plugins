@@ -11,74 +11,78 @@
  */
 
 import {} from '../redux/actions/appStateActions';
-import { getIndexPattern } from '../components/overview/mitre/lib';
+import { getIndexPattern } from './elastic_helpers';
 import { buildPhraseFilter } from '../../../../src/plugins/data/common';
 import rison from 'rison-node';
 
-
 export class AppNavigate {
-
-
   static getUrlParameter(sParam) {
     var sPageURL = window.location.hash.split('?')[1],
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
+      sURLVariables = sPageURL.split('&'),
+      sParameterName,
+      i;
     for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
+      sParameterName = sURLVariables[i].split('=');
 
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-        }
+      if (sParameterName[0] === sParam) {
+        return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+      }
     }
-};
-
-  static buildFilter_w(filters, indexPattern){
-    const filtersArray = [];
-      Object.keys(filters).forEach(currentFilter => {
-        filtersArray.push(
-          {
-            ...buildPhraseFilter({ name: currentFilter, type: 'text' }, filters[currentFilter], indexPattern),
-            "$state": { "isImplicit": false, "store": "appState" },
-          }
-        )
-      });
-    return rison.encode({ filters: filtersArray});
   }
 
-  static navigateToModule(e, section, params, navigateMethod=false) {
+  static buildFilter_w(filters, indexPattern) {
+    const filtersArray = [];
+    Object.keys(filters).forEach((currentFilter) => {
+      filtersArray.push({
+        ...buildPhraseFilter(
+          { name: currentFilter, type: 'text' },
+          filters[currentFilter],
+          indexPattern
+        ),
+        $state: { isImplicit: false, store: 'appState' },
+      });
+    });
+    return rison.encode({ filters: filtersArray });
+  }
+
+  static navigateToModule(e, section, params, navigateMethod = false) {
     e.persist(); // needed to access this event asynchronously
-    if(e.button == 0){ // left button clicked
-      if(navigateMethod){
+    if (e.button == 0) {
+      // left button clicked
+      if (navigateMethod) {
         navigateMethod();
         return;
       }
     }
-    getIndexPattern().then(indexPattern => {
+    getIndexPattern().then((indexPattern) => {
       const urlParams = {};
 
-      if(Object.keys(params).length){
-        Object.keys(params).forEach(key => {
-          if(key === "filters"){ 
-            urlParams["_w"] = this.buildFilter_w(params[key], indexPattern);
-          }else{
+      if (Object.keys(params).length) {
+        Object.keys(params).forEach((key) => {
+          if (key === 'filters') {
+            urlParams['_w'] = this.buildFilter_w(params[key], indexPattern);
+          } else {
             urlParams[key] = params[key];
           }
-        })
+        });
       }
-      const url = Object.entries(urlParams).map(e => e.join('=')).join('&');
-      const currentUrl = window.location.href.split("#/")[0];
-      const newUrl = currentUrl+ `#/${section}?` + url;
+      const url = Object.entries(urlParams)
+        .map((e) => e.join('='))
+        .join('&');
+      const currentUrl = window.location.href.split('#/')[0];
+      const newUrl = currentUrl + `#/${section}?` + url;
 
-      if (e && (e.which == 2 || e.button == 1 )) { // middlebutton clicked
-         window.open(newUrl, '_blank', "noreferrer");
-      }else if(e.button == 0){ // left button clicked
-        if(navigateMethod){
-          navigateMethod()
-        }else{
+      if (e && (e.which == 2 || e.button == 1)) {
+        // middlebutton clicked
+        window.open(newUrl, '_blank', 'noreferrer');
+      } else if (e.button == 0) {
+        // left button clicked
+        if (navigateMethod) {
+          navigateMethod();
+        } else {
           window.location.href = newUrl;
         }
       }
-    })
+    });
   }
 }

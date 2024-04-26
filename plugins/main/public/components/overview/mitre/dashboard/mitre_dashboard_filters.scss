@@ -1,0 +1,20 @@
+.mitre-dashboard-filters-wrapper {
+  .euiDataGrid__controls,
+  .euiDataGrid__pagination {
+    display: none !important;
+  }
+  .visTable {
+    overflow: hidden !important;
+  }
+}
+
+.mitre-dashboard-responsive {
+  @media (max-width: 767px) {
+    .react-grid-layout {
+      height: auto !important;
+    }
+    .dshLayout-isMaximizedPanel {
+      height: 100% !important;
+    }
+  }
+}
