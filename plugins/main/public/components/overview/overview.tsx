@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getAngularModule } from '../../kibana-services';
+import {
+  getAngularModule,
+  getDataPlugin,
+  getUiSettings,
+} from '../../kibana-services';
 import { Stats } from '../../controllers/overview/components/stats';
 import { WzRequest } from '../../react-services';
 import { OverviewWelcome } from '../common/welcome/overview-welcome';
@@ -8,6 +12,10 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { WzCurrentOverviewSectionWrapper } from '../common/modules/overview-current-section-wrapper';
+import { createHashHistory } from 'history';
+import { syncQueryStateWithUrl } from '../../../../../src/plugins/data/public';
+import { once } from 'lodash';
+import { createOsdUrlStateStorage } from '../../../../../src/plugins/opensearch_dashboards_utils/public';
 
 export const Overview: React.FC = () => {
   const [agentsCounts, setAgentsCounts] = useState({});
@@ -25,6 +33,22 @@ export const Overview: React.FC = () => {
     if (tab === 'welcome' || tab === undefined) {
       getSummary();
     }
+  }, []);
+
+  useEffect(() => {
+    const data = getDataPlugin();
+
+    const config = getUiSettings();
+    const getHistory = once(() => createHashHistory());
+
+    const osdUrlStateStorage = createOsdUrlStateStorage({
+      useHash: config.get('state:storeInSessionStorage'),
+      history: getHistory(),
+    });
+    const { stop: stopSyncingGlobalStateWithUrl } = syncQueryStateWithUrl(
+      data.query,
+      osdUrlStateStorage,
+    );
   }, []);
 
   /**
