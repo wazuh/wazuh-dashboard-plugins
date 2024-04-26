@@ -16,8 +16,7 @@ import WzDecodersOverview from './views/decoders-overview';
 import WzFileEditor from '../common/file-editor';
 import { SECTION_DECODERS_SECTION } from '../common/constants';
 
-export default function WzDecoder({ logtestProps }) {
-
+export default function WzDecoder() {
   const [fileContent, setFileContent] = useState(false);
   const [addingFile, setAddingFile] = useState(false);
   const [showingFiles, setShowingFiles] = useState(false);
@@ -25,29 +24,34 @@ export default function WzDecoder({ logtestProps }) {
   const cleanEditState = () => {
     setFileContent(false);
     setAddingFile(false);
-  }
+  };
 
   return (
     <WzReduxProvider>
-      {
-        ((fileContent || addingFile) && (
-          <WzFileEditor
-            section={SECTION_DECODERS_SECTION}
-            fileContent={fileContent}
-            addingFile={addingFile}
-            logtestProps={logtestProps}
-            updateFileContent={(fileContent) => { setFileContent(fileContent) }}
-            cleanEditState={() => cleanEditState()}
-          />
-        )) || (
-          <WzDecodersOverview
-            updateFileContent={(fileContent) => { setFileContent(fileContent) }}
-            updateAddingFile={(addingFile) => { setAddingFile(addingFile) }}
-            setShowingFiles={() => { setShowingFiles(!showingFiles) }}
-            showingFiles={showingFiles}
-          />
-        )
-      }
+      {((fileContent || addingFile) && (
+        <WzFileEditor
+          section={SECTION_DECODERS_SECTION}
+          fileContent={fileContent}
+          addingFile={addingFile}
+          updateFileContent={fileContent => {
+            setFileContent(fileContent);
+          }}
+          cleanEditState={() => cleanEditState()}
+        />
+      )) || (
+        <WzDecodersOverview
+          updateFileContent={fileContent => {
+            setFileContent(fileContent);
+          }}
+          updateAddingFile={addingFile => {
+            setAddingFile(addingFile);
+          }}
+          setShowingFiles={() => {
+            setShowingFiles(!showingFiles);
+          }}
+          showingFiles={showingFiles}
+        />
+      )}
     </WzReduxProvider>
   );
 }
