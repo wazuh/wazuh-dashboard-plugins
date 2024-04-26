@@ -83,10 +83,9 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
   };
 
   useEffect(() => {
-    init();
-  }, []);
 
-  const init = async () => {
+    let subscription;
+    (async () => {
     setIsLoading(true);
     const factory = injectedFactory || new PatternDataSourceFactory();
     const patternsData = await repository.getAll();
@@ -104,7 +103,7 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
       initialFetchFilters
     );
     // what the filters update
-    dataSourceFilterManager.getUpdates$().subscribe({
+    subscription = dataSourceFilterManager.getUpdates$().subscribe({
       next: () => {
         // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
         dataSourceFilterManager.setFilters(dataSourceFilterManager.getFilters());
@@ -116,7 +115,9 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
     setFetchFilters(dataSourceFilterManager.getFetchFilters());
     setDataSourceFilterManager(dataSourceFilterManager);
     setIsLoading(false);
-  };
+  })();
+    return () => subscription.unsubscribe();
+  }, []);
 
   if (isLoading) {
     return {
