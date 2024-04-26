@@ -234,6 +234,9 @@ export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID =
 export const DATA_SOURCE_FILTER_CONTROLLED_VIRUSTOTAL_RULE_GROUP =
   'virustotal-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP = 'aws-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
+
+
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
 export const WAZUH_LINK_GOOGLE_GROUPS =
