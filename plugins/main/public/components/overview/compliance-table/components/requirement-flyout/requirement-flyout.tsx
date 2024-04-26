@@ -11,7 +11,6 @@
  */
 import React, { Component } from 'react';
 import {
-  EuiFlyout,
   EuiFlyoutHeader,
   EuiLoadingContent,
   EuiTitle,
@@ -23,228 +22,360 @@ import {
   EuiText,
   EuiFlexItem,
   EuiSpacer,
+  EuiLink,
 } from '@elastic/eui';
-import { Discover } from '../../../../common/modules/discover';
 import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
 import { getUiSettings } from '../../../../../kibana-services';
-import { FilterManager } from '../../../../../../../../src/plugins/data/public/';
+import {
+  FilterManager,
+  IndexPattern,
+} from '../../../../../../../../src/plugins/data/public/';
 import { WzFlyout } from '../../../../../components/common/flyouts';
+import { WazuhFlyoutDiscover } from '../../../../common/wazuh-discover/wz-flyout-discover';
+import { PatternDataSource } from '../../../../common/data-source';
+import { AppNavigate, formatUIDate } from '../../../../../react-services';
+import TechniqueRowDetails from '../../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
+import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
+import { connect } from 'react-redux';
 
-export class RequirementFlyout extends Component {
-  _isMount = false;
-  state: {};
+const renderRequirements = (value: []) => {
+  return (
+    <EuiFlexGroup gutterSize='s' direction='column'>
+      {value.map(v => {
+        return <EuiFlexItem key={v}>{v}</EuiFlexItem>;
+      })}
+    </EuiFlexGroup>
+  );
+};
 
-  props!: {};
+const mapStateToProps = state => ({
+  currentAgentData: state.appStateReducers.currentAgentData,
+});
 
-  filterManager: FilterManager;
+export const RequirementFlyout = connect(mapStateToProps)(
+  class RequirementFlyout extends Component {
+    _isMount = false;
+    state: {};
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-    this.filterManager = new FilterManager(getUiSettings());
-  }
+    props!: {};
 
-  componentDidMount() {
-    this._isMount = true;
-  }
+    filterManager: FilterManager;
 
-  renderHeader() {
-    const { currentRequirement } = this.props;
-    return (
-      <EuiFlyoutHeader hasBorder style={{ padding: '12px 16px' }}>
-        {(!currentRequirement && (
-          <div>
-            <EuiLoadingContent lines={1} />
-          </div>
-        )) || (
-          <EuiTitle size="m">
-            <h2 id="flyoutSmallTitle">Requirement {currentRequirement}</h2>
-          </EuiTitle>
-        )}
-      </EuiFlyoutHeader>
-    );
-  }
-
-  updateTotalHits = (total) => {
-    this.setState({ totalHits: total });
-  };
-
-  renderBody() {
-    const { currentRequirement } = this.props;
-    const requirementImplicitFilter = {};
-    const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
-    const clusterFilter = isCluster
-      ? { 'cluster.name': AppState.getClusterInfo().cluster }
-      : { 'manager.name': AppState.getClusterInfo().manager };
-    this.clusterFilter = clusterFilter;
-    requirementImplicitFilter[this.props.getRequirementKey()] = currentRequirement;
-
-    const implicitFilters = [requirementImplicitFilter, this.clusterFilter];
-    if (this.props.implicitFilters) {
-      this.props.implicitFilters.forEach((item) => implicitFilters.push(item));
+    constructor(props) {
+      super(props);
+      this.state = {};
+      this.filterManager = new FilterManager(getUiSettings());
     }
-    //Goal for PCI
-    const currentReq = this.props.currentRequirement.split('.')[0];
 
-    return (
-      <EuiFlyoutBody className="flyout-body">
-        <EuiAccordion
-          id={'details'}
-          buttonContent={
-            <EuiTitle size="s">
-              <h3>Details</h3>
+    componentDidMount() {
+      this._isMount = true;
+    }
+
+    getDiscoverColumns() {
+      const agentId = this.props.currentAgentData?.id;
+      return agentId
+        ? [
+            {
+              id: 'timestamp',
+              displayAsText: 'Time',
+              render: value => formatUIDate(value),
+            },
+            {
+              id: this.props.getRequirementKey(),
+              displayAsText: 'Requirement(s)',
+              render: renderRequirements,
+            },
+            { id: 'rule.description', displayAsText: 'Description' },
+            { id: 'rule.level', displayAsText: 'Level' },
+            {
+              id: 'rule.id',
+              displayAsText: 'Rule ID',
+              render: value => (
+                <EuiLink
+                  onClick={e =>
+                    AppNavigate.navigateToModule(e, 'manager', {
+                      tab: 'rules',
+                      redirectRule: value,
+                    })
+                  }
+                >
+                  {value}
+                </EuiLink>
+              ),
+            },
+          ]
+        : [
+            {
+              id: 'timestamp',
+              displayAsText: 'Time',
+              render: value => formatUIDate(value),
+            },
+            {
+              id: 'agent.id',
+              displayAsText: 'Agent',
+              render: value => (
+                <EuiLink
+                  onClick={e =>
+                    AppNavigate.navigateToModule(e, 'agents', {
+                      tab: 'welcome',
+                      agent: value,
+                    })
+                  }
+                >
+                  {value}
+                </EuiLink>
+              ),
+            },
+            {
+              id: 'agent.name',
+              displayAsText: 'Agent Name',
+            },
+            {
+              id: this.props.getRequirementKey(),
+              displayAsText: 'Requirement',
+              render: renderRequirements,
+            },
+            { id: 'rule.description', displayAsText: 'Description' },
+            { id: 'rule.level', displayAsText: 'Level' },
+            {
+              id: 'rule.id',
+              displayAsText: 'Rule ID',
+              render: value => (
+                <EuiLink
+                  onClick={e =>
+                    AppNavigate.navigateToModule(e, 'manager', {
+                      tab: 'rules',
+                      redirectRule: value,
+                    })
+                  }
+                >
+                  {value}
+                </EuiLink>
+              ),
+            },
+          ];
+    }
+
+    renderHeader() {
+      const { currentRequirement } = this.props;
+      return (
+        <EuiFlyoutHeader hasBorder style={{ padding: '12px 16px' }}>
+          {(!currentRequirement && (
+            <div>
+              <EuiLoadingContent lines={1} />
+            </div>
+          )) || (
+            <EuiTitle size='m'>
+              <h2 id='flyoutSmallTitle'>Requirement {currentRequirement}</h2>
             </EuiTitle>
-          }
-          paddingSize="xs"
-          initialIsOpen={true}
-        >
-          <div className="flyout-row details-row">
-            <EuiSpacer size="xs" />
-            {requirementGoal[currentReq] && (
-              <EuiFlexGroup style={{ marginBottom: 10 }}>
+          )}
+        </EuiFlyoutHeader>
+      );
+    }
+
+    renderDiscoverExpandedRow(props: {
+      doc: any;
+      item: any;
+      indexPattern: any;
+    }) {
+      return (
+        <TechniqueRowDetails
+          {...props}
+          onRuleItemClick={(value: any, indexPattern: IndexPattern) => {
+            // add filters to the filter state
+            // generate the filter
+            const key = Object.keys(value)[0];
+            const filterValue = value[key];
+            const valuesArray = Array.isArray(filterValue)
+              ? [...filterValue]
+              : [filterValue];
+            const newFilter = valuesArray
+              .map(item =>
+                buildPhraseFilter(
+                  { name: key, type: 'string' },
+                  item,
+                  indexPattern,
+                ),
+              )
+              .filter(Boolean);
+
+            this.filterManager.addFilters(newFilter);
+          }}
+        />
+      );
+    }
+
+    renderBody() {
+      const { currentRequirement } = this.props;
+      const requirementImplicitFilter = {};
+      const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
+      const clusterFilter = isCluster
+        ? { 'cluster.name': AppState.getClusterInfo().cluster }
+        : { 'manager.name': AppState.getClusterInfo().manager };
+      this.clusterFilter = clusterFilter;
+      requirementImplicitFilter[this.props.getRequirementKey()] =
+        currentRequirement;
+
+      const implicitFilters = [requirementImplicitFilter, this.clusterFilter];
+      if (this.props.implicitFilters) {
+        this.props.implicitFilters.forEach(item => implicitFilters.push(item));
+      }
+      //Goal for PCI
+      const currentReq = this.props.currentRequirement.split('.')[0];
+
+      return (
+        <EuiFlyoutBody className='flyout-body'>
+          <EuiAccordion
+            id={'details'}
+            buttonContent={
+              <EuiTitle size='s'>
+                <h3>Details</h3>
+              </EuiTitle>
+            }
+            paddingSize='xs'
+            initialIsOpen={true}
+          >
+            <div className='flyout-row details-row'>
+              <EuiSpacer size='xs' />
+              {requirementGoal[currentReq] && (
+                <EuiFlexGroup style={{ marginBottom: 10 }}>
+                  <EuiFlexItem grow={false}>
+                    <EuiIcon
+                      size='l'
+                      type={'bullseye'}
+                      color='primary'
+                      style={{ marginTop: 8 }}
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
+                    <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
+                      <p style={{ fontWeight: 500, marginBottom: 2 }}>Goals</p>
+
+                      <p>{requirementGoal[currentReq]}</p>
+                    </EuiText>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              )}
+
+              <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
-                  <EuiIcon size="l" type={'bullseye'} color="primary" style={{ marginTop: 8 }} />
+                  <EuiIcon
+                    size='l'
+                    type={'filebeatApp'}
+                    color='primary'
+                    style={{ marginTop: 8 }}
+                  />
                 </EuiFlexItem>
                 <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                   <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                    <p style={{ fontWeight: 500, marginBottom: 2 }}>Goals</p>
+                    <p style={{ fontWeight: 500, marginBottom: 2 }}>
+                      Requirement description
+                    </p>
 
-                    <p>{requirementGoal[currentReq]}</p>
+                    <p>{this.props.description}</p>
                   </EuiText>
                 </EuiFlexItem>
               </EuiFlexGroup>
-            )}
-
-            <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
-                <EuiIcon size="l" type={'filebeatApp'} color="primary" style={{ marginTop: 8 }} />
-              </EuiFlexItem>
-              <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
-                <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                  <p style={{ fontWeight: 500, marginBottom: 2 }}>Requirement description</p>
-
-                  <p>{this.props.description}</p>
-                </EuiText>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiSpacer size="xs" />
-          </div>
-        </EuiAccordion>
-
-        <EuiSpacer size="s" />
-        <EuiAccordion
-          style={{ textDecoration: 'none' }}
-          id={'recent_events'}
-          className="events-accordion"
-          extraAction={
-            <div style={{ marginBottom: 5 }}>
-              <strong>{this.state.totalHits || 0}</strong> hits
+              <EuiSpacer size='xs' />
             </div>
-          }
-          buttonContent={
-            <EuiTitle size="s">
-              <h3>
-                Recent events
-                {this.props.view !== 'events' && (
-                  <span style={{ marginLeft: 16 }}>
-                    <span>
-                      <EuiToolTip
-                        position="top"
-                        content={'Show ' + currentRequirement + ' in Dashboard'}
-                      >
-                        <EuiIcon
-                          onMouseDown={(e) => {
-                            this.props.openDashboard(e, currentRequirement);
-                            e.stopPropagation();
-                          }}
-                          color="primary"
-                          type="visualizeApp"
-                          style={{ marginRight: '10px' }}
-                        ></EuiIcon>
-                      </EuiToolTip>
-                      <EuiToolTip
-                        position="top"
-                        content={'Inspect ' + currentRequirement + ' in Events'}
-                      >
-                        <EuiIcon
-                          onMouseDown={(e) => {
-                            this.props.openDiscover(e, currentRequirement);
-                            e.stopPropagation();
-                          }}
-                          color="primary"
-                          type="discoverApp"
-                        ></EuiIcon>
-                      </EuiToolTip>
+          </EuiAccordion>
+
+          <EuiSpacer size='s' />
+          <EuiAccordion
+            style={{ textDecoration: 'none' }}
+            id={'recent_events'}
+            className='events-accordion'
+            buttonContent={
+              <EuiTitle size='s'>
+                <h3>
+                  Recent events
+                  {this.props.view !== 'events' && (
+                    <span style={{ marginLeft: 16 }}>
+                      <span>
+                        <EuiToolTip
+                          position='top'
+                          content={
+                            'Show ' + currentRequirement + ' in Dashboard'
+                          }
+                        >
+                          <EuiIcon
+                            onMouseDown={e => {
+                              this.props.openDashboard(e, currentRequirement);
+                              e.stopPropagation();
+                            }}
+                            color='primary'
+                            type='visualizeApp'
+                            style={{ marginRight: '10px' }}
+                          ></EuiIcon>
+                        </EuiToolTip>
+                        <EuiToolTip
+                          position='top'
+                          content={
+                            'Inspect ' + currentRequirement + ' in Events'
+                          }
+                        >
+                          <EuiIcon
+                            onMouseDown={e => {
+                              this.props.openDiscover(e, currentRequirement);
+                              e.stopPropagation();
+                            }}
+                            color='primary'
+                            type='discoverApp'
+                          ></EuiIcon>
+                        </EuiToolTip>
+                      </span>
                     </span>
-                  </span>
-                )}
-              </h3>
-            </EuiTitle>
-          }
-          paddingSize="none"
-          initialIsOpen={true}
-        >
-          <EuiFlexGroup className="flyout-row">
-            <EuiFlexItem>
-              <Discover
-                kbnSearchBar
-                shareFilterManager={this.filterManager}
-                initialColumns={[
-                  { field: 'icon' },
-                  { field: 'timestamp' },
-                  { field: 'agent.id', label: 'Agent' },
-                  { field: 'agent.name', label: 'Agent name' },
-                  { field: this.props.getRequirementKey() },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
-                ]}
-                initialAgentColumns={[
-                  { field: 'icon' },
-                  { field: 'timestamp' },
-                  { field: this.props.getRequirementKey() },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
-                ]}
-                implicitFilters={implicitFilters}
-                initialFilters={[]}
-                updateTotalHits={(total) => this.updateTotalHits(total)}
+                  )}
+                </h3>
+              </EuiTitle>
+            }
+            paddingSize='none'
+            initialIsOpen={true}
+          >
+            <div className='details-row'>
+              <WazuhFlyoutDiscover
+                DataSource={PatternDataSource}
+                tableColumns={this.getDiscoverColumns()}
+                filterManager={this.filterManager}
+                initialFetchFilters={this.props.fetchFilters}
+                expandedRowComponent={(...args) =>
+                  this.renderDiscoverExpandedRow(...args)
+                }
               />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiAccordion>
-      </EuiFlyoutBody>
-    );
-  }
+            </div>
+          </EuiAccordion>
+        </EuiFlyoutBody>
+      );
+    }
 
-  renderLoading() {
-    return (
-      <EuiFlyoutBody>
-        <EuiLoadingContent lines={2} />
-        <EuiLoadingContent lines={3} />
-      </EuiFlyoutBody>
-    );
-  }
+    renderLoading() {
+      return (
+        <EuiFlyoutBody>
+          <EuiLoadingContent lines={2} />
+          <EuiLoadingContent lines={3} />
+        </EuiFlyoutBody>
+      );
+    }
 
-  render() {
-    const { currentRequirement } = this.props;
-    const { onChangeFlyout } = this.props;
-    return (
-      <WzFlyout
-        onClose={() => onChangeFlyout(false)}
-        flyoutProps={{
-          maxWidth: '60%',
-          size: 'l',
-          className: 'flyout-no-overlap wz-inventory wzApp',
-          'aria-labelledby': 'flyoutSmallTitle',
-        }}
-      >
-        {currentRequirement && this.renderHeader()}
-        {this.renderBody()}
-        {this.state.loading && this.renderLoading()}
-      </WzFlyout>
-    );
-  }
-}
+    render() {
+      const { currentRequirement } = this.props;
+      const { onChangeFlyout } = this.props;
+      return (
+        <WzFlyout
+          onClose={() => onChangeFlyout(false)}
+          flyoutProps={{
+            maxWidth: '60%',
+            size: 'l',
+            className: 'flyout-no-overlap wz-inventory wzApp',
+            'aria-labelledby': 'flyoutSmallTitle',
+          }}
+        >
+          {currentRequirement && this.renderHeader()}
+          {this.renderBody()}
+          {this.state.loading && this.renderLoading()}
+        </WzFlyout>
+      );
+    }
+  },
+);
