@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Handle index pattern selector on new discover [#6499](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6499)
 - Added macOS log collector tab [#6545](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6545)
 - Add ability to disable the edition of configuration through API endpoints and UI [#6557](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6557)
+- Added journald log collector tab [#6572](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6572)
 
 ### Changed
 
@@ -32,6 +33,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Enhance the validation for `enrollment.dns` on App Settings application [#6573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6573)
 - Remove AngularJS controller for manage groups [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
 - Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
+- Implement new data source feature on MITRE ATT&CK module [#6482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6482)
 
 ### Fixed
 
