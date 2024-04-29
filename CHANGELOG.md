@@ -31,8 +31,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Move AngularJS controller for management to ReactJS component [#6555](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6555)
 - Moved the registry data to in-memory cache [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Enhance the validation for `enrollment.dns` on App Settings application [#6573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6573)
-- Remove AngularJS controller for manage groups [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
 - Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
+- Move AngularJS controller for the agent view to ReactJS [#6618](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6618)
 - Implement new data source feature on MITRE ATT&CK module [#6482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6482)
 
 ### Fixed
