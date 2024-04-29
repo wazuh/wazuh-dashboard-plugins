@@ -600,7 +600,7 @@ export const AgentsWelcome = compose(
                     }}
                   >
                     {' '}
-                    {/* DatePicker */}
+                    {/* TODO: Replace with SearchBar and replace implementation to get the time range in AgentView component*/}
                     <WzDatePicker condensed={true} onTimeChange={() => { }} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
