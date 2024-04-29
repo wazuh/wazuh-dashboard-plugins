@@ -17,13 +17,14 @@ import {
 } from '../../../../react-services/error-management';
 import { compose } from 'redux';
 import { SampleDataWarning } from '../../../visualize/components';
-import { AlertsGitHubDataSource } from '../../../common/data-source/pattern/alerts/alerts-github/alerts-github-data-source';
 import {
   AlertsDataSourceRepository,
   PatternDataSource,
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
+import { GitHubDataSource } from '../../../common/data-source/pattern/alerts/github/github-data-source';
+
 
 const plugins = getPlugins();
 
@@ -44,7 +45,7 @@ const DashboardGitHubComponent: React.FC = () => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsGitHubDataSource,
+    DataSource: GitHubDataSource,
     repository: new AlertsDataSourceRepository(),
   });
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -93,12 +94,12 @@ const DashboardGitHubComponent: React.FC = () => {
               />
             </div>
           )}
-          <SampleDataWarning />
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
             <div className='github-dashboard-responsive'>
+              <SampleDataWarning />
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,

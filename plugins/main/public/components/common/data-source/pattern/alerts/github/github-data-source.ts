@@ -5,7 +5,7 @@ import { AlertsDataSource } from '../alerts-data-source';
 const GITHUB_GROUP_KEY = 'rule.groups';
 const GITHUB_GROUP_VALUE = 'github';
 
-export class AlertsGitHubDataSource extends AlertsDataSource {
+export class GitHubDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }

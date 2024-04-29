@@ -49,15 +49,15 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardGitHub } from '../../overview/github/dashboards/dashboard';
-import { AlertsGitHubDataSource } from '../data-source/pattern/alerts/alerts-github/alerts-github-data-source';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
   AlertsDataSource,
   AlertsVulnerabilitiesDataSource,
-  AlertsAWSDataSource,
+  AWSDataSource,
   VirusTotalDataSource,
-  AlertsFIMDataSource,
+  FIMDataSource,
+  GitHubDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -124,7 +124,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: fileIntegrityMonitoringColumns,
-        DataSource: AlertsFIMDataSource,
+        DataSource: FIMDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -140,7 +140,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: amazonWebServicesColumns,
-        DataSource: AlertsAWSDataSource,
+        DataSource: AWSDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -223,7 +223,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: githubColumns,
-        DataSource: AlertsGitHubDataSource,
+        DataSource: GitHubDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],

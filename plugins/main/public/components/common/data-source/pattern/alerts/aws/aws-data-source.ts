@@ -5,7 +5,7 @@ import { AlertsDataSource } from '../alerts-data-source';
 const AWS_GROUP_KEY = 'rule.groups';
 const AWS_GROUP_VALUE = 'amazon';
 
-export class AlertsAWSDataSource extends AlertsDataSource {
+export class AWSDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }

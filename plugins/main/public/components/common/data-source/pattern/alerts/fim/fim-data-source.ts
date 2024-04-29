@@ -5,7 +5,7 @@ import { AlertsDataSource } from '../alerts-data-source';
 const FIM_GROUP_KEY = 'rule.groups';
 const FIM_GROUP_VALUE = 'syscheck';
 
-export class AlertsFIMDataSource extends AlertsDataSource {
+export class FIMDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }
