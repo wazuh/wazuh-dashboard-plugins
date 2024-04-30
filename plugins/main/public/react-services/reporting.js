@@ -39,6 +39,7 @@ import {
   buildRangeFilter,
   getOpenSearchQueryConfig,
 } from '../../../../src/plugins/data/common';
+import { getForceNow } from '../components/common/search-bar/search-bar-service';
 
 const app = getAngularModule();
 
@@ -179,12 +180,12 @@ export class ReportingService {
       const time =
         tab === 'syscollector'
           ? { to: dataSourceContext.time.to, from: dataSourceContext.time.from }
-          : // FIXME: the Today and This week date ranges on the selector are not working
-            {
-              to: dateMath.parse(dataSourceContext.time.to, { roundUp: true }),
-              from: dateMath.parse(dataSourceContext.time.from, {
+          : {
+              to: dateMath.parse(dataSourceContext.time.to, {
                 roundUp: true,
+                forceNow: getForceNow(),
               }),
+              from: dateMath.parse(dataSourceContext.time.from),
             };
 
       const data = {
