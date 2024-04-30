@@ -26,7 +26,7 @@ export type tDataGridColumn = {
   ) => string | React.ReactNode;
 } & EuiDataGridColumn;
 
-type tDataGridProps = {
+export type tDataGridProps = {
   indexPattern: IndexPattern;
   results: SearchResponse;
   defaultColumns: tDataGridColumn[];
