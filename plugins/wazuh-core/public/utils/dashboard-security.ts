@@ -1,4 +1,4 @@
-import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../common/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../common/constants';
 import { ILogger } from '../../common/services/configuration';
 
 export class DashboardSecurity {
@@ -28,20 +28,15 @@ export class DashboardSecurity {
   }
   async start() {}
   async stop() {}
-  async fetchAccount() {
-    if (
-      this.securityPlatform ===
-      WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY
-    ) {
-      try {
-        this.logger.debug('Fetching the account');
-        const response = await this.http.get('/utils/account');
-        this.logger.debug(`Fetched account: ${JSON.stringify(response)}`);
-        return response;
-      } catch (error) {
-        this.logger.error(error.message);
-        throw error;
-      }
-    }
+  getAccountFromJWTAPIDecodedToken(decodedToken: number[]) {
+    const isAdministrator = decodedToken?.rbac_roles?.some?.(
+      (role: number) => role === WAZUH_ROLE_ADMINISTRATOR_ID,
+    );
+    return {
+      administrator: isAdministrator,
+      administrator_requirements: !isAdministrator
+        ? 'User has no administrator role in the selected API connection.'
+        : null,
+    };
   }
 }

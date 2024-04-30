@@ -27,7 +27,7 @@ const initialState = {
   logtestToken: '',
   userAccount: {
     administrator: false,
-    administrator_error_message: '',
+    administrator_requirements: '',
   },
 };
 

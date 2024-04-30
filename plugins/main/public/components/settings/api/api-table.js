@@ -44,7 +44,7 @@ import {
   getWazuhCorePlugin,
 } from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
-import { AddAPIHostForm } from './add-api';
+import { AddApi } from './add-api';
 import {
   WzButtonOpenFlyout,
   WzButtonPermissionsOpenFlyout,
@@ -55,6 +55,7 @@ import {
   ErrorHandler,
   GenericRequest,
 } from '../../../react-services';
+import { WazuhConfig } from '../../../react-services/wazuh-config';
 
 export const ApiTable = compose(
   withErrorBoundary,
@@ -79,7 +80,7 @@ export const ApiTable = compose(
         selectedAPIConnection,
         refreshingEntries: false,
         availableUpdates: {},
-        refreshingAvailableUpdates: true,
+        refreshingAvailableUpdates: false,
       };
     }
 
@@ -115,8 +116,11 @@ export const ApiTable = compose(
 
     componentDidMount() {
       this.refresh();
-
-      this.getApisAvailableUpdates();
+      this.wazuhConfig = new WazuhConfig().getConfig();
+      this.isUpdatesEnabled = !this.wazuhConfig?.['wazuh.updates.disabled'];
+      if (this.isUpdatesEnabled) {
+        this.getApisAvailableUpdates();
+      }
     }
 
     copyToClipBoard(msg) {
@@ -147,10 +151,6 @@ export const ApiTable = compose(
           true,
         );
         APIConnection.cluster_info = response.data;
-        // Updates the cluster-information in the registry
-        await GenericRequest.request('PUT', `/hosts/update-hostname/${id}`, {
-          cluster_info: APIConnection.cluster_info,
-        });
         APIConnection.status = 'online';
         APIConnection.allow_run_as = response.data.allow_run_as;
         !silent && ErrorHandler.info('Connection success', 'Settings');
@@ -218,14 +218,7 @@ export const ApiTable = compose(
         const clusterInfo = data.data || {};
         APIconnection.status = 'online';
         APIconnection.cluster_info = clusterInfo;
-        //Updates the cluster info in the registry
-        await GenericRequest.request(
-          'PUT',
-          `/hosts/update-hostname/${APIconnection.id}`,
-          {
-            cluster_info: clusterInfo,
-          },
-        );
+        APIconnection.allow_run_as = clusterInfo.allow_run_as;
         if (options?.selectAPIHostOnAvailable) {
           this.setDefault(entry);
         }
@@ -327,29 +320,6 @@ export const ApiTable = compose(
           },
         };
 
-        getErrorOrchestrator().handleError(options);
-      }
-    }
-
-    async deleteAPIHost(id) {
-      try {
-        const response = await GenericRequest.request(
-          'DELETE',
-          `/hosts/apis/${id}`,
-        );
-        ErrorHandler.info(response.data.message);
-        await this.refresh();
-      } catch (error) {
-        const options = {
-          context: `${ApiTable.name}.deleteAPIHost`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error removing the API host ${id}`,
-          },
-        };
         getErrorOrchestrator().handleError(options);
       }
     }
@@ -499,94 +469,6 @@ export const ApiTable = compose(
           },
         },
         {
-          field: 'current_version',
-          name: 'Version',
-          align: 'left',
-          sortable: true,
-        },
-        {
-          field: 'version_status',
-          name: 'Updates status',
-          sortable: true,
-          render: (item, api) => {
-            const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
-
-            const content =
-              API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
-
-            if (!this.state.refreshingAvailableUpdates) {
-              return (
-                <EuiFlexGroup
-                  alignItems='center'
-                  gutterSize='xs'
-                  responsive={false}
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
-                      {content}
-                    </EuiHealth>
-                  </EuiFlexItem>
-                  {!item ? (
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip
-                        position='top'
-                        content={
-                          <p>
-                            Click <b>Check updates</b> button to get information
-                          </p>
-                        }
-                      >
-                        <EuiButtonIcon
-                          aria-label={content}
-                          iconType='questionInCircle'
-                        />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                  ) : null}
-                  {item === 'availableUpdates' ? (
-                    <EuiFlexItem grow={false}>
-                      <WzButtonOpenFlyout
-                        tooltip={{ content: 'View available updates' }}
-                        flyoutTitle={'Availabe updates'}
-                        flyoutBody={() => {
-                          return <AvailableUpdatesFlyout api={api} />;
-                        }}
-                        buttonProps={{
-                          buttonType: 'icon',
-                          iconType: 'eye',
-                        }}
-                      />
-                    </EuiFlexItem>
-                  ) : null}
-                  {item === 'error' && api.error?.detail ? (
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip
-                        position='top'
-                        title={api.error.title}
-                        content={api.error.detail}
-                      >
-                        <EuiButtonIcon
-                          color='primary'
-                          iconType='questionInCircle'
-                          aria-label='Info about the error'
-                          onClick={() => this.copyToClipBoard(api.error.detail)}
-                        />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                  ) : null}
-                </EuiFlexGroup>
-              );
-            } else {
-              return (
-                <span>
-                  <EuiLoadingSpinner size='s' />
-                  <span>&nbsp;&nbsp;Checking</span>
-                </span>
-              );
-            }
-          },
-        },
-        {
           name: 'Run as',
           field: 'allow_run_as',
           align: 'center',
@@ -647,54 +529,105 @@ export const ApiTable = compose(
                   color='success'
                 />
               </EuiToolTip>
-              <WzButtonPermissionsOpenFlyout
-                flyoutTitle={`Edit API connection: ${item.id} `}
-                flyoutBody={({ onClose, onUpdateCanClose }) => (
-                  <AddAPIHostForm
-                    mode='EDIT'
-                    onUpdateCanClose={onUpdateCanClose}
-                    initialValue={{
-                      id: item.id,
-                      url: item.url,
-                      port: item.port,
-                      run_as: item.run_as,
-                      username: item.username,
-                      password: '',
-                      password_confirm: '',
-                    }}
-                    apiId={item.id}
-                    onSave={async () => {
-                      onClose();
-                      await this.refresh();
-                    }}
-                  />
-                )}
-                buttonProps={{
-                  administrator: true,
-                  buttonType: 'icon',
-                  iconType: 'pencil',
-                  tooltip: {
-                    content: 'Edit',
-                  },
-                }}
-              ></WzButtonPermissionsOpenFlyout>
-              <WzButtonPermissionsModalConfirm
-                administrator={true}
-                buttonType='icon'
-                tooltip={{
-                  content: 'Delete',
-                }}
-                modalTitle={`Do you want to delete the ${item.id} API connection?`}
-                onConfirm={() => this.deleteAPIHost(item.id)}
-                modalProps={{ buttonColor: 'danger' }}
-                iconType='trash'
-                color='danger'
-                aria-label='Delete API connection'
-              />
             </EuiFlexGroup>
           ),
         },
       ];
+
+      // optional column if Check Updates is enabled
+      const currentVersionColumn = {
+        field: 'current_version',
+        name: 'Version',
+        align: 'left',
+        sortable: true,
+      };
+
+      // optional column if Check Updates is enabled
+      const versionStatusColumn = {
+        field: 'version_status',
+        name: 'Updates status',
+        sortable: true,
+        render: (item, api) => {
+          const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
+
+          const content =
+            API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
+
+          if (!this.state.refreshingAvailableUpdates) {
+            return (
+              <EuiFlexGroup
+                alignItems='center'
+                gutterSize='xs'
+                responsive={false}
+              >
+                <EuiFlexItem grow={false}>
+                  <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
+                    {content}
+                  </EuiHealth>
+                </EuiFlexItem>
+                {!item ? (
+                  <EuiFlexItem grow={false}>
+                    <EuiToolTip
+                      position='top'
+                      content={
+                        <p>
+                          Click <b>Check updates</b> button to get information
+                        </p>
+                      }
+                    >
+                      <EuiButtonIcon
+                        aria-label={content}
+                        iconType='questionInCircle'
+                      />
+                    </EuiToolTip>
+                  </EuiFlexItem>
+                ) : null}
+                {item === 'availableUpdates' ? (
+                  <EuiFlexItem grow={false}>
+                    <WzButtonOpenFlyout
+                      tooltip={{ content: 'View available updates' }}
+                      flyoutTitle={'Availabe updates'}
+                      flyoutBody={() => {
+                        return <AvailableUpdatesFlyout api={api} />;
+                      }}
+                      buttonProps={{
+                        buttonType: 'icon',
+                        iconType: 'eye',
+                      }}
+                    />
+                  </EuiFlexItem>
+                ) : null}
+                {item === 'error' && api.error?.detail ? (
+                  <EuiFlexItem grow={false}>
+                    <EuiToolTip
+                      position='top'
+                      title={api.error.title}
+                      content={api.error.detail}
+                    >
+                      <EuiButtonIcon
+                        color='primary'
+                        iconType='questionInCircle'
+                        aria-label='Info about the error'
+                        onClick={() => this.copyToClipBoard(api.error.detail)}
+                      />
+                    </EuiToolTip>
+                  </EuiFlexItem>
+                ) : null}
+              </EuiFlexGroup>
+            );
+          } else {
+            return (
+              <span>
+                <EuiLoadingSpinner size='s' />
+                <span>&nbsp;&nbsp;Checking</span>
+              </span>
+            );
+          }
+        },
+      };
+      if (this.isUpdatesEnabled) {
+        columns.splice(7, 0, currentVersionColumn, versionStatusColumn);
+      }
 
       const search = {
         box: {
@@ -732,16 +665,7 @@ export const ApiTable = compose(
               <EuiFlexItem grow={false}>
                 <WzButtonPermissionsOpenFlyout
                   flyoutTitle='Add API connection'
-                  flyoutBody={({ onClose, onUpdateCanClose }) => (
-                    <AddAPIHostForm
-                      mode='CREATE'
-                      onUpdateCanClose={onUpdateCanClose}
-                      onSave={async () => {
-                        onClose();
-                        await this.refresh();
-                      }}
-                    />
-                  )}
+                  flyoutBody={() => <AddApi />}
                   buttonProps={{
                     administrator: true,
                     buttonType: 'empty',
@@ -759,33 +683,37 @@ export const ApiTable = compose(
                   Refresh
                 </EuiButtonEmpty>
               </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButtonEmpty
-                  iconType='refresh'
-                  onClick={async () =>
-                    await this.getApisAvailableUpdates(true, true)
-                  }
-                >
-                  <span>
-                    Check updates{' '}
-                    <EuiToolTip
-                      title='Last dashboard check'
-                      content={
-                        this.state.availableUpdates?.last_check_date
-                          ? getWazuhCorePlugin().utils.formatUIDate(
-                              this.state.availableUpdates.last_check_date,
-                            )
-                          : '-'
+              {this.isUpdatesEnabled && (
+                <>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty
+                      iconType='refresh'
+                      onClick={async () =>
+                        await this.getApisAvailableUpdates(true, true)
                       }
                     >
-                      <EuiIcon type='iInCircle' color='primary' />
-                    </EuiToolTip>
-                  </span>
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <DismissNotificationCheck />
-              </EuiFlexItem>
+                      <span>
+                        Check updates{' '}
+                        <EuiToolTip
+                          title='Last dashboard check'
+                          content={
+                            this.state.availableUpdates?.last_check_date
+                              ? getWazuhCorePlugin().utils.formatUIDate(
+                                  this.state.availableUpdates.last_check_date,
+                                )
+                              : '-'
+                          }
+                        >
+                          <EuiIcon type='iInCircle' color='primary' />
+                        </EuiToolTip>
+                      </span>
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <DismissNotificationCheck />
+                  </EuiFlexItem>
+                </>
+              )}
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>

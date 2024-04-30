@@ -239,9 +239,7 @@ export const useForm = (fields: FormConfiguration): UseFormReturn => {
         pathFormState: [],
       },
       ({ changed, error, value }, _, { pathFormState, fieldDefinition }) => {
-        changed &&
-          (result.changed[pathFormState] =
-            fieldDefinition?.transformChangedOutputValue?.(value) ?? value);
+        changed && (result.changed[pathFormState] = value);
         error && (result.errors[pathFormState] = error);
       },
     );

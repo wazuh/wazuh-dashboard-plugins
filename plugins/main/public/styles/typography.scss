@@ -20,13 +20,13 @@ body,
 button:not(.fa):not(.fa-times),
 textarea,
 input,
-select{
+select {
   //font-size: 14px;
 }
 
 .wz-headline-title:not(.wz-dev-title) {
-  padding: 8px!important;
-  justify-content: start!important;
+  padding: 8px !important;
+  justify-content: start !important;
   font-size: 12px;
 }
 
@@ -37,18 +37,6 @@ select{
 
 .color-grey {
   color: grey !important;
-}
-
-.color-f9 {
-  color: #ff9999;
-}
-
-.wz-color-orange {
-  color: #f39c12 !important;
-}
-
-.color-pointer {
-  color: #006bb4 !important;
 }
 
 .wz-line-height {
@@ -140,31 +128,6 @@ select{
 
 .json-string {
   color: rgb(0, 166, 155);
-}
-
-/* Class for linkable text elements */
-.wz-text-link {
-  cursor: pointer !important;
-  color: #006bb4 !important;
-
-  &:hover {
-    text-decoration: underline !important;
-  }
-}
-
-.wz-text-link-add {
-  cursor: pointer !important;
-  color: #006bb4 !important;
-
-  &:hover {
-    text-decoration: none !important;
-  }
-}
-
-.wz-text-active {
-  color: rgb(0, 121, 165);
-  font-weight: bold;
-  text-decoration: underline;
 }
 
 /* Special fix for text in navbars */

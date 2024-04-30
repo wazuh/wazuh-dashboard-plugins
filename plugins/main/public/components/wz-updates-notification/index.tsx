@@ -11,11 +11,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
-import { getWazuhCheckUpdatesPlugin } from '../../kibana-services';
-
-export const WzUpdatesNotification = () => {
-  const { UpdatesNotification } = getWazuhCheckUpdatesPlugin();
-
-  return <UpdatesNotification />;
-};
+export { WzUpdatesNotification } from './wz-updates-notification';

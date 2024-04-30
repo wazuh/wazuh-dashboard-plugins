@@ -29,6 +29,7 @@ import {
   getWazuhCorePlugin,
 } from '../../kibana-services';
 import { getServices } from '../../kibana-integrations/discover/kibana_services';
+import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from '../../../common/constants';
 
 class WzAgentSelector extends Component {
   constructor(props) {
@@ -90,6 +91,7 @@ class WzAgentSelector extends Component {
             params: { query: agentIdList[0] },
             type: 'phrase',
             index: currentPattern,
+            controlledBy: DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT
           },
           query: {
             match: {
@@ -99,7 +101,7 @@ class WzAgentSelector extends Component {
               },
             },
           },
-          $state: { store: 'appState', isImplicit: true },
+          $state: { store: 'appState' },
         };
         agentFilters.push(filter);
         filterManager.setFilters(agentFilters);

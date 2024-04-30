@@ -201,7 +201,7 @@ function discoverController(
     filterManager,
     timefilter,
     toastNotifications,
-    history: getHistory,
+    history: syncHistoryLocations,
     uiSettings: config,
     visualizations,
   } = getServices();
@@ -215,7 +215,7 @@ function discoverController(
       : undefined;
   };
 
-  const history = getHistory();
+  const history = syncHistoryLocations();
 
   const {
     appStateContainer,
@@ -1123,14 +1123,6 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  $scope.$watch('fetchStatus', () => {
-    if ($scope.fetchStatus !== fetchStatuses.UNINITIALIZED) {
-      setTimeout(() => {
-        modulesHelper.hideCloseButtons();
-      }, 100);
-    }
-  });
 
   $scope.loadFilters = async (wzCurrentFilters, tab) => {
     filterManager.removeAll();

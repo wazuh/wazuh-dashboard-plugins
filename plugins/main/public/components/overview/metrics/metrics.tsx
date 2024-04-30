@@ -20,7 +20,7 @@ import {
 } from '../../../../../../src/plugins/data/common';
 
 //@ts-ignore
-import { getElasticAlerts, getIndexPattern } from '../mitre/lib';
+import { getElasticAlerts, getIndexPattern } from '../../../react-services';
 import { ModulesHelper } from '../../common/modules/modules-helper';
 import { getDataPlugin } from '../../../kibana-services';
 import { withAllowedAgents } from '../../common/hocs/withAllowedAgents';
@@ -148,9 +148,7 @@ export const Metrics = withAllowedAgents(
           },
           { name: 'Total', type: 'total' },
         ],
-        osquery: [
-          { name: 'Agents reporting', type: 'unique-count', field: 'agent.id' },
-        ],
+        osquery: [{ name: 'Agents reporting', type: 'unique-count', field: 'agent.id' }],
         ciscat: [
           {
             name: 'Last scan not checked',
@@ -390,12 +388,7 @@ export const Metrics = withAllowedAgents(
 
     async getResults(filterParams, aggs = {}) {
       const params = { size: 0, track_total_hits: true };
-      const result = await getElasticAlerts(
-        this.indexPattern,
-        filterParams,
-        aggs,
-        params,
-      );
+      const result = await getElasticAlerts(this.indexPattern, filterParams, aggs, params);
       let totalHits = 0;
       if (Object.keys(aggs).length) {
         const agg = (result.data || {}).aggregations || {};
@@ -403,10 +396,8 @@ export const Metrics = withAllowedAgents(
           //CUSTOM AGG
           totalHits =
             (
-              ((
-                (((agg.customAggResult || {}).buckets || [])[0] || {})
-                  .aggResult || {}
-              ).buckets || [])[0] || {}
+              (((((agg.customAggResult || {}).buckets || [])[0] || {}).aggResult || {}).buckets ||
+                [])[0] || {}
             ).key || 0;
         } else {
           totalHits = (agg.aggResult || {}).value || 0;
@@ -429,7 +420,7 @@ export const Metrics = withAllowedAgents(
       this.setState({ filterParams, loading: true });
       const newOnClick = {};
 
-      const result = this.metricsList[this.props.section].map(async item => {
+      const result = this.metricsList[this.props.section].map(async (item) => {
         let filters = [];
         if (item.type === 'range') {
           const results = {};
@@ -439,7 +430,7 @@ export const Metrics = withAllowedAgents(
             ...buildRangeFilter(
               { name: item.field, type: 'integer' },
               valuesArray,
-              this.indexPattern,
+              this.indexPattern
             ),
             $state: { store: 'appState' },
           };
@@ -459,7 +450,7 @@ export const Metrics = withAllowedAgents(
             ...buildPhrasesFilter(
               { name: item.field, type: 'string' },
               item.values,
-              this.indexPattern,
+              this.indexPattern
             ),
             $state: { store: 'appState' },
           };
@@ -484,7 +475,7 @@ export const Metrics = withAllowedAgents(
               ...buildPhraseFilter(
                 { name: item.filter.field, type: 'string' },
                 item.filter.phrase,
-                this.indexPattern,
+                this.indexPattern
               ),
               $state: { store: 'appState' },
             };
@@ -496,10 +487,7 @@ export const Metrics = withAllowedAgents(
           const results = {};
           const existsFilters = {};
           const filters = {
-            ...buildExistsFilter(
-              { name: item.field, type: 'nested' },
-              this.indexPattern,
-            ),
+            ...buildExistsFilter({ name: item.field, type: 'nested' }, this.indexPattern),
             $state: { store: 'appState' },
           };
           existsFilters['filters'] = [...filterParams['filters']];
@@ -534,7 +522,7 @@ export const Metrics = withAllowedAgents(
             ...buildPhraseFilter(
               { name: item.field, type: 'string' },
               item.value,
-              this.indexPattern,
+              this.indexPattern
             ),
             $state: { store: 'appState' },
           };
@@ -560,7 +548,7 @@ export const Metrics = withAllowedAgents(
       try {
         const completed = await Promise.all(result);
         const newResults = {};
-        completed.forEach(item => {
+        completed.forEach((item) => {
           const key = Object.keys(item)[0];
           newResults[key] = item[key];
         });
@@ -594,22 +582,18 @@ export const Metrics = withAllowedAgents(
         this.props.resultState === 'ready' &&
         this.state.resultState === 'loading'
       ) {
-        this.setState(
-          { buildingMetrics: true, resultState: this.props.resultState },
-          () => {
-            this.stats = this.buildMetric();
-          },
-        );
+        this.setState({ buildingMetrics: true, resultState: this.props.resultState }, () => {
+          this.stats = this.buildMetric();
+        });
       } else if (this.props.resultState !== this.state.resultState) {
-        const isLoading =
-          this.props.resultState === 'loading' ? { loading: true } : {};
+        const isLoading = this.props.resultState === 'loading' ? { loading: true } : {};
         this.setState({ resultState: this.props.resultState, ...isLoading });
       }
     }
 
     buildTitleButton = (count, itemName) => {
       return (
-        <EuiToolTip position='top' content={`Filter by ${itemName}`}>
+        <EuiToolTip position="top" content={`Filter by ${itemName}`}>
           <span
             className={'statWithLink'}
             style={{
@@ -646,7 +630,7 @@ export const Metrics = withAllowedAgents(
                 description={item.name}
                 titleColor={this.metricsList[section][idx].color || 'primary'}
                 isLoading={this.state.loading}
-                textAlign='center'
+                textAlign="center"
               />
             </EuiFlexItem>
           );
@@ -664,5 +648,5 @@ export const Metrics = withAllowedAgents(
         </EuiFlexGroup>
       );
     }
-  },
+  }
 );
