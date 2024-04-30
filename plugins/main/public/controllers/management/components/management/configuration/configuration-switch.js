@@ -501,7 +501,9 @@ export default compose(
         ],
   ]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
   withRenderIfOrWrapped(
-    props => props.agent.status !== API_NAME_AGENT_STATUS.ACTIVE,
+    props =>
+      props.agent.id !== '000' &&
+      props.agent.status !== API_NAME_AGENT_STATUS.ACTIVE,
     PromptNoActiveAgentWithoutSelect,
   ),
   connect(mapStateToProps, mapDispatchToProps),
