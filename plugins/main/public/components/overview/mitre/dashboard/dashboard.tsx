@@ -23,6 +23,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
+import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
 interface DashboardThreatHuntingProps {
   pinnedAgent: Filter;
@@ -55,6 +56,18 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
     setFilters,
   });
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useReportingCommunicateSearchContext({
+    isSearching: isDataSourceLoading,
+    totalResults: results?.hits?.total ?? 0,
+    indexPattern: dataSource?.indexPattern,
+    filters: fetchFilters,
+    query: query,
+    time: {
+      from: dateRangeFrom,
+      to: dateRangeTo,
+    },
+  });
 
   useEffect(() => {
     if (isDataSourceLoading) {
