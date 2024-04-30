@@ -6,9 +6,9 @@ import os.path
 import warnings
 
 warnings.filterwarnings("ignore")
-def generateRandomDate():
+def generateRandomDate(days_interval=10):
     start_date = datetime.now()
-    end_date = start_date - timedelta(days=10)
+    end_date = start_date - timedelta(days=days_interval)
     random_date = start_date + (end_date - start_date) * random.random()
     return(random_date.strftime("%Y-%m-%dT%H:%M:%S.{}Z".format(random.randint(0, 999))))
 
@@ -115,8 +115,8 @@ def generateRandomVulnerability():
     vulnerability['scanner'] = {'vendor':'vendor-{}'.format(random.randint(0, 9))}
     vulnerability['score'] = {'base':round(random.uniform(0, 10),1), 'environmental':round(random.uniform(0, 10),1), 'temporal':round(random.uniform(0, 10),1),'version':'{}'.format(round(random.uniform(0, 10),1))}
     vulnerability['severity'] = random.choice(['Low','Medium','High','Critical'])
-    vulnerability['published_at'] = generateRandomDate()
-    vulnerability['detected_at'] = generateRandomDate()
+    vulnerability['published_at'] = generateRandomDate(2000)
+    vulnerability['detected_at'] = generateRandomDate(180)
     return(vulnerability)
 
 def generateRandomWazuh():

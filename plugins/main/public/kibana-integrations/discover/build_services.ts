@@ -40,11 +40,15 @@ import { VisualizationsStart } from 'src/plugins/visualizations/public';
 import { SavedObjectOpenSearchDashboardsServices } from 'src/plugins/saved_objects/public';
 
 //import { createSavedSearchesLoader, SavedSearch } from './saved_searches';
-import { getHistory } from './kibana_services';
+import { syncHistoryLocations } from './kibana_services';
 import { OpenSearchDashboardsLegacyStart } from '../../../../../src/plugins/opensearch_dashboards_legacy/public';
 import { UrlForwardingStart } from '../../../../../src/plugins/url_forwarding/public';
 import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';
-import { getDataPlugin, getNavigationPlugin, getVisualizationsPlugin } from '../../kibana-services';
+import {
+  getDataPlugin,
+  getNavigationPlugin,
+  getVisualizationsPlugin,
+} from '../../kibana-services';
 //import { DiscoverStartPlugins, SavedSearch } from '../../../../../src/plugins/discover/public';
 
 export interface DiscoverServices {
@@ -77,9 +81,9 @@ export async function buildServices(
   core: CoreStart,
   plugins: any, //DiscoverStartPlugins,
   context: PluginInitializerContext,
-  getEmbeddableInjector: any
+  getEmbeddableInjector: any,
 ): Promise<DiscoverServices> {
-/*   const services: SavedObjectOpenSearchDashboardsServices = {
+  /*   const services: SavedObjectOpenSearchDashboardsServices = {
     savedObjectsClient: core.savedObjects.client,
     indexPatterns: plugins.data.indexPatterns,
     search: plugins.data.search,
@@ -99,7 +103,10 @@ export async function buildServices(
     getEmbeddableInjector,
     /* getSavedSearchById: async (id: string) => savedObjectService.get(id),
     getSavedSearchUrlById: async (id: string) => savedObjectService.urlFor(id), */
-    history: getHistory,
+    /* Discover currently uses two history instances:
+    one from Opensearch Dashboards Platform and another from history package.
+    getHistory is replaced by the following function that is used each time the Discover application is loaded to synchronise both instances */
+    history: syncHistoryLocations,
     indexPatterns: getDataPlugin().indexPatterns,
     inspector: plugins.inspector,
     metadata: {

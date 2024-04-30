@@ -7,7 +7,6 @@ import {
   EuiButtonIcon,
   EuiDataGridCellValueElementProps,
   EuiFlexGroup,
-  EuiFlexItem,
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
@@ -46,6 +45,7 @@ import {
 } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
+import { DocumentViewTableAndJson } from '../../common/components/document-view-table-and-json';
 
 const InventoryVulsComponent = () => {
   const {
@@ -243,9 +243,10 @@ const InventoryVulsComponent = () => {
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
                   <EuiFlexGroup direction='column'>
-                    <EuiFlexItem>
-                      <DocViewer {...docViewerProps} />
-                    </EuiFlexItem>
+                    <DocumentViewTableAndJson
+                      document={inspectedHit}
+                      indexPattern={indexPattern}
+                    />
                   </EuiFlexGroup>
                 </EuiFlyoutBody>
               </EuiFlyout>
