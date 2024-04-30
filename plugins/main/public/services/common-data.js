@@ -129,7 +129,6 @@ export class CommonData {
     try {
       const tabFilters = {
         welcome: { group: '' },
-        fim: { group: 'syscheck' },
         pm: { group: 'rootcheck' },
         vuls: { group: 'vulnerability-detector' },
         oscap: { group: 'oscap' },
@@ -141,6 +140,7 @@ export class CommonData {
         nist: { group: 'nist' },
         tsc: { group: 'tsc' },
         aws: { group: 'amazon' },
+        gcp: { group: 'gcp' },
         office: { group: 'office365' },
         osquery: { group: 'osquery' },
         sca: { group: 'sca' },
