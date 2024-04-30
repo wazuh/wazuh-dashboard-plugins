@@ -172,15 +172,26 @@ export class ReportingService {
       );
       const browserTimezone = moment.tz.guess(true);
 
+      /* The report for syscollector uses the keywords for from and to properties.
+      They are used with the format epoch_millis on the server side to get alerts data from
+      vulnerable packages. If these values are parsed, will cause an error due to unexpected format.
+      */
+      const time =
+        tab === 'syscollector'
+          ? { to: dataSourceContext.time.to, from: dataSourceContext.time.from }
+          : // FIXME: the Today and This week date ranges on the selector are not working
+            {
+              to: dateMath.parse(dataSourceContext.time.to, { roundUp: true }),
+              from: dateMath.parse(dataSourceContext.time.from, {
+                roundUp: true,
+              }),
+            };
+
       const data = {
         array: visualizations,
         serverSideQuery, // Used for applying the same filters on the server side requests
         filters: dataSourceContext.filters,
-        // TODO: review for Today or This week
-        time: {
-          to: dateMath.parse(dataSourceContext.time.to),
-          from: dateMath.parse(dataSourceContext.time.from),
-        },
+        time,
         searchBar: dataSourceContext?.query?.query || '',
         tables: [], // TODO: check is this is used
         tab,
