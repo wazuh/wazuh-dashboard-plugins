@@ -55,6 +55,7 @@ import {
   ErrorHandler,
   GenericRequest,
 } from '../../../react-services';
+import { WazuhConfig } from '../../../react-services/wazuh-config';
 
 export const ApiTable = compose(
   withErrorBoundary,
@@ -79,7 +80,7 @@ export const ApiTable = compose(
         selectedAPIConnection,
         refreshingEntries: false,
         availableUpdates: {},
-        refreshingAvailableUpdates: true,
+        refreshingAvailableUpdates: false,
       };
     }
 
@@ -115,8 +116,11 @@ export const ApiTable = compose(
 
     componentDidMount() {
       this.refresh();
-
-      this.getApisAvailableUpdates();
+      this.wazuhConfig = new WazuhConfig().getConfig();
+      this.isUpdatesEnabled = !this.wazuhConfig?.['wazuh.updates.disabled'];
+      if (this.isUpdatesEnabled) {
+        this.getApisAvailableUpdates();
+      }
     }
 
     copyToClipBoard(msg) {
@@ -465,94 +469,6 @@ export const ApiTable = compose(
           },
         },
         {
-          field: 'current_version',
-          name: 'Version',
-          align: 'left',
-          sortable: true,
-        },
-        {
-          field: 'version_status',
-          name: 'Updates status',
-          sortable: true,
-          render: (item, api) => {
-            const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
-
-            const content =
-              API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
-
-            if (!this.state.refreshingAvailableUpdates) {
-              return (
-                <EuiFlexGroup
-                  alignItems='center'
-                  gutterSize='xs'
-                  responsive={false}
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
-                      {content}
-                    </EuiHealth>
-                  </EuiFlexItem>
-                  {!item ? (
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip
-                        position='top'
-                        content={
-                          <p>
-                            Click <b>Check updates</b> button to get information
-                          </p>
-                        }
-                      >
-                        <EuiButtonIcon
-                          aria-label={content}
-                          iconType='questionInCircle'
-                        />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                  ) : null}
-                  {item === 'availableUpdates' ? (
-                    <EuiFlexItem grow={false}>
-                      <WzButtonOpenFlyout
-                        tooltip={{ content: 'View available updates' }}
-                        flyoutTitle={'Availabe updates'}
-                        flyoutBody={() => {
-                          return <AvailableUpdatesFlyout api={api} />;
-                        }}
-                        buttonProps={{
-                          buttonType: 'icon',
-                          iconType: 'eye',
-                        }}
-                      />
-                    </EuiFlexItem>
-                  ) : null}
-                  {item === 'error' && api.error?.detail ? (
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip
-                        position='top'
-                        title={api.error.title}
-                        content={api.error.detail}
-                      >
-                        <EuiButtonIcon
-                          color='primary'
-                          iconType='questionInCircle'
-                          aria-label='Info about the error'
-                          onClick={() => this.copyToClipBoard(api.error.detail)}
-                        />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                  ) : null}
-                </EuiFlexGroup>
-              );
-            } else {
-              return (
-                <span>
-                  <EuiLoadingSpinner size='s' />
-                  <span>&nbsp;&nbsp;Checking</span>
-                </span>
-              );
-            }
-          },
-        },
-        {
           name: 'Run as',
           field: 'allow_run_as',
           align: 'center',
@@ -618,6 +534,101 @@ export const ApiTable = compose(
         },
       ];
 
+      // optional column if Check Updates is enabled
+      const currentVersionColumn = {
+        field: 'current_version',
+        name: 'Version',
+        align: 'left',
+        sortable: true,
+      };
+
+      // optional column if Check Updates is enabled
+      const versionStatusColumn = {
+        field: 'version_status',
+        name: 'Updates status',
+        sortable: true,
+        render: (item, api) => {
+          const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
+
+          const content =
+            API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
+
+          if (!this.state.refreshingAvailableUpdates) {
+            return (
+              <EuiFlexGroup
+                alignItems='center'
+                gutterSize='xs'
+                responsive={false}
+              >
+                <EuiFlexItem grow={false}>
+                  <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
+                    {content}
+                  </EuiHealth>
+                </EuiFlexItem>
+                {!item ? (
+                  <EuiFlexItem grow={false}>
+                    <EuiToolTip
+                      position='top'
+                      content={
+                        <p>
+                          Click <b>Check updates</b> button to get information
+                        </p>
+                      }
+                    >
+                      <EuiButtonIcon
+                        aria-label={content}
+                        iconType='questionInCircle'
+                      />
+                    </EuiToolTip>
+                  </EuiFlexItem>
+                ) : null}
+                {item === 'availableUpdates' ? (
+                  <EuiFlexItem grow={false}>
+                    <WzButtonOpenFlyout
+                      tooltip={{ content: 'View available updates' }}
+                      flyoutTitle={'Availabe updates'}
+                      flyoutBody={() => {
+                        return <AvailableUpdatesFlyout api={api} />;
+                      }}
+                      buttonProps={{
+                        buttonType: 'icon',
+                        iconType: 'eye',
+                      }}
+                    />
+                  </EuiFlexItem>
+                ) : null}
+                {item === 'error' && api.error?.detail ? (
+                  <EuiFlexItem grow={false}>
+                    <EuiToolTip
+                      position='top'
+                      title={api.error.title}
+                      content={api.error.detail}
+                    >
+                      <EuiButtonIcon
+                        color='primary'
+                        iconType='questionInCircle'
+                        aria-label='Info about the error'
+                        onClick={() => this.copyToClipBoard(api.error.detail)}
+                      />
+                    </EuiToolTip>
+                  </EuiFlexItem>
+                ) : null}
+              </EuiFlexGroup>
+            );
+          } else {
+            return (
+              <span>
+                <EuiLoadingSpinner size='s' />
+                <span>&nbsp;&nbsp;Checking</span>
+              </span>
+            );
+          }
+        },
+      };
+      if (this.isUpdatesEnabled) {
+        columns.splice(7, 0, currentVersionColumn, versionStatusColumn);
+      }
+
       const search = {
         box: {
           incremental: this.state.incremental,
@@ -672,33 +683,37 @@ export const ApiTable = compose(
                   Refresh
                 </EuiButtonEmpty>
               </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButtonEmpty
-                  iconType='refresh'
-                  onClick={async () =>
-                    await this.getApisAvailableUpdates(true, true)
-                  }
-                >
-                  <span>
-                    Check updates{' '}
-                    <EuiToolTip
-                      title='Last dashboard check'
-                      content={
-                        this.state.availableUpdates?.last_check_date
-                          ? getWazuhCorePlugin().utils.formatUIDate(
-                              this.state.availableUpdates.last_check_date,
-                            )
-                          : '-'
+              {this.isUpdatesEnabled && (
+                <>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty
+                      iconType='refresh'
+                      onClick={async () =>
+                        await this.getApisAvailableUpdates(true, true)
                       }
                     >
-                      <EuiIcon type='iInCircle' color='primary' />
-                    </EuiToolTip>
-                  </span>
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <DismissNotificationCheck />
-              </EuiFlexItem>
+                      <span>
+                        Check updates{' '}
+                        <EuiToolTip
+                          title='Last dashboard check'
+                          content={
+                            this.state.availableUpdates?.last_check_date
+                              ? getWazuhCorePlugin().utils.formatUIDate(
+                                  this.state.availableUpdates.last_check_date,
+                                )
+                              : '-'
+                          }
+                        >
+                          <EuiIcon type='iInCircle' color='primary' />
+                        </EuiToolTip>
+                      </span>
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <DismissNotificationCheck />
+                  </EuiFlexItem>
+                </>
+              )}
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>

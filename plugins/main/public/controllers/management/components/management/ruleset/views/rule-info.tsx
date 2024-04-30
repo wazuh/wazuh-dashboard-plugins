@@ -29,6 +29,7 @@ import { TableWzAPI } from '../../../../../../components/common/tables';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import { getCore } from '../../../../../../kibana-services';
 import { threatHunting } from '../../../../../../utils/applications';
+import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 
 export default class WzRuleInfo extends Component {
   constructor(props) {
@@ -105,7 +106,7 @@ export default class WzRuleInfo extends Component {
             for (const oldValue of result) {
               let newValue = oldValue.replace(
                 '$(',
-                `<strong style="color:#006BB4">`,
+                `<strong style="color: ${euiThemeVars.euiColorPrimaryText}">`,
               );
               newValue = newValue.replace(')', ' </strong>');
               value = value.replace(oldValue, newValue);
@@ -702,7 +703,10 @@ export default class WzRuleInfo extends Component {
     let result = value.match(regex);
     if (result !== null) {
       for (const oldValue of result) {
-        let newValue = oldValue.replace('$(', `<span style="color:#006BB4">`);
+        let newValue = oldValue.replace(
+          '$(',
+          `<span style="color: ${euiThemeVars.euiColorPrimaryText}">`,
+        );
         newValue = newValue.replace(')', ' </span>');
         value = value.replace(oldValue, newValue);
       }
