@@ -160,7 +160,11 @@ export const VisualizationBasicWidgetSelector = ({
 
   return (
     <>
-      <EuiFlexGroup className='embPanel__header' gutterSize='none'>
+      <EuiFlexGroup
+        className='embPanel__header'
+        gutterSize='none'
+        alignItems='center'
+      >
         <EuiFlexItem>
           {title && (
             <h2 className='embPanel__title wz-headline-title'>

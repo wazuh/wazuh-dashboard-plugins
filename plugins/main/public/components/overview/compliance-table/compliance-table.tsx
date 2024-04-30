@@ -16,7 +16,11 @@ import { FilterManager } from '../../../../../../src/plugins/data/public/';
 //@ts-ignore
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components/subrequirements';
-import { getElasticAlerts, getIndexPattern, IFilterParams } from '../mitre/lib';
+import {
+  getElasticAlerts,
+  getIndexPattern,
+  IFilterParams,
+} from '../../../react-services';
 import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';

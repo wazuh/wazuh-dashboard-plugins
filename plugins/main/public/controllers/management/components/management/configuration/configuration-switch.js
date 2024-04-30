@@ -243,7 +243,6 @@ class WzConfigurationSwitch extends Component {
               <WzConfigurationOverview
                 agent={masterNodeInfo || agent}
                 agentSynchronized={agentSynchronized}
-                exportConfiguration={this.props.exportConfiguration}
                 updateConfigurationSection={this.updateConfigurationSection}
               />
             )) || <WzLoading />)}
@@ -493,12 +492,12 @@ export default compose(
     props.agent.id === '000'
       ? { action: 'manager:read', resource: '*:*:*' }
       : [
-          { action: 'agent:read', resource: `agent:id:${props.agent.id}` },
-          ...(props.agent.group || []).map(group => ({
-            action: 'agent:read',
-            resource: `agent:group:${group}`,
-          })),
-        ],
+        { action: 'agent:read', resource: `agent:id:${props.agent.id}` },
+        ...(props.agent.group || []).map(group => ({
+          action: 'agent:read',
+          resource: `agent:group:${group}`,
+        })),
+      ],
   ]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
   withRenderIfOrWrapped(
     props => props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
