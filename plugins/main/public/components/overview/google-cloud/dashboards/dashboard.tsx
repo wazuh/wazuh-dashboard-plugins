@@ -99,37 +99,38 @@ const DashboardGoogleCloudComponent: React.FC = () => {
           )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
-          ) : (
-            <SampleDataWarning />
-          )}
+          ) : null}
           {dataSource && results?.hits?.total > 0 ? (
-            <div className='google-cloud-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    dataSource?.id,
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'google-cloud-detector-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'Google Cloud detector dashboard',
-                  description: 'Dashboard of the Google Cloud',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
-            </div>
+          <>
+            <SampleDataWarning />
+              <div className='google-cloud-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      dataSource?.id,
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'google-cloud-detector-dashboard-tab',
+                    timeRange: {
+                      from: searchBarProps.dateRangeFrom,
+                      to: searchBarProps.dateRangeTo,
+                    },
+                    title: 'Google Cloud detector dashboard',
+                    description: 'Dashboard of the Google Cloud',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
+            </>
           ) : null}
         </>
       </I18nProvider>
