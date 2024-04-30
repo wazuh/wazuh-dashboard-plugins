@@ -5,7 +5,7 @@ import {
   getUiSettings,
 } from '../../kibana-services';
 import { Stats } from '../../controllers/overview/components/stats';
-import { WzRequest } from '../../react-services';
+import { AppState, WzRequest } from '../../react-services';
 import { OverviewWelcome } from '../common/welcome/overview-welcome';
 import { MainModule } from '../common/modules/main';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
@@ -13,21 +13,29 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { WzCurrentOverviewSectionWrapper } from '../common/modules/overview-current-section-wrapper';
 import { createHashHistory } from 'history';
-import { syncQueryStateWithUrl } from '../../../../../src/plugins/data/public';
+import {
+  connectToQueryState,
+  opensearchFilters,
+  syncQueryStateWithUrl,
+} from '../../../../../src/plugins/data/public';
 import { once } from 'lodash';
-import { createOsdUrlStateStorage } from '../../../../../src/plugins/opensearch_dashboards_utils/public';
+import {
+  createOsdUrlStateStorage,
+  createStateContainer,
+  syncState,
+} from '../../../../../src/plugins/opensearch_dashboards_utils/public';
 
 export const Overview: React.FC = () => {
   const [agentsCounts, setAgentsCounts] = useState({});
   const [tabActive, setTabActive] = useState('welcome');
   const [tabViewActive, setTabViewActive] = useState('panels');
   const [agentSelected, setAgentSelected] = useState({});
+  const $location = getAngularModule().$injector.get('$location');
+  const $route = getAngularModule().$injector.get('$route');
 
   useEffect(() => {
-    const tab = getAngularModule().$injector.get('$location').search().tab;
-    const tabView = getAngularModule()
-      .$injector.get('$location')
-      .search().tabView;
+    const tab = $location.search().tab;
+    const tabView = $location.search().tabView;
     setTabActive(tab || 'welcome');
     setTabViewActive(tabView || 'panels');
     if (tab === 'welcome' || tab === undefined) {
@@ -37,18 +45,62 @@ export const Overview: React.FC = () => {
 
   useEffect(() => {
     const data = getDataPlugin();
-
     const config = getUiSettings();
     const getHistory = once(() => createHashHistory());
-
     const osdUrlStateStorage = createOsdUrlStateStorage({
       useHash: config.get('state:storeInSessionStorage'),
       history: getHistory(),
     });
+
+    const appStateFromUrl = osdUrlStateStorage.get('_a') as AppState;
+    let initialAppState = {
+      ...data.query.queryString.getDefaultQuery(),
+      ...appStateFromUrl,
+    };
+    let previousAppState: AppState;
+    const appStateContainer = createStateContainer<AppState>(initialAppState);
+    const appStateContainerModified = {
+      ...appStateContainer,
+      set: (value: AppState | null) => {
+        if (value) {
+          previousAppState = appStateContainer.getState();
+          appStateContainer.set(value);
+        }
+      },
+    };
+
+    const replaceUrlAppState = async (newPartial: AppState = {}) => {
+      const state = { ...appStateContainer.getState(), ...newPartial };
+      await osdUrlStateStorage.set('_a', state, { replace: true });
+    };
+
+    const { start, stop } = syncState({
+      storageKey: '_a',
+      stateContainer: appStateContainerModified,
+      stateStorage: osdUrlStateStorage,
+    });
+
+    const stopSyncingQueryAppStateWithStateContainer = connectToQueryState(
+      data.query,
+      appStateContainer,
+      {
+        filters: opensearchFilters.FilterStateStore.APP_STATE,
+        query: true,
+      },
+    );
+
     const { stop: stopSyncingGlobalStateWithUrl } = syncQueryStateWithUrl(
       data.query,
       osdUrlStateStorage,
     );
+
+    replaceUrlAppState().then(() => start());
+
+    return () => {
+      stop();
+      stopSyncingGlobalStateWithUrl();
+      stopSyncingQueryAppStateWithStateContainer();
+    };
   }, []);
 
   /**
@@ -112,8 +164,16 @@ export const Overview: React.FC = () => {
 
   const updateSelectedAgents = (agentList: Array<any>) => {
     try {
-      if (typeof agentList.length) {
-        setAgentSelected(agentList[0]);
+      if (agentList.length > 0) {
+        if ($location.search().agentId !== agentList[0]) {
+          setAgentSelected(agentList[0]);
+          $location.search('agentId', agentList[0]);
+          $route.reload();
+        }
+      } else {
+        setAgentSelected('');
+        $location.search('agentId', null);
+        $route.reload();
       }
     } catch (error) {
       const options = {
