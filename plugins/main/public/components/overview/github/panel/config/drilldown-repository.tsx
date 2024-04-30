@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid } from '@elastic/eui';
 import { VisCard } from '../../../../common/modules/panel/';
-import { EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { SecurityAlerts } from '../../../../visualize/components';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../../kibana-services';
@@ -25,6 +25,10 @@ import {
   getVisStateTopCountries,
   getVisStateTopOrganizations,
 } from './visualizations';
+import { ModuleConfigProps } from './module-config';
+import { useDataGrid } from '../../../../common/data-grid';
+import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
+import WazuhDataGrid from '../../../../common/wazuh-data-grid/wz-data-grid';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -110,159 +114,126 @@ const getDashboardPanels = (
   };
 };
 
-export const DrilldownConfigRepository = {
-  rows: [
-    {
-      columns: [
-        {
-          width: 100,
-          component: props => {
-            const searchBarProps = {
-              filters: [
-                {
-                  meta: {
-                    disabled: false,
-                    negate: false,
-                    key: 'data.github.action',
-                    params: ['git.clone'],
-                    alias: null,
-                    type: 'phrases',
-                    value: 'git.clone',
-                    index: 'wazuh-alerts-*',
-                  },
-                  $state: {
-                    store: 'appState',
-                    isImplicit: true,
-                  },
-                  query: {
-                    bool: {
-                      minimum_should_match: 1,
-                      should: [
-                        {
-                          match_phrase: {
-                            'data.github.action': {
-                              query: 'git.clone',
-                            },
-                          },
-                        },
-                      ],
-                    },
-                  },
-                },
-                {
-                  $state: {
-                    store: 'appState',
-                  },
-                  meta: {
-                    alias: null,
-                    disabled: false,
-                    index: 'wazuh-alerts-*',
-                    key: 'rule.groups',
-                    negate: false,
-                    params: {
-                      query: 'github',
-                    },
-                    removable: false,
-                    type: 'phrase',
-                  },
-                  query: {
-                    match: {
-                      'rule.groups': {
-                        query: 'github',
-                        type: 'phrase',
+export const DrilldownConfigRepository = (
+  drilldownProps: ModuleConfigProps,
+) => {
+  const {
+    fetchData,
+    fetchFilters,
+    searchBarProps,
+    indexPattern
+  } = drilldownProps;
+
+  return {
+    rows: [
+      {
+        columns: [
+          {
+            width: 100,
+            component: props => {
+              return (
+                <div style={{ width: '100%' }}>
+                  <DashboardByRenderer
+                    input={{
+                      viewMode: ViewMode.VIEW,
+                      panels: getDashboardPanels(indexPattern.id),
+                      isFullScreenMode: false,
+                      filters: fetchFilters ?? [],
+                      useMargins: true,
+                      id: 'github-drilldown-action-dashboard-tab',
+                      timeRange: {
+                        from: searchBarProps.dateRangeFrom,
+                        to: searchBarProps.dateRangeTo,
                       },
-                    },
-                  },
-                },
-                {
-                  $state: {
-                    store: 'appState',
-                  },
-                  meta: {
-                    alias: null,
-                    disabled: false,
-                    index: 'wazuh-alerts-*',
-                    key: 'cluster.name',
-                    negate: false,
-                    params: {
-                      query: 'wazuh',
-                    },
-                    removable: false,
-                    type: 'phrase',
-                  },
-                  query: {
-                    match: {
-                      'cluster.name': {
-                        query: 'wazuh',
-                        type: 'phrase',
+                      title: 'GitHub drilldown action dashboard',
+                      description: 'Dashboard of the GitHub drilldown action',
+                      query: searchBarProps.query,
+                      refreshConfig: {
+                        pause: false,
+                        value: 15,
                       },
-                    },
-                  },
-                },
-              ],
-              query: {
-                query: '',
-                language: 'kuery',
-              },
-              dateRangeFrom: 'now-7d',
-              dateRangeTo: 'now',
-            };
-            const fetchFilters = searchBarProps.filters;
-            return (
-              <div style={{ width: '100%' }}>
-                <DashboardByRenderer
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    panels: getDashboardPanels('wazuh-alerts-*'), // TODO: replace by the data source
-                    isFullScreenMode: false,
-                    filters: fetchFilters ?? [],
-                    useMargins: true,
-                    id: 'github-drilldown-action-dashboard-tab',
-                    timeRange: {
-                      from: searchBarProps.dateRangeFrom,
-                      to: searchBarProps.dateRangeTo,
-                    },
-                    title: 'GitHub drilldown action dashboard',
-                    description: 'Dashboard of the GitHub drilldown action',
-                    query: searchBarProps.query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles: false,
-                  }}
-                  onInputUpdated={() => {}}
-                />
-              </div>
-            );
+                      hidePanelTitles: false,
+                    }}
+                    onInputUpdated={() => { }}
+                  />
+                </div>
+              );
+            },
           },
-        },
-      ],
-    },
-    {
-      columns: [
-        {
-          width: 100,
-          component: () => (
-            <EuiFlexItem>
-              <EuiPanel paddingSize={'s'}>
-                <SecurityAlerts
-                  initialColumns={[
-                    { field: 'icon' },
-                    { field: 'timestamp' },
-                    { field: 'rule.description' },
-                    { field: 'data.github.org', label: 'Organization' },
-                    { field: 'data.github.actor', label: 'Actor' },
-                    { field: 'data.github.action', label: 'Action' },
-                    { field: 'rule.level' },
-                    { field: 'rule.id' },
-                  ]}
-                />
-              </EuiPanel>
-            </EuiFlexItem>
-          ),
-        },
-      ],
-    },
-  ],
+        ],
+      },
+      {
+        columns: [
+          {
+            width: 100,
+            component: () => {
+              const [inspectedHit, setInspectedHit] = useState<any>(undefined);
+              const [results, setResults] = useState<any>([]);
+              const [pagination, setPagination] = useState({
+                pageIndex: 0,
+                pageSize: 15,
+                pageSizeOptions: [15, 25, 50, 100],
+              })
+              const [sorting, setSorting] = useState<any[]>([]);
+
+              useEffect(() => {
+                if (!indexPattern) {
+                  return;
+                }
+                fetchData({
+                  query: searchBarProps.query,
+                  pagination,
+                  dateRange: {
+                    from: searchBarProps.dateRangeFrom || '',
+                    to: searchBarProps.dateRangeTo || '',
+                  },
+                })
+                  .then(results => {
+                    setResults(results);
+                  })
+                  .catch(error => {
+                    const searchError = ErrorFactory.create(HttpError, {
+                      error,
+                      message: 'Error fetching actions',
+                    });
+                    ErrorHandler.handleError(searchError);
+                  });
+              }, [
+                JSON.stringify(fetchFilters),
+                JSON.stringify(searchBarProps.query),
+                JSON.stringify(pagination),
+                //JSON.stringify(sorting), ToDo: Fix sorting
+                searchBarProps.dateRangeFrom,
+                searchBarProps.dateRangeTo,
+              ])
+
+              const defaultTableColumns = [
+                { id: 'icon' },
+                { id: 'timestamp' },
+                { id: 'rule.description' },
+                { id: 'data.github.org', displayAsText: 'Organization' },
+                { id: 'data.github.actor', displayAsText: 'Actor' },
+                { id: 'data.github.action', displayAsText: 'Action' },
+                { id: 'rule.level' },
+                { id: 'rule.id' },
+              ]
+
+              return (
+                <EuiFlexItem>
+                  <WazuhDataGrid
+                    results={results}
+                    defaultColumns={defaultTableColumns}
+                    indexPattern={indexPattern}
+                    isLoading={false}
+                    defaultPagination={pagination}
+                    onChangePagination={(pagination) => setPagination(pagination)}
+                    onChangeSorting={(sorting => setSorting(sorting))}
+                  />
+                </EuiFlexItem>);
+            },
+          },
+        ],
+      },
+    ],
+  };
 };
