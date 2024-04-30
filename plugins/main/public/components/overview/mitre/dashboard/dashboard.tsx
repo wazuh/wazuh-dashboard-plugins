@@ -4,7 +4,6 @@ import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { Filter } from '../../../../../../../src/plugins/data/common';
 import { SampleDataWarning } from '../../../visualize/components';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import {
@@ -25,17 +24,11 @@ import {
 } from '../../../common/data-source';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
-interface DashboardThreatHuntingProps {
-  pinnedAgent: Filter;
-}
-
 const plugins = getPlugins();
 const SearchBar = getPlugins().data.ui.SearchBar;
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
-  pinnedAgent,
-}) => {
+export const DashboardMITRE: React.FC = () => {
   const {
     filters,
     dataSource,
