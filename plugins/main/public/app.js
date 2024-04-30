@@ -82,14 +82,6 @@ app.run([
       })
       .catch(() => {});
 
-    // Set user account data in Redux when app starts.
-    getWazuhCorePlugin()
-      .dashboardSecurity.fetchAccount()
-      .then(response => {
-        store.dispatch(updateUserAccount(response));
-      })
-      .catch(() => {});
-
     // Init the process of refreshing the user's token when app start.
     checkPluginVersion().finally(WzAuthentication.refresh);
 
@@ -109,7 +101,7 @@ app.run(function ($rootElement) {
       <react-component name="WzMenuWrapper" props=""></react-component>
       <react-component name="WzAgentSelectorWrapper" props=""></react-component>
       <react-component name="ToastNotificationsModal" props=""></react-component>
-      <react-component name="WzUpdatesNotification" props=""></react-component>
+      <react-component name="WzUpdatesNotification"></react-component>
     </div>`);
 
   // Bind deleteExistentToken on Log out component.

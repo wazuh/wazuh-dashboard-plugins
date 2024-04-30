@@ -344,8 +344,8 @@
       {
         "name": "/agents/:agent_id/daemons/stats",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_daemon_stats",
-        "description": "Return Wazuh statistical information from specified daemons in a specified agent",
-        "summary": "Get Wazuh daemon stats from an agent",
+        "description": "Return Server statistical information from specified daemons in a specified agent",
+        "summary": "Get Server daemon stats from an agent",
         "tags": [
           "Agents"
         ],
@@ -478,7 +478,7 @@
       {
         "name": "/agents/:agent_id/stats/:component",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_component_stats",
-        "description": "Return Wazuh's {component} statistical information from agent {agent_id}",
+        "description": "Return Server's {component} statistical information from agent {agent_id}",
         "summary": "Get agent's component stats",
         "tags": [
           "Agents"
@@ -660,6 +660,17 @@
             "schema": {
               "type": "string",
               "format": "search"
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
             }
           },
           {
@@ -1181,6 +1192,7 @@
                 "socket",
                 "syscheck",
                 "syslog_output",
+                "vulnerability-detection",
                 "indexer",
                 "aws-s3",
                 "azure-logs",
@@ -1303,8 +1315,8 @@
       {
         "name": "/cluster/:node_id/daemons/stats",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_daemon_stats_node",
-        "description": "Return Wazuh statistical information from specified daemons in a specified cluster node",
-        "summary": "Get Wazuh daemon stats from a cluster node",
+        "description": "Return Server statistical information from specified daemons in a specified cluster node",
+        "summary": "Get Server daemon stats from a cluster node",
         "tags": [
           "Cluster"
         ],
@@ -1499,7 +1511,7 @@
           },
           {
             "name": "tag",
-            "description": "Wazuh component that logged the event",
+            "description": "Server component that logged the event",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -1556,7 +1568,7 @@
       {
         "name": "/cluster/:node_id/stats",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_node",
-        "description": "Return Wazuh statistical information in node {node_id} for the current or specified date",
+        "description": "Return Server statistical information in node {node_id} for the current or specified date",
         "summary": "Get node stats",
         "tags": [
           "Cluster"
@@ -1602,7 +1614,7 @@
       {
         "name": "/cluster/:node_id/stats/analysisd",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_analysisd_node",
-        "description": "Return Wazuh analysisd statistical information in node {node_id}",
+        "description": "Return Server analysisd statistical information in node {node_id}",
         "summary": "Get node stats analysisd",
         "tags": [
           "Cluster"
@@ -1640,7 +1652,7 @@
       {
         "name": "/cluster/:node_id/stats/hourly",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_hourly_node",
-        "description": "Return Wazuh statistical information in node {node_id} per hour. Each number in the averages field represents the average of alerts per hour",
+        "description": "Return Server statistical information in node {node_id} per hour. Each number in the averages field represents the average of alerts per hour",
         "summary": "Get node stats hour",
         "tags": [
           "Cluster"
@@ -1678,7 +1690,7 @@
       {
         "name": "/cluster/:node_id/stats/remoted",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_remoted_node",
-        "description": "Return Wazuh remoted statistical information in node {node_id}",
+        "description": "Return Server remoted statistical information in node {node_id}",
         "summary": "Get node stats remoted",
         "tags": [
           "Cluster"
@@ -1716,7 +1728,7 @@
       {
         "name": "/cluster/:node_id/stats/weekly",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_stats_weekly_node",
-        "description": "Return Wazuh statistical information in node {node_id} per week. Each number in the averages field represents the average of alerts per hour for that specific day",
+        "description": "Return Server statistical information in node {node_id} per week. Each number in the averages field represents the average of alerts per hour for that specific day",
         "summary": "Get node stats week",
         "tags": [
           "Cluster"
@@ -1754,7 +1766,7 @@
       {
         "name": "/cluster/:node_id/status",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_status_node",
-        "description": "Return the status of all Wazuh daemons in node node_id",
+        "description": "Return the status of all Server daemons in node node_id",
         "summary": "Get node status",
         "tags": [
           "Cluster"
@@ -1829,7 +1841,7 @@
       {
         "name": "/cluster/configuration/validation",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_conf_validation",
-        "description": "Return whether the Wazuh configuration is correct or not in all cluster nodes or a list of them",
+        "description": "Return whether the Server configuration is correct or not in all cluster nodes or a list of them",
         "summary": "Check nodes config",
         "tags": [
           "Cluster"
@@ -2265,7 +2277,7 @@
       {
         "name": "/decoders/files",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.decoder_controller.get_decoders_files",
-        "description": "Return information about all decoders files used in Wazuh. This information include decoder's file, decoder's route and decoder's status among others",
+        "description": "Return information about all decoders files used in Server. This information include decoder's file, decoder's route and decoder's status among others",
         "summary": "Get files",
         "tags": [
           "Decoders"
@@ -4566,7 +4578,7 @@
       {
         "name": "/lists/files",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.cdb_list_controller.get_lists_files",
-        "description": "Return the path from all CDB lists. Use this method to know all the CDB lists and their location in the filesystem relative to Wazuh installation folder",
+        "description": "Return the path from all CDB lists. Use this method to know all the CDB lists and their location in the filesystem relative to Server installation folder",
         "summary": "Get CDB lists files",
         "tags": [
           "Lists"
@@ -4789,6 +4801,7 @@
                 "socket",
                 "syscheck",
                 "syslog_output",
+                "vulnerability-detection",
                 "indexer",
                 "aws-s3",
                 "azure-logs",
@@ -4902,7 +4915,7 @@
       {
         "name": "/manager/configuration/validation",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_conf_validation",
-        "description": "Return whether the Wazuh configuration is correct",
+        "description": "Return whether the Server configuration is correct",
         "summary": "Check config",
         "tags": [
           "Manager"
@@ -4929,8 +4942,8 @@
       {
         "name": "/manager/daemons/stats",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_daemon_stats",
-        "description": "Return Wazuh statistical information from specified daemons",
-        "summary": "Get Wazuh daemon stats",
+        "description": "Return Server statistical information from specified daemons",
+        "summary": "Get Server daemon stats",
         "tags": [
           "Manager"
         ],
@@ -5092,7 +5105,7 @@
           },
           {
             "name": "tag",
-            "description": "Wazuh component that logged the event",
+            "description": "Server component that logged the event",
             "schema": {
               "type": "string",
               "format": "alphanumeric"
@@ -5138,7 +5151,7 @@
       {
         "name": "/manager/stats",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats",
-        "description": "Return Wazuh statistical information for the current or specified date",
+        "description": "Return Server statistical information for the current or specified date",
         "summary": "Get stats",
         "tags": [
           "Manager"
@@ -5173,7 +5186,7 @@
       {
         "name": "/manager/stats/analysisd",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_analysisd",
-        "description": "Return Wazuh analysisd statistical information",
+        "description": "Return Server analysisd statistical information",
         "summary": "Get stats analysisd",
         "tags": [
           "Manager"
@@ -5200,7 +5213,7 @@
       {
         "name": "/manager/stats/hourly",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_hourly",
-        "description": "Return Wazuh statistical information per hour. Each number in the averages field represents the average of alerts per hour",
+        "description": "Return Server statistical information per hour. Each number in the averages field represents the average of alerts per hour",
         "summary": "Get stats hour",
         "tags": [
           "Manager"
@@ -5227,7 +5240,7 @@
       {
         "name": "/manager/stats/remoted",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_remoted",
-        "description": "Return Wazuh remoted statistical information",
+        "description": "Return Server remoted statistical information",
         "summary": "Get stats remoted",
         "tags": [
           "Manager"
@@ -5254,7 +5267,7 @@
       {
         "name": "/manager/stats/weekly",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_stats_weekly",
-        "description": "Return Wazuh statistical information per week. Each number in the averages field represents the average of alerts per hour for that specific day",
+        "description": "Return Server statistical information per week. Each number in the averages field represents the average of alerts per hour for that specific day",
         "summary": "Get stats week",
         "tags": [
           "Manager"
@@ -5281,7 +5294,7 @@
       {
         "name": "/manager/status",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.manager_controller.get_status",
-        "description": "Return the status of all Wazuh daemons",
+        "description": "Return the status of all Server daemons",
         "summary": "Get status",
         "tags": [
           "Manager"
@@ -6600,7 +6613,7 @@
       {
         "name": "/rules/requirement/:requirement",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.rule_controller.get_rules_requirement",
-        "description": "Return all specified requirement names defined in the Wazuh ruleset",
+        "description": "Return all specified requirement names defined in the Server ruleset",
         "summary": "Get requirements",
         "tags": [
           "Rules"
@@ -9693,7 +9706,7 @@
           },
           {
             "name": "upgrade_version",
-            "description": "Wazuh version to upgrade to",
+            "description": "Server version to upgrade to",
             "schema": {
               "type": "string",
               "format": "wazuh_version"
@@ -9758,7 +9771,7 @@
           },
           {
             "name": "file_path",
-            "description": "Full path to the WPK file. The file must be on a folder on the Wazuh's installation directory (by default, <code>/var/ossec</code>)",
+            "description": "Full path to the WPK file. The file must be on a folder on the Server's installation directory (by default, <code>/var/ossec</code>)",
             "required": true,
             "schema": {
               "type": "string",
@@ -10151,8 +10164,8 @@
       {
         "name": "/manager/configuration",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.manager_controller.update_configuration",
-        "description": "Replace Wazuh configuration with the data contained in the API request",
-        "summary": "Update Wazuh configuration",
+        "description": "Replace Server configuration with the data contained in the API request",
+        "summary": "Update Server configuration",
         "tags": [
           "Manager"
         ],

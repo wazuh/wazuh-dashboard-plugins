@@ -57,7 +57,7 @@ describe('enhanceConfiguration', () => {
       });
       expect(
         await configuration.getCustomizationSetting('customization.test'),
-      ).toEqual(expectedSettingValue);
+      ).toEqual({ 'customization.test': expectedSettingValue });
     },
   );
 });

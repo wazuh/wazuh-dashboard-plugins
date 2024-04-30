@@ -219,7 +219,6 @@
       "GET /groups/{group_id}/configuration",
       "GET /groups/{group_id}/files",
       "GET /groups/{group_id}/files/{file_name}",
-      "GET /groups/{group_id}/files/{file_name}?raw=true",
       "GET /overview/agents"
     ]
   },

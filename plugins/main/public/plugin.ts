@@ -45,7 +45,6 @@ import {
   unregisterInterceptor,
 } from './services/request-handler';
 import { Applications, Categories } from './utils/applications';
-import { syncHistoryLocations } from './kibana-integrations/discover/kibana_services';
 import { euiPaletteColorBlind } from '@elastic/eui';
 
 const innerAngularName = 'app/wazuh';
@@ -140,15 +139,15 @@ export class WazuhPlugin
             const setting = plugins.wazuhCore.configuration._settings.get(
               'cron.statistics.interval',
             );
+            !setting.validateUIForm &&
+              (setting.validateUIForm = function (value) {
+                return this.validate(value);
+              });
             !setting.validate &&
               (setting.validate = function (value: string) {
                 return validateNodeCronInterval(value)
                   ? undefined
                   : 'Interval is not valid.';
-              });
-            !setting.validateBackend &&
-              (setting.validateBackend = function (schema) {
-                return schema.string({ validate: this.validate });
               });
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
@@ -170,10 +169,6 @@ export class WazuhPlugin
             setScopedHistory(params.history);
             // This allows you to add the selectors to the navbar
             setHeaderActionMenuMounter(params.setHeaderActionMenu);
-            // Discover currently uses two history instances:
-            // one from Kibana Platform and another from history package.
-            // Below function is used every time Discover app is loaded to synchronize both instances
-            syncHistoryLocations();
             // Load application bundle
             const { renderApp } = await import('./application');
             // Get start services as specified in kibana.json

@@ -167,7 +167,7 @@ export const WzVisualize = compose(
               There were some unknown fields for the current index pattern. You
               need to refresh the page to apply the changes.
               <EuiLink
-                title='More information in Wazuh documentation'
+                title='More information in documentation'
                 href={urlTroubleShootingDocs}
                 target='_blank'
                 external
@@ -337,7 +337,7 @@ export const WzVisualize = compose(
                         className='embPanel__header'
                       >
                         <h2 className='embPanel__title wz-headline-title'>
-                          Security Alerts
+                          Security Alerts table
                         </h2>
                         <EuiButtonIcon
                           color='text'

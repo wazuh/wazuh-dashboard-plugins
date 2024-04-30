@@ -54,9 +54,6 @@ export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = {
   disabled: 'wazuh.manager.name',
 };
 
-// Wazuh fim
-export const WAZUH_FIM_PATTERN = 'wazuh-states-fim';
-
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
@@ -223,8 +220,21 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   ABOUT = 'about',
 }
 
-export const AUTHORIZED_AGENTS = 'authorized-agents';
-export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER = 'exclude-server';
+export const AUTHORIZED_AGENTS = 'hidden-authorized-agents';
+export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER =
+  'hidden-exclude-server';
+export const DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT = 'pinned-agent';
+export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
+export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
+  'vulnerabilities-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
+  'mitre-attack-rule';
+export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID =
+  'hidden-mitre-attack-rule-id';
+export const DATA_SOURCE_FILTER_CONTROLLED_VIRUSTOTAL_RULE_GROUP =
+  'virustotal-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP = 'aws-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
@@ -279,9 +289,7 @@ export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © 2024 Wazuh, Inc.';
 export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 
 // Plugin platform
-export const PLUGIN_PLATFORM_NAME = 'Wazuh dashboard';
-export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH =
-  '/usr/share/wazuh-dashboard/data/wazuh/';
+export const PLUGIN_PLATFORM_NAME = 'dashboard';
 export const PLUGIN_PLATFORM_INSTALLATION_USER = 'wazuh-dashboard';
 export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'wazuh-dashboard';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_UPGRADE_PLATFORM =
@@ -299,9 +307,18 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
 };
 
 // Plugin app
-export const PLUGIN_APP_NAME = 'Wazuh dashboard';
+export const PLUGIN_APP_NAME = 'dashboard';
 
 // UI
+export const UI_COLOR_STATUS = {
+  success: '#007871',
+  danger: '#BD271E',
+  warning: '#FEC514',
+  disabled: '#646A77',
+  info: '#6092C0',
+  default: '#000000',
+} as const;
+
 export const API_NAME_AGENT_STATUS = {
   ACTIVE: 'active',
   DISCONNECTED: 'disconnected',
@@ -310,11 +327,11 @@ export const API_NAME_AGENT_STATUS = {
 } as const;
 
 export const UI_COLOR_AGENT_STATUS = {
-  [API_NAME_AGENT_STATUS.ACTIVE]: '#007871',
-  [API_NAME_AGENT_STATUS.DISCONNECTED]: '#BD271E',
-  [API_NAME_AGENT_STATUS.PENDING]: '#FEC514',
-  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: '#646A77',
-  default: '#000000',
+  [API_NAME_AGENT_STATUS.ACTIVE]: UI_COLOR_STATUS.success,
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: UI_COLOR_STATUS.danger,
+  [API_NAME_AGENT_STATUS.PENDING]: UI_COLOR_STATUS.warning,
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: UI_COLOR_STATUS.disabled,
+  default: UI_COLOR_STATUS.default,
 } as const;
 
 export const UI_LABEL_NAME_AGENT_STATUS = {
@@ -394,7 +411,7 @@ export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
 export const ELASTIC_NAME = 'elastic';
 
 // Default Wazuh indexer name
-export const WAZUH_INDEXER_NAME = 'Wazuh indexer';
+export const WAZUH_INDEXER_NAME = 'indexer';
 
 // Not timeFieldName on index pattern
 export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =
