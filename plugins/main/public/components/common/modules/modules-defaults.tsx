@@ -11,6 +11,7 @@
  */
 import { Dashboard } from './dashboard';
 import { MainSca } from '../../agents/sca';
+import { DashboardAWS } from '../../overview/amazon-web-services/dashboards';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { MainFim } from '../../agents/fim';
@@ -48,12 +49,15 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
+import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
   AlertsDataSource,
   AlertsPCIDSSDataSource,
   AlertsVulnerabilitiesDataSource,
+  AlertsAWSDataSource,
   VirusTotalDataSource,
+  AlertsFIMDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -106,22 +110,38 @@ export const ModulesDefaults = {
   fim: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardFIM,
+      },
       {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonModuleExploreAgent],
         component: MainFim,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, fileIntegrityMonitoringColumns),
+      renderDiscoverTab({
+        tableColumns: fileIntegrityMonitoringColumns,
+        DataSource: AlertsFIMDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
   aws: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, amazonWebServicesColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardAWS,
+      },
+      renderDiscoverTab({
+        tableColumns: amazonWebServicesColumns,
+        DataSource: AlertsAWSDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },

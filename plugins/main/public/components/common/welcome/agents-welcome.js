@@ -22,7 +22,6 @@ import {
   EuiButtonEmpty,
   EuiPage,
   EuiPopover,
-  EuiLoadingChart,
   EuiToolTip,
   EuiButtonIcon,
   EuiPageBody,
@@ -39,20 +38,16 @@ import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
-import KibanaVis from '../../../kibana-integrations/kibana-vis';
-import { VisFactoryHandler } from '../../../react-services/vis-factory-handler';
-import { AppState } from '../../../react-services/app-state';
-import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import {
   showExploreAgentModalGlobal,
   updateCurrentAgentData,
 } from '../../../redux/actions/appStateActions';
 import {
-  getAngularModule,
   getChrome,
   getCore,
   getDataPlugin,
+  getAngularModule,
 } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import {
@@ -80,6 +75,7 @@ import {
   malwareDetection,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { EventsCount } from './dashboard/events-count';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,
@@ -105,11 +101,11 @@ export const AgentsWelcome = compose(
       },
       ...(agent?.name
         ? [
-            {
-              text: `${agent.name}`,
-              truncate: true,
-            },
-          ]
+          {
+            text: `${agent.name}`,
+            truncate: true,
+          },
+        ]
         : []),
     ];
   }),
@@ -149,6 +145,9 @@ export const AgentsWelcome = compose(
       this.offset = 275;
 
       this.sidebarSizeDefault = 320;
+
+      const $injector = getAngularModule().$injector;
+      this.location = $injector.get('$location');
 
       this.state = {
         lastScans: [],
@@ -200,8 +199,8 @@ export const AgentsWelcome = compose(
       of duplicating it. It was duplicated due to the differences of requirements
       in the Explore agent button for the modules and agent welcome
     */
-    async removeAgentsFilter() {
-      await this.props.setAgent(false);
+    removeAgentsFilter() {
+      this.props.setAgent(false);
       const currentAppliedFilters = getDataPlugin().query.filterManager.filters;
       const agentFilters = currentAppliedFilters.filter(x => {
         return x.meta.key !== 'agent.id';
@@ -226,8 +225,7 @@ export const AgentsWelcome = compose(
       tabVisualizations.assign({
         welcome: 8,
       });
-      const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-      const $injector = getAngularModule().$injector;
+
       this.drawerLokedSubscribtion = getChrome()
         .getIsNavDrawerLocked$()
         .subscribe(isLocked => {
@@ -235,15 +233,7 @@ export const AgentsWelcome = compose(
             this.updateWidth();
           });
         });
-      this.router = $injector.get('$route');
-      this.location = $injector.get('$location');
       window.addEventListener('resize', this.updateWidth); //eslint-disable-line
-      await VisFactoryHandler.buildAgentsVisualizations(
-        filterHandler,
-        'welcome',
-        null,
-        this.props.agent.id,
-      );
     }
 
     componentDidUpdate(prevProps) {
@@ -268,13 +258,13 @@ export const AgentsWelcome = compose(
         )
           ? JSON.parse(window.localStorage.getItem('wz-menu-agent-apps-pinned'))
           : [
-              // Default pinned applications
-              threatHunting.id,
-              fileIntegrityMonitoring.id,
-              configurationAssessment.id,
-              mitreAttack.id,
-              malwareDetection.id,
-            ];
+            // Default pinned applications
+            threatHunting.id,
+            fileIntegrityMonitoring.id,
+            configurationAssessment.id,
+            mitreAttack.id,
+            malwareDetection.id,
+          ];
       }
 
       // Ensure the pinned applications are supported
@@ -354,7 +344,6 @@ export const AgentsWelcome = compose(
                       closePopover={() => {
                         this.setState({ switchModule: false });
                       }}
-                      switchTab={module => this.props.switchTab(module)}
                     ></MenuAgent>
                   </div>
                 </WzReduxProvider>
@@ -366,7 +355,6 @@ export const AgentsWelcome = compose(
     }
 
     renderTitle() {
-      const notNeedStatus = true;
       const thereAreAgentSelected = Boolean(this.props.agent?.id);
       // Calculate if the header buttons should display the name or only the icon to be responsive
 
@@ -411,7 +399,6 @@ export const AgentsWelcome = compose(
                             closePopover={() => {
                               this.setState({ switchModule: false });
                             }}
-                            switchTab={module => this.props.switchTab(module)}
                           ></MenuAgent>
                         </div>
                       </WzReduxProvider>
@@ -460,9 +447,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='inspect'
-                  onClick={() =>
-                    this.props.switchTab('syscollector', notNeedStatus)
-                  }
+                  onClick={() => this.props.switchTab('syscollector')}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -477,7 +462,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='stats'
-                  onClick={() => this.props.switchTab('stats', notNeedStatus)}
+                  onClick={() => this.props.switchTab('stats')}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -492,9 +477,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='gear'
-                  onClick={() =>
-                    this.props.switchTab('configuration', notNeedStatus)
-                  }
+                  onClick={() => this.props.switchTab('configuration')}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -569,50 +552,13 @@ export const AgentsWelcome = compose(
     }
 
     renderEventCountVisualization() {
-      return (
-        <EuiPanel paddingSize='s'>
-          <EuiFlexItem>
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <h2 className='embPanel__title wz-headline-title'>
-                  <EuiText size='xs'>
-                    <h2>Events count evolution</h2>
-                  </EuiText>
-                </h2>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiSpacer size='s' />
-            <div
-              style={{
-                height: this.props.resultState !== 'loading' ? '350px' : 0,
-              }}
-            >
-              <WzReduxProvider>
-                <KibanaVis
-                  visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                  tab={'welcome'}
-                ></KibanaVis>
-              </WzReduxProvider>
-            </div>
-            <div
-              style={{
-                display:
-                  this.props.resultState === 'loading' ? 'block' : 'none',
-                alignSelf: 'center',
-                paddingTop: 100,
-              }}
-            >
-              <EuiLoadingChart size='xl' />
-            </div>
-          </EuiFlexItem>
-        </EuiPanel>
-      );
+      return <EventsCount />;
     }
 
     renderSCALastScan() {
       return (
         <EuiFlexGroup direction='column'>
-          <ScaScan switchTab={this.props.switchTab} {...this.props} />
+          <ScaScan {...this.props} />
         </EuiFlexGroup>
       );
     }
@@ -654,8 +600,8 @@ export const AgentsWelcome = compose(
                     }}
                   >
                     {' '}
-                    {/* DatePicker */}
-                    <WzDatePicker condensed={true} onTimeChange={() => {}} />
+                    {/* TODO: Replace with SearchBar and replace implementation to get the time range in AgentView component*/}
+                    <WzDatePicker condensed={true} onTimeChange={() => { }} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 {(this.state.widthWindow < 1150 && (
@@ -688,33 +634,33 @@ export const AgentsWelcome = compose(
                     </EuiFlexGroup>
                   </Fragment>
                 )) || (
-                  <Fragment>
-                    <EuiFlexGrid columns={2}>
-                      <EuiFlexItem>
-                        <EuiFlexGroup>
-                          <EuiFlexItem
-                            key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                          >
-                            {this.renderMitrePanel()}
-                          </EuiFlexItem>
-                          {this.renderCompliancePanel()}
-                        </EuiFlexGroup>
-                      </EuiFlexItem>
-                      <FimEventsTable agent={this.props.agent} />
-                    </EuiFlexGrid>
-                    <EuiSpacer size='l' />
-                    <EuiFlexGroup>
-                      <EuiFlexItem
-                        key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                      >
-                        {' '}
-                        {/* Events count evolution */}
-                        {this.renderEventCountVisualization()}
-                      </EuiFlexItem>
-                      <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
-                    </EuiFlexGroup>
-                  </Fragment>
-                )}
+                    <Fragment>
+                      <EuiFlexGrid columns={2}>
+                        <EuiFlexItem>
+                          <EuiFlexGroup>
+                            <EuiFlexItem
+                              key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
+                            >
+                              {this.renderMitrePanel()}
+                            </EuiFlexItem>
+                            {this.renderCompliancePanel()}
+                          </EuiFlexGroup>
+                        </EuiFlexItem>
+                        <FimEventsTable agent={this.props.agent} />
+                      </EuiFlexGrid>
+                      <EuiSpacer size='l' />
+                      <EuiFlexGroup>
+                        <EuiFlexItem
+                          key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                        >
+                          {' '}
+                          {/* Events count evolution */}
+                          {this.renderEventCountVisualization()}
+                        </EuiFlexItem>
+                        <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
+                      </EuiFlexGroup>
+                    </Fragment>
+                  )}
               </EuiPageBody>
             </EuiPage>
           </div>
