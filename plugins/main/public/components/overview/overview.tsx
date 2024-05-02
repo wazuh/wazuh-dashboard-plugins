@@ -36,8 +36,8 @@ export const Overview: React.FC = () => {
   useEffect(() => {
     const tab = $location.search().tab;
     const tabView = $location.search().tabView;
-    setTabActive(tab || 'welcome');
-    setTabViewActive(tabView || 'panels');
+    setTabActive(tab || $location.search().tab || 'welcome');
+    setTabViewActive(tabView || $location.search().subTab || 'panels');
     if (tab === 'welcome' || tab === undefined) {
       getSummary();
     }
@@ -171,9 +171,21 @@ export const Overview: React.FC = () => {
           $route.reload();
         }
       } else {
-        setAgentSelected('');
-        $location.search('agentId', null);
-        $route.reload();
+        const { filterManager } = getDataPlugin().query;
+        const currentAppliedFilters = filterManager.filters;
+        const agentFilters = currentAppliedFilters.filter(x => {
+          return x.meta.key === 'agent.id';
+        });
+        agentFilters.map(x => {
+          filterManager.removeFilter(x);
+        });
+
+        setTimeout(() => {
+          if ($location.search()['agentId']) {
+            $location.search('agentId', null);
+            $route.reload();
+          }
+        }, 1);
       }
     } catch (error) {
       const options = {
