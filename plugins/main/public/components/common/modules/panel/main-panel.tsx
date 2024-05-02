@@ -24,79 +24,28 @@ import {
 } from '../../../../../../../src/plugins/data/common';
 import { SampleDataWarning } from '../../../visualize/components';
 
+type MainPanelProps = {
+  sidePanelChildren?: React.ReactNode;
+  moduleConfig?: any;
+  filterDrillDownValue?: (value: any) => void;
+  onChangeView?: (selectedFilter) => void;
+};
+
 export const MainPanel = ({
   sidePanelChildren,
   moduleConfig = {},
-  filterDrillDownValue = (value: any) => {},
-}) => {
+  filterDrillDownValue,
+  onChangeView
+}: MainPanelProps) => {
   const [viewId, setViewId] = useState('main');
   const [selectedFilter, setSelectedFilter] = useState({
     field: '',
     value: '',
   });
-  const { filterManager, filters } = useFilterManager();
-
-  /**
-   * When a filter is toggled applies the selection
-   */
-  const applyFilter = (clearOnly = false) => {
-    const newFilters = [
-      ...filters.filter(
-        filter =>
-          filter.meta.key !== selectedFilter.field ||
-          filter.$state?.store == 'globalState',
-      ),
-      ...(!clearOnly && selectedFilter.value
-        ? [buildCustomFilter(selectedFilter)]
-        : []),
-    ];
-    filterManager.setFilters(newFilters);
-  };
 
   useEffect(() => {
-    applyFilter();
-    filterDrillDownValue(selectedFilter);
-    return () => applyFilter(true);
+    filterDrillDownValue && filterDrillDownValue(selectedFilter);
   }, [selectedFilter]);
-
-  /**
-   * Builds selected filter structure
-   * @param value
-   * @param field
-   */
-  const buildCustomFilter = ({ field, value }): Filter => {
-    // TODO: manage by the data source
-    const meta: FilterMeta = {
-      disabled: false,
-      negate: false,
-      key: field,
-      params: [value],
-      alias: null,
-      type: 'phrases',
-      value: value,
-      index: AppState.getCurrentPattern(),
-    };
-    const $state: FilterState = {
-      store: FilterStateStore.APP_STATE,
-      isImplicit: true,
-    };
-    const query = {
-      bool: {
-        minimum_should_match: 1,
-        should: [
-          {
-            match_phrase: {
-              [field]: {
-                query: value,
-              },
-            },
-          },
-        ],
-      },
-    };
-
-    return { meta, $state, query };
-  };
 
   const toggleView = (id = 'main') => {
     if (id != viewId) setViewId(id);
@@ -104,6 +53,7 @@ export const MainPanel = ({
 
   const toggleFilter = (field = '', value = '') => {
     setSelectedFilter({ field, value });
+    onChangeView({ field, value });
   };
 
   /**
