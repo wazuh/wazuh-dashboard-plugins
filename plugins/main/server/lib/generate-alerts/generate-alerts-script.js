@@ -61,7 +61,7 @@ const ruleDescription = [
   'Sample alert 4',
   'Sample alert 5',
 ];
-const ruleMaxLevel = 14;
+const ruleMaxLevel = 15;
 
 /**
  * Generate a alert

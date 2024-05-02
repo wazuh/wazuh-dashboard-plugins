@@ -24,7 +24,7 @@ import WzHelpButtonPopover from './util-components/help-button-popover';
 import WzBadge from './util-components/badge';
 import WzClusterSelect from './util-components/configuration-cluster-selector';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
-import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { ExportConfiguration } from '../../../../../components/agents/export-configuration';
 import { ReportingService } from '../../../../../react-services/reporting';
 
 import configurationSettingsGroup from './configuration-settings';
