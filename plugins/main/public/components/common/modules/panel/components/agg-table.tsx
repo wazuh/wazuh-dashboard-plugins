@@ -12,19 +12,40 @@
  */
 
 import { EuiPanel, EuiTitle, EuiBasicTableColumn, EuiInMemoryTable } from '@elastic/eui';
-import { useEsSearch } from '../../../hooks';
-import React, { useState, useMemo } from 'react';
+import { SearchResponse, IndexPattern } from '../../../../../../src/core/server';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { search } from '../../../search-bar/search-bar-service';
+import { tFilter } from '../../../data-source';
 
-export const AggTable = ({
-  onRowClick = (field, value) => {},
+type AggTableProps = {
+  onRowClick?: (field: string, value: string) => void;
+  aggTerm: string;
+  aggLabel: string;
+  maxRows: number;
+  tableTitle: string;
+  panelProps: any;
+  titleProps: any;
+  searchParams: {
+    filters: tFilter[];
+    indexPattern: IndexPattern;
+    query: any;
+  }
+};
+
+export const AggTable = React.memo(({
+  onRowClick,
   aggTerm,
   aggLabel,
   maxRows,
   tableTitle,
   panelProps,
   titleProps,
-}) => {
+  searchParams,
+}: AggTableProps) => {
   const [order, setOrder] = useState({ _count: 'desc' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
+  const [esResults, setEsResults] = useState<SearchResponse | undefined>(undefined);
   const preAppliedAggs = useMemo(() => {
     return {
       buckets: {
@@ -37,8 +58,34 @@ export const AggTable = ({
     };
   }, [order, aggTerm, maxRows]);
 
-  const { esResults, isLoading, error } = useEsSearch({ preAppliedAggs });
-  const buckets = ((esResults.aggregations || {}).buckets || {}).buckets || [];
+  const fetchAggData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await search({
+        aggs: preAppliedAggs,
+        filters: searchParams.filters,
+        indexPattern: searchParams.indexPattern,
+        query: searchParams.query
+      })
+      setEsResults(response);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [preAppliedAggs, searchParams.filters, searchParams.indexPattern, searchParams.query]);
+
+  useEffect(() => {
+    console.log('mount agg table');
+    fetchAggData();
+  }, [
+    JSON.stringify(searchParams.filters),
+    JSON.stringify(searchParams.query),
+    JSON.stringify(searchParams.indexPattern),
+  ])
+
+
+  const buckets = ((esResults?.aggregations || {}).buckets || {}).buckets || [];
   const columns: EuiBasicTableColumn<any>[] = [
     {
       field: 'key',
@@ -58,7 +105,7 @@ export const AggTable = ({
     return {
       'data-test-subj': `row-${key}`,
       onClick: () => {
-        onRowClick(aggTerm, key);
+        onRowClick && onRowClick(aggTerm, key);
       },
     };
   };
@@ -95,4 +142,4 @@ export const AggTable = ({
       />
     </EuiPanel>
   );
-};
+});
