@@ -370,7 +370,7 @@ export default [
           },
         ],
       }),
-      uiStateJSON: '{"vis":{"legendOpen":false}}',
+      uiStateJSON: '{"vis":{"legendOpen":true}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {

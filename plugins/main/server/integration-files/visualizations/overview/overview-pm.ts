@@ -128,7 +128,7 @@ export default [
             },
           ],
           addTooltip: true,
-          addLegend: true,
+          addLegend: false,
           legendPosition: 'right',
           times: [],
           addTimeMarker: false,
