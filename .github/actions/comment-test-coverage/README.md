@@ -52,4 +52,5 @@ Feel free to submit a PR to this repo and ask me to update the action, but if yo
 
 ## License
 
+Repurposed from https://github.com/AthleticNet/comment-test-coverage, Copyright (c) 2021 AthleticNet
 Repurposed from https://github.com/peter-evans/commit-comment, Copyright (c) 2019 Peter Evans and https://github.com/mshick/add-pr-comment, Copyright (c) 2019 Michael Shick
