@@ -109,7 +109,7 @@ export const OverviewWelcome = compose(
     render() {
       return (
         <Fragment>
-          <EuiPage>
+          <EuiPage className='wz-welcome-page'>
             <EuiFlexGroup gutterSize='l'>
               <EuiFlexItem>
                 {this.props.agentsCountTotal === 0 && this.addAgent()}

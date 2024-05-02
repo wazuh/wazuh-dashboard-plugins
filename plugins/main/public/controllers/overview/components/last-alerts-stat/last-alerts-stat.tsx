@@ -139,11 +139,11 @@ export function LastAlertsStat({ severity }: { severity: string }) {
             </EuiToolTip>
           }
           description={`${severityLabel[severity].label} severity`}
-          descriptionElement='h2'
+          descriptionElement='h3'
           titleColor={severityLabel[severity].color}
           textAlign='center'
         />
-        <EuiText size='s' css='margin-top: 0.7vh'>
+        <EuiText size='xs' css='margin-top: 0.7vh'>
           {'Rule level ' +
             severityLabel[severity].ruleLevelRange.minRuleLevel +
             (severityLabel[severity].ruleLevelRange.maxRuleLevel

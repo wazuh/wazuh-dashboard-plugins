@@ -82,7 +82,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { WzConfigurationOffice365 } from './office365/office365';
 import { getCore } from '../../../../../kibana-services';
-import { PromptAgentNeverConnected } from '../../../../../components/agents/prompts';
+import { PromptNoActiveAgentWithoutSelect } from '../../../../../components/agents/prompts';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { endpointGroups } from '../../../../../utils/applications';
 
@@ -501,8 +501,10 @@ export default compose(
         ],
   ]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
   withRenderIfOrWrapped(
-    props => props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
-    PromptAgentNeverConnected,
+    props =>
+      props.agent.id !== '000' &&
+      props.agent.status !== API_NAME_AGENT_STATUS.ACTIVE,
+    PromptNoActiveAgentWithoutSelect,
   ),
   connect(mapStateToProps, mapDispatchToProps),
 )(WzConfigurationSwitch);

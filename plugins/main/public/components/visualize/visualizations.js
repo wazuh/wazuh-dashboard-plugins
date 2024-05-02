@@ -261,15 +261,6 @@ export const visualizations = {
         ],
       },
       {
-        height: 300,
-        vis: [
-          {
-            title: 'Top requirements over time',
-            id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
-          },
-        ],
-      },
-      {
         height: 530,
         vis: [
           {

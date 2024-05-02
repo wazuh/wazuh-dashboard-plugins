@@ -20,12 +20,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Moved the plugin menu to platform applications into the side menu [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840) [#6226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6226) [#6244](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6244) [#6176](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6176) [#6423](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6423) [#6510](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6510) [#6591](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6591)
-- Changed dashboards. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035)
+- Changed dashboards visualizations definitions. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035) [#6632](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6632)
 - Change the display order of tabs in all modules. [#6067](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6067)
 - Upgraded the `axios` dependency to `1.6.1` [#6114](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6114)
 - Changed the api configuration title in the Server APIs section. [#6373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6373)
 - Changed overview home top KPIs. [#6379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6379) [#6408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6408) [#6569](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6569)
 - Updated the PDF report year number. [#6492](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6492)
+- Changed overview home font size [#6627](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6627)
 
 ### Fixed
 
@@ -49,6 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed minor style issues [#6484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6484) [#6489](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6489)
 - Fixed "View alerts of this Rule" link [#6553](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6553)
 - Fixed minor color styles [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6587)
+- Fixed disconnected agent configuration error [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6617)
 
 ### Removed
 
@@ -58,6 +60,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed notice of old Discover deprecation [#6341](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6341)
 - Removed compilation date field from the app [#6366](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6366)
 - Removed WAZUH_REGISTRATION_SERVER from Windows agent deployment command [#6361](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6361)
+
+## Wazuh v4.7.4 - OpenSearch Dashboards 2.8.0 - Revision 02
+
+### Added
+
+- Support for Wazuh 4.7.4
 
 ## Wazuh v4.7.3 - OpenSearch Dashboards 2.8.0 - Revision 02
 

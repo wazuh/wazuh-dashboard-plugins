@@ -334,7 +334,7 @@ export default [
           orientation: 'single',
           minFontSize: 15,
           maxFontSize: 25,
-          showLabel: true,
+          showLabel: false,
           metric: {
             type: 'vis_dimension',
             accessor: 1,
