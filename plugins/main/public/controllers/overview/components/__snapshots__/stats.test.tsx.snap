@@ -105,11 +105,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                     <div
                       class="euiText euiText--small euiStat__description"
                     >
-                      <h2
+                      <h3
                         aria-hidden="true"
                       >
                         Critical severity
-                      </h2>
+                      </h3>
                     </div>
                     <p
                       aria-hidden="true"
@@ -131,7 +131,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                     </p>
                   </div>
                   <div
-                    class="euiText euiText--small"
+                    class="euiText euiText--extraSmall"
                     css="margin-top: 0.7vh"
                   >
                     Rule level 15 or higher
@@ -150,11 +150,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                     <div
                       class="euiText euiText--small euiStat__description"
                     >
-                      <h2
+                      <h3
                         aria-hidden="true"
                       >
                         High severity
-                      </h2>
+                      </h3>
                     </div>
                     <p
                       aria-hidden="true"
@@ -176,7 +176,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                     </p>
                   </div>
                   <div
-                    class="euiText euiText--small"
+                    class="euiText euiText--extraSmall"
                     css="margin-top: 0.7vh"
                   >
                     Rule level 12 to 14
@@ -195,11 +195,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                     <div
                       class="euiText euiText--small euiStat__description"
                     >
-                      <h2
+                      <h3
                         aria-hidden="true"
                       >
                         Medium severity
-                      </h2>
+                      </h3>
                     </div>
                     <p
                       aria-hidden="true"
@@ -221,7 +221,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                     </p>
                   </div>
                   <div
-                    class="euiText euiText--small"
+                    class="euiText euiText--extraSmall"
                     css="margin-top: 0.7vh"
                   >
                     Rule level 7 to 11
@@ -240,11 +240,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                     <div
                       class="euiText euiText--small euiStat__description"
                     >
-                      <h2
+                      <h3
                         aria-hidden="true"
                       >
                         Low severity
-                      </h2>
+                      </h3>
                     </div>
                     <p
                       aria-hidden="true"
@@ -266,7 +266,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                     </p>
                   </div>
                   <div
-                    class="euiText euiText--small"
+                    class="euiText euiText--extraSmall"
                     css="margin-top: 0.7vh"
                   >
                     Rule level 0 to 6
