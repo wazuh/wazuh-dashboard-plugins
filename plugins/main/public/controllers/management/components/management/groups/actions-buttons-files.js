@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
 import { updateFileContent } from '../../../../../redux/actions/groupsActions';
 
 import GroupsHandler from './utils/groups-handler';
-import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { ExportConfiguration } from '../../../../../components/agents/export-configuration';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { ReportingService } from '../../../../../react-services/reporting';
 
