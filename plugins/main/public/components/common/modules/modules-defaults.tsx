@@ -48,6 +48,7 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
@@ -55,6 +56,7 @@ import {
   AlertsVulnerabilitiesDataSource,
   AlertsAWSDataSource,
   VirusTotalDataSource,
+  AlertsMalwareDetectionDataSource,
   AlertsFIMDataSource,
 } from '../data-source';
 
@@ -155,8 +157,16 @@ export const ModulesDefaults = {
   pm: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, malwareDetectionColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardMalwareDetection,
+      },
+      renderDiscoverTab({
+        tableColumns: malwareDetectionColumns,
+        DataSource: AlertsMalwareDetectionDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
