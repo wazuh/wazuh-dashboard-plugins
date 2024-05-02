@@ -24,7 +24,12 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
             metric: {
               accessor: 1,
@@ -57,7 +62,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -105,7 +116,12 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
             metric: {
               accessor: 1,
@@ -138,7 +154,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -186,7 +208,12 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
             metric: {
               accessor: 1,
@@ -219,7 +246,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -267,7 +300,12 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
             metric: {
               accessor: 1,
@@ -300,7 +338,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -348,7 +392,12 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
             metric: {
               accessor: 1,
@@ -381,7 +430,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -429,7 +484,12 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
           dimensions: {
             metric: {
               accessor: 1,
@@ -462,7 +522,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -478,108 +544,6 @@ export default [
               missingBucket: false,
               missingBucketLabel: 'Missing',
               customLabel: 'Requirement',
-            },
-          },
-        ],
-      }),
-      uiStateJSON: JSON.stringify({
-        vis: { params: { sort: { columnIndex: 2, direction: 'desc' } } },
-      }),
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: JSON.stringify({
-          index: 'wazuh-alerts',
-          query: { query: '', language: 'lucene' },
-          filter: [],
-        }),
-      },
-    },
-  },
-  {
-    _id: 'Wazuh-App-Agents-Welcome-Events-Evolution',
-    _type: 'visualization',
-    _source: {
-      title: 'Events evolution',
-      visState: JSON.stringify({
-        title: 'event evolution',
-        type: 'line',
-        params: {
-          type: 'line',
-          grid: { categoryLines: false },
-          categoryAxes: [
-            {
-              id: 'CategoryAxis-1',
-              type: 'category',
-              position: 'bottom',
-              show: true,
-              style: {},
-              scale: { type: 'linear' },
-              labels: { show: true, filter: true, truncate: 100 },
-              title: {},
-            },
-          ],
-          valueAxes: [
-            {
-              id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
-              type: 'value',
-              position: 'left',
-              show: true,
-              style: {},
-              scale: { type: 'linear', mode: 'normal' },
-              labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-              title: { text: 'Count' },
-            },
-          ],
-          seriesParams: [
-            {
-              show: true,
-              type: 'line',
-              mode: 'normal',
-              data: { label: 'Count', id: '1' },
-              valueAxis: 'ValueAxis-1',
-              drawLinesBetweenPoints: true,
-              lineWidth: 2,
-              interpolate: 'linear',
-              showCircles: true,
-            },
-          ],
-          addTooltip: true,
-          addLegend: false,
-          legendPosition: 'right',
-          times: [],
-          addTimeMarker: false,
-          labels: {},
-          thresholdLine: { show: false, value: 10, width: 1, style: 'full', color: '#E7664C' },
-          dimensions: {
-            x: null,
-            y: [
-              {
-                accessor: 0,
-                format: { id: 'number' },
-                params: {},
-                label: 'Count',
-                aggType: 'count',
-              },
-            ],
-          },
-        },
-        aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
-          {
-            id: '2',
-            enabled: true,
-            type: 'date_histogram',
-            schema: 'segment',
-            params: {
-              field: 'timestamp',
-              useNormalizedEsInterval: true,
-              scaleMetricValues: false,
-              interval: 'auto',
-              drop_partials: false,
-              min_doc_count: 1,
-              extended_bounds: {},
             },
           },
         ],

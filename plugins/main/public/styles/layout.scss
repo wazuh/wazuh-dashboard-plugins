@@ -294,131 +294,6 @@
   display: inline;
 }
 
-md-dialog-actions button {
-  color: white !important;
-  transition: none !important;
-  background-color: rgb(0, 85, 113) !important;
-}
-
-md-backdrop.md-opaque {
-  opacity: 1 !important;
-  background-color: rgba(255, 255, 255, 0.8);
-}
-
-md-backdrop.md-opaque.ng-leave {
-  opacity: 0 !important;
-  transition: none !important;
-  transform: none !important;
-}
-
-md-dialog.md-transition-in {
-  transition: 150ms ease-in !important;
-  transform: none !important;
-  animation: 350ms cubic-bezier(0.34, 1.61, 0.7, 1);
-}
-
-md-dialog.md-transition-out {
-  transition: none !important;
-  transform: none !important;
-}
-
-.md-dialog-container {
-  //padding-bottom: 10vh;
-  z-index: 100 !important;
-}
-
-md-dialog .md-dialog-content {
-  padding: 0px !important;
-}
-
-md-dialog {
-  animation: 350ms cubic-bezier(0.34, 1.61, 0.7, 1);
-  border: 1px solid #d9d9d9;
-  border-color: #c4cace;
-  border-top-color: #e2e5e7;
-  border-bottom-color: #a7b0b6;
-  min-width: 400px;
-  max-width: 768px;
-  padding: 15px;
-  box-shadow: 0 40px 64px 0 rgba(59, 79, 93, 0.1),
-    0 24px 32px 0 rgba(59, 79, 93, 0.1), 0 16px 16px 0 rgba(59, 79, 93, 0.1),
-    0 8px 8px 0 rgba(59, 79, 93, 0.1), 0 4px 4px 0 rgba(59, 79, 93, 0.1),
-    0 2px 2px 0 rgba(59, 79, 93, 0.1) !important;
-}
-
-.md-cancel-button {
-  background-color: #ffffff !important;
-  color: #005571 !important;
-}
-
-.md-title {
-  color: #1a1a1a;
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 2.5rem;
-}
-
-md-dialog md-dialog-content .md-dialog-content-body {
-  padding-top: 15px;
-  margin-bottom: 45px;
-}
-
-md-dialog .md-dialog-content {
-  padding: 25px 5px 35px 5px;
-  overflow: hidden !important;
-  height: auto !important;
-}
-
-md-dialog .md-actions,
-md-dialog md-dialog-actions {
-  border: none !important;
-}
-
-md-dialog .md-button.md-primary:not(.md-cancel-button) {
-  color: #ffffff;
-  background-color: #006bb4 !important;
-  border-color: #006bb4 !important;
-  border-radius: 4px;
-}
-
-md-dialog .md-button.md-primary:not(.md-cancel-button):hover {
-  background-color: #005472 !important;
-  border-color: #004c68 !important;
-}
-
-md-dialog.modalTheme {
-  animation: none !important;
-  transition: none !important;
-  transform: none !important;
-  bottom: 0;
-  right: 0;
-  position: fixed;
-  width: 350px;
-}
-
-md-dialog.modalTheme .md-button {
-  margin-bottom: 0;
-}
-
-.md-dialog-body {
-  top: 0 !important;
-  width: 100vw !important;
-}
-
-.md-dialog-body {
-  top: 0 !important;
-  width: 100vw !important;
-}
-
-.md-dialog-body .md-scroll-mask {
-  display: none !important;
-}
-
-.md-dialog-body .md-dialog-container {
-  height: 0 !important;
-  width: 0 !important;
-}
-
 .chrHeaderWrapper--navIsLocked ~ .app-wrapper .fullscreen {
   width: calc(100vw - 400px) !important;
   left: 321px !important;
@@ -438,10 +313,6 @@ md-dialog.modalTheme .md-button {
 
 .fullscreen kbn-vis {
   padding: 5%;
-}
-
-.filter-bar .filter {
-  background-color: #0079a5 !important;
 }
 
 .columns-bar {
@@ -511,8 +382,4 @@ md-dialog.modalTheme .md-button {
   font-size: 13px !important;
   font-kerning: normal !important;
   padding: 8px !important;
-}
-
-.kbnTableCellFilter {
-  cursor: pointer;
 }

@@ -16,7 +16,7 @@ import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import helpLinks from './help-links';
 
@@ -34,15 +34,12 @@ class WzConfigurationIntegrityMonitoring extends Component {
     super(props);
   }
   componentDidMount() {
-    this.props.currentConfig['syscheck-syscheck'].syscheck.disabled = 'no';
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
     return (
-      this.props.currentConfig['syscheck-syscheck'] &&
-      this.props.currentConfig['syscheck-syscheck'].syscheck &&
-      this.props.currentConfig['syscheck-syscheck'].syscheck.disabled &&
-      this.props.currentConfig['syscheck-syscheck'].syscheck.disabled === 'no'
+      this.props.currentConfig?.['syscheck-syscheck']?.syscheck?.disabled ===
+      'no'
     );
   }
 
@@ -61,43 +58,44 @@ class WzConfigurationIntegrityMonitoring extends Component {
         {currentConfig['syscheck-syscheck'] &&
           !isString(currentConfig['syscheck-syscheck']) &&
           !currentConfig['syscheck-syscheck'].syscheck && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig['syscheck-syscheck'] &&
           !isString(currentConfig['syscheck-syscheck']) &&
           currentConfig['syscheck-syscheck'].syscheck && (
             <WzTabSelector>
-              <WzTabSelectorTab label="General">
+              <WzTabSelectorTab label='General'>
                 <WzConfigurationIntegrityMonitoringGeneral {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="Monitored">
+              <WzTabSelectorTab label='Monitored'>
                 <WzConfigurationIntegrityMonitoringMonitored {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="Ignored">
+              <WzTabSelectorTab label='Ignored'>
                 <WzConfigurationIntegrityMonitoringIgnored {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="No diff">
+              <WzTabSelectorTab label='No diff'>
                 <WzConfigurationIntegrityMonitoringNoDiff {...this.props} />
               </WzTabSelectorTab>
               {agentPlatform !== 'windows' && (
-                <WzTabSelectorTab label="Who-data">
+                <WzTabSelectorTab label='Who-data'>
                   <WzConfigurationIntegrityMonitoringWhoData {...this.props} />
                 </WzTabSelectorTab>
               )}
-              <WzTabSelectorTab label="Synchronization">
+              <WzTabSelectorTab label='Synchronization'>
                 <WzConfigurationIntegrityMonitoringSynchronization
                   {...this.props}
                 />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="Files limit">
+              <WzTabSelectorTab label='Files limit'>
                 <WzConfigurationIntegrityMonitoringFileLimit {...this.props} />
               </WzTabSelectorTab>
-              { agentPlatform === 'windows' && (
-                <WzTabSelectorTab label="Registries limit">
-                  <WzConfigurationIntegrityMonitoringRegistryLimit {...this.props} />
+              {agentPlatform === 'windows' && (
+                <WzTabSelectorTab label='Registries limit'>
+                  <WzConfigurationIntegrityMonitoringRegistryLimit
+                    {...this.props}
+                  />
                 </WzTabSelectorTab>
               )}
-              
             </WzTabSelector>
           )}
       </Fragment>
