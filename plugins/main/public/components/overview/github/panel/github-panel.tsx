@@ -26,12 +26,14 @@ import {
   useDataSource,
 } from '../../../common/data-source';
 import { GitHubDataSource } from '../../../common/data-source/pattern/alerts/github/github-data-source';
+import { IndexPattern } from '../../../../../../src/plugins/data/public';
 
 export const GitHubPanel = withErrorBoundary(() => {
   const [drillDownValue, setDrillDownValue] = useState({
     field: '',
     value: '',
   });
+  const [currentSelectedFilter, setCurrentSelectedFilter] = useState();
   const filterDrillDownValue = value => {
     setDrillDownValue(value);
   };
@@ -43,6 +45,7 @@ export const GitHubPanel = withErrorBoundary(() => {
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
+    filterManager
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: GitHubDataSource,
     repository: new AlertsDataSourceRepository(),
@@ -53,6 +56,22 @@ export const GitHubPanel = withErrorBoundary(() => {
     filters,
     setFilters,
   });
+
+
+  const handleChangeView = selectedFilter => {
+    if (!selectedFilter) {
+      return;
+    }
+
+    if (selectedFilter?.value) {
+      const filter = filterManager.createFilter(selectedFilter.field, selectedFilter.value);
+      setFilters([...filters, filter]);
+    } else {
+      // the previous filter is stored in currentSelectedFilter
+      filterManager.removeFilter(currentSelectedFilter.field, currentSelectedFilter.value);
+    }
+    setCurrentSelectedFilter(selectedFilter);
+  }
 
   return (
     <>
@@ -75,6 +94,7 @@ export const GitHubPanel = withErrorBoundary(() => {
             })}
             filterDrillDownValue={filterDrillDownValue}
             sidePanelChildren={<ModuleConfiguration />}
+            onChangeView={handleChangeView}
           />
         </>
       )}
