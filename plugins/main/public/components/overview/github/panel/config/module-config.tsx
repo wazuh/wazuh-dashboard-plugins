@@ -19,6 +19,7 @@ import {
   DrilldownConfigRepository,
 } from './';
 import { tUseSearchBarProps } from '../../../common/search-bar/use-search-bar';
+import { IndexPattern } from '../../../../../../src/plugins/data/public';
 
 export type ModuleConfigProps = {
   fetchData: (params: any) => void;
@@ -30,7 +31,8 @@ export type ModuleConfigProps = {
 export const ModuleConfig = (moduleProps: ModuleConfigProps) => {
   return {
     main: {
-      component: props => <Main {...{ ...MainViewConfig, ...props }} />,
+      component:
+        props => <Main {...{ ...MainViewConfig(moduleProps), ...props }} />,
     },
     'data.github.actor': {
       component: props => (
