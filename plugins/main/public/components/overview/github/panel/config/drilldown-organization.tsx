@@ -25,8 +25,8 @@ import {
   getVisStateTopActions,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import { useDataGrid } from '../../../../common/data-grid';
 import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
+import WazuhDataGrid from '../../../../common/wazuh-data-grid/wz-data-grid';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -166,17 +166,21 @@ export const DrilldownConfigOrganization = (
           {
             width: 100,
             component: () => {
-              const [inspectedHit, setInspectedHit] = useState<any>(undefined);
               const [results, setResults] = useState<any>([]);
+              const [pagination, setPagination] = useState({
+                pageIndex: 0,
+                pageSize: 15,
+                pageSizeOptions: [15, 25, 50, 100],
+              })
+              const [sorting, setSorting] = useState<any[]>([]);
 
               useEffect(() => {
+                if (!indexPattern) {
+                  return;
+                }
                 fetchData({
                   query: searchBarProps.query,
-                  pagination: {
-                    pageIndex: 0,
-                    pageSize: 15,
-                    pageSizeOptions: [15, 25, 50, 100],
-                  },
+                  pagination,
                   dateRange: {
                     from: searchBarProps.dateRangeFrom || '',
                     to: searchBarProps.dateRangeTo || '',
@@ -192,8 +196,14 @@ export const DrilldownConfigOrganization = (
                     });
                     ErrorHandler.handleError(searchError);
                   });
-              }, [])
-
+              }, [
+                JSON.stringify(fetchFilters),
+                JSON.stringify(searchBarProps.query),
+                JSON.stringify(pagination),
+                //JSON.stringify(sorting), ToDo: Fix sorting
+                searchBarProps.dateRangeFrom,
+                searchBarProps.dateRangeTo,
+              ])
               const defaultTableColumns = [
                 { id: 'icon' },
                 { id: 'timestamp' },
@@ -205,47 +215,15 @@ export const DrilldownConfigOrganization = (
                 { id: 'rule.id' },
               ]
 
-              const onClickInspectDoc = useMemo(
-                () => (index: number) => {
-                  const rowClicked = results.hits.hits[index];
-                  setInspectedHit(rowClicked);
-                },
-                [results],
-              );
-
-
-              const DocViewInspectButton = ({
-                rowIndex,
-              }: EuiDataGridCellValueElementProps) => {
-                const inspectHintMsg = 'Inspect document details';
-                return (
-                  <EuiToolTip content={inspectHintMsg}>
-                    <EuiButtonIcon
-                      onClick={() => onClickInspectDoc(rowIndex)}
-                      iconType='inspect'
-                      aria-label={inspectHintMsg}
-                    />
-                  </EuiToolTip>
-                );
-              };
-
-
-              const dataGridProps = useDataGrid({
-                ariaLabelledBy: 'Actions data grid',
-                defaultColumns: defaultTableColumns,
-                results,
-                indexPattern: indexPattern as IndexPattern,
-                DocViewInspectButton,
-                pagination: {
-                  pageIndex: 0,
-                  pageSize: 15,
-                  pageSizeOptions: [15, 25, 50, 100],
-                },
-              });
-
               return (<EuiFlexItem>
-                <EuiDataGrid
-                  {...dataGridProps}
+                <WazuhDataGrid
+                  results={results}
+                  defaultColumns={defaultTableColumns}
+                  indexPattern={indexPattern}
+                  isLoading={false}
+                  defaultPagination={pagination}
+                  onChangePagination={(pagination) => setPagination(pagination)}
+                  onChangeSorting={(sorting => setSorting(sorting))}
                 />
               </EuiFlexItem>);
             },

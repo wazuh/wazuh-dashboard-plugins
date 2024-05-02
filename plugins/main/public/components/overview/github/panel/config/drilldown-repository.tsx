@@ -26,7 +26,6 @@ import {
   getVisStateTopOrganizations,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import { useDataGrid } from '../../../../common/data-grid';
 import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
 import WazuhDataGrid from '../../../../common/wazuh-data-grid/wz-data-grid';
 
@@ -167,7 +166,6 @@ export const DrilldownConfigRepository = (
           {
             width: 100,
             component: () => {
-              const [inspectedHit, setInspectedHit] = useState<any>(undefined);
               const [results, setResults] = useState<any>([]);
               const [pagination, setPagination] = useState({
                 pageIndex: 0,

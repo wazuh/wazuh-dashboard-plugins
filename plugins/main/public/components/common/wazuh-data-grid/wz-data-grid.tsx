@@ -1,23 +1,30 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   EuiFlexItem,
-  EuiPanel,
   EuiToolTip,
   EuiButtonIcon,
   EuiDataGridCellValueElementProps,
   EuiDataGrid,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiFlyout,
+  EuiFlyoutHeader,
+  EuiTitle,
+  EuiFlyoutBody,
+  EuiFlexGroup,
 } from '@elastic/eui';
-import { useDataGrid, tDataGridProps, exportSearchToCSV } from '../data-grid';
+import { useDataGrid, tDataGridProps, exportSearchToCSV, tDataGridColumn } from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
-import { IndexPattern } from '../../../../../../src/plugins/data/public';
+import { IndexPattern, SearchResponse } from '../../../../../../src/plugins/data/public';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { useDocViewer } from '../doc-viewer';
+import DocViewer from '../doc-viewer/doc-viewer';
 import {
   ErrorHandler,
   ErrorFactory,
   HttpError,
 } from '../../../react-services/error-management';
+import { LoadingSpinner } from '../loading-spinner/loading-spinner';
+import { DiscoverNoResults } from '../no-results/no-results';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
