@@ -252,30 +252,6 @@
   top: 210px !important;
 }
 
-.btn-as-i {
-  background: none;
-  border: 0;
-  color: #006bb4;
-  padding: 0;
-  margin: 0;
-  font-size: 20px;
-  box-shadow: none !important;
-}
-
-.btn-as-i:hover,
-.btn-as-i:focus {
-  background: none !important;
-  color: #006bb4 !important;
-}
-
-/* Custom reporting button styles */
-
-.wz-report-button:hover {
-  background-color: #006bb4 !important;
-  color: #f5f5f5;
-  border-radius: 0;
-}
-
 .wz-report-refresh-btn {
   position: absolute !important;
   right: 0px;
@@ -324,23 +300,6 @@ input[type='search'].euiFieldSearch {
 .input-filter-box:focus {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #d9d9d9 !important;
-}
-
-/* Custom input container styles */
-
-.wz-input-container label {
-  font-weight: 700 !important;
-  color: rgba(0, 0, 0, 0.38) !important;
-}
-
-.wz-input-container label.md-required:after {
-  color: #006bb4 !important;
-}
-
-.wz-input-container input,
-.wz-input-container input.md-input-invalid.md-input,
-.wz-input-container input.ng-invalid.ng-touched {
-  border-color: rgba(0, 0, 0, 0.12) !important;
 }
 
 .wz-autocomplete md-autocomplete-wrap {

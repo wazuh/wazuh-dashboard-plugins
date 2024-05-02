@@ -18,6 +18,7 @@ import {
   EuiTitle,
   EuiButtonEmpty,
 } from '@elastic/eui';
+import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 import '../../common/modules/module.scss';
 import store from '../../../redux/store';
 import { FilterHandler } from '../../../utils/filter-handler';
@@ -78,6 +79,7 @@ export class MainModuleAgent extends Component {
                 <EuiTitle size='s' className='wz-module-header-agent-title-btn'>
                   <h1>
                     <span
+                      style={{ color: euiThemeVars.euiColorPrimaryText }}
                       onClick={() => {
                         window.location.href = `#/agents?agent=${this.props.agent.id}`;
                         this.router.reload();

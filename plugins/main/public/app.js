@@ -101,7 +101,7 @@ app.run(function ($rootElement) {
       <react-component name="WzMenuWrapper" props=""></react-component>
       <react-component name="WzAgentSelectorWrapper" props=""></react-component>
       <react-component name="ToastNotificationsModal" props=""></react-component>
-      <react-component name="WzUpdatesNotification" props=""></react-component>
+      <react-component name="WzUpdatesNotification"></react-component>
     </div>`);
 
   // Bind deleteExistentToken on Log out component.
