@@ -12,12 +12,11 @@ import {
   EuiFlyoutBody,
   EuiFlexGroup,
 } from '@elastic/eui';
-import { useDataGrid, tDataGridProps, exportSearchToCSV, tDataGridColumn } from '../data-grid';
+import { useDataGrid, exportSearchToCSV, tDataGridColumn } from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import { IndexPattern, SearchResponse } from '../../../../../../src/plugins/data/public';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { useDocViewer } from '../doc-viewer';
-import DocViewer from '../doc-viewer/doc-viewer';
 import {
   ErrorHandler,
   ErrorFactory,
@@ -25,6 +24,8 @@ import {
 } from '../../../react-services/error-management';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../no-results/no-results';
+import { DocumentViewTableAndJson } from '../wazuh-discover/components/document-view-table-and-json';
+import DiscoverDataGridAdditionalControls from '../wazuh-discover/components/data-grid-additional-controls';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -38,13 +39,14 @@ export type tWazuhDataGridProps = {
     pageSize: number;
     pageSizeOptions: number[];
   };
+  query: any;
   exportFilters: tFilter[];
   onChangePagination: (pagination: { pageIndex: number; pageSize: number }) => void;
   onChangeSorting: (sorting: { columns: any[], onSort: any }) => void;
 };
 
 const WazuhDataGrid = (props: tWazuhDataGridProps) => {
-  const { results, defaultColumns, indexPattern, isLoading, defaultPagination, onChangePagination, exportFilters = [], onChangeSorting } = props;
+  const { results, defaultColumns, indexPattern, isLoading, defaultPagination, onChangePagination, exportFilters = [], onChangeSorting, query } = props;
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
@@ -133,9 +135,9 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
 
   return (
     <>
-      { isLoading ? <LoadingSpinner /> : null}
-      { !isLoading && !results?.hits?.total === 0 ? <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} /> : null}
-      { !isLoading && results?.hits?.total > 0 ?
+      {isLoading ? <LoadingSpinner /> : null}
+      {!isLoading && !results?.hits?.total === 0 ? <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} /> : null}
+      {!isLoading && results?.hits?.total > 0 ?
         <div className='discoverDataGrid'>
           <EuiDataGrid
             {...dataGridProps}
@@ -143,37 +145,12 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
             toolbarVisibility={{
               additionalControls: (
                 <>
-                  <HitsCounter
-                    hits={results?.hits?.total}
-                    showResetButton={false}
-                    tooltip={
-                      results?.hits?.total &&
-                        results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                        ? {
-                          ariaLabel: 'Warning',
-                          content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits.`,
-                          iconType: 'alert',
-                          position: 'top',
-                        }
-                        : undefined
-                    }
+                  <DiscoverDataGridAdditionalControls
+                    totalHits={results.hits.total}
+                    isExporting={isExporting}
+                    onClickExportResults={onClickExportResults}
+                    maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
                   />
-                  <EuiButtonEmpty
-                    disabled={
-                      results?.hits?.total === 0 ||
-                      columnVisibility.visibleColumns.length === 0
-                    }
-                    size='xs'
-                    iconType='exportAction'
-                    color='primary'
-                    isLoading={isExporting}
-                    className='euiDataGrid__controlBtn'
-                    onClick={onClickExportResults}
-                  >
-                    Export Formated
-                        </EuiButtonEmpty>
                 </>
               ),
             }}
@@ -189,7 +166,10 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
           <EuiFlyoutBody>
             <EuiFlexGroup direction='column'>
               <EuiFlexItem>
-                <DocViewer {...docViewerProps} />
+                <DocumentViewTableAndJson
+                  document={inspectedHit}
+                  indexPattern={indexPattern as IndexPattern}
+                />
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlyoutBody>
