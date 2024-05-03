@@ -26,24 +26,22 @@ import {
 } from '../../../../../src/plugins/opensearch_dashboards_utils/public';
 
 export const Overview: React.FC = () => {
-  const [agentsCounts, setAgentsCounts] = useState({});
-  const [tabActive, setTabActive] = useState('welcome');
-  const [tabViewActive, setTabViewActive] = useState('panels');
-  const [agentSelected, setAgentSelected] = useState({});
+  const [agentsCounts, setAgentsCounts] = useState<object>({});
+  const [tabActive, setTabActive] = useState<string>('welcome');
+  const [tabViewActive, setTabViewActive] = useState<string>('panels');
   const $location = getAngularModule().$injector.get('$location');
   const $route = getAngularModule().$injector.get('$route');
 
   useEffect(() => {
     const tab = $location.search().tab;
     const tabView = $location.search().tabView;
-    setTabActive(tab || $location.search().tab || 'welcome');
-    setTabViewActive(tabView || $location.search().subTab || 'panels');
+    setTabActive(tab || 'welcome');
+    setTabViewActive(tabView || 'panels');
     if (tab === 'welcome' || tab === undefined) {
       getSummary();
     }
-  }, []);
 
-  useEffect(() => {
+    // This is the code to sync the state of the URL with the state of the app
     const data = getDataPlugin();
     const config = getUiSettings();
     const getHistory = once(() => createHashHistory());
@@ -125,6 +123,7 @@ export const Overview: React.FC = () => {
         return;
       }
       setTabActive(newTab);
+      setTabViewActive($location.search().tabView || 'panels');
     } catch (error) {
       const options = {
         context: `${Overview.name}.switchTab`,
@@ -161,25 +160,15 @@ export const Overview: React.FC = () => {
       getErrorOrchestrator().handleError(options);
     }
   };
-
+  // TODO: Create a service or add it in the dataSource the management of the pinned agent
   const updateSelectedAgents = (agentList: Array<any>) => {
     try {
       if (agentList.length > 0) {
         if ($location.search().agentId !== agentList[0]) {
-          setAgentSelected(agentList[0]);
           $location.search('agentId', agentList[0]);
           $route.reload();
         }
       } else {
-        const { filterManager } = getDataPlugin().query;
-        const currentAppliedFilters = filterManager.filters;
-        const agentFilters = currentAppliedFilters.filter(x => {
-          return x.meta.key === 'agent.id';
-        });
-        agentFilters.map(x => {
-          filterManager.removeFilter(x);
-        });
-
         setTimeout(() => {
           if ($location.search()['agentId']) {
             $location.search('agentId', null);
