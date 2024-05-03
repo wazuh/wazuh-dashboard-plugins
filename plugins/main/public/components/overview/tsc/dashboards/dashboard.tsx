@@ -88,7 +88,7 @@ const DashboardTSCComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar'>
+            <div className='wz-search-bar hide-filter-control'>
               <SearchBar
                 appName='tsc-searchbar'
                 {...searchBarProps}
