@@ -54,14 +54,14 @@ import { DashboardMalwareDetection } from '../../overview/malware-detection/dash
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
-  AlertsDockerDataSource,
+  DockerDataSource,
   AlertsDataSource,
   AlertsVulnerabilitiesDataSource,
   AWSDataSource,
   VirusTotalDataSource,
   FIMDataSource,
   GitHubDataSource,
-  AlertsMalwareDetectionDataSource,
+  MalwareDetectionDataSource,
   AlertsFIMDataSource,
 } from '../data-source';
 
@@ -170,7 +170,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: malwareDetectionColumns,
-        DataSource: AlertsMalwareDetectionDataSource,
+        DataSource: MalwareDetectionDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -333,7 +333,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: dockerColumns,
-        DataSource: AlertsDockerDataSource,
+        DataSource: DockerDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],

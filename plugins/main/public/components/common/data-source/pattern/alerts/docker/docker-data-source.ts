@@ -5,7 +5,7 @@ import { AlertsDataSource } from '../alerts-data-source';
 const DOCKER_GROUP_KEY = 'rule.groups';
 const DOCKER_GROUP_VALUE = 'docker';
 
-export class AlertsDockerDataSource extends AlertsDataSource {
+export class DockerDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }
