@@ -1,13 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { SearchResponse } from '../../../../../../../src/core/server';
 import { getPlugins } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { getDashboardPanels } from './dashboard_panels';
+import { getDashboardPanels } from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { getDashboardFilters } from './dashboard_panels_filters';
-import './fim_filters.scss';
-import { getKPIsPanel } from './dashboard_panels_kpis';
-import { useAppConfig } from '../../../common/hooks';
+import './styles.scss';
+import { withErrorBoundary } from '../../../common/hocs';
+import { IndexPattern } from '../../../../../../../src/plugins/data/common';
+import {
+  ErrorFactory,
+  ErrorHandler,
+  HttpError,
+} from '../../../../react-services/error-management';
+import { compose } from 'redux';
+import { SampleDataWarning } from '../../../visualize/components';
+import {
+  AlertsDataSourceRepository,
+  PatternDataSource,
+  tParsedIndexPattern,
+  useDataSource,
+  AlertsFIMDataSource,
+} from '../../../common/data-source';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 
 const plugins = getPlugins();
 
@@ -15,94 +31,111 @@ const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-export const DashboardFim: React.FC = () => {
-  const appConfig = useAppConfig();
-  const FIM_INDEX_PATTERN_ID = appConfig.data['fim.pattern'];
+const DashboardFIMComponent: React.FC = ({}) => {
+  const {
+    filters,
+    dataSource,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+    setFilters,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    DataSource: AlertsFIMDataSource,
+    repository: new AlertsDataSourceRepository(),
+  });
+
+  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
   const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: FIM_INDEX_PATTERN_ID,
-    filters: [],
+    indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters,
   });
+
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useEffect(() => {
+    if (isDataSourceLoading) {
+      return;
+    }
+    fetchData({
+      query,
+      dateRange: {
+        to: dateRangeTo,
+        from: dateRangeFrom,
+      },
+    })
+      .then(results => setResults(results))
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching data',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
+  ]);
 
   return (
     <>
       <I18nProvider>
-        <SearchBar
-          appName='fim-searchbar'
-          {...searchBarProps}
-          showDatePicker={false}
-          showQueryInput={true}
-          showQueryBar={true}
-        />
+        <>
+          {isDataSourceLoading && !dataSource ? (
+            <LoadingSpinner />
+          ) : (
+            <div className='wz-search-bar hide-filter-control'>
+              <SearchBar
+                appName='fim-searchbar'
+                {...searchBarProps}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            </div>
+          )}
+          {dataSource && results?.hits?.total === 0 ? (
+            <DiscoverNoResults />
+          ) : null}
+          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+            <>
+              <SampleDataWarning />
+              <div className='fim-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      dataSource?.id,
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'fim-dashboard-tab',
+                    timeRange: {
+                      from: dateRangeFrom,
+                      to: dateRangeTo,
+                    },
+                    title: 'File Integrity Monitoring dashboard',
+                    description: 'Dashboard of the File Integrity Monitoring',
+                    query: query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
+            </>
+          ) : null}
+        </>
       </I18nProvider>
-      <div className='fim-dashboard-filters-wrapper'>
-        <DashboardByRenderer
-          input={{
-            viewMode: ViewMode.VIEW,
-            panels: getDashboardFilters(FIM_INDEX_PATTERN_ID),
-            isFullScreenMode: false,
-            filters: searchBarProps.filters ?? [],
-            useMargins: false,
-            id: 'fim-dashboard-tab-filters',
-            timeRange: {
-              from: searchBarProps.dateRangeFrom,
-              to: searchBarProps.dateRangeTo,
-            },
-            title: 'Fim dashboard filters',
-            description: 'Dashboard of the Fim filters',
-            query: searchBarProps.query,
-            refreshConfig: {
-              pause: false,
-              value: 15,
-            },
-            hidePanelTitles: true,
-          }}
-        />
-      </div>
-      <DashboardByRenderer
-        input={{
-          viewMode: ViewMode.VIEW,
-          panels: getKPIsPanel(FIM_INDEX_PATTERN_ID),
-          isFullScreenMode: false,
-          filters: searchBarProps.filters ?? [],
-          useMargins: true,
-          id: 'kpis-fim-dashboard-tab',
-          timeRange: {
-            from: searchBarProps.dateRangeFrom,
-            to: searchBarProps.dateRangeTo,
-          },
-          title: 'KPIs Fim dashboard',
-          description: 'KPIs Dashboard of the Fim',
-          query: searchBarProps.query,
-          refreshConfig: {
-            pause: false,
-            value: 15,
-          },
-          hidePanelTitles: true,
-        }}
-      />
-      <DashboardByRenderer
-        input={{
-          viewMode: ViewMode.VIEW,
-          panels: getDashboardPanels(FIM_INDEX_PATTERN_ID),
-          isFullScreenMode: false,
-          filters: searchBarProps.filters ?? [],
-          useMargins: true,
-          id: 'fim-dashboard-tab',
-          timeRange: {
-            from: searchBarProps.dateRangeFrom,
-            to: searchBarProps.dateRangeTo,
-          },
-          title: 'Fim dashboard',
-          description: 'Dashboard of the Fim',
-          query: searchBarProps.query,
-          refreshConfig: {
-            pause: false,
-            value: 15,
-          },
-          hidePanelTitles: false,
-        }}
-      />
     </>
   );
 };
+
+export const DashboardFIM = compose(withErrorBoundary)(DashboardFIMComponent);

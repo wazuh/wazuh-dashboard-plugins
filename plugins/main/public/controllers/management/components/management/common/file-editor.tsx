@@ -48,6 +48,8 @@ import _ from 'lodash';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { WzButtonPermissionsOpenFlyout } from '../../../../../components/common/buttons/flyout';
+import { Logtest } from '../../../../../directives/wz-logtest/components/logtest';
 
 class WzFileEditor extends Component {
   _isMounted = false;
@@ -236,22 +238,23 @@ class WzFileEditor extends Component {
 
     const xmlError = validateXML(content);
 
-    const onClickOpenLogtest = () => {
-      this.props.logtestProps.openCloseFlyout();
-    };
-
     const buildLogtestButton = () => {
       return (
-        <WzButtonPermissions
-          buttonType='empty'
-          permissions={[{ action: 'logtest:run', resource: `*:*:*` }]}
-          color='primary'
-          iconType='documentEdit'
-          style={{ margin: '0px 8px', cursor: 'pointer' }}
-          onClick={onClickOpenLogtest}
+        <WzButtonPermissionsOpenFlyout
+          flyoutTitle={isRules}
+          flyoutBody={({ onClose, onUpdateCanClose }) => (
+            <Logtest onFlyout={true}></Logtest>
+          )}
+          buttonProps={{
+            buttonType: 'empty',
+            permissions: [{ action: 'logtest:run', resource: `*:*:*` }],
+            color: 'primary',
+            iconType: 'documentEdit',
+            style: { margin: '0px 8px', cursor: 'pointer' },
+          }}
         >
           {isRules}
-        </WzButtonPermissions>
+        </WzButtonPermissionsOpenFlyout>
       );
     };
 

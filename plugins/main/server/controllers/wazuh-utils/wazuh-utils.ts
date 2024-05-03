@@ -22,7 +22,11 @@ import path from 'path';
 import { createDirectoryIfNotExists } from '../../lib/filesystem';
 import glob from 'glob';
 import { getFileExtensionFromBuffer } from '../../../common/services/file-extension';
-import { routeDecoratorProtectedAdministrator } from '../decorators';
+import {
+  compose,
+  routeDecoratorConfigurationAPIEditable,
+  routeDecoratorProtectedAdministrator,
+} from '../decorators';
 
 // TODO: these controllers have no logs. We should include them.
 export class WazuhUtilsCtrl {
@@ -71,7 +75,10 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object}
    */
-  updateConfiguration = routeDecoratorProtectedAdministrator(
+  updateConfiguration = compose(
+    routeDecoratorConfigurationAPIEditable(3021),
+    routeDecoratorProtectedAdministrator(3021),
+  )(
     async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest,
@@ -100,7 +107,6 @@ export class WazuhUtilsCtrl {
         },
       });
     },
-    3021,
   );
 
   /**
@@ -110,7 +116,10 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  uploadFile = routeDecoratorProtectedAdministrator(
+  uploadFile = compose(
+    routeDecoratorConfigurationAPIEditable(3022),
+    routeDecoratorProtectedAdministrator(3022),
+  )(
     async (
       context: RequestHandlerContext,
       request: KibanaRequest,
@@ -175,7 +184,6 @@ export class WazuhUtilsCtrl {
         },
       });
     },
-    3022,
   );
 
   /**
@@ -185,7 +193,10 @@ export class WazuhUtilsCtrl {
    * @param {Object} response
    * @returns {Object} Configuration File or ErrorResponse
    */
-  deleteFile = routeDecoratorProtectedAdministrator(
+  deleteFile = compose(
+    routeDecoratorConfigurationAPIEditable(3023),
+    routeDecoratorProtectedAdministrator(3023),
+  )(
     async (
       context: RequestHandlerContext,
       request: KibanaRequest,
@@ -222,6 +233,5 @@ export class WazuhUtilsCtrl {
         },
       });
     },
-    3023,
   );
 }
