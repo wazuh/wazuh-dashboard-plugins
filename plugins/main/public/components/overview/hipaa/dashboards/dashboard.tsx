@@ -99,38 +99,40 @@ const DashboardHIPAAComponent: React.FC = () => {
               />
             </div>
           )}
-          <SampleDataWarning />
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
-            <div className='hipaa-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    dataSource?.id,
-                    Boolean(dataSource.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'hipaa-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'HIPAA dashboard',
-                  description: 'Dashboard of the HIPAA',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
-            </div>
+            <>
+              <SampleDataWarning />
+              <div className='hipaa-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      dataSource?.id,
+                      Boolean(dataSource.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'hipaa-dashboard-tab',
+                    timeRange: {
+                      from: searchBarProps.dateRangeFrom,
+                      to: searchBarProps.dateRangeTo,
+                    },
+                    title: 'HIPAA dashboard',
+                    description: 'Dashboard of the HIPAA',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
+            </>
           ) : null}
         </>
       </I18nProvider>
