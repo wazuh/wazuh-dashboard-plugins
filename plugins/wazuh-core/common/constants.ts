@@ -299,6 +299,15 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
 export const PLUGIN_APP_NAME = 'Dashboard';
 
 // UI
+export const UI_COLOR_STATUS = {
+  success: '#007871',
+  danger: '#BD271E',
+  warning: '#FEC514',
+  disabled: '#646A77',
+  info: '#6092C0',
+  default: '#000000',
+} as const;
+
 export const API_NAME_AGENT_STATUS = {
   ACTIVE: 'active',
   DISCONNECTED: 'disconnected',
@@ -307,11 +316,11 @@ export const API_NAME_AGENT_STATUS = {
 } as const;
 
 export const UI_COLOR_AGENT_STATUS = {
-  [API_NAME_AGENT_STATUS.ACTIVE]: '#007871',
-  [API_NAME_AGENT_STATUS.DISCONNECTED]: '#BD271E',
-  [API_NAME_AGENT_STATUS.PENDING]: '#FEC514',
-  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: '#646A77',
-  default: '#000000',
+  [API_NAME_AGENT_STATUS.ACTIVE]: UI_COLOR_STATUS.success,
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: UI_COLOR_STATUS.danger,
+  [API_NAME_AGENT_STATUS.PENDING]: UI_COLOR_STATUS.warning,
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: UI_COLOR_STATUS.disabled,
+  default: UI_COLOR_STATUS.default,
 } as const;
 
 export const UI_LABEL_NAME_AGENT_STATUS = {
@@ -839,6 +848,38 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.switch,
     defaultValue: true,
     isConfigurableFromSettings: true,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.isBoolean,
+  },
+  'configuration.ui_api_editable': {
+    title: 'Configuration UI editable',
+    description:
+      'Enable or disable the ability to edit the configuration from UI or API endpoints. When disabled, this can only be edited from the configuration file, the related API endpoints are disabled, and the UI is inaccessible.',
+    store: {
+      file: {
+        configurableManaged: false,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromSettings: false,
+    requiresRestartingPluginPlatform: true,
     options: {
       switch: {
         values: {
@@ -1700,6 +1741,33 @@ hosts:
     },
     validateUIForm: function (value) {
       return this.validate(value);
+    },
+    validate: SettingsValidator.isBoolean,
+  },
+  'wazuh.updates.disabled': {
+    title: 'Check updates',
+    description: 'Define if the check updates service is active.',
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    store: {
+      file: {
+        configurableManaged: false,
+      },
+    },
+    isConfigurableFromSettings: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
     },
     validate: SettingsValidator.isBoolean,
   },

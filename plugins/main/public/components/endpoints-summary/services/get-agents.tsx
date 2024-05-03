@@ -4,11 +4,13 @@ import { Agent } from '../types';
 
 export const getAgentsService = async ({
   filters,
+  agents,
   limit,
   offset,
   pageSize = 1000,
 }: {
-  filters: any;
+  filters?: any;
+  agents?: string[];
   limit?: number;
   offset?: number;
   pageSize?: number;
@@ -27,7 +29,8 @@ export const getAgentsService = async ({
       params: {
         limit: queryLimit,
         offset: queryOffset,
-        q: filters,
+        ...(agents?.length ? { agents_list: agents?.join(',') } : {}),
+        ...(filters ? { q: filters } : {}),
         wait_for_complete: true,
       },
     })) as IApiResponse<Agent>;

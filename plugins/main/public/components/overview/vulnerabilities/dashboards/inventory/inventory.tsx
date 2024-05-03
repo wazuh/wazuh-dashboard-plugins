@@ -7,7 +7,6 @@ import {
   EuiButtonIcon,
   EuiDataGridCellValueElementProps,
   EuiFlexGroup,
-  EuiFlexItem,
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
@@ -38,13 +37,15 @@ import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 
-import { 
+import {
   VulnerabilitiesDataSourceRepository,
   VulnerabilitiesDataSource,
-  tParsedIndexPattern, 
-  PatternDataSource } from '../../../../common/data-source';
+  tParsedIndexPattern,
+  PatternDataSource,
+} from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
+import { DocumentViewTableAndJson } from '../../common/components/document-view-table-and-json';
 
 const InventoryVulsComponent = () => {
   const {
@@ -56,12 +57,12 @@ const InventoryVulsComponent = () => {
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: VulnerabilitiesDataSource,
-    repository: new VulnerabilitiesDataSourceRepository()
+    repository: new VulnerabilitiesDataSourceRepository(),
   });
   const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
-    setFilters
+    setFilters,
   });
   const { query } = searchBarProps;
 
@@ -114,7 +115,6 @@ const InventoryVulsComponent = () => {
     indexPattern: indexPattern as IndexPattern,
   });
 
-
   const onClickExportResults = async () => {
     const params = {
       indexPattern: indexPattern as IndexPattern,
@@ -162,7 +162,7 @@ const InventoryVulsComponent = () => {
     JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
-  ])
+  ]);
 
   return (
     <IntlProvider locale='en'>
@@ -177,7 +177,7 @@ const InventoryVulsComponent = () => {
             {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
-              <div className="wz-search-bar">
+              <div className='wz-search-bar hide-filter-control'>
                 <SearchBar
                   appName='inventory-vuls'
                   {...searchBarProps}
@@ -203,15 +203,15 @@ const InventoryVulsComponent = () => {
                         showResetButton={false}
                         tooltip={
                           results?.hits?.total &&
-                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
                             ? {
-                              ariaLabel: 'Warning',
-                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                MAX_ENTRIES_PER_QUERY,
-                              )} hits.`,
-                              iconType: 'alert',
-                              position: 'top',
-                            }
+                                ariaLabel: 'Warning',
+                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                  MAX_ENTRIES_PER_QUERY,
+                                )} hits.`,
+                                iconType: 'alert',
+                                position: 'top',
+                              }
                             : undefined
                         }
                       />
@@ -243,9 +243,10 @@ const InventoryVulsComponent = () => {
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
                   <EuiFlexGroup direction='column'>
-                    <EuiFlexItem>
-                      <DocViewer {...docViewerProps} />
-                    </EuiFlexItem>
+                    <DocumentViewTableAndJson
+                      document={inspectedHit}
+                      indexPattern={indexPattern}
+                    />
                   </EuiFlexGroup>
                 </EuiFlyoutBody>
               </EuiFlyout>

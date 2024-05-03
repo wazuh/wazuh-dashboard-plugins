@@ -15,12 +15,11 @@ import { WzVisualize } from './visualize/wz-visualize';
 import { WzMenuWrapper } from '../components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from '../components/wz-agent-selector/wz-agent-selector-wrapper';
 import { WzBlankScreen } from '../components/wz-blank-screen/wz-blank-screen';
-import { ClusterDisabled } from '../components/management/cluster/cluster-disabled';
-import { ClusterTimelions } from '../components/management/cluster/cluster-timelions';
 import { KibanaVisWrapper } from '../components/management/cluster/cluster-visualization';
 import { ToastNotificationsModal } from '../components/notifications/modal';
 import { getAngularModule } from '../kibana-services';
 import { WzUpdatesNotification } from './wz-updates-notification';
+import { Settings } from './settings';
 
 const app = getAngularModule();
 
@@ -29,8 +28,7 @@ app.value('WzVisualize', WzVisualize);
 app.value('WzMenuWrapper', WzMenuWrapper);
 app.value('WzAgentSelectorWrapper', WzAgentSelectorWrapper);
 app.value('WzBlankScreen', WzBlankScreen);
-app.value('ClusterDisabled', ClusterDisabled);
-app.value('ClusterTimelions', ClusterTimelions);
+app.value('Settings', Settings);
 app.value('KibanaVisualization', KibanaVisWrapper);
 app.value('ToastNotificationsModal', ToastNotificationsModal);
 app.value('WzUpdatesNotification', WzUpdatesNotification);
