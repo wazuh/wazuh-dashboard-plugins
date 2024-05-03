@@ -14,17 +14,20 @@ import { hideCloseButtonOnFixedFilters } from './search-bar-service';
 type tUseSearchBarCustomInputs = {
   indexPattern: IndexPattern;
   setFilters: (filters: Filter[]) => void;
+  setTimeFilter?: (timeRange: TimeRange) => void;
+  setQuery?: (query: Query) => void;
   onFiltersUpdated?: (filters: Filter[]) => void;
   onQuerySubmitted?: (
     payload: { dateRange: TimeRange; query?: Query },
     isUpdate?: boolean,
   ) => void;
 };
-type tUseSearchBarProps = Partial<SearchBarProps> & tUseSearchBarCustomInputs;
+export type tUseSearchBarProps = Partial<SearchBarProps> &
+  tUseSearchBarCustomInputs;
 
 // Output types
 type tUserSearchBarResponse = {
-  searchBarProps: Partial<SearchBarProps>
+  searchBarProps: Partial<SearchBarProps>;
 };
 
 /**
@@ -36,30 +39,39 @@ const useSearchBarConfiguration = (
   props: tUseSearchBarProps,
 ): tUserSearchBarResponse => {
   const { indexPattern, filters: defaultFilters, setFilters } = props;
+
   // dependencies
+  const {
+    timeFilter: globalTimeFilter,
+    timeHistory,
+    setTimeFilter: setGlobalTimeFilter,
+  } = useTimeFilter();
   const filters = defaultFilters ? defaultFilters : [];
-  const [query, setQuery] = props?.query
-    ? useState(props?.query)
+  const [timeFilter, setTimeFilter] = useState(globalTimeFilter);
+  const [query, setQuery] = props?.setQuery
+    ? useState(props?.query || { query: '', language: 'kuery' })
     : useQueryManager();
-  const { timeFilter, timeHistory, setTimeFilter } = useTimeFilter();
+
   // states
   const [isLoading, setIsLoading] = useState(true);
-  const [indexPatternSelected, setIndexPatternSelected] = useState<IndexPattern>(indexPattern);
+  const [indexPatternSelected, setIndexPatternSelected] =
+    useState<IndexPattern>(indexPattern);
   const TIMEOUT_MILISECONDS = 100;
 
   const hideRemoveFilter = (retry: number = 0) => {
-    let elements = document.querySelectorAll('.wz-search-bar .globalFilterItem');
+    let elements = document.querySelectorAll(
+      '.wz-search-bar .globalFilterItem',
+    );
     if ((!elements || !filters.length) && retry < 10) {
       // the setTimeout is used to wait for the DOM elements to be rendered
       setTimeout(() => {
         // this is a workaround to hide the close button on fixed filters via vanilla js
         hideRemoveFilter(++retry);
       }, TIMEOUT_MILISECONDS);
-
-    }else{
+    } else {
       hideCloseButtonOnFixedFilters(filters, elements);
     }
-  }
+  };
 
   useLayoutEffect(() => {
     setTimeout(() => {
@@ -98,14 +110,17 @@ const useSearchBarConfiguration = (
    * @returns
    */
   const getDefaultIndexPattern = async (): Promise<IndexPattern> => {
-    const indexPatternService = getDataPlugin().indexPatterns as IndexPatternsContract;
+    const indexPatternService = getDataPlugin()
+      .indexPatterns as IndexPatternsContract;
     return await indexPatternService.getDefault();
   };
 
   /**
    * Search bar properties necessary to render and initialize the osd search bar component
    */
-  const searchBarProps: Partial<SearchBarProps & { useDefaultBehaviors: boolean }> = {
+  const searchBarProps: Partial<
+    SearchBarProps & { useDefaultBehaviors: boolean }
+  > = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
     filters: filters,
@@ -114,7 +129,9 @@ const useSearchBarConfiguration = (
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (filters: Filter[]) => {
-      setFilters ? setFilters(filters) : console.warn('setFilters function is not defined');
+      setFilters
+        ? setFilters(filters)
+        : console.warn('setFilters function is not defined');
       props?.onFiltersUpdated && props?.onFiltersUpdated(filters);
     },
     onQuerySubmit: (
@@ -123,10 +140,16 @@ const useSearchBarConfiguration = (
     ): void => {
       const { dateRange, query } = payload;
       // its necessary execute setter to apply query filters
+      // when the hook receives the dateRange use the setter instead the global setTimeFilter
+      props?.setTimeFilter
+        ? props?.setTimeFilter(dateRange)
+        : setGlobalTimeFilter(dateRange);
+      props?.setQuery ? props?.setQuery(query) : setQuery(query);
+      props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
       setTimeFilter(dateRange);
       setQuery(query);
-      props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
     },
+
     // its necessary to use saved queries. if not, the load saved query not work
     useDefaultBehaviors: true,
   };

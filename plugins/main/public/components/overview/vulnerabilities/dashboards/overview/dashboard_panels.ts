@@ -269,11 +269,11 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
   indexPatternId: string,
 ) => {
   return {
-    id: 'accumulation_most_vulnerable_vulnerabilities',
-    title: 'Accumulation of the most detected vulnerabilities',
-    type: 'line',
+    id: 'vulnerabilities_by_year_of_publication',
+    title: 'Vulnerabilities by year of publication',
+    type: 'histogram',
     params: {
-      type: 'line',
+      type: 'histogram',
       grid: {
         categoryLines: false,
       },
@@ -304,8 +304,9 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
           show: true,
           style: {},
           scale: {
-            type: 'linear',
+            type: 'log',
             mode: 'normal',
+            defaultYExtents: true,
           },
           labels: {
             show: true,
@@ -321,16 +322,15 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
       seriesParams: [
         {
           show: true,
-          type: 'line',
-          mode: 'normal',
+          type: 'histogram',
+          mode: 'stacked',
           data: {
             label: 'Count',
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
-          drawLinesBetweenPoints: false,
+          drawLinesBetweenPoints: true,
           lineWidth: 2,
-          interpolate: 'linear',
           showCircles: true,
         },
       ],
@@ -339,7 +339,9 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
       legendPosition: 'right',
       times: [],
       addTimeMarker: false,
-      labels: {},
+      labels: {
+        show: false,
+      },
       thresholdLine: {
         show: false,
         value: 10,
@@ -347,7 +349,6 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
         style: 'full',
         color: '#E7664C',
       },
-      radiusRatio: 20,
     },
     data: {
       searchSource: {
@@ -376,48 +377,37 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
         {
           id: '2',
           enabled: true,
-          type: 'count',
-          params: {},
-          schema: 'radius',
-        },
-        {
-          id: '4',
-          enabled: true,
-          type: 'terms',
-          params: {
-            field: 'vulnerability.id',
-            orderBy: '1',
-            order: 'desc',
-            size: 5,
-            otherBucket: false,
-            otherBucketLabel: 'Others',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-          },
-          schema: 'group',
-        },
-        {
-          id: '3',
-          enabled: true,
           type: 'date_histogram',
           params: {
             field: 'vulnerability.published_at',
-            customLabel: 'Published at',
             timeRange: {
               from: 'now-24h',
               to: 'now',
             },
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
-            interval: 'w',
-            // eslint-disable-next-line camelcase
+            interval: 'y',
             drop_partials: false,
-            // eslint-disable-next-line camelcase
             min_doc_count: 1,
-            // eslint-disable-next-line camelcase
             extended_bounds: {},
           },
           schema: 'segment',
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'vulnerability.severity',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+          schema: 'group',
         },
       ],
     },
