@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
 import { updateShowAddAgents } from '../../../../../redux/actions/groupsActions';
 
 import GroupsHandler from './utils/groups-handler';
-import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { ExportConfiguration } from '../../../../../components/agents/export-configuration';
 import { ReportingService } from '../../../../../react-services/reporting';
 
 class WzGroupsActionButtonsAgents extends Component {

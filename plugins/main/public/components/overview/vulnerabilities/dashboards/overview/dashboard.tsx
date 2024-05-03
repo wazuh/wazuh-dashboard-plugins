@@ -24,7 +24,7 @@ import {
   VulnerabilitiesDataSourceRepository,
   VulnerabilitiesDataSource,
   PatternDataSource,
-  tParsedIndexPattern
+  tParsedIndexPattern,
 } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
@@ -44,7 +44,7 @@ const DashboardVulsComponent: React.FC = () => {
     fetchFilters,
     isLoading: isDataSourceLoading,
     fetchData,
-    setFilters
+    setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository(),
@@ -63,9 +63,10 @@ const DashboardVulsComponent: React.FC = () => {
     if (isDataSourceLoading) {
       return;
     }
-    fetchData({ query }).then(results => {
-      setResults(results);
-    })
+    fetchData({ query })
+      .then(results => {
+        setResults(results);
+      })
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
@@ -73,30 +74,27 @@ const DashboardVulsComponent: React.FC = () => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [
-    JSON.stringify(fetchFilters),
-    JSON.stringify(query),
-  ])
+  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
 
   return (
     <>
       <I18nProvider>
         <>
           <ModuleEnabledCheck />
-          {
-            isDataSourceLoading && !dataSource ?
-              <LoadingSpinner /> : 
-              <div className="wz-search-bar">
-                <SearchBar
-                  appName='vulnerability-detector-searchbar'
-                  {...searchBarProps}
-                  showDatePicker={false}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                  showSaveQuery={true}
-                />
-              </div>
-          }
+          {isDataSourceLoading && !dataSource ? (
+            <LoadingSpinner />
+          ) : (
+            <div className='wz-search-bar hide-filter-control'>
+              <SearchBar
+                appName='vulnerability-detector-searchbar'
+                {...searchBarProps}
+                showDatePicker={false}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+            </div>
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
