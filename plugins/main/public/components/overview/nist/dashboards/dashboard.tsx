@@ -88,9 +88,9 @@ const DashboardNIST80053Component: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar'>
+            <div className='wz-search-bar hide-filter-control'>
               <SearchBar
-                appName='tsc-searchbar'
+                appName='nist-searchbar'
                 {...searchBarProps}
                 showDatePicker={true}
                 showQueryInput={true}
