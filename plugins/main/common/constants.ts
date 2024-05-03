@@ -225,6 +225,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER =
   'hidden-exclude-server';
 export const DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT = 'pinned-agent';
 export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
+export const DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST = 'pci-dss-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
   'vulnerabilities-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
