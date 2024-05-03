@@ -1,0 +1,10 @@
+.docker-dashboard-responsive {
+  @media (max-width: 767px) {
+    .react-grid-layout {
+      height: auto !important;
+    }
+    .dshLayout-isMaximizedPanel {
+      height: 100% !important;
+    }
+  }
+}
