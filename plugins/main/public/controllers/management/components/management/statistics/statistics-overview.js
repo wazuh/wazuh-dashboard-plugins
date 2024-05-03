@@ -34,7 +34,6 @@ import {
 } from '../../../../../components/common/hocs';
 import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
-import { WazuhConfig } from '../../../../../react-services/wazuh-config';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -43,8 +42,7 @@ import { getCore } from '../../../../../kibana-services';
 import { appSettings, statistics } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
-
-const wzConfig = new WazuhConfig();
+import { connect } from 'react-redux';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -174,19 +172,21 @@ export class WzStatisticsOverview extends Component {
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <RedirectAppLinks application={getCore().application}>
-                <EuiButtonEmpty
-                  href={getCore().application.getUrlForApp(appSettings.id, {
-                    path: '#/settings?tab=configuration&category=Task:Statistics',
-                  })}
-                  iconType='gear'
-                  iconSide='left'
-                >
-                  Settings
-                </EuiButtonEmpty>
-              </RedirectAppLinks>
-            </EuiFlexItem>
+            {this.props.configurationUIEditable && (
+              <EuiFlexItem grow={false}>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiButtonEmpty
+                    href={getCore().application.getUrlForApp(appSettings.id, {
+                      path: '#/settings?tab=configuration&category=Task:Statistics',
+                    })}
+                    iconType='gear'
+                    iconSide='left'
+                  >
+                    Settings
+                  </EuiButtonEmpty>
+                </RedirectAppLinks>
+              </EuiFlexItem>
+            )}
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -215,14 +215,21 @@ export class WzStatisticsOverview extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  statisticsEnabled: state.appConfig.data?.['cron.statistics.status'],
+  configurationUIEditable:
+    state.appConfig.data?.['configuration.ui_api_editable'],
+});
+
 export default compose(
   withGlobalBreadcrumb([{ text: statistics.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
+  connect(mapStateToProps),
   withGuard(props => {
-    return !(wzConfig.getConfig() || {})['cron.statistics.status']; // if 'cron.statistics.status' is false, then it renders PromptStatisticsDisabled component
+    return !props.statisticsEnabled;
   }, PromptStatisticsDisabled),
 )(props => {
   const [loading, setLoading] = useState(false);

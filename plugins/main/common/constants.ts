@@ -229,12 +229,16 @@ export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
   'vulnerabilities-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_GITHUB_RULE_GROUP =
   'github-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_DOCKER_RULE_GROUP =
+  'docker-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
   'mitre-attack-rule';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID =
   'hidden-mitre-attack-rule-id';
 export const DATA_SOURCE_FILTER_CONTROLLED_VIRUSTOTAL_RULE_GROUP =
   'virustotal-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_MALWARE_DETECTION_RULE_GROUP =
+  'malware-detection-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP = 'aws-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
 
