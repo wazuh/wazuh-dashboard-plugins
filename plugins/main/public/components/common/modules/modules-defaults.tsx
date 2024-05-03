@@ -11,14 +11,17 @@
  */
 import { Dashboard } from './dashboard';
 import { MainSca } from '../../agents/sca';
+import { DashboardAWS } from '../../overview/amazon-web-services/dashboards';
 import { MainMitre } from './main-mitre';
-import { ModuleMitreAttackIntelligence } from '../../overview/mitre_attack_intelligence';
+import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
+import { MainFim } from '../../agents/fim';
 import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
+import { DashboardMITRE } from '../../overview/mitre/dashboard';
 import { withModuleNotForAgent } from '../hocs';
 import {
   WazuhDiscover,
@@ -29,6 +32,8 @@ import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vu
 import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
 import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import { DashboardOffice365 } from '../../overview/office/dashboard';
+import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
+import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -49,6 +54,18 @@ import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import {
   AlertsOffice365DataSource,
   AlertsVulnerabilitiesDataSource,
+import { DashboardDocker } from '../../overview/docker/dashboards';
+import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
+import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
+import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
+import {
+  AlertsDockerDataSource,
+  AlertsDataSource,
+  AlertsVulnerabilitiesDataSource,
+  AlertsAWSDataSource,
+  VirusTotalDataSource,
+  AlertsMalwareDetectionDataSource,
+  AlertsFIMDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -62,7 +79,6 @@ const DashboardTab = {
 };
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
-  const { DataSource, tableColumns } = props;
   return {
     id: 'events',
     name: 'Events',
@@ -86,8 +102,16 @@ export const ModulesDefaults = {
   general: {
     init: 'events',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, threatHuntingColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardThreatHunting,
+      },
+      renderDiscoverTab({
+        tableColumns: threatHuntingColumns,
+        DataSource: AlertsDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -97,24 +121,35 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent],
-        component: DashboardFim,
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardFIM,
       },
       {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonModuleExploreAgent],
-        component: InventoryFim,
+        component: MainFim,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, fileIntegrityMonitoringColumns),
+      renderDiscoverTab({
+        tableColumns: fileIntegrityMonitoringColumns,
+        DataSource: AlertsFIMDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
   aws: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, amazonWebServicesColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardAWS,
+      },
+      renderDiscoverTab({
+        tableColumns: amazonWebServicesColumns,
+        DataSource: AlertsAWSDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -130,8 +165,16 @@ export const ModulesDefaults = {
   pm: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, malwareDetectionColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardMalwareDetection,
+      },
+      renderDiscoverTab({
+        tableColumns: malwareDetectionColumns,
+        DataSource: AlertsMalwareDetectionDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -181,6 +224,12 @@ export const ModulesDefaults = {
         name: 'Panel',
         buttons: [ButtonModuleExploreAgent],
         component: withModuleNotForAgent(OfficePanel),
+      },
+      {
+        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
+        component: withModuleNotForAgent(() => (
+          <WazuhDiscover tableColumns={office365Columns} />
+        )),
       },
     ],
     availableFor: ['manager'],
@@ -241,7 +290,12 @@ export const ModulesDefaults = {
   mitre: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardMITRE,
+      },
       {
         id: 'intelligence',
         name: 'Intelligence',
@@ -253,23 +307,41 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainMitre,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, mitreAttackColumns),
+      renderDiscoverTab({
+        DataSource: MitreAttackDataSource,
+        tableColumns: mitreAttackColumns,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
   virustotal: {
-    init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, virustotalColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardVirustotal,
+      },
+      renderDiscoverTab({
+        tableColumns: virustotalColumns,
+        DataSource: VirusTotalDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
   docker: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, dockerColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardDocker,
+      },
+      renderDiscoverTab({
+        tableColumns: dockerColumns,
+        DataSource: AlertsDockerDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },

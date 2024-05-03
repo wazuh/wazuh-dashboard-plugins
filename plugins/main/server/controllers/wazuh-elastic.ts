@@ -641,7 +641,7 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {index: string, alerts: [...], count: number} or ErrorResponse
    */
-  createSampleAlerts = routeDecoratorProtectedAdministrator(
+  createSampleAlerts = routeDecoratorProtectedAdministrator(1000)(
     async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest<{ category: string }>,
@@ -724,7 +724,6 @@ export class WazuhElasticCtrl {
         return ErrorResponse(errorMessage || error, 1000, statusCode, response);
       }
     },
-    1000,
   );
   /**
    * This deletes sample alerts
@@ -733,7 +732,7 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {result: "deleted", index: string} or ErrorResponse
    */
-  deleteSampleAlerts = routeDecoratorProtectedAdministrator(
+  deleteSampleAlerts = routeDecoratorProtectedAdministrator(1000)(
     async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest<{ category: string }>,
@@ -779,7 +778,6 @@ export class WazuhElasticCtrl {
         return ErrorResponse(errorMessage || error, 1000, statusCode, response);
       }
     },
-    1000,
   );
 
   async alerts(

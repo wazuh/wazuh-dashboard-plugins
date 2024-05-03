@@ -16,9 +16,7 @@ import {
   EuiPanel,
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
-import {
-  IndexPattern,
-} from '../../../../../../src/plugins/data/common';
+import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { useDocViewer } from '../doc-viewer';
 import DocViewer from '../doc-viewer/doc-viewer';
@@ -40,11 +38,11 @@ const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 import { withErrorBoundary } from '../hocs';
-import { 
+import {
   IDataSourceFactoryConstructor,
-  useDataSource, 
-  tParsedIndexPattern, 
-  PatternDataSource, 
+  useDataSource,
+  tParsedIndexPattern,
+  PatternDataSource,
   AlertsDataSourceRepository,
 } from '../data-source';
 
@@ -80,7 +78,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
-    DataSource
+    DataSource,
   });
 
   const onClickInspectDoc = useMemo(
@@ -109,13 +107,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
-    setFilters
+    setFilters,
   });
-  const {
-    query,
-    dateRangeFrom,
-    dateRangeTo,
-  } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
@@ -142,10 +136,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       return;
     }
     setIndexPattern(dataSource?.indexPattern);
-    fetchData({ 
-      query, 
-      pagination, 
-      sorting,  
+    fetchData({
+      query,
+      pagination,
+      sorting,
       dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
     })
       .then(results => {
@@ -165,7 +159,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     JSON.stringify(sorting),
     dateRangeFrom,
     dateRangeTo,
-  ])
+  ]);
 
   const timeField = indexPattern?.timeFieldName
     ? indexPattern.timeFieldName
@@ -209,10 +203,12 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-            <div className="wz-search-bar">
+            <div className='wz-discover hide-filter-control wz-search-bar'>
               <SearchBar
                 appName='wazuh-discover-search-bar'
                 {...searchBarProps}
+                showQueryInput={true}
+                showQueryBar={true}
                 showSaveQuery={true}
               />
             </div>

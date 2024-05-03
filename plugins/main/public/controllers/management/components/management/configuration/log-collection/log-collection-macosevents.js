@@ -115,10 +115,16 @@ class WzConfigurationLogCollectionMacOSEvents extends Component {
         {currentConfig?.[LOGCOLLECTOR_LOCALFILE_PROP]?.[
           LOCALFILE_MACOSEVENT_PROP
         ]?.length === 1 ? (
-          <WzConfigurationSettingsGroup
-            config={items[0].data}
-            items={mainSettings}
-          />
+          <WzConfigurationSettingsHeader
+            title='macOS events logs'
+            description='Logs that will be processed'
+            help={helpLinks}
+          >
+            <WzConfigurationSettingsGroup
+              config={items[0].data}
+              items={mainSettings}
+            />
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );
