@@ -217,7 +217,7 @@ export class PatternDataSourceFilterManager
    * @returns
    */
   createFilter(field: string, value: string): tFilter {
-    return getFilter(field, value, this.dataSource.id);
+    return this.generateFilter(field, value, this.dataSource.id);
   }
 
   /**
@@ -381,7 +381,11 @@ export class PatternDataSourceFilterManager
    * @param value
    * @param indexPatternTitle
    */
-  static getFilter(field: string, value: string, indexPatternTitle: string) {
+  private generateFilter(
+    field: string,
+    value: string,
+    indexPatternTitle: string,
+  ) {
     const meta = {
       disabled: false,
       negate: false,
@@ -390,7 +394,7 @@ export class PatternDataSourceFilterManager
       alias: null,
       type: 'phrases',
       value: value,
-      index: this.dataSource.id,
+      index: indexPatternTitle,
     };
     const $state = {
       store: 'appState',
