@@ -37,6 +37,8 @@ describe('[settings] Input validation', () => {
     ${'checks.setup'}                   | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'checks.template'}                | ${true}                                                                | ${undefined}
     ${'checks.template'}                | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
+    ${'configuration.ui_api_editable'}  | ${true}                                                                | ${undefined}
+    ${'configuration.ui_api_editable'}  | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'checks.timeFilter'}              | ${true}                                                                | ${undefined}
     ${'checks.timeFilter'}              | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'cron.prefix'}                    | ${'test'}                                                              | ${undefined}

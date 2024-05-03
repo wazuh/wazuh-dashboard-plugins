@@ -17,7 +17,14 @@ import { render, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Stats } from './stats';
 
-jest.mock('react-use/lib/useObservable', () => () => {});
+jest.mock(
+  '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  }),
+);
+
+jest.mock('react-use/lib/useObservable', () => () => { });
 jest.mock('./last-alerts-stat/last-alerts-service', () => ({
   getLast24HoursAlerts: jest.fn().mockReturnValue({
     count: 100,
@@ -35,12 +42,15 @@ jest.mock('../../../kibana-services', () => ({
       navigateToApp: () => 'http://url',
       getUrlForApp: () => 'http://url',
     },
+    uiSettings: {
+      get: () => true
+    }
   }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => {},
+    handleError: options => { },
   }),
 }));
 
