@@ -228,6 +228,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
 export const DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST = 'pci-dss-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
   'vulnerabilities-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_DOCKER_RULE_GROUP =
+  'docker-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
   'mitre-attack-rule';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID =

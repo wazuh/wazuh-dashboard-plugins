@@ -49,10 +49,12 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
+import { DashboardDocker } from '../../overview/docker/dashboards';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
+  AlertsDockerDataSource,
   AlertsDataSource,
   AlertsPCIDSSDataSource,
   AlertsVulnerabilitiesDataSource,
@@ -314,8 +316,16 @@ export const ModulesDefaults = {
   docker: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, dockerColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardDocker,
+      },
+      renderDiscoverTab({
+        tableColumns: dockerColumns,
+        DataSource: AlertsDockerDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
