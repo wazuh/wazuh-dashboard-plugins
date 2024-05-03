@@ -249,7 +249,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
                 <SearchBar
                   appName='compliance-controls'
                   {...searchBarProps}
-                  showDatePicker={false}
+                  showDatePicker={true}
                   showQueryInput={true}
                   showQueryBar={true}
                   showSaveQuery={true}
