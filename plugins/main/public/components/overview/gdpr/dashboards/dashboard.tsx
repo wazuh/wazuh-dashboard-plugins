@@ -98,38 +98,40 @@ const DashboardGDPRComponent: React.FC = () => {
               />
             </div>
           )}
-          <SampleDataWarning />
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
-            <div className='gdpr-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    dataSource?.id,
-                    Boolean(dataSource.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'gdpr-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'GDPR dashboard',
-                  description: 'Dashboard of the GDPR',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
-            </div>
+            <>
+              <SampleDataWarning />
+              <div className='gdpr-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      dataSource?.id,
+                      Boolean(dataSource.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'gdpr-dashboard-tab',
+                    timeRange: {
+                      from: searchBarProps.dateRangeFrom,
+                      to: searchBarProps.dateRangeTo,
+                    },
+                    title: 'GDPR dashboard',
+                    description: 'Dashboard of the GDPR',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
+            </>
           ) : null}
         </>
       </I18nProvider>
