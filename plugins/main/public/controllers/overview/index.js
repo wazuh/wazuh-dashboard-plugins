@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { OverviewController } from './overview';
 import { OverviewWelcome } from '../../components/common/welcome/overview-welcome';
 import { WzCurrentOverviewSectionWrapper } from '../../components/common/modules/overview-current-section-wrapper';
 import { Mitre } from '../../components/overview';
@@ -28,7 +27,6 @@ SelectAgent.displayName = 'SelectAgent';
 RequirementCard.displayName = 'RequirementCard';
 
 app
-  .controller('overviewController', OverviewController)
   .value('OverviewWelcome', OverviewWelcome)
   .value('WzCurrentOverviewSectionWrapper', WzCurrentOverviewSectionWrapper)
   .value('StatsOverview', Stats)
