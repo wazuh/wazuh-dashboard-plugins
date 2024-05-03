@@ -48,10 +48,12 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { DashboardDocker } from '../../overview/docker/dashboards';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
+  AlertsDockerDataSource,
   AlertsDataSource,
   AlertsVulnerabilitiesDataSource,
   AlertsAWSDataSource,
@@ -312,8 +314,16 @@ export const ModulesDefaults = {
   docker: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, dockerColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardDocker,
+      },
+      renderDiscoverTab({
+        tableColumns: dockerColumns,
+        DataSource: AlertsDockerDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
