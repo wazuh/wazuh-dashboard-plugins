@@ -245,9 +245,9 @@ export const ComplianceTable = withAgentSupportModule(props => {
             {isDataSourceLoading && !dataSource ? (
               <LoadingSpinner />
             ) : (
-              <div className='wz-search-bar'>
+              <div className='wz-search-bar hide-filter-control'>
                 <SearchBar
-                  appName='pci-dss-inventory'
+                  appName='compliance-controls'
                   {...searchBarProps}
                   showDatePicker={false}
                   showQueryInput={true}
