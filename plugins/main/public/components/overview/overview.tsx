@@ -30,7 +30,7 @@ export const Overview: React.FC = () => {
   const [tabActive, setTabActive] = useState<string>('welcome');
   const [tabViewActive, setTabViewActive] = useState<string>('panels');
   const $location = getAngularModule().$injector.get('$location');
-  const $route = getAngularModule().$injector.get('$route');
+  const $rootScope = getAngularModule().$injector.get('$rootScope');
 
   useEffect(() => {
     const tab = $location.search().tab;
@@ -163,19 +163,11 @@ export const Overview: React.FC = () => {
   // TODO: Create a service or add it in the dataSource the management of the pinned agent
   const updateSelectedAgents = (agentList: Array<any>) => {
     try {
-      if (agentList.length > 0) {
-        if ($location.search().agentId !== agentList[0]) {
-          $location.search('agentId', agentList[0]);
-          $route.reload();
-        }
-      } else {
-        setTimeout(() => {
-          if ($location.search()['agentId']) {
-            $location.search('agentId', null);
-            $route.reload();
-          }
-        }, 1);
-      }
+      // This is a workaround to sync the pinned agent with the URL
+      setTimeout(() => {
+        $location.search('agentId', agentList?.[0] || null);
+        $rootScope.$applyAsync();
+      }, 1);
     } catch (error) {
       const options = {
         context: `${Overview.name}.updateSelectedAgents`,
