@@ -9,3 +9,5 @@ export * from './vulnerabilities';
 export * from './mitre-attack';
 export * from './pci-dss';
 export * from './virustotal';
+
+export * from './alerts-google-cloud';
