@@ -156,7 +156,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardGoogleCloud,
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
       },
       renderDiscoverTab({
         tableColumns: googleCloudColumns,
