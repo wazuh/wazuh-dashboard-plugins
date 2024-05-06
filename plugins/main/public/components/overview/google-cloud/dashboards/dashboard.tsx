@@ -23,6 +23,7 @@ import {
 import { AlertsGoogleCloudDataSource } from '../../../common/data-source/pattern/alerts/alerts-google-cloud/alerts-google-cloud-data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
 const plugins = getPlugins();
 
@@ -52,6 +53,18 @@ const DashboardGoogleCloudComponent: React.FC = () => {
   });
 
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useReportingCommunicateSearchContext({
+    isSearching: isDataSourceLoading,
+    totalResults: results?.hits?.total ?? 0,
+    indexPattern: dataSource?.indexPattern,
+    filters: fetchFilters,
+    query: query,
+    time: {
+      from: dateRangeFrom,
+      to: dateRangeTo,
+    },
+  });
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -101,8 +114,8 @@ const DashboardGoogleCloudComponent: React.FC = () => {
             <DiscoverNoResults />
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
-          <>
-            <SampleDataWarning />
+            <>
+              <SampleDataWarning />
               <div className='google-cloud-dashboard-responsive'>
                 <DashboardByRenderer
                   input={{
