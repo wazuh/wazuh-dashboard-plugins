@@ -31,6 +31,7 @@ import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
 import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
+import { DashboardGoogleCloud } from '../../overview/google-cloud/dashboards';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -62,7 +63,8 @@ import {
   FIMDataSource,
   GitHubDataSource,
   MalwareDetectionDataSource,
-  AlertsFIMDataSource,
+  AlertsGoogleCloudDataSource,
+  AlertsMalwareDetectionDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -153,8 +155,16 @@ export const ModulesDefaults = {
   gcp: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, googleCloudColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        component: DashboardGoogleCloud,
+        buttons: [ButtonModuleExploreAgent],
+      },
+      renderDiscoverTab({
+        tableColumns: googleCloudColumns,
+        DataSource: AlertsGoogleCloudDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },

@@ -48,5 +48,5 @@ export {
   docker,
   welcome,
   aws,
-  github
+  github,
 };
