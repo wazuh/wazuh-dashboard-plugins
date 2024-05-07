@@ -36,7 +36,6 @@ import 'angular-material/angular-material';
 import './setup';
 
 //App imports
-import './kibana-integrations';
 import './services';
 import './controllers';
 import './factories';

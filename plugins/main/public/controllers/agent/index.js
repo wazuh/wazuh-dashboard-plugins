@@ -13,6 +13,7 @@ import { RegisterAgent } from '../../components/endpoints-summary/register-agent
 import { MainModule } from '../../components/common/modules/main';
 import { getAngularModule } from '../../kibana-services';
 import { MainEndpointsSummary } from '../../components/endpoints-summary';
+import { Overview } from '../../components/overview/overview';
 import { AgentView } from '../../components/endpoints-summary/agent';
 
 const app = getAngularModule();
@@ -21,4 +22,5 @@ app
   .value('RegisterAgent', RegisterAgent)
   .value('AgentView', AgentView)
   .value('MainModule', MainModule)
-  .value('MainEndpointsSummary', MainEndpointsSummary);
+  .value('MainEndpointsSummary', MainEndpointsSummary)
+  .value('Overview', Overview);
