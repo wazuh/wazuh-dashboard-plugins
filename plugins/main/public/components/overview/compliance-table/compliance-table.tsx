@@ -9,32 +9,28 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { FilterManager } from '../../../../../../src/plugins/data/public/';
-
 //@ts-ignore
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components/subrequirements';
-import {
-  getElasticAlerts,
-  getIndexPattern,
-  IFilterParams,
-} from '../../../react-services';
 import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
-import { KbnSearchBar } from '../../kbn-search-bar';
-import { getDataPlugin, getPlugins } from '../../../kibana-services';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { getPlugins } from '../../../kibana-services';
+import {
+  DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
+  UI_LOGGER_LEVELS,
+} from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { withAgentSupportModule } from '../../common/hocs';
 import {
   AlertsDataSourceRepository,
   PatternDataSource,
+  tFilter,
   tParsedIndexPattern,
   useDataSource,
 } from '../../common/data-source';
@@ -173,6 +169,43 @@ export const ComplianceTable = withAgentSupportModule(props => {
     selectedRequirements: {},
   });
 
+  const getRegulatoryComplianceRequirementFilter = (
+    key: string,
+    value: string,
+  ) => {
+    if (!value) return [];
+    return [
+      {
+        meta: {
+          index: dataSource?.indexPattern.id,
+          negate: false,
+          disabled: false,
+          alias: null,
+          type: 'phrase',
+          key: key,
+          value: value,
+          params: {
+            query: value,
+            type: 'phrase',
+          },
+          controlledBy:
+            DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
+        },
+        query: {
+          match: {
+            [key]: {
+              query: value,
+              type: 'phrase',
+            },
+          },
+        },
+        $state: {
+          store: 'appState',
+        },
+      } as tFilter,
+    ];
+  };
+
   const getRequirementsCount = async ({ section, query, fetchData }) => {
     try {
       const mapFieldAgg = {
@@ -294,6 +327,9 @@ export const ComplianceTable = withAgentSupportModule(props => {
                       requirementsCount={action.data || []}
                       loadingAlerts={action.running}
                       fetchFilters={fetchFilters}
+                      getRegulatoryComplianceRequirementFilter={
+                        getRegulatoryComplianceRequirementFilter
+                      }
                       {...complianceData}
                     />
                   </EuiFlexItem>

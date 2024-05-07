@@ -352,7 +352,13 @@ export class ComplianceSubrequirements extends Component {
             getRequirementKey={() => {
               return this.getRequirementKey();
             }}
-            fetchFilters={this.props.fetchFilters}
+            fetchFilters={[
+              ...this.props.fetchFilters,
+              ...this.props.getRegulatoryComplianceRequirementFilter(
+                this.getRequirementKey(),
+                this.state.selectedRequirement,
+              ),
+            ]}
             openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
             openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
           />
