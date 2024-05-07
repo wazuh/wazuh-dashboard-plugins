@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Move AngularJS controllers and views of Tools and Dev Tools to ReactJS [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
 - Move the AngularJS controller and template of blank screen to ReactJS component [#6538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6538)
 - Move AngularJS controller for management to ReactJS component [#6555](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6555)
+- Move AngularJS controller for overview to ReactJS component [#6594](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6594)
 - Moved the registry data to in-memory cache [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Enhance the validation for `enrollment.dns` on App Settings application [#6573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6573)
 - Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
