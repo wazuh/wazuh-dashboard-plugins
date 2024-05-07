@@ -49,6 +49,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed API endpoint DELETE /hosts/remove-orphan-entries [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Removed AngularJS component `click-action` [#6613](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6613)
 - Removed AngularJS service `config-handler` [#6631](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6631)
+- Removed legacy discover references and methods [#6646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6646)
 
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 08
 
