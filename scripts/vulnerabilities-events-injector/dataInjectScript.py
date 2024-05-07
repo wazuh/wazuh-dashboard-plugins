@@ -184,9 +184,9 @@ def verifySettings():
         if port == '':
             port = '9200'
 
-        index = input("\nEnter the index name [default=wazuh-states-vulnerabilities]: \n")
+        index = input("\nEnter the index name [default=wazuh-states-vulnerabilities-default]: \n")
         if index == '':
-            index = 'wazuh-states-vulnerabilities'
+            index = 'wazuh-states-vulnerabilities-default'
 
         url = 'https://{}:{}/{}/_doc'.format(ip, port, index)
 
