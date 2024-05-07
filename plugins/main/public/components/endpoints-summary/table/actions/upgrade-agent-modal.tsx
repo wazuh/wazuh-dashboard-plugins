@@ -200,7 +200,7 @@ export const UpgradeAgentModal = compose(
             isLoading={isLoading}
             disabled={showPackageSelector && !packageType}
           >
-            Upgrade agent
+            Upgrade
           </EuiButton>
         </EuiModalFooter>
       </EuiModal>
