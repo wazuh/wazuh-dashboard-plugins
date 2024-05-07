@@ -49,6 +49,7 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
 import { DashboardDocker } from '../../overview/docker/dashboards';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
@@ -56,6 +57,7 @@ import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attac
 import {
   AlertsDockerDataSource,
   AlertsDataSource,
+  AlertsPCIDSSDataSource,
   AlertsVulnerabilitiesDataSource,
   AlertsAWSDataSource,
   VirusTotalDataSource,
@@ -339,7 +341,26 @@ export const ModulesDefaults = {
   },
   pci: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(pciColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardPCIDSS,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsPCIDSSDataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: pciColumns,
+        DataSource: AlertsPCIDSSDataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
