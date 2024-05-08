@@ -38,6 +38,30 @@ const mainSettings = [
   { field: 'hidden', label: 'Hide cluster information in alerts' },
 ];
 
+const haproxySettings = [
+  { field: 'haproxy_helper.haproxy_disabled', label: 'Disabled' },
+  { field: 'haproxy_helper.haproxy_address', label: 'Address' },
+  { field: 'haproxy_helper.haproxy_user', label: 'User' },
+  { field: 'haproxy_helper.haproxy_port', label: 'Port' },
+  { field: 'haproxy_helper.haproxy_protocol', label: 'Protocol' },
+  { field: 'haproxy_helper.haproxy_backend', label: 'Backend' },
+  { field: 'haproxy_helper.frequency', label: 'Frequency' },
+  { field: 'haproxy_helper.agent_chunk_size', label: 'Agent chunk size' },
+  {
+    field: 'haproxy_helper.agent_reconnection_time',
+    label: 'Agent reconnection time',
+  },
+  {
+    field: 'haproxy_helper.agent_reconnection_stability_time',
+    label: 'Agent reconnection stability time',
+  },
+  { field: 'haproxy_helper.imbalance_tolerance', label: 'Imbalance tolerance' },
+  {
+    field: 'haproxy_helper.remove_disconnected_node_after',
+    label: 'Remove disconnected node after',
+  },
+];
+
 const helpLinks = [
   {
     text: 'Configuring a cluster',
@@ -81,6 +105,11 @@ class WzCluster extends Component {
               <WzConfigurationSettingsGroup
                 config={mainSettingsConfig}
                 items={mainSettings}
+              />
+              <WzConfigurationSettingsGroup
+                title='HAProxy settings'
+                config={mainSettingsConfig}
+                items={haproxySettings}
               />
             </WzConfigurationSettingsHeader>
           )}
