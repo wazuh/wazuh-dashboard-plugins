@@ -10,6 +10,11 @@
     height: calc(100vh - 49px);
     bottom: 0;
     top: auto;
+
+    .euiDataGrid__virtualized {
+      height: calc(100vh - 152px) !important;
+      width: 100% !important;
+    }
   }
 }
 
