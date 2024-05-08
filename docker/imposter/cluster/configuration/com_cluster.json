@@ -10,7 +10,21 @@
         "port": 1516,
         "bind_addr": "0.0.0.0",
         "nodes": ["0.0.0.0"],
-        "hidden": "no"
+        "hidden": "no",
+        "haproxy_helper": {
+          "haproxy_disabled": "no",
+          "haproxy_address": "wazuh-proxy",
+          "haproxy_user": "haproxy",
+          "haproxy_port": 5555,
+          "haproxy_protocol": "http",
+          "haproxy_backend": "wazuh_cluster",
+          "frequency": 60,
+          "agent_chunk_size": 10,
+          "agent_reconnection_time": 10,
+          "agent_reconnection_stability_time": 60,
+          "imbalance_tolerance": 0.1,
+          "remove_disconnected_node_after": 1
+        }
       }
     ],
     "total_affected_items": 1,
