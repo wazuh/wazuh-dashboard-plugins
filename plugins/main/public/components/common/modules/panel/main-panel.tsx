@@ -43,15 +43,12 @@ export const MainPanel = ({
     value: '',
   });
 
-  useEffect(() => {
-    filterDrillDownValue && filterDrillDownValue(selectedFilter);
-  }, [selectedFilter]);
-
   const toggleView = (id = 'main') => {
     if (id != viewId) setViewId(id);
   };
 
   const toggleFilter = (field = '', value = '') => {
+    console.log('toggle filter');
     setSelectedFilter({ field, value });
     onChangeView({ field, value });
   };

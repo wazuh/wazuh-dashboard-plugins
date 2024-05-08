@@ -32,7 +32,7 @@ type AggTableProps = {
   }
 };
 
-export const AggTable = React.memo(({
+export const AggTable = ({
   onRowClick,
   aggTerm,
   aggLabel,
@@ -56,9 +56,9 @@ export const AggTable = React.memo(({
         },
       },
     };
-  }, [order, aggTerm, maxRows]);
+  }, []);
 
-  const fetchAggData = useCallback(async () => {
+  const fetchAggData = async () => {
     setIsLoading(true);
     try {
       const response = await search({
@@ -73,16 +73,12 @@ export const AggTable = React.memo(({
     } finally {
       setIsLoading(false);
     }
-  }, [preAppliedAggs, searchParams.filters, searchParams.indexPattern, searchParams.query]);
+  }
 
   useEffect(() => {
     console.log('mount agg table');
     fetchAggData();
-  }, [
-    JSON.stringify(searchParams.filters),
-    JSON.stringify(searchParams.query),
-    JSON.stringify(searchParams.indexPattern),
-  ])
+  }, [])
 
 
   const buckets = ((esResults?.aggregations || {}).buckets || {}).buckets || [];
@@ -142,4 +138,4 @@ export const AggTable = React.memo(({
       />
     </EuiPanel>
   );
-});
+}

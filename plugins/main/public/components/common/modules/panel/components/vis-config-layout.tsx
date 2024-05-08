@@ -15,6 +15,9 @@ import React from 'react';
 import { EuiFlexGroup } from '@elastic/eui';
 
 export const VisConfigLayout = ({ rowClickHandler, rows = [] }) => {
+
+  console.log('vis config', rows);
+
   return (
     <>
       {rows.map((row, key) => {

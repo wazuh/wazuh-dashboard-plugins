@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MainPanel } from '../../../common/modules/panel';
 import { withErrorBoundary } from '../../../common/hocs';
 import { CustomSearchBar } from '../../../common/custom-search-bar';
@@ -35,7 +35,7 @@ export const GitHubPanel = withErrorBoundary(() => {
   });
   const [currentSelectedFilter, setCurrentSelectedFilter] = useState();
   const filterDrillDownValue = value => {
-    setDrillDownValue(value);
+    //setDrillDownValue(value);
   };
 
   const {
@@ -73,31 +73,36 @@ export const GitHubPanel = withErrorBoundary(() => {
     setCurrentSelectedFilter(selectedFilter);
   }
 
+  useEffect(() => {
+    console.log('github panel', isDataSourceLoading);
+  }, [])
+
   return (
     <>
       {isDataSourceLoading ? (
         <LoadingSpinner />
       ) : (
-        <>
-          <CustomSearchBar
-            filterInputs={filtersValues}
-            filterDrillDownValue={drillDownValue}
-            searchBarProps={searchBarProps}
-            setFilters={setFilters}
-          />
-          <MainPanel
-            moduleConfig={ModuleConfig({
-              fetchData,
-              fetchFilters,
-              indexPattern: dataSource?.indexPattern as IndexPattern,
-              searchBarProps,
-            })}
-            filterDrillDownValue={filterDrillDownValue}
-            sidePanelChildren={<ModuleConfiguration />}
-            onChangeView={handleChangeView}
-          />
-        </>
-      )}
+          <>
+            <CustomSearchBar
+              filterInputs={filtersValues}
+              filterDrillDownValue={drillDownValue}
+              searchBarProps={searchBarProps}
+              setFilters={setFilters}
+              indexPattern={dataSource.indexPattern}
+            />
+            <MainPanel
+              moduleConfig={ModuleConfig({
+                fetchData,
+                fetchFilters,
+                indexPattern: dataSource?.indexPattern as IndexPattern,
+                searchBarProps,
+              })}
+              filterDrillDownValue={filterDrillDownValue}
+              sidePanelChildren={<ModuleConfiguration />}
+              onChangeView={handleChangeView}
+            />
+          </>
+        )}
     </>
   );
 });

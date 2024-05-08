@@ -1,4 +1,3 @@
-'use strict';
 /*
  * Wazuh app - Office 365 Drilldown UserId field Config.
  *

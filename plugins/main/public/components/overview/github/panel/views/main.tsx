@@ -10,14 +10,19 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { VisConfigLayout } from '../../../../common/modules/panel';
 
-export const Main = ({ changeView, toggleFilter, rows = [] }) => {
+export const Main = (props) => {
+  const { changeView, toggleFilter, rows = [] } = props;
   const rowClickHandler = (field, value) => {
     toggleFilter(field, value);
     changeView(field);
   };
+
+  useEffect(() => {
+    console.log('main', props);
+  }, [])
 
   return <VisConfigLayout rows={rows} rowClickHandler={rowClickHandler} />;
 };
