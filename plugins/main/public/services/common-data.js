@@ -160,9 +160,7 @@ export class CommonData {
             : AppState.getClusterInfo().manager,
           isCluster,
           tab === 'vuls'
-            ? VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER[
-                AppState.getClusterInfo().status
-              ]
+            ? VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER
             : undefined,
         ),
       );
