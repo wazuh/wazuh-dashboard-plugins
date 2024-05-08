@@ -42,6 +42,7 @@ const haproxySettings = [
   { field: 'haproxy_helper.haproxy_disabled', label: 'Disabled' },
   { field: 'haproxy_helper.haproxy_address', label: 'Address' },
   { field: 'haproxy_helper.haproxy_user', label: 'User' },
+  { field: 'haproxy_helper.haproxy_password', label: 'Password' },
   { field: 'haproxy_helper.haproxy_port', label: 'Port' },
   { field: 'haproxy_helper.haproxy_protocol', label: 'Protocol' },
   { field: 'haproxy_helper.haproxy_backend', label: 'Backend' },
@@ -60,6 +61,8 @@ const haproxySettings = [
     field: 'haproxy_helper.remove_disconnected_node_after',
     label: 'Remove disconnected node after',
   },
+  { field: 'haproxy_helper.haproxy_resolver', label: 'Resolver' },
+  { field: 'haproxy_helper.excluded_nodes', label: 'Excluded nodes' },
 ];
 
 const helpLinks = [
@@ -82,9 +85,14 @@ class WzCluster extends Component {
     let mainSettingsConfig = {
       ...currentConfig['com-cluster'],
       disabled:
-        currentConfig['com-cluster'].disabled === 'yes'
-          ? 'disabled'
-          : 'enabled',
+        currentConfig['com-cluster'].disabled === true ? 'disabled' : 'enabled',
+      haproxy_helper: {
+        ...currentConfig['com-cluster'].haproxy_helper,
+        haproxy_disabled:
+          currentConfig['com-cluster'].haproxy_helper.haproxy_disabled === true
+            ? 'disabled'
+            : 'enabled',
+      },
     };
     return (
       <Fragment>
