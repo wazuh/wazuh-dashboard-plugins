@@ -16,7 +16,6 @@ import fim from './overview-fim';
 import general from './overview-general';
 import oscap from './overview-oscap';
 import ciscat from './overview-ciscat';
-import pci from './overview-pci';
 import hipaa from './overview-hipaa';
 import nist from './overview-nist';
 import tsc from './overview-tsc';
@@ -36,7 +35,6 @@ export {
   general,
   oscap,
   ciscat,
-  pci,
   hipaa,
   nist,
   tsc,
