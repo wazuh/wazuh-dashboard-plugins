@@ -86,14 +86,21 @@ class WzCluster extends Component {
       ...currentConfig['com-cluster'],
       disabled:
         currentConfig['com-cluster'].disabled === true ? 'disabled' : 'enabled',
-      haproxy_helper: {
-        ...currentConfig['com-cluster'].haproxy_helper,
-        haproxy_disabled:
-          currentConfig['com-cluster'].haproxy_helper.haproxy_disabled === true
-            ? 'disabled'
-            : 'enabled',
-      },
     };
+
+    if (currentConfig['com-cluster'].haproxy_helper) {
+      mainSettingsConfig = {
+        ...mainSettingsConfig,
+        haproxy_helper: {
+          ...currentConfig['com-cluster'].haproxy_helper,
+          haproxy_disabled:
+            currentConfig['com-cluster'].haproxy_helper.haproxy_disabled ===
+            true
+              ? 'disabled'
+              : 'enabled',
+        },
+      };
+    }
     return (
       <Fragment>
         {currentConfig['com-cluster'] &&
@@ -114,11 +121,13 @@ class WzCluster extends Component {
                 config={mainSettingsConfig}
                 items={mainSettings}
               />
-              <WzConfigurationSettingsGroup
-                title='HAProxy settings'
-                config={mainSettingsConfig}
-                items={haproxySettings}
-              />
+              {mainSettingsConfig.haproxy_helper && (
+                <WzConfigurationSettingsGroup
+                  title='HAProxy settings'
+                  config={mainSettingsConfig}
+                  items={haproxySettings}
+                />
+              )}
             </WzConfigurationSettingsHeader>
           )}
       </Fragment>
