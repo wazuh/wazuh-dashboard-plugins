@@ -99,13 +99,15 @@ const DashboardVulsComponent: React.FC = () => {
           <ModuleEnabledCheck />
           {isLoading ? <LoadingSpinner /> : null}
           {!isLoading ? (
-            <SearchBar
-              appName='vulnerability-detector-searchbar'
-              {...searchBarProps}
-              showDatePicker={false}
-              showQueryInput={true}
-              showQueryBar={true}
-            />
+            <div className='wz-search-bar hide-filter-control'>
+              <SearchBar
+                appName='vulnerability-detector-searchbar'
+                {...searchBarProps}
+                showDatePicker={false}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            </div>
           ) : null}
           {isSearching ? <LoadingSpinner /> : null}
           {!isLoading && !isSearching && results?.hits?.total === 0 ? (

@@ -178,13 +178,15 @@ const InventoryVulsComponent = () => {
             {isLoading ? (
               <LoadingSpinner />
             ) : (
-              <SearchBar
-                appName='inventory-vuls'
-                {...searchBarProps}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
+              <div className='wz-search-bar hide-filter-control'>
+                <SearchBar
+                  appName='inventory-vuls'
+                  {...searchBarProps}
+                  showDatePicker={false}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                />
+              </div>
             )}
             {isSearching ? <LoadingSpinner /> : null}
             {!isLoading && !isSearching && results?.hits?.total === 0 ? (
