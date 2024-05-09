@@ -1,0 +1,1402 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Cluster settings should render the cluster settings 1`] = `
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <h2
+        class="euiTitle euiTitle--small"
+      >
+        Main settings
+      </h2>
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <span>
+          <div
+            class="euiPopover euiPopover--anchorDownCenter"
+            id="show-help"
+          >
+            <div
+              class="euiPopover__anchor"
+            >
+              <button
+                class="euiButtonEmpty euiButtonEmpty--primary"
+                type="button"
+              >
+                <span
+                  class="euiButtonContent euiButtonEmpty__content"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                    focusable="false"
+                    height="16"
+                    role="img"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                    />
+                  </svg>
+                  <span
+                    class="euiButtonEmpty__text"
+                  />
+                </span>
+              </button>
+            </div>
+          </div>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--xs"
+  />
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full"
+    style="margin-bottom: 16px;"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <h2
+        class="euiTitle euiTitle--small"
+      />
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+      />
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--xs"
+  />
+  <div
+    class="euiSpacer euiSpacer--s"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Cluster status
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="cluster-status"
+                readonly=""
+                type="text"
+                value="enabled"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Cluster name
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="cluster-name"
+                readonly=""
+                type="text"
+                value="wazuh1"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Node name
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="node-name"
+                readonly=""
+                type="text"
+                value="master"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Node type
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="node-type"
+                readonly=""
+                type="text"
+                value="master"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Master node IP address
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <ul>
+            <li>
+              <div
+                class="euiFormControlLayout euiFormControlLayout--readOnly"
+              >
+                <div
+                  class="euiFormControlLayout__childrenWrapper"
+                >
+                  <input
+                    class="euiFieldText"
+                    readonly=""
+                    type="text"
+                    value="0.0.0.0"
+                  />
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Port to listen to cluster communications
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="port-to-listen-to-cluster-communications"
+                readonly=""
+                type="text"
+                value="1516"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            IP address to listen to cluster communications
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="ip-address-to-listen-to-cluster-communications"
+                readonly=""
+                type="text"
+                value="0.0.0.0"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Hide cluster information in alerts
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="hide-cluster-information-in-alerts"
+                readonly=""
+                type="text"
+                value="no"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Cluster settings should render the cluster settings with HAProxy helper 1`] = `
+<div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <h2
+        class="euiTitle euiTitle--small"
+      >
+        Main settings
+      </h2>
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <span>
+          <div
+            class="euiPopover euiPopover--anchorDownCenter"
+            id="show-help"
+          >
+            <div
+              class="euiPopover__anchor"
+            >
+              <button
+                class="euiButtonEmpty euiButtonEmpty--primary"
+                type="button"
+              >
+                <span
+                  class="euiButtonContent euiButtonEmpty__content"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                    focusable="false"
+                    height="16"
+                    role="img"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12Zm0-1A5 5 0 1 0 8 3a5 5 0 0 0 0 10Zm-.186-1.065A.785.785 0 0 1 7 11.12c0-.48.34-.82.814-.82.475 0 .809.34.809.82 0 .475-.334.815-.809.815ZM5.9 6.317C5.96 5.168 6.755 4.4 8.048 4.4c1.218 0 2.091.759 2.091 1.8 0 .736-.36 1.304-1.03 1.707-.56.33-.717.56-.717 1.022v.305l-.1.1H7.47l-.1-.1v-.431c-.005-.646.302-1.104.987-1.514.527-.322.708-.59.708-1.047 0-.536-.416-.91-1.05-.91-.652 0-1.064.374-1.112.998l-.1.092H6l-.1-.105Z"
+                    />
+                  </svg>
+                  <span
+                    class="euiButtonEmpty__text"
+                  />
+                </span>
+              </button>
+            </div>
+          </div>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--xs"
+  />
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full"
+    style="margin-bottom: 16px;"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <h2
+        class="euiTitle euiTitle--small"
+      />
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+      />
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--xs"
+  />
+  <div
+    class="euiSpacer euiSpacer--s"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Cluster status
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="cluster-status"
+                readonly=""
+                type="text"
+                value="enabled"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Cluster name
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="cluster-name"
+                readonly=""
+                type="text"
+                value="wazuh1"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Node name
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="node-name"
+                readonly=""
+                type="text"
+                value="master"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Node type
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="node-type"
+                readonly=""
+                type="text"
+                value="master"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Master node IP address
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <ul>
+            <li>
+              <div
+                class="euiFormControlLayout euiFormControlLayout--readOnly"
+              >
+                <div
+                  class="euiFormControlLayout__childrenWrapper"
+                >
+                  <input
+                    class="euiFieldText"
+                    readonly=""
+                    type="text"
+                    value="0.0.0.0"
+                  />
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Port to listen to cluster communications
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="port-to-listen-to-cluster-communications"
+                readonly=""
+                type="text"
+                value="1516"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            IP address to listen to cluster communications
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="ip-address-to-listen-to-cluster-communications"
+                readonly=""
+                type="text"
+                value="0.0.0.0"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Hide cluster information in alerts
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="hide-cluster-information-in-alerts"
+                readonly=""
+                type="text"
+                value="no"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+    </div>
+  </div>
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <h2
+        class="euiTitle euiTitle--small"
+      >
+        HAProxy settings
+      </h2>
+    </div>
+    <div
+      class="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+      />
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--xs"
+  />
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full"
+    style="margin-bottom: 16px;"
+  />
+  <div
+    class="euiSpacer euiSpacer--s"
+  />
+  <div
+    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+  >
+    <div
+      class="euiFlexItem"
+    >
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            HAProxy status
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="haproxy-status"
+                readonly=""
+                type="text"
+                value="enabled"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Address
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="address"
+                readonly=""
+                type="text"
+                value="wazuh-proxy"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            User
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="user"
+                readonly=""
+                type="text"
+                value="haproxy"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Password
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="password"
+                readonly=""
+                type="text"
+                value="haproxy"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Port
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="port"
+                readonly=""
+                type="text"
+                value="5555"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Protocol
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="protocol"
+                readonly=""
+                type="text"
+                value="http"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Backend
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="backend"
+                readonly=""
+                type="text"
+                value="wazuh_cluster"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Frequency
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="frequency"
+                readonly=""
+                type="text"
+                value="60"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Agent chunk size
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="agent-chunk-size"
+                readonly=""
+                type="text"
+                value="300"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Agent reconnection time
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="agent-reconnection-time"
+                readonly=""
+                type="text"
+                value="5"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Agent reconnection stability time
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="agent-reconnection-stability-time"
+                readonly=""
+                type="text"
+                value="60"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Imbalance tolerance
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="imbalance-tolerance"
+                readonly=""
+                type="text"
+                value="0.1"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Remove disconnected node after
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="remove-disconnected-node-after"
+                readonly=""
+                type="text"
+                value="240"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+      <div
+        style="display: flex; align-items: center; flex-direction: row;"
+      >
+        <div
+          style="justify-self: flex-end; margin: 1em; width: 35%;"
+        >
+          <div
+            class="euiTextAlign euiTextAlign--right"
+          >
+            Excluded nodes
+          </div>
+        </div>
+        <div
+          style="width: 65%;"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--readOnly"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText"
+                data-testid="excluded-nodes"
+                readonly=""
+                type="text"
+                value=""
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiSpacer euiSpacer--s"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Cluster settings should render the error message when the cluster setting is a string 1`] = `
+<div>
+  <div
+    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+  >
+    <div
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+    >
+      <div
+        class="euiFlexItem"
+      >
+        <div
+          style="text-align: center;"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon-isLoading"
+            focusable="false"
+            height="16"
+            role="img"
+            style="margin-right: 4px;"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+            />
+          </svg>
+          <span>
+            Configuration not available
+          </span>
+          <div
+            class="euiPopover euiPopover--anchorDownCenter"
+            id="show-help"
+          >
+            <div
+              class="euiPopover__anchor"
+            >
+              <button
+                class="euiButtonEmpty euiButtonEmpty--primary"
+                type="button"
+              >
+                <span
+                  class="euiButtonContent euiButtonEmpty__content"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                    focusable="false"
+                    height="16"
+                    role="img"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12Zm0-1A5 5 0 1 0 8 3a5 5 0 0 0 0 10Zm-.186-1.065A.785.785 0 0 1 7 11.12c0-.48.34-.82.814-.82.475 0 .809.34.809.82 0 .475-.334.815-.809.815ZM5.9 6.317C5.96 5.168 6.755 4.4 8.048 4.4c1.218 0 2.091.759 2.091 1.8 0 .736-.36 1.304-1.03 1.707-.56.33-.717.56-.717 1.022v.305l-.1.1H7.47l-.1-.1v-.431c-.005-.646.302-1.104.987-1.514.527-.322.708-.59.708-1.047 0-.536-.416-.91-1.05-.91-.652 0-1.064.374-1.112.998l-.1.092H6l-.1-.105Z"
+                    />
+                  </svg>
+                  <span
+                    class="euiButtonEmpty__text"
+                  />
+                </span>
+              </button>
+            </div>
+          </div>
+          <hr
+            class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
+          />
+          <span>
+            There was a problem while fetching the configuration for this section. It may be a server problem or the configuration doesn't exist.
+          </span>
+          <div
+            class="euiSpacer euiSpacer--s"
+          />
+          <div>
+            <p>
+              Click on the 
+              <svg
+                aria-hidden="true"
+                class="euiIcon euiIcon--medium"
+                focusable="false"
+                height="16"
+                role="img"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12Zm0-1A5 5 0 1 0 8 3a5 5 0 0 0 0 10Zm-.186-1.065A.785.785 0 0 1 7 11.12c0-.48.34-.82.814-.82.475 0 .809.34.809.82 0 .475-.334.815-.809.815ZM5.9 6.317C5.96 5.168 6.755 4.4 8.048 4.4c1.218 0 2.091.759 2.091 1.8 0 .736-.36 1.304-1.03 1.707-.56.33-.717.56-.717 1.022v.305l-.1.1H7.47l-.1-.1v-.431c-.005-.646.302-1.104.987-1.514.527-.322.708-.59.708-1.047 0-.536-.416-.91-1.05-.91-.652 0-1.064.374-1.112.998l-.1.092H6l-.1-.105Z"
+                />
+              </svg>
+               icon for help. Check the documentation links to learn more about how to configure it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

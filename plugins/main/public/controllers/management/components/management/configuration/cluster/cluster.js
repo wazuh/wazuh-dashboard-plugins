@@ -76,7 +76,7 @@ const helpLinks = [
   },
 ];
 
-class WzCluster extends Component {
+export class WzCluster extends Component {
   constructor(props) {
     super(props);
   }
