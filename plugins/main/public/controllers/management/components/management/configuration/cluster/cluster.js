@@ -39,7 +39,7 @@ const mainSettings = [
 ];
 
 const haproxySettings = [
-  { field: 'haproxy_helper.haproxy_disabled', label: 'Disabled' },
+  { field: 'haproxy_helper.haproxy_disabled', label: 'HAProxy status' },
   { field: 'haproxy_helper.haproxy_address', label: 'Address' },
   { field: 'haproxy_helper.haproxy_user', label: 'User' },
   { field: 'haproxy_helper.haproxy_password', label: 'Password' },
