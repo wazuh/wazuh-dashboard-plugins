@@ -16,7 +16,6 @@ import fim from './overview-fim';
 import general from './overview-general';
 import oscap from './overview-oscap';
 import ciscat from './overview-ciscat';
-import pci from './overview-pci';
 import gdpr from './overview-gdpr';
 import hipaa from './overview-hipaa';
 import tsc from './overview-tsc';
@@ -36,7 +35,6 @@ export {
   general,
   oscap,
   ciscat,
-  pci,
   gdpr,
   hipaa,
   tsc,

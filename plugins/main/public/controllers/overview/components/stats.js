@@ -82,7 +82,7 @@ export const Stats = withErrorBoundary(
         ({ status }) => this.props[status],
       );
       return (
-        <>
+        <EuiPage>
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiCard betaBadgeLabel='Agents summary' title=''>
@@ -121,7 +121,7 @@ export const Stats = withErrorBoundary(
               </EuiCard>
             </EuiFlexItem>
           </EuiFlexGroup>
-        </>
+        </EuiPage>
       );
     }
   },
