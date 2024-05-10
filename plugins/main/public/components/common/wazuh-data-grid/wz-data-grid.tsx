@@ -26,6 +26,7 @@ import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { DocumentViewTableAndJson } from '../wazuh-discover/components/document-view-table-and-json';
 import DiscoverDataGridAdditionalControls from '../wazuh-discover/components/data-grid-additional-controls';
+import './wazuh-data-grid.scss';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -93,11 +94,10 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     onChangePagination && onChangePagination(pagination);
   }, [JSON.stringify(pagination)])
 
-  /*
   useEffect(() => {
-    onChangeSorting && onChangeSorting(sorting);
-  }, [sorting]);
-  */
+    onChangeSorting && onChangeSorting(sorting || []);
+  }, [JSON.stringify(sorting)]);
+
   const docViewerProps = useDocViewer({
     doc: inspectedHit,
     indexPattern: indexPattern as IndexPattern,
@@ -117,7 +117,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
         pageIndex: 0,
         pageSize: results.hits.total,
       },
-      sorting,
+      sorting
     };
     try {
       setIsExporting(true);
@@ -138,7 +138,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
       {isLoading ? <LoadingSpinner /> : null}
       {!isLoading && !results?.hits?.total === 0 ? <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} /> : null}
       {!isLoading && results?.hits?.total > 0 ?
-        <div className='discoverDataGrid'>
+        <div className='wazuhDataGridContainer'>
           <EuiDataGrid
             {...dataGridProps}
             className={sideNavDocked ? 'dataGridDockedNav' : ''}

@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid } from '@elastic/eui';
+import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
 import { SecurityAlerts } from '../../../../visualize/components';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../../kibana-services';
@@ -26,7 +26,8 @@ import {
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
 import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
-import WazuhDataGrid from '../../../../common/wazuh-data-grid/wz-data-grid';
+import DrillDownDataGrid from './drilldown-data-grid';
+import { AppNavigate } from '../../../../../react-services';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -164,44 +165,6 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
           {
             width: 100,
             component: () => {
-              const [results, setResults] = useState<any>([]);
-              const [pagination, setPagination] = useState({
-                pageIndex: 0,
-                pageSize: 15,
-                pageSizeOptions: [15, 25, 50, 100],
-              })
-              const [sorting, setSorting] = useState<any[]>([]);
-
-              useEffect(() => {
-                if (!indexPattern) {
-                  return;
-                }
-                fetchData({
-                  query: searchBarProps.query,
-                  pagination,
-                  dateRange: {
-                    from: searchBarProps.dateRangeFrom || '',
-                    to: searchBarProps.dateRangeTo || '',
-                  },
-                })
-                  .then(results => {
-                    setResults(results);
-                  })
-                  .catch(error => {
-                    const searchError = ErrorFactory.create(HttpError, {
-                      error,
-                      message: 'Error fetching actions',
-                    });
-                    ErrorHandler.handleError(searchError);
-                  });
-              }, [
-                JSON.stringify(fetchFilters),
-                JSON.stringify(searchBarProps.query),
-                JSON.stringify(pagination),
-                //JSON.stringify(sorting), ToDo: Fix sorting
-                searchBarProps.dateRangeFrom,
-                searchBarProps.dateRangeTo,
-              ])
 
               const defaultTableColumns = [
                 { id: 'timestamp' },
@@ -210,21 +173,31 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                 { id: 'data.github.repo', displayAsText: 'Repository' },
                 { id: 'data.github.actor', displayAsText: 'Actor' },
                 { id: 'rule.level' },
-                { id: 'rule.id' },
+                {
+                  id: 'rule.id', render: value => (
+                    <EuiLink
+                      onClick={e =>
+                        AppNavigate.navigateToModule(e, 'manager', {
+                          tab: 'rules',
+                          redirectRule: value,
+                        })
+                      }
+                    >
+                      {value}
+                    </EuiLink>
+                  ),
+                },
               ]
 
               return (
-                <EuiFlexItem>
-                  <WazuhDataGrid
-                    results={results}
-                    defaultColumns={defaultTableColumns}
-                    indexPattern={indexPattern}
-                    isLoading={false}
-                    defaultPagination={pagination}
-                    onChangePagination={(pagination) => setPagination(pagination)}
-                    onChangeSorting={(sorting => setSorting(sorting))}
-                  />
-                </EuiFlexItem>);
+                <DrillDownDataGrid
+                  defaultTableColumns={defaultTableColumns}
+                  fetchData={fetchData}
+                  fetchFilters={fetchFilters}
+                  searchBarProps={searchBarProps}
+                  indexPattern={indexPattern}
+                />
+              )
             },
           }
         ],
