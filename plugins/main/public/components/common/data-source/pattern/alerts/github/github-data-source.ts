@@ -19,6 +19,6 @@ export class GitHubDataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...this.getRuleGroupsFilter(), ...super.getFixedFilters()];
+    return [...super.getFixedFilters(), ...this.getRuleGroupsFilter()];
   }
 }

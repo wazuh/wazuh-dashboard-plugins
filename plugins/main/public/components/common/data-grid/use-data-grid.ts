@@ -21,8 +21,7 @@ const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 export type tDataGridColumn = {
   render?: (
     value: any,
-    rowItem: object,
-    cellFormatted: string,
+    rowItem: object
   ) => string | React.ReactNode;
 } & EuiDataGridColumn;
 
@@ -116,15 +115,9 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       // check if column have render method initialized
       const column = columns.find(column => column.id === columnId);
       if (column && column.render) {
-        // pass the formatted cell value
-        const cellFormatted = indexPattern.formatField(
-          rows[rowIndex],
-          columnId,
-        );
         return column.render(
           fieldFormatted,
-          rowsParsed[relativeRowIndex],
-          cellFormatted,
+          rowsParsed[relativeRowIndex]
         );
       }
       return fieldFormatted;
