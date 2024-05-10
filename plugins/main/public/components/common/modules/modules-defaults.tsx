@@ -66,6 +66,7 @@ import {
   AlertsFIMDataSource,
   MitreAttackDataSource,
   AlertsGDPRDataSource,
+  AlertsConfigurationAssessmentDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -201,7 +202,10 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, configurationAssessmentColumns),
+      renderDiscoverTab({
+        tableColumns: configurationAssessmentColumns,
+        DataSource: AlertsConfigurationAssessmentDataSource,
+      }),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],

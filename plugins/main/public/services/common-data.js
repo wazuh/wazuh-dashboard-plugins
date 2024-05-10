@@ -140,7 +140,6 @@ export class CommonData {
         tsc: { group: 'tsc' },
         office: { group: 'office365' },
         osquery: { group: 'osquery' },
-        sca: { group: 'sca' },
         docker: { group: 'docker' },
         github: { group: 'github' },
       };
