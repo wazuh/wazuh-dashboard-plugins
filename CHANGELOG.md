@@ -18,7 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6288](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6288) [#6290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6290) [#6289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6289) [#6286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6286) [#6275](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6275) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6297](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6297) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6291](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6459) [#6434](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6434)
+- Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6288](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6288) [#6290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6290) [#6289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6289) [#6286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6286) [#6275](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6275) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6297](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6297) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6291](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6459) [#6434](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6434) [#6504](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6504) [#6649](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6649)
 - Develop logic of a new index for the fim module [#6227](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6227)
 - Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
 - Change how the configuration is managed in the backend side [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337) [#6519](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6519) [#6573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6573)
@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Move AngularJS controllers and views of Tools and Dev Tools to ReactJS [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
 - Move the AngularJS controller and template of blank screen to ReactJS component [#6538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6538)
 - Move AngularJS controller for management to ReactJS component [#6555](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6555)
+- Move AngularJS controller for overview to ReactJS component [#6594](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6594)
 - Moved the registry data to in-memory cache [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Enhance the validation for `enrollment.dns` on App Settings application [#6573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6573)
 - Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
@@ -48,6 +49,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed API endpoint DELETE /hosts/remove-orphan-entries [#6481](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6481)
 - Removed AngularJS component `click-action` [#6613](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6613)
 - Removed AngularJS service `config-handler` [#6631](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6631)
+- Removed legacy discover references and methods [#6646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6646)
 
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 08
 

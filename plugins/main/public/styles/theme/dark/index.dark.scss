@@ -452,7 +452,7 @@ svg .legend text {
 }
 
 .wz-app {
-  [name='OverviewWelcome'] .euiIcon--app .euiIcon__fillSecondary {
+  .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
     fill: #dfe5ef;
   }
 }
