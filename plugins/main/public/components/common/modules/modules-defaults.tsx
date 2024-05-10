@@ -31,6 +31,7 @@ import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
 import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
+import { DashboardGoogleCloud } from '../../overview/google-cloud/dashboards';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -49,17 +50,23 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
+import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
+import { DashboardDocker } from '../../overview/docker/dashboards';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
+  AlertsDockerDataSource,
   AlertsDataSource,
+  AlertsPCIDSSDataSource,
   AlertsVulnerabilitiesDataSource,
   AlertsAWSDataSource,
   VirusTotalDataSource,
+  AlertsGoogleCloudDataSource,
   AlertsMalwareDetectionDataSource,
   AlertsFIMDataSource,
   AlertsTSCDataSource,
+  AlertsConfigurationAssessmentDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -150,8 +157,16 @@ export const ModulesDefaults = {
   gcp: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, googleCloudColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        component: DashboardGoogleCloud,
+        buttons: [ButtonModuleExploreAgent],
+      },
+      renderDiscoverTab({
+        tableColumns: googleCloudColumns,
+        DataSource: AlertsGoogleCloudDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -187,7 +202,10 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, configurationAssessmentColumns),
+      renderDiscoverTab({
+        tableColumns: configurationAssessmentColumns,
+        DataSource: AlertsConfigurationAssessmentDataSource,
+      }),
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
@@ -314,14 +332,41 @@ export const ModulesDefaults = {
   docker: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, dockerColumns),
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardDocker,
+      },
+      renderDiscoverTab({
+        tableColumns: dockerColumns,
+        DataSource: AlertsDockerDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
   pci: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(pciColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardPCIDSS,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsPCIDSSDataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: pciColumns,
+        DataSource: AlertsPCIDSSDataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
