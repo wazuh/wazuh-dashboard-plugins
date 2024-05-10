@@ -19,10 +19,5 @@ export const Main = (props) => {
     toggleFilter(field, value);
     changeView(field);
   };
-
-  useEffect(() => {
-    console.log('main', props);
-  }, [])
-
   return <VisConfigLayout rows={rows} rowClickHandler={rowClickHandler} />;
 };

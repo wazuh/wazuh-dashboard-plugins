@@ -73,10 +73,6 @@ export const GitHubPanel = withErrorBoundary(() => {
     setCurrentSelectedFilter(selectedFilter);
   }
 
-  useEffect(() => {
-    console.log('github panel', isDataSourceLoading);
-  }, [])
-
   return (
     <>
       {isDataSourceLoading ? (

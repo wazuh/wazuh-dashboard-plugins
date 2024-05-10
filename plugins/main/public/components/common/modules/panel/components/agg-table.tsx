@@ -76,7 +76,6 @@ export const AggTable = ({
   }
 
   useEffect(() => {
-    console.log('mount agg table');
     fetchAggData();
   }, [])
 
