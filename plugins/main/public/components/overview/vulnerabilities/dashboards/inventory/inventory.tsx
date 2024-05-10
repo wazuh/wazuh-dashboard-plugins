@@ -82,7 +82,7 @@ const InventoryVulsComponent = () => {
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect document details';
+    const inspectHintMsg = 'Inspect vulnerability details';
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -237,7 +237,7 @@ const InventoryVulsComponent = () => {
               <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
                 <EuiFlyoutHeader>
                   <EuiTitle>
-                    <h2>Document details</h2>
+                    <h2>Vulnerability details</h2>
                   </EuiTitle>
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
