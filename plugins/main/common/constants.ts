@@ -244,6 +244,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_MALWARE_DETECTION_RULE_GROUP =
   'malware-detection-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP = 'aws-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP =
+  'configuration-assessment-rule-group';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
