@@ -19,6 +19,16 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
 
   const { fetchFilters, searchBarProps, indexPattern } = props;
 
+  const searchParams = {
+    filters: fetchFilters,
+    indexPattern,
+    query: searchBarProps.query,
+    dateRange: {
+      from: searchBarProps.dateRangeFrom || '',
+      to: searchBarProps.dateRangeTo || '',
+    }
+  };
+
   return {
     rows: [
       {
@@ -33,11 +43,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
                   aggLabel='Actor'
                   maxRows={5}
                   onRowClick={props.onRowClick}
-                  searchParams={{
-                    filters: fetchFilters,
-                    indexPattern,
-                    query: searchBarProps.query,
-                  }}
+                  searchParams={searchParams}
                 />
               </EuiFlexItem>
             ),
@@ -52,11 +58,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
                   aggLabel='Organization'
                   maxRows={5}
                   onRowClick={props.onRowClick}
-                  searchParams={{
-                    filters: fetchFilters,
-                    indexPattern,
-                    query: searchBarProps.query,
-                  }}
+                  searchParams={searchParams}
                 />
               </EuiFlexItem>
             ),
@@ -75,11 +77,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
                   aggLabel='Repository'
                   maxRows={5}
                   onRowClick={props.onRowClick}
-                  searchParams={{
-                    filters: fetchFilters,
-                    indexPattern,
-                    query: searchBarProps.query,
-                  }}
+                  searchParams={searchParams}
                 />
               </EuiFlexItem>
             ),
@@ -94,11 +92,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
                   aggLabel='Action'
                   maxRows={5}
                   onRowClick={props.onRowClick}
-                  searchParams={{
-                    filters: fetchFilters,
-                    indexPattern,
-                    query: searchBarProps.query,
-                  }}
+                  searchParams={searchParams}
                 />
               </EuiFlexItem>
             ),

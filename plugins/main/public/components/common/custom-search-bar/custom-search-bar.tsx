@@ -118,24 +118,19 @@ export const CustomSearchBar = ({
     return { meta, $state, query };
   };
 
-  // not use filter manager
   const setPluginPlatformFilters = (values: any[], selectReference: String) => {
+    let customFilter = [];
     const currentFilters = filters.filter(
       item => item.meta.key != selectReference,
     );
-    //filterManager.removeAll();
-    //filterManager.addFilters(currentFilters);
-    setFilters(currentFilters);
     if (values.length != 0) {
-      const customFilter = buildCustomFilter(false, values);
-      //filterManager.addFilters(customFilter);
-      setFilters([...currentFilters, customFilter]);
+      customFilter = [buildCustomFilter(false, values)];
     }
+    setFilters([...currentFilters, ...customFilter]);
   };
 
-  // not use filter manager
   const refreshCustomSelectedFilter = () => {
-    setSelectedOptions(defaultSelectedOptions);
+    setSelectedOptions(defaultSelectedOptions());
     const currentFilters =
       filters
         .filter(
@@ -149,9 +144,8 @@ export const CustomSearchBar = ({
         })) || [];
 
     const getFilterCustom = item => {
-      return item;
-      // ToDo: Check how it works
-      //return item.params.map((element) => ({ checked: 'on', label: item.key === 'data.office365.UserType' ? getLabelUserType(element) : element, value: item.key, key: element, filterByKey: item.key === 'data.office365.UserType' ? true : false}));
+      // ToDo: Make this generic, without office 365 hardcode
+      return item.params.map((element) => ({ checked: 'on', label: item.key === 'data.office365.UserType' ? getLabelUserType(element) : element, value: item.key, key: element, filterByKey: item.key === 'data.office365.UserType' ? true : false }));
     };
     const getLabelUserType = element => {
       const userTypeOptions = getCustomValueSuggestion(
@@ -161,9 +155,9 @@ export const CustomSearchBar = ({
         (item, index) => index.toString() === element,
       );
     };
-    const filterCustom = filters.map(item => getFilterCustom(item)) || [];
+    const filterCustom = currentFilters.map(item => getFilterCustom(item)) || [];
     if (filterCustom.length != 0) {
-      /*filterCustom.forEach((item) => {
+      filterCustom.forEach((item) => {
         item.forEach((element) => {
           setSelectedOptions((prevState) => ({
             ...prevState,
@@ -171,7 +165,6 @@ export const CustomSearchBar = ({
           }));
         });
       });
-      */
     }
   };
 
@@ -182,8 +175,6 @@ export const CustomSearchBar = ({
 
   const onRemove = filter => {
     const currentFilters = filters.filter(item => item.meta.key != filter);
-    //filterManager.removeAll();
-    //filterManager.addFilters(currentFilters);
     setFilters(currentFilters);
     refreshCustomSelectedFilter();
   };

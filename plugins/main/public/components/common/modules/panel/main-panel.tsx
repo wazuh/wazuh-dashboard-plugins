@@ -21,22 +21,34 @@ import {
   FilterMeta,
   FilterState,
   FilterStateStore,
+  IndexPattern
 } from '../../../../../../../src/plugins/data/common';
 import { SampleDataWarning } from '../../../visualize/components';
+import { tUseSearchBarProps } from '../../search-bar/use-search-bar';
 
 type MainPanelProps = {
   sidePanelChildren?: React.ReactNode;
   moduleConfig?: any;
   filterDrillDownValue?: (value: any) => void;
   onChangeView?: (selectedFilter) => void;
+  isLoading: boolean;
+  dataSourceProps: {
+    fetchData: (params: any) => void;
+    fetchFilters: any[];
+    searchBarProps: tUseSearchBarProps;
+    indexPattern: IndexPattern;
+  }
 };
 
-export const MainPanel = ({
-  sidePanelChildren,
-  moduleConfig = {},
-  filterDrillDownValue,
-  onChangeView
-}: MainPanelProps) => {
+export const MainPanel = (props: MainPanelProps) => {
+  const {
+    sidePanelChildren,
+    moduleConfig = {},
+    filterDrillDownValue,
+    onChangeView,
+    dataSourceProps,
+    isLoading
+  } = props;
   const [viewId, setViewId] = useState('main');
   const [selectedFilter, setSelectedFilter] = useState({
     field: '',
@@ -52,6 +64,14 @@ export const MainPanel = ({
     onChangeView({ field, value });
   };
 
+  useEffect(() => {
+    filterDrillDownValue(selectedFilter)
+  }, [selectedFilter]);
+
+  if (isLoading) {
+    return null;
+  }
+
   /**
    * Builds active view
    * @param props
@@ -64,6 +84,7 @@ export const MainPanel = ({
         <WzReduxProvider>
           <View
             {...rest}
+            {...dataSourceProps}
             selectedFilter={selectedFilter}
             toggleFilter={toggleFilter}
             changeView={toggleView}
@@ -71,7 +92,7 @@ export const MainPanel = ({
         </WzReduxProvider>
       );
     },
-    [viewId],
+    [viewId, JSON.stringify(dataSourceProps)],
   );
 
   return (

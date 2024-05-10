@@ -29,6 +29,10 @@ type AggTableProps = {
     filters: tFilter[];
     indexPattern: IndexPattern;
     query: any;
+    dateRange: {
+      to: string;
+      from: string;
+    }
   }
 };
 
@@ -65,7 +69,8 @@ export const AggTable = ({
         aggs: preAppliedAggs,
         filters: searchParams.filters,
         indexPattern: searchParams.indexPattern,
-        query: searchParams.query
+        query: searchParams.query,
+        dateRange: searchParams.dateRange,
       })
       setEsResults(response);
     } catch (error) {
@@ -77,7 +82,11 @@ export const AggTable = ({
 
   useEffect(() => {
     fetchAggData();
-  }, [])
+  }, [
+    JSON.stringify(searchParams.filters),
+    JSON.stringify(searchParams.query),
+    JSON.stringify(order),
+  ]);
 
 
   const buckets = ((esResults?.aggregations || {}).buckets || {}).buckets || [];
