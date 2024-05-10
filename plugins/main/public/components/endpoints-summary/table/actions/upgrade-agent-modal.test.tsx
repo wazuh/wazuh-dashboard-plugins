@@ -9,7 +9,7 @@ jest.mock('../../services', () => ({
 
 jest.mock('../../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: () => {},
+    handleError: () => { },
   }),
 }));
 
@@ -20,18 +20,30 @@ describe('UpgradeAgentModal component', () => {
         agent={{
           id: '001',
           name: 'agent1',
+          version: 'v4.8.0',
           group: ['default'],
+          os: { name: 'Ubuntu', uname: 'Linux', platform: 'ubuntu' }
         }}
-        onClose={() => {}}
-        reloadAgents={() => {}}
-        setIsUpgradePanelClosed={() => {}}
+        onClose={() => { }}
+        reloadAgents={() => { }}
+        setIsUpgradePanelClosed={() => { }}
       />,
     );
 
     expect(container).toMatchSnapshot();
 
-    const agentName = getByText('Upgrade agent agent1?');
+    const agentId = getByText('001');
+    expect(agentId).toBeInTheDocument();
+
+    const agentName = getByText('agent1');
     expect(agentName).toBeInTheDocument();
+
+    const agentVersion = getByText('v4.8.0');
+    expect(agentVersion).toBeInTheDocument();
+
+    const os = getByText('Ubuntu');
+    expect(os).toBeInTheDocument();
+
 
     const saveButton = getByRole('button', { name: 'Upgrade' });
     expect(saveButton).toBeInTheDocument();
@@ -46,11 +58,13 @@ describe('UpgradeAgentModal component', () => {
         agent={{
           id: '001',
           name: 'agent1',
+          version: 'v4.8.0',
           group: ['default'],
+          os: { name: 'Ubuntu', uname: 'Linux', platform: 'ubuntu' }
         }}
-        onClose={() => {}}
-        reloadAgents={() => {}}
-        setIsUpgradePanelClosed={() => {}}
+        onClose={() => { }}
+        reloadAgents={() => { }}
+        setIsUpgradePanelClosed={() => { }}
       />,
     );
 
