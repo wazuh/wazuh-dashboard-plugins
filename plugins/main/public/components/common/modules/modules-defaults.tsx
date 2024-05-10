@@ -53,6 +53,7 @@ import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
 import { DashboardDocker } from '../../overview/docker/dashboards';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
+import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
 import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
 import {
   AlertsDockerDataSource,
@@ -65,6 +66,7 @@ import {
   AlertsMalwareDetectionDataSource,
   AlertsFIMDataSource,
   AlertsConfigurationAssessmentDataSource,
+  AlertsHIPAADataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
