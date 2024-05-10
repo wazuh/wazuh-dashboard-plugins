@@ -22,35 +22,31 @@ import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashb
 export const SampleDataWarning = ({ ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
 
+  const request = async () => {
+    try {
+      const result = (
+        await WzRequest.genericReq('GET', '/elastic/samplealerts')
+      ).data.sampleAlertsInstalled;
+      setIsSampleData(result);
+    } catch (error) {
+      const options = {
+        context: `${SampleDataWarning.name}.usesSampleData`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      try {
-        const result = (
-          await WzRequest.genericReq('GET', '/elastic/samplealerts')
-        ).data.sampleAlertsInstalled;
-        setIsSampleData(result);
-      } catch (error) {
-        const options = {
-          context: `${SampleDataWarning.name}.usesSampleData`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.UI,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    })();
-  }, [
-    SampleDataWarning,
-    setIsSampleData,
-    UI_ERROR_SEVERITIES,
-    UI_LOGGER_LEVELS,
-    getErrorOrchestrator,
-    WzRequest,
-  ]);
+    request();
+  }, []);
+
   if (isSampleData) {
     return (
       <EuiCallOut
@@ -68,9 +64,9 @@ export const SampleDataWarning = ({ ...props }) => {
               href={getCore().application.getUrlForApp(sampleData.id)}
               aria-label='go to configure sample data'
             >
-              {'here '}
+              {'here'}
             </EuiLink>
-            {'to configure the sample data.'}
+            {' to configure the sample data.'}
           </p>
         </RedirectAppLinks>
       </EuiCallOut>
