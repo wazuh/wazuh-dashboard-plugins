@@ -15,7 +15,6 @@ import general from './agents-general';
 import gcp from './agents-gcp';
 import oscap from './agents-oscap';
 import ciscat from './agents-ciscat';
-import gdpr from './agents-gdpr';
 import mitre from './agents-mitre';
 import nist from './agents-nist';
 import tsc from './agents-tsc';
@@ -34,7 +33,6 @@ export {
   gcp,
   oscap,
   ciscat,
-  gdpr,
   nist,
   tsc,
   pm,

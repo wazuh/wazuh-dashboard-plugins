@@ -16,7 +16,6 @@ import fim from './overview-fim';
 import general from './overview-general';
 import oscap from './overview-oscap';
 import ciscat from './overview-ciscat';
-import gdpr from './overview-gdpr';
 import nist from './overview-nist';
 import tsc from './overview-tsc';
 import pm from './overview-pm';
@@ -35,7 +34,6 @@ export {
   general,
   oscap,
   ciscat,
-  gdpr,
   nist,
   tsc,
   pm,

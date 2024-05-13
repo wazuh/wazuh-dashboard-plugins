@@ -10,5 +10,6 @@ export * from './vulnerabilities';
 export * from './mitre-attack';
 export * from './pci-dss';
 export * from './virustotal';
+export * from './alerts-gdpr';
 export * from './alerts-configuration-assessment';
 export * from './alerts-google-cloud';
