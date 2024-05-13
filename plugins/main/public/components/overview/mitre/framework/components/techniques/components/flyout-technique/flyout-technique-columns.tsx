@@ -2,6 +2,8 @@ import React from 'react';
 import { formatUIDate, AppNavigate } from '../../../../../../../../react-services';
 import { tDataGridColumn } from '../../../../../../../common/data-grid';
 import { EuiLink, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { getCore } from '../../../../../../../../kibana-services';
+import { rules } from '../../../../../../../../utils/applications';
 
 const navigateTo = (ev, section, params) => {
   AppNavigate.navigateToModule(ev, section, params);
@@ -59,15 +61,14 @@ export const techniquesColumns: tDataGridColumn[] = [
     displayAsText: 'Rule ID',
     render: (value) => (
       <EuiLink
-        onClick={(e) =>
-          navigateTo(e, 'manager', {
-            tab: 'rules',
-            redirectRule: value,
-          })
-        }
+        onClick={e => {
+          getCore().application.navigateToApp(rules.id, {
+            path: `#/manager/?tab=rules&redirectRule=${value}`,
+          });
+        }}
       >
-        {value}
-      </EuiLink>
+        { value}
+      </EuiLink >
     ),
   },
   { id: 'rule.description', displayAsText: 'Description' },
@@ -87,15 +88,14 @@ export const agentTechniquesColumns: tDataGridColumn[] = [
     displayAsText: 'Rule ID',
     render: (value) => (
       <EuiLink
-        onClick={(e) =>
-          navigateTo(e, 'manager', {
-            tab: 'rules',
-            redirectRule: value,
-          })
-        }
+        onClick={e => {
+          getCore().application.navigateToApp(rules.id, {
+            path: `#/manager/?tab=rules&redirectRule=${value}`,
+          });
+        }}
       >
-        {value}
-      </EuiLink>
+        { value}
+      </EuiLink >
     ),
   },
   { id: 'rule.description', displayAsText: 'Description' },

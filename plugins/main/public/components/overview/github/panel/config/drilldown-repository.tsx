@@ -13,9 +13,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
 import { VisCard } from '../../../../common/modules/panel/';
-import { SecurityAlerts } from '../../../../visualize/components';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getPlugins } from '../../../../../kibana-services';
+import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import {
@@ -28,7 +27,7 @@ import {
 import { ModuleConfigProps } from './module-config';
 import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
 import DrillDownDataGrid from './drilldown-data-grid';
-import { AppNavigate } from '../../../../../react-services';
+import { rules } from '../../../../../utils/applications';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -177,15 +176,14 @@ export const DrilldownConfigRepository = (
                 {
                   id: 'rule.id', render: value => (
                     <EuiLink
-                      onClick={e =>
-                        AppNavigate.navigateToModule(e, 'manager', {
-                          tab: 'rules',
-                          redirectRule: value,
-                        })
-                      }
+                      onClick={e => {
+                        getCore().application.navigateToApp(rules.id, {
+                          path: `#/manager/?tab=rules&redirectRule=${value}`,
+                        });
+                      }}
                     >
-                      {value}
-                    </EuiLink>
+                      { value}
+                    </EuiLink >
                   ),
                 },
               ]

@@ -15,7 +15,7 @@
 import React from 'react';
 import { EuiFlexItem, EuiPanel, EuiLink } from '@elastic/eui';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getPlugins } from '../../../../../kibana-services';
+import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import {
@@ -26,6 +26,7 @@ import {
 } from './visualizations';
 import { AppNavigate } from '../../../../../react-services';
 import DrillDownDataGrid from '../../../github/panel/config/drilldown-data-grid';
+import { rules } from '../../../../../utils/applications';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -127,15 +128,14 @@ export const drilldownIPConfig = (props) => {
                 {
                   id: 'rule.id', render: value => (
                     <EuiLink
-                      onClick={e =>
-                        AppNavigate.navigateToModule(e, 'manager', {
-                          tab: 'rules',
-                          redirectRule: value,
-                        })
-                      }
+                      onClick={e => {
+                        getCore().application.navigateToApp(rules.id, {
+                          path: `#/manager/?tab=rules&redirectRule=${value}`,
+                        });
+                      }}
                     >
-                      {value}
-                    </EuiLink>
+                      { value}
+                    </EuiLink >
                   ),
                 },
               ]
