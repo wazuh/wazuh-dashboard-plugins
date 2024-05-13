@@ -12,7 +12,7 @@ import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 import { tFilter } from '../data-source';
 //@ts-ignore
 import { MultiSelect } from './components';
-import { getCustomValueSuggestion } from '../../../components/overview/office-panel/config/helpers/helper-value-suggestion';
+import { getCustomValueSuggestion } from '../../../components/overview/office/panel/config/helpers/helper-value-suggestion';
 import { I18nProvider } from '@osd/i18n/react';
 import { getPlugins } from '../../../kibana-services';
 import { tUseSearchBarProps } from '../search-bar/use-search-bar';
