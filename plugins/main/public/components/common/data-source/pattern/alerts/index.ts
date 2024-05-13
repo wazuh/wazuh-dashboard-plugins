@@ -9,6 +9,7 @@ export * from './malware-detection';
 export * from './alerts-hipaa';
 export * from './alerts-virustotal';
 export * from './alerts-nist-800-53';
+export * from './alerts-tsc';
 export * from './vulnerabilities';
 export * from './mitre-attack';
 export * from './pci-dss';

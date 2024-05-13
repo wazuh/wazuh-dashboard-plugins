@@ -232,6 +232,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
   'vulnerabilities-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_GITHUB_RULE_GROUP =
   'github-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST = 'tsc-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_NIST_800_53_EXIST =
   'nist-800-53-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_GDPR_EXIST = 'gdpr-rule-exist';
