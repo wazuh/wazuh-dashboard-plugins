@@ -20,7 +20,7 @@ import {
   PatternDataSource,
   tParsedIndexPattern,
   useDataSource,
-  AlertsFIMDataSource,
+  FIMDataSource,
 } from '../../../common/data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
@@ -40,7 +40,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsFIMDataSource,
+    DataSource: FIMDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 

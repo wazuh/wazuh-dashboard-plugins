@@ -211,6 +211,33 @@ export class PatternDataSourceFilterManager
   }
 
   /**
+   * Returns a filter with the field and value received
+   * @param field
+   * @param value
+   * @returns
+   */
+  createFilter(field: string, value: string): tFilter {
+    return this.generateFilter(field, value, this.dataSource.id);
+  }
+
+  /**
+   * Search the the field and value received and remove the filter when exists
+   * @param field
+   * @param value
+   */
+  removeFilter(field: string, value: string): void {
+    let filters = this.filterManager.getFilters();
+    const filterIndex = filters.findIndex(
+      f => f.meta?.key === field && f.meta?.value === value,
+    );
+    // only remove when exists the filter
+    if (filterIndex > -1) {
+      filters.splice(filterIndex, 1);
+      this.setFilters(filters);
+    }
+  }
+
+  /**
    * Prevent duplicated filters, cannot exists with the same controlledBy value.
    * This ignore the filters that have the controlledBy value null
    * @param filters
@@ -345,5 +372,49 @@ export class PatternDataSourceFilterManager
       return [allowAgentsFilter];
     }
     return [];
+  }
+
+  /**
+   * Return a simple filter object with the field, value and index pattern received
+   *
+   * @param field
+   * @param value
+   * @param indexPatternTitle
+   */
+  private generateFilter(
+    field: string,
+    value: string,
+    indexPatternTitle: string,
+  ) {
+    const meta = {
+      disabled: false,
+      negate: false,
+      key: field,
+      params: [value],
+      alias: null,
+      type: 'phrases',
+      value: value,
+      index: indexPatternTitle,
+    };
+    const $state = {
+      store: 'appState',
+      isImplicit: true,
+    };
+    const query = {
+      bool: {
+        minimum_should_match: 1,
+        should: [
+          {
+            match_phrase: {
+              [field]: {
+                query: value,
+              },
+            },
+          },
+        ],
+      },
+    };
+
+    return { meta, $state, query };
   }
 }
