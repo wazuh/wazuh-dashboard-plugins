@@ -43,13 +43,8 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
-import {
-  DataSourceSelector,
-  PatternDataSource,
-  AlertsDataSourceRepository,
-  PatternDataSourceFactory,
-} from '../common/data-source';
 import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
+import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 
 const sections = {
   overview: 'overview',
@@ -85,6 +80,7 @@ export const WzMenu = withWindowSize(
       this.wazuhConfig = new WazuhConfig();
       this.indexPatterns = getDataPlugin().indexPatterns;
       this.isLoading = false;
+      this.pinnedAgentManager = new PinnedAgentManager();
     }
 
     async componentDidMount() {
@@ -367,7 +363,10 @@ export const WzMenu = withWindowSize(
         AppState.setCurrentAPI(
           JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
         );
-
+        const isPinnedAgent = this.pinnedAgentManager.isPinnedAgent();
+        if (isPinnedAgent) {
+          this.pinnedAgentManager.unPinAgent();
+        }
         if (this.state.currentMenuTab !== 'wazuh-dev') {
           this.router.reload();
         }
@@ -508,9 +507,10 @@ export const WzMenu = withWindowSize(
           </EuiFlexItem>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
-              <WzDataSourceSelector 
-                onChange={this.onChangePattern} 
-                name="index pattern"/>
+              <WzDataSourceSelector
+                onChange={this.onChangePattern}
+                name='index pattern'
+              />
             </div>
           </EuiFlexItem>
         </>

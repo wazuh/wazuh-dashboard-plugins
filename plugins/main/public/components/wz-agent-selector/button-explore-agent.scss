@@ -1,0 +1,13 @@
+.wz-explore-agent .euiButtonEmpty:focus {
+  background-color: transparent;
+}
+
+.wz-unpin-agent {
+  background-color: rgba(0, 107, 180, 0.1);
+  border-radius: 0;
+  height: 40px;
+}
+
+.wz-unpin-agent:hover {
+  transform: translateY(0px) !important;
+}
