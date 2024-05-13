@@ -56,8 +56,13 @@ const DashboardOffice365Component: React.FC = () => {
     if (isDataSourceLoading) {
       return;
     }
-    //TODO: Add time range
-    fetchData({ query })
+    fetchData({
+      query,
+      dateRange: {
+        from: searchBarProps.dateRangeFrom || '',
+        to: searchBarProps.dateRangeTo || '',
+      },
+    })
       .then(results => {
         setResults(results);
       })
@@ -68,7 +73,12 @@ const DashboardOffice365Component: React.FC = () => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    searchBarProps.dateRangeFrom,
+    searchBarProps.dateRangeTo,
+  ]);
 
   return (
     <>
