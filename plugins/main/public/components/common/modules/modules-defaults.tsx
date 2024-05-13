@@ -50,11 +50,13 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardGitHub } from '../../overview/github/dashboards/dashboard';
+import { DashboardGDPR } from '../../overview/gdpr/dashboards/dashboard';
 import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
 import { DashboardDocker } from '../../overview/docker/dashboards';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
-import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
+import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
+import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
 import {
   DockerDataSource,
   AlertsDataSource,
@@ -67,7 +69,12 @@ import {
   MalwareDetectionDataSource,
   AlertsGoogleCloudDataSource,
   AlertsMalwareDetectionDataSource,
+  AlertsFIMDataSource,
+  AlertsNIST80053DataSource,
+  MitreAttackDataSource,
+  AlertsGDPRDataSource,
   AlertsConfigurationAssessmentDataSource,
+  AlertsHIPAADataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -380,17 +387,74 @@ export const ModulesDefaults = {
   },
   hipaa: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(hipaaColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardHIPAA,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsHIPAADataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: hipaaColumns,
+        DataSource: AlertsHIPAADataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   nist: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(nistColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardNIST80053,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsNIST80053DataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: nistColumns,
+        DataSource: AlertsNIST80053DataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   gdpr: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(gdprColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardGDPR,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsGDPRDataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: gdprColumns,
+        DataSource: AlertsGDPRDataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   tsc: {

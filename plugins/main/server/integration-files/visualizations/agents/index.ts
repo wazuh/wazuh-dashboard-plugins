@@ -15,10 +15,7 @@ import general from './agents-general';
 import gcp from './agents-gcp';
 import oscap from './agents-oscap';
 import ciscat from './agents-ciscat';
-import gdpr from './agents-gdpr';
-import hipaa from './agents-hipaa';
 import mitre from './agents-mitre';
-import nist from './agents-nist';
 import tsc from './agents-tsc';
 import pm from './agents-pm';
 import virustotal from './agents-virustotal';
@@ -35,9 +32,6 @@ export {
   gcp,
   oscap,
   ciscat,
-  gdpr,
-  hipaa,
-  nist,
   tsc,
   pm,
   virustotal,
