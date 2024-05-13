@@ -148,7 +148,7 @@ export const AgentsTable = compose(
     return {
       'data-test-subj': `row-${id}`,
       className: 'customRowClass',
-      onClick: () => {},
+      onClick: () => { },
     };
   };
 
@@ -220,9 +220,8 @@ export const AgentsTable = compose(
             <EuiFlexItem grow={false}>
               <EuiCallOut
                 size='s'
-                title={`${totalSelected} ${
-                  totalSelected === 1 ? 'agent' : 'agents'
-                } selected`}
+                title={`${totalSelected} ${totalSelected === 1 ? 'agent' : 'agents'
+                  } selected`}
               />
             </EuiFlexItem>
             {showSelectAllItems ? (
@@ -410,11 +409,11 @@ export const AgentsTable = compose(
                               sort: `+${field}`,
                               ...(currentValue
                                 ? {
-                                    q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
-                                  }
+                                  q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                }
                                 : {
-                                    q: `${searchBarWQLOptions.implicitQuery.query}`,
-                                  }),
+                                  q: `${searchBarWQLOptions.implicitQuery.query}`,
+                                }),
                             },
                           },
                         );
@@ -505,7 +504,7 @@ export const AgentsTable = compose(
           agent={agent}
           reloadAgents={() => reloadAgents()}
           onClose={() => {
-            setIsEditGroupsVisible(false);
+            setIsUpgradeModalVisible(false)
             setAgent(undefined);
           }}
           setIsUpgradePanelClosed={setIsUpgradePanelClosed}

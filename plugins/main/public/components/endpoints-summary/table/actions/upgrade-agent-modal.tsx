@@ -1,5 +1,22 @@
 import React, { useState } from 'react';
-import { EuiConfirmModal } from '@elastic/eui';
+import {
+  EuiForm,
+  EuiFormRow,
+  EuiSelect,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiModal,
+  EuiModalHeader,
+  EuiModalHeaderTitle,
+  EuiButton,
+  EuiModalBody,
+  EuiModalFooter,
+  EuiButtonEmpty,
+  EuiDescriptionList,
+  EuiDescriptionListTitle,
+  EuiDescriptionListDescription,
+  EuiIconTip,
+} from '@elastic/eui';
 import { compose } from 'redux';
 import { withErrorBoundary, withReduxProvider } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -8,6 +25,21 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 import { upgradeAgentService } from '../../services';
 import { Agent } from '../../types';
 import { getToasts } from '../../../../kibana-services';
+
+const supportedPlatforms = [
+  'debian',
+  'ubuntu',
+  'amzn',
+  'centos',
+  'fedora',
+  'ol',
+  'opensuse',
+  'opensuse-leap',
+  'opensuse-tumbleweed',
+  'rhel',
+  'sles',
+  'suse',
+];
 
 interface UpgradeAgentModalProps {
   agent: Agent;
@@ -27,6 +59,8 @@ export const UpgradeAgentModal = compose(
     setIsUpgradePanelClosed,
   }: UpgradeAgentModalProps) => {
     const [isLoading, setIsLoading] = useState(false);
+    const [packageType, setPackageType] = useState<'deb' | 'rpm'>();
+
     const showToast = (
       color: string,
       title: string = '',
@@ -45,7 +79,7 @@ export const UpgradeAgentModal = compose(
       setIsLoading(true);
 
       try {
-        await upgradeAgentService(agent.id);
+        await upgradeAgentService(agent.id, packageType);
         showToast('success', 'Upgrade agent', 'Upgrade task in progress');
         reloadAgents();
         setIsUpgradePanelClosed(false);
@@ -67,21 +101,109 @@ export const UpgradeAgentModal = compose(
       }
     };
 
+    const regex = /linux/i;
+    const isLinux = regex.test(agent.os.uname);
+    const showPackageSelector =
+      isLinux && !supportedPlatforms.includes(agent.os.platform);
+
+    const form = (
+      <EuiForm component='form'>
+        <EuiFlexGroup direction='column' gutterSize='m'>
+          <EuiFlexItem>
+            <EuiFlexGroup gutterSize='m'>
+              <EuiFlexItem>
+                <EuiDescriptionList compressed>
+                  <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                  <EuiDescriptionListDescription>
+                    {agent.id}
+                  </EuiDescriptionListDescription>
+                </EuiDescriptionList>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiDescriptionList compressed>
+                  <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
+                  <EuiDescriptionListDescription>
+                    {agent.name}
+                  </EuiDescriptionListDescription>
+                </EuiDescriptionList>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiFlexGroup gutterSize='m'>
+              <EuiFlexItem>
+                <EuiDescriptionList compressed>
+                  <EuiDescriptionListTitle>
+                    Agent version
+                  </EuiDescriptionListTitle>
+                  <EuiDescriptionListDescription>
+                    {agent.version}
+                  </EuiDescriptionListDescription>
+                </EuiDescriptionList>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiDescriptionList compressed>
+                  <EuiDescriptionListTitle>OS</EuiDescriptionListTitle>
+                  <EuiDescriptionListDescription>
+                    {agent.os.name}
+                  </EuiDescriptionListDescription>
+                </EuiDescriptionList>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          {showPackageSelector && (
+            <EuiFlexItem>
+              <EuiFormRow
+                label={
+                  <span>
+                    Package type{' '}
+                    <EuiIconTip content="Specify the package type, as the manager can't determine it automatically for the OS platform" />
+                  </span>
+                }
+                isInvalid={!packageType}
+              >
+                <EuiSelect
+                  placeholder='Packege type'
+                  value={packageType}
+                  options={[
+                    { value: 'deb', text: 'DEB' },
+                    { value: 'rpm', text: 'RPM' },
+                  ]}
+                  onChange={e => setPackageType(e.target.value)}
+                  hasNoInitialSelection
+                />
+              </EuiFormRow>
+            </EuiFlexItem>
+          )}
+        </EuiFlexGroup>
+      </EuiForm>
+    );
+
     return (
-      <EuiConfirmModal
-        title='Upgrade agent'
-        onCancel={onClose}
-        onConfirm={handleOnSave}
-        cancelButtonText='Cancel'
-        confirmButtonText='Upgrade'
+      <EuiModal
         onClose={onClose}
         onClick={ev => {
           ev.stopPropagation();
         }}
-        isLoading={isLoading}
       >
-        <p>{`Upgrade agent ${agent?.name}?`}</p>
-      </EuiConfirmModal>
+        <EuiModalHeader>
+          <EuiModalHeaderTitle>Upgrade agent</EuiModalHeaderTitle>
+        </EuiModalHeader>
+
+        <EuiModalBody>{form}</EuiModalBody>
+
+        <EuiModalFooter>
+          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButton
+            onClick={handleOnSave}
+            fill
+            isLoading={isLoading}
+            disabled={showPackageSelector && !packageType}
+          >
+            Upgrade
+          </EuiButton>
+        </EuiModalFooter>
+      </EuiModal>
     );
   },
 );

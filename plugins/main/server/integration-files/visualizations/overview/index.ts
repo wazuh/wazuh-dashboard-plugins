@@ -17,6 +17,7 @@ import general from './overview-general';
 import oscap from './overview-oscap';
 import ciscat from './overview-ciscat';
 import hipaa from './overview-hipaa';
+import gdpr from './overview-gdpr';
 import nist from './overview-nist';
 import tsc from './overview-tsc';
 import pm from './overview-pm';
@@ -36,6 +37,7 @@ export {
   oscap,
   ciscat,
   hipaa,
+  gdpr,
   nist,
   tsc,
   pm,
