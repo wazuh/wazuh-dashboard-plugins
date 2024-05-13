@@ -5,7 +5,7 @@ import { AlertsDataSource } from '../alerts-data-source';
 const OFFICE_365_GROUP_KEY = 'rule.groups';
 const OFFICE_365_GROUP_VALUE = 'office365';
 
-export class AlertsOffice365DataSource extends AlertsDataSource {
+export class Office365DataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }

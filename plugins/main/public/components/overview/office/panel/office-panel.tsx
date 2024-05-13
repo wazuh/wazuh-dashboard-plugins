@@ -11,33 +11,97 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MainPanel } from '../../../common/modules/panel';
 import { withErrorBoundary } from '../../../common/hocs';
 import { CustomSearchBar } from '../../../common/custom-search-bar';
+import useSearchBar from '../../../common/search-bar/use-search-bar';
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { ModuleConfiguration } from './views';
 import { ModuleConfig, filtersValues } from './config';
+import {
+  AlertsDataSourceRepository,
+  PatternDataSource,
+  tParsedIndexPattern,
+  useDataSource,
+} from '../../../common/data-source';
+import { Office365DataSource } from '../../../common/data-source/pattern/alerts/office-365/office-365-data-source';
+import { IndexPattern } from '../../../../../../src/plugins/data/public';
 
 export const OfficePanel = withErrorBoundary(() => {
   const [drillDownValue, setDrillDownValue] = useState({
     field: '',
     value: '',
   });
+  const [currentSelectedFilter, setCurrentSelectedFilter] = useState();
   const filterDrillDownValue = value => {
     setDrillDownValue(value);
   };
+  const {
+    filters,
+    dataSource,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+    setFilters,
+    filterManager
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    DataSource: Office365DataSource,
+    repository: new AlertsDataSourceRepository(),
+  });
+
+  const { searchBarProps } = useSearchBar({
+    indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters,
+  });
+
+  const handleChangeView = selectedFilter => {
+    if (!selectedFilter) {
+      return;
+    }
+
+    if (selectedFilter?.value) {
+      const filter = filterManager.createFilter(selectedFilter.field, selectedFilter.value);
+      // this hide the remove filter button in the filter bar
+      filter.meta.controlledBy = 'office-panel-row-filter';
+      setFilters([...filters, filter]);
+    } else {
+      // the previous filter is stored in currentSelectedFilter
+      filterManager.removeFilter(currentSelectedFilter.field, currentSelectedFilter.value);
+    }
+    setCurrentSelectedFilter(selectedFilter);
+  }
+
   return (
     <>
-      <CustomSearchBar
-        filtersValues={filtersValues}
-        filterDrillDownValue={drillDownValue}
-      />
-      <MainPanel
-        moduleConfig={ModuleConfig}
-        tab={'office'}
-        filterDrillDownValue={filterDrillDownValue}
-        sidePanelChildren={<ModuleConfiguration />}
-      />
+      {isDataSourceLoading ? (
+        <LoadingSpinner />
+      ) : (
+          <>
+            <CustomSearchBar
+              filterInputs={filtersValues}
+              filterDrillDownValue={drillDownValue}
+              searchBarProps={searchBarProps}
+              setFilters={setFilters}
+              indexPattern={dataSource.indexPattern}
+            />
+            <MainPanel
+              moduleConfig={ModuleConfig}
+              filterDrillDownValue={filterDrillDownValue}
+              sidePanelChildren={<ModuleConfiguration />}
+              onChangeView={handleChangeView}
+              dataSourceProps={{
+                fetchData,
+                fetchFilters,
+                searchBarProps,
+                indexPattern: dataSource?.indexPattern,
+              }}
+              isLoading={isDataSourceLoading}
+            />
+          </>
+        )}
     </>
   );
 });
+

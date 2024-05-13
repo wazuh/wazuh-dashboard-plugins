@@ -63,6 +63,8 @@ export const GitHubPanel = withErrorBoundary(() => {
 
     if (selectedFilter?.value) {
       const filter = filterManager.createFilter(selectedFilter.field, selectedFilter.value);
+      // this hide the remove filter button in the filter bar
+      filter.meta.controlledBy = 'github-panel-row-filter';
       setFilters([...filters, filter]);
     } else {
       // the previous filter is stored in currentSelectedFilter

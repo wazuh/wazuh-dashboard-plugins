@@ -21,7 +21,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-import { AlertsOffice365DataSource } from '../../../common/data-source/pattern/alerts/alerts-office-365/alerts-office-365-data-source';
+import { Office365DataSource } from '../../../common/data-source/pattern/alerts/office-365/office-365-data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 
@@ -40,7 +40,7 @@ const DashboardOffice365Component: React.FC = () => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsOffice365DataSource,
+    DataSource: Office365DataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
@@ -77,17 +77,17 @@ const DashboardOffice365Component: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar'>
-              <SearchBar
-                appName='google-cloud-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            </div>
-          )}
+              <div className='wz-search-bar'>
+                <SearchBar
+                  appName='google-cloud-searchbar'
+                  {...searchBarProps}
+                  showDatePicker={true}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                  showSaveQuery={true}
+                />
+              </div>
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

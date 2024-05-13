@@ -18,7 +18,7 @@ import { MainFim } from '../../agents/fim';
 import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
-import { OfficePanel } from '../../overview/office-panel';
+import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { DashboardMITRE } from '../../overview/mitre/dashboard';
@@ -78,6 +78,7 @@ import {
   GDPRDataSource,
   ConfigurationAssessmentDataSource,
   HIPAADataSource,
+  Office365DataSource
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -98,17 +99,6 @@ const renderDiscoverTab = (props: WazuhDiscoverProps) => {
     component: () => <WazuhDiscover {...props} />,
   };
 };
-
-const RegulatoryComplianceTabs = columns => [
-  DashboardTab,
-  {
-    id: 'inventory',
-    name: 'Controls',
-    buttons: [ButtonModuleExploreAgent],
-    component: ComplianceTable,
-  },
-  renderDiscoverTab(DEFAULT_INDEX_PATTERN, columns),
-];
 
 export const ModulesDefaults = {
   general: {
@@ -238,22 +228,16 @@ export const ModulesDefaults = {
           ),
         ],
       },
-      renderDiscoverTab({
-        tableColumns: office365Columns,
-        DataSource: AlertsOffice365DataSource,
-      }),
       {
         id: 'inventory',
         name: 'Panel',
         buttons: [ButtonModuleExploreAgent],
         component: withModuleNotForAgent(OfficePanel),
       },
-      {
-        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
-        component: withModuleNotForAgent(() => (
-          <WazuhDiscover tableColumns={office365Columns} />
-        )),
-      },
+      renderDiscoverTab({
+        tableColumns: office365Columns,
+        DataSource: Office365DataSource,
+      }),
     ],
     availableFor: ['manager'],
   },
