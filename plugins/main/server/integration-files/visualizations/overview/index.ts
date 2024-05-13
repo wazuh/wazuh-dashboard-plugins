@@ -16,9 +16,6 @@ import fim from './overview-fim';
 import general from './overview-general';
 import oscap from './overview-oscap';
 import ciscat from './overview-ciscat';
-import gdpr from './overview-gdpr';
-import hipaa from './overview-hipaa';
-import nist from './overview-nist';
 import pm from './overview-pm';
 import virustotal from './overview-virustotal';
 import mitre from './overview-mitre';
@@ -35,9 +32,6 @@ export {
   general,
   oscap,
   ciscat,
-  gdpr,
-  hipaa,
-  nist,
   pm,
   virustotal,
   mitre,

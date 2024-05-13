@@ -211,7 +211,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
       const mapFieldAgg = {
         pci: 'rule.pci_dss',
         gdpr: 'rule.gdpr',
-        hippa: 'rule.hipaa',
+        hipaa: 'rule.hipaa',
         nist: 'rule.nist_800_53',
         tsc: 'rule.tsc',
       };
