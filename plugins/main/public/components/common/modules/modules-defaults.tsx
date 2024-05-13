@@ -49,6 +49,7 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
 import { DashboardGDPR } from '../../overview/gdpr/dashboards/dashboard';
 import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
 import { DashboardDocker } from '../../overview/docker/dashboards';
@@ -66,6 +67,7 @@ import {
   AlertsGoogleCloudDataSource,
   AlertsMalwareDetectionDataSource,
   AlertsFIMDataSource,
+  AlertsTSCDataSource,
   AlertsNIST80053DataSource,
   MitreAttackDataSource,
   AlertsGDPRDataSource,
@@ -447,7 +449,26 @@ export const ModulesDefaults = {
   },
   tsc: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(tscColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardTSC,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsTSCDataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: tscColumns,
+        DataSource: AlertsTSCDataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   syscollector: {
