@@ -5,7 +5,7 @@ import { AlertsDataSource } from '../alerts-data-source';
 const CONFIGURATION_ASSESSMENT_GROUP_KEY = 'rule.groups';
 const CONFIGURATION_ASSESSMENT_VALUE = 'sca';
 
-export class AlertsConfigurationAssessmentDataSource extends AlertsDataSource {
+export class ConfigurationAssessmentDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }

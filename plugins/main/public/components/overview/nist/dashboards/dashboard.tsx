@@ -17,7 +17,7 @@ import {
 } from '../../../../react-services/error-management';
 import { compose } from 'redux';
 import { SampleDataWarning } from '../../../visualize/components';
-import { AlertsNIST80053DataSource } from '../../../common/data-source/pattern/alerts/alerts-nist-800-53/alerts-nist-800-53-data-source';
+import { NIST80053DataSource } from '../../../common/data-source/pattern/alerts/nist-800-53/nist-800-53-data-source';
 import {
   AlertsDataSourceRepository,
   PatternDataSource,
@@ -40,7 +40,7 @@ const DashboardNIST80053Component: React.FC = () => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsNIST80053DataSource,
+    DataSource: NIST80053DataSource,
     repository: new AlertsDataSourceRepository(),
   });
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -88,16 +88,16 @@ const DashboardNIST80053Component: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='nist-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            </div>
-          )}
+              <div className='wz-search-bar hide-filter-control'>
+                <SearchBar
+                  appName='nist-searchbar'
+                  {...searchBarProps}
+                  showDatePicker={true}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                />
+              </div>
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

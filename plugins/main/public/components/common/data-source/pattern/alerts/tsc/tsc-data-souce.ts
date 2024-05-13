@@ -1,10 +1,10 @@
 import { tFilter } from '../../../index';
-import { DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST } from '../../../../../../../common/constants';
+import { DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST } from '../../../../../../../common/constants';
 import { AlertsDataSource } from '../alerts-data-source';
 
-const KEY_EXIST = 'rule.pci_dss';
+const KEY_EXIST = 'rule.tsc';
 
-export class AlertsPCIDSSDataSource extends AlertsDataSource {
+export class TSCDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }
@@ -24,7 +24,7 @@ export class AlertsPCIDSSDataSource extends AlertsDataSource {
             query: null,
             type: 'phrase',
           },
-          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST,
+          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST,
         },
         exists: {
           field: KEY_EXIST,

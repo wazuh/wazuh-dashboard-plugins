@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   Filter,
   IndexPattern,
@@ -16,6 +16,7 @@ import { KbnSearchBar } from '../../kbn-search-bar';
 import { MultiSelect } from './components';
 import { useFilterManager } from '../hooks';
 import useSearchBar, { tUseSearchBarProps } from '../search-bar/use-search-bar';
+import { hideCloseButtonOnFixedFilters } from '../search-bar/search-bar-service';
 import { getCustomValueSuggestion } from '../../../components/overview/office-panel/config/helpers/helper-value-suggestion';
 import { I18nProvider } from '@osd/i18n/react';
 import { getPlugins } from '../../../kibana-services';
@@ -34,6 +35,7 @@ type CustomSearchBarProps = {
 
 const plugins = getPlugins();
 const SearchBar = getPlugins().data.ui.SearchBar;
+const TIMEOUT_MILISECONDS = 100;
 
 export const CustomSearchBar = ({
   filterInputs,
@@ -42,7 +44,6 @@ export const CustomSearchBar = ({
   indexPattern,
   setFilters
 }: CustomSearchBarProps) => {
-  //const { filterManager, filters } = useFilterManager(); // remove
   const { filters } = searchBarProps;
   const defaultSelectedOptions = () => {
     const array = [];
@@ -58,6 +59,28 @@ export const CustomSearchBar = ({
   );
   const [values, setValues] = useState(Array);
   const [selectReference, setSelectReference] = useState('');
+
+  const hideRemoveFilter = (retry: number = 0) => {
+    let elements = document.querySelectorAll(
+      '.wz-search-bar .globalFilterItem',
+    );
+    if ((!elements || !filters.length) && retry < 10) {
+      // the setTimeout is used to wait for the DOM elements to be rendered
+      setTimeout(() => {
+        // this is a workaround to hide the close button on fixed filters via vanilla js
+        hideRemoveFilter(++retry);
+      }, TIMEOUT_MILISECONDS);
+    } else {
+      hideCloseButtonOnFixedFilters(filters, elements);
+    }
+  };
+
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      // this is a workaround to hide the close button on fixed filters via vanilla js
+      hideRemoveFilter();
+    }, TIMEOUT_MILISECONDS);
+  }, [filters]);
 
   useEffect(() => {
     setPluginPlatformFilters(values, selectReference);
@@ -82,7 +105,7 @@ export const CustomSearchBar = ({
     setAvancedFiltersState(state => !state);
   };
 
-  const buildCustomFilter = (isPinned: boolean, values?: any): Filter => {
+  const buildCustomFilter = (values?: any): Filter => {
     const newFilters = values.map(element => ({
       match_phrase: {
         [element.value]: {
@@ -104,9 +127,7 @@ export const CustomSearchBar = ({
       index: indexPattern.id,
     };
     const $state: FilterState = {
-      store: isPinned
-        ? FilterStateStore.GLOBAL_STATE
-        : FilterStateStore.APP_STATE,
+      store: FilterStateStore.APP_STATE,
     };
     const query = {
       bool: {
@@ -124,7 +145,7 @@ export const CustomSearchBar = ({
       item => item.meta.key != selectReference,
     );
     if (values.length != 0) {
-      customFilter = [buildCustomFilter(false, values)];
+      customFilter = [buildCustomFilter(values)];
     }
     setFilters([...currentFilters, ...customFilter]);
   };
@@ -209,7 +230,7 @@ export const CustomSearchBar = ({
           ))
           : ''}
         <EuiFlexItem>
-          <div className='wz-search-bar'>
+          <div className='wz-search-bar hide-filter-control'>
             <SearchBar
               {...searchBarProps}
               showFilterBar={false}
@@ -221,7 +242,7 @@ export const CustomSearchBar = ({
       </EuiFlexGroup>
       <EuiFlexGroup justifyContent='flexEnd' style={{ margin: '0 20px' }}>
         <EuiFlexItem className={'filters-search-bar'} style={{ margin: '0px' }}>
-          <div className='wz-search-bar'>
+          <div className='wz-search-bar hide-filter-control'>
             <SearchBar
               {...searchBarProps}
               showDatePicker={false}

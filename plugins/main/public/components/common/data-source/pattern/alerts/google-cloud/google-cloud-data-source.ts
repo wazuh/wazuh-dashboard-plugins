@@ -5,7 +5,7 @@ import { AlertsDataSource } from '../alerts-data-source';
 const GOOGLE_CLOUD_GROUP_KEY = 'rule.groups';
 const GOOGLE_CLOUD_GROUP_VALUE = 'gcp';
 
-export class AlertsGoogleCloudDataSource extends AlertsDataSource {
+export class GoogleCloudDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }

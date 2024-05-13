@@ -4,7 +4,7 @@ import { AlertsDataSource } from '../alerts-data-source';
 
 const KEY_EXIST = 'rule.gdpr';
 
-export class AlertsGDPRDataSource extends AlertsDataSource {
+export class GDPRDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }

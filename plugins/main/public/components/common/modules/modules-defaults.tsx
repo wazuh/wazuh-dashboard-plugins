@@ -50,7 +50,6 @@ import { virustotalColumns } from '../../overview/virustotal/events/virustotal-c
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import { DashboardGitHub } from '../../overview/github/dashboards/dashboard';
-import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
 import { DashboardGDPR } from '../../overview/gdpr/dashboards/dashboard';
 import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
 import { DashboardDocker } from '../../overview/docker/dashboards';
@@ -58,25 +57,24 @@ import { DashboardMalwareDetection } from '../../overview/malware-detection/dash
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
 import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
+import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
+import { PCIDSSDataSource } from '../data-source/pattern/alerts/pci-dss/pci-dss-data-source';
 import {
   DockerDataSource,
   AlertsDataSource,
-  AlertsPCIDSSDataSource,
   AlertsVulnerabilitiesDataSource,
   AWSDataSource,
   VirusTotalDataSource,
   FIMDataSource,
   GitHubDataSource,
   MalwareDetectionDataSource,
-  AlertsGoogleCloudDataSource,
-  AlertsMalwareDetectionDataSource,
-  AlertsFIMDataSource,
-  AlertsTSCDataSource,
-  AlertsNIST80053DataSource,
+  TSCDataSource,
+  GoogleCloudDataSource,
+  NIST80053DataSource,
   MitreAttackDataSource,
-  AlertsGDPRDataSource,
-  AlertsConfigurationAssessmentDataSource,
-  AlertsHIPAADataSource,
+  GDPRDataSource,
+  ConfigurationAssessmentDataSource,
+  HIPAADataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -175,7 +173,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: googleCloudColumns,
-        DataSource: AlertsGoogleCloudDataSource,
+        DataSource: GoogleCloudDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -214,7 +212,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: configurationAssessmentColumns,
-        DataSource: AlertsConfigurationAssessmentDataSource,
+        DataSource: ConfigurationAssessmentDataSource,
       }),
     ],
     buttons: ['settings'],
@@ -377,12 +375,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsPCIDSSDataSource} />
+          <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: pciColumns,
-        DataSource: AlertsPCIDSSDataSource,
+        DataSource: PCIDSSDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -401,12 +399,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsHIPAADataSource} />
+          <ComplianceTable {...props} DataSource={HIPAADataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: hipaaColumns,
-        DataSource: AlertsHIPAADataSource,
+        DataSource: HIPAADataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -425,12 +423,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsNIST80053DataSource} />
+          <ComplianceTable {...props} DataSource={NIST80053DataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: nistColumns,
-        DataSource: AlertsNIST80053DataSource,
+        DataSource: NIST80053DataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -449,12 +447,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsGDPRDataSource} />
+          <ComplianceTable {...props} DataSource={GDPRDataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: gdprColumns,
-        DataSource: AlertsGDPRDataSource,
+        DataSource: GDPRDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -473,12 +471,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsTSCDataSource} />
+          <ComplianceTable {...props} DataSource={TSCDataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: tscColumns,
-        DataSource: AlertsTSCDataSource,
+        DataSource: TSCDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],

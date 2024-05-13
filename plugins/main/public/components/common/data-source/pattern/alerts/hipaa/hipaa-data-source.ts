@@ -1,10 +1,10 @@
 import { tFilter } from '../../../index';
-import { DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST } from '../../../../../../../common/constants';
+import { DATA_SOURCE_FILTER_CONTROLLED_HIPAA_EXIST } from '../../../../../../../common/constants';
 import { AlertsDataSource } from '../alerts-data-source';
 
-const KEY_EXIST = 'rule.tsc';
+const KEY_EXIST = 'rule.hipaa';
 
-export class AlertsTSCDataSource extends AlertsDataSource {
+export class HIPAADataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }
@@ -24,7 +24,7 @@ export class AlertsTSCDataSource extends AlertsDataSource {
             query: null,
             type: 'phrase',
           },
-          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST,
+          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_HIPAA_EXIST,
         },
         exists: {
           field: KEY_EXIST,

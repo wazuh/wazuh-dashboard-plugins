@@ -23,7 +23,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-import { AlertsHIPAADataSource } from '../../../common/data-source/pattern/alerts/alerts-hipaa/alerts-hipaa-data-source';
+import { HIPAADataSource } from '../../../common/data-source/pattern/alerts/hipaa/hipaa-data-source';
 
 const plugins = getPlugins();
 
@@ -40,7 +40,7 @@ const DashboardHIPAAComponent: React.FC = () => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsHIPAADataSource,
+    DataSource: HIPAADataSource,
     repository: new AlertsDataSourceRepository(),
   });
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -89,16 +89,16 @@ const DashboardHIPAAComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='hipaa-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            </div>
-          )}
+              <div className='wz-search-bar hide-filter-control'>
+                <SearchBar
+                  appName='hipaa-searchbar'
+                  {...searchBarProps}
+                  showDatePicker={true}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                />
+              </div>
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

@@ -56,7 +56,6 @@ export const GitHubPanel = withErrorBoundary(() => {
     setFilters,
   });
 
-
   const handleChangeView = selectedFilter => {
     if (!selectedFilter) {
       return;

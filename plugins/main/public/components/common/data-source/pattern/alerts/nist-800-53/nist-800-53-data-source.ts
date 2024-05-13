@@ -1,10 +1,10 @@
 import { tFilter } from '../../../index';
-import { DATA_SOURCE_FILTER_CONTROLLED_HIPAA_EXIST } from '../../../../../../../common/constants';
+import { DATA_SOURCE_FILTER_CONTROLLED_NIST_800_53_EXIST } from '../../../../../../../common/constants';
 import { AlertsDataSource } from '../alerts-data-source';
 
-const KEY_EXIST = 'rule.hipaa';
+const KEY_EXIST = 'rule.nist_800_53';
 
-export class AlertsHIPAADataSource extends AlertsDataSource {
+export class NIST80053DataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }
@@ -24,7 +24,7 @@ export class AlertsHIPAADataSource extends AlertsDataSource {
             query: null,
             type: 'phrase',
           },
-          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_HIPAA_EXIST,
+          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_NIST_800_53_EXIST,
         },
         exists: {
           field: KEY_EXIST,
