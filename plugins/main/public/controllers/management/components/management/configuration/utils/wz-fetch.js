@@ -66,8 +66,17 @@ export const getCurrentConfig = async (
               ? partialResult.data.data.affected_items[0]
               : {};
         } else {
+          /*
+           * I need to check the amount of properties and use the first one in case there's only one
+           * because the /agents/{agent_id}/config/logcollector/socket response has property named "target" instead of "socket" in versions before Wazuh 4.9.0
+           * this allows to interprete any property name in the response
+           */
+          const configKeys = Object.keys(partialResult.data.data);
+          const configPropertyName =
+            configKeys.length === 1 ? configKeys[0] : configuration;
+
           result[`${component}-${configuration}`] = partialResult.data.data[
-            configuration
+            configPropertyName
           ]
             ? partialResult.data.data
             : {};
