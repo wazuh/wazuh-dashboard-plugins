@@ -8,18 +8,14 @@ import {
   FilterState,
   FilterStateStore,
 } from '../../../../../../src/plugins/data/common';
-import { AppState } from '../../../react-services/app-state';
 import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
 import { tFilter } from '../data-source';
 //@ts-ignore
-import { KbnSearchBar } from '../../kbn-search-bar';
 import { MultiSelect } from './components';
-import { useFilterManager } from '../hooks';
-import useSearchBar, { tUseSearchBarProps } from '../search-bar/use-search-bar';
-import { hideCloseButtonOnFixedFilters } from '../search-bar/search-bar-service';
 import { getCustomValueSuggestion } from '../../../components/overview/office-panel/config/helpers/helper-value-suggestion';
 import { I18nProvider } from '@osd/i18n/react';
 import { getPlugins } from '../../../kibana-services';
+import { tUseSearchBarProps } from '../search-bar/use-search-bar';
 
 type CustomSearchBarProps = {
   filterInputs: {
@@ -33,9 +29,7 @@ type CustomSearchBarProps = {
   setFilters: (filters: tFilter[]) => void;
 };
 
-const plugins = getPlugins();
 const SearchBar = getPlugins().data.ui.SearchBar;
-const TIMEOUT_MILISECONDS = 100;
 
 export const CustomSearchBar = ({
   filterInputs,
@@ -59,28 +53,6 @@ export const CustomSearchBar = ({
   );
   const [values, setValues] = useState(Array);
   const [selectReference, setSelectReference] = useState('');
-
-  const hideRemoveFilter = (retry: number = 0) => {
-    let elements = document.querySelectorAll(
-      '.wz-search-bar .globalFilterItem',
-    );
-    if ((!elements || !filters.length) && retry < 10) {
-      // the setTimeout is used to wait for the DOM elements to be rendered
-      setTimeout(() => {
-        // this is a workaround to hide the close button on fixed filters via vanilla js
-        hideRemoveFilter(++retry);
-      }, TIMEOUT_MILISECONDS);
-    } else {
-      hideCloseButtonOnFixedFilters(filters, elements);
-    }
-  };
-
-  useLayoutEffect(() => {
-    setTimeout(() => {
-      // this is a workaround to hide the close button on fixed filters via vanilla js
-      hideRemoveFilter();
-    }, TIMEOUT_MILISECONDS);
-  }, [filters]);
 
   useEffect(() => {
     setPluginPlatformFilters(values, selectReference);
