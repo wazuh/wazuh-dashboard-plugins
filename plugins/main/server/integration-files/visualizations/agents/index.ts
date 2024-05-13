@@ -16,7 +16,6 @@ import gcp from './agents-gcp';
 import oscap from './agents-oscap';
 import ciscat from './agents-ciscat';
 import mitre from './agents-mitre';
-import nist from './agents-nist';
 import tsc from './agents-tsc';
 import pm from './agents-pm';
 import virustotal from './agents-virustotal';
@@ -33,7 +32,6 @@ export {
   gcp,
   oscap,
   ciscat,
-  nist,
   tsc,
   pm,
   virustotal,

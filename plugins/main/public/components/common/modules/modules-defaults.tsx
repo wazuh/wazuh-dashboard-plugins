@@ -54,6 +54,7 @@ import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
 import { DashboardDocker } from '../../overview/docker/dashboards';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
+import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
 import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
 import {
   AlertsDockerDataSource,
@@ -65,6 +66,7 @@ import {
   AlertsGoogleCloudDataSource,
   AlertsMalwareDetectionDataSource,
   AlertsFIMDataSource,
+  AlertsNIST80053DataSource,
   MitreAttackDataSource,
   AlertsGDPRDataSource,
   AlertsConfigurationAssessmentDataSource,
@@ -397,7 +399,26 @@ export const ModulesDefaults = {
   },
   nist: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(nistColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardNIST80053,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonModuleExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={AlertsNIST80053DataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: nistColumns,
+        DataSource: AlertsNIST80053DataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   gdpr: {

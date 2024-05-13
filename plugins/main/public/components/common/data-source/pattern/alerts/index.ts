@@ -5,6 +5,7 @@ export * from './alerts-hipaa';
 export * from './alerts-docker';
 export * from './alerts-virustotal';
 export * from './alerts-malware-detection';
+export * from './alerts-nist-800-53';
 export * from './alerts-aws';
 export * from './vulnerabilities';
 export * from './mitre-attack';
