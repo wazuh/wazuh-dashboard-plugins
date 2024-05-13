@@ -1,1 +1,1 @@
-export * from './alerts-pci-dss-data-source';
+export * from './pci-dss-data-source';

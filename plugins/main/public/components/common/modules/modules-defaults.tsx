@@ -19,7 +19,7 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
-import { GitHubPanel } from '../../overview/github-panel';
+import { GitHubPanel } from '../../overview/github/panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { DashboardMITRE } from '../../overview/mitre/dashboard';
 import { withModuleNotForAgent } from '../hocs';
@@ -44,12 +44,12 @@ import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
 import { nistColumns } from '../../overview/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/tsc/events/tsc-columns';
-import { githubColumns } from '../../overview/github-panel/events/github-columns';
+import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
-import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
+import { DashboardGitHub } from '../../overview/github/dashboards/dashboard';
 import { DashboardGDPR } from '../../overview/gdpr/dashboards/dashboard';
 import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
 import { DashboardDocker } from '../../overview/docker/dashboards';
@@ -57,22 +57,24 @@ import { DashboardMalwareDetection } from '../../overview/malware-detection/dash
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
 import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
+import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
+import { PCIDSSDataSource } from '../data-source/pattern/alerts/pci-dss/pci-dss-data-source';
 import {
-  AlertsDockerDataSource,
+  DockerDataSource,
   AlertsDataSource,
-  AlertsPCIDSSDataSource,
   AlertsVulnerabilitiesDataSource,
-  AlertsAWSDataSource,
+  AWSDataSource,
   VirusTotalDataSource,
-  AlertsGoogleCloudDataSource,
-  AlertsMalwareDetectionDataSource,
-  AlertsFIMDataSource,
-  AlertsTSCDataSource,
-  AlertsNIST80053DataSource,
+  FIMDataSource,
+  GitHubDataSource,
+  MalwareDetectionDataSource,
+  TSCDataSource,
+  GoogleCloudDataSource,
+  NIST80053DataSource,
   MitreAttackDataSource,
-  AlertsGDPRDataSource,
-  AlertsConfigurationAssessmentDataSource,
-  AlertsHIPAADataSource,
+  GDPRDataSource,
+  ConfigurationAssessmentDataSource,
+  HIPAADataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -139,7 +141,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: fileIntegrityMonitoringColumns,
-        DataSource: AlertsFIMDataSource,
+        DataSource: FIMDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -155,7 +157,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: amazonWebServicesColumns,
-        DataSource: AlertsAWSDataSource,
+        DataSource: AWSDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -171,7 +173,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: googleCloudColumns,
-        DataSource: AlertsGoogleCloudDataSource,
+        DataSource: GoogleCloudDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -188,7 +190,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: malwareDetectionColumns,
-        DataSource: AlertsMalwareDetectionDataSource,
+        DataSource: MalwareDetectionDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -210,7 +212,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: configurationAssessmentColumns,
-        DataSource: AlertsConfigurationAssessmentDataSource,
+        DataSource: ConfigurationAssessmentDataSource,
       }),
     ],
     buttons: ['settings'],
@@ -243,14 +245,22 @@ export const ModulesDefaults = {
   github: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardGitHub,
+      },
       {
         id: 'inventory',
         name: 'Panel',
         buttons: [ButtonModuleExploreAgent],
         component: GitHubPanel,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
+      renderDiscoverTab({
+        tableColumns: githubColumns,
+        DataSource: GitHubDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -346,7 +356,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: dockerColumns,
-        DataSource: AlertsDockerDataSource,
+        DataSource: DockerDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -365,12 +375,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsPCIDSSDataSource} />
+          <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: pciColumns,
-        DataSource: AlertsPCIDSSDataSource,
+        DataSource: PCIDSSDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -389,12 +399,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsHIPAADataSource} />
+          <ComplianceTable {...props} DataSource={HIPAADataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: hipaaColumns,
-        DataSource: AlertsHIPAADataSource,
+        DataSource: HIPAADataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -413,12 +423,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsNIST80053DataSource} />
+          <ComplianceTable {...props} DataSource={NIST80053DataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: nistColumns,
-        DataSource: AlertsNIST80053DataSource,
+        DataSource: NIST80053DataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -437,12 +447,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsGDPRDataSource} />
+          <ComplianceTable {...props} DataSource={GDPRDataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: gdprColumns,
-        DataSource: AlertsGDPRDataSource,
+        DataSource: GDPRDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -461,12 +471,12 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonModuleExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsTSCDataSource} />
+          <ComplianceTable {...props} DataSource={TSCDataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: tscColumns,
-        DataSource: AlertsTSCDataSource,
+        DataSource: TSCDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],

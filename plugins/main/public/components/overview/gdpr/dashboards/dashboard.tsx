@@ -17,7 +17,7 @@ import {
 } from '../../../../react-services/error-management';
 import { compose } from 'redux';
 import { SampleDataWarning } from '../../../visualize/components';
-import { AlertsGDPRDataSource } from '../../../common/data-source/pattern/alerts/alerts-gdpr/alerts-gdpr-data-source';
+import { GDPRDataSource } from '../../../common/data-source/pattern/alerts/gdpr/gdpr-data-source';
 import {
   AlertsDataSourceRepository,
   PatternDataSource,
@@ -40,7 +40,7 @@ const DashboardGDPRComponent: React.FC = () => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsGDPRDataSource,
+    DataSource: GDPRDataSource,
     repository: new AlertsDataSourceRepository(),
   });
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -88,16 +88,16 @@ const DashboardGDPRComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='gdpr-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            </div>
-          )}
+              <div className='wz-search-bar hide-filter-control'>
+                <SearchBar
+                  appName='gdpr-searchbar'
+                  {...searchBarProps}
+                  showDatePicker={true}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                />
+              </div>
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
