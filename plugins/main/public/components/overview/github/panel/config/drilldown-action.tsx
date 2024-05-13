@@ -182,7 +182,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                         });
                       }}
                     >
-                      { value}
+                      {value}
                     </EuiLink >
                   ),
                 },

@@ -183,7 +183,7 @@ export const DrilldownConfigOrganization = (
                         });
                       }}
                     >
-                      { value}
+                      {value}
                     </EuiLink >
                   ),
                 },

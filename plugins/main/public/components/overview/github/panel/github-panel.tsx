@@ -78,29 +78,29 @@ export const GitHubPanel = withErrorBoundary(() => {
       {isDataSourceLoading ? (
         <LoadingSpinner />
       ) : (
-          <>
-            <CustomSearchBar
-              filterInputs={filtersValues}
-              filterDrillDownValue={drillDownValue}
-              searchBarProps={searchBarProps}
-              setFilters={setFilters}
-              indexPattern={dataSource.indexPattern}
-            />
-            <MainPanel
-              moduleConfig={ModuleConfig}
-              filterDrillDownValue={filterDrillDownValue}
-              sidePanelChildren={<ModuleConfiguration />}
-              onChangeView={handleChangeView}
-              dataSourceProps={{
-                fetchData,
-                fetchFilters,
-                searchBarProps,
-                indexPattern: dataSource?.indexPattern,
-              }}
-              isLoading={isDataSourceLoading}
-            />
-          </>
-        )}
+        <>
+          <CustomSearchBar
+            filterInputs={filtersValues}
+            filterDrillDownValue={drillDownValue}
+            searchBarProps={searchBarProps}
+            setFilters={setFilters}
+            indexPattern={dataSource.indexPattern}
+          />
+          <MainPanel
+            moduleConfig={ModuleConfig}
+            filterDrillDownValue={filterDrillDownValue}
+            sidePanelChildren={<ModuleConfiguration />}
+            onChangeView={handleChangeView}
+            dataSourceProps={{
+              fetchData,
+              fetchFilters,
+              searchBarProps,
+              indexPattern: dataSource?.indexPattern,
+            }}
+            isLoading={isDataSourceLoading}
+          />
+        </>
+      )}
     </>
   );
 });

@@ -75,7 +75,7 @@ export const mitreAttackColumns: tDataGridColumn[] = [
           });
         }}
       >
-        { value}
+        {value}
       </EuiLink >
     ),
   },

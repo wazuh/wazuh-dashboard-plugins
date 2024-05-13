@@ -36,6 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Remove some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
 - Move AngularJS controller for the agent view to ReactJS [#6618](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6618)
 - Implement new data source feature on MITRE ATT&CK module [#6482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6482)
+- Changed agent log collector socket API response controller component [#6660](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6660)
 
 ### Fixed
 
