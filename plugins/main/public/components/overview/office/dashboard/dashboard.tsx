@@ -109,7 +109,7 @@ const DashboardOffice365Component: React.FC = () => {
                   viewMode: ViewMode.VIEW,
                   panels: getKPIsPanel(dataSource.id),
                   isFullScreenMode: false,
-                  filters: searchBarProps.filters ?? [],
+                  filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'kpis-th-dashboard-tab',
                   timeRange: {
