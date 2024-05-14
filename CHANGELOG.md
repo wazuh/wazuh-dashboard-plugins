@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added macOS log collector tab [#6545](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6545)
 - Add ability to disable the edition of configuration through API endpoints and UI [#6557](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6557)
 - Added journald log collector tab [#6572](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6572)
+- Added HAProxy helper settings to cluster configuration [#6653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6653)
 
 ### Changed
 
