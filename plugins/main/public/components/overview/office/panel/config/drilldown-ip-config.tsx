@@ -27,6 +27,7 @@ import {
 import { AppNavigate } from '../../../../../react-services';
 import DrillDownDataGrid from '../../../github/panel/config/drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -127,15 +128,17 @@ export const drilldownIPConfig = (props) => {
                 { id: 'rule.level', displayAsText: 'Level' },
                 {
                   id: 'rule.id', render: value => (
-                    <EuiLink
-                      onClick={e => {
-                        getCore().application.navigateToApp(rules.id, {
-                          path: `#/manager/?tab=rules&redirectRule=${value}`,
-                        });
-                      }}
-                    >
-                      { value}
-                    </EuiLink >
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiLink
+                        onClick={e => {
+                          getCore().application.navigateToApp(rules.id, {
+                            path: `#/manager/?tab=rules&redirectRule=${value}`,
+                          });
+                        }}
+                      >
+                        {value}
+                      </EuiLink >
+                    </RedirectAppLinks>
                   ),
                 },
               ]

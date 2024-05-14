@@ -40,6 +40,7 @@ import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/comm
 import { connect } from 'react-redux';
 import { rules } from '../../../../../utils/applications';
 import { endpointSummary } from '../../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const renderRequirements = (value: []) => {
   return (
@@ -78,22 +79,23 @@ export const RequirementFlyout = connect(mapStateToProps)(
       const agentId = this.props.currentAgentData?.id;
       return agentId
         ? [
-            {
-              id: 'timestamp',
-              displayAsText: 'Time',
-              render: value => formatUIDate(value),
-            },
-            {
-              id: this.props.getRequirementKey(),
-              displayAsText: 'Requirement(s)',
-              render: renderRequirements,
-            },
-            { id: 'rule.description', displayAsText: 'Description' },
-            { id: 'rule.level', displayAsText: 'Level' },
-            {
-              id: 'rule.id',
-              displayAsText: 'Rule ID',
-              render: value => (
+          {
+            id: 'timestamp',
+            displayAsText: 'Time',
+            render: value => formatUIDate(value),
+          },
+          {
+            id: this.props.getRequirementKey(),
+            displayAsText: 'Requirement(s)',
+            render: renderRequirements,
+          },
+          { id: 'rule.description', displayAsText: 'Description' },
+          { id: 'rule.level', displayAsText: 'Level' },
+          {
+            id: 'rule.id',
+            displayAsText: 'Rule ID',
+            render: value => (
+              <RedirectAppLinks application={getCore().application}>
                 <EuiLink
                   onClick={e => {
                     getCore().application.navigateToApp(rules.id, {
@@ -102,46 +104,48 @@ export const RequirementFlyout = connect(mapStateToProps)(
                   }}
                 >
                   {value}
-                </EuiLink>
-              ),
-            },
-          ]
+                </EuiLink >
+              </RedirectAppLinks>
+            ),
+          },
+        ]
         : [
-            {
-              id: 'timestamp',
-              displayAsText: 'Time',
-              render: value => formatUIDate(value),
-            },
-            {
-              id: 'agent.id',
-              displayAsText: 'Agent',
-              render: value => (
-                <EuiLink
-                  onClick={e => {
-                    getCore().application.navigateToApp(endpointSummary.id, {
-                      path: `#/agents/?tab=welcome&agent=${value}`,
-                    });
-                  }}
-                >
-                  {value}
-                </EuiLink>
-              ),
-            },
-            {
-              id: 'agent.name',
-              displayAsText: 'Agent name',
-            },
-            {
-              id: this.props.getRequirementKey(),
-              displayAsText: 'Requirement',
-              render: renderRequirements,
-            },
-            { id: 'rule.description', displayAsText: 'Description' },
-            { id: 'rule.level', displayAsText: 'Level' },
-            {
-              id: 'rule.id',
-              displayAsText: 'Rule ID',
-              render: value => (
+          {
+            id: 'timestamp',
+            displayAsText: 'Time',
+            render: value => formatUIDate(value),
+          },
+          {
+            id: 'agent.id',
+            displayAsText: 'Agent',
+            render: value => (
+              <EuiLink
+                onClick={e => {
+                  getCore().application.navigateToApp(endpointSummary.id, {
+                    path: `#/agents/?tab=welcome&agent=${value}`,
+                  });
+                }}
+              >
+                {value}
+              </EuiLink>
+            ),
+          },
+          {
+            id: 'agent.name',
+            displayAsText: 'Agent name',
+          },
+          {
+            id: this.props.getRequirementKey(),
+            displayAsText: 'Requirement',
+            render: renderRequirements,
+          },
+          { id: 'rule.description', displayAsText: 'Description' },
+          { id: 'rule.level', displayAsText: 'Level' },
+          {
+            id: 'rule.id',
+            displayAsText: 'Rule ID',
+            render: value => (
+              <RedirectAppLinks application={getCore().application}>
                 <EuiLink
                   onClick={e => {
                     getCore().application.navigateToApp(rules.id, {
@@ -150,10 +154,11 @@ export const RequirementFlyout = connect(mapStateToProps)(
                   }}
                 >
                   {value}
-                </EuiLink>
-              ),
-            },
-          ];
+                </EuiLink >
+              </RedirectAppLinks>
+            ),
+          },
+        ];
     }
 
     renderHeader() {
@@ -165,10 +170,10 @@ export const RequirementFlyout = connect(mapStateToProps)(
               <EuiLoadingContent lines={1} />
             </div>
           )) || (
-            <EuiTitle size='m'>
-              <h2 id='flyoutSmallTitle'>Requirement {currentRequirement}</h2>
-            </EuiTitle>
-          )}
+              <EuiTitle size='m'>
+                <h2 id='flyoutSmallTitle'>Requirement {currentRequirement}</h2>
+              </EuiTitle>
+            )}
         </EuiFlyoutHeader>
       );
     }

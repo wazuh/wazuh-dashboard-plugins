@@ -4,6 +4,7 @@ import { tDataGridColumn } from '../../../../../../../common/data-grid';
 import { EuiLink, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { getCore } from '../../../../../../../../kibana-services';
 import { rules } from '../../../../../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const navigateTo = (ev, section, params) => {
   AppNavigate.navigateToModule(ev, section, params);
@@ -60,15 +61,17 @@ export const techniquesColumns: tDataGridColumn[] = [
     id: 'rule.id',
     displayAsText: 'Rule ID',
     render: (value) => (
-      <EuiLink
-        onClick={e => {
-          getCore().application.navigateToApp(rules.id, {
-            path: `#/manager/?tab=rules&redirectRule=${value}`,
-          });
-        }}
-      >
-        { value}
-      </EuiLink >
+      <RedirectAppLinks application={getCore().application}>
+        <EuiLink
+          onClick={e => {
+            getCore().application.navigateToApp(rules.id, {
+              path: `#/manager/?tab=rules&redirectRule=${value}`,
+            });
+          }}
+        >
+          {value}
+        </EuiLink >
+      </RedirectAppLinks>
     ),
   },
   { id: 'rule.description', displayAsText: 'Description' },
@@ -87,15 +90,17 @@ export const agentTechniquesColumns: tDataGridColumn[] = [
     id: 'rule.id',
     displayAsText: 'Rule ID',
     render: (value) => (
-      <EuiLink
-        onClick={e => {
-          getCore().application.navigateToApp(rules.id, {
-            path: `#/manager/?tab=rules&redirectRule=${value}`,
-          });
-        }}
-      >
-        { value}
-      </EuiLink >
+      <RedirectAppLinks application={getCore().application}>
+        <EuiLink
+          onClick={e => {
+            getCore().application.navigateToApp(rules.id, {
+              path: `#/manager/?tab=rules&redirectRule=${value}`,
+            });
+          }}
+        >
+          {value}
+        </EuiLink >
+      </RedirectAppLinks>
     ),
   },
   { id: 'rule.description', displayAsText: 'Description' },

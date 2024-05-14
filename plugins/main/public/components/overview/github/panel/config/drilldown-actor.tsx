@@ -27,6 +27,7 @@ import { ModuleConfigProps } from './module-config';
 import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
 import DrillDownDataGrid from './drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -173,15 +174,17 @@ export const DrilldownConfigActor = (drilldownProps: ModuleConfigProps) => {
                 { id: 'rule.level' },
                 {
                   id: 'rule.id', render: value => (
-                    <EuiLink
-                      onClick={e => {
-                        getCore().application.navigateToApp(rules.id, {
-                          path: `#/manager/?tab=rules&redirectRule=${value}`,
-                        });
-                      }}
-                    >
-                      {value}
-                    </EuiLink >
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiLink
+                        onClick={e => {
+                          getCore().application.navigateToApp(rules.id, {
+                            path: `#/manager/?tab=rules&redirectRule=${value}`,
+                          });
+                        }}
+                      >
+                        {value}
+                      </EuiLink >
+                    </RedirectAppLinks>
                   ),
                 }
               ]

@@ -68,15 +68,17 @@ export const mitreAttackColumns: tDataGridColumn[] = [
     id: 'rule.id',
     displayAsText: 'Rule ID',
     render: value => (
-      <EuiLink
-        onClick={e => {
-          getCore().application.navigateToApp(rules.id, {
-            path: `#/manager/?tab=rules&redirectRule=${value}`,
-          });
-        }}
-      >
-        {value}
-      </EuiLink >
+      <RedirectAppLinks application={getCore().application}>
+        <EuiLink
+          onClick={e => {
+            getCore().application.navigateToApp(rules.id, {
+              path: `#/manager/?tab=rules&redirectRule=${value}`,
+            });
+          }}
+        >
+          {value}
+        </EuiLink >
+      </RedirectAppLinks>
     ),
   },
 ];
