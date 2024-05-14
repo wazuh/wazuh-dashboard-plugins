@@ -42,6 +42,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed the scripted fields disappear when the fields of the events index pattern was refreshed [#6237](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6237)
+- Fixed the sample alerts scripts to generate valid IP ranges and file hashes [#6667](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6667)
 
 ### Removed
 
