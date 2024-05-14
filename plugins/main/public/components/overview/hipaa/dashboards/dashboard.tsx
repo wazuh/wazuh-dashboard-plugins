@@ -24,6 +24,7 @@ import {
   useDataSource,
 } from '../../../common/data-source';
 import { HIPAADataSource } from '../../../common/data-source/pattern/alerts/hipaa/hipaa-data-source';
+import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
 const plugins = getPlugins();
 
@@ -52,6 +53,18 @@ const DashboardHIPAAComponent: React.FC = () => {
   });
 
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useReportingCommunicateSearchContext({
+    isSearching: isDataSourceLoading,
+    totalResults: results?.hits?.total ?? 0,
+    indexPattern: dataSource?.indexPattern,
+    filters: fetchFilters,
+    query: query,
+    time: {
+      from: dateRangeFrom,
+      to: dateRangeTo,
+    },
+  });
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -89,16 +102,16 @@ const DashboardHIPAAComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <div className='wz-search-bar hide-filter-control'>
-                <SearchBar
-                  appName='hipaa-searchbar'
-                  {...searchBarProps}
-                  showDatePicker={true}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                />
-              </div>
-            )}
+            <div className='wz-search-bar hide-filter-control'>
+              <SearchBar
+                appName='hipaa-searchbar'
+                {...searchBarProps}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            </div>
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
