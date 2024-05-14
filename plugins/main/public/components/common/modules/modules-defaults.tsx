@@ -96,17 +96,6 @@ const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   };
 };
 
-const RegulatoryComplianceTabs = columns => [
-  DashboardTab,
-  {
-    id: 'inventory',
-    name: 'Controls',
-    buttons: [ButtonModuleExploreAgent],
-    component: ComplianceTable,
-  },
-  renderDiscoverTab(DEFAULT_INDEX_PATTERN, columns),
-];
-
 export const ModulesDefaults = {
   general: {
     init: 'events',
