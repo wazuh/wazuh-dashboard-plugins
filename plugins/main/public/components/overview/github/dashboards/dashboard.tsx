@@ -76,6 +76,10 @@ const DashboardGitHubComponent: React.FC = () => {
     }
     fetchData({
       query,
+      dateRange: {
+        to: dateRangeTo,
+        from: dateRangeFrom,
+      },
     })
       .then(results => {
         setResults(results);
