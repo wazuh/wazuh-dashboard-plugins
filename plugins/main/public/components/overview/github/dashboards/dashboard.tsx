@@ -87,7 +87,12 @@ const DashboardGitHubComponent: React.FC = () => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
+  ]);
 
   return (
     <>
