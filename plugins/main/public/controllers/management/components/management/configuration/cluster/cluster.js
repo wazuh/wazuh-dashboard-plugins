@@ -17,7 +17,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import withWzConfig from '../util-hocs/wz-config';
-import { isString } from '../utils/utils';
+import { isString, renderValueOrNoValue } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -62,7 +62,11 @@ const haproxySettings = [
     label: 'Remove disconnected node after',
   },
   { field: 'haproxy_helper.haproxy_resolver', label: 'Resolver' },
-  { field: 'haproxy_helper.excluded_nodes', label: 'Excluded nodes' },
+  {
+    field: 'haproxy_helper.excluded_nodes',
+    label: 'Excluded nodes',
+    render: renderValueOrNoValue,
+  },
 ];
 
 const helpLinks = [
