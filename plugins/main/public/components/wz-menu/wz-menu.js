@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import {
   EuiFlexGroup,
@@ -19,15 +19,12 @@ import {
   EuiCallOut,
   EuiToolTip,
   EuiLoadingSpinner,
-  EuiFormRow,
   EuiSelect,
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
-import WzReduxProvider from '../../redux/wz-redux-provider';
-import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import {
   getAngularModule,
@@ -422,23 +419,6 @@ export const WzMenu = withWindowSize(
         </EuiCallOut>,
         container[0],
       );
-    }
-
-    removeSelectedAgent() {
-      store.dispatch(updateCurrentAgentData({}));
-      if (window.location.href.includes('/agents?')) {
-        window.location.href = '#/agents-preview';
-        this.router.reload();
-        return;
-      }
-      const { filterManager } = getDataPlugin().query;
-      const currentAppliedFilters = filterManager.getFilters();
-      const agentFilters = currentAppliedFilters.filter(x => {
-        return x.meta.key === 'agent.id';
-      });
-      agentFilters.map(x => {
-        filterManager.removeFilter(x);
-      });
     }
 
     getApiSelectorComponent() {

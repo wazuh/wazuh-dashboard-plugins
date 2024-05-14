@@ -61,7 +61,6 @@ export const Overview: React.FC = () => {
       ...appStateContainer,
       set: (value: AppState | null) => {
         if (value) {
-          previousAppState = appStateContainer.getState();
           appStateContainer.set(value);
         }
       },

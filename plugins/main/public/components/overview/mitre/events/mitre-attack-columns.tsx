@@ -5,7 +5,7 @@ import React from 'react';
 import { formatUIDate } from '../../../../react-services';
 import { getCore } from '../../../../kibana-services';
 import { rules } from '../../../../utils/applications';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const navigateTo = (ev, section, params) => {
   AppNavigate.navigateToModule(ev, section, params);

@@ -28,6 +28,14 @@ export class PinnedAgentManager {
     return pinnedAgent?.id === agentData?.id;
   }
 
+  private checkValidAgentId(agentId: string | null): boolean {
+    if (!agentId) {
+      return false;
+    }
+    const regex = /^[0-9]+$/;
+    return regex.test(agentId);
+  }
+
   pinAgent(agentData: any): void {
     const isPinnedAgent = this.isPinnedAgent();
     if (isPinnedAgent && this.equalToPinnedAgent(agentData)) {
@@ -66,18 +74,29 @@ export class PinnedAgentManager {
       : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY;
     const regex = new RegExp('[?&]' + keyToMatch + '[^&]*');
     const pinnedAgentByUrl = locationHref.match(regex);
+    const agentIdValueUrl = pinnedAgentByUrl
+      ? pinnedAgentByUrl[0].split('=')[1]
+      : null;
+    const isValidAgentId = this.checkValidAgentId(agentIdValueUrl);
     const pinnedAgentByStore = this.isPinnedAgent();
-    const mustBeSynchronized = !pinnedAgentByUrl === pinnedAgentByStore;
-    if (mustBeSynchronized) {
-      if (pinnedAgentByUrl) {
-        const agentIdValueUrl = pinnedAgentByUrl[0].split('=')[1];
-        const data = await WzRequest.apiReq('GET', '/agents', {
-          params: { q: 'id=' + agentIdValueUrl },
-        });
-        const formattedData = data?.data?.data?.affected_items?.[0];
-        this.pinAgent(formattedData);
-      } else {
-        this.unPinAgent();
+    if (pinnedAgentByUrl && !isValidAgentId) {
+      this.unPinAgent();
+    } else {
+      const mustBeSynchronized = !pinnedAgentByUrl === pinnedAgentByStore;
+      if (mustBeSynchronized) {
+        try {
+          if (isValidAgentId) {
+            const data = await WzRequest.apiReq('GET', '/agents', {
+              params: { q: 'id=' + agentIdValueUrl },
+            });
+            const formattedData = data?.data?.data?.affected_items?.[0];
+            this.pinAgent(formattedData);
+          } else {
+            this.unPinAgent();
+          }
+        } catch (_error) {
+          this.unPinAgent();
+        }
       }
     }
   }
