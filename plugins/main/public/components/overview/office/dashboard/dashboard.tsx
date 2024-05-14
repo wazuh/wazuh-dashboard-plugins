@@ -87,7 +87,7 @@ const DashboardOffice365Component: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <div className='wz-search-bar'>
+              <div className='wz-search-bar hide-filter-control'>
                 <SearchBar
                   appName='google-cloud-searchbar'
                   {...searchBarProps}
