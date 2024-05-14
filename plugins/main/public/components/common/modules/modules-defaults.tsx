@@ -58,7 +58,6 @@ import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
 import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
 import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
-import { PCIDSSDataSource } from '../data-source/pattern/alerts/pci-dss/pci-dss-data-source';
 import {
   DockerDataSource,
   AlertsDataSource,
@@ -75,6 +74,7 @@ import {
   GDPRDataSource,
   ConfigurationAssessmentDataSource,
   HIPAADataSource,
+  PCIDSSDataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
