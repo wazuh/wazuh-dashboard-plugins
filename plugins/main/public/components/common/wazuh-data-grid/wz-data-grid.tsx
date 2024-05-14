@@ -110,7 +110,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
   const onClickExportResults = async () => {
     const params = {
       indexPattern: indexPattern as IndexPattern,
-      exportFilters,
+      filters: exportFilters,
       query,
       fields: columnVisibility.visibleColumns,
       pagination: {

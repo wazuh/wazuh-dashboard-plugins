@@ -161,7 +161,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const onClickExportResults = async () => {
     const params = {
       indexPattern: indexPattern as IndexPattern,
-      fetchFilters,
+      filters: fetchFilters,
       query,
       fields: columnVisibility.visibleColumns,
       pagination: {
@@ -196,16 +196,16 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-discover hide-filter-control wz-search-bar'>
-              <SearchBar
-                appName='wazuh-discover-search-bar'
-                {...searchBarProps}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            </div>
-          )}
+              <div className='wz-discover hide-filter-control wz-search-bar'>
+                <SearchBar
+                  appName='wazuh-discover-search-bar'
+                  {...searchBarProps}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                  showSaveQuery={true}
+                />
+              </div>
+            )}
           {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
