@@ -3,6 +3,8 @@ import { AppNavigate } from '../../../../react-services';
 import { tDataGridColumn } from '../../../common/data-grid';
 import React from 'react';
 import { formatUIDate } from '../../../../react-services';
+import { getCore } from '../../../../kibana-services';
+import { rules } from '../../../../utils/applications';
 
 const navigateTo = (ev, section, params) => {
   AppNavigate.navigateToModule(ev, section, params);
@@ -66,16 +68,13 @@ export const mitreAttackColumns: tDataGridColumn[] = [
     id: 'rule.id',
     displayAsText: 'Rule ID',
     render: value => (
-      <EuiLink
-        onClick={e =>
-          navigateTo(e, 'manager', {
-            tab: 'rules',
-            redirectRule: value,
-          })
-        }
-      >
-        {value}
-      </EuiLink>
+      <RedirectAppLinks application={getCore().application}>
+        <EuiLink
+          href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
+        >
+          {value}
+        </EuiLink >
+      </RedirectAppLinks>
     ),
   },
 ];

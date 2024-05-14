@@ -1,5 +1,6 @@
 /*
- * Wazuh app - GitHub Panel tab - Drilldown layout configuration
+ * Wazuh app - Office 365 Drilldown Rules field Config.
+ *
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,22 +11,20 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
+import React from 'react';
+import { VisCard } from '../../../../common/modules/panel';
+import { EuiFlexItem, EuiPanel, EuiLink } from '@elastic/eui';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import {
-  getVisStateTopActions,
-  getVisStateRuleLevelEvolution,
-  getVisStateTopCountries,
-  getVisStateTopOrganizations,
-  getVisStateTopRepositories,
+  getVisStateOfficeTopOperations,
+  getVisStateTopOfficeUsers,
+  getVisStateOfficeCountryTagCloud,
+  getVisStateOfficeAlertsEvolutionByUserID,
 } from './visualizations';
-import { ModuleConfigProps } from './module-config';
-import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
-import DrillDownDataGrid from './drilldown-data-grid';
+import DrillDownDataGrid from '../../../github/panel/config/drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
@@ -42,8 +41,8 @@ const getDashboardPanels = (
   return {
     d0: {
       gridData: {
-        w: 16,
-        h: 11,
+        w: 15,
+        h: 14,
         x: 0,
         y: 0,
         i: 'd0',
@@ -51,76 +50,63 @@ const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'd0',
-        savedVis: getVisStateTopActions(indexPatternId),
+        savedVis: getVisStateOfficeTopOperations(indexPatternId),
       },
     },
     d1: {
       gridData: {
-        w: 16,
-        h: 11,
-        x: 16,
+        w: 15,
+        h: 14,
+        x: 15,
         y: 0,
         i: 'd1',
       },
       type: 'visualization',
       explicitInput: {
         id: 'd1',
-        savedVis: getVisStateTopRepositories(indexPatternId),
+        savedVis: getVisStateTopOfficeUsers(indexPatternId),
       },
     },
     d2: {
       gridData: {
-        w: 16,
-        h: 11,
-        x: 32,
+        w: 18,
+        h: 14,
+        x: 30,
         y: 0,
         i: 'd2',
       },
       type: 'visualization',
       explicitInput: {
         id: 'd2',
-        savedVis: getVisStateTopOrganizations(indexPatternId),
+        savedVis: getVisStateOfficeCountryTagCloud(indexPatternId),
       },
     },
     d3: {
       gridData: {
-        w: 24,
+        w: 48,
         h: 11,
         x: 0,
-        y: 11,
+        y: 14,
         i: 'd3',
       },
       type: 'visualization',
       explicitInput: {
         id: 'd3',
-        savedVis: getVisStateTopCountries(indexPatternId),
-      },
-    },
-    d4: {
-      gridData: {
-        w: 24,
-        h: 11,
-        x: 24,
-        y: 11,
-        i: 'd4',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd4',
-        savedVis: getVisStateRuleLevelEvolution(indexPatternId),
+        savedVis: getVisStateOfficeAlertsEvolutionByUserID(indexPatternId),
       },
     },
   };
 };
 
-export const DrilldownConfigActor = (drilldownProps: ModuleConfigProps) => {
+export const drilldownRulesConfig = (props) => {
 
   const {
     fetchData,
     fetchFilters,
     searchBarProps,
     indexPattern
-  } = drilldownProps;
+  } = props;
+
 
   return {
     rows: [
@@ -129,49 +115,20 @@ export const DrilldownConfigActor = (drilldownProps: ModuleConfigProps) => {
           {
             width: 100,
             component: props => {
-              return (
-                <div style={{ width: '100%' }}>
-                  <DashboardByRenderer
-                    input={{
-                      viewMode: ViewMode.VIEW,
-                      panels: getDashboardPanels(indexPattern.id),
-                      isFullScreenMode: false,
-                      filters: fetchFilters ?? [],
-                      useMargins: true,
-                      id: 'github-drilldown-action-dashboard-tab',
-                      timeRange: {
-                        from: searchBarProps.dateRangeFrom,
-                        to: searchBarProps.dateRangeTo
-                      },
-                      title: 'GitHub drilldown action dashboard',
-                      description: 'Dashboard of the GitHub drilldown action',
-                      query: searchBarProps.query,
-                      refreshConfig: {
-                        pause: false,
-                        value: 15,
-                      },
-                      hidePanelTitles: false,
-                    }}
-                    onInputUpdated={() => { }}
-                  />
-                </div>
-              );
-            },
-          },
-        ],
-      },
-      {
-        columns: [
-          {
-            width: 100,
-            component: () => {
+
               const defaultTableColumns = [
                 { id: 'timestamp' },
-                { id: 'rule.description' },
-                { id: 'data.github.org', displayAsText: 'Organization' },
-                { id: 'data.github.repo', displayAsText: 'Repository' },
-                { id: 'data.github.action', displayAsText: 'Action' },
-                { id: 'rule.level' },
+                { id: 'rule.description', displayAsText: 'Description' },
+                { id: 'data.office365.UserId', displayAsText: 'User ID' },
+                {
+                  id: 'data.office365.ClientIP',
+                  displayAsText: 'Client IP address',
+                },
+                {
+                  id: 'data.office365.Operation',
+                  displayAsText: 'Operation',
+                },
+                { id: 'rule.level', displayAsText: 'Level' },
                 {
                   id: 'rule.id', render: value => (
                     <RedirectAppLinks application={getCore().application}>
@@ -182,22 +139,49 @@ export const DrilldownConfigActor = (drilldownProps: ModuleConfigProps) => {
                       </EuiLink >
                     </RedirectAppLinks>
                   ),
-                }
+                },
               ]
 
               return (
-                <DrillDownDataGrid
-                  defaultTableColumns={defaultTableColumns}
-                  fetchData={fetchData}
-                  fetchFilters={fetchFilters}
-                  searchBarProps={searchBarProps}
-                  indexPattern={indexPattern}
-                />
-              )
+                <div style={{ width: '100%' }}>
+                  <DashboardByRenderer
+                    input={{
+                      viewMode: ViewMode.VIEW,
+                      panels: getDashboardPanels(indexPattern.id),
+                      isFullScreenMode: false,
+                      filters: fetchFilters ?? [],
+                      useMargins: true,
+                      id: 'office-drilldown-ip-config-panel-tab',
+                      timeRange: {
+                        from: searchBarProps.dateRangeFrom,
+                        to: searchBarProps.dateRangeTo,
+                      },
+                      title: 'Office drilldown ip config dashboard',
+                      description: 'Dashboard of the Office drilldown ip config',
+                      query: searchBarProps.query,
+                      refreshConfig: {
+                        pause: false,
+                        value: 15,
+                      },
+                      hidePanelTitles: false,
+                    }}
+                    onInputUpdated={() => { }}
+                  />
+                  <EuiFlexItem>
+                    <DrillDownDataGrid
+                      defaultTableColumns={defaultTableColumns}
+                      fetchData={fetchData}
+                      fetchFilters={fetchFilters}
+                      searchBarProps={searchBarProps}
+                      indexPattern={indexPattern}
+                    />
+                  </EuiFlexItem>
+                </div>
+              );
             },
-          }
+          },
         ],
       },
     ],
   };
-};
+}

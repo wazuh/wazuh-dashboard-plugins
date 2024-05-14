@@ -12,8 +12,13 @@
  */
 
 import React from 'react';
-import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiTitle } from '@elastic/eui';
-import { VisConfigLayout } from '../../../common/modules/panel/components';
+import {
+  EuiButtonEmpty,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTitle,
+} from '@elastic/eui';
+import { VisConfigLayout } from '../../../../common/modules/panel/components';
 
 export const OfficeDrilldown = ({
   title = '',
@@ -32,11 +37,14 @@ export const OfficeDrilldown = ({
       <EuiFlexGroup className={'wz-margin-0'}>
         <EuiFlexItem grow={false}>
           <div>
-            <EuiButtonEmpty onClick={() => rowClickHandler()} iconType={'sortLeft'} />
+            <EuiButtonEmpty
+              onClick={() => rowClickHandler()}
+              iconType={'sortLeft'}
+            />
           </div>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiTitle size="s">
+          <EuiTitle size='s'>
             <h3>{title}</h3>
           </EuiTitle>
           <p>{selectedFilter.value}</p>

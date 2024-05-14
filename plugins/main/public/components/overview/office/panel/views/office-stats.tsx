@@ -13,9 +13,9 @@
 
 import React from 'react';
 import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
-import { PanelModuleConfiguration } from '../../../common/modules/panel';
-import { LogoOffice365 } from '../../../common/logos';
-import { renderValueYesThenEnabled } from '../../../../controllers/management/components/management/configuration/utils/utils';
+import { PanelModuleConfiguration } from '../../../../common/modules/panel';
+import { LogoOffice365 } from '../../../../common/logos';
+import { renderValueYesThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
 
 const settings = [
   {
@@ -25,7 +25,7 @@ const settings = [
   },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since manager was started',
+    label: 'Collect events generated since Wazuh manager was started',
   },
   {
     field: 'curl_max_size',
