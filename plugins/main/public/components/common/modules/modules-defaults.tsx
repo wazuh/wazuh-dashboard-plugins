@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { Dashboard } from './dashboard';
 import { MainSca } from '../../agents/sca';
 import { DashboardAWS } from '../../overview/amazon-web-services/dashboards';
 import { MainMitre } from './main-mitre';
@@ -17,8 +16,8 @@ import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence
 import { MainFim } from '../../agents/fim';
 import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
-import { OfficePanel } from '../../overview/office-panel';
-import { GitHubPanel } from '../../overview/github-panel';
+import { OfficePanel } from '../../overview/office/panel';
+import { GitHubPanel } from '../../overview/github/panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { DashboardMITRE } from '../../overview/mitre/dashboard';
 import { withModuleNotForAgent } from '../hocs';
@@ -28,6 +27,7 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
+import { DashboardOffice365 } from '../../overview/office/dashboard';
 import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
 import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
 import { DashboardGoogleCloud } from '../../overview/google-cloud/dashboards';
@@ -35,7 +35,7 @@ import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
 import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
-import { office365Columns } from '../../overview/office-panel/events/office-365-columns';
+import { office365Columns } from '../../overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 import { pciColumns } from '../../overview/pci/events/pci-columns';
@@ -43,39 +43,40 @@ import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
 import { nistColumns } from '../../overview/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/tsc/events/tsc-columns';
-import { githubColumns } from '../../overview/github-panel/events/github-columns';
+import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import { DashboardGitHub } from '../../overview/github/dashboards/dashboard';
+import { DashboardGDPR } from '../../overview/gdpr/dashboards/dashboard';
 import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
 import { DashboardDocker } from '../../overview/docker/dashboards';
 import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
 import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
-import { MitreAttackDataSource } from '../data-source/pattern/alerts/mitre-attack/mitre-attack-data-source';
+import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
+import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
+import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
+import { PCIDSSDataSource } from '../data-source/pattern/alerts/pci-dss/pci-dss-data-source';
 import {
-  AlertsDockerDataSource,
+  DockerDataSource,
   AlertsDataSource,
-  AlertsPCIDSSDataSource,
   AlertsVulnerabilitiesDataSource,
-  AlertsAWSDataSource,
+  AWSDataSource,
   VirusTotalDataSource,
-  AlertsGoogleCloudDataSource,
-  AlertsMalwareDetectionDataSource,
-  AlertsFIMDataSource,
-  AlertsConfigurationAssessmentDataSource,
+  FIMDataSource,
+  GitHubDataSource,
+  MalwareDetectionDataSource,
+  TSCDataSource,
+  GoogleCloudDataSource,
+  NIST80053DataSource,
+  MitreAttackDataSource,
+  GDPRDataSource,
+  ConfigurationAssessmentDataSource,
+  HIPAADataSource,
+  Office365DataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
-
-const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
-const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
-
-const DashboardTab = {
-  id: 'dashboard',
-  name: 'Dashboard',
-  buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-  component: Dashboard,
-};
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -85,17 +86,6 @@ const renderDiscoverTab = (props: WazuhDiscoverProps) => {
     component: () => <WazuhDiscover {...props} />,
   };
 };
-
-const RegulatoryComplianceTabs = columns => [
-  DashboardTab,
-  {
-    id: 'inventory',
-    name: 'Controls',
-    buttons: [ButtonExploreAgent],
-    component: ComplianceTable,
-  },
-  renderDiscoverTab(DEFAULT_INDEX_PATTERN, columns),
-];
 
 export const ModulesDefaults = {
   general: {
@@ -131,7 +121,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: fileIntegrityMonitoringColumns,
-        DataSource: AlertsFIMDataSource,
+        DataSource: FIMDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -147,7 +137,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: amazonWebServicesColumns,
-        DataSource: AlertsAWSDataSource,
+        DataSource: AWSDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -163,7 +153,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: googleCloudColumns,
-        DataSource: AlertsGoogleCloudDataSource,
+        DataSource: GoogleCloudDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -180,7 +170,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: malwareDetectionColumns,
-        DataSource: AlertsMalwareDetectionDataSource,
+        DataSource: MalwareDetectionDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -202,7 +192,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: configurationAssessmentColumns,
-        DataSource: AlertsConfigurationAssessmentDataSource,
+        DataSource: ConfigurationAssessmentDataSource,
       }),
     ],
     buttons: ['settings'],
@@ -214,8 +204,16 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: withModuleNotForAgent(Dashboard),
+        component: DashboardOffice365,
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         id: 'inventory',
@@ -223,26 +221,32 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent],
         component: withModuleNotForAgent(OfficePanel),
       },
-      {
-        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
-        component: withModuleNotForAgent(() => (
-          <WazuhDiscover tableColumns={office365Columns} />
-        )),
-      },
+      renderDiscoverTab({
+        tableColumns: office365Columns,
+        DataSource: Office365DataSource,
+      }),
     ],
     availableFor: ['manager'],
   },
   github: {
     init: 'dashboard',
     tabs: [
-      DashboardTab,
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardGitHub,
+      },
       {
         id: 'inventory',
         name: 'Panel',
         buttons: [ButtonExploreAgent],
         component: GitHubPanel,
       },
-      renderDiscoverTab(DEFAULT_INDEX_PATTERN, githubColumns),
+      renderDiscoverTab({
+        tableColumns: githubColumns,
+        DataSource: GitHubDataSource,
+      }),
     ],
     availableFor: ['manager', 'agent'],
   },
@@ -338,7 +342,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: dockerColumns,
-        DataSource: AlertsDockerDataSource,
+        DataSource: DockerDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -357,34 +361,110 @@ export const ModulesDefaults = {
         name: 'Controls',
         buttons: [ButtonExploreAgent],
         component: props => (
-          <ComplianceTable {...props} DataSource={AlertsPCIDSSDataSource} />
+          <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
         ),
       },
       renderDiscoverTab({
         tableColumns: pciColumns,
-        DataSource: AlertsPCIDSSDataSource,
+        DataSource: PCIDSSDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(hipaaColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardHIPAA,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={HIPAADataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: hipaaColumns,
+        DataSource: HIPAADataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   nist: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(nistColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardNIST80053,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={NIST80053DataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: nistColumns,
+        DataSource: NIST80053DataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   gdpr: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(gdprColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardGDPR,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={GDPRDataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: gdprColumns,
+        DataSource: GDPRDataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   tsc: {
     init: 'dashboard',
-    tabs: RegulatoryComplianceTabs(tscColumns),
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardTSC,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonExploreAgent],
+        component: props => (
+          <ComplianceTable {...props} DataSource={TSCDataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        tableColumns: tscColumns,
+        DataSource: TSCDataSource,
+      }),
+    ],
     availableFor: ['manager', 'agent'],
   },
   syscollector: {

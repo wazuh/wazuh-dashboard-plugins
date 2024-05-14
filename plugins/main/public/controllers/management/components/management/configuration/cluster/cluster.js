@@ -17,7 +17,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import withWzConfig from '../util-hocs/wz-config';
-import { isString } from '../utils/utils';
+import { isString, renderValueOrNoValue } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -38,6 +38,37 @@ const mainSettings = [
   { field: 'hidden', label: 'Hide cluster information in alerts' },
 ];
 
+const haproxySettings = [
+  { field: 'haproxy_helper.haproxy_disabled', label: 'HAProxy status' },
+  { field: 'haproxy_helper.haproxy_address', label: 'Address' },
+  { field: 'haproxy_helper.haproxy_user', label: 'User' },
+  { field: 'haproxy_helper.haproxy_password', label: 'Password' },
+  { field: 'haproxy_helper.haproxy_port', label: 'Port' },
+  { field: 'haproxy_helper.haproxy_protocol', label: 'Protocol' },
+  { field: 'haproxy_helper.haproxy_backend', label: 'Backend' },
+  { field: 'haproxy_helper.frequency', label: 'Frequency' },
+  { field: 'haproxy_helper.agent_chunk_size', label: 'Agent chunk size' },
+  {
+    field: 'haproxy_helper.agent_reconnection_time',
+    label: 'Agent reconnection time',
+  },
+  {
+    field: 'haproxy_helper.agent_reconnection_stability_time',
+    label: 'Agent reconnection stability time',
+  },
+  { field: 'haproxy_helper.imbalance_tolerance', label: 'Imbalance tolerance' },
+  {
+    field: 'haproxy_helper.remove_disconnected_node_after',
+    label: 'Remove disconnected node after',
+  },
+  { field: 'haproxy_helper.haproxy_resolver', label: 'Resolver' },
+  {
+    field: 'haproxy_helper.excluded_nodes',
+    label: 'Excluded nodes',
+    render: renderValueOrNoValue,
+  },
+];
+
 const helpLinks = [
   {
     text: 'Configuring a cluster',
@@ -49,7 +80,7 @@ const helpLinks = [
   },
 ];
 
-class WzCluster extends Component {
+export class WzCluster extends Component {
   constructor(props) {
     super(props);
   }
@@ -58,10 +89,22 @@ class WzCluster extends Component {
     let mainSettingsConfig = {
       ...currentConfig['com-cluster'],
       disabled:
-        currentConfig['com-cluster'].disabled === 'yes'
-          ? 'disabled'
-          : 'enabled',
+        currentConfig['com-cluster'].disabled === true ? 'disabled' : 'enabled',
     };
+
+    if (currentConfig['com-cluster'].haproxy_helper) {
+      mainSettingsConfig = {
+        ...mainSettingsConfig,
+        haproxy_helper: {
+          ...currentConfig['com-cluster'].haproxy_helper,
+          haproxy_disabled:
+            currentConfig['com-cluster'].haproxy_helper.haproxy_disabled ===
+            true
+              ? 'disabled'
+              : 'enabled',
+        },
+      };
+    }
     return (
       <Fragment>
         {currentConfig['com-cluster'] &&
@@ -82,6 +125,13 @@ class WzCluster extends Component {
                 config={mainSettingsConfig}
                 items={mainSettings}
               />
+              {mainSettingsConfig.haproxy_helper && (
+                <WzConfigurationSettingsGroup
+                  title='HAProxy settings'
+                  config={mainSettingsConfig}
+                  items={haproxySettings}
+                />
+              )}
             </WzConfigurationSettingsHeader>
           )}
       </Fragment>

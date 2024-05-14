@@ -21,7 +21,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-import { AlertsPCIDSSDataSource } from '../../../common/data-source/pattern/alerts/pci-dss/alerts-pci-dss-data-source';
+import { PCIDSSDataSource } from '../../../common/data-source/pattern/alerts/pci-dss/pci-dss-data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 
@@ -40,7 +40,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsPCIDSSDataSource,
+    DataSource: PCIDSSDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
@@ -89,16 +89,16 @@ const DashboardPCIDSSComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='pci-dss-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            </div>
-          )}
+              <div className='wz-search-bar hide-filter-control'>
+                <SearchBar
+                  appName='pci-dss-searchbar'
+                  {...searchBarProps}
+                  showDatePicker={true}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                />
+              </div>
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
