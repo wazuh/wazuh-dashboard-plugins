@@ -71,7 +71,7 @@ export const search = async (
   const fromField =
     (pagination?.pageIndex || 0) * (pagination?.pageSize || 100);
   const sortOrder: OpenSearchQuerySortValue[] =
-    sorting?.columns.map(column => {
+    sorting?.columns?.map(column => {
       const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
       return { [column?.id || '']: sortDirection } as OpenSearchQuerySortValue;
     }) || [];

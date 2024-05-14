@@ -20,7 +20,7 @@ import {
   PatternDataSource,
   tParsedIndexPattern,
   useDataSource,
-  AlertsDockerDataSource,
+  DockerDataSource,
 } from '../../../common/data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
@@ -32,7 +32,7 @@ const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-const DashboardDockerComponent: React.FC = ({}) => {
+const DashboardDockerComponent: React.FC = ({ }) => {
   const {
     filters,
     dataSource,
@@ -41,7 +41,7 @@ const DashboardDockerComponent: React.FC = ({}) => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsDockerDataSource,
+    DataSource: DockerDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
@@ -100,16 +100,16 @@ const DashboardDockerComponent: React.FC = ({}) => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='docker-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            </div>
-          )}
+              <div className='wz-search-bar hide-filter-control'>
+                <SearchBar
+                  appName='docker-searchbar'
+                  {...searchBarProps}
+                  showDatePicker={true}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                />
+              </div>
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

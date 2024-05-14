@@ -20,7 +20,7 @@ import {
   PatternDataSource,
   tParsedIndexPattern,
   useDataSource,
-  AlertsAWSDataSource,
+  AWSDataSource,
 } from '../../../common/data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
@@ -41,7 +41,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsAWSDataSource,
+    DataSource: AWSDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
