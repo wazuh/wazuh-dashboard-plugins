@@ -65,6 +65,7 @@ export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
                 defaultColumns={defaultTableColumns}
                 indexPattern={indexPattern}
                 isLoading={false}
+                exportFilters={fetchFilters}
                 defaultPagination={pagination}
                 onChangePagination={(pagination) => setPagination(pagination)}
                 onChangeSorting={(sorting) => {

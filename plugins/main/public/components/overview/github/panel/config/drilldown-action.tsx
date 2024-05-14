@@ -178,11 +178,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                   id: 'rule.id', render: value => (
                     <RedirectAppLinks application={getCore().application}>
                       <EuiLink
-                        onClick={e => {
-                          getCore().application.navigateToApp(rules.id, {
-                            path: `#/manager/?tab=rules&redirectRule=${value}`,
-                          });
-                        }}
+                        href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
                       >
                         {value}
                       </EuiLink >
