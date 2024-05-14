@@ -204,6 +204,7 @@ export class FileDetails extends Component {
     const { file } = this.props.currentFile;
     if (this.props.view === 'extern') {
       AppNavigate.navigateToModule(ev, 'overview', {
+        agentId: this.props?.agent?.id,
         tab: 'fim',
         tabView: 'events',
         filters: { 'syscheck.path': file },
@@ -212,7 +213,12 @@ export class FileDetails extends Component {
       AppNavigate.navigateToModule(
         ev,
         'overview',
-        { tab: 'fim', tabView: 'events', filters: { 'syscheck.path': file } },
+        {
+          agentId: this.props?.agent?.id,
+          tab: 'fim',
+          tabView: 'events',
+          filters: { 'syscheck.path': file },
+        },
         () => this.openEventCurrentWindow(),
       );
     }

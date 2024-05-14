@@ -51,9 +51,9 @@ export function FimEventsTable({ agent }) {
                     iconType='popout'
                     color='primary'
                     onClick={() => navigateToFim(agent)}
-                    href={getCore().application.getUrlForApp(
+                    href={`${getCore().application.getUrlForApp(
                       fileIntegrityMonitoring.id,
-                    )}
+                    )}?agentId=${agent.id}`}
                     aria-label='Open FIM'
                   />
                 </RedirectAppLinks>

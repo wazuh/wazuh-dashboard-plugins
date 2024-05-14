@@ -152,7 +152,7 @@ export const ScaScan = compose(
           'scaPolicies',
           JSON.stringify(this.state.policies),
         );
-        window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}`;
+        window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}&agentId=${this.props.agent.id}`;
       });
     };
 
@@ -216,7 +216,7 @@ export const ScaScan = compose(
                     href={getCore().application.getUrlForApp(
                       configurationAssessment.id,
                       {
-                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}`,
+                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
                       },
                     )}
                   >
@@ -295,7 +295,7 @@ export const ScaScan = compose(
                         href={getCore().application.getUrlForApp(
                           configurationAssessment.id,
                           {
-                            path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}`,
+                            path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
                           },
                         )}
                       >
