@@ -20,7 +20,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-import { AlertsGoogleCloudDataSource } from '../../../common/data-source/pattern/alerts/alerts-google-cloud/alerts-google-cloud-data-source';
+import { GoogleCloudDataSource } from '../../../common/data-source/pattern/alerts/google-cloud/google-cloud-data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 
@@ -39,7 +39,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsGoogleCloudDataSource,
+    DataSource: GoogleCloudDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
@@ -86,23 +86,23 @@ const DashboardGoogleCloudComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='google-cloud-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            </div>
-          )}
+              <div className='wz-search-bar hide-filter-control'>
+                <SearchBar
+                  appName='google-cloud-searchbar'
+                  {...searchBarProps}
+                  showDatePicker={true}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                  showSaveQuery={true}
+                />
+              </div>
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
-          <>
-            <SampleDataWarning />
+            <>
+              <SampleDataWarning />
               <div className='google-cloud-dashboard-responsive'>
                 <DashboardByRenderer
                   input={{

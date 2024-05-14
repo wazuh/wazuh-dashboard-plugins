@@ -79,11 +79,10 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     : undefined;
   // table states
   const [pagination, setPagination] = useState<
-    EuiBasicTableProps<any>['pagination']
+    Omit<EuiBasicTableProps<any>['pagination'], 'totalItemCount'>
   >({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE,
-    totalItemCount: 0,
   });
   const [sorting, setSorting] = useState<EuiBasicTableProps<any>['sorting']>({
     sort: { field: timeField || '@timestamp', direction: 'desc' },
@@ -146,13 +145,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       sorting: parseSorting,
     })
       .then((response: SearchResponse) => {
-        const totalHits = response?.hits?.total || 0;
         setPagination({
           ...pagination,
-          totalItemCount:
-            totalHits > MAX_ENTRIES_PER_QUERY
-              ? MAX_ENTRIES_PER_QUERY
-              : totalHits,
         });
         setResults(response);
       })
@@ -197,7 +191,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     setPagination({
       pageIndex,
       pageSize,
-      totalItemCount: results?.hits?.total || 0,
     });
     setSorting({ sort: { field, direction: direction as Direction } });
   };
@@ -258,8 +251,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
         indexPattern,
       })
     ) : (
-      <DocDetails doc={doc} item={item} indexPattern={indexPattern} />
-    );
+        <DocDetails doc={doc} item={item} indexPattern={indexPattern} />
+      );
   };
 
   const parsedItems = useMemo(() => {
@@ -282,14 +275,14 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar'>
-              <SearchBar
-                appName='wazuh-discover-search-bar'
-                {...searchBarProps}
-                useDefaultBehaviors={false}
-              />
-            </div>
-          )}
+              <div className='wz-search-bar'>
+                <SearchBar
+                  appName='wazuh-discover-search-bar'
+                  {...searchBarProps}
+                  useDefaultBehaviors={false}
+                />
+              </div>
+            )}
           {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
@@ -306,15 +299,15 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                   showResetButton={false}
                   tooltip={
                     results?.hits?.total &&
-                    results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                      results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
-                          ariaLabel: 'Warning',
-                          content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits.`,
-                          iconType: 'alert',
-                          position: 'top',
-                        }
+                        ariaLabel: 'Warning',
+                        content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                          MAX_ENTRIES_PER_QUERY,
+                        )} hits.`,
+                        iconType: 'alert',
+                        position: 'top',
+                      }
                       : undefined
                   }
                 />
@@ -325,7 +318,13 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                 itemIdToExpandedRowMap={itemIdToExpandedRowMap}
                 isExpandable={isExpanded}
                 columns={getColumns()}
-                pagination={pagination}
+                pagination={{
+                  ...pagination,
+                  totalItemCount:
+                    (results?.hits?.total ?? 0) > MAX_ENTRIES_PER_QUERY
+                      ? MAX_ENTRIES_PER_QUERY
+                      : results?.hits?.total ?? 0,
+                }}
                 sorting={sorting}
                 onChange={onTableChange}
               />

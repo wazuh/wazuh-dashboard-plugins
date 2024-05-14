@@ -18,18 +18,15 @@ import {
 import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
-import { useDocViewer } from '../doc-viewer';
-import DocViewer from '../doc-viewer/doc-viewer';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../data-grid';
+import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import {
   ErrorHandler,
   ErrorFactory,
   HttpError,
 } from '../../../react-services/error-management';
-import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
-import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
 import useSearchBar from '../search-bar/use-search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
@@ -45,6 +42,7 @@ import {
   PatternDataSource,
   AlertsDataSourceRepository,
 } from '../data-source';
+import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -125,11 +123,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
-
-  const docViewerProps = useDocViewer({
-    doc: inspectedHit,
-    indexPattern: indexPattern as IndexPattern,
-  });
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -246,37 +239,12 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   toolbarVisibility={{
                     additionalControls: (
                       <>
-                        <HitsCounter
-                          hits={results?.hits?.total}
-                          showResetButton={false}
-                          tooltip={
-                            results?.hits?.total &&
-                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                              ? {
-                                  ariaLabel: 'Warning',
-                                  content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                    MAX_ENTRIES_PER_QUERY,
-                                  )} hits.`,
-                                  iconType: 'alert',
-                                  position: 'top',
-                                }
-                              : undefined
-                          }
+                        <DiscoverDataGridAdditionalControls
+                          totalHits={results.hits.total}
+                          isExporting={isExporting}
+                          onClickExportResults={onClickExportResults}
+                          maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
                         />
-                        <EuiButtonEmpty
-                          disabled={
-                            results?.hits?.total === 0 ||
-                            columnVisibility.visibleColumns.length === 0
-                          }
-                          size='xs'
-                          iconType='exportAction'
-                          color='primary'
-                          isLoading={isExporting}
-                          className='euiDataGrid__controlBtn'
-                          onClick={onClickExportResults}
-                        >
-                          Export Formated
-                        </EuiButtonEmpty>
                       </>
                     ),
                   }}
@@ -294,7 +262,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               <EuiFlyoutBody>
                 <EuiFlexGroup direction='column'>
                   <EuiFlexItem>
-                    <DocViewer {...docViewerProps} />
+                    <DocumentViewTableAndJson
+                      document={inspectedHit}
+                      indexPattern={indexPattern}
+                    />
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlyoutBody>

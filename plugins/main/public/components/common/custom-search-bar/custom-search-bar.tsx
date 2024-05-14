@@ -1,66 +1,93 @@
-import React, { useState, useEffect } from 'react';
-import { Filter } from '../../../../../../src/plugins/data/public/';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import {
+  Filter,
+  IndexPattern,
+} from '../../../../../../src/plugins/data/public/';
 import {
   FilterMeta,
   FilterState,
   FilterStateStore,
 } from '../../../../../../src/plugins/data/common';
-
-import { AppState } from '../../../react-services/app-state';
-
 import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
-
+import { tFilter } from '../data-source';
 //@ts-ignore
-import { KbnSearchBar } from '../../kbn-search-bar';
 import { MultiSelect } from './components';
-import { useFilterManager } from '../hooks';
 import { getCustomValueSuggestion } from '../../../components/overview/office-panel/config/helpers/helper-value-suggestion';
+import { I18nProvider } from '@osd/i18n/react';
+import { getPlugins } from '../../../kibana-services';
+import { tUseSearchBarProps } from '../search-bar/use-search-bar';
 
-export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field: '', value: '' }, ...props }) => {
-  const { filterManager, filters } = useFilterManager();
+type CustomSearchBarProps = {
+  filterInputs: {
+    type: string;
+    key: string;
+    placeholder: string;
+  }[];
+  filterDrillDownValue: { field: string; value: string };
+  searchBarProps: tUseSearchBarProps;
+  indexPattern: IndexPattern;
+  setFilters: (filters: tFilter[]) => void;
+};
+
+const SearchBar = getPlugins().data.ui.SearchBar;
+
+export const CustomSearchBar = ({
+  filterInputs,
+  filterDrillDownValue = { field: '', value: '' },
+  searchBarProps,
+  indexPattern,
+  setFilters
+}: CustomSearchBarProps) => {
+  const { filters } = searchBarProps;
   const defaultSelectedOptions = () => {
     const array = [];
-    filtersValues.forEach((item) => {
+    filterInputs.forEach(item => {
       array[item.key] = [];
     });
 
     return array;
   };
   const [avancedFiltersState, setAvancedFiltersState] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState(defaultSelectedOptions);
+  const [selectedOptions, setSelectedOptions] = useState(
+    defaultSelectedOptions,
+  );
   const [values, setValues] = useState(Array);
   const [selectReference, setSelectReference] = useState('');
 
   useEffect(() => {
-      setPluginPlatformFilters(values, selectReference);
-      refreshCustomSelectedFilter();
+    setPluginPlatformFilters(values, selectReference);
+    refreshCustomSelectedFilter();
   }, [values]);
 
   useEffect(() => {
     onFiltersUpdated();
   }, [filters]);
 
-  
-  const checkSelectDrillDownValue = (key) => {
-    return filterDrillDownValue.field === key && filterDrillDownValue.value != '' ? true : false
-  }
+  const checkSelectDrillDownValue = key => {
+    return filterDrillDownValue.field === key &&
+      filterDrillDownValue.value != ''
+      ? true
+      : false;
+  };
   const onFiltersUpdated = () => {
     refreshCustomSelectedFilter();
   };
 
   const changeSwitch = () => {
-    setAvancedFiltersState((state) => !state);
+    setAvancedFiltersState(state => !state);
   };
 
-  const buildCustomFilter = (isPinned: boolean, values?: any): Filter => {
-    const newFilters = values.map((element) => ({
+  const buildCustomFilter = (values?: any): Filter => {
+    const newFilters = values.map(element => ({
       match_phrase: {
         [element.value]: {
           query: element.filterByKey ? element.key : element.label,
         },
       },
     }));
-    const params = values.map((item) => item.filterByKey ? item.key.toString() : item.label);
+    const params = values.map(item =>
+      item.filterByKey ? item.key.toString() : item.label,
+    );
     const meta: FilterMeta = {
       disabled: false,
       negate: false,
@@ -69,10 +96,10 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
       alias: null,
       type: 'phrases',
       value: params.join(','),
-      index: AppState.getCurrentPattern(),
+      index: indexPattern.id,
     };
     const $state: FilterState = {
-      store: isPinned ? FilterStateStore.GLOBAL_STATE : FilterStateStore.APP_STATE,
+      store: FilterStateStore.APP_STATE,
     };
     const query = {
       bool: {
@@ -85,36 +112,43 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
   };
 
   const setPluginPlatformFilters = (values: any[], selectReference: String) => {
-    const currentFilters = filterManager
-      .getFilters()
-      .filter((item) => item.meta.key != selectReference);
-    filterManager.removeAll();
-    filterManager.addFilters(currentFilters);
+    let customFilter = [];
+    const currentFilters = filters.filter(
+      item => item.meta.key != selectReference,
+    );
     if (values.length != 0) {
-      const customFilter = buildCustomFilter(false, values);
-      filterManager.addFilters(customFilter);
+      customFilter = [buildCustomFilter(values)];
     }
+    setFilters([...currentFilters, ...customFilter]);
   };
 
   const refreshCustomSelectedFilter = () => {
-    setSelectedOptions(defaultSelectedOptions);
-    const filters =
-      filterManager
-        .getFilters()
+    setSelectedOptions(defaultSelectedOptions());
+    const currentFilters =
+      filters
         .filter(
-          (item) =>
-            item.meta.type === 'phrases' && Object.keys(selectedOptions).includes(item.meta.key)
+          item =>
+            item.meta.type === 'phrases' &&
+            Object.keys(selectedOptions).includes(item.meta.key),
         )
-        .map((element) => ({ params: element.meta.params, key: element.meta.key })) || [];
+        .map(element => ({
+          params: element.meta.params,
+          key: element.meta.key,
+        })) || [];
 
-    const getFilterCustom = (item) => {
-      return item.params.map((element) => ({ checked: 'on', label: item.key === 'data.office365.UserType' ? getLabelUserType(element) : element, value: item.key, key: element, filterByKey: item.key === 'data.office365.UserType' ? true : false}));
+    const getFilterCustom = item => {
+      // ToDo: Make this generic, without office 365 hardcode
+      return item.params.map((element) => ({ checked: 'on', label: item.key === 'data.office365.UserType' ? getLabelUserType(element) : element, value: item.key, key: element, filterByKey: item.key === 'data.office365.UserType' ? true : false }));
     };
-    const getLabelUserType = (element) => {
-      const userTypeOptions = getCustomValueSuggestion('data.office365.UserType')
-      return userTypeOptions.find((item,index) =>  index.toString() === element)
-    }
-    const filterCustom = filters.map((item) => getFilterCustom(item)) || [];
+    const getLabelUserType = element => {
+      const userTypeOptions = getCustomValueSuggestion(
+        'data.office365.UserType',
+      );
+      return userTypeOptions.find(
+        (item, index) => index.toString() === element,
+      );
+    };
+    const filterCustom = currentFilters.map(item => getFilterCustom(item)) || [];
     if (filterCustom.length != 0) {
       filterCustom.forEach((item) => {
         item.forEach((element) => {
@@ -128,14 +162,13 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
   };
 
   const onChange = (values: any[], id: string) => {
-    setSelectReference(id)
+    setSelectReference(id);
     setValues(values);
   };
 
-  const onRemove = (filter) => {
-    const currentFilters = filterManager.getFilters().filter((item) => item.meta.key != filter);
-    filterManager.removeAll();
-    filterManager.addFilters(currentFilters);
+  const onRemove = filter => {
+    const currentFilters = filters.filter(item => item.meta.key != filter);
+    setFilters(currentFilters);
     refreshCustomSelectedFilter();
   };
 
@@ -157,41 +190,47 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
   };
 
   return (
-    <>
+    <I18nProvider>
       <EuiFlexGroup
-        className="custom-kbn-search-bar"
-        alignItems="center"
+        className='custom-kbn-search-bar'
+        alignItems='center'
         style={{ margin: '0 8px' }}
       >
         {!avancedFiltersState
-          ? filtersValues.map((item, key) => (
-              <EuiFlexItem key={key}>{getComponent(item)}</EuiFlexItem>
-            ))
+          ? filterInputs.map((item, key) => (
+            <EuiFlexItem key={key}>{getComponent(item)}</EuiFlexItem>
+          ))
           : ''}
         <EuiFlexItem>
-          <KbnSearchBar
-            showFilterBar={false}
-            showQueryInput={avancedFiltersState}
-            onFiltersUpdated={onFiltersUpdated}
-          />
+          <div className='wz-search-bar hide-filter-control'>
+            <SearchBar
+              {...searchBarProps}
+              showFilterBar={false}
+              showQueryInput={avancedFiltersState}
+              onFiltersUpdated={onFiltersUpdated}
+            />
+          </div>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiFlexGroup justifyContent="flexEnd" style={{ margin: '0 20px' }}>
+      <EuiFlexGroup justifyContent='flexEnd' style={{ margin: '0 20px' }}>
         <EuiFlexItem className={'filters-search-bar'} style={{ margin: '0px' }}>
-          <KbnSearchBar
-            showDatePicker={false}
-            showQueryInput={false}
-            onFiltersUpdated={onFiltersUpdated}
-          />
+          <div className='wz-search-bar hide-filter-control'>
+            <SearchBar
+              {...searchBarProps}
+              showDatePicker={false}
+              showQueryInput={false}
+              onFiltersUpdated={onFiltersUpdated}
+            />
+          </div>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiSwitch
-            label="Advanced filters"
+            label='Advanced filters'
             checked={avancedFiltersState}
             onChange={() => changeSwitch()}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-    </>
+    </I18nProvider>
   );
 };
