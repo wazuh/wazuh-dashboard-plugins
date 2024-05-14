@@ -132,6 +132,12 @@ export const search = async (
   }
 };
 
+const getValueDisplayedOnFilter = (filter: tFilter) => {
+  return filter.query?.bool?.minimum_should_match === 1 ? 
+    `is one of ${filter.meta?.value}` :
+    filter.meta?.params?.query || filter.meta?.value;
+}
+
 export const hideCloseButtonOnFixedFilters = (
   filters: tFilter[],
   elements: NodeListOf<Element>,
@@ -146,7 +152,7 @@ export const hideCloseButtonOnFixedFilters = (
           index,
           filter,
           field: filter.meta?.key,
-          value: filter.meta?.params?.query || filter.meta?.value,
+          value: getValueDisplayedOnFilter(filter)
         };
       }
     })

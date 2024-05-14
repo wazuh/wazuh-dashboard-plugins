@@ -25,10 +25,10 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-import { GitHubDataSource } from '../../../common/data-source/pattern/alerts/github/github-data-source';
+import { Office365DataSource } from '../../../common/data-source/pattern/alerts/office-365/office-365-data-source';
 import { IndexPattern } from '../../../../../../src/plugins/data/public';
 
-export const GitHubPanel = withErrorBoundary(() => {
+export const OfficePanel = withErrorBoundary(() => {
   const [drillDownValue, setDrillDownValue] = useState({
     field: '',
     value: '',
@@ -46,7 +46,7 @@ export const GitHubPanel = withErrorBoundary(() => {
     setFilters,
     filterManager
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: GitHubDataSource,
+    DataSource: Office365DataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
@@ -64,7 +64,7 @@ export const GitHubPanel = withErrorBoundary(() => {
     if (selectedFilter?.value) {
       const filter = filterManager.createFilter(selectedFilter.field, selectedFilter.value);
       // this hide the remove filter button in the filter bar
-      filter.meta.controlledBy = 'github-panel-row-filter';
+      filter.meta.controlledBy = 'office-panel-row-filter';
       setFilters([...filters, filter]);
     } else {
       // the previous filter is stored in currentSelectedFilter
@@ -78,29 +78,30 @@ export const GitHubPanel = withErrorBoundary(() => {
       {isDataSourceLoading ? (
         <LoadingSpinner />
       ) : (
-        <>
-          <CustomSearchBar
-            filterInputs={filtersValues}
-            filterDrillDownValue={drillDownValue}
-            searchBarProps={searchBarProps}
-            setFilters={setFilters}
-            indexPattern={dataSource.indexPattern}
-          />
-          <MainPanel
-            moduleConfig={ModuleConfig}
-            filterDrillDownValue={filterDrillDownValue}
-            sidePanelChildren={<ModuleConfiguration />}
-            onChangeView={handleChangeView}
-            dataSourceProps={{
-              fetchData,
-              fetchFilters,
-              searchBarProps,
-              indexPattern: dataSource?.indexPattern,
-            }}
-            isLoading={isDataSourceLoading}
-          />
-        </>
-      )}
+          <>
+            <CustomSearchBar
+              filterInputs={filtersValues}
+              filterDrillDownValue={drillDownValue}
+              searchBarProps={searchBarProps}
+              setFilters={setFilters}
+              indexPattern={dataSource.indexPattern}
+            />
+            <MainPanel
+              moduleConfig={ModuleConfig}
+              filterDrillDownValue={filterDrillDownValue}
+              sidePanelChildren={<ModuleConfiguration />}
+              onChangeView={handleChangeView}
+              dataSourceProps={{
+                fetchData,
+                fetchFilters,
+                searchBarProps,
+                indexPattern: dataSource?.indexPattern,
+              }}
+              isLoading={isDataSourceLoading}
+            />
+          </>
+        )}
     </>
   );
 });
+
