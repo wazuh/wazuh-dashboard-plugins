@@ -15,8 +15,8 @@
   "author": "Wazuh, Inc",
   "license": "GPL-2.0",
   "resolutions": {
-    "**/es5-ext": "0.10.64",
-    "**/follow-redirects": "1.15.6"
+    "**/es5-ext": "^0.10.63",
+    "**/follow-redirects": "^1.15.4"
   },
   "repository": {
     "type": "git",
