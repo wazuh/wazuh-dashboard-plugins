@@ -84,7 +84,11 @@ export class PinnedAgentManager {
     if (pinnedAgentByUrl && !isValidAgentId) {
       this.unPinAgent();
     } else {
-      const mustBeSynchronized = !pinnedAgentByUrl === pinnedAgentByStore;
+      const mustBeSynchronized =
+        !pinnedAgentByUrl === pinnedAgentByStore ||
+        (pinnedAgentByUrl &&
+          pinnedAgentByStore &&
+          agentIdValueUrl !== this.getPinnedAgent().id);
       if (mustBeSynchronized) {
         try {
           if (isValidAgentId) {
