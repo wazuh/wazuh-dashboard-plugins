@@ -76,6 +76,7 @@ import {
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EventsCount } from './dashboard/events-count';
+import { IntlProvider } from 'react-intl';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,
@@ -101,11 +102,11 @@ export const AgentsWelcome = compose(
       },
       ...(agent?.name
         ? [
-          {
-            text: `${agent.name}`,
-            truncate: true,
-          },
-        ]
+            {
+              text: `${agent.name}`,
+              truncate: true,
+            },
+          ]
         : []),
     ];
   }),
@@ -258,13 +259,13 @@ export const AgentsWelcome = compose(
         )
           ? JSON.parse(window.localStorage.getItem('wz-menu-agent-apps-pinned'))
           : [
-            // Default pinned applications
-            threatHunting.id,
-            fileIntegrityMonitoring.id,
-            configurationAssessment.id,
-            mitreAttack.id,
-            malwareDetection.id,
-          ];
+              // Default pinned applications
+              threatHunting.id,
+              fileIntegrityMonitoring.id,
+              configurationAssessment.id,
+              mitreAttack.id,
+              malwareDetection.id,
+            ];
       }
 
       // Ensure the pinned applications are supported
@@ -567,73 +568,74 @@ export const AgentsWelcome = compose(
       const title = this.renderTitle();
 
       return (
-        <div className='wz-module wz-module-welcome'>
-          <div className='wz-module-header-agent-wrapper'>
-            <div className='wz-module-header-agent-main'>{title}</div>
-          </div>
-          <div className='wz-module-agents-padding-responsive'>
-            <EuiPage>
-              <EuiPageBody component='div'>
-                <div className='wz-module-header-nav'>
-                  <div>
-                    <EuiPanel
-                      grow
-                      paddingSize='s'
-                      className='wz-welcome-page-agent-info'
-                    >
-                      <AgentInfo
-                        agent={this.props.agent}
-                        isCondensed={false}
-                        hideActions={true}
-                        {...this.props}
-                      ></AgentInfo>
-                    </EuiPanel>
+        <IntlProvider locale='en'>
+          <div className='wz-module wz-module-welcome'>
+            <div className='wz-module-header-agent-wrapper'>
+              <div className='wz-module-header-agent-main'>{title}</div>
+            </div>
+            <div className='wz-module-agents-padding-responsive'>
+              <EuiPage>
+                <EuiPageBody component='div'>
+                  <div className='wz-module-header-nav'>
+                    <div>
+                      <EuiPanel
+                        grow
+                        paddingSize='s'
+                        className='wz-welcome-page-agent-info'
+                      >
+                        <AgentInfo
+                          agent={this.props.agent}
+                          isCondensed={false}
+                          hideActions={true}
+                          {...this.props}
+                        ></AgentInfo>
+                      </EuiPanel>
+                    </div>
                   </div>
-                </div>
-                <EuiFlexGroup>
-                  <EuiFlexItem />
-                  <EuiFlexItem
-                    style={{
-                      alignItems: 'flex-end',
-                      marginTop: 10,
-                      marginBottom: 10,
-                    }}
-                  >
-                    {' '}
-                    {/* TODO: Replace with SearchBar and replace implementation to get the time range in AgentView component*/}
-                    <WzDatePicker condensed={true} onTimeChange={() => { }} />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-                {(this.state.widthWindow < 1150 && (
-                  <Fragment>
-                    <EuiFlexGrid columns={2}>
-                      <EuiFlexItem
-                        key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                      >
-                        {this.renderMitrePanel()}
-                      </EuiFlexItem>
-                      {this.renderCompliancePanel()}
-                    </EuiFlexGrid>
-                    <EuiSpacer size='m' />
-                    <EuiFlexGroup>
-                      <FimEventsTable agent={this.props.agent} />
-                    </EuiFlexGroup>
-                    <EuiSpacer size='m' />
-                    <EuiFlexGroup>
-                      <EuiFlexItem
-                        key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                      >
-                        {' '}
-                        {/* Events count evolution */}
-                        {this.renderEventCountVisualization()}
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                    <EuiSpacer size='m' />
-                    <EuiFlexGroup>
-                      <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
-                    </EuiFlexGroup>
-                  </Fragment>
-                )) || (
+                  <EuiFlexGroup>
+                    <EuiFlexItem />
+                    <EuiFlexItem
+                      style={{
+                        alignItems: 'flex-end',
+                        marginTop: 10,
+                        marginBottom: 10,
+                      }}
+                    >
+                      {' '}
+                      {/* TODO: Replace with SearchBar and replace implementation to get the time range in AgentView component*/}
+                      <WzDatePicker condensed={true} onTimeChange={() => {}} />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  {(this.state.widthWindow < 1150 && (
+                    <Fragment>
+                      <EuiFlexGrid columns={2}>
+                        <EuiFlexItem
+                          key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
+                        >
+                          {this.renderMitrePanel()}
+                        </EuiFlexItem>
+                        {this.renderCompliancePanel()}
+                      </EuiFlexGrid>
+                      <EuiSpacer size='m' />
+                      <EuiFlexGroup>
+                        <FimEventsTable agent={this.props.agent} />
+                      </EuiFlexGroup>
+                      <EuiSpacer size='m' />
+                      <EuiFlexGroup>
+                        <EuiFlexItem
+                          key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                        >
+                          {' '}
+                          {/* Events count evolution */}
+                          {this.renderEventCountVisualization()}
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                      <EuiSpacer size='m' />
+                      <EuiFlexGroup>
+                        <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
+                      </EuiFlexGroup>
+                    </Fragment>
+                  )) || (
                     <Fragment>
                       <EuiFlexGrid columns={2}>
                         <EuiFlexItem>
@@ -661,10 +663,11 @@ export const AgentsWelcome = compose(
                       </EuiFlexGroup>
                     </Fragment>
                   )}
-              </EuiPageBody>
-            </EuiPage>
+                </EuiPageBody>
+              </EuiPage>
+            </div>
           </div>
-        </div>
+        </IntlProvider>
       );
     }
   },
