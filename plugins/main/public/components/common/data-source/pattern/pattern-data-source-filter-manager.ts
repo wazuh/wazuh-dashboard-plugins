@@ -398,7 +398,6 @@ export class PatternDataSourceFilterManager
     };
     const $state = {
       store: 'appState',
-      isImplicit: true,
     };
     const query = {
       bool: {

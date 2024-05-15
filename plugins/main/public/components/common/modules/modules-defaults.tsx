@@ -18,7 +18,7 @@ import { MainFim } from '../../agents/fim';
 import { ComplianceTable } from '../../overview/compliance-table';
 import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
-import { OfficePanel } from '../../overview/office-panel';
+import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { DashboardMITRE } from '../../overview/mitre/dashboard';
@@ -29,6 +29,9 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
+import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
+import { InventoryFim } from '../../overview/fim/inventory/inventory';
+import { DashboardOffice365 } from '../../overview/office/dashboard';
 import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
 import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
 import { DashboardGoogleCloud } from '../../overview/google-cloud/dashboards';
@@ -36,7 +39,7 @@ import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
 import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
-import { office365Columns } from '../../overview/office-panel/events/office-365-columns';
+import { office365Columns } from '../../overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
 import { pciColumns } from '../../overview/pci/events/pci-columns';
@@ -75,6 +78,7 @@ import {
   ConfigurationAssessmentDataSource,
   HIPAADataSource,
   PCIDSSDataSource,
+  Office365DataSource,
 } from '../data-source';
 
 const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
@@ -213,8 +217,16 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-        component: withModuleNotForAgent(Dashboard),
+        component: DashboardOffice365,
+        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        buttons: [
+          ({ ...props }) => (
+            <ButtonModuleExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+            />
+          ),
+        ],
       },
       {
         id: 'inventory',
@@ -222,12 +234,10 @@ export const ModulesDefaults = {
         buttons: [ButtonModuleExploreAgent],
         component: withModuleNotForAgent(OfficePanel),
       },
-      {
-        ...renderDiscoverTab(DEFAULT_INDEX_PATTERN, office365Columns),
-        component: withModuleNotForAgent(() => (
-          <WazuhDiscover tableColumns={office365Columns} />
-        )),
-      },
+      renderDiscoverTab({
+        tableColumns: office365Columns,
+        DataSource: Office365DataSource,
+      }),
     ],
     availableFor: ['manager'],
   },

@@ -26,33 +26,26 @@ import {
  */
 export const ModuleConfig = {
   main: {
-    length: () => MainViewConfig.rows.reduce((total, row) => total + row.columns.length, 0),
-    component: (props) => <OfficeBody {...{ ...MainViewConfig, ...props }} />,
+    component: (props) => <OfficeBody {...{ ...MainViewConfig(props), ...props }} />,
   },
   'data.office365.UserId': {
-    length: () => drilldownUserConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
-      <OfficeDrilldown title={'User Activity'} {...{ ...drilldownUserConfig, ...props }} />
+      <OfficeDrilldown title={'User Activity'} {...{ ...drilldownUserConfig(props), ...props }} />
     ),
   },
   'data.office365.ClientIP': {
-    length: () => drilldownIPConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
-      <OfficeDrilldown title={'Client IP address'} {...{ ...drilldownIPConfig, ...props }} />
+      <OfficeDrilldown title={'Client IP address'} {...{ ...drilldownIPConfig(props), ...props }} />
     ),
   },
   'data.office365.Operation': {
-    length: () =>
-      drilldownOperationsConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
-      <OfficeDrilldown title={'Operation'} {...{ ...drilldownOperationsConfig, ...props }} />
+      <OfficeDrilldown title={'Operation'} {...{ ...drilldownOperationsConfig(props), ...props }} />
     ),
   },
   'rule.description': {
-    length: () =>
-      drilldownRulesConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
-      <OfficeDrilldown title={'Rule'} {...{ ...drilldownRulesConfig, ...props }} />
+      <OfficeDrilldown title={'Rule'} {...{ ...drilldownRulesConfig(props), ...props }} />
     ),
   },
 };

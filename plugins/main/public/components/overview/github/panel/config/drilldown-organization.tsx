@@ -14,7 +14,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
 import { SecurityAlerts } from '../../../../visualize/components';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getPlugins } from '../../../../../kibana-services';
+import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import {
@@ -27,7 +27,8 @@ import {
 import { ModuleConfigProps } from './module-config';
 import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
 import DrillDownDataGrid from './drilldown-data-grid';
-import { AppNavigate } from '../../../../../react-services';
+import { rules } from '../../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -176,16 +177,13 @@ export const DrilldownConfigOrganization = (
                 { id: 'rule.level' },
                 {
                   id: 'rule.id', render: value => (
-                    <EuiLink
-                      onClick={e =>
-                        AppNavigate.navigateToModule(e, 'manager', {
-                          tab: 'rules',
-                          redirectRule: value,
-                        })
-                      }
-                    >
-                      {value}
-                    </EuiLink>
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiLink
+                        href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
+                      >
+                        {value}
+                      </EuiLink >
+                    </RedirectAppLinks>
                   ),
                 },
               ]
