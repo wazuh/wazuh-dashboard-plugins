@@ -37,15 +37,15 @@ export const AgentView = compose(
   const [tab, setTab] = useState<string>($commonData.checkTabLocation());
 
   const getAgent = async () => {
+    setIsLoadingAgent(true);
     await pinnedAgentManager.syncPinnedAgentSources();
     const isPinnedAgent = pinnedAgentManager.isPinnedAgent();
     setAgent(isPinnedAgent ? pinnedAgentManager.getPinnedAgent() : null);
+    setIsLoadingAgent(false);
   };
 
   useEffect(() => {
-    setIsLoadingAgent(true);
     getAgent();
-    setIsLoadingAgent(false);
   }, [tab]);
 
   const switchTab = (tab: string) => {

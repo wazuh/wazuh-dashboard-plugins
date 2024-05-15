@@ -34,6 +34,7 @@ export const Overview: React.FC = () => {
   const pinnedAgentManager = new PinnedAgentManager();
 
   useEffect(() => {
+    pinnedAgentManager.syncPinnedAgentSources();
     const tab = $location.search().tab;
     const tabView = $location.search().tabView;
     setTabActive(tab || 'welcome');
@@ -92,8 +93,6 @@ export const Overview: React.FC = () => {
     );
 
     replaceUrlAppState().then(() => start());
-
-    pinnedAgentManager.syncPinnedAgentSources();
 
     return () => {
       stop();

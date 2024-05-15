@@ -57,10 +57,12 @@ export class PinnedAgentManager {
     );
     ['agent', 'agentId'].forEach(param => {
       if (this.location.search()[param]) {
-        this.location.search(param, null);
+        setTimeout(() => {
+          this.location.search(param, null);
+          this.route.reload();
+        }, 1);
       }
     });
-    this.route.reload();
   }
 
   isPinnedAgent(): boolean {
