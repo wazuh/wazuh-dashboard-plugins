@@ -53,7 +53,7 @@ export function FimEventsTable({ agent }) {
                     onClick={() => navigateToFim(agent)}
                     href={`${getCore().application.getUrlForApp(
                       fileIntegrityMonitoring.id,
-                    )}?agentId=${agent.id}`}
+                    )}`}
                     aria-label='Open FIM'
                   />
                 </RedirectAppLinks>

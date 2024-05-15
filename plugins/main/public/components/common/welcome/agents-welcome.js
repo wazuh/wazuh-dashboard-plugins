@@ -440,7 +440,7 @@ export const AgentsWelcome = compose(
                         color='primary'
                         href={`${getCore().application.getUrlForApp(
                           mitreAttack.id,
-                        )}?agent=${this.props.agent.id}`}
+                        )}`}
                         aria-label='Open MITRE ATT&CK'
                       />
                     </RedirectAppLinks>
