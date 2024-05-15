@@ -252,30 +252,6 @@
   top: 210px !important;
 }
 
-.btn-as-i {
-  background: none;
-  border: 0;
-  color: #006bb4;
-  padding: 0;
-  margin: 0;
-  font-size: 20px;
-  box-shadow: none !important;
-}
-
-.btn-as-i:hover,
-.btn-as-i:focus {
-  background: none !important;
-  color: #006bb4 !important;
-}
-
-/* Custom reporting button styles */
-
-.wz-report-button:hover {
-  background-color: #006bb4 !important;
-  color: #f5f5f5;
-  border-radius: 0;
-}
-
 .wz-report-refresh-btn {
   position: absolute !important;
   right: 0px;
@@ -326,23 +302,6 @@ input[type='search'].euiFieldSearch {
   border: 1px solid #d9d9d9 !important;
 }
 
-/* Custom input container styles */
-
-.wz-input-container label {
-  font-weight: 700 !important;
-  color: rgba(0, 0, 0, 0.38) !important;
-}
-
-.wz-input-container label.md-required:after {
-  color: #006bb4 !important;
-}
-
-.wz-input-container input,
-.wz-input-container input.md-input-invalid.md-input,
-.wz-input-container input.ng-invalid.ng-touched {
-  border-color: rgba(0, 0, 0, 0.12) !important;
-}
-
 .wz-autocomplete md-autocomplete-wrap {
   box-shadow: none !important;
 }
@@ -365,7 +324,9 @@ input[type='search'].euiFieldSearch {
   box-shadow: none;
 }
 
-:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput):not(.euiTextArea):not(.euiPanel.euiPopover__panel.euiPopover__panel-isOpen) {
+:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput):not(
+    .euiTextArea
+  ):not(.euiPanel.euiPopover__panel.euiPopover__panel-isOpen) {
   box-shadow: none !important;
 }
 
@@ -443,7 +404,7 @@ md-content {
   color: black !important;
 }
 
-.table-hover>tbody>tr:hover {
+.table-hover > tbody > tr:hover {
   background-color: #fafbfd !important;
 }
 
@@ -777,7 +738,7 @@ md-switch.md-checked .md-thumb {
   min-height: 300px;
 }
 
-.nav-bar-white-bg>div {
+.nav-bar-white-bg > div {
   background: #fff;
 }
 
@@ -803,7 +764,7 @@ md-switch.md-checked .md-thumb {
  * https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/
  * Handling long URLs on error toasts.
  */
-.euiGlobalToastList>.euiToast>.euiToastHeader>.euiToastHeader__title {
+.euiGlobalToastList > .euiToast > .euiToastHeader > .euiToastHeader__title {
   overflow-wrap: break-word;
   word-wrap: break-word;
   -ms-word-break: break-all;
@@ -866,34 +827,34 @@ wz-xml-file-editor {
   background: #ecf6fb !important;
 }
 
-.table-striped>tbody>tr:nth-of-type(odd) {
+.table-striped > tbody > tr:nth-of-type(odd) {
   background-color: transparent !important;
 }
 
-.table-striped>tbody>tr:nth-of-type(odd):hover {
+.table-striped > tbody > tr:nth-of-type(odd):hover {
   background-color: #fafbfd !important;
 }
 
-.table-striped-duo>tbody tr:not(.euiTableRow):nth-child(2n + 1):not(:hover),
-.table-striped-duo>tbody tr:not(.euiTableRow):nth-child(2n + 2):not(:hover) {
+.table-striped-duo > tbody tr:not(.euiTableRow):nth-child(2n + 1):not(:hover),
+.table-striped-duo > tbody tr:not(.euiTableRow):nth-child(2n + 2):not(:hover) {
   background: #f9f9f9;
 }
 
-.table-striped-duo>tbody tr:not(.euiTableRow):nth-child(4n + 1):not(:hover),
-.table-striped-duo>tbody tr:not(.euiTableRow):nth-child(4n + 2):not(:hover) {
+.table-striped-duo > tbody tr:not(.euiTableRow):nth-child(4n + 1):not(:hover),
+.table-striped-duo > tbody tr:not(.euiTableRow):nth-child(4n + 2):not(:hover) {
   background: #fff;
 }
 
-.table-resizable>thead th:not(:first-child) {
+.table-resizable > thead th:not(:first-child) {
   border-left: 1px dashed #dfeff8;
   overflow: hidden;
 }
 
-.table-resizable>thead th:last-child .ui-resizable-handle {
+.table-resizable > thead th:last-child .ui-resizable-handle {
   display: none !important;
 }
 
-.table-resizable td+td {
+.table-resizable td + td {
   width: auto;
 }
 
@@ -944,7 +905,7 @@ wz-xml-file-editor {
   display: block !important;
 }
 
-.sca-vis .visWrapper .visWrapper__chart>div>svg>g>text:nth-child(2) {
+.sca-vis .visWrapper .visWrapper__chart > div > svg > g > text:nth-child(2) {
   font-size: 10px !important;
 }
 
@@ -1033,7 +994,7 @@ wz-xml-file-editor {
   white-space: nowrap;
 }
 
-.health-check dl.euiDescriptionList dd>span:first-child {
+.health-check dl.euiDescriptionList dd > span:first-child {
   display: inline-block;
   width: 26px;
 }
@@ -1168,7 +1129,7 @@ wz-xml-file-editor {
   margin: 0px;
 }
 
-.header-global-wrapper+.app-wrapper:not(.hidden-chrome) {
+.header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
   top: 48px !important;
   left: 48px !important;
 }
@@ -1323,15 +1284,15 @@ md-chips .md-chips {
 //   margin-top: 50px;
 // }
 
-.wz-markdown-margin>p {
+.wz-markdown-margin > p {
   margin-top: 5px;
 }
 
-.wz-markdown-margin>ul {
+.wz-markdown-margin > ul {
   list-style: disc;
 }
 
-.wz-markdown-margin>ul>li {
+.wz-markdown-margin > ul > li {
   margin-left: 25px;
 }
 
@@ -1369,7 +1330,7 @@ md-chips .md-chips {
   border: solid 1px #d9d9d9;
 }
 
-.react-code-mirror>.CodeMirror.CodeMirror-wrap.cm-s-default {
+.react-code-mirror > .CodeMirror.CodeMirror-wrap.cm-s-default {
   height: 100% !important;
 }
 
@@ -1523,7 +1484,12 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
 }
 
 /* Change custom discover size */
-.wz-discover>.globalQueryBar>.kbnQueryBar--withDatePicker>.euiFlexItem.euiFlexItem--flexGrowZero>.euiFlexGroup>.euiFlexItem.kbnQueryBar__datePickerWrapper {
+.wz-discover
+  > .globalQueryBar
+  > .kbnQueryBar--withDatePicker
+  > .euiFlexItem.euiFlexItem--flexGrowZero
+  > .euiFlexGroup
+  > .euiFlexItem.kbnQueryBar__datePickerWrapper {
   max-width: 300px;
 }
 
@@ -1533,13 +1499,18 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
   }
 
   /* Change custom discover size */
-  .wz-discover>.globalQueryBar>.euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker {
+  .wz-discover
+    > .globalQueryBar
+    > .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker {
     flex-wrap: wrap;
     margin-left: 0;
     margin-right: 0;
   }
 
-  .wz-discover>.globalQueryBar>.euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker>.euiFlexItem {
+  .wz-discover
+    > .globalQueryBar
+    > .euiFlexGroup.kbnQueryBar.kbnQueryBar--withDatePicker
+    > .euiFlexItem {
     width: 100% !important;
     -ms-flex-preferred-size: 100% !important;
     flex-basis: 100% !important;
@@ -1548,16 +1519,27 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
     margin-bottom: 16px !important;
   }
 
-  .wz-discover>.globalQueryBar>.kbnQueryBar--withDatePicker> :first-child {
+  .wz-discover > .globalQueryBar > .kbnQueryBar--withDatePicker > :first-child {
     order: 1;
     margin-top: -8px;
   }
 
-  .wz-discover>.globalQueryBar>.kbnQueryBar--withDatePicker>.euiFlexItem.euiFlexItem--flexGrowZero>.euiFlexGroup>.euiFlexItem.kbnQueryBar__datePickerWrapper>.euiFlexGroup {
+  .wz-discover
+    > .globalQueryBar
+    > .kbnQueryBar--withDatePicker
+    > .euiFlexItem.euiFlexItem--flexGrowZero
+    > .euiFlexGroup
+    > .euiFlexItem.kbnQueryBar__datePickerWrapper
+    > .euiFlexGroup {
     width: 100%;
   }
 
-  .wz-discover>.globalQueryBar>.kbnQueryBar--withDatePicker>.euiFlexItem.euiFlexItem--flexGrowZero>.euiFlexGroup>.euiFlexItem.kbnQueryBar__datePickerWrapper {
+  .wz-discover
+    > .globalQueryBar
+    > .kbnQueryBar--withDatePicker
+    > .euiFlexItem.euiFlexItem--flexGrowZero
+    > .euiFlexGroup
+    > .euiFlexItem.kbnQueryBar__datePickerWrapper {
     flex-grow: 1 !important;
     max-width: none;
   }
@@ -1605,7 +1587,7 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
   }
 }
 
-.chrHeaderWrapper--navIsLocked~.app-wrapper .wz-module-header-agent-wrapper {
+.chrHeaderWrapper--navIsLocked ~ .app-wrapper .wz-module-header-agent-wrapper {
   padding-left: 320px;
 }
 
@@ -1747,7 +1729,6 @@ iframe.width-changed {
 }
 
 .wz-euiCard-no-title {
-
   .euiCard__title,
   .euiCard__description {
     display: none;
@@ -1784,7 +1765,7 @@ iframe.width-changed {
 }
 
 @media only screen and (max-width: 767px) {
-  .header-global-wrapper+.app-wrapper:not(.hidden-chrome) {
+  .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
     left: 0 !important;
   }
 
@@ -1845,7 +1826,7 @@ iframe.width-changed {
     background-color: transparent;
   }
 
-  [name='OverviewWelcome'] .euiIcon--app .euiIcon__fillSecondary {
+  .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
     fill: #000000bb;
   }
 }

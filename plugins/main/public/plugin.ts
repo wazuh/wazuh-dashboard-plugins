@@ -45,7 +45,6 @@ import {
   unregisterInterceptor,
 } from './services/request-handler';
 import { Applications, Categories } from './utils/applications';
-import { syncHistoryLocations } from './kibana-integrations/discover/kibana_services';
 import { euiPaletteColorBlind } from '@elastic/eui';
 
 const innerAngularName = 'app/wazuh';
@@ -62,10 +61,6 @@ export class WazuhPlugin
     core: CoreSetup,
     plugins: WazuhSetupPlugins,
   ): Promise<WazuhSetup> {
-    // Hide the discover deprecation notice
-    // After opensearch version 2.11.0 this line may be deleted
-    localStorage.setItem('discover:deprecation-notice:show', 'false');
-
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState = {};
     try {
@@ -150,9 +145,9 @@ export class WazuhPlugin
                   ? undefined
                   : 'Interval is not valid.';
               });
+            setWzCurrentAppID(id);
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
-            setWzCurrentAppID(id);
             initializeInterceptor(core);
             if (!this.initializeInnerAngular) {
               throw Error(
@@ -170,10 +165,6 @@ export class WazuhPlugin
             setScopedHistory(params.history);
             // This allows you to add the selectors to the navbar
             setHeaderActionMenuMounter(params.setHeaderActionMenu);
-            // Discover currently uses two history instances:
-            // one from Kibana Platform and another from history package.
-            // Below function is used every time Discover app is loaded to synchronize both instances
-            syncHistoryLocations();
             // Load application bundle
             const { renderApp } = await import('./application');
             // Get start services as specified in kibana.json

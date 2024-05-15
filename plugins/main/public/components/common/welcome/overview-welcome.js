@@ -116,11 +116,11 @@ export const OverviewWelcome = compose(
     render() {
       return (
         <Fragment>
-          <EuiPage>
+          <EuiPage className='wz-welcome-page'>
             <EuiFlexGroup gutterSize='l'>
               <EuiFlexItem>
                 {this.props.agentsCountTotal === 0 && this.addAgent()}
-                <EuiFlexGroup>
+                <EuiFlexGroup gutterSize='none'>
                   <EuiFlexGrid columns={2}>
                     {appCategories.map(({ label, apps }) => (
                       <EuiFlexItem key={label}>
@@ -136,7 +136,8 @@ export const OverviewWelcome = compose(
                           <EuiFlexGrid columns={2}>
                             {apps.map(app => (
                               <EuiFlexItem key={app.id}>
-                                <RedirectAppLinks className='flex-redirect-app-links'
+                                <RedirectAppLinks
+                                  className='flex-redirect-app-links'
                                   application={getCore().application}
                                 >
                                   <EuiCard

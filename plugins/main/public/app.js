@@ -36,7 +36,6 @@ import 'angular-material/angular-material';
 import './setup';
 
 //App imports
-import './kibana-integrations';
 import './services';
 import './controllers';
 import './factories';
@@ -101,7 +100,7 @@ app.run(function ($rootElement) {
       <react-component name="WzMenuWrapper" props=""></react-component>
       <react-component name="WzAgentSelectorWrapper" props=""></react-component>
       <react-component name="ToastNotificationsModal" props=""></react-component>
-      <react-component name="WzUpdatesNotification" props=""></react-component>
+      <react-component name="WzUpdatesNotification"></react-component>
     </div>`);
 
   // Bind deleteExistentToken on Log out component.

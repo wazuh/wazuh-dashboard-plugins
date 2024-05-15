@@ -123,19 +123,9 @@ md-content {
   color: #fff;
 }
 
-.wz-nav-item button.md-primary {
-  color: #0079a5 !important;
-  background-color: #232635 !important;
-  border-bottom: 2px solid #006bb4;
-}
-
 md-nav-bar.md-default-theme .md-nav-bar,
 md-nav-bar .md-nav-bar {
   border-color: rgb(52, 55, 65);
-}
-
-.wz-nav-item button.md-unselected {
-  color: #fff !important;
 }
 
 .sidebar-container .index-pattern {
@@ -239,10 +229,6 @@ table thead > tr {
   border-left: 1px dashed #343741;
 }
 
-md-dialog.md-default-theme.md-content-overflow .md-actions,
-md-dialog.md-content-overflow .md-actions,
-md-dialog.md-default-theme.md-content-overflow md-dialog-actions,
-md-dialog.md-content-overflow md-dialog-actions,
 md-divider.md-default-theme,
 md-divider {
   border-top-color: rgb(52, 55, 65);
@@ -466,7 +452,7 @@ svg .legend text {
 }
 
 .wz-app {
-  [name='OverviewWelcome'] .euiIcon--app .euiIcon__fillSecondary {
+  .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
     fill: #dfe5ef;
   }
 }

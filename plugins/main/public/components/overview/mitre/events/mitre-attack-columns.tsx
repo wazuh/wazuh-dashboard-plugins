@@ -2,7 +2,9 @@ import { EuiLink } from '@elastic/eui';
 import { AppNavigate } from '../../../../react-services';
 import { tDataGridColumn } from '../../../common/data-grid';
 import React from 'react';
-import dompurify from 'dompurify';
+import { formatUIDate } from '../../../../react-services';
+import { getCore } from '../../../../kibana-services';
+import { rules } from '../../../../utils/applications';
 
 const navigateTo = (ev, section, params) => {
   AppNavigate.navigateToModule(ev, section, params);
@@ -37,10 +39,7 @@ export const mitreAttackColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
     displayAsText: 'Time',
-    render: (value, row, cellFormatted) => {
-      const sanitizedCellValue = dompurify.sanitize(cellFormatted);
-      return <span dangerouslySetInnerHTML={{ __html: sanitizedCellValue }} />;
-    },
+    render: value => formatUIDate(value),
   },
   {
     id: 'agent.name',
@@ -69,16 +68,13 @@ export const mitreAttackColumns: tDataGridColumn[] = [
     id: 'rule.id',
     displayAsText: 'Rule ID',
     render: value => (
-      <EuiLink
-        onClick={e =>
-          navigateTo(e, 'manager', {
-            tab: 'rules',
-            redirectRule: value,
-          })
-        }
-      >
-        {value}
-      </EuiLink>
+      <RedirectAppLinks application={getCore().application}>
+        <EuiLink
+          href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
+        >
+          {value}
+        </EuiLink >
+      </RedirectAppLinks>
     ),
   },
 ];

@@ -77,7 +77,7 @@ class WzConfigurationLogCollection extends Component {
         condition:
           currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
           currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_LOGS_PROP]
-            .length > 0,
+            ?.length > 0,
         component: (
           <WzTabSelectorTab label='Logs'>
             <WzConfigurationLogCollectionLogs
@@ -92,7 +92,7 @@ class WzConfigurationLogCollection extends Component {
           currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
           currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][
             LOCALFILE_WINDOWSEVENT_PROP
-          ].length > 0,
+          ]?.length > 0,
         component: (
           <WzTabSelectorTab label='Windows Events'>
             <WzConfigurationLogCollectionWindowsEvents
@@ -134,7 +134,7 @@ class WzConfigurationLogCollection extends Component {
         condition:
           currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
           currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_COMMANDS_PROP]
-            .length > 0,
+            ?.length > 0,
         component: (
           <WzTabSelectorTab label='Commands'>
             <WzConfigurationLogCollectionCommands

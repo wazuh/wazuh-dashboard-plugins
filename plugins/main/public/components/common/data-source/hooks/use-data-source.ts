@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   IDataSourceFactoryConstructor,
   tDataSourceRepository,
@@ -43,8 +43,11 @@ type tUseDataSourceNotLoadedReturns = {
   filterManager: null;
 };
 
-export function useDataSource<T extends tParsedIndexPattern, K extends PatternDataSource>(
-  props: tUseDataSourceProps<T, K>
+export function useDataSource<
+  T extends tParsedIndexPattern,
+  K extends PatternDataSource,
+>(
+  props: tUseDataSourceProps<T, K>,
 ): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
   const {
     filters: initialFilters = [],
@@ -59,6 +62,7 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
     throw new Error('DataSource and repository are required');
   }
 
+  const [subscription, setSubscription] = useState<any>();
   const [dataSource, setDataSource] = useState<PatternDataSource>();
   const [dataSourceFilterManager, setDataSourceFilterManager] =
     useState<PatternDataSourceFilterManager | null>(null);
@@ -82,15 +86,14 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
     return await dataSourceFilterManager?.fetch(params);
   };
 
-  useEffect(() => {
-    init();
-  }, []);
-
-  const init = async () => {
+  const initialize = async () => {
     setIsLoading(true);
     const factory = injectedFactory || new PatternDataSourceFactory();
     const patternsData = await repository.getAll();
-    const dataSources = await factory.createAll(DataSourceConstructor, patternsData);
+    const dataSources = await factory.createAll(
+      DataSourceConstructor,
+      patternsData,
+    );
     const selector = new PatternDataSourceSelector(dataSources, repository);
     const dataSource = await selector.getSelectedDataSource();
     if (!dataSource) {
@@ -101,22 +104,30 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
       dataSource,
       initialFilters,
       injectedFilterManager,
-      initialFetchFilters
+      initialFetchFilters,
     );
     // what the filters update
-    dataSourceFilterManager.getUpdates$().subscribe({
+    let subscription = dataSourceFilterManager.getUpdates$().subscribe({
       next: () => {
         // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-        dataSourceFilterManager.setFilters(dataSourceFilterManager.getFilters());
+        dataSourceFilterManager.setFilters(
+          dataSourceFilterManager.getFilters(),
+        );
         setAllFilters(dataSourceFilterManager.getFilters());
         setFetchFilters(dataSourceFilterManager.getFetchFilters());
       },
     });
+    setSubscription(subscription);
     setAllFilters(dataSourceFilterManager.getFilters());
     setFetchFilters(dataSourceFilterManager.getFetchFilters());
     setDataSourceFilterManager(dataSourceFilterManager);
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    initialize();
+    return () => subscription && subscription.unsubscribe();
+  }, []);
 
   if (isLoading) {
     return {

@@ -1,0 +1,14 @@
+.wazuhDataGridContainer {
+    max-width: 100%;
+    min-width: 100%;
+
+    .euiDataGrid--fullScreen {
+        height: calc(100vh - 49px);
+        bottom: 0;
+        top: auto;
+    }
+}
+
+.headerIsExpanded .wazuhDataGridContainer {
+    height: calc(100vh - 153px);
+}
