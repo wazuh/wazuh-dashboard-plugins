@@ -214,14 +214,14 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Panel',
         buttons: [ButtonModuleExploreAgent],
-        component: withModuleNotForAgent(OfficePanel),
+        component: OfficePanel,
       },
       renderDiscoverTab({
         tableColumns: office365Columns,
         DataSource: Office365DataSource,
       }),
     ],
-    availableFor: ['manager'],
+    availableFor: ['manager', 'agent'],
   },
   github: {
     init: 'dashboard',
