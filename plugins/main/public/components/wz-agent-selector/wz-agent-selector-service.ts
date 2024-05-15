@@ -15,12 +15,14 @@ export class PinnedAgentManager {
   private store: any;
   private location: any;
   private route: any;
+  private rootScope: any;
 
   constructor(inputStore?: any) {
     this.store = inputStore ?? store;
     const $injector = getAngularModule().$injector;
     this.location = $injector.get('$location');
     this.route = $injector.get('$route');
+    this.rootScope = $injector.get('$rootScope');
   }
 
   private equalToPinnedAgent(agentData: any): boolean {
@@ -42,24 +44,42 @@ export class PinnedAgentManager {
       return;
     }
     this.store.dispatch(updateCurrentAgentData(agentData));
-    this.location.search(
-      window.location.href.includes(this.AGENT_VIEW_URL)
-        ? PinnedAgentManager.AGENT_ID_VIEW_KEY
-        : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
-      String(agentData?.id),
-    );
-    this.route.reload();
+    /* The following code is a workaround so that both overview and agent overview are re-rendered when a pinned agent changes, including the URL as a source. This will surely change when Angular is permanently removed and the routing system changes. */
+    setTimeout(() => {
+      const includesAgentViewURL = window.location.href.includes(
+        this.AGENT_VIEW_URL,
+      );
+      this.location.search(
+        includesAgentViewURL
+          ? PinnedAgentManager.AGENT_ID_VIEW_KEY
+          : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
+        String(agentData?.id),
+      );
+      if (includesAgentViewURL) {
+        this.route.reload();
+      } else {
+        this.rootScope.$applyAsync();
+      }
+    }, 1);
   }
 
   unPinAgent(): void {
     this.store.dispatch(
       updateCurrentAgentData(PinnedAgentManager.NO_AGENT_DATA),
     );
+    /* The following code is a workaround so that both overview and agent overview are re-rendered when a pinned agent changes, including the URL as a source. This will surely change when Angular is permanently removed and the routing system changes. */
     ['agent', 'agentId'].forEach(param => {
       if (this.location.search()[param]) {
         setTimeout(() => {
+          const includesAgentViewURL = window.location.href.includes(
+            this.AGENT_VIEW_URL,
+          );
           this.location.search(param, null);
-          this.route.reload();
+          if (includesAgentViewURL) {
+            this.route.reload();
+          } else {
+            this.rootScope.$applyAsync();
+          }
         }, 1);
       }
     });
