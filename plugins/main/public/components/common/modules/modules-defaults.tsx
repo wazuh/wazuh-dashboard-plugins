@@ -81,16 +81,6 @@ import {
   Office365DataSource,
 } from '../data-source';
 
-const ALERTS_INDEX_PATTERN = 'wazuh-alerts-*';
-const DEFAULT_INDEX_PATTERN = ALERTS_INDEX_PATTERN;
-
-const DashboardTab = {
-  id: 'dashboard',
-  name: 'Dashboard',
-  buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
-  component: Dashboard,
-};
-
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
     id: 'events',
