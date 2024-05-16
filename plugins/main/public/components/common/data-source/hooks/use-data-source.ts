@@ -11,6 +11,7 @@ import {
   PatternDataSourceFilterManager,
   tFilterManager,
 } from '../index';
+import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   DataSource: IDataSourceFactoryConstructor<K>;
@@ -62,13 +63,14 @@ export function useDataSource<
     throw new Error('DataSource and repository are required');
   }
 
-  const [subscription, setSubscription] = useState<any>();
   const [dataSource, setDataSource] = useState<PatternDataSource>();
   const [dataSourceFilterManager, setDataSourceFilterManager] =
     useState<PatternDataSourceFilterManager | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
+  const pinnedAgentManager = new PinnedAgentManager();
+  const pinnedAgent = pinnedAgentManager.getPinnedAgent();
 
   const setFilters = (filters: tFilter[]) => {
     if (!dataSourceFilterManager) {
@@ -86,48 +88,71 @@ export function useDataSource<
     return await dataSourceFilterManager?.fetch(params);
   };
 
-  const initialize = async () => {
-    setIsLoading(true);
-    const factory = injectedFactory || new PatternDataSourceFactory();
-    const patternsData = await repository.getAll();
-    const dataSources = await factory.createAll(
-      DataSourceConstructor,
-      patternsData,
-    );
-    const selector = new PatternDataSourceSelector(dataSources, repository);
-    const dataSource = await selector.getSelectedDataSource();
-    if (!dataSource) {
-      throw new Error('No valid data source found');
-    }
-    setDataSource(dataSource);
-    const dataSourceFilterManager = new PatternDataSourceFilterManager(
-      dataSource,
-      initialFilters,
-      injectedFilterManager,
-      initialFetchFilters,
-    );
-    // what the filters update
-    let subscription = dataSourceFilterManager.getUpdates$().subscribe({
-      next: () => {
-        // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-        dataSourceFilterManager.setFilters(
-          dataSourceFilterManager.getFilters(),
-        );
-        setAllFilters(dataSourceFilterManager.getFilters());
-        setFetchFilters(dataSourceFilterManager.getFetchFilters());
-      },
-    });
-    setSubscription(subscription);
-    setAllFilters(dataSourceFilterManager.getFilters());
-    setFetchFilters(dataSourceFilterManager.getFetchFilters());
-    setDataSourceFilterManager(dataSourceFilterManager);
-    setIsLoading(false);
-  };
-
   useEffect(() => {
-    initialize();
+    let subscription;
+    (async () => {
+      setIsLoading(true);
+      const factory = injectedFactory || new PatternDataSourceFactory();
+      const patternsData = await repository.getAll();
+      const dataSources = await factory.createAll(
+        DataSourceConstructor,
+        patternsData,
+      );
+      const selector = new PatternDataSourceSelector(dataSources, repository);
+      const dataSource = await selector.getSelectedDataSource();
+      if (!dataSource) {
+        throw new Error('No valid data source found');
+      }
+      setDataSource(dataSource);
+      const dataSourceFilterManager = new PatternDataSourceFilterManager(
+        dataSource,
+        initialFilters,
+        injectedFilterManager,
+        initialFetchFilters,
+      );
+      // what the filters update
+      subscription = dataSourceFilterManager.getUpdates$().subscribe({
+        next: () => {
+          // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
+          dataSourceFilterManager.setFilters(
+            dataSourceFilterManager.getFilters(),
+          );
+          setAllFilters(dataSourceFilterManager.getFilters());
+          setFetchFilters(dataSourceFilterManager.getFetchFilters());
+        },
+      });
+      setAllFilters(dataSourceFilterManager.getFilters());
+      setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      setDataSourceFilterManager(dataSourceFilterManager);
+      setIsLoading(false);
+    })();
+  
     return () => subscription && subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (dataSourceFilterManager && dataSource) {
+      const filteredPinnedAgent = dataSourceFilterManager
+        .getFilters()
+        .filter(
+          (filter: tFilter) =>
+            filter.meta.controlledBy !==
+            PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
+        );
+      if (pinnedAgentManager.isPinnedAgent()) {
+        const pinnedAgent = PatternDataSourceFilterManager.getPinnedAgentFilter(
+          dataSource.id,
+        );
+
+        dataSourceFilterManager.setFilters([
+          ...filteredPinnedAgent,
+          ...pinnedAgent,
+        ]);
+      } else {
+        dataSourceFilterManager.setFilters([...filteredPinnedAgent]);
+      }
+    }
+  }, [JSON.stringify(pinnedAgent)]);
 
   if (isLoading) {
     return {

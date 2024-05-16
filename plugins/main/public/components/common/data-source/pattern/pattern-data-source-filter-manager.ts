@@ -10,10 +10,10 @@ import {
   tFilterManager,
 } from '../index';
 import {
-  DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT,
   DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
   AUTHORIZED_AGENTS,
 } from '../../../../../common/constants';
+import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 const MANAGER_AGENT_ID = '000';
 const AGENT_ID_KEY = 'agent.id';
 
@@ -310,29 +310,28 @@ export class PatternDataSourceFilterManager
    * Returns the filter when the an agent is pinned (saved in the session storage or redux store)
    */
   static getPinnedAgentFilter(indexPatternTitle: string): tFilter[] {
-    const agentId = store.getState().appStateReducers?.currentAgentData?.id;
-    const url = window.location.href;
-    const regex = new RegExp('agentId=' + '[^&]*');
-    const match = url.match(regex);
-    const isPinnedAgentByUrl = match && match[0];
-    if (!agentId && !isPinnedAgentByUrl) return [];
-    const agentValueUrl = isPinnedAgentByUrl?.split('=')[1];
+    const pinnedAgentManager = new PinnedAgentManager();
+    const isPinnedAgent = pinnedAgentManager.isPinnedAgent();
+    if (!isPinnedAgent) {
+      return [];
+    }
+    const currentPinnedAgent = pinnedAgentManager.getPinnedAgent();
     return [
       {
         meta: {
           alias: null,
           disabled: false,
-          key: AGENT_ID_KEY,
+          key: PinnedAgentManager.AGENT_ID_KEY,
           negate: false,
-          params: { query: agentId || agentValueUrl },
+          params: { query: currentPinnedAgent.id },
           type: 'phrase',
           index: indexPatternTitle,
-          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT,
+          controlledBy: PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
         },
         query: {
           match: {
-            [AGENT_ID_KEY]: {
-              query: agentId || agentValueUrl,
+            [PinnedAgentManager.AGENT_ID_KEY]: {
+              query: currentPinnedAgent.id,
               type: 'phrase',
             },
           },

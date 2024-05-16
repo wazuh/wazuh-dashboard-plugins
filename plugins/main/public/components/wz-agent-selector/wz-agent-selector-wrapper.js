@@ -17,5 +17,5 @@ import { withErrorBoundary, withReduxProvider } from '../common/hocs';
 
 export const WzAgentSelectorWrapper = compose(
   withErrorBoundary,
-  withReduxProvider
+  withReduxProvider,
 )(WzAgentSelector);

@@ -40,7 +40,6 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
 import { AgentStatus } from '../../../../../components/agents/agent-status';
 import { WzRequest } from '../../../../../react-services';
 import { endpointSummary } from '../../../../../utils/applications';
-import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -120,7 +119,6 @@ class WzGroupAgentsTable extends Component {
                 aria-label='Go to the agent'
                 iconType='eye'
                 onClick={async () => {
-                  this.props.updateCurrentAgentData(item);
                   getCore().application.navigateToApp(endpointSummary.id, {
                     path: `#/agents?agent=${item.id}`,
                   });
@@ -337,7 +335,6 @@ const mapDispatchToProps = dispatch => {
     updateSortFieldAgents: sortFieldAgents =>
       dispatch(updateSortFieldAgents(sortFieldAgents)),
     updateReload: () => dispatch(updateReload()),
-    updateCurrentAgentData: data => dispatch(updateCurrentAgentData(data)),
   };
 };
 
