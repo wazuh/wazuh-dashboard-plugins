@@ -24,7 +24,7 @@ import {
   useDataSource,
 } from '../../../common/data-source';
 import { GitHubDataSource } from '../../../common/data-source/pattern/alerts/github/github-data-source';
-
+import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
 const plugins = getPlugins();
 
@@ -56,7 +56,19 @@ const DashboardGitHubComponent: React.FC = () => {
     setFilters,
   });
 
-  const { query } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useReportingCommunicateSearchContext({
+    isSearching: isDataSourceLoading,
+    totalResults: results?.hits?.total ?? 0,
+    indexPattern: dataSource?.indexPattern,
+    filters: fetchFilters,
+    query: query,
+    time: {
+      from: dateRangeFrom,
+      to: dateRangeTo,
+    },
+  });
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -64,6 +76,10 @@ const DashboardGitHubComponent: React.FC = () => {
     }
     fetchData({
       query,
+      dateRange: {
+        to: dateRangeTo,
+        from: dateRangeFrom,
+      },
     })
       .then(results => {
         setResults(results);
@@ -75,7 +91,12 @@ const DashboardGitHubComponent: React.FC = () => {
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
+  ]);
 
   return (
     <>
@@ -84,16 +105,16 @@ const DashboardGitHubComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <div className='wz-search-bar hide-filter-control'>
-                <SearchBar
-                  appName='github-searchbar'
-                  {...searchBarProps}
-                  showDatePicker={true}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                />
-              </div>
-            )}
+            <div className='wz-search-bar hide-filter-control'>
+              <SearchBar
+                appName='github-searchbar'
+                {...searchBarProps}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            </div>
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
