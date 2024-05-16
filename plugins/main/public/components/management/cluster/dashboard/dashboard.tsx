@@ -19,7 +19,7 @@ import { WzRequest } from '../../../../react-services';
 import { ConfigurationCards } from '../components/configuration_cards';
 import { NodeList } from '../node-list';
 import {
-  AlertsDataSource,
+  ClusterDataSource,
   AlertsDataSourceRepository,
   PatternDataSource,
   tParsedIndexPattern,
@@ -51,7 +51,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsDataSource,
+    DataSource: ClusterDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
@@ -172,26 +172,26 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         ) : null}
         <EuiSpacer size='m' />
         {!isDataSourceLoading &&
-        dataSource &&
-        !state.showConfig &&
-        !state.showNodes ? (
-          <OverviewCards
-            goNodes={goNodes}
-            goAgents={goAgents}
-            goConfiguration={goConfiguration}
-            status={statusRunning}
-            configuration={state?.configuration}
-            version={state?.version}
-            nodesCount={state?.nodesCount}
-            nodeList={state?.nodeList}
-            clusterName={state.configuration?.name}
-            agentsCount={state?.agentsCount}
-            searchBarProps={searchBarProps}
-            results={results}
-            indexPatternId={dataSource?.id}
-            filters={fetchFilters ?? []}
-          />
-        ) : null}
+          dataSource &&
+          !state.showConfig &&
+          !state.showNodes ? (
+            <OverviewCards
+              goNodes={goNodes}
+              goAgents={goAgents}
+              goConfiguration={goConfiguration}
+              status={statusRunning}
+              configuration={state?.configuration}
+              version={state?.version}
+              nodesCount={state?.nodesCount}
+              nodeList={state?.nodeList}
+              clusterName={state.configuration?.name}
+              agentsCount={state?.agentsCount}
+              searchBarProps={searchBarProps}
+              results={results}
+              indexPatternId={dataSource?.id}
+              filters={fetchFilters ?? []}
+            />
+          ) : null}
         {state.showConfig ? (
           <ConfigurationCards
             goBack={goBack}
