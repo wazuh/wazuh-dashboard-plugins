@@ -24,6 +24,7 @@ import {
 } from '../../../common/data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
 const plugins = getPlugins();
 
@@ -53,6 +54,18 @@ const DashboardDockerComponent: React.FC = ({ }) => {
   });
 
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useReportingCommunicateSearchContext({
+    isSearching: isDataSourceLoading,
+    totalResults: results?.hits?.total ?? 0,
+    indexPattern: dataSource?.indexPattern,
+    filters: fetchFilters,
+    query: query,
+    time: {
+      from: dateRangeFrom,
+      to: dateRangeTo,
+    },
+  });
 
   useEffect(() => {
     if (isDataSourceLoading) {

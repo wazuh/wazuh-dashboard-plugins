@@ -4,7 +4,6 @@ import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { Filter } from '../../../../../../../src/plugins/data/common';
 import { SampleDataWarning } from '../../../visualize/components';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import {
@@ -23,18 +22,13 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-
-interface DashboardThreatHuntingProps {
-  pinnedAgent: Filter;
-}
+import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
 const plugins = getPlugins();
 const SearchBar = getPlugins().data.ui.SearchBar;
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
-  pinnedAgent,
-}) => {
+export const DashboardMITRE: React.FC = () => {
   const {
     filters,
     dataSource,
@@ -55,6 +49,18 @@ export const DashboardMITRE: React.FC<DashboardThreatHuntingProps> = ({
     setFilters,
   });
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useReportingCommunicateSearchContext({
+    isSearching: isDataSourceLoading,
+    totalResults: results?.hits?.total ?? 0,
+    indexPattern: dataSource?.indexPattern,
+    filters: fetchFilters,
+    query: query,
+    time: {
+      from: dateRangeFrom,
+      to: dateRangeTo,
+    },
+  });
 
   useEffect(() => {
     if (isDataSourceLoading) {

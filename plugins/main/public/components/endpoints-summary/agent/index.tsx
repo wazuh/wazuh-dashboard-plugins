@@ -14,6 +14,7 @@ import { endpointSummary } from '../../../utils/applications';
 import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { compose } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
+import { MainModuleAgent } from '../../common/modules/main-agent';
 
 export const AgentView = compose(
   withErrorBoundary,
@@ -66,15 +67,30 @@ export const AgentView = compose(
   }
 
   if (tab === 'syscollector' && agent) {
-    return <MainSyscollector agent={agent} />;
+    return (
+      <>
+        <MainModuleAgent agent={agent} section={tab} />
+        <MainSyscollector agent={agent} />
+      </>
+    );
   }
 
   if (tab === 'stats' && agent) {
-    return <MainAgentStats agent={agent} />;
+    return (
+      <>
+        <MainModuleAgent agent={agent} section={tab} />
+        <MainAgentStats agent={agent} />
+      </>
+    );
   }
 
   if (tab === 'configuration' && agent) {
-    return <WzManagementConfiguration agent={agent} />;
+    return (
+      <>
+        <MainModuleAgent agent={agent} section={tab} />
+        <WzManagementConfiguration agent={agent} />
+      </>
+    );
   }
 
   return (

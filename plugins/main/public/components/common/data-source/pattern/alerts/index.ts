@@ -17,3 +17,4 @@ export * from './configuration-assessment';
 export * from './google-cloud';
 export * from './tsc';
 export * from './office-365';
+export * from './cluster'
