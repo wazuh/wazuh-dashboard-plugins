@@ -24,6 +24,7 @@ import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner'
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { VirusTotalDataSource } from '../../../common/data-source/pattern/alerts/virustotal/virustotal-data-source';
 import './virustotal_dashboard.scss';
+import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
 const plugins = getPlugins();
 
@@ -51,6 +52,18 @@ const DashboardVT: React.FC = () => {
     setFilters,
   });
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useReportingCommunicateSearchContext({
+    isSearching: isDataSourceLoading,
+    totalResults: results?.hits?.total ?? 0,
+    indexPattern: dataSource?.indexPattern,
+    filters: fetchFilters,
+    query: query,
+    time: {
+      from: dateRangeFrom,
+      to: dateRangeTo,
+    },
+  });
 
   useEffect(() => {
     if (isDataSourceLoading) {

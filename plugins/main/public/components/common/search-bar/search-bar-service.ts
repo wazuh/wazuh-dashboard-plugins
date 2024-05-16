@@ -34,7 +34,7 @@ function parseQueryString() {
 /**
  * Get the forceNow query parameter
  */
-function getForceNow() {
+export function getForceNow() {
   const forceNow = parseQueryString().forceNow as string;
   if (!forceNow) {
     return;
@@ -90,7 +90,7 @@ export const search = async (
             gte: dateMath.parse(from).toISOString(),
             /* roundUp: true is used to transform the osd dateform to a generic date format
               For instance: the "This week" date range in the date picker.
-              To: now/w 
+              To: now/w
               From: now/w
               Without the roundUp the to and from date will be the same and the search will return no results or error
 
