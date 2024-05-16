@@ -106,7 +106,7 @@ async function run(configuration) {
   execSystem('git fetch --prune --prune-tags --force');
   logger.info('Pruned local branches and tags');
 
-  const tag = `v${version}-${tagSuffix ? tagSuffix : ''}`;
+  const tag = `v${version}${tagSuffix ? tagSuffix : ''}`;
   logger.info(`Generating tag: ${tag}...`);
 
   bump(configuration);
