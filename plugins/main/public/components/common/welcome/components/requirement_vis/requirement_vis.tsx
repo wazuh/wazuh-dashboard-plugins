@@ -12,18 +12,17 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { EuiFlexItem, EuiPanel, euiPaletteColorBlind } from '@elastic/eui';
 import { VisualizationBasicWidgetSelector } from '../../../charts/visualizations/basic';
 import { getRequirementAlerts } from './lib';
 import { useTimeFilter } from '../../../hooks';
-import { useDispatch } from 'react-redux';
-import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
-import { getAngularModule, getCore } from '../../../../../kibana-services';
+import { getCore } from '../../../../../kibana-services';
 import { getIndexPattern } from '../../../../../react-services';
 import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
 import rison from 'rison-node';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
+import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 
 const selectionOptionsCompliance = [
   { value: 'pci_dss', text: 'PCI DSS' },
@@ -46,17 +45,19 @@ const requirementNameModuleID = {
 export function RequirementVis(props) {
   const colors = euiPaletteColorBlind();
   const { timeFilter } = useTimeFilter();
-  const dispatch = useDispatch();
+  const pinnedAgentManager = new PinnedAgentManager();
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
     try {
-      dispatch(updateCurrentAgentData(agent));
-      const $injector = getAngularModule().$injector;
-      const route = $injector.get('$route');
+      pinnedAgentManager.pinAgent(agent);
       const indexPattern = getIndexPattern();
       const filters = [
         {
-          ...buildPhraseFilter({ name: `rule.${requirement}`, type: 'text' }, key, indexPattern),
+          ...buildPhraseFilter(
+            { name: `rule.${requirement}`, type: 'text' },
+            key,
+            indexPattern,
+          ),
           $state: { isImplicit: false, store: 'appState' },
         },
       ];
@@ -66,7 +67,7 @@ export function RequirementVis(props) {
         _w: rison.encode(_w),
       };
       const url = Object.entries(params)
-        .map((e) => e.join('='))
+        .map(e => e.join('='))
         .join('&');
       // TODO: redirection to gdpr will fail
       getCore().application.navigateToApp(WAZUH_MODULES[params.tab].appId, {
@@ -75,33 +76,41 @@ export function RequirementVis(props) {
     } catch (error) {}
   };
 
-  const fetchData = useCallback(async (selectedOptionValue, timeFilter, agent) => {
-    const buckets = await getRequirementAlerts(agent.id, timeFilter, selectedOptionValue);
-    return buckets?.length
-      ? buckets.map(({ key, doc_count }, index) => ({
-          label: key,
-          value: doc_count,
-          color: colors[index],
-          onClick:
-            selectedOptionValue === 'gpg13'
-              ? undefined
-              : () => goToDashboardWithFilter(selectedOptionValue, key, agent),
-        }))
-      : null;
-  }, []);
+  const fetchData = useCallback(
+    async (selectedOptionValue, timeFilter, agent) => {
+      const buckets = await getRequirementAlerts(
+        agent.id,
+        timeFilter,
+        selectedOptionValue,
+      );
+      return buckets?.length
+        ? buckets.map(({ key, doc_count }, index) => ({
+            label: key,
+            value: doc_count,
+            color: colors[index],
+            onClick:
+              selectedOptionValue === 'gpg13'
+                ? undefined
+                : () =>
+                    goToDashboardWithFilter(selectedOptionValue, key, agent),
+          }))
+        : null;
+    },
+    [],
+  );
 
   return (
     <EuiFlexItem>
-      <EuiPanel paddingSize="m">
+      <EuiPanel paddingSize='m'>
         <VisualizationBasicWidgetSelector
-          type="donut"
+          type='donut'
           size={{ width: '100%', height: '200px' }}
           showLegend
-          title="Compliance"
+          title='Compliance'
           selectorOptions={selectionOptionsCompliance}
           onFetch={fetchData}
           onFetchExtraDependencies={[timeFilter, props.agent]}
-          noDataTitle="No results"
+          noDataTitle='No results'
           noDataMessage={(_, optionRequirement) =>
             `No ${optionRequirement.text} results were found in the selected time range.`
           }
