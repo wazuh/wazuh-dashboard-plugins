@@ -11,6 +11,7 @@ import {
   PatternDataSourceFilterManager,
   tFilterManager,
 } from '../index';
+import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   DataSource: IDataSourceFactoryConstructor<K>;
@@ -68,6 +69,8 @@ export function useDataSource<
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
+  const pinnedAgentManager = new PinnedAgentManager();
+  const pinnedAgent = pinnedAgentManager.getPinnedAgent();
 
   const setFilters = (filters: tFilter[]) => {
     if (!dataSourceFilterManager) {
@@ -126,6 +129,30 @@ export function useDataSource<
   
     return () => subscription && subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (dataSourceFilterManager && dataSource) {
+      const filteredPinnedAgent = dataSourceFilterManager
+        .getFilters()
+        .filter(
+          (filter: tFilter) =>
+            filter.meta.controlledBy !==
+            PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
+        );
+      if (pinnedAgentManager.isPinnedAgent()) {
+        const pinnedAgent = PatternDataSourceFilterManager.getPinnedAgentFilter(
+          dataSource.id,
+        );
+
+        dataSourceFilterManager.setFilters([
+          ...filteredPinnedAgent,
+          ...pinnedAgent,
+        ]);
+      } else {
+        dataSourceFilterManager.setFilters([...filteredPinnedAgent]);
+      }
+    }
+  }, [JSON.stringify(pinnedAgent)]);
 
   if (isLoading) {
     return {

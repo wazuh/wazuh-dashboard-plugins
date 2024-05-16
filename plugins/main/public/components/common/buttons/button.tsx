@@ -19,7 +19,7 @@ import {
   EuiSwitch,
 } from '@elastic/eui';
 
-enum WzButtonType {
+export enum WzButtonType {
   default = 'default',
   empty = 'empty',
   icon = 'icon',
@@ -30,6 +30,9 @@ enum WzButtonType {
 interface WzButtonProps {
   buttonType?: WzButtonType;
   tooltip?: any;
+  color?: any;
+  children?: any;
+  isDisabled?: any;
   rest?: any;
 }
 

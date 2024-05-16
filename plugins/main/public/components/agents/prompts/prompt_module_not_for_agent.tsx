@@ -11,39 +11,31 @@
  */
 
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { EuiButton, EuiEmptyPrompt } from '@elastic/eui';
-import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
-import { useFilterManager } from '../../common/hooks';
+import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 
 type PromptSelectAgentProps = {
   body?: string;
   title: string;
-  agentsSelectionProps: {
-    setAgent: (agent: boolean) => void
-  }
 };
 
-export const PromptModuleNotForAgent = ({ body, title, agentsSelectionProps }: PromptSelectAgentProps) => {
-  const dispatch = useDispatch();
-  const { filterManager, filters } = useFilterManager();
+export const PromptModuleNotForAgent = ({
+  body,
+  title,
+}: PromptSelectAgentProps) => {
+  const pinnedAgentManager = new PinnedAgentManager();
 
   const unpinAgent = async () => {
-    dispatch(updateCurrentAgentData({}));
-    await agentsSelectionProps.setAgent(false);
-    const moduleFilters = filters.filter(x => {
-      return x.meta.key !== 'agent.id';
-    });
-    filterManager.setFilters(moduleFilters);
+    pinnedAgentManager.unPinAgent();
   };
 
   return (
     <EuiEmptyPrompt
-      iconType="watchesApp"
+      iconType='watchesApp'
       title={<h2>{title}</h2>}
       body={body && <p>{body}</p>}
       actions={
-        <EuiButton color="primary" fill onClick={unpinAgent}>
+        <EuiButton color='primary' fill onClick={unpinAgent}>
           Unpin agent
         </EuiButton>
       }
