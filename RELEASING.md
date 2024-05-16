@@ -140,10 +140,10 @@ After the base branches have set the expected [# Files](#files), we must create 
 
 The tag name follows the pattern:
 
-- final release tag: `v{version}-{platform version}`. Example: `v4.4.5-2.6.0`.
-- non-final release tag: `v{version}-{platform version}{suffix}`. Example: `v4.4.5-2.6.0-pre-alpha1`, `v4.4.5-2.6.0-alpha1`, `v4.4.5-2.6.0-rc1`.
+- final release tag: `v{version}`. Example: `v4.9.0`.
+- non-final release tag: `v{version}{suffix}`. Example: `v4.9.0-pre-alpha1`, `v4.9.0-alpha1`, `v4.9.0-rc1`.
 
-> See the [script instructions](#create-tags---script) that reduces this job.
+> See the [script instructions](#create-tags---script) that simplifies the task.
 
 #### Create tags - Manually
 
@@ -166,7 +166,7 @@ git tag {tag} -a -m "Wazuh {version} for OpenSearch Dashboards {platform version
 
 > replace the placeholders:
 >
-> - `{tag}`: tag name. Use this schema: `v{version}-{platform version}`. We add suffixes for release candidates, pre-alpha, alpha or beta versions:
+> - `{tag}`: tag name. Use this schema: `v{version}`. We add suffixes for release candidates, pre-alpha, alpha or beta versions:
 >   - pre-alpha: `-pre-alpha{number}`. Example: `-pre-alpha1`.
 >   - alpha: `-alpha{number}`. Example: `-alpha1`.
 >   - beta: `-beta{number}`. Example: `-beta1`.
@@ -186,7 +186,7 @@ git push origin {tag}
 
 #### Create tags - Script
 
-The process to create the required tag can be run through a script ( `scripts/release/tag.js` ) that bump the repository through the script (`scripts/release/bump.js`) .
+The process to create the required tag can be run through a script ( `scripts/release/tag.js` ) that bumps the repository through the script (`scripts/release/bump.js`) .
 
 - for each plugin in `plugins-directory`:
   - edit `version`, `revision`, `pluginPlatfrom.version` in the package manifest file: `package.json`
