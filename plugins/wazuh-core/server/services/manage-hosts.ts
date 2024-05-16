@@ -191,7 +191,7 @@ export class ManageHosts {
           { apiHostID },
         );
 
-      if (this.isServerAPIClientResponseOk(responseClusterStatus)) {
+      if (this.isServerAPIClientResponseOk(responseClusterStatus) && responseClusterStatus.data?.data?.enabled === 'yes') {
         status = 'enabled';
 
         const responseClusterLocal =
@@ -202,7 +202,7 @@ export class ManageHosts {
             { apiHostID },
           );
 
-        if (this.isServerAPIClientResponseOk(responseClusterStatus)) {
+        if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
           node = responseClusterLocal.data.data.affected_items[0].node;
           cluster = responseClusterLocal.data.data.affected_items[0].cluster;
         }
