@@ -11,9 +11,9 @@ import {
   EuiFlyoutBody,
   EuiFlyoutHeader,
   EuiTitle,
-  EuiButtonEmpty,
   EuiSpacer,
   EuiPanel,
+  EuiLink,
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
@@ -28,7 +28,7 @@ import {
   HttpError,
 } from '../../../react-services/error-management';
 import useSearchBar from '../search-bar/use-search-bar';
-import { getPlugins } from '../../../kibana-services';
+import { getCore, getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 const DashboardByRenderer =
@@ -43,6 +43,8 @@ import {
   AlertsDataSourceRepository,
 } from '../data-source';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { endpointSummary } from '../../../utils/applications';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -136,6 +138,32 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
     })
       .then(results => {
+        results?.hits?.hits.map(value => {
+          const agentId = value._source.agent.id;
+          const agentName = value._source.agent.name;
+          if (agentId === '000') {
+            return value;
+          }
+          value._source.agent.name = (
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                href={`${endpointSummary.id}#/agents?tab=welcome&agent=${agentId}`}
+              >
+                {agentName}
+              </EuiLink>
+            </RedirectAppLinks>
+          );
+          value._source.agent.id = (
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                href={`${endpointSummary.id}#/agents?tab=welcome&agent=${agentId}`}
+              >
+                {agentId}
+              </EuiLink>
+            </RedirectAppLinks>
+          );
+          return value;
+        });
         setResults(results);
       })
       .catch(error => {
@@ -196,16 +224,16 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-              <div className='wz-discover hide-filter-control wz-search-bar'>
-                <SearchBar
-                  appName='wazuh-discover-search-bar'
-                  {...searchBarProps}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                  showSaveQuery={true}
-                />
-              </div>
-            )}
+            <div className='wz-discover hide-filter-control wz-search-bar'>
+              <SearchBar
+                appName='wazuh-discover-search-bar'
+                {...searchBarProps}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+            </div>
+          )}
           {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
