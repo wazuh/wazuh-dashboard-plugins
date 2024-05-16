@@ -22,12 +22,8 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiToolTip,
-  EuiOverlayMask,
-  EuiOutsideClickDetector,
 } from '@elastic/eui';
 // @ts-ignore
-import store from '../../../../../redux/store';
-import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { getFimAlerts } from './lib';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout';
@@ -35,6 +31,7 @@ import { EuiLink } from '@elastic/eui';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { fileIntegrityMonitoring } from '../../../../../utils/applications';
+import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 
 export function FimEventsTable({ agent }) {
   return (
@@ -54,9 +51,9 @@ export function FimEventsTable({ agent }) {
                     iconType='popout'
                     color='primary'
                     onClick={() => navigateToFim(agent)}
-                    href={getCore().application.getUrlForApp(
+                    href={`${getCore().application.getUrlForApp(
                       fileIntegrityMonitoring.id,
-                    )}
+                    )}`}
                     aria-label='Open FIM'
                   />
                 </RedirectAppLinks>
@@ -122,7 +119,8 @@ function FimTable({ agent }) {
 }
 
 function navigateToFim(agent) {
-  store.dispatch(updateCurrentAgentData(agent));
+  const pinnedAgentManager = new PinnedAgentManager();
+  pinnedAgentManager.pinAgent(agent);
 }
 
 const columns = (setFile, setIsOpen) => [

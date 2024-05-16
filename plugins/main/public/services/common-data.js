@@ -11,7 +11,6 @@
  */
 import { AppState } from '../react-services/app-state';
 import { GenericRequest } from '../react-services/generic-request';
-import { ShareAgent } from '../factories/share-agent';
 import { ModulesHelper } from '../components/common/modules/modules-helper';
 import rison from 'rison-node';
 import { VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from '../../common/constants';
@@ -31,7 +30,6 @@ export class CommonData {
     this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.$location = $location;
-    this.shareAgent = new ShareAgent();
     //    this.globalState = globalState;
     this.savedTimefilter = null;
     this.$window = $window;
@@ -380,28 +378,6 @@ export class CommonData {
     } else {
       this.$location.search('tabView', 'panels');
       return 'panels';
-    }
-  }
-
-  /**
-   * Check the location of a given agent
-   * @param {String} newAgentId
-   * @param {Boolean} globalAgent
-   */
-  checkLocationAgentId(newAgentId, globalAgent) {
-    if (newAgentId) {
-      this.$location.search('agent', newAgentId);
-      return newAgentId;
-    } else {
-      if (this.$location.search().agent && !globalAgent) {
-        // There's one in the url
-        return this.$location.search().agent;
-      } else {
-        this.shareAgent.deleteAgent();
-        const agentId = globalAgent?.id || null;
-        agentId && this.$location.search('agent', agentId);
-        return agentId;
-      }
     }
   }
 

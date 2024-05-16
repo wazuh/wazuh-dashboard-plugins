@@ -9,14 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { Dashboard } from './dashboard';
 import { MainSca } from '../../agents/sca';
 import { DashboardAWS } from '../../overview/amazon-web-services/dashboards';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { MainFim } from '../../agents/fim';
 import { ComplianceTable } from '../../overview/compliance-table';
-import ButtonModuleExploreAgent from '../../../controllers/overview/components/overview-actions/overview-actions';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
@@ -29,8 +27,6 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
-import { DashboardFim } from '../../overview/fim/dashboard/dashboard';
-import { InventoryFim } from '../../overview/fim/inventory/inventory';
 import { DashboardOffice365 } from '../../overview/office/dashboard';
 import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
 import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
@@ -80,12 +76,13 @@ import {
   PCIDSSDataSource,
   Office365DataSource,
 } from '../data-source';
+import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
     id: 'events',
     name: 'Events',
-    buttons: [ButtonModuleExploreAgent],
+    buttons: [ButtonExploreAgent],
     component: () => <WazuhDiscover {...props} />,
   };
 };
@@ -97,7 +94,7 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardThreatHunting,
       },
       renderDiscoverTab({
@@ -113,13 +110,13 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardFIM,
       },
       {
         id: 'inventory',
         name: 'Inventory',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: MainFim,
       },
       renderDiscoverTab({
@@ -135,7 +132,7 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardAWS,
       },
       renderDiscoverTab({
@@ -152,7 +149,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardGoogleCloud,
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
       renderDiscoverTab({
         tableColumns: googleCloudColumns,
@@ -168,7 +165,7 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardMalwareDetection,
       },
       renderDiscoverTab({
@@ -184,13 +181,13 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: MainSca,
       },
       {
         id: 'inventory',
         name: 'Inventory',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: MainSca,
       },
       renderDiscoverTab({
@@ -208,12 +205,12 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardOffice365,
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
       {
         id: 'inventory',
         name: 'Panel',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: OfficePanel,
       },
       renderDiscoverTab({
@@ -229,13 +226,13 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardGitHub,
       },
       {
         id: 'inventory',
         name: 'Panel',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: GitHubPanel,
       },
       renderDiscoverTab({
@@ -252,10 +249,10 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardVuls,
-        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
         buttons: [
           ({ ...props }) => (
-            <ButtonModuleExploreAgent
+            <ButtonExploreAgent
               {...props}
               moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
             />
@@ -266,10 +263,10 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Inventory',
         component: InventoryVuls,
-        /* For ButtonModuleExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
         buttons: [
           ({ ...props }) => (
-            <ButtonModuleExploreAgent
+            <ButtonExploreAgent
               {...props}
               moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
             />
@@ -290,7 +287,7 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardMITRE,
       },
       {
@@ -301,7 +298,7 @@ export const ModulesDefaults = {
       {
         id: 'inventory',
         name: 'Framework',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: MainMitre,
       },
       renderDiscoverTab({
@@ -316,7 +313,7 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardVirustotal,
       },
       renderDiscoverTab({
@@ -332,7 +329,7 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardDocker,
       },
       renderDiscoverTab({
@@ -348,13 +345,13 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardPCIDSS,
       },
       {
         id: 'inventory',
         name: 'Controls',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: props => (
           <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
         ),
@@ -372,13 +369,13 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardHIPAA,
       },
       {
         id: 'inventory',
         name: 'Controls',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: props => (
           <ComplianceTable {...props} DataSource={HIPAADataSource} />
         ),
@@ -396,13 +393,13 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardNIST80053,
       },
       {
         id: 'inventory',
         name: 'Controls',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: props => (
           <ComplianceTable {...props} DataSource={NIST80053DataSource} />
         ),
@@ -420,13 +417,13 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardGDPR,
       },
       {
         id: 'inventory',
         name: 'Controls',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: props => (
           <ComplianceTable {...props} DataSource={GDPRDataSource} />
         ),
@@ -444,13 +441,13 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardTSC,
       },
       {
         id: 'inventory',
         name: 'Controls',
-        buttons: [ButtonModuleExploreAgent],
+        buttons: [ButtonExploreAgent],
         component: props => (
           <ComplianceTable {...props} DataSource={TSCDataSource} />
         ),

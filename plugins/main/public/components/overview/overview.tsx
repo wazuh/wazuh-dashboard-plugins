@@ -24,15 +24,17 @@ import {
   createStateContainer,
   syncState,
 } from '../../../../../src/plugins/opensearch_dashboards_utils/public';
+import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 
 export const Overview: React.FC = () => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
   const [tabActive, setTabActive] = useState<string>('welcome');
   const [tabViewActive, setTabViewActive] = useState<string>('panels');
   const $location = getAngularModule().$injector.get('$location');
-  const $rootScope = getAngularModule().$injector.get('$rootScope');
+  const pinnedAgentManager = new PinnedAgentManager();
 
   useEffect(() => {
+    pinnedAgentManager.syncPinnedAgentSources();
     const tab = $location.search().tab;
     const tabView = $location.search().tabView;
     setTabActive(tab || 'welcome');
@@ -55,13 +57,11 @@ export const Overview: React.FC = () => {
       ...data.query.queryString.getDefaultQuery(),
       ...appStateFromUrl,
     };
-    let previousAppState: AppState;
     const appStateContainer = createStateContainer<AppState>(initialAppState);
     const appStateContainerModified = {
       ...appStateContainer,
       set: (value: AppState | null) => {
         if (value) {
-          previousAppState = appStateContainer.getState();
           appStateContainer.set(value);
         }
       },
@@ -160,29 +160,6 @@ export const Overview: React.FC = () => {
       getErrorOrchestrator().handleError(options);
     }
   };
-  // TODO: Create a service or add it in the dataSource the management of the pinned agent
-  const updateSelectedAgents = (agentList: Array<any>) => {
-    try {
-      // This is a workaround to sync the pinned agent with the URL
-      setTimeout(() => {
-        $location.search('agentId', agentList?.[0] || null);
-        $rootScope.$applyAsync();
-      }, 1);
-    } catch (error) {
-      const options = {
-        context: `${Overview.name}.updateSelectedAgents`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-
-      getErrorOrchestrator().handleError(options);
-    }
-  };
 
   return (
     <>
@@ -193,8 +170,6 @@ export const Overview: React.FC = () => {
             agentsSelectionProps={{
               tab: tabActive,
               subtab: tabViewActive,
-              setAgent: (agentList: Array<any>) =>
-                updateSelectedAgents(agentList),
             }}
             switchSubTab={subTab => switchSubTab(subTab)}
           />

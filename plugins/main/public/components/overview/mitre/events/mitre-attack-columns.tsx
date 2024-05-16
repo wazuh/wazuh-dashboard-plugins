@@ -5,6 +5,7 @@ import React from 'react';
 import { formatUIDate } from '../../../../react-services';
 import { getCore } from '../../../../kibana-services';
 import { rules } from '../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const navigateTo = (ev, section, params) => {
   AppNavigate.navigateToModule(ev, section, params);
@@ -69,11 +70,9 @@ export const mitreAttackColumns: tDataGridColumn[] = [
     displayAsText: 'Rule ID',
     render: value => (
       <RedirectAppLinks application={getCore().application}>
-        <EuiLink
-          href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-        >
+        <EuiLink href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}>
           {value}
-        </EuiLink >
+        </EuiLink>
       </RedirectAppLinks>
     ),
   },

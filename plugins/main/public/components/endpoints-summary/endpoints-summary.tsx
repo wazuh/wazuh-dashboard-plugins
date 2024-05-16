@@ -24,7 +24,6 @@ import {
 } from '../common/hocs';
 import { compose } from 'redux';
 import { endpointSummary } from '../../utils/applications';
-import { ShareAgent } from '../../factories/share-agent';
 import './endpoints-summary.scss';
 import { EndpointsSummaryDashboard } from './dashboard/endpoints-summary-dashboard';
 import { getOutdatedAgents } from './services';
@@ -55,7 +54,6 @@ export const EndpointsSummary = compose(
         showOnlyOutdatedAgents: false,
       };
       this.wazuhConfig = new WazuhConfig();
-      this.shareAgent = new ShareAgent();
       this.filterAgentByStatus = this.filterAgentByStatus.bind(this);
       this.filterAgentByOS = this.filterAgentByOS.bind(this);
       this.filterAgentByGroup = this.filterAgentByGroup.bind(this);
