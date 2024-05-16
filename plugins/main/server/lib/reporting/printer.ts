@@ -12,6 +12,18 @@ import { REPORTS_PRIMARY_COLOR } from '../../../common/constants';
 import { Logger } from 'opensearch-dashboards/server';
 import { IConfigurationEnhanced } from '../../../../wazuh-core/server';
 
+interface IVisualization {
+  title: string;
+  element: string;
+  height: number;
+  width?: number;
+}
+
+type IVisualizationExtended = IVisualization & {
+  id: string;
+  width: number;
+};
+
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR,
 };
@@ -356,77 +368,99 @@ export class ReportPrinter {
     this.addContent({ text: '\n' });
     this.logger.debug('Time range and filters rendered');
   }
-  addVisualizations(visualizations, isAgents, tab) {
-    this.logger.debug(`${visualizations.length} visualizations for tab ${tab}`);
-    const single_vis = visualizations.filter(item => item.width >= 600);
-    const double_vis = visualizations.filter(item => item.width < 600);
 
-    single_vis.forEach(visualization => {
-      const title = this.checkTitle(visualization, isAgents, tab);
-      this.addContent({
-        id: 'singlevis' + title[0]._source.title,
-        text: title[0]._source.title,
+  private addVisualizationSingle(visualization: IVisualizationExtended) {
+    this.addContent({
+      id: 'singlevis' + visualization.id,
+      text: visualization.title,
+      style: 'h3',
+    });
+    this.addContent({
+      columns: [{ image: visualization.element, width: 500 }],
+    });
+    this.addNewLine();
+  }
+  private addVisualizationSplit(
+    split: [IVisualizationExtended, IVisualizationExtended],
+  ) {
+    this.addContent({
+      columns: split.map(visualization => ({
+        id: 'splitvis' + visualization.id,
+        text: visualization.title,
         style: 'h3',
-      });
-      this.addContent({
-        columns: [{ image: visualization.element, width: 500 }],
-      });
-      this.addNewLine();
+        width: 280,
+      })),
     });
 
-    let pair = [];
+    this.addContent({
+      columns: split.map(visualization => ({
+        image: visualization.element,
+        width: 270,
+      })),
+    });
 
-    for (const item of double_vis) {
-      pair.push(item);
-      if (pair.length === 2) {
-        const title_1 = this.checkTitle(pair[0], isAgents, tab);
-        const title_2 = this.checkTitle(pair[1], isAgents, tab);
+    this.addNewLine();
+  }
+  private addVisualizationSplitSingle(visualization: IVisualizationExtended) {
+    this.addContent({
+      columns: [
+        {
+          id: 'splitsinglevis' + visualization.id,
+          text: visualization.title,
+          style: 'h3',
+          width: 280,
+        },
+      ],
+    });
+    this.addContent({
+      columns: [{ image: visualization.element, width: 280 }],
+    });
+    this.addNewLine();
+  }
+  addVisualizations(visualizations: IVisualization[]) {
+    this.logger.debug(`Add visualizations [${visualizations.length}]`);
+    const sanitazedVisualizations: IVisualizationExtended[] =
+      visualizations.map((visualization, index) => ({
+        ...visualization,
+        title: visualization.title || '',
+        id: `${visualization.title || ''}.${index}`,
+      }));
+    const { single: fullWidthVisualizations, split: splitWidthVisualizations } =
+      sanitazedVisualizations.reduce(
+        (accum, visualization) => {
+          (
+            (visualization.width >= 600
+              ? accum.single
+              : accum.split) as IVisualizationExtended[]
+          ).push(visualization);
+          return accum;
+        },
+        { single: [], split: [] },
+      );
 
-        this.addContent({
-          columns: [
-            {
-              id: 'splitvis' + title_1[0]._source.title,
-              text: title_1[0]._source.title,
-              style: 'h3',
-              width: 280,
-            },
-            {
-              id: 'splitvis' + title_2[0]._source.title,
-              text: title_2[0]._source.title,
-              style: 'h3',
-              width: 280,
-            },
-          ],
-        });
+    fullWidthVisualizations.forEach(visualization =>
+      this.addVisualizationSingle(visualization),
+    );
 
-        this.addContent({
-          columns: [
-            { image: pair[0].element, width: 270 },
-            { image: pair[1].element, width: 270 },
-          ],
-        });
+    const splitBy = 2;
+    const splits = splitWidthVisualizations.reduce(function (
+      accum,
+      value,
+      index,
+      array,
+    ) {
+      if (index % splitBy === 0)
+        accum.push(array.slice(index, index + splitBy));
+      return accum;
+    },
+    []);
 
-        this.addNewLine();
-        pair = [];
+    splits.forEach(split => {
+      if (split.length === splitBy) {
+        return this.addVisualizationSplit(split);
       }
-    }
-
-    if (double_vis.length % 2 !== 0) {
-      const item = double_vis[double_vis.length - 1];
-      const title = this.checkTitle(item, isAgents, tab);
-      this.addContent({
-        columns: [
-          {
-            id: 'splitsinglevis' + title[0]._source.title,
-            text: title[0]._source.title,
-            style: 'h3',
-            width: 280,
-          },
-        ],
-      });
-      this.addContent({ columns: [{ image: item.element, width: 280 }] });
-      this.addNewLine();
-    }
+      this.addVisualizationSplitSingle(split[0]);
+    });
   }
   formatDate(date: Date): string {
     this.logger.debug(`Format date ${date}`);

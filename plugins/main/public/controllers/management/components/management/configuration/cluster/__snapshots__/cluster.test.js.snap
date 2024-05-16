@@ -1258,41 +1258,6 @@ exports[`Cluster settings should render the cluster settings with HAProxy helper
       <div
         class="euiSpacer euiSpacer--s"
       />
-      <div
-        style="display: flex; align-items: center; flex-direction: row;"
-      >
-        <div
-          style="justify-self: flex-end; margin: 1em; width: 35%;"
-        >
-          <div
-            class="euiTextAlign euiTextAlign--right"
-          >
-            Excluded nodes
-          </div>
-        </div>
-        <div
-          style="width: 65%;"
-        >
-          <div
-            class="euiFormControlLayout euiFormControlLayout--readOnly"
-          >
-            <div
-              class="euiFormControlLayout__childrenWrapper"
-            >
-              <input
-                class="euiFieldText"
-                data-testid="excluded-nodes"
-                readonly=""
-                type="text"
-                value=""
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        class="euiSpacer euiSpacer--s"
-      />
     </div>
   </div>
 </div>

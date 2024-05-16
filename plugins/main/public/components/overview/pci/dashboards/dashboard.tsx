@@ -24,6 +24,7 @@ import {
 import { PCIDSSDataSource } from '../../../common/data-source/pattern/alerts/pci-dss/pci-dss-data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
 const plugins = getPlugins();
 
@@ -53,6 +54,18 @@ const DashboardPCIDSSComponent: React.FC = () => {
   });
 
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+
+  useReportingCommunicateSearchContext({
+    isSearching: isDataSourceLoading,
+    totalResults: results?.hits?.total ?? 0,
+    indexPattern: dataSource?.indexPattern,
+    filters: fetchFilters,
+    query: query,
+    time: {
+      from: dateRangeFrom,
+      to: dateRangeTo,
+    },
+  });
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -89,16 +102,16 @@ const DashboardPCIDSSComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <div className='wz-search-bar hide-filter-control'>
-                <SearchBar
-                  appName='pci-dss-searchbar'
-                  {...searchBarProps}
-                  showDatePicker={true}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                />
-              </div>
-            )}
+            <div className='wz-search-bar hide-filter-control'>
+              <SearchBar
+                appName='pci-dss-searchbar'
+                {...searchBarProps}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            </div>
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

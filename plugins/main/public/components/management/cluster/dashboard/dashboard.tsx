@@ -19,7 +19,7 @@ import { WzRequest } from '../../../../react-services';
 import { ConfigurationCards } from '../components/configuration_cards';
 import { NodeList } from '../node-list';
 import {
-  AlertsDataSource,
+  ClusterDataSource,
   AlertsDataSourceRepository,
   PatternDataSource,
   tParsedIndexPattern,
@@ -51,7 +51,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsDataSource,
+    DataSource: ClusterDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
@@ -160,7 +160,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : !state.showNodes ? (
-          <div className='wz-search-bar'>
+          <div className='wz-search-bar hide-filter-control'>
             <SearchBar
               appName='ct-searchbar'
               {...searchBarProps}
