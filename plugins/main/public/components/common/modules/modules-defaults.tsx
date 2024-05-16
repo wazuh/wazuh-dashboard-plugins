@@ -57,7 +57,6 @@ import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
 import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
 import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
 import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
-import { PCIDSSDataSource } from '../data-source/pattern/alerts/pci-dss/pci-dss-data-source';
 import {
   DockerDataSource,
   AlertsDataSource,
@@ -74,6 +73,7 @@ import {
   GDPRDataSource,
   ConfigurationAssessmentDataSource,
   HIPAADataSource,
+  PCIDSSDataSource,
   Office365DataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
@@ -149,7 +149,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardGoogleCloud,
-        buttons: [ButtonExploreAgent],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
       renderDiscoverTab({
         tableColumns: googleCloudColumns,
@@ -205,28 +205,20 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardOffice365,
-        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
-        buttons: [
-          ({ ...props }) => (
-            <ButtonExploreAgent
-              {...props}
-              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
-            />
-          ),
-        ],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
       {
         id: 'inventory',
         name: 'Panel',
         buttons: [ButtonExploreAgent],
-        component: withModuleNotForAgent(OfficePanel),
+        component: OfficePanel,
       },
       renderDiscoverTab({
         tableColumns: office365Columns,
         DataSource: Office365DataSource,
       }),
     ],
-    availableFor: ['manager'],
+    availableFor: ['manager', 'agent'],
   },
   github: {
     init: 'dashboard',
