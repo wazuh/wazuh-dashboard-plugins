@@ -18,6 +18,11 @@ export class StatisticsDataSource extends PatternDataSource {
     return [...this.getAPIFilter()];
   }
 
+  getFixedFilters(): tFilter[] {
+    // getFixedFilters is overridden so that it does not return the pinned agent's fixed filter.
+    return [];
+  }
+
   getAPIFilter(): tFilter[] {
     const currentApi = AppState.getCurrentAPI();
     const parsedCurrentApi = currentApi ? JSON.parse(currentApi) : undefined;
