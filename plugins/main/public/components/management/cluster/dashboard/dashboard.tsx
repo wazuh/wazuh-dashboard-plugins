@@ -160,7 +160,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : !state.showNodes ? (
-          <div className='wz-search-bar'>
+          <div className='wz-search-bar hide-filter-control'>
             <SearchBar
               appName='ct-searchbar'
               {...searchBarProps}
@@ -172,26 +172,26 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         ) : null}
         <EuiSpacer size='m' />
         {!isDataSourceLoading &&
-          dataSource &&
-          !state.showConfig &&
-          !state.showNodes ? (
-            <OverviewCards
-              goNodes={goNodes}
-              goAgents={goAgents}
-              goConfiguration={goConfiguration}
-              status={statusRunning}
-              configuration={state?.configuration}
-              version={state?.version}
-              nodesCount={state?.nodesCount}
-              nodeList={state?.nodeList}
-              clusterName={state.configuration?.name}
-              agentsCount={state?.agentsCount}
-              searchBarProps={searchBarProps}
-              results={results}
-              indexPatternId={dataSource?.id}
-              filters={fetchFilters ?? []}
-            />
-          ) : null}
+        dataSource &&
+        !state.showConfig &&
+        !state.showNodes ? (
+          <OverviewCards
+            goNodes={goNodes}
+            goAgents={goAgents}
+            goConfiguration={goConfiguration}
+            status={statusRunning}
+            configuration={state?.configuration}
+            version={state?.version}
+            nodesCount={state?.nodesCount}
+            nodeList={state?.nodeList}
+            clusterName={state.configuration?.name}
+            agentsCount={state?.agentsCount}
+            searchBarProps={searchBarProps}
+            results={results}
+            indexPatternId={dataSource?.id}
+            filters={fetchFilters ?? []}
+          />
+        ) : null}
         {state.showConfig ? (
           <ConfigurationCards
             goBack={goBack}
