@@ -3,6 +3,11 @@ import { tDataGridColumn } from '../../../common/data-grid';
 import { getCore } from '../../../../kibana-services';
 import React from 'react';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import {
+  endpointSummary,
+  mitreAttack,
+  rules,
+} from '../../../../utils/applications';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -16,7 +21,10 @@ export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
   {
     id: 'agent.id',
     render: (value: any) => {
-      const destURL = getCore().application.getUrlForApp('endpoints-summary', {
+      if (value === '000') {
+        return value;
+      }
+      const destURL = getCore().application.getUrlForApp(endpointSummary.id, {
         path: `#/agents?tab=welcome&agent=${value}`,
       });
       return (
@@ -30,11 +38,26 @@ export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
   },
   {
     id: 'agent.name',
+    render: (value: any, _source) => {
+      if (_source.agent.id === '000') {
+        return value;
+      }
+      const destURL = getCore().application.getUrlForApp(endpointSummary.id, {
+        path: `#/agents?tab=welcome&agent=${_source.agent.id}`,
+      });
+      return (
+        <RedirectAppLinks application={getCore().application}>
+          <EuiLink href={destURL} style={{ cursor: 'pointer' }}>
+            {value}
+          </EuiLink>
+        </RedirectAppLinks>
+      );
+    },
   },
   {
     id: 'rule.mitre.id',
     render: (value: any) => {
-      const destURL = getCore().application.getUrlForApp('mitre-attack', {
+      const destURL = getCore().application.getUrlForApp(mitreAttack.id, {
         path: `#/overview/?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${value}`,
       });
       return (
@@ -58,7 +81,7 @@ export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
   {
     id: 'rule.id',
     render: (value: any) => {
-      const destURL = getCore().application.getUrlForApp('rules', {
+      const destURL = getCore().application.getUrlForApp(rules.id, {
         path: `manager/?tab=ruleset&redirectRule=${value}`,
       });
       return (
@@ -82,7 +105,7 @@ export const threatHuntingTableAgentColumns: EuiDataGridColumn[] = [
   {
     id: 'rule.mitre.id',
     render: (value: any) => {
-      const destURL = getCore().application.getUrlForApp('mitre-attack', {
+      const destURL = getCore().application.getUrlForApp(mitreAttack.id, {
         path: `#/overview/?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${value}`,
       });
       return (
@@ -106,7 +129,7 @@ export const threatHuntingTableAgentColumns: EuiDataGridColumn[] = [
   {
     id: 'rule.id',
     render: (value: any) => {
-      const destURL = getCore().application.getUrlForApp('rules', {
+      const destURL = getCore().application.getUrlForApp(rules.id, {
         path: `manager/?tab=ruleset&redirectRule=${value}`,
       });
       return (
