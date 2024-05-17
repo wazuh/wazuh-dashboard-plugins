@@ -140,10 +140,10 @@ After the base branches have set the expected [# Files](#files), we must create 
 
 The tag name follows the pattern:
 
-- final release tag: `v{version}-{platform version}`. Example: `v4.4.5-2.6.0`.
-- non-final release tag: `v{version}-{platform version}{suffix}`. Example: `v4.4.5-2.6.0-pre-alpha1`, `v4.4.5-2.6.0-alpha1`, `v4.4.5-2.6.0-rc1`.
+- final release tag: `v{version}`. Example: `v4.9.0`.
+- non-final release tag: `v{version}{suffix}`. Example: `v4.9.0-pre-alpha1`, `v4.9.0-alpha1`, `v4.9.0-rc1`.
 
-> See the [script instructions](#create-tags---script) that reduces this job.
+> See the [script instructions](#create-tags---script) that simplifies the task.
 
 #### Create tags - Manually
 
@@ -166,7 +166,7 @@ git tag {tag} -a -m "Wazuh {version} for OpenSearch Dashboards {platform version
 
 > replace the placeholders:
 >
-> - `{tag}`: tag name. Use this schema: `v{version}-{platform version}`. We add suffixes for release candidates, pre-alpha, alpha or beta versions:
+> - `{tag}`: tag name. Use this schema: `v{version}`. We add suffixes for release candidates, pre-alpha, alpha or beta versions:
 >   - pre-alpha: `-pre-alpha{number}`. Example: `-pre-alpha1`.
 >   - alpha: `-alpha{number}`. Example: `-alpha1`.
 >   - beta: `-beta{number}`. Example: `-beta1`.
@@ -186,7 +186,7 @@ git push origin {tag}
 
 #### Create tags - Script
 
-The process to create the required tag can be run through a script ( `scripts/release/tag.js` ) that bump the repository through the script (`scripts/release/bump.js`) .
+The process to create the required tag can be run through a script ( `scripts/release/tag.js` ) that bumps the repository through the script (`scripts/release/bump.js`) .
 
 - for each plugin in `plugins-directory`:
   - edit `version`, `revision`, `pluginPlatfrom.version` in the package manifest file: `package.json`
@@ -214,10 +214,10 @@ Example:
 node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --version 4.6.0 --revision 03 --platform-version 2.8.0
 ```
 
-- Use a package manifest as base to take the `version`, `revision` and `pluginPlatformVersion` values:
+- Use a `manifest-package` as base to take the `version`, `revision` and `pluginPlatformVersion` values:
 
 ```console
-node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --manifest-plugin ./plugins/main/package.json
+node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-package ./plugins/main/package.json
 ```
 
 > If the version, the revision or platform version is not specified, then you can define the package manifest file base to take these values.
@@ -225,9 +225,9 @@ node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog .
 > It is not recommended because these values should be bumped previously to create the tag.
 
 ```console
-node scripts/release/tag.js --plugins-directory <plugins_directory> --manifest-changelog <changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --manifest-plugin <package_manifest_file> --version <bump_version>
-node scripts/release/tag.js --plugins-directory <plugins_directory> --manifest-changelog <changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --manifest-plugin <package_manifest_file> --revision <bump_revision>
-node scripts/release/tag.js --plugins-directory <plugins_directory> --manifest-changelog <changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --manifest-plugin <package_manifest_file> --platform-version <bump_platform_version>
+node scripts/release/tag.js --plugins-directory <plugins_directory> --manifest-changelog <changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --manifest-package <package_manifest_file> --version <bump_version>
+node scripts/release/tag.js --plugins-directory <plugins_directory> --manifest-changelog <changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --manifest-package <package_manifest_file> --revision <bump_revision>
+node scripts/release/tag.js --plugins-directory <plugins_directory> --manifest-changelog <changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --manifest-package <package_manifest_file> --platform-version <bump_platform_version>
 ```
 
 Examples:
@@ -235,26 +235,26 @@ Examples:
 - Change the plugin version. Take the `revision` and `platform-version` parameters from the specified manifest plugin file.
 
 ```console
-node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-plugin ./plugins/main/package.json --version 4.5.0
+node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-package ./plugins/main/package.json --version 4.5.0
 ```
 
 - Change the plugin revision. Take the `version` and `platform-version` parameters from the specified manifest plugin file.
 
 ```console
-node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-plugin ./plugins/main/package.json --revision 02
+node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-package ./plugins/main/package.json --revision 02
 ```
 
 - Change the platform version. Take the `version` and `revision` parameters from the specified manifest plugin file.
 
 ```console
-node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-plugin ./plugins/main/package.json --platform-version 2.8.0
+node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-package ./plugins/main/package.json --platform-version 2.8.0
 ```
 
 For tags that needs a suffix, use the `--tag-suffix <tag-suffix>` flag.
 
 ```console
 node scripts/release/tag.js --plugins-directory <plugins_directory> --manifest-changelog <changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --version <bump_version> --revision <bump_revision> --platform-version <bump_platform_version> --tag-suffix <tag-suffix>
-node scripts/release/tag.js --plugins-directory <plugins_directory> --manifest-changelog <changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --manifest-plugin <package_manifest_file> --platform-version <bump_platform_version> --tag-suffix <tag-suffix>
+node scripts/release/tag.js --plugins-directory <plugins_directory> --manifest-changelog <changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --manifest-package <package_manifest_file> --platform-version <bump_platform_version> --tag-suffix <tag-suffix>
 ```
 
 Example:
@@ -264,12 +264,28 @@ node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog .
 node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-package ./plugins/main/package.json --revision 02 --tag-suffix -rc2
 ```
 
+> It not recommended to bumps the values of `version`, `revision` and `plugin-platform` in our current releasing flow.
+
+For final tags:
+
+```
+node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-package ./plugins/main/package.json
+```
+
+For non-final tags (pre-alpha, alpha, beta, rc):
+
+Example:
+
+```
+node scripts/release/tag.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/v4.6.0/api/api/spec/spec.yaml --manifest-package ./plugins/main/package.json --tag-suffix -rc2
+```
+
 2. Review the new tags were pushed to the remote repository.
 
 ### Build packages
 
 ## Release Phase 2 - Release testing
 
-### Release Phase 3 - Release Announcement
+### Release Phase 3 - Release announcement
 
 ### Release Phase 4 - Post-Release
