@@ -8,7 +8,7 @@ import { getConfiguration } from '../../lib/get-configuration';
 
 /**
  * This task checks for custom SVG files uploaded by the user and sanitizes them.
- * The goal is to sanitize files uploaded in previous versions.
+ * The goal is to sanitize any previously uploaded SVG file.
  * @param context
  * @returns
  */
@@ -28,8 +28,9 @@ export default function sanitizeUploadedSVG(context) {
   };
 
   try {
-    logger.debug('Task sanitize SVG started');
+    logger.info('Task sanitize SVG started');
 
+    logger.debug('Get Wazuh configuration');
     const configuration = getConfiguration();
     const logosSettingKeys = [
       'customization.logo.sidebar',
@@ -37,6 +38,7 @@ export default function sanitizeUploadedSVG(context) {
       'customization.logo.healthcheck',
     ];
 
+    logger.debug('Check configuration for custom branding uploaded SVG files');
     // Check each of the possible custom settings uploaded files look for SVG to sanitize
     logosSettingKeys.forEach(logoKey => {
       const logoSetting: TPluginSetting | undefined = PLUGIN_SETTINGS[logoKey];
@@ -51,15 +53,15 @@ export default function sanitizeUploadedSVG(context) {
         logoSetting.options.file.store.relativePathFileSystem,
       );
 
-      // If the setting folder doesn't exist abort the task
+      // If the setting folder doesn't exist abort
       if (!fs.existsSync(targetDirectory)) {
         return;
       }
 
-      // Get the files related to the setting and remove them
+      // Get the files related to the setting
       const files = glob.sync(path.join(targetDirectory, `${logoKey}.*`));
 
-      // If there are no files saved abort the task
+      // If there are no files saved abort
       if (!files?.length) {
         return;
       }
@@ -76,19 +78,26 @@ export default function sanitizeUploadedSVG(context) {
       const originalFileBuffer = fs.readFileSync(fileFullPath);
 
       // Sanitize the file contents
-      const svgString = originalFileBuffer.toString();
-      const cleanSVG = sanitizeSVG(svgString);
+      const originalSVGString = originalFileBuffer.toString();
+      const cleanSVG = sanitizeSVG(originalSVGString);
       const cleanFileBuffer = Buffer.from(cleanSVG);
 
-      // Delete the original file
-      fs.unlinkSync(fileFullPath);
+      // Check if any changes were made in the sanitization process ignoring white spaces
+      // If any change was made then save the sanitized content
+      if (originalSVGString.replace(/\s/g, '') != cleanSVG.replace(/\s/g, '')) {
+        logger.info(
+          `[sanitize:sanitizeUploadedSVG] ${fileName} SVG file sanitized`,
+        );
+        // Delete the original file
+        fs.unlinkSync(fileFullPath);
 
-      // Save the clean file in the target directory
-      fs.writeFileSync(fileFullPath, cleanFileBuffer);
+        // Save the clean file in the target directory
+        fs.writeFileSync(fileFullPath, cleanFileBuffer);
+      }
     });
 
-    logger.debug('Task finished');
+    logger.info('[sanitize:sanitizeUploadedSVG] Task finished');
   } catch (error) {
-    logger.error(`Error: ${error.message}`);
+    logger.error(`Error [sanitize:sanitizeUploadedSVG]: ${error.message}`);
   }
 }
