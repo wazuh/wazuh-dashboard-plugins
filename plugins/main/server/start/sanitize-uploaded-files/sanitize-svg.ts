@@ -44,6 +44,7 @@ export default function sanitizeUploadedSVG(context) {
       const logoSetting: TPluginSetting | undefined = PLUGIN_SETTINGS[logoKey];
       const customLogoPath = configuration[logoKey];
       if (!logoSetting || !customLogoPath) {
+        logger.debug(`Logo [${logoKey}] not customized. Skip.`);
         return;
       }
 
@@ -96,7 +97,7 @@ export default function sanitizeUploadedSVG(context) {
       }
     });
 
-    logger.info('[sanitize:sanitizeUploadedSVG] Task finished');
+    logger.debug('[sanitize:sanitizeUploadedSVG] Task finished');
   } catch (error) {
     logger.error(`Error [sanitize:sanitizeUploadedSVG]: ${error.message}`);
   }
