@@ -10,9 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-// Redux
-import store from '../../../../redux/store';
-
 import WzRuleset from './ruleset/main-ruleset';
 import WzCDBLists from './cdblists/main-cdblists';
 import WzDecoders from './decoders/main-decoders';
@@ -27,11 +24,7 @@ import {
   SECTION_DECODERS_SECTION,
   SECTION_RULES_SECTION,
 } from './common/constants';
-import { getAngularModule } from '../../../../kibana-services';
-import {
-  withGuardAsync,
-  withReduxProvider,
-} from '../../../../components/common/hocs';
+import { withGuardAsync } from '../../../../components/common/hocs';
 import { compose } from 'redux';
 import { ClusterOverview } from './cluster/cluster-overview';
 
@@ -82,13 +75,10 @@ const availableViews = [
 ];
 
 export const ManagementRouter = compose(
-  withReduxProvider,
   withGuardAsync(
-    () => {
-      // This uses AngularJS to get the tab query parameter
-      const section = getAngularModule()
-        .$injector.get('$location')
-        .search().tab;
+    ({ location }) => {
+      const section = new URLSearchParams(location.search).get('tab');
+
       if (availableViews.includes(section)) {
         return { ok: false, data: { section } };
       }

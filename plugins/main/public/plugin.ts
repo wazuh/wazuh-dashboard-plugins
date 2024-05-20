@@ -11,7 +11,6 @@ import {
   setToasts,
   setUiSettings,
   setChrome,
-  setAngularModule,
   setNavigationPlugin,
   setVisualizationsPlugin,
   setSavedObjects,
@@ -47,15 +46,11 @@ import {
 import { Applications, Categories } from './utils/applications';
 import { euiPaletteColorBlind } from '@elastic/eui';
 
-const innerAngularName = 'app/wazuh';
-
 export class WazuhPlugin
   implements
     Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins>
 {
   constructor(private readonly initializerContext: PluginInitializerContext) {}
-  public initializeInnerAngular?: () => void;
-  private innerAngularInitialized: boolean = false;
   private hideTelemetryBanner?: () => void;
   public async setup(
     core: CoreSetup,
@@ -149,11 +144,6 @@ export class WazuhPlugin
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
             initializeInterceptor(core);
-            if (!this.initializeInnerAngular) {
-              throw Error(
-                'Wazuh plugin method initializeInnerAngular is undefined',
-              );
-            }
 
             // Update redux app state logos with the custom logos
             if (logosInitialState?.logos) {
@@ -167,17 +157,14 @@ export class WazuhPlugin
             setHeaderActionMenuMounter(params.setHeaderActionMenu);
             // Load application bundle
             const { renderApp } = await import('./application');
-            // Get start services as specified in kibana.json
-            const [coreStart, depsStart] = await core.getStartServices();
             setErrorOrchestrator(ErrorOrchestratorService);
             setHttp(core.http);
             setCookies(new Cookies());
             if (!AppState.checkCookies()) {
               window.location.reload();
             }
-            await this.initializeInnerAngular();
             params.element.classList.add('dscAppWrapper', 'wz-app');
-            const unmount = await renderApp(innerAngularName, params.element);
+            const unmount = await renderApp(params);
             return () => {
               unmount();
               unregisterInterceptor();
@@ -206,25 +193,6 @@ export class WazuhPlugin
       this.hideTelemetryBanner = () =>
         plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
     }
-    // we need to register the application service at setup, but to render it
-    // there are some start dependencies necessary, for this reason
-    // initializeInnerAngular + initializeServices are assigned at start and used
-    // when the application/embeddable is mounted
-    this.initializeInnerAngular = async () => {
-      if (this.innerAngularInitialized) {
-        return;
-      }
-      // this is used by application mount and tests
-      const { getInnerAngularModule } = await import('./get_inner_angular');
-      const module = getInnerAngularModule(
-        innerAngularName,
-        core,
-        plugins,
-        this.initializerContext,
-      );
-      setAngularModule(module);
-      this.innerAngularInitialized = true;
-    };
     setCore(core);
     setPlugins(plugins);
     setHttp(core.http);

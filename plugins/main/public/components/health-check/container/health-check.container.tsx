@@ -21,7 +21,7 @@ import {
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { AppState, ErrorHandler } from '../../../react-services';
-import { useAppConfig, useRootScope } from '../../../components/common/hooks';
+import { useAppConfig } from '../../../components/common/hooks';
 import {
   checkApiService,
   checkIndexPatternService,
@@ -29,15 +29,13 @@ import {
   checkSetupService,
 } from '../services';
 import { CheckResult } from '../components/check-result';
-import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
+import { withErrorBoundary } from '../../common/hocs';
 import { getCore, getHttp, getWzCurrentAppID } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../../../common/constants';
-
-import { compose } from 'redux';
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 import { serverApis } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -99,9 +97,10 @@ function HealthCheckComponent() {
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
   const appConfig = useAppConfig();
   const checksInitiated = useRef(false);
-  const $rootScope = useRootScope();
 
   const redirectionPassHealthcheck = () => {
+    // TODO: port code to ReactJS
+    return;
     const params = $rootScope.previousParams || {};
     const queryString = Object.keys(params)
       .map(key => key + '=' + params[key])
@@ -353,9 +352,6 @@ function HealthCheckComponent() {
   );
 }
 
-export const HealthCheck = compose(
-  withErrorBoundary,
-  withReduxProvider,
-)(HealthCheckComponent);
+export const HealthCheck = withErrorBoundary(HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;

@@ -1,5 +1,4 @@
 import React from 'react';
-import { getAngularModule } from '../../kibana-services';
 import { Logtest } from '../../directives/wz-logtest/components/logtest';
 import { ToolDevTools } from './devtools/devtools-old';
 import { devTools, rulesetTest } from '../../utils/applications';
@@ -24,8 +23,8 @@ const views = {
 export const ToolsRouter = compose(
   withReduxProvider,
   withGuardAsync(
-    () => {
-      const tab = getAngularModule().$injector.get('$location').search().tab;
+    ({ location }) => {
+      const tab = new URLSearchParams(location.search).get('tab');
       if (views[tab]) {
         return { ok: false, data: { tab } };
       }
