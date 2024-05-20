@@ -1,3 +1,1 @@
-import { sanitizeSVG } from './sanitizer';
-
-export { sanitizeSVG };
+export { sanitizeSVG } from './sanitizer';
