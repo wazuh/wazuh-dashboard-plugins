@@ -1,9 +1,4 @@
-import React from 'react';
 import { tDataGridColumn } from '../../../common/data-grid';
-import { EuiLink } from '@elastic/eui';
-import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { getCore } from '../../../../kibana-services';
-import { rules } from '../../../../utils/applications';
 
 export const office365Columns: tDataGridColumn[] = [
   {
@@ -22,15 +17,6 @@ export const office365Columns: tDataGridColumn[] = [
     id: 'rule.level',
   },
   {
-    id: 'rule.id',
-    render: value => (
-      <RedirectAppLinks application={getCore().application}>
-        <EuiLink
-          href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-        >
-          {value}
-        </EuiLink >
-      </RedirectAppLinks>
-    ),
+    id: 'rule.id'
   },
 ];
