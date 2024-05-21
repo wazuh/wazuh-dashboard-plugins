@@ -108,7 +108,11 @@ export function AppRouter(props) {
           render={MainEndpointsSummary}
         ></Route>
         <Route path={'/manager'} exact render={WzManagement}></Route>
-        <Route path={'/overview'} exact render={Overview}></Route>
+        <Route
+          path={'/overview'}
+          exact
+          render={props => <Overview {...props} />}
+        ></Route>
         <Route path={'/settings'} exact render={Settings}></Route>
         <Route path={'/security'} exact render={WzSecurity}></Route>
         <Route path={'/wazuh-dev'} exact render={ToolsRouter}></Route>

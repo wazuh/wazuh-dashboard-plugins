@@ -27,100 +27,104 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { overview } from '../../utils/applications';
 import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { withRouteResolvers } from '../common/hocs';
+import { enableMenu } from '../../services/resolves/enable-menu';
 
-export class WzBlankScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      errorToShow: null,
-    };
+export const WzBlankScreen = withRouteResolvers({ enableMenu })(
+  class WzBlankScreen extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        errorToShow: null,
+      };
 
-    // Create instance of WzMisc that stores the error
-    this.wzMisc = new WzMisc();
-  }
-
-  componentDidMount() {
-    AppState.setWzMenu();
-    const catchedError = this.wzMisc.getBlankScr();
-    if (catchedError) {
-      let parsed = null;
-      try {
-        parsed = ErrorHandler.handle(catchedError, '', { silent: true });
-      } catch (error) {
-        const options = {
-          context: `${WzBlankScreen.name}.componentDidMount`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.UI,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-
-      this.setState({ errorToShow: parsed || catchedError });
-      this.wzMisc.setBlankScr(false);
-    } else {
-      this.goOverview();
+      // Create instance of WzMisc that stores the error
+      this.wzMisc = new WzMisc();
     }
-  }
 
-  /**
-   * This navigate to overview
-   */
-  goOverview() {
-    getCore().application.navigateToApp(overview.id);
-  }
-
-  render() {
-    if (!this.state.errorToShow) {
-      return null;
-    }
-    return (
-      <ErrorComponentPrompt
-        errorTitle={this.state.errorToShow}
-        errorInfo={''}
-        action={
-          <>
-            <p>
-              <EuiLink
-                href={PLUGIN_PLATFORM_URL_GUIDE}
-                target='_blank'
-                external
-                rel='noopener noreferrer'
-              >
-                {PLUGIN_PLATFORM_URL_GUIDE_TITLE}
-              </EuiLink>
-              <br />
-              <br />
-              <EuiLink
-                href={webDocumentationLink(
-                  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
-                )}
-                target='_blank'
-                rel='noopener noreferrer'
-                external
-              >
-                Installation guide
-              </EuiLink>
-            </p>
-            <EuiSpacer />
-
-            <RedirectAppLinks application={getCore().application}>
-              <EuiButton
-                href={getCore().application.getUrlForApp(overview.id)}
-                style={{ cursor: 'pointer' }}
-                color='primary'
-                fill
-              >
-                Go to {overview.title}
-              </EuiButton>
-            </RedirectAppLinks>
-          </>
+    componentDidMount() {
+      AppState.setWzMenu();
+      const catchedError = this.wzMisc.getBlankScr();
+      if (catchedError) {
+        let parsed = null;
+        try {
+          parsed = ErrorHandler.handle(catchedError, '', { silent: true });
+        } catch (error) {
+          const options = {
+            context: `${WzBlankScreen.name}.componentDidMount`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.UI,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: error.name,
+            },
+          };
+          getErrorOrchestrator().handleError(options);
         }
-      />
-    );
-  }
-}
+
+        this.setState({ errorToShow: parsed || catchedError });
+        this.wzMisc.setBlankScr(false);
+      } else {
+        this.goOverview();
+      }
+    }
+
+    /**
+     * This navigate to overview
+     */
+    goOverview() {
+      getCore().application.navigateToApp(overview.id);
+    }
+
+    render() {
+      if (!this.state.errorToShow) {
+        return null;
+      }
+      return (
+        <ErrorComponentPrompt
+          errorTitle={this.state.errorToShow}
+          errorInfo={''}
+          action={
+            <>
+              <p>
+                <EuiLink
+                  href={PLUGIN_PLATFORM_URL_GUIDE}
+                  target='_blank'
+                  external
+                  rel='noopener noreferrer'
+                >
+                  {PLUGIN_PLATFORM_URL_GUIDE_TITLE}
+                </EuiLink>
+                <br />
+                <br />
+                <EuiLink
+                  href={webDocumentationLink(
+                    PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
+                  )}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  external
+                >
+                  Installation guide
+                </EuiLink>
+              </p>
+              <EuiSpacer />
+
+              <RedirectAppLinks application={getCore().application}>
+                <EuiButton
+                  href={getCore().application.getUrlForApp(overview.id)}
+                  style={{ cursor: 'pointer' }}
+                  color='primary'
+                  fill
+                >
+                  Go to {overview.title}
+                </EuiButton>
+              </RedirectAppLinks>
+            </>
+          }
+        />
+      );
+    }
+  },
+);

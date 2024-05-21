@@ -26,17 +26,16 @@ import {
 } from '../../../../../src/plugins/opensearch_dashboards_utils/public';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 
-export const Overview: React.FC = () => {
+export const Overview: React.FC = ({ location }) => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
   const [tabActive, setTabActive] = useState<string>('welcome');
   const [tabViewActive, setTabViewActive] = useState<string>('panels');
-  const $location = getAngularModule().$injector.get('$location');
   const pinnedAgentManager = new PinnedAgentManager();
 
   useEffect(() => {
     pinnedAgentManager.syncPinnedAgentSources();
-    const tab = $location.search().tab;
-    const tabView = $location.search().tabView;
+    const tab = new URLSearchParams(location.search).get('tab');
+    const tabView = new URLSearchParams(location.search).get('tabView');
     setTabActive(tab || 'welcome');
     setTabViewActive(tabView || 'panels');
     if (tab === 'welcome' || tab === undefined) {
@@ -123,7 +122,9 @@ export const Overview: React.FC = () => {
         return;
       }
       setTabActive(newTab);
-      setTabViewActive($location.search().tabView || 'panels');
+      setTabViewActive(
+        new URLSearchParams(location.search).get('tabView') || 'panels',
+      );
     } catch (error) {
       const options = {
         context: `${Overview.name}.switchTab`,

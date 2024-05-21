@@ -29,7 +29,7 @@ import {
   checkSetupService,
 } from '../services';
 import { CheckResult } from '../components/check-result';
-import { withErrorBoundary } from '../../common/hocs';
+import { withErrorBoundary, withRouteResolvers } from '../../common/hocs';
 import { getCore, getHttp, getWzCurrentAppID } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
@@ -39,6 +39,9 @@ import {
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 import { serverApis } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { wzConfig } from '../../../services/resolves/wz-config';
+import { compose } from 'redux';
+import { ip } from '../../../services/resolves/ip';
 
 const checks = {
   api: {
@@ -352,6 +355,9 @@ function HealthCheckComponent() {
   );
 }
 
-export const HealthCheck = withErrorBoundary(HealthCheckComponent);
+export const HealthCheck = compose(
+  withErrorBoundary,
+  withRouteResolvers({ wzConfig, ip }),
+)(HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;
