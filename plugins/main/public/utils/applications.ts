@@ -46,7 +46,12 @@ export const overview = {
   order: 1,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/overview/',
+  redirectTo: () =>
+    `/overview/${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `?agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
 };
 
 export const fileIntegrityMonitoring = {
