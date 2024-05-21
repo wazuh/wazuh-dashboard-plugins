@@ -77,6 +77,8 @@ const availableViews = [
 export const ManagementRouter = compose(
   withGuardAsync(
     ({ location }) => {
+      // TODO: Test if URLSearchParams works correctly with location.search,
+      // location.href may have to be used instead
       const section = new URLSearchParams(location.search).get('tab');
 
       if (availableViews.includes(section)) {

@@ -1,7 +1,6 @@
 import store from '../../redux/store';
 import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from '../../../common/constants';
-import { getAngularModule } from '../../kibana-services';
 import { WzRequest } from '../../react-services';
 
 export class PinnedAgentManager {
@@ -13,16 +12,13 @@ export class PinnedAgentManager {
     DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT;
   private AGENT_VIEW_URL = '/agents';
   private store: any;
-  private location: any;
-  private route: any;
-  private rootScope: any;
+  private params: URLSearchParams;
 
   constructor(inputStore?: any) {
     this.store = inputStore ?? store;
-    const $injector = getAngularModule().$injector;
-    this.location = $injector.get('$location');
-    this.route = $injector.get('$route');
-    this.rootScope = $injector.get('$rootScope');
+
+    const querystring = window.location.href;
+    this.params = new URLSearchParams(querystring);
   }
 
   private equalToPinnedAgent(agentData: any): boolean {
@@ -49,7 +45,20 @@ export class PinnedAgentManager {
       const includesAgentViewURL = window.location.href.includes(
         this.AGENT_VIEW_URL,
       );
-      this.location.search(
+      this.params.set(
+        includesAgentViewURL
+          ? PinnedAgentManager.AGENT_ID_VIEW_KEY
+          : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
+        String(agentData?.id),
+      );
+      // TODO: Analyze the mechanism to use to update the URL and whether or not it is necessary to reload the page when updating it.
+      window.history.replaceState(
+        {},
+        '',
+        `${window.location.pathname}?${this.params.toString()}`,
+      );
+      // TODO: override route and rootScope functionality if necessary
+      /* this.location.search(
         includesAgentViewURL
           ? PinnedAgentManager.AGENT_ID_VIEW_KEY
           : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
@@ -59,7 +68,7 @@ export class PinnedAgentManager {
         this.route.reload();
       } else {
         this.rootScope.$applyAsync();
-      }
+      } */
     }, 1);
   }
 
@@ -69,17 +78,18 @@ export class PinnedAgentManager {
     );
     /* The following code is a workaround so that both overview and agent overview are re-rendered when a pinned agent changes, including the URL as a source. This will surely change when Angular is permanently removed and the routing system changes. */
     ['agent', 'agentId'].forEach(param => {
-      if (this.location.search()[param]) {
+      if (this.params.has(param)) {
         setTimeout(() => {
           const includesAgentViewURL = window.location.href.includes(
             this.AGENT_VIEW_URL,
           );
-          this.location.search(param, null);
-          if (includesAgentViewURL) {
-            this.route.reload();
-          } else {
-            this.rootScope.$applyAsync();
-          }
+          this.params.delete(param);
+          // TODO: Analyze the mechanism to use to update the URL and whether or not it is necessary to reload the page when updating it.
+          window.history.replaceState(
+            {},
+            '',
+            `${window.location.pathname}?${this.params.toString()}`,
+          );
         }, 1);
       }
     });

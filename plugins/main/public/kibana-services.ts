@@ -51,6 +51,7 @@ export const [getHeaderActionMenuMounter, setHeaderActionMenuMounter] =
   createGetterSetter<AppMountParameters['setHeaderActionMenu']>(
     'headerActionMenuMounter',
   );
+export const [getHistory, setHistory] = createGetterSetter<any>('History');
 
 /**
  * set bootstrapped inner angular module

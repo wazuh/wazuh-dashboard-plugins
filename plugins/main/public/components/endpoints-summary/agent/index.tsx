@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress } from '@elastic/eui';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
 import { Agent } from '../types';
-import {
-  getAngularModule,
-  getCore,
-  getDataPlugin,
-} from '../../../kibana-services';
+import { getCore } from '../../../kibana-services';
 import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
@@ -27,22 +23,26 @@ export const AgentView = compose(
   withErrorBoundary,
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
 )(() => {
+  const urlParams = new URLSearchParams(window.location.href);
+  const urlTab = urlParams.get('tab');
   //TODO: Replace when implement React router
-  const $injector = getAngularModule().$injector;
-  const $commonData = $injector.get('commonData');
+  /* const $injector = getAngularModule().$injector;
+  const $commonData = $injector.get('commonData'); */
 
   //TODO: Replace with useDatasource and useSearchBar when replace WzDatePicker with SearchBar in AgentsWelcome component
-  const savedTimefilter = $commonData.getTimefilter();
+  /* const savedTimefilter = $commonData.getTimefilter();
   if (savedTimefilter) {
     getDataPlugin().query.timefilter.timefilter.setTime(savedTimefilter);
     $commonData.removeTimefilter();
-  }
+  } */
 
   const pinnedAgentManager = new PinnedAgentManager();
 
+  const defaultTab: string = 'welcome';
+
   const [agent, setAgent] = useState<Agent>();
   const [isLoadingAgent, setIsLoadingAgent] = useState(true);
-  const [tab, setTab] = useState<string>($commonData.checkTabLocation());
+  const [tab, setTab] = useState<string>(urlTab ?? defaultTab);
 
   const getAgent = async () => {
     setIsLoadingAgent(true);

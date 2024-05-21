@@ -15,7 +15,8 @@ export const setBreadcrumbs = (breadcrumbs, router) => {
             getCore().application.navigateToApp(endpointSummary.id, {
               path: `#/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
             });
-            router.reload();
+            // TODO: Replace router with another mechanism that does not depend on Angular
+            /* router.reload(); */
           },
           truncate: true,
           text: breadcrumb.agent.name,

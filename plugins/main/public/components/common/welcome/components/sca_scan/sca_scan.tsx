@@ -29,7 +29,7 @@ import {
 import moment from 'moment-timezone';
 import { WzRequest } from '../../../../../react-services';
 import { formatUIDate } from '../../../../../react-services/time-service';
-import { getAngularModule, getCore } from '../../../../../kibana-services';
+import { getCore } from '../../../../../kibana-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
 import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
@@ -40,7 +40,6 @@ import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selec
 
 type Props = {
   agent: { [key in string]: any };
-  router: any; // its angular router
 };
 
 export const ScaScan = compose(
@@ -58,7 +57,6 @@ export const ScaScan = compose(
 )(
   class ScaScan extends Component<Props> {
     _isMount = false;
-    router;
     state: {
       lastScan: {
         [key: string]: any;
@@ -87,8 +85,6 @@ export const ScaScan = compose(
         this.setState({ policies: JSON.parse(storedPolicies) });
       }
       this._isMount = true;
-      const $injector = getAngularModule().$injector;
-      this.router = $injector.get('$route');
       this.getLastScan(this.props.agent.id);
     }
 
