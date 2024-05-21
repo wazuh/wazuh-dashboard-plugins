@@ -5,6 +5,7 @@ import { PLUGIN_SETTINGS, TPluginSetting } from '../../../common/constants';
 import { log } from '../../lib/logger';
 import { sanitizeSVG } from '../../lib/sanitizer';
 import { getConfiguration } from '../../lib/get-configuration';
+import { UpdateConfigurationFile } from '../../lib/update-configuration';
 
 /**
  * This task checks for custom SVG files uploaded by the user and sanitizes them.
@@ -28,9 +29,10 @@ export default function sanitizeUploadedSVG(context) {
   };
 
   try {
-    logger.info('Task sanitize SVG started');
+    logger.debug('Task sanitize SVG started');
 
     logger.debug('Get Wazuh configuration');
+    const updateConfigurationFile = new UpdateConfigurationFile();
     const configuration = getConfiguration();
     const logosSettingKeys = [
       'customization.logo.sidebar',
@@ -40,7 +42,7 @@ export default function sanitizeUploadedSVG(context) {
 
     logger.debug('Check configuration for custom branding uploaded SVG files');
     // Check each of the possible custom settings uploaded files look for SVG to sanitize
-    logosSettingKeys.forEach(logoKey => {
+    logosSettingKeys.forEach(async logoKey => {
       const logoSetting: TPluginSetting | undefined = PLUGIN_SETTINGS[logoKey];
       const customLogoPath = configuration[logoKey];
       if (!logoSetting || !customLogoPath) {
@@ -48,10 +50,23 @@ export default function sanitizeUploadedSVG(context) {
         return;
       }
 
+      // Parse the configured logo information and remove the timestamp used as version control
+      const configuredCustomLogo = {
+        subpath: path.dirname(customLogoPath),
+        fileName: path.basename(customLogoPath.replace(/\?v=[\d].*/g, '')),
+        fileExtension: path.extname(customLogoPath.replace(/\?v=[\d].*/g, '')),
+      };
+
+      // If the configured custom logo is not a SVG file there's nothing to do
+      if (configuredCustomLogo.fileExtension.toLocaleLowerCase() !== '.svg') {
+        return;
+      }
+
+      // The assets folder is the base folder used in the frontend. It's concatenated with the path configured in the
       const targetDirectory = path.join(
         __dirname,
-        '../../..',
-        logoSetting.options.file.store.relativePathFileSystem,
+        '../../../public/assets',
+        configuredCustomLogo.subpath,
       );
 
       // If the setting folder doesn't exist abort
@@ -59,23 +74,20 @@ export default function sanitizeUploadedSVG(context) {
         return;
       }
 
-      // Get the files related to the setting
-      const files = glob.sync(path.join(targetDirectory, `${logoKey}.*`));
-
-      // If there are no files saved abort
-      if (!files?.length) {
-        return;
-      }
-
-      // Check file extension
-      const fileName = path.basename(files[0]);
-      const fileExtension = path.extname(fileName);
-      if (fileExtension.toLocaleLowerCase() !== '.svg') {
-        return;
-      }
-
       // Read the file contents
-      const fileFullPath = path.join(targetDirectory, fileName);
+      const fileFullPath = path.join(
+        targetDirectory,
+        configuredCustomLogo.fileName,
+      );
+
+      // Get the files related to the setting
+      const file = glob.sync(fileFullPath);
+
+      // If the file doesn't exists abort
+      if (!file?.length) {
+        return;
+      }
+
       const originalFileBuffer = fs.readFileSync(fileFullPath);
 
       // Sanitize the file contents
@@ -86,19 +98,26 @@ export default function sanitizeUploadedSVG(context) {
       // Check if any changes were made in the sanitization process ignoring white spaces
       // If any change was made then save the sanitized content
       if (originalSVGString.replace(/\s/g, '') != cleanSVG.replace(/\s/g, '')) {
-        logger.info(
-          `[sanitize:sanitizeUploadedSVG] ${fileName} SVG file sanitized`,
-        );
+        logger.debug(` ${configuredCustomLogo.fileName} SVG file sanitized`);
         // Delete the original file
         fs.unlinkSync(fileFullPath);
 
         // Save the clean file in the target directory
         fs.writeFileSync(fileFullPath, cleanFileBuffer);
+
+        // Update the setting in the configuration cache
+        const pluginSettingValue =
+          logoSetting.options.file.store.resolveStaticURL(
+            configuredCustomLogo.fileName,
+          );
+        await updateConfigurationFile.updateConfiguration({
+          [logoKey]: pluginSettingValue,
+        });
       }
     });
 
-    logger.debug('[sanitize:sanitizeUploadedSVG] Task finished');
+    logger.debug(' Task finished');
   } catch (error) {
-    logger.error(`Error [sanitize:sanitizeUploadedSVG]: ${error.message}`);
+    logger.error(`Error: ${error.message}`);
   }
 }
