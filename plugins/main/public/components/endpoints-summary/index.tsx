@@ -9,8 +9,8 @@ import { EndpointsSummary } from './endpoints-summary';
 import { endpointSummary } from '../../utils/applications';
 import {
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb,
+  withRouteResolvers,
 } from '../common/hocs';
 import { compose } from 'redux';
 import { WzButtonPermissions } from '../common/permissions/button';
@@ -20,9 +20,16 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { useGetTotalAgents } from './hooks';
 
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../services/resolves';
+
 export const MainEndpointsSummary = compose(
   withErrorBoundary,
-  withReduxProvider,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
 )(() => {
   const { isLoading, totalAgents, error } = useGetTotalAgents('id!=000');

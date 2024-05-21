@@ -15,9 +15,9 @@ import { GenericRequest } from '../../react-services/generic-request';
 import { AppState } from '../../react-services/app-state';
 import { RolesMapping } from './roles-mapping/roles-mapping';
 import {
-  withReduxProvider,
   withGlobalBreadcrumb,
   withErrorBoundary,
+  withRouteResolvers,
 } from '../common/hocs';
 import { compose } from 'redux';
 import {
@@ -29,6 +29,12 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { security } from '../../utils/applications';
 import { getWazuhCorePlugin } from '../../kibana-services';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../services/resolves';
 
 const tabs = [
   {
@@ -55,7 +61,7 @@ const tabs = [
 
 export const WzSecurity = compose(
   withErrorBoundary,
-  withReduxProvider,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([{ text: security.breadcrumbLabel }]),
 )(() => {
   // Get the initial tab when the component is initiated

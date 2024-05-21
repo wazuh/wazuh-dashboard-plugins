@@ -94,7 +94,10 @@ export function settingsWizard(
       currentParams.get('tab') === 'ruleset' &&
       currentParams.get('ruleid');
     if (!targetedAgent && !targetedRule && !disableErrors && healthCheck()) {
-      history.push('/health-check');
+      history.push({
+        pathname: '/health-check',
+        state: { prevLocation: location },
+      });
     } else {
       // There's no cookie for current API
       const currentApi = AppState.getCurrentAPI();
@@ -105,7 +108,10 @@ export function settingsWizard(
               // Try to set some API entry as default
               const defaultApi = await tryToSetDefault(data.data);
               setUpCredentials('Default API has been updated.', defaultApi);
-              history.push('/health-check');
+              history.push({
+                pathname: '/health-check',
+                state: { prevLocation: location },
+              });
             } else {
               setUpCredentials('Please set up API credentials.');
             }
@@ -132,7 +138,10 @@ export function settingsWizard(
                 // Try to set some as default
                 const defaultApi = await tryToSetDefault(data.data);
                 setUpCredentials('Default API has been updated.', defaultApi);
-                history.push('/health-check');
+                history.push({
+                  pathname: '/health-check',
+                  state: { prevLocation: location },
+                });
               } else {
                 setUpCredentials('Please set up API credentials.', false);
               }

@@ -39,9 +39,8 @@ import {
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 import { serverApis } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { wzConfig } from '../../../services/resolves/wz-config';
+import { ip, wzConfig } from '../../../services/resolves';
 import { compose } from 'redux';
-import { ip } from '../../../services/resolves/ip';
 
 const checks = {
   api: {
@@ -91,7 +90,7 @@ const checks = {
   },
 };
 
-function HealthCheckComponent() {
+function HealthCheckComponent({ location, history }) {
   const [checkWarnings, setCheckWarnings] = useState<{ [key: string]: [] }>({});
   const [checkErrors, setCheckErrors] = useState<{ [key: string]: [] }>({});
   const [checksReady, setChecksReady] = useState<{ [key: string]: boolean }>(
@@ -102,18 +101,18 @@ function HealthCheckComponent() {
   const checksInitiated = useRef(false);
 
   const redirectionPassHealthcheck = () => {
-    // TODO: port code to ReactJS
-    return;
-    const params = $rootScope.previousParams || {};
-    const queryString = Object.keys(params)
-      .map(key => key + '=' + params[key])
-      .join('&');
-    const url =
-      `/app/${getWzCurrentAppID()}#` +
-      ($rootScope.previousLocation || '') +
-      '?' +
-      queryString;
-    window.location.href = getHttp().basePath.prepend(url);
+    // This uses the previous location that is passed in as an state
+    if (location?.state?.prevLocation) {
+      const searchParams = new URLSearchParams(
+        location?.state?.prevLocation?.search,
+      );
+      // update browser url
+      const relativePath =
+        location.state.prevLocation.pathname + '?' + searchParams.toString();
+      history.push(relativePath);
+    } else {
+      history.push('/');
+    }
   };
 
   const thereAreErrors = Object.keys(checkErrors).length > 0;
@@ -357,7 +356,7 @@ function HealthCheckComponent() {
 
 export const HealthCheck = compose(
   withErrorBoundary,
-  withRouteResolvers({ wzConfig, ip }),
+  withRouteResolvers({ ip, wzConfig }),
 )(HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;

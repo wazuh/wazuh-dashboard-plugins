@@ -34,8 +34,14 @@ import {
   appSettings,
 } from '../../utils/applications';
 import { compose } from 'redux';
-import { withReduxProvider } from '../common/hocs';
+import { withErrorBoundary, withRouteResolvers } from '../common/hocs';
 import { connect } from 'react-redux';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../services/resolves';
 
 const Views = {
   api: () => (
@@ -81,7 +87,8 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export const Settings = compose(
-  withReduxProvider,
+  withErrorBoundary,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   connect(mapStateToProps, mapDispatchToProps),
 )(
   class Settings extends React.Component {

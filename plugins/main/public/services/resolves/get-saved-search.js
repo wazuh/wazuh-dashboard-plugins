@@ -44,7 +44,10 @@ export function getSavedSearch({ location, history }) {
       currentParams.get('tab') === 'ruleset' &&
       currentParams.get('ruleid');
     if (!targetedAgent && !targetedRule && healthCheck()) {
-      history.push('/health-check');
+      history.push({
+        pathname: '/health-check',
+        state: { prevLocation: location },
+      });
       return Promise.reject();
     } else {
       const savedSearchId = currentParams.get('id'); // = $route.current.params.id; TODO: I am not sure how to port this

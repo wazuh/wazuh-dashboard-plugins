@@ -27,8 +27,8 @@ import { FormConfiguration } from '../../../../common/form/types';
 import { useSelector } from 'react-redux';
 import {
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb,
+  withRouteResolvers,
   withUserAuthorizationPrompt,
 } from '../../../../common/hocs';
 import GroupInput from '../../components/group-input/group-input';
@@ -38,10 +38,16 @@ import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getCore, getWazuhCorePlugin } from '../../../../../kibana-services';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../../../../services/resolves';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
-  withReduxProvider,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([
     {
       text: endpointSummary.breadcrumbLabel,

@@ -5,9 +5,15 @@ import { devTools, rulesetTest } from '../../utils/applications';
 import {
   withGlobalBreadcrumb,
   withGuardAsync,
-  withReduxProvider,
+  withRouteResolvers,
 } from '../common/hocs';
 import { compose } from 'redux';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../services/resolves';
 
 const views = {
   devTools: {
@@ -21,7 +27,7 @@ const views = {
 };
 
 export const ToolsRouter = compose(
-  withReduxProvider,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   withGuardAsync(
     ({ location }) => {
       const tab = new URLSearchParams(location.search).get('tab');

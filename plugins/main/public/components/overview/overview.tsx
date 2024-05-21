@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  getAngularModule,
-  getDataPlugin,
-  getUiSettings,
-} from '../../kibana-services';
+import { getDataPlugin, getUiSettings } from '../../kibana-services';
 import { Stats } from '../../controllers/overview/components/stats';
 import { AppState, WzRequest } from '../../react-services';
 import { OverviewWelcome } from '../common/welcome/overview-welcome';
@@ -25,8 +21,20 @@ import {
   syncState,
 } from '../../../../../src/plugins/opensearch_dashboards_utils/public';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
+import { withRouteResolvers } from '../common/hocs';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../services/resolves';
 
-export const Overview: React.FC = ({ location }) => {
+export const Overview: React.FC = withRouteResolvers({
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+})(({ location }) => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
   const [tabActive, setTabActive] = useState<string>('welcome');
   const [tabViewActive, setTabViewActive] = useState<string>('panels');
@@ -188,4 +196,4 @@ export const Overview: React.FC = ({ location }) => {
       )}
     </>
   );
-};
+});

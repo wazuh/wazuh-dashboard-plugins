@@ -11,14 +11,21 @@ import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
 import { endpointSummary } from '../../../utils/applications';
-import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
+import { withErrorBoundary, withRouteResolvers } from '../../common/hocs';
 import { compose } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 import { MainModuleAgent } from '../../common/modules/main-agent';
 
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../../services/resolves';
+
 export const AgentView = compose(
   withErrorBoundary,
-  withReduxProvider,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
 )(() => {
   //TODO: Replace when implement React router
   const $injector = getAngularModule().$injector;

@@ -54,7 +54,10 @@ export async function getIp({ location, history }) {
         !(await checkWazuhPatterns(savedObjects))
       ) {
         if (!location.pathname.includes('/health-check')) {
-          history.push('/health-check');
+          history.push({
+            pathname: '/health-check',
+            state: { prevLocation: location },
+          });
         }
       }
 
@@ -105,7 +108,10 @@ export async function getIp({ location, history }) {
     currentParams.get('tab') === 'ruleset' &&
     currentParams.get('ruleid');
   if (!targetedRule && healthCheck()) {
-    history.push('/health-check');
+    history.push({
+      pathname: '/health-check',
+      state: { prevLocation: location },
+    });
   } else {
     await buildSavedObjectsClient();
   }
