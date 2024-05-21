@@ -98,7 +98,7 @@ export default function sanitizeUploadedSVG(context) {
       // Check if any changes were made in the sanitization process ignoring white spaces
       // If any change was made then save the sanitized content
       if (originalSVGString.replace(/\s/g, '') != cleanSVG.replace(/\s/g, '')) {
-        logger.debug(` ${configuredCustomLogo.fileName} SVG file sanitized`);
+        logger.debug(`${configuredCustomLogo.fileName} SVG file sanitized`);
         // Delete the original file
         fs.unlinkSync(fileFullPath);
 
