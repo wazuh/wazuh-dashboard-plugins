@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.7.5
+- Added sanitization to custom branding SVG files [#6687](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6687)
 
 ## Wazuh v4.7.4 - OpenSearch Dashboards 2.8.0 - Revision 02
 
