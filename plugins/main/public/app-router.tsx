@@ -28,8 +28,6 @@ import { WzSecurity } from './components/security';
 export function Application(props) {
   const dispatch = useDispatch();
 
-  const { history } = props;
-
   useEffect(() => {
     // Get the dashboard security
     getWazuhCorePlugin()
@@ -92,6 +90,8 @@ export function Application(props) {
 }
 
 export function AppRouter(props) {
+  const { history } = props.params;
+
   return (
     <Router basename={props.params.appBasePath} history={history}>
       {' '}

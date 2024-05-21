@@ -2,6 +2,8 @@ import store from '../../redux/store';
 import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from '../../../common/constants';
 import { WzRequest } from '../../react-services';
+import { getHistory } from '../../kibana-services';
+import { AppMountParameters } from '../../../../../src/core/public';
 
 export class PinnedAgentManager {
   public static NO_AGENT_DATA = {};
@@ -13,12 +15,12 @@ export class PinnedAgentManager {
   private AGENT_VIEW_URL = '/agents';
   private store: any;
   private params: URLSearchParams;
+  private history: AppMountParameters['history'];
 
   constructor(inputStore?: any) {
     this.store = inputStore ?? store;
-
-    const querystring = window.location.href;
-    this.params = new URLSearchParams(querystring);
+    this.history = getHistory();
+    this.params = new URLSearchParams(this.history.location.hash);
   }
 
   private equalToPinnedAgent(agentData: any): boolean {
@@ -52,11 +54,11 @@ export class PinnedAgentManager {
         String(agentData?.id),
       );
       // TODO: Analyze the mechanism to use to update the URL and whether or not it is necessary to reload the page when updating it.
-      window.history.replaceState(
+      /*  this.history.push(
         {},
         '',
         `${window.location.pathname}?${this.params.toString()}`,
-      );
+      ); */
       // TODO: override route and rootScope functionality if necessary
       /* this.location.search(
         includesAgentViewURL
@@ -84,12 +86,13 @@ export class PinnedAgentManager {
             this.AGENT_VIEW_URL,
           );
           this.params.delete(param);
+
           // TODO: Analyze the mechanism to use to update the URL and whether or not it is necessary to reload the page when updating it.
-          window.history.replaceState(
+          /* window.history.replaceState(
             {},
             '',
             `${window.location.pathname}?${this.params.toString()}`,
-          );
+          ); */
         }, 1);
       }
     });
