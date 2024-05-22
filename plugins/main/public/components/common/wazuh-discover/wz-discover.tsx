@@ -211,6 +211,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           ) : null}
           {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
             <>
+              <EuiSpacer size='m' />
               <EuiFlexItem grow={false} className='discoverChartContainer'>
                 <EuiPanel
                   hasBorder={false}
