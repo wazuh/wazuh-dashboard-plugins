@@ -19,6 +19,10 @@ export class FIMDataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...this.getRuleGroupsFilter(), ...super.getFixedFilters()];
+    return [
+      ...super.getFixedFiltersClusterManager(),
+      ...this.getRuleGroupsFilter(),
+      ...super.getFixedFilters(),
+    ];
   }
 }

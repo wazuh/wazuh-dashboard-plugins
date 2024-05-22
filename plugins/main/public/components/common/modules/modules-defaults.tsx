@@ -59,7 +59,6 @@ import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
 import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
 import {
   DockerDataSource,
-  AlertsDataSource,
   AlertsVulnerabilitiesDataSource,
   AWSDataSource,
   VirusTotalDataSource,
@@ -75,6 +74,7 @@ import {
   HIPAADataSource,
   PCIDSSDataSource,
   Office365DataSource,
+  ThreatHuntingDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 
@@ -99,7 +99,7 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         tableColumns: threatHuntingColumns,
-        DataSource: AlertsDataSource,
+        DataSource: ThreatHuntingDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],

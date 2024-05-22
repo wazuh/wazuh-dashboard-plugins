@@ -37,6 +37,10 @@ export class GDPRDataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...this.getFilterExist(), ...super.getFixedFilters()];
+    return [
+      ...super.getFixedFiltersClusterManager(),
+      ...this.getFilterExist(),
+      ...super.getFixedFilters(),
+    ];
   }
 }
