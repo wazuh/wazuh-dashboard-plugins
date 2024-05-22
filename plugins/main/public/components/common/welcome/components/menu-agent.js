@@ -20,11 +20,7 @@ import {
 } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
-import {
-  getAngularModule,
-  getCore,
-  getToasts,
-} from '../../../../kibana-services';
+import { getCore, getToasts } from '../../../../kibana-services';
 import { Applications, Categories } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
@@ -65,11 +61,6 @@ class WzMenuAgent extends Component {
         Categories.find(category => b.id === category.id).order
       );
     });
-  }
-
-  componentDidMount() {
-    const $injector = getAngularModule().$injector;
-    this.router = $injector.get('$route');
   }
 
   clickMenuItem = appId => {
