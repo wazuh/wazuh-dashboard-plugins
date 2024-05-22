@@ -27,7 +27,6 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
 import {
-  getAngularModule,
   getToasts,
   getDataPlugin,
   getHeaderActionMenuMounter,
@@ -81,12 +80,7 @@ export const WzMenu = withWindowSize(
     }
 
     async componentDidMount() {
-      const $injector = getAngularModule().$injector;
-      this.router = $injector.get('$route');
-      setBreadcrumbs(
-        this.props.globalBreadcrumbReducers.breadcrumb,
-        this.router,
-      );
+      setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
       try {
         const APIlist = await this.loadApiList();
         this.setState({ APIlist: APIlist });
@@ -244,10 +238,7 @@ export const WzMenu = withWindowSize(
           prevProps.globalBreadcrumbReducers.breadcrumb,
         )
       ) {
-        setBreadcrumbs(
-          this.props.globalBreadcrumbReducers.breadcrumb,
-          this.router,
-        );
+        setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
       }
 
       newState = { ...prevProps.state, ...newState };
@@ -365,7 +356,7 @@ export const WzMenu = withWindowSize(
           this.pinnedAgentManager.unPinAgent();
         }
         if (this.state.currentMenuTab !== 'wazuh-dev') {
-          this.router.reload();
+          // TODO: port to ReactJS this.router.reload();
         }
       } catch (error) {
         const options = {
@@ -454,7 +445,7 @@ export const WzMenu = withWindowSize(
       try {
         this.setState({ currentSelectedPattern: pattern.id });
         if (this.state.currentMenuTab !== 'wazuh-dev') {
-          this.router.reload();
+          // TODO: port to ReactJS this.router.reload();
         }
         await this.updatePatternAndApi();
       } catch (error) {

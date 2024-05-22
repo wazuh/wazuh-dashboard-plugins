@@ -61,8 +61,8 @@ export function Application(props) {
   return (
     <>
       <div className='wazuhNotReadyYet'></div>{' '}
-      {/* TODO: The plugins/main/public/components/wz-menu/wz-menu.js defines a portal to mount here. We could avoid the usage of the React portl and render the component instead*/}
-      {/* <WzMenuWrapper /> */}
+      {/* TODO: The plugins/main/public/components/wz-menu/wz-menu.js defines a portal to mount here. We could avoid the usage of the React portal and render the component instead*/}
+      <WzMenuWrapper />
       <WzAgentSelectorWrapper />
       <ToastNotificationsModal /> {/* TODO: check if this is being used */}
       <WzUpdatesNotification />
