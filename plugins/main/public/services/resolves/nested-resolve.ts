@@ -8,7 +8,6 @@ export function nestedResolve(params) {
   const healthCheckStatus = sessionStorage.getItem('healthCheck');
   if (!healthCheckStatus) return;
   const wazuhConfig = new WazuhConfig();
-  // TODO: assignPreviousLocation($rootScope, $location);
   return getWzConfig(wazuhConfig).then(() =>
     settingsWizard(
       params,
