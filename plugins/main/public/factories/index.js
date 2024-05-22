@@ -13,7 +13,6 @@ import { RawVisualizations } from './raw-visualizations';
 import { LoadedVisualizations } from './loaded-visualizations';
 import { DiscoverPendingUpdates } from './discover-pending-updates';
 import { VisHandlers } from './vis-handlers';
-import { Vis2PNG } from './vis2png';
 import { getAngularModule } from '../kibana-services';
 
 const app = getAngularModule();
@@ -22,5 +21,4 @@ app
   .service('rawVisualizations', RawVisualizations)
   .service('loadedVisualizations', LoadedVisualizations)
   .service('discoverPendingUpdates', DiscoverPendingUpdates)
-  .service('visHandlers', VisHandlers)
-  .service('vis2png', Vis2PNG);
+  .service('visHandlers', VisHandlers);
