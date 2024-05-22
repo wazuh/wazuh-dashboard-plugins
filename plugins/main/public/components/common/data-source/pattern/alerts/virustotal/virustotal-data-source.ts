@@ -19,6 +19,10 @@ export class VirusTotalDataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...super.getFixedFilters(), ...this.getRuleGroupsFilter()];
+    return [
+      ...super.getFixedFiltersClusterManager(),
+      ...this.getRuleGroupsFilter(),
+      ...super.getFixedFilters(),
+    ];
   }
 }

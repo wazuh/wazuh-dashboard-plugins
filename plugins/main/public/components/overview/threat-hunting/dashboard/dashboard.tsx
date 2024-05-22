@@ -42,8 +42,8 @@ import {
   threatHuntingTableDefaultColumns,
 } from '../events/threat-hunting-columns';
 import {
-  AlertsDataSource,
   AlertsDataSourceRepository,
+  ThreatHuntingDataSource,
   PatternDataSource,
   PatternDataSourceFilterManager,
   tParsedIndexPattern,
@@ -68,7 +68,7 @@ const DashboardTH: React.FC = () => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsDataSource,
+    DataSource: ThreatHuntingDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
