@@ -24,6 +24,7 @@ import WzManagement from './controllers/management/components/management/managem
 import { Overview } from './components/overview/overview';
 import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
+import $ from 'jquery';
 
 export function Application(props) {
   const dispatch = useDispatch();
@@ -46,33 +47,15 @@ export function Application(props) {
     loadAppConfig();
 
     // Bind deleteExistentToken on Log out component.
-    // TODO: port to react
-    // $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
-    //   'mouseleave',
-    //   function () {
-    //     // opendistro
-    //     $('button:contains(Log out)').on('click', function () {
-    //       WzAuthentication.deleteExistentToken();
-    //     });
-    //     // x-pack
-    //     TODO: this could be removed
-    //     $('a:contains(Log out)').on('click', function (event) {
-    //       // Override href's behaviour and navigate programatically
-    //       // to the logout path once the token has been deleted.
-    //       event.preventDefault();
-    //       WzAuthentication.deleteExistentToken()
-    //         .catch(err => {
-    //           console.error(
-    //             '[ERROR] - User token could not be deprecated - ',
-    //             err,
-    //           );
-    //         })
-    //         .finally(() => {
-    //           window.location = event.currentTarget.href;
-    //         });
-    //     });
-    //   },
-    // );
+    $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
+      'mouseleave',
+      function () {
+        // opendistro
+        $('button:contains(Log out)').on('click', function () {
+          WzAuthentication.deleteExistentToken();
+        });
+      },
+    );
   }, []);
 
   return (
