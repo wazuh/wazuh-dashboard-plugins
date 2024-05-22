@@ -18,7 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Moved the plugin menu to platform applications into the side menu [#5840](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5840) [#6226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6226) [#6244](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6244) [#6423](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6423) [#6510](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6510) [#6591](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6591)
-- Changed dashboards visualizations definitions. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035) [#6632](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6632)
+- Changed dashboards visualizations definitions. [#6035](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6035) [#6632](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6632) [#6690](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6690)
 - Change the display order of tabs in all modules. [#6067](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6067)
 - Upgraded the `axios` dependency to `1.6.1` [#6114](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6114)
 - Changed the API configuration title in the Server APIs section. [#6373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6373)
