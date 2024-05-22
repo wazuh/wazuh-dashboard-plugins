@@ -55,6 +55,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed compilation date field from the app [#6366](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6366)
 - Removed WAZUH_REGISTRATION_SERVER from Windows agent deployment command [#6361](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6361)
 
+## Wazuh v4.7.5 - OpenSearch Dashboards 2.8.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.7.5
+- Added sanitization to custom branding SVG files [#6687](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6687)
+
 ## Wazuh v4.7.4 - OpenSearch Dashboards 2.8.0 - Revision 02
 
 ### Added
