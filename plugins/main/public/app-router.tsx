@@ -63,10 +63,10 @@ export function Application(props) {
       {/* <div class="wazuhNotReadyYet"></div>
     <div ng-view class="mainView"></div>
      */}
-      {/* <WzMenuWrapper />
+      {/* <WzMenuWrapper /> */}
       <WzAgentSelectorWrapper />
-      <ToastNotificationsModal />
-      <WzUpdatesNotification /> */}
+      <ToastNotificationsModal /> {/* TODO: check if this is being used */}
+      <WzUpdatesNotification />
       <AppRouter {...props} />
     </>
   );
