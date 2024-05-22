@@ -13,7 +13,6 @@ import {
   EuiTitle,
   EuiSpacer,
   EuiPanel,
-  EuiLink,
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
@@ -28,7 +27,7 @@ import {
   HttpError,
 } from '../../../react-services/error-management';
 import useSearchBar from '../search-bar/use-search-bar';
-import { getCore, getPlugins } from '../../../kibana-services';
+import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 const DashboardByRenderer =
@@ -43,29 +42,9 @@ import {
   AlertsDataSourceRepository,
 } from '../data-source';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
-import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { endpointSummary, rules } from '../../../utils/applications';
-import _ from 'lodash';
-import { AppNavigate, formatUIDate } from '../../../react-services';
+import { wzDiscoverRenderColumns } from './render-columns';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
-
-const navigateTo = (ev, section, params) => {
-  AppNavigate.navigateToModule(ev, section, params);
-};
-
-const renderMitreTechnique = (technique: string) => <EuiLink
-  onClick={e =>
-    navigateTo(e, 'overview', {
-      tab: 'mitre',
-      tabView: 'intelligence',
-      tabRedirect: 'techniques',
-      idToRedirect: technique,
-    })
-  }
->
-  {technique}
-</EuiLink>
 
 export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
@@ -131,65 +110,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   });
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
-  const renderColumns = [
-    {
-      id: 'agent.id',
-      render: (value) => {
-        if (value === '000') return value
-
-        return <RedirectAppLinks application={getCore().application}>
-          <EuiLink
-            href={`${endpointSummary.id}#/agents?tab=welcome&agent=${value}`}
-          >
-            {value}
-          </EuiLink>
-        </RedirectAppLinks>
-      }
-    },
-    {
-      id: 'agent.name',
-      render: (value, row) => {
-        if (row.agent.id === '000') return value
-
-        return <RedirectAppLinks application={getCore().application}>
-          <EuiLink
-            href={`${endpointSummary.id}#/agents?tab=welcome&agent=${row.agent.id}`}
-          >
-            {value}
-          </EuiLink>
-        </RedirectAppLinks>
-      }
-    },
-    {
-      id: 'rule.id',
-      render: (value) => <RedirectAppLinks application={getCore().application}>
-        <EuiLink href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}>
-          {value}
-        </EuiLink>
-      </RedirectAppLinks>
-    },
-    {
-      id: 'rule.mitre.id',
-      render: (value) => Array.isArray(value) ? <div style={{ display: 'flex', gap: 10 }}>
-        {value?.map(technique => (
-          <div key={technique}>
-            {renderMitreTechnique(technique)}
-          </div>
-        ))}
-      </div> : <div>
-        {renderMitreTechnique(value)}
-      </div>
-    },
-    {
-      id: 'timestamp',
-      render: (value) => formatUIDate(value)
-    },
-  ]
-
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
     defaultColumns: defaultTableColumns,
-    renderColumns,
+    renderColumns: wzDiscoverRenderColumns,
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
