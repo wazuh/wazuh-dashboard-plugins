@@ -27,10 +27,10 @@
   height: calc(100vh - 153px);
 }
 
-.globalQueryBar {
+.wz-discover .globalQueryBar {
   padding: 0px !important;
 }
 
-.globalQueryBar:not(:empty) {
+.wz-discover .globalQueryBar:not(:empty) {
   padding: 0px !important;
 }
