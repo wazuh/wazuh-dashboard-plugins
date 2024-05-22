@@ -4,6 +4,7 @@ import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from '../../../common/cons
 import { WzRequest } from '../../react-services';
 import { getHistory } from '../../kibana-services';
 import { AppMountParameters } from '../../../../../src/core/public';
+import NavigationService from '../../react-services/navigation-service';
 
 export class PinnedAgentManager {
   public static NO_AGENT_DATA = {};
@@ -16,11 +17,13 @@ export class PinnedAgentManager {
   private store: any;
   private params: URLSearchParams;
   private history: AppMountParameters['history'];
+  private navigationService: NavigationService;
 
   constructor(inputStore?: any) {
     this.store = inputStore ?? store;
     this.history = getHistory();
     this.params = new URLSearchParams(this.history.location.hash);
+    this.navigationService = NavigationService.getInstance();
   }
 
   private equalToPinnedAgent(agentData: any): boolean {
@@ -86,7 +89,6 @@ export class PinnedAgentManager {
             this.AGENT_VIEW_URL,
           );
           this.params.delete(param);
-
           // TODO: Analyze the mechanism to use to update the URL and whether or not it is necessary to reload the page when updating it.
           /* window.history.replaceState(
             {},
