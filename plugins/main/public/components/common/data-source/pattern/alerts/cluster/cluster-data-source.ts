@@ -1,3 +1,4 @@
+import { tFilter } from '../../../types';
 import { AlertsDataSource } from '../alerts-data-source';
 
 export class ClusterDataSource extends AlertsDataSource {
@@ -6,8 +7,6 @@ export class ClusterDataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [
-        ...super.getClusterManagerFilters(),    
-    ];
+    return [...super.getClusterManagerFilters()];
   }
 }

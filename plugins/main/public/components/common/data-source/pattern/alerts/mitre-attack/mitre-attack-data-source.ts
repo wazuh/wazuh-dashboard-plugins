@@ -40,6 +40,10 @@ export class MitreAttackDataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...super.getFixedFilters(), ...this.getMitreRuleFilter()];
+    return [
+      ...super.getFixedFiltersClusterManager(),
+      ...this.getMitreRuleFilter(),
+      ...super.getFixedFilters(),
+    ];
   }
 }
