@@ -44,7 +44,7 @@ import {
 } from '../data-source';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { endpointSummary, mitreAttack, rules } from '../../../utils/applications';
+import { endpointSummary, rules } from '../../../utils/applications';
 import _ from 'lodash';
 import { AppNavigate, formatUIDate } from '../../../react-services';
 
@@ -80,7 +80,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   }
 
   const SearchBar = getPlugins().data.ui.SearchBar;
-  const [results, setResults] = useState<{ raw: SearchResponse, withRender: SearchResponse }>({ raw: {}, withRender: {} });
+  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
@@ -102,7 +102,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
-      const rowClicked = results.raw.hits.hits[index];
+      const rowClicked = results.hits.hits[index];
       setInspectedHit(rowClicked);
     },
     [results],
@@ -131,10 +131,66 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   });
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
+  const renderColumns = [
+    {
+      id: 'agent.id',
+      render: (value) => {
+        if (value === '000') return value
+
+        return <RedirectAppLinks application={getCore().application}>
+          <EuiLink
+            href={`${endpointSummary.id}#/agents?tab=welcome&agent=${value}`}
+          >
+            {value}
+          </EuiLink>
+        </RedirectAppLinks>
+      }
+    },
+    {
+      id: 'agent.name',
+      render: (value, row) => {
+        if (row.agent.id === '000') return value
+
+        return <RedirectAppLinks application={getCore().application}>
+          <EuiLink
+            href={`${endpointSummary.id}#/agents?tab=welcome&agent=${row.agent.id}`}
+          >
+            {value}
+          </EuiLink>
+        </RedirectAppLinks>
+      }
+    },
+    {
+      id: 'rule.id',
+      render: (value) => <RedirectAppLinks application={getCore().application}>
+        <EuiLink href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}>
+          {value}
+        </EuiLink>
+      </RedirectAppLinks>
+    },
+    {
+      id: 'rule.mitre.id',
+      render: (value) => Array.isArray(value) ? <div style={{ display: 'flex', gap: 10 }}>
+        {value?.map(technique => (
+          <div key={technique}>
+            {renderMitreTechnique(technique)}
+          </div>
+        ))}
+      </div> : <div>
+        {renderMitreTechnique(value)}
+      </div>
+    },
+    {
+      id: 'timestamp',
+      render: (value) => formatUIDate(value)
+    },
+  ]
+
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
     defaultColumns: defaultTableColumns,
-    results: results.withRender,
+    renderColumns,
+    results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
     pagination: {
@@ -157,63 +213,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       sorting,
       dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
     })
-      .then(rawResults => {
-        const hitsWithRender = rawResults?.hits?.hits.map(value => {
-          const { agent, rule, timestamp } = value._source;
-          const newValue = _.cloneDeep(value)
-
-          if (agent.id !== '000') {
-            _.set(newValue, '_source.agent.id', <RedirectAppLinks application={getCore().application}>
-              <EuiLink
-                href={`${endpointSummary.id}#/agents?tab=welcome&agent=${agent.id}`}
-              >
-                {agent.id}
-              </EuiLink>
-            </RedirectAppLinks>);
-            _.set(newValue, '_source.agent.name', <RedirectAppLinks application={getCore().application}>
-              <EuiLink
-                href={`${endpointSummary.id}#/agents?tab=welcome&agent=${agent.id}`}
-              >
-                {agent.name}
-              </EuiLink>
-            </RedirectAppLinks>)
-          }
-
-          if (rule?.id) {
-            _.set(newValue, '_source.rule.id', <RedirectAppLinks application={getCore().application}>
-              <EuiLink href={`${rules.id}#/manager/?tab=rules&redirectRule=${rule.id}`}>
-                {rule.id}
-              </EuiLink>
-            </RedirectAppLinks>)
-          }
-
-          if (rule?.mitre?.id) {
-            _.set(newValue, '_source.rule.mitre.id', Array.isArray(rule.mitre.id) ? <div style={{ display: 'flex', gap: 10 }}>
-              {rule.mitre.id?.map(technique => (
-                <div key={technique}>
-                  {renderMitreTechnique(technique)}
-                </div>
-              ))}
-            </div> : <div>
-              {renderMitreTechnique(rule.mitre.id)}
-            </div>)
-          }
-
-          if (timestamp) {
-            _.set(newValue, '_source.timestamp', formatUIDate(timestamp))
-          }
-
-          return newValue
-        });
-
-        const withRenderResults = _.set(_.cloneDeep(rawResults), 'hits.hits', hitsWithRender)
-
-        const results = {
-          raw: rawResults,
-          withRender: withRenderResults
-        }
-        setResults(results);
-      })
+      .then(results => setResults(results))
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
@@ -242,7 +242,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       fields: columnVisibility.visibleColumns,
       pagination: {
         pageIndex: 0,
-        pageSize: results.raw.hits.total,
+        pageSize: results.hits.total,
       },
       sorting,
     };
@@ -282,10 +282,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               />
             </div>
           )}
-          {!isDataSourceLoading && results?.raw?.hits?.total === 0 ? (
+          {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
-          {!isDataSourceLoading && dataSource && results?.raw?.hits?.total > 0 ? (
+          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
             <>
               <EuiFlexItem grow={false} className='discoverChartContainer'>
                 <EuiPanel
@@ -316,7 +316,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     additionalControls: (
                       <>
                         <DiscoverDataGridAdditionalControls
-                          totalHits={results.raw.hits.total}
+                          totalHits={results.hits.total}
                           isExporting={isExporting}
                           onClickExportResults={onClickExportResults}
                           maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
