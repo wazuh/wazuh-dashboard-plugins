@@ -37,6 +37,10 @@ export class NIST80053DataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...this.getFilterExist(), ...super.getFixedFilters()];
+    return [
+      ...super.getFixedFiltersClusterManager(),
+      ...this.getFilterExist(),
+      ...super.getFixedFilters(),
+    ];
   }
 }

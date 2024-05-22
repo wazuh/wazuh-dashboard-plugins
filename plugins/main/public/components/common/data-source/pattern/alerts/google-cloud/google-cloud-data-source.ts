@@ -19,6 +19,10 @@ export class GoogleCloudDataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...this.getRuleGroupsFilter(), ...super.getFixedFilters()];
+    return [
+      ...super.getFixedFiltersClusterManager(),
+      ...this.getRuleGroupsFilter(),
+      ...super.getFixedFilters(),
+    ];
   }
 }
