@@ -10,5 +10,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { SecurityAlerts } from './security-alerts';
 export { SampleDataWarning } from './sample-data-warning';
