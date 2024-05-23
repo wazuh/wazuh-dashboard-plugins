@@ -25,6 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed overview home top KPIs. [#6379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6379) [#6408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6408) [#6569](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6569)
 - Updated the PDF report year number. [#6492](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6492)
 - Changed overview home font size [#6627](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6627)
+- Changed endpoints summary KPIs, index pattern and APIs selects font sizes [#6702](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6702)
 
 ### Fixed
 
