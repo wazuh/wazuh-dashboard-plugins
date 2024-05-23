@@ -47,6 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the scripted fields disappear when the fields of the events index pattern was refreshed [#6237](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6237)
 - Fixed an error of malformed table row on the generation of PDF reports [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
 - Fixed the sample alerts scripts to generate valid IP ranges and file hashes [#6667](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6667)
+- Fixed remove filter icon visibility when pin and unpin agent [#6685](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6685)
 
 ### Removed
 
