@@ -502,14 +502,14 @@ md-sidenav {
 }
 
 #wz-dev-left-column {
-  width: calc(30% - 7px);
+  width: calc(45% - 7px);
   min-width: calc(20% - 7px);
   max-width: calc(80% - 7px);
   float: left;
 }
 
 #wz-dev-right-column {
-  width: calc(70% - 7px);
+  width: calc(55% - 7px);
   min-width: calc(20% - 7px);
   max-width: calc(80% - 7px);
   float: left;
@@ -1550,6 +1550,10 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
   .agents-link-item {
     max-width: 45%;
     max-height: 100%;
+
+    .euiLink {
+      font-weight: normal;
+    }
 
     .last-agents-link {
       .euiToolTipAnchor {
