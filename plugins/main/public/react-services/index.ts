@@ -12,7 +12,6 @@ export * from './reporting';
 export * from './saved-objects';
 export * from './time-service';
 export * from './toast-notifications';
-export * from './vis-factory-handler';
 export * from './wazuh-config';
 export * from './wz-agents';
 export * from './wz-api-check';
