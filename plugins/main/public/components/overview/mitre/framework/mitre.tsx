@@ -34,6 +34,8 @@ import {
   PatternDataSource,
   tFilter,
 } from '../../../common/data-source';
+import './mitre.scss'
+
 export interface ITactic {
   [key: string]: string[];
 }
@@ -162,7 +164,7 @@ const MitreComponent = props => {
             {isDataSourceLoading && !dataSource ? (
               <LoadingSpinner />
             ) : (
-              <div className='wz-search-bar hide-filter-control'>
+              <div className='wz-mitre-framework wz-search-bar hide-filter-control'>
                 <SearchBar
                   appName='mitre-attack-searchbar'
                   {...searchBarProps}
