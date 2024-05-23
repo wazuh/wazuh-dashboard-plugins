@@ -273,7 +273,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
   return (
     <>
       <I18nProvider>
-        <EuiFlexGroup>
+        <EuiFlexGroup style={{ margin: '0px' }}>
           <EuiFlexItem>
             {isDataSourceLoading && !dataSource ? (
               <LoadingSpinner />
