@@ -51,8 +51,13 @@ export function getForceNow() {
 
 ////////////////////////////////////////////////////////////////////////////////////
 
+interface Options {
+  signal?: AbortSignal;
+}
+
 export const search = async (
   params: SearchParams,
+  options: Options = {},
 ): Promise<SearchResponse | void> => {
   const {
     indexPattern,
@@ -123,7 +128,7 @@ export const search = async (
     searchSource.setField('aggs', aggs);
   }
   try {
-    return await searchParams.fetch();
+    return await searchParams.fetch({ signal: options.signal });
   } catch (error) {
     if (error.body) {
       throw error.body;
@@ -133,10 +138,10 @@ export const search = async (
 };
 
 const getValueDisplayedOnFilter = (filter: tFilter) => {
-  return filter.query?.bool?.minimum_should_match === 1 ? 
-    `is one of ${filter.meta?.value}` :
-    filter.meta?.params?.query || filter.meta?.value;
-}
+  return filter.query?.bool?.minimum_should_match === 1
+    ? `is one of ${filter.meta?.value}`
+    : filter.meta?.params?.query || filter.meta?.value;
+};
 
 export const hideCloseButtonOnFixedFilters = (
   filters: tFilter[],
@@ -152,7 +157,7 @@ export const hideCloseButtonOnFixedFilters = (
           index,
           filter,
           field: filter.meta?.key,
-          value: getValueDisplayedOnFilter(filter)
+          value: getValueDisplayedOnFilter(filter),
         };
       }
     })
