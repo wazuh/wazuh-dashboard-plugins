@@ -27,7 +27,7 @@ export const PromptSelectAgent = ({ body, title }: PromptSelectAgentProps) => {
     <EuiEmptyPrompt
       iconType='watchesApp'
       title={<h2>{title}</h2>}
-      body={body && <p>{body}</p>}
+      body={body && <>{body}</>}
       actions={
         <EuiButton color='primary' fill onClick={openAgentSelector}>
           Select agent
