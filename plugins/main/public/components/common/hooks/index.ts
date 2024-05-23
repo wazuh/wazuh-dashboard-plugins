@@ -18,7 +18,6 @@ export * from './use-time-filter';
 export * from './useWindowSize';
 export * from './useUserPermissions';
 export * from './use-user-is-admin';
-export * from './useResfreshAngularDiscover';
 export * from './useAllowedAgents';
 export * from './useApiRequest';
 export * from './use-app-config';

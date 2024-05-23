@@ -26,7 +26,6 @@ import {
   EuiCodeBlock,
 } from '@elastic/eui';
 import { Discover } from '../../../common/modules/discover';
-import { ModulesHelper } from '../../../common/modules/modules-helper';
 import { ICustomBadges } from '../../../wz-search-bar/components';
 import {
   buildPhraseFilter,
@@ -34,7 +33,6 @@ import {
 } from '../../../../../../../src/plugins/data/common';
 import moment from 'moment-timezone';
 import { AppNavigate } from '../../../../react-services/app-navigate';
-import { TruncateHorizontalComponents } from '../../../common/util';
 import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { getIndexPattern } from '../../../../react-services';
 import { RegistryValues } from './registryValues';
@@ -253,8 +251,6 @@ export class FileDetails extends Component {
           filterManager.removeFilter(x);
         });
         filterManager.addFilters([filters]);
-        const scope = await ModulesHelper.getDiscoverScope();
-        scope.updateQueryAndFetch && scope.updateQueryAndFetch({ query: null });
       } else {
         setTimeout(() => {
           this.checkFilterManager(filters);

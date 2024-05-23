@@ -9,4 +9,3 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export * from './modules-helper.js';
