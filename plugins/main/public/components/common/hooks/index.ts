@@ -22,7 +22,6 @@ export * from './useResfreshAngularDiscover';
 export * from './useAllowedAgents';
 export * from './useApiRequest';
 export * from './use-app-config';
-export * from './useRootScope';
 export * from './use_async_action';
 export * from './use_async_action_run_on_start';
 export { useEsSearch } from './use-es-search';
