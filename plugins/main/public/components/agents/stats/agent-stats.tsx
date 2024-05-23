@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -148,8 +148,12 @@ function AgentStats({ agent }) {
   const [loading, setLoading] = useState();
   const [dataStatLogcollector, setDataStatLogcollector] = useState({});
   const [dataStatAgent, setDataStatAgent] = useState();
+  const isMounted = useRef(false);
+
   useEffect(() => {
-    (async function () {
+    isMounted.current = true;
+
+    const fetchData = async () => {
       setLoading(true);
       try {
         const responseDataStatLogcollector = await WzRequest.apiReq(
@@ -162,29 +166,43 @@ function AgentStats({ agent }) {
           `/agents/${agent.id}/stats/agent`,
           {},
         );
-        setDataStatLogcollector(
-          responseDataStatLogcollector?.data?.data?.affected_items?.[0] || {},
-        );
-        setDataStatAgent(
-          responseDataStatAgent?.data?.data?.affected_items?.[0] || undefined,
-        );
+
+        if (isMounted.current) {
+          setDataStatLogcollector(
+            responseDataStatLogcollector?.data?.data?.affected_items?.[0] || {},
+          );
+          setDataStatAgent(
+            responseDataStatAgent?.data?.data?.affected_items?.[0] || undefined,
+          );
+        }
       } catch (error) {
-        const options: UIErrorLog = {
-          context: `${AgentStats.name}.useEffect`,
-          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
+        if (isMounted.current) {
+          const options: UIErrorLog = {
+            context: `${AgentStats.name}.useEffect`,
+            level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+            severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: error.name || error,
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted.current) {
+          setLoading(false);
+        }
       }
-    })();
-  }, []);
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted.current = false;
+    };
+  }, [agent.id]);
+
   return (
     <EuiPage>
       <EuiPageBody>
