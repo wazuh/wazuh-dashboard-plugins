@@ -11,7 +11,6 @@
  */
 import './eui-loader';
 import { WzFilterBar } from './wz-filter-bar/wz-filter-bar';
-import { WzVisualize } from './visualize/wz-visualize';
 import { WzMenuWrapper } from '../components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from '../components/wz-agent-selector/wz-agent-selector-wrapper';
 import { WzBlankScreen } from '../components/wz-blank-screen/wz-blank-screen';
@@ -24,7 +23,6 @@ import { Settings } from './settings';
 const app = getAngularModule();
 
 app.value('WzFilterBar', WzFilterBar);
-app.value('WzVisualize', WzVisualize);
 app.value('WzMenuWrapper', WzMenuWrapper);
 app.value('WzAgentSelectorWrapper', WzAgentSelectorWrapper);
 app.value('WzBlankScreen', WzBlankScreen);
