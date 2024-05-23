@@ -8,7 +8,7 @@
   }
 
   .discoverDataGrid {
-    height: calc(100vh - 496px);
+    height: calc(100vh - 464px);
   }
 
   .discoverChartContainer {
@@ -25,12 +25,4 @@
 
 .headerIsExpanded .discoverContainer {
   height: calc(100vh - 153px);
-}
-
-.wz-discover .globalQueryBar {
-  padding: 0px !important;
-}
-
-.wz-discover .globalQueryBar:not(:empty) {
-  padding: 0px !important;
 }

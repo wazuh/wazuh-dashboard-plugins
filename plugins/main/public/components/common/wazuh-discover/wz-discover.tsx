@@ -191,6 +191,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         restrictWidth='100%'
         fullHeight={true}
         grow
+        paddingSize='none'
       >
         <>
           {isDataSourceLoading ? (
@@ -210,48 +211,48 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
           {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-            <>
-              <EuiSpacer size='m' />
-              <EuiFlexItem grow={false} className='discoverChartContainer'>
-                <EuiPanel
-                  hasBorder={false}
-                  hasShadow={false}
-                  color='transparent'
-                  paddingSize='none'
-                >
-                  <EuiPanel>
-                    <DashboardByRenderer
-                      input={histogramChartInput(
-                        dataSource?.title,
-                        fetchFilters,
-                        query,
-                        dateRangeFrom,
-                        dateRangeTo,
-                      )}
-                    />
+            <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false}>
+              <EuiFlexGroup gutterSize='s' direction='column'>
+                <EuiFlexItem grow={false} className='discoverChartContainer'>
+                  <EuiPanel
+                    hasBorder={false}
+                    hasShadow={false}
+                    color='transparent'
+                    paddingSize='none'
+                  >
+                    <EuiPanel>
+                      <DashboardByRenderer
+                        input={histogramChartInput(
+                          dataSource?.title,
+                          fetchFilters,
+                          query,
+                          dateRangeFrom,
+                          dateRangeTo,
+                        )}
+                      />
+                    </EuiPanel>
                   </EuiPanel>
-                </EuiPanel>
-              </EuiFlexItem>
-              <EuiSpacer size='m' />
-              <div className='discoverDataGrid'>
-                <EuiDataGrid
-                  {...dataGridProps}
-                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                  toolbarVisibility={{
-                    additionalControls: (
-                      <>
-                        <DiscoverDataGridAdditionalControls
-                          totalHits={results.hits.total}
-                          isExporting={isExporting}
-                          onClickExportResults={onClickExportResults}
-                          maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                        />
-                      </>
-                    ),
-                  }}
-                />
-              </div>
-            </>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false} className='discoverDataGrid'>
+                  <EuiDataGrid
+                    {...dataGridProps}
+                    className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                    toolbarVisibility={{
+                      additionalControls: (
+                        <>
+                          <DiscoverDataGridAdditionalControls
+                            totalHits={results.hits.total}
+                            isExporting={isExporting}
+                            onClickExportResults={onClickExportResults}
+                            maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                          />
+                        </>
+                      ),
+                    }}
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPanel>
           ) : null}
           {inspectedHit && (
             <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
