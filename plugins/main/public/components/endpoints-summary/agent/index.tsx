@@ -11,23 +11,21 @@ import { withErrorBoundary, withRouteResolvers } from '../../common/hocs';
 import { compose } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 import { MainModuleAgent } from '../../common/modules/main-agent';
-
 import {
   enableMenu,
   ip,
   nestedResolve,
   savedSearch,
 } from '../../../services/resolves';
+import { useHistory } from 'react-router-dom';
+import { useRouterSearch } from '../../common/hooks/use-router-search';
 
 export const AgentView = compose(
   withErrorBoundary,
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
 )(() => {
-  const urlParams = new URLSearchParams(window.location.href);
-  const urlTab = urlParams.get('tab');
-  //TODO: Replace when implement React router
-  /* const $injector = getAngularModule().$injector;
-  const $commonData = $injector.get('commonData'); */
+  const { tab = 'welcome' } = useRouterSearch();
+  const history = useHistory();
 
   //TODO: Replace with useDatasource and useSearchBar when replace WzDatePicker with SearchBar in AgentsWelcome component
   /* const savedTimefilter = $commonData.getTimefilter();
@@ -38,11 +36,8 @@ export const AgentView = compose(
 
   const pinnedAgentManager = new PinnedAgentManager();
 
-  const defaultTab: string = 'welcome';
-
   const [agent, setAgent] = useState<Agent>();
   const [isLoadingAgent, setIsLoadingAgent] = useState(true);
-  const [tab, setTab] = useState<string>(urlTab ?? defaultTab);
 
   const getAgent = async () => {
     setIsLoadingAgent(true);
@@ -57,10 +52,7 @@ export const AgentView = compose(
   }, [tab]);
 
   const switchTab = (tab: string) => {
-    setTab(tab);
-    getCore().application.navigateToApp(endpointSummary.id, {
-      path: `#/agents?tab=${tab}&agent=${agent?.id}`,
-    });
+    history.push(`/agents?tab=${tab}&agent=${agent?.id}`);
   };
 
   if (isLoadingAgent) {
