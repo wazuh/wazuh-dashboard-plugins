@@ -16,7 +16,7 @@ export const EventsSelectedFiles = {
     'syscheck.event',
     'rule.description',
     'rule.level',
-    'rule.id'
+    'rule.id',
   ],
   mitre: [
     'agent.name',
@@ -24,7 +24,7 @@ export const EventsSelectedFiles = {
     'rule.mitre.tactic',
     'rule.description',
     'rule.level',
-    'rule.id'
+    'rule.id',
   ],
   sca: [
     'data.sca.check.title',
@@ -32,18 +32,8 @@ export const EventsSelectedFiles = {
     'data.sca.check.result',
     'data.sca.policy',
   ],
-  general: [
-    'agent.name',
-    'rule.description',
-    'rule.level',
-    'rule.id',
-  ],
-  aws: [
-    'data.aws.source',
-    'rule.description',
-    'rule.level',
-    'rule.id',
-  ],
+  general: ['agent.name', 'rule.description', 'rule.level', 'rule.id'],
+  aws: ['data.aws.source', 'rule.description', 'rule.level', 'rule.id'],
   gcp: [
     'agent.name',
     'data.gcp.jsonPayload.vmInstanceName',
@@ -52,13 +42,7 @@ export const EventsSelectedFiles = {
     'data.gcp.resource.type',
     'data.gcp.severity',
   ],
-  pm: [
-    'agent.name',
-    'data.title',
-    'rule.description',
-    'rule.level',
-    'rule.id',
-  ],
+  pm: ['agent.name', 'data.title', 'rule.description', 'rule.level', 'rule.id'],
   audit: [
     'agent.name',
     'data.audit.command',
@@ -85,10 +69,9 @@ export const EventsSelectedFiles = {
   ],
   vuls: [
     'agent.name',
-    'data.vulnerability.package.name',
-    'data.vulnerability.cve',
     'data.vulnerability.severity',
-    'data.vulnerability.status'
+    'data.vulnerability.cve',
+    'data.vulnerability.package.name',
   ],
   virustotal: [
     'agent.name',
@@ -118,43 +101,37 @@ export const EventsSelectedFiles = {
     'rule.pci_dss',
     'rule.description',
     'rule.level',
-    'rule.id'
+    'rule.id',
   ],
   gdpr: [
     'agent.name',
     'rule.gdpr',
     'rule.description',
     'rule.level',
-    'rule.id'
+    'rule.id',
   ],
   hipaa: [
     'agent.name',
     'rule.hipaa',
     'rule.description',
     'rule.level',
-    'rule.id'
+    'rule.id',
   ],
   nist: [
     'agent.name',
     'rule.nist_800_53',
     'rule.description',
     'rule.level',
-    'rule.id'
+    'rule.id',
   ],
-  tsc: [
-    'agent.name',
-    'rule.tsc',
-    'rule.description',
-    'rule.level',
-    'rule.id'
-  ],
+  tsc: ['agent.name', 'rule.tsc', 'rule.description', 'rule.level', 'rule.id'],
   office: [
     'data.office365.Subscription',
     'data.office365.Operation',
     'data.office365.UserId',
     'data.office365.ClientIP',
     'rule.level',
-    'rule.id'
+    'rule.id',
   ],
   github: [
     'agent.id',
@@ -163,7 +140,6 @@ export const EventsSelectedFiles = {
     'data.github.org',
     'rule.description',
     'rule.level',
-    'rule.id'
+    'rule.id',
   ],
-  
 };
