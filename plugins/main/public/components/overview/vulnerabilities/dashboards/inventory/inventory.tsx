@@ -12,6 +12,7 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiButtonEmpty,
+  EuiSpacer
 } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
@@ -27,7 +28,6 @@ import { MAX_ENTRIES_PER_QUERY, inventoryTableDefaultColumns } from './config';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
 // common components/hooks
-import DocViewer from '../../../../common/doc-viewer/doc-viewer';
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { useDataGrid } from '../../../../common/data-grid/use-data-grid';
 import { useDocViewer } from '../../../../common/doc-viewer/use-doc-viewer';
@@ -177,7 +177,7 @@ const InventoryVulsComponent = () => {
             {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
-              <div className='wz-search-bar hide-filter-control'>
+              <div className='wz-inventory-vuls wz-search-bar hide-filter-control'>
                 <SearchBar
                   appName='inventory-vuls'
                   {...searchBarProps}
@@ -192,19 +192,21 @@ const InventoryVulsComponent = () => {
               <DiscoverNoResults />
             ) : null}
             {!isDataSourceLoading && results?.hits?.total > 0 ? (
-              <EuiDataGrid
-                {...dataGridProps}
-                className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                toolbarVisibility={{
-                  additionalControls: (
-                    <>
-                      <HitsCounter
-                        hits={results?.hits?.total}
-                        showResetButton={false}
-                        tooltip={
-                          results?.hits?.total &&
-                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                            ? {
+              <>
+                <EuiSpacer size='m' />
+                <EuiDataGrid
+                  {...dataGridProps}
+                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                  toolbarVisibility={{
+                    additionalControls: (
+                      <>
+                        <HitsCounter
+                          hits={results?.hits?.total}
+                          showResetButton={false}
+                          tooltip={
+                            results?.hits?.total &&
+                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                              ? {
                                 ariaLabel: 'Warning',
                                 content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
                                   MAX_ENTRIES_PER_QUERY,
@@ -212,27 +214,28 @@ const InventoryVulsComponent = () => {
                                 iconType: 'alert',
                                 position: 'top',
                               }
-                            : undefined
-                        }
-                      />
-                      <EuiButtonEmpty
-                        disabled={
-                          results?.hits?.total === 0 ||
-                          !columnVisibility?.visibleColumns?.length
-                        }
-                        size='xs'
-                        iconType='exportAction'
-                        color='primary'
-                        isLoading={isExporting}
-                        className='euiDataGrid__controlBtn'
-                        onClick={onClickExportResults}
-                      >
-                        Export Formated
-                      </EuiButtonEmpty>
-                    </>
-                  ),
-                }}
-              />
+                              : undefined
+                          }
+                        />
+                        <EuiButtonEmpty
+                          disabled={
+                            results?.hits?.total === 0 ||
+                            !columnVisibility?.visibleColumns?.length
+                          }
+                          size='xs'
+                          iconType='exportAction'
+                          color='primary'
+                          isLoading={isExporting}
+                          className='euiDataGrid__controlBtn'
+                          onClick={onClickExportResults}
+                        >
+                          Export Formated
+                        </EuiButtonEmpty>
+                      </>
+                    ),
+                  }}
+                />
+              </>
             ) : null}
             {inspectedHit && (
               <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>

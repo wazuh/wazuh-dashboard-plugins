@@ -16,3 +16,11 @@
 .headerIsExpanded .vulsInventoryContainer {
   height: calc(100vh - 153px);
 }
+
+.wz-inventory-vuls .globalQueryBar {
+  padding: 0px !important;
+}
+
+.wz-inventory-vuls .globalQueryBar:not(:empty) {
+  padding: 0px !important;
+}
