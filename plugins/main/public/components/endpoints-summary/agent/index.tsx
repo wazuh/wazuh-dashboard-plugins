@@ -19,6 +19,7 @@ import {
 } from '../../../services/resolves';
 import { useHistory } from 'react-router-dom';
 import { useRouterSearch } from '../../common/hooks/use-router-search';
+import { Redirect, Route, Switch } from '../../router-search';
 
 export const AgentView = compose(
   withErrorBoundary,
@@ -65,39 +66,29 @@ export const AgentView = compose(
     );
   }
 
-  if (tab === 'syscollector' && agent) {
-    return (
-      <>
+  return (
+    <Switch>
+      <Route path='?tab=syscollector'>
         <MainModuleAgent agent={agent} section={tab} />
         <MainSyscollector agent={agent} />
-      </>
-    );
-  }
-
-  if (tab === 'stats' && agent) {
-    return (
-      <>
+      </Route>
+      <Route path='?tab=stats'>
         <MainModuleAgent agent={agent} section={tab} />
         <MainAgentStats agent={agent} />
-      </>
-    );
-  }
-
-  if (tab === 'configuration' && agent) {
-    return (
-      <>
+      </Route>
+      <Route path='?tab=configuration'>
         <MainModuleAgent agent={agent} section={tab} />
-        <WzManagementConfiguration agent={agent} />
-      </>
-    );
-  }
-
-  return (
-    <AgentsWelcome
-      switchTab={switchTab}
-      agent={agent}
-      pinAgent={pinnedAgentManager.pinAgent}
-      unPinAgent={pinnedAgentManager.unPinAgent}
-    />
+        <MainAgentStats agent={agent} />
+      </Route>
+      <Route path='?tab=welcome'>
+        <AgentsWelcome
+          switchTab={switchTab}
+          agent={agent}
+          pinAgent={pinnedAgentManager.pinAgent}
+          unPinAgent={pinnedAgentManager.unPinAgent}
+        />
+      </Route>
+      <Redirect to='?tab=welcome'></Redirect>
+    </Switch>
   );
 });

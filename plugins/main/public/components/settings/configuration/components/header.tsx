@@ -96,6 +96,7 @@ const SearchBar = ({ query, setQuery, searchBarFilters }) => {
       setError(args.error);
     } else {
       setError(undefined);
+      // TODO: replace URL adding the query to the category query parameter
       setQuery(args);
     }
   };

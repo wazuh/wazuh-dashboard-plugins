@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React from 'react';
 import WzRuleset from './ruleset/main-ruleset';
 import WzCDBLists from './cdblists/main-cdblists';
 import WzDecoders from './decoders/main-decoders';
@@ -24,70 +24,49 @@ import {
   SECTION_DECODERS_SECTION,
   SECTION_RULES_SECTION,
 } from './common/constants';
-import { withGuardAsync } from '../../../../components/common/hocs';
-import { compose } from 'redux';
 import { ClusterOverview } from './cluster/cluster-overview';
+import { Switch, Route } from '../../../../components/router-search';
 
-class WzManagementMain extends Component {
-  constructor(props) {
-    super(props);
-  }
+const WzManagementMain = props => (
+  <Switch>
+    <Route path='?tab=groups'>
+      <WzGroups {...props} />
+    </Route>
+    <Route path='?tab=status'>
+      <WzStatus />
+    </Route>
+    <Route path='?tab=monitoring'>
+      <ClusterOverview />
+    </Route>
+    <Route path='?tab=reporting'>
+      <WzReporting />
+    </Route>
+    <Route path='?tab=statistics'>
+      <WzStatistics />
+    </Route>
+    <Route path='?tab=logs'>
+      <WzLogs />
+    </Route>
+    <Route path='?tab=configuration'>
+      <WzConfiguration
+        agent={{
+          id: '000',
+        }}
+      />
+    </Route>
+    <Route path={`?tab=${SECTION_DECODERS_SECTION}`}>
+      <WzDecoders />
+    </Route>
+    <Route path={`?tab=${SECTION_CDBLIST_SECTION}`}>
+      <WzCDBLists />
+    </Route>
+    <Route path={`?tab=ruleset`}>
+      <WzRuleset />
+    </Route>
+    <Route path={`?tab=${SECTION_RULES_SECTION}`}>
+      <WzRuleset />
+    </Route>
+  </Switch>
+);
 
-  render() {
-    const { section } = this.props;
-    return (
-      <Fragment>
-        {(section === 'groups' && <WzGroups {...this.props} />) ||
-          (section === 'status' && <WzStatus />) ||
-          (section === 'monitoring' && <ClusterOverview />) ||
-          (section === 'reporting' && <WzReporting />) ||
-          (section === 'statistics' && <WzStatistics />) ||
-          (section === 'logs' && <WzLogs />) ||
-          (section === 'configuration' && (
-            <WzConfiguration
-              agent={{
-                id: '000',
-              }}
-            />
-          )) ||
-          (section === SECTION_DECODERS_SECTION && <WzDecoders />) ||
-          (section === SECTION_CDBLIST_SECTION && <WzCDBLists />) ||
-          (['ruleset', SECTION_RULES_SECTION].includes(section) && (
-            <WzRuleset />
-          ))}
-      </Fragment>
-    );
-  }
-}
-
-const availableViews = [
-  'groups',
-  'status',
-  'reporting',
-  'statistics',
-  'logs',
-  'configuration',
-  'decoders',
-  'lists',
-  'ruleset',
-  'rules',
-  'monitoring',
-];
-
-export const ManagementRouter = compose(
-  withGuardAsync(
-    ({ location }) => {
-      // TODO: Test if URLSearchParams works correctly with location.search,
-      // location.href may have to be used instead
-      const section = new URLSearchParams(location.search).get('tab');
-
-      if (availableViews.includes(section)) {
-        return { ok: false, data: { section } };
-      }
-      return { ok: true, data: { section } };
-    },
-    () => null,
-  ),
-)(({ section }) => <WzManagementMain section={section} />);
-
-export default ManagementRouter;
+export default WzManagementMain;

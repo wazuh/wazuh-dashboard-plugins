@@ -82,7 +82,7 @@ export const MainModuleAgent = withRouter(
                         style={{ color: euiThemeVars.euiColorPrimaryText }}
                         onClick={() => {
                           this.props.history.push(
-                            `#/agents?tab=welcome&agent=${this.props.agent.id}`,
+                            `/agents?tab=welcome&agent=${this.props.agent.id}`,
                           );
                         }}
                       >

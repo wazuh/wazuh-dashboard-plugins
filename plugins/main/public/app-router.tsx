@@ -99,7 +99,11 @@ export function AppRouter(props) {
         ></Route>
         <Route path={'/settings'} exact render={Settings}></Route>
         <Route path={'/security'} exact render={WzSecurity}></Route>
-        <Route path={'/wazuh-dev'} exact render={ToolsRouter}></Route>
+        <Route
+          path={'/wazuh-dev'}
+          exact
+          render={props => <ToolsRouter {...props} />}
+        ></Route>
         <Route
           path={'/blank-screen'}
           exact

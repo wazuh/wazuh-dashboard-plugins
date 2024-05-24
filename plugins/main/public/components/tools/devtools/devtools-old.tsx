@@ -23,6 +23,8 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { withGlobalBreadcrumb } from '../../common/hocs';
+import { devTools } from '../../../utils/applications';
 
 /**
  * Detect de groups of instructions
@@ -878,7 +880,9 @@ function exportOutput(editor) {
   }
 }
 
-export const ToolDevTools = () => {
+export const ToolDevTools = withGlobalBreadcrumb([
+  { text: devTools.breadcrumbLabel },
+])(() => {
   const [multipleKeyPressed, setMultipleKeyPressed] = useState([]);
   const editorInputRef = useRef();
   const editorOutputRef = useRef();
@@ -1082,4 +1086,4 @@ export const ToolDevTools = () => {
       {/* </md-content> */}
     </div>
   );
-};
+});

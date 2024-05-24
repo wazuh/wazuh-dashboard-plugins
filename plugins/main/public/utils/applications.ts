@@ -715,7 +715,7 @@ export const devTools = {
   order: 610,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/wazuh-dev/?tab=devTools',
+  redirectTo: () => '/wazuh-dev?tab=devTools',
 };
 
 export const rulesetTest = {
@@ -734,7 +734,7 @@ export const rulesetTest = {
   order: 611,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/wazuh-dev/?tab=logtest',
+  redirectTo: () => '/wazuh-dev?tab=logtest',
 };
 
 export const security = {

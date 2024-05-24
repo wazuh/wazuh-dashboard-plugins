@@ -35,6 +35,9 @@ import {
   nestedResolve,
   savedSearch,
 } from '../../services/resolves';
+import { Redirect, Route, Switch } from '../router-search';
+import { useHistory } from 'react-router-dom';
+import { useRouterSearch } from '../common/hooks';
 
 const tabs = [
   {
@@ -64,13 +67,8 @@ export const WzSecurity = compose(
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([{ text: security.breadcrumbLabel }]),
 )(() => {
-  // Get the initial tab when the component is initiated
-  const securityTabRegExp = new RegExp(
-    `tab=(${tabs.map(tab => tab.id).join('|')})`,
-  );
-  const tab = window.location.href.match(securityTabRegExp);
-
-  const selectedTabId = (tab && tab[1]) || 'users';
+  const history = useHistory();
+  const { tab: selectedTabId } = useRouterSearch();
 
   const checkRunAsUser = async () => {
     const currentApi = AppState.getCurrentAPI();
@@ -109,18 +107,11 @@ export const WzSecurity = compose(
     }
   }, []);
 
-  const onSelectedTabChanged = id => {
-    window.location.href = window.location.href.replace(
-      `tab=${selectedTabId}`,
-      `tab=${id}`,
-    );
-  };
-
   const renderTabs = () => {
     return tabs.map((tab, index) => (
       <EuiTab
         {...(tab.href && { href: tab.href, target: '_blank' })}
-        onClick={() => onSelectedTabChanged(tab.id)}
+        onClick={() => history.push(`/security?tab=${tab.id}`)}
         isSelected={tab.id === selectedTabId}
         disabled={tab.disabled}
         key={index}
@@ -169,18 +160,27 @@ export const WzSecurity = compose(
         <EuiFlexItem>
           <EuiTabs>{renderTabs()}</EuiTabs>
           <EuiSpacer size='m'></EuiSpacer>
-          {selectedTabId === 'users' && <Users></Users>}
-          {selectedTabId === 'roles' && <Roles></Roles>}
-          {selectedTabId === 'policies' && <Policies></Policies>}
-          {selectedTabId === 'roleMapping' && (
-            <>
-              {allowRunAs !== undefined &&
-                allowRunAs !==
-                  getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ENABLED &&
-                isNotRunAs(allowRunAs)}
-              <RolesMapping></RolesMapping>
-            </>
-          )}
+          <Switch>
+            <Route path='?tab=users'>
+              <Users></Users>
+            </Route>
+            <Route path='?tab=roles'>
+              <Roles></Roles>
+            </Route>
+            <Route path='?tab=policies'>
+              <Policies></Policies>
+            </Route>
+            <Route path='?tab=roleMapping'>
+              <>
+                {allowRunAs !== undefined &&
+                  allowRunAs !==
+                    getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ENABLED &&
+                  isNotRunAs(allowRunAs)}
+                <RolesMapping></RolesMapping>
+              </>
+            </Route>
+            <Redirect to='?tab=users'></Redirect>
+          </Switch>
         </EuiFlexItem>
       </EuiFlexGroup>
     </EuiPage>
