@@ -197,7 +197,7 @@ const InventoryVulsComponent = () => {
               <DiscoverNoResults />
             ) : null}
             {!isDataSourceLoading && results?.hits?.total > 0 ? (
-              <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false}>
+              <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
                 <div className='vulsInventoryDataGrid'>
                   <EuiDataGrid
                     {...dataGridProps}
