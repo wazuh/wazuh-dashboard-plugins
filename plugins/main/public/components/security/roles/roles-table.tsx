@@ -75,14 +75,14 @@ export const RolesTable = ({
     {
       field: 'id',
       name: 'ID',
-      width: 75,
+      width: '75',
       sortable: true,
       truncateText: true,
     },
     {
       field: 'name',
       name: 'Name',
-      width: 200,
+      width: '200',
       sortable: true,
       truncateText: true,
     },
@@ -147,7 +147,7 @@ export const RolesTable = ({
           )
         );
       },
-      width: 150,
+      width: '150',
       sortable: false,
     },
     {
