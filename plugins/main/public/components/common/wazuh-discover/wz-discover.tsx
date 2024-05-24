@@ -11,7 +11,6 @@ import {
   EuiFlyoutBody,
   EuiFlyoutHeader,
   EuiTitle,
-  EuiSpacer,
   EuiPanel,
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
@@ -192,6 +191,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         fullHeight={true}
         grow
         paddingSize='none'
+        pageContentProps={{ color: 'transparent' }}
       >
         <>
           {isDataSourceLoading ? (
@@ -211,7 +211,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
           {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-            <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false}>
+            <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
               <EuiFlexGroup gutterSize='s' direction='column'>
                 <EuiFlexItem grow={false} className='discoverChartContainer'>
                   <EuiPanel

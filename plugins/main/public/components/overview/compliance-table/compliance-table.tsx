@@ -271,74 +271,74 @@ export const ComplianceTable = withAgentSupportModule(props => {
   ]);
 
   return (
-    <>
-      <I18nProvider>
-        <EuiFlexGroup style={{ margin: '0px' }}>
-          <EuiFlexItem>
-            {isDataSourceLoading && !dataSource ? (
-              <LoadingSpinner />
-            ) : (
-              <div className='wz-search-bar hide-filter-control'>
-                <SearchBar
-                  appName='compliance-controls'
-                  {...searchBarProps}
-                  showDatePicker={true}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                  showSaveQuery={true}
-                />
-              </div>
-            )}
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup style={{ margin: '0 8px' }}>
-          <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
-            <EuiPanel paddingSize='none'>
-              {!!Object.keys(complianceData.complianceObject).length && (
-                <EuiFlexGroup>
-                  <EuiFlexItem
-                    grow={false}
-                    style={{
-                      width: '15%',
-                      minWidth: 145,
-                      maxHeight: 'calc(100vh - 320px)',
-                      overflowX: 'hidden',
-                    }}
-                  >
-                    <ComplianceRequirements
-                      section={props.section}
-                      onChangeSelectedRequirements={selectedRequirements =>
-                        setComplianceData(state => ({
-                          ...state,
-                          selectedRequirements,
-                        }))
-                      }
-                      requirementsCount={action.data || []}
-                      loadingAlerts={action.running}
-                      {...complianceData}
-                    />
-                  </EuiFlexItem>
-                  <EuiFlexItem style={{ width: '15%' }}>
-                    <ComplianceSubrequirements
-                      section={props.section}
-                      onSelectedTabChanged={id =>
-                        props.onSelectedTabChanged(id)
-                      }
-                      requirementsCount={action.data || []}
-                      loadingAlerts={action.running}
-                      fetchFilters={fetchFilters}
-                      getRegulatoryComplianceRequirementFilter={
-                        getRegulatoryComplianceRequirementFilter
-                      }
-                      {...complianceData}
-                    />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              )}
-            </EuiPanel>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </I18nProvider>
-    </>
+    <I18nProvider>
+      <>
+        <EuiPanel paddingSize='none' hasShadow={false} hasBorder={false} color="transparent">
+          {isDataSourceLoading && !dataSource ? (
+            <LoadingSpinner />
+          ) : (
+            <div className='wz-search-bar hide-filter-control'>
+              <SearchBar
+                appName='compliance-controls'
+                {...searchBarProps}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+            </div>
+          )}
+        </EuiPanel>
+        <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+          <EuiPanel paddingSize='none'>
+            <EuiFlexGroup paddingSize='none'>
+              <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
+                {!!Object.keys(complianceData.complianceObject).length && (
+                  <EuiFlexGroup>
+                    <EuiFlexItem
+                      grow={false}
+                      style={{
+                        width: '15%',
+                        minWidth: 145,
+                        maxHeight: 'calc(100vh - 320px)',
+                        overflowX: 'hidden',
+                      }}
+                    >
+                      <ComplianceRequirements
+                        section={props.section}
+                        onChangeSelectedRequirements={selectedRequirements =>
+                          setComplianceData(state => ({
+                            ...state,
+                            selectedRequirements,
+                          }))
+                        }
+                        requirementsCount={action.data || []}
+                        loadingAlerts={action.running}
+                        {...complianceData}
+                      />
+                    </EuiFlexItem>
+                    <EuiFlexItem style={{ width: '15%' }}>
+                      <ComplianceSubrequirements
+                        section={props.section}
+                        onSelectedTabChanged={id =>
+                          props.onSelectedTabChanged(id)
+                        }
+                        requirementsCount={action.data || []}
+                        loadingAlerts={action.running}
+                        fetchFilters={fetchFilters}
+                        getRegulatoryComplianceRequirementFilter={
+                          getRegulatoryComplianceRequirementFilter
+                        }
+                        {...complianceData}
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                )}
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPanel>
+        </EuiPanel>
+      </>
+    </I18nProvider>
   );
 });

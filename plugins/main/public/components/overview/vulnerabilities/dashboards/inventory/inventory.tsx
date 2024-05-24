@@ -12,7 +12,7 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiButtonEmpty,
-  EuiSpacer
+  EuiPanel
 } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
@@ -173,13 +173,16 @@ const InventoryVulsComponent = () => {
         <EuiPageTemplate
           className='vulsInventoryContainer'
           restrictWidth='100%'
+          fullHeight={true}
           grow
+          paddingSize='none'
+          pageContentProps={{ color: 'transparent' }}
         >
           <>
             {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
-              <div className='wz-inventory-vuls wz-search-bar hide-filter-control'>
+              <div className='wz-search-bar hide-filter-control'>
                 <SearchBar
                   appName='inventory-vuls'
                   {...searchBarProps}
@@ -194,50 +197,51 @@ const InventoryVulsComponent = () => {
               <DiscoverNoResults />
             ) : null}
             {!isDataSourceLoading && results?.hits?.total > 0 ? (
-              <>
-                <EuiSpacer size='m' />
-                <EuiDataGrid
-                  {...dataGridProps}
-                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                  toolbarVisibility={{
-                    additionalControls: (
-                      <>
-                        <HitsCounter
-                          hits={results?.hits?.total}
-                          showResetButton={false}
-                          tooltip={
-                            results?.hits?.total &&
-                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                              ? {
-                                ariaLabel: 'Warning',
-                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits.`,
-                                iconType: 'alert',
-                                position: 'top',
-                              }
-                              : undefined
-                          }
-                        />
-                        <EuiButtonEmpty
-                          disabled={
-                            results?.hits?.total === 0 ||
-                            !columnVisibility?.visibleColumns?.length
-                          }
-                          size='xs'
-                          iconType='exportAction'
-                          color='primary'
-                          isLoading={isExporting}
-                          className='euiDataGrid__controlBtn'
-                          onClick={onClickExportResults}
-                        >
-                          Export Formated
-                        </EuiButtonEmpty>
-                      </>
-                    ),
-                  }}
-                />
-              </>
+              <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false}>
+                <div className='vulsInventoryDataGrid'>
+                  <EuiDataGrid
+                    {...dataGridProps}
+                    className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                    toolbarVisibility={{
+                      additionalControls: (
+                        <>
+                          <HitsCounter
+                            hits={results?.hits?.total}
+                            showResetButton={false}
+                            tooltip={
+                              results?.hits?.total &&
+                                results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                                ? {
+                                  ariaLabel: 'Warning',
+                                  content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                    MAX_ENTRIES_PER_QUERY,
+                                  )} hits.`,
+                                  iconType: 'alert',
+                                  position: 'top',
+                                }
+                                : undefined
+                            }
+                          />
+                          <EuiButtonEmpty
+                            disabled={
+                              results?.hits?.total === 0 ||
+                              !columnVisibility?.visibleColumns?.length
+                            }
+                            size='xs'
+                            iconType='exportAction'
+                            color='primary'
+                            isLoading={isExporting}
+                            className='euiDataGrid__controlBtn'
+                            onClick={onClickExportResults}
+                          >
+                            Export Formated
+                          </EuiButtonEmpty>
+                        </>
+                      ),
+                    }}
+                  />
+                </div>
+              </EuiPanel>
             ) : null}
             {inspectedHit && (
               <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>

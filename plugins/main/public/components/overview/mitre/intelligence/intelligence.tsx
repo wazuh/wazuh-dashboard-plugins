@@ -118,7 +118,7 @@ export const ModuleMitreAttackIntelligence = compose(
   }, []);
 
   return (
-    <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false}>
+    <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
       <PanelSplit
         side={
           <ModuleMitreAttackIntelligenceLeftPanel
