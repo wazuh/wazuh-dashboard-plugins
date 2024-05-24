@@ -46,6 +46,7 @@ import {
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { DocumentViewTableAndJson } from '../../common/components/document-view-table-and-json';
+import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
 
 const InventoryVulsComponent = () => {
   const {
@@ -103,6 +104,7 @@ const InventoryVulsComponent = () => {
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Vulnerabilities Inventory Table',
     defaultColumns: inventoryTableDefaultColumns,
+    renderColumns: wzDiscoverRenderColumns,
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
