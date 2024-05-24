@@ -126,6 +126,34 @@ export function TableWithSearchBar<T>({
   const isMounted = useRef(false);
   const tableRef = useRef();
 
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
+    // We don't want to set the pagination state because there is another effect that has this dependency
+    // and will cause the effect is triggered (redoing the onSearch function).
+    if (isMounted.current) {
+      // Reset the page index when the endpoint or reload changes.
+      // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
+      updateRefresh();
+    }
+  }, [endpoint, reload]);
+
+  useEffect(() => {
+    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
+    // We don't want to set the filters state because there is another effect that has this dependency
+    // and will cause the effect is triggered (redoing the onSearch function).
+    if (isMounted.current && !_.isEqual(rest.filters, filters)) {
+      setFilters(rest.filters || {});
+      updateRefresh();
+    }
+  }, [rest.filters]);
+
   const searchBarWQLOptions = useMemo(
     () => ({
       searchTermFields: tableColumns
@@ -163,34 +191,25 @@ export function TableWithSearchBar<T>({
   }
 
   useEffect(() => {
-    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
-    // We don't want to set the pagination state because there is another effect that has this dependency
-    // and will cause the effect is triggered (redoing the onSearch function).
-    if (isMounted.current) {
-      // Reset the page index when the endpoint or reload changes.
-      // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
-      updateRefresh();
-    }
-  }, [endpoint, reload]);
+    (async () => {
+      try {
+        setLoading(true);
 
-  useEffect(
-    function () {
-      (async () => {
-        try {
-          setLoading(true);
+        //Reset the table selection in case is enabled
+        tableRef.current.setSelection([]);
 
-          //Reset the table selection in case is enabled
-          tableRef.current.setSelection([]);
-
-          const { items, totalItems } = await onSearch(
-            endpoint,
-            filters,
-            pagination,
-            sorting,
-          );
+        const { items, totalItems } = await onSearch(
+          endpoint,
+          filters,
+          pagination,
+          sorting,
+        );
+        if (isMounted.current) {
           setItems(items);
           setTotalItems(totalItems);
-        } catch (error) {
+        }
+      } catch (error) {
+        if (isMounted.current) {
           setItems([]);
           setTotalItems(0);
           const options = {
@@ -205,28 +224,12 @@ export function TableWithSearchBar<T>({
           };
           getErrorOrchestrator().handleError(options);
         }
+      }
+      if (isMounted.current) {
         setLoading(false);
-      })();
-    },
-    [filters, pagination, sorting, refresh],
-  );
-
-  useEffect(() => {
-    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
-    // We don't want to set the filters state because there is another effect that has this dependency
-    // and will cause the effect is triggered (redoing the onSearch function).
-    if (isMounted.current && !_.isEqual(rest.filters, filters)) {
-      setFilters(rest.filters || {});
-      updateRefresh();
-    }
-  }, [rest.filters]);
-
-  // It is required that this effect runs after other effects that use isMounted
-  // to avoid that these effects run when the component is mounted, only running
-  // when one of its dependencies changes.
-  useEffect(() => {
-    isMounted.current = true;
-  }, []);
+      }
+    })();
+  }, [filters, pagination, sorting, refresh]);
 
   const tablePagination = {
     ...pagination,
