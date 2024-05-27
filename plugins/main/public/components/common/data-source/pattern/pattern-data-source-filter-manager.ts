@@ -17,6 +17,16 @@ import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector
 const MANAGER_AGENT_ID = '000';
 const AGENT_ID_KEY = 'agent.id';
 
+function getParameterByName(name, url = window.location.href) {
+  name = name.replace(/[\[\]]/g, '\\$&');
+  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+
 /**
  * Get the filter that excludes the data related to Wazuh servers
  * @param indexPatternTitle Index pattern title
@@ -127,6 +137,35 @@ export class PatternDataSourceFilterManager
     this.filterManager && this.filterManager.setFilters(cleanedFilters);
   }
 
+
+  getFiltersFromQueryParams() {
+    const filtersParams = getParameterByName('filters');
+    if(!filtersParams){
+      return [];
+    }
+    try {
+      const urlFilters = JSON.parse(filtersParams);
+      let filtersList = [];
+      urlFilters?.forEach( item => {
+        const key = Object.keys(item)[0];
+        const value = item[key];
+        if(key && value){
+          const urlFilter = this.createFilter(key,value);
+          filtersList.push(urlFilter);
+        }
+      })
+      return filtersList;
+    }catch(error){
+      return []
+    }finally{
+      window.location.href = window.location.href.replace(
+        new RegExp('&filters=' + '[^&]*', 'g'),
+        '',
+      );
+    }
+    
+  }
+
   /**
    * Get all the filters from the filters manager and only returns the filters added by the user and
    * adds the fixed filters defined in the data source.
@@ -134,10 +173,12 @@ export class PatternDataSourceFilterManager
    * @returns
    */
   private getDefaultFilters(filters: tFilter[]) {
+    const urlQueryFilters = this.getFiltersFromQueryParams();
     const defaultFilters = filters.length ? filters : this.getFilters();
     return [
       ...this.getFixedFilters(),
       ...(this.filterUserFilters(defaultFilters) || []),
+      ...urlQueryFilters
     ];
   }
 
@@ -216,8 +257,8 @@ export class PatternDataSourceFilterManager
    * @param value
    * @returns
    */
-  createFilter(field: string, value: string): tFilter {
-    return this.generateFilter(field, value, this.dataSource.id);
+  createFilter(field: string, value: string, query?: tFilter['query']): tFilter {
+    return this.generateFilter(field, value, this.dataSource.id, query);
   }
 
   /**
@@ -382,14 +423,15 @@ export class PatternDataSourceFilterManager
    */
   private generateFilter(
     field: string,
-    value: string,
+    value: string | string[],
     indexPatternTitle: string,
+    customQuery?: tFilter['query']
   ) {
     const meta = {
       disabled: false,
       negate: false,
       key: field,
-      params: [value],
+      params: { query: value },
       alias: null,
       type: 'phrases',
       value: value,
@@ -398,20 +440,8 @@ export class PatternDataSourceFilterManager
     const $state = {
       store: 'appState',
     };
-    const query = {
-      bool: {
-        minimum_should_match: 1,
-        should: [
-          {
-            match_phrase: {
-              [field]: {
-                query: value,
-              },
-            },
-          },
-        ],
-      },
-    };
+
+    let query = customQuery || { match_phrase: { [field]: value }};
 
     return { meta, $state, query };
   }
