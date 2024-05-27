@@ -21,7 +21,10 @@ import {
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { AppState, ErrorHandler } from '../../../react-services';
-import { useAppConfig } from '../../../components/common/hooks';
+import {
+  useAppConfig,
+  useRouterSearch,
+} from '../../../components/common/hooks';
 import {
   checkApiService,
   checkIndexPatternService,
@@ -99,6 +102,7 @@ function HealthCheckComponent({ location, history }) {
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
   const appConfig = useAppConfig();
   const checksInitiated = useRef(false);
+  const search = useRouterSearch();
 
   const redirectionPassHealthcheck = () => {
     // This uses the previous location that is passed in as an state
@@ -139,7 +143,7 @@ function HealthCheckComponent({ location, history }) {
 
   useEffect(() => {
     // Check if Health should not redirect automatically (Debug mode)
-    setIsDebugMode(window.location.href.includes('debug'));
+    setIsDebugMode(typeof search.debug !== 'undefined');
   }, []);
 
   const handleWarnings = (checkID, warnings, parsed) => {
