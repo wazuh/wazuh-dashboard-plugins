@@ -26,13 +26,17 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
-import { getHttp, getWzCurrentAppID } from '../../../kibana-services';
+import { useHistory, useLocation } from 'react-router-dom';
 
 export const SettingsMiscellaneous = () => {
+  const history = useHistory();
+  const location = useLocation();
   const redirectHealthCheckDebugMode = useCallback(() => {
-    window.location.href = getHttp().basePath.prepend(
-      `/app/${getWzCurrentAppID()}#/health-check?debug`,
-    );
+    history.push({
+      pathname: '/health-check',
+      search: '?debug',
+      state: { prevLocation: location },
+    });
   }, []);
 
   return (

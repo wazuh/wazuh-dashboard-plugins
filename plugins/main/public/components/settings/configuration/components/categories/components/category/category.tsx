@@ -47,7 +47,7 @@ import {
   toastRequiresRunningHealthcheck,
   toastSuccessUpdateConfiguration,
 } from '../show-toasts';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 interface ICategoryProps {
   title: string;
@@ -181,6 +181,7 @@ const InputFormFilePickerPreInput = ({
 }) => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const location = useLocation();
 
   return (
     <>
@@ -217,7 +218,7 @@ const InputFormFilePickerPreInput = ({
                   requiresRestartingPluginPlatform,
                 } = response.data.data;
                 requiresRunningHealthCheck &&
-                  toastRequiresRunningHealthcheck({ history });
+                  toastRequiresRunningHealthcheck({ history, location });
                 requiresReloadingBrowserTab &&
                   toastRequiresReloadingBrowserTab();
                 requiresRestartingPluginPlatform &&

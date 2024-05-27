@@ -52,7 +52,7 @@ import {
   toastSuccessUpdateConfiguration,
 } from './components/categories/components/show-toasts';
 import { getWazuhCorePlugin } from '../../../kibana-services';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 export type ISetting = {
   key: string;
@@ -153,6 +153,7 @@ const WzConfigurationSettingsProvider = props => {
   const [query, setQuery] = useState('');
   const currentConfiguration = useSelector(state => state.appConfig.data);
   const history = useHistory();
+  const location = useLocation();
 
   const {
     fields,
@@ -282,7 +283,7 @@ const WzConfigurationSettingsProvider = props => {
             data: { requiresRunningHealthCheck },
           },
         }) => requiresRunningHealthCheck,
-      ) && toastRequiresRunningHealthcheck({ history });
+      ) && toastRequiresRunningHealthcheck({ history, location });
       responses.some(
         ({
           data: {

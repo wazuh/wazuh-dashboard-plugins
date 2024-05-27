@@ -19,7 +19,7 @@ export const toastRequiresReloadingBrowserTab = () => {
   });
 };
 
-export const toastRequiresRunningHealthcheck = ({ history }) => {
+export const toastRequiresRunningHealthcheck = ({ history, location }) => {
   const toast = getToasts().add({
     color: 'warning',
     title: 'Run a health check to apply the changes.',
@@ -30,7 +30,10 @@ export const toastRequiresRunningHealthcheck = ({ history }) => {
           <EuiButton
             onClick={() => {
               getToasts().remove(toast);
-              history.push('/health-check');
+              history.push({
+                pathname: '/health-check',
+                state: { prevLocation: location },
+              });
             }}
             size='s'
           >
