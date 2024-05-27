@@ -60,7 +60,6 @@ export const WzMenu = withWindowSize(
       this.state = {
         showMenu: false,
         menuOpened: false,
-        currentMenuTab: '',
         currentAPI: '',
         APIlist: [],
         showSelector: false,
@@ -123,18 +122,6 @@ export const WzMenu = withWindowSize(
       });
     };
 
-    getCurrentTab() {
-      const currentWindowLocation = window.location.hash;
-      let currentTab = '';
-      Object.keys(sections).some(section => {
-        if (currentWindowLocation.match(`#/${section}`)) {
-          currentTab = sections[section];
-          return true;
-        }
-      });
-      return currentTab;
-    }
-
     loadApiList = async () => {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const APIlist = (result || {}).data || [];
@@ -196,11 +183,6 @@ export const WzMenu = withWindowSize(
       let newState = {};
       const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
       const { currentAPI } = this.state;
-      const currentTab = this.getCurrentTab();
-
-      if (currentTab !== this.state.currentMenuTab) {
-        newState = { ...newState, currentMenuTab: currentTab };
-      }
 
       if (this.props.windowSize) {
         this.showSelectorsInPopover = this.props.windowSize.width < 1100;
@@ -258,14 +240,6 @@ export const WzMenu = withWindowSize(
           isSelectorsPopoverOpen: false,
         };
 
-        const currentTab = this.getCurrentTab();
-        if (currentTab !== this.state.currentMenuTab) {
-          newState = {
-            ...newState,
-            currentMenuTab: currentTab,
-            hover: currentTab,
-          };
-        }
         let list = await PatternHandler.getPatternList('api');
         if (!list || (list && !list.length)) return;
         this.props?.appConfig?.data?.['ip.ignore']?.length &&
@@ -327,7 +301,6 @@ export const WzMenu = withWindowSize(
     updatePatternAndApi = async () => {
       this.setState({
         menuOpened: false,
-        hover: this.state.currentMenuTab,
         ...{ APIlist: await this.loadApiList() },
         ...(await this.loadIndexPatternsList()),
       });
