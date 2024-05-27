@@ -1,4 +1,4 @@
-import { useEffect, useState, useLayoutEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SearchBarProps,
   TimeRange,
@@ -9,7 +9,7 @@ import {
 } from '../../../../../../src/plugins/data/public';
 import { getDataPlugin } from '../../../kibana-services';
 import { useQueryManager, useTimeFilter } from '../hooks';
-import { hideCloseButtonOnFixedFilters } from './search-bar-service';
+
 // Input - types
 type tUseSearchBarCustomInputs = {
   indexPattern: IndexPattern;
@@ -56,31 +56,6 @@ const useSearchBarConfiguration = (
   const [isLoading, setIsLoading] = useState(true);
   const [indexPatternSelected, setIndexPatternSelected] =
     useState<IndexPattern>(indexPattern);
-  const TIMEOUT_MILISECONDS = 100;
-
-  const hideRemoveFilter = (filters, retry: number = 0) => {
-    const allFilters = filters;
-    let elements = document.querySelectorAll(
-      '.wz-search-bar .globalFilterItem',
-    );
-    // when the filters are not empty in DOM and the length is equal to the filters length
-    if (elements.length > 0 && elements.length === allFilters.length) {
-      hideCloseButtonOnFixedFilters(allFilters, elements);
-    } else if (retry < 10) {
-      // the setTimeout is used to wait for the DOM elements to be rendered
-      setTimeout(() => {
-        // this is a workaround to hide the close button on fixed filters via vanilla js
-        hideRemoveFilter(allFilters, ++retry);
-      }, TIMEOUT_MILISECONDS);
-    }
-  };
-
-  useLayoutEffect(() => {
-    setTimeout(() => {
-      // this is a workaround to hide the close button on fixed filters via vanilla js
-      hideRemoveFilter(filters);
-    }, TIMEOUT_MILISECONDS);
-  }, [filters]);
 
   useEffect(() => {
     if (indexPattern) {

@@ -27,7 +27,6 @@ type tUseDataSourceLoadedReturns<K> = {
   dataSource: K;
   filters: tFilter[];
   fetchFilters: tFilter[];
-  fixedFilters: tFilter[];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: PatternDataSourceFilterManager;
@@ -38,7 +37,6 @@ type tUseDataSourceNotLoadedReturns = {
   dataSource: undefined;
   filters: [];
   fetchFilters: [];
-  fixedFilters: [];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: null;
@@ -126,7 +124,7 @@ export function useDataSource<
       setDataSourceFilterManager(dataSourceFilterManager);
       setIsLoading(false);
     })();
-  
+
     return () => subscription && subscription.unsubscribe();
   }, []);
 
@@ -161,7 +159,6 @@ export function useDataSource<
       dataSource: undefined,
       filters: [],
       fetchFilters: [],
-      fixedFilters: [],
       fetchData,
       setFilters,
       filterManager: null,
@@ -172,7 +169,6 @@ export function useDataSource<
       dataSource: dataSource as K,
       filters: allFilters,
       fetchFilters,
-      fixedFilters: dataSourceFilterManager?.getFixedFilters() || [],
       fetchData,
       setFilters,
       filterManager: dataSourceFilterManager as PatternDataSourceFilterManager,
