@@ -155,8 +155,8 @@ const MitreComponent = props => {
   };
 
   return (
-    <div>
-      <I18nProvider>
+    <I18nProvider>
+      <>
         <EuiFlexGroup style={flexGroupStyle}>
           <EuiFlexItem>
             {isDataSourceLoading && !dataSource ? (
@@ -211,8 +211,8 @@ const MitreComponent = props => {
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
-      </I18nProvider>
-    </div>
+      </>
+    </I18nProvider>
   );
 };
 
