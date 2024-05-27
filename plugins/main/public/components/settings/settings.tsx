@@ -376,7 +376,7 @@ class SettingsComponent extends React.Component {
             <SettingsAbout appInfo={this.appInfo} />
           </div>
         </Route>
-        <Route path='?tab=samepl_data'>
+        <Route path='?tab=sample_data'>
           <div>
             <WzSampleDataWrapper />
           </div>
