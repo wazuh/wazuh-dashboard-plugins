@@ -2,18 +2,16 @@
 
 exports[`Inventory component A Apple agent should be well rendered. 1`] = `
 <div
-  style="overflow:hidden"
+  style="overflow:hidden;margin:12px 16px 12px 16px"
 >
   <div
     class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionRow euiFlexGroup--responsive"
   >
     <div
       class="euiFlexItem"
-      style="margin-bottom:0"
     >
       <div
         class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-        style="margin:16px"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -123,10 +121,9 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
   >
     <div
       class="euiFlexItem euiFlexItem--flexGrow2"
-      style="margin-right:4px;margin-top:0"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -526,10 +523,9 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
     </div>
     <div
       class="euiFlexItem euiFlexItem--flexGrow2"
-      style="margin-left:4px;margin-top:0"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -879,10 +875,9 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
   >
     <div
       class="euiFlexItem euiFlexItem--flexGrow3"
-      style="margin-right:4px"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -1288,7 +1283,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -1696,7 +1691,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -2150,18 +2145,16 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
 
 exports[`Inventory component A Linux agent should be well rendered. 1`] = `
 <div
-  style="overflow:hidden"
+  style="overflow:hidden;margin:12px 16px 12px 16px"
 >
   <div
     class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionRow euiFlexGroup--responsive"
   >
     <div
       class="euiFlexItem"
-      style="margin-bottom:0"
     >
       <div
         class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-        style="margin:16px"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -2271,10 +2264,9 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
   >
     <div
       class="euiFlexItem euiFlexItem--flexGrow2"
-      style="margin-right:4px;margin-top:0"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -2673,10 +2665,9 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
     </div>
     <div
       class="euiFlexItem euiFlexItem--flexGrow2"
-      style="margin-left:4px;margin-top:0"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -3057,10 +3048,9 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
   >
     <div
       class="euiFlexItem euiFlexItem--flexGrow3"
-      style="margin-right:4px"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -3465,7 +3455,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -3873,7 +3863,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -4448,18 +4438,16 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
 
 exports[`Inventory component A Windows agent should be well rendered. 1`] = `
 <div
-  style="overflow:hidden"
+  style="overflow:hidden;margin:12px 16px 12px 16px"
 >
   <div
     class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionRow euiFlexGroup--responsive"
   >
     <div
       class="euiFlexItem"
-      style="margin-bottom:0"
     >
       <div
         class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-        style="margin:16px"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -4569,10 +4557,9 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
   >
     <div
       class="euiFlexItem euiFlexItem--flexGrow2"
-      style="margin-right:4px;margin-top:0"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -4972,10 +4959,9 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
     </div>
     <div
       class="euiFlexItem euiFlexItem--flexGrow2"
-      style="margin-left:4px;margin-top:0"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -5349,10 +5335,9 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
   >
     <div
       class="euiFlexItem euiFlexItem--flexGrow3"
-      style="margin-right:4px"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -5752,10 +5737,9 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
     </div>
     <div
       class="euiFlexItem euiFlexItem--flexGrow1"
-      style="margin-left:4px"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -6065,7 +6049,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -6449,7 +6433,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow wz-agent-inventory-panel"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
