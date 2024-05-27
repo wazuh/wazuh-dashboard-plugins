@@ -30,20 +30,20 @@ import moment from 'moment-timezone';
 import { WzRequest } from '../../../../../react-services';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { getCore } from '../../../../../kibana-services';
-import { withReduxProvider, withUserAuthorizationPrompt } from '../../../hocs';
+import { withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
 import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
 import { configurationAssessment } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
+import { withRouter } from 'react-router-dom';
 
 type Props = {
   agent: { [key in string]: any };
 };
 
 export const ScaScan = compose(
-  withReduxProvider,
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
@@ -148,7 +148,9 @@ export const ScaScan = compose(
           'scaPolicies',
           JSON.stringify(this.state.policies),
         );
-        window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}&agentId=${this.props.agent.id}`;
+        getCore().application.navigateToApp(configurationAssessment.id, {
+          path: `#/overview?tab=sca&redirectPolicy=${policy.policy_id}&agentId=${this.props.agent.id}`,
+        });
       });
     };
 
