@@ -14,8 +14,10 @@ import {
 } from '@elastic/eui';
 import { useDataGrid, exportSearchToCSV, tDataGridColumn } from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
-import { IndexPattern, SearchResponse } from '../../../../../../src/plugins/data/public';
-import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
+import {
+  IndexPattern,
+  SearchResponse,
+} from '../../../../../../src/plugins/data/public';
 import { useDocViewer } from '../doc-viewer';
 import {
   ErrorHandler,
@@ -42,12 +44,25 @@ export type tWazuhDataGridProps = {
   };
   query: any;
   exportFilters: tFilter[];
-  onChangePagination: (pagination: { pageIndex: number; pageSize: number }) => void;
-  onChangeSorting: (sorting: { columns: any[], onSort: any }) => void;
+  onChangePagination: (pagination: {
+    pageIndex: number;
+    pageSize: number;
+  }) => void;
+  onChangeSorting: (sorting: { columns: any[]; onSort: any }) => void;
 };
 
 const WazuhDataGrid = (props: tWazuhDataGridProps) => {
-  const { results, defaultColumns, indexPattern, isLoading, defaultPagination, onChangePagination, exportFilters = [], onChangeSorting, query } = props;
+  const {
+    results,
+    defaultColumns,
+    indexPattern,
+    isLoading,
+    defaultPagination,
+    onChangePagination,
+    exportFilters = [],
+    onChangeSorting,
+    query,
+  } = props;
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
@@ -92,7 +107,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
 
   useEffect(() => {
     onChangePagination && onChangePagination(pagination);
-  }, [JSON.stringify(pagination)])
+  }, [JSON.stringify(pagination)]);
 
   useEffect(() => {
     onChangeSorting && onChangeSorting(sorting || []);
@@ -117,7 +132,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
         pageIndex: 0,
         pageSize: results.hits.total,
       },
-      sorting
+      sorting,
     };
     try {
       setIsExporting(true);
@@ -136,8 +151,10 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
   return (
     <>
       {isLoading ? <LoadingSpinner /> : null}
-      {!isLoading && !results?.hits?.total === 0 ? <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} /> : null}
-      {!isLoading && results?.hits?.total > 0 ?
+      {!isLoading && !results?.hits?.total === 0 ? (
+        <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+      ) : null}
+      {!isLoading && results?.hits?.total > 0 ? (
         <div className='wazuhDataGridContainer'>
           <EuiDataGrid
             {...dataGridProps}
@@ -155,7 +172,8 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
               ),
             }}
           />
-        </div> : null}
+        </div>
+      ) : null}
       {inspectedHit && (
         <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
           <EuiFlyoutHeader>
