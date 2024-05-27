@@ -14,7 +14,6 @@
 import React, { Component } from 'react';
 import { EuiPage, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { AgentsTable } from './table/agents-table';
-import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import {
   withGlobalBreadcrumb,
@@ -156,16 +155,14 @@ export const EndpointsSummary = compose(
               reloadDashboard={this.state.reload}
             />
             <EuiSpacer size='m' />
-            <WzReduxProvider>
-              <AgentsTable
-                filters={this.state.agentTableFilters}
-                externalReload={this.state.reload}
-                setExternalReload={this.setReload}
-                showOnlyOutdated={this.state.showOnlyOutdatedAgents}
-                setShowOnlyOutdated={this.setShowOnlyOutdatedAgents}
-                totalOutdated={this.state.outdatedAgents}
-              />
-            </WzReduxProvider>
+            <AgentsTable
+              filters={this.state.agentTableFilters}
+              externalReload={this.state.reload}
+              setExternalReload={this.setReload}
+              showOnlyOutdated={this.state.showOnlyOutdatedAgents}
+              setShowOnlyOutdated={this.setShowOnlyOutdatedAgents}
+              totalOutdated={this.state.outdatedAgents}
+            />
           </EuiFlexItem>
         </EuiPage>
       );

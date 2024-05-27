@@ -10,9 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-// Redux
-import store from '../../../../../redux/store';
-import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
 import WzGroupDetail from './group-detail';
@@ -84,7 +81,7 @@ class WzGroups extends Component {
   render() {
     const { itemDetail, showAddAgents, fileContent } = this.props.state;
     return (
-      <WzReduxProvider>
+      <>
         {!showAddAgents &&
           ((itemDetail && !fileContent && <WzGroupDetail {...this.props} />) ||
             (fileContent && <WzGroupEditor />) || <WzGroupsOverview />)}
@@ -94,7 +91,7 @@ class WzGroups extends Component {
             cancelButton={() => this.props.updateShowAddAgents(false)}
           />
         )}
-      </WzReduxProvider>
+      </>
     );
   }
 }

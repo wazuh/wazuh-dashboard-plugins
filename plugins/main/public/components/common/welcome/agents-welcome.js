@@ -34,7 +34,6 @@ import {
   RequirementVis,
 } from './components';
 import { AgentInfo } from './agents-info';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
@@ -278,20 +277,18 @@ export const AgentsWelcome = compose(
               anchorPosition='downCenter'
             >
               <div>
-                <WzReduxProvider>
-                  <div style={{ maxWidth: 730 }}>
-                    <MenuAgent
-                      isAgent={this.props.agent}
-                      pinnedApplications={this.state.menuAgent}
-                      updatePinnedApplications={applications =>
-                        this.updatePinnedApplications(applications)
-                      }
-                      closePopover={() => {
-                        this.setState({ switchModule: false });
-                      }}
-                    ></MenuAgent>
-                  </div>
-                </WzReduxProvider>
+                <div style={{ maxWidth: 730 }}>
+                  <MenuAgent
+                    isAgent={this.props.agent}
+                    pinnedApplications={this.state.menuAgent}
+                    updatePinnedApplications={applications =>
+                      this.updatePinnedApplications(applications)
+                    }
+                    closePopover={() => {
+                      this.setState({ switchModule: false });
+                    }}
+                  ></MenuAgent>
+                </div>
               </div>
             </EuiPopover>
           </EuiFlexItem>
@@ -333,20 +330,18 @@ export const AgentsWelcome = compose(
                     anchorPosition='downCenter'
                   >
                     <div>
-                      <WzReduxProvider>
-                        <div style={{ maxWidth: 730 }}>
-                          <MenuAgent
-                            isAgent={this.props.agent}
-                            pinnedApplications={this.state.menuAgent}
-                            updatePinnedApplications={applications =>
-                              this.updatePinnedApplications(applications)
-                            }
-                            closePopover={() => {
-                              this.setState({ switchModule: false });
-                            }}
-                          ></MenuAgent>
-                        </div>
-                      </WzReduxProvider>
+                      <div style={{ maxWidth: 730 }}>
+                        <MenuAgent
+                          isAgent={this.props.agent}
+                          pinnedApplications={this.state.menuAgent}
+                          updatePinnedApplications={applications =>
+                            this.updatePinnedApplications(applications)
+                          }
+                          closePopover={() => {
+                            this.setState({ switchModule: false });
+                          }}
+                        ></MenuAgent>
+                      </div>
                     </div>
                   </EuiPopover>
                 </EuiFlexItem>

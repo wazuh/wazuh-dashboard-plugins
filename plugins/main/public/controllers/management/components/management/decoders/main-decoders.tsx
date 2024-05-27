@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState } from 'react';
-// Redux
-import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzDecodersOverview from './views/decoders-overview';
 import WzFileEditor from '../common/file-editor';
 import { SECTION_DECODERS_SECTION } from '../common/constants';
@@ -27,7 +25,7 @@ export default function WzDecoder() {
   };
 
   return (
-    <WzReduxProvider>
+    <>
       {((fileContent || addingFile) && (
         <WzFileEditor
           section={SECTION_DECODERS_SECTION}
@@ -52,6 +50,6 @@ export default function WzDecoder() {
           showingFiles={showingFiles}
         />
       )}
-    </WzReduxProvider>
+    </>
   );
 }
