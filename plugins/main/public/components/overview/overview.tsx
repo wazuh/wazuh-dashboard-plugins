@@ -4,9 +4,6 @@ import { Stats } from '../../controllers/overview/components/stats';
 import { AppState, WzRequest } from '../../react-services';
 import { OverviewWelcome } from '../common/welcome/overview-welcome';
 import { MainModule } from '../common/modules/main';
-import { UI_LOGGER_LEVELS } from '../../../common/constants';
-import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../react-services/common-services';
 import { WzCurrentOverviewSectionWrapper } from '../common/modules/overview-current-section-wrapper';
 import { createHashHistory } from 'history';
 import {
@@ -28,6 +25,8 @@ import {
   nestedResolve,
   savedSearch,
 } from '../../services/resolves';
+import { useRouterSearch } from '../common/hooks';
+import { useHistory } from 'react-router-dom';
 
 export const Overview: React.FC = withRouteResolvers({
   enableMenu,
@@ -36,16 +35,12 @@ export const Overview: React.FC = withRouteResolvers({
   savedSearch,
 })(({ location }) => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
-  const [tabActive, setTabActive] = useState<string>('welcome');
-  const [tabViewActive, setTabViewActive] = useState<string>('panels');
+  const { tab = 'welcome', tabView = 'panels' } = useRouterSearch();
+  const history = useHistory();
   const pinnedAgentManager = new PinnedAgentManager();
 
   useEffect(() => {
     pinnedAgentManager.syncPinnedAgentSources();
-    const tab = new URLSearchParams(location.search).get('tab');
-    const tabView = new URLSearchParams(location.search).get('tabView');
-    setTabActive(tab || 'welcome');
-    setTabViewActive(tabView || 'panels');
     if (tab === 'welcome' || tab === undefined) {
       getSummary();
     }
@@ -125,70 +120,36 @@ export const Overview: React.FC = withRouteResolvers({
   };
 
   function switchTab(newTab: any, force: any) {
-    try {
-      if (tabActive === newTab && !force) {
-        return;
-      }
-      setTabActive(newTab);
-      setTabViewActive(
-        new URLSearchParams(location.search).get('tabView') || 'panels',
-      );
-    } catch (error) {
-      const options = {
-        context: `${Overview.name}.switchTab`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-
-      getErrorOrchestrator().handleError(options);
-    }
+    const urlSearchParams = new URLSearchParams(location.search);
+    urlSearchParams.set('tab', newTab);
+    history.push(`${location.pathname}?${urlSearchParams.toString()}`);
   }
 
   const switchSubTab = (subTab: string) => {
-    try {
-      if (tabViewActive !== subTab) {
-        setTabViewActive(subTab);
-      }
-    } catch (error) {
-      const options = {
-        context: `${Overview.name}.switchSubtab`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-
-      getErrorOrchestrator().handleError(options);
-    }
+    const urlSearchParams = new URLSearchParams(location.search);
+    urlSearchParams.set('tabView', subTab);
+    history.push(`${location.pathname}?${urlSearchParams.toString()}`);
   };
 
   return (
     <>
-      {tabActive && tabActive !== 'welcome' && (
+      {tab && tab !== 'welcome' && (
         <>
           <MainModule
-            section={tabActive}
+            section={tab}
             agentsSelectionProps={{
-              tab: tabActive,
-              subtab: tabViewActive,
+              tab: tab,
+              subtab: tabView,
             }}
             switchSubTab={subTab => switchSubTab(subTab)}
           />
           <WzCurrentOverviewSectionWrapper
             switchTab={(tab, force) => switchTab(tab, force)}
-            currentTab={tabActive}
+            currentTab={tab}
           />
         </>
       )}
-      {tabActive === 'welcome' && (
+      {tab === 'welcome' && (
         <>
           <Stats {...agentsCounts} />
           <OverviewWelcome {...agentsCounts} />
