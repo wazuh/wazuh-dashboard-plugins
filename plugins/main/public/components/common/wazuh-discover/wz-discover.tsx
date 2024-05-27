@@ -42,6 +42,7 @@ import {
 } from '../data-source';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
+import { WzSearchBar } from '../search-bar';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -57,7 +58,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     throw new Error('DataSource is required');
   }
 
-  const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
@@ -198,7 +198,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             <LoadingSpinner />
           ) : (
             <div className='wz-discover hide-filter-control wz-search-bar'>
-              <SearchBar
+              <WzSearchBar
                 appName='wazuh-discover-search-bar'
                 {...searchBarProps}
                 showQueryInput={true}
