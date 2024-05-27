@@ -19,7 +19,12 @@ export const Switch = ({ children }) => {
       : child.props.to,
   );
 
-  return child?.props?.render?.({}) || child?.props?.children || child || null;
+  return (
+    child?.props?.render?.({ search }) ||
+    child?.props?.children ||
+    child ||
+    null
+  );
 };
 
 export const Route = ({
