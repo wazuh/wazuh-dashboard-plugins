@@ -91,16 +91,6 @@ export const MainModule = compose(
                 ? 'inventory'
                 : 'panels',
             );
-          window.location.href = window.location.href.replace(
-            new RegExp('tabView=' + '[^&]*'),
-            `tabView=${
-              id === 'events'
-                ? 'discover'
-                : id === 'inventory'
-                ? 'inventory'
-                : 'panels'
-            }`,
-          );
           this.loadSection(
             id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id,
           );
