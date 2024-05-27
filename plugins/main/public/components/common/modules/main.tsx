@@ -19,18 +19,14 @@ import { getDataPlugin } from '../../../kibana-services';
 import { MainModuleAgent } from './main-agent';
 import { MainModuleOverview } from './main-overview';
 import { compose } from 'redux';
-import { withReduxProvider, withErrorBoundary } from '../hocs';
+import { withErrorBoundary } from '../hocs';
 
-export const MainModule = compose(
-  withErrorBoundary,
-  withReduxProvider,
-)(
+export const MainModule = compose(withErrorBoundary)(
   class MainModule extends Component {
     constructor(props) {
       super(props);
       this.reportingService = new ReportingService();
       this.state = {
-        selectView: false,
         loadingReport: false,
         switchModule: false,
         showAgentInfo: false,
@@ -52,7 +48,6 @@ export const MainModule = compose(
     }
 
     renderTabs(agent = false) {
-      const { selectView } = this.state;
       if (!agent) {
       }
       return (
@@ -63,7 +58,7 @@ export const MainModule = compose(
                 return (
                   <EuiTab
                     onClick={() => this.onSelectedTabChanged(tab.id)}
-                    isSelected={selectView === tab.id}
+                    isSelected={this.props.tabView === tab.id}
                     key={index}
                   >
                     {tab.name}
@@ -76,41 +71,19 @@ export const MainModule = compose(
       );
     }
 
-    loadSection(id) {
-      this.setState({ selectView: id });
-    }
-
     onSelectedTabChanged(id) {
-      if (id !== this.state.selectView) {
-        if (id === 'events' || id === 'dashboard' || id === 'inventory') {
-          if (this.props.switchSubTab)
-            this.props.switchSubTab(
-              id === 'events'
-                ? 'discover'
-                : id === 'inventory'
-                ? 'inventory'
-                : 'panels',
-            );
-          this.loadSection(
-            id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id,
-          );
-        } else {
-          this.loadSection(
-            id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id,
-          );
-        }
+      if (id !== this.props.tabView) {
+        this.props.switchSubTab(id);
       }
     }
 
     render() {
       const { agent } = this.props;
-      const { selectView } = this.state;
       const mainProps = {
-        selectView,
+        selectView: this.props.tabView,
         tabs: this.tabs,
         module: this.module,
         renderTabs: () => this.renderTabs(),
-        loadSection: id => this.loadSection(id),
         onSelectedTabChanged: id => this.onSelectedTabChanged(id),
       };
       return (

@@ -75,7 +75,7 @@ export const fileIntegrityMonitoring = {
   showInAgentMenu: true,
   order: 202,
   redirectTo: () =>
-    `/overview/?tab=fim&tabView=panels${
+    `/overview/?tab=fim&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -119,7 +119,7 @@ export const malwareDetection = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=pm&tabView=panels${
+    `/overview/?tab=pm&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -147,7 +147,7 @@ export const configurationAssessment = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=sca&tabView=panels${
+    `/overview/?tab=sca&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -172,7 +172,7 @@ export const threatHunting = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=general&tabView=panels${
+    `/overview/?tab=general&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -200,7 +200,7 @@ export const vulnerabilityDetection = {
   showInOverviewApp: true,
   showInAgentMenu: false,
   redirectTo: () =>
-    `/overview/?tab=vuls&tabView=panels${
+    `/overview/?tab=vuls&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -225,7 +225,7 @@ export const mitreAttack = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=mitre&tabView=panels${
+    `/overview/?tab=mitre&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -250,7 +250,7 @@ export const virustotal = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=virustotal&tabView=panels${
+    `/overview/?tab=virustotal&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -275,7 +275,7 @@ const pciDss = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=pci&tabView=panels${
+    `/overview/?tab=pci&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -300,7 +300,7 @@ const hipaa = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=hipaa&tabView=panels${
+    `/overview/?tab=hipaa&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -325,7 +325,7 @@ const gdpr = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=gdpr&tabView=panels${
+    `/overview/?tab=gdpr&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -350,7 +350,7 @@ const nist80053 = {
   showInAgentMenu: true,
   order: 403,
   redirectTo: () =>
-    `/overview/?tab=nist&tabView=panels${
+    `/overview/?tab=nist&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -375,7 +375,7 @@ const tsc = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=tsc&tabView=panels${
+    `/overview/?tab=tsc&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -403,7 +403,7 @@ export const amazonWebServices = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=aws&tabView=panels${
+    `/overview/?tab=aws&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -428,7 +428,7 @@ export const googleCloud = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=gcp&tabView=panels${
+    `/overview/?tab=gcp&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -453,7 +453,7 @@ export const github = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=github&tabView=panels${
+    `/overview/?tab=github&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -477,7 +477,7 @@ export const office365 = {
   showInOverviewApp: true,
   showInAgentMenu: false,
   redirectTo: () =>
-    `/overview/?tab=office&tabView=panels${
+    `/overview/?tab=office&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -502,7 +502,7 @@ export const docker = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=docker&tabView=panels${
+    `/overview/?tab=docker&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''

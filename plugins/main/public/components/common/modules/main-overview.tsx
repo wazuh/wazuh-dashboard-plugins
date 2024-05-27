@@ -14,9 +14,7 @@ import React, { Component } from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
-import { AppNavigate } from '../../../react-services/app-navigate';
 import { connect } from 'react-redux';
-import { getDataPlugin } from '../../../kibana-services';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,
@@ -35,21 +33,10 @@ export const MainModuleOverview = connect(mapStateToProps)(
     }
 
     async componentDidMount() {
-      const { module } = this.props;
-      const tabView = AppNavigate.getUrlParameter('tabView') || 'panels';
-      const tab = AppNavigate.getUrlParameter('tab');
-      const tabExceptions = ['sca', 'vuls'];
-      if (tabView && tabView !== this.props.selectView) {
-        if (tabView === 'panels' && tabExceptions.includes(tab)) {
-          // SCA & Vulnerabilities initial tab is inventory
-          this.props.onSelectedTabChanged(module.init);
-        } else {
-          this.props.onSelectedTabChanged(tabView);
-        }
+      // Redirect to the initial tab view if the selected is not available for the module
+      if (!module.tabs.map(({ id }) => id).includes(this.props.selectView)) {
+        this.props.onSelectedTabChanged(this.props.module.init);
       }
-
-      const { filterManager } = getDataPlugin().query;
-      this.filterManager = filterManager;
     }
 
     render() {

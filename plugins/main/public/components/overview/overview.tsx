@@ -35,7 +35,7 @@ export const Overview: React.FC = withRouteResolvers({
   savedSearch,
 })(({ location }) => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
-  const { tab = 'welcome', tabView = 'panels' } = useRouterSearch();
+  const { tab = 'welcome', tabView = 'dashboard' } = useRouterSearch();
   const history = useHistory();
   const pinnedAgentManager = new PinnedAgentManager();
 
@@ -137,6 +137,7 @@ export const Overview: React.FC = withRouteResolvers({
         <>
           <MainModule
             section={tab}
+            tabView={tabView}
             agentsSelectionProps={{
               tab: tab,
               subtab: tabView,
