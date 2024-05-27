@@ -17,7 +17,6 @@ import { AgentsTable } from './table/agents-table';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import {
-  withReduxProvider,
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
   withErrorBoundary,
@@ -33,7 +32,6 @@ import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export const EndpointsSummary = compose(
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     [

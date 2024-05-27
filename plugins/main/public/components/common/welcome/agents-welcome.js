@@ -41,12 +41,7 @@ import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker'
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { getChrome, getCore } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withGuard,
-  withReduxProvider,
-} from '../hocs';
+import { withErrorBoundary, withGlobalBreadcrumb, withGuard } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
@@ -70,7 +65,6 @@ import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 
 export const AgentsWelcome = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(({ agent }) => {
     return [

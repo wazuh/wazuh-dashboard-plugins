@@ -18,6 +18,8 @@ import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { useHistory } from 'react-router-dom';
+import { useRouterSearch } from '../../../common/hooks';
 
 export const ModuleMitreAttackIntelligenceResource = ({
   label,
@@ -28,17 +30,19 @@ export const ModuleMitreAttackIntelligenceResource = ({
   resourceFilters,
 }) => {
   const [details, setDetails] = useState(null);
+  const history = useHistory();
+  const search = useRouterSearch();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.href);
-    const redirectTab = urlParams.get('tabRedirect');
-    const idToRedirect = urlParams.get('idToRedirect');
+    const redirectTab = search.tabRedirect;
+    const idToRedirect = search.idToRedirect;
     if (redirectTab && idToRedirect) {
       const endpoint = `/mitre/${redirectTab}?q=external_id=${idToRedirect}`;
       getMitreItemToRedirect(endpoint);
       urlParams.delete('tabRedirect');
       urlParams.delete('idToRedirect');
-      window.history.pushState({}, document.title, '#/overview/?tab=mitre');
+      // TODO: replace window.history.pushState({}, document.title, '#/overview/?tab=mitre');
     }
   }, []);
 

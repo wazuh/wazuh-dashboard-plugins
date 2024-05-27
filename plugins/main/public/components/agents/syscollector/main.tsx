@@ -11,18 +11,13 @@
  */
 
 import React from 'react';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withReduxProvider,
-} from '../../common/hocs';
+import { withErrorBoundary, withGlobalBreadcrumb } from '../../common/hocs';
 import { SyscollectorInventory } from './inventory';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 
 export const MainSyscollector = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(({ agent }) => {
     return [

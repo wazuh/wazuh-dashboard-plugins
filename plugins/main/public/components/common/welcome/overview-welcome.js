@@ -24,11 +24,7 @@ import {
   EuiPage,
 } from '@elastic/eui';
 import './welcome.scss';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withReduxProvider,
-} from '../hocs';
+import { withErrorBoundary, withGlobalBreadcrumb } from '../hocs';
 import { compose } from 'redux';
 import {
   Applications,
@@ -63,7 +59,6 @@ const appCategories = Applications.reduce((categories, app) => {
 });
 
 export const OverviewWelcome = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(props => {
     return [{ text: overview.breadcrumbLabel }];

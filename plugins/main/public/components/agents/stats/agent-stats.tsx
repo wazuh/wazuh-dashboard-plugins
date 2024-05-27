@@ -23,7 +23,6 @@ import {
 
 import {
   withGlobalBreadcrumb,
-  withReduxProvider,
   withGuard,
   withUserAuthorizationPrompt,
   withErrorBoundary,
@@ -104,7 +103,6 @@ const statsAgents: { title: string; field: string; render?: (value) => any }[] =
 
 export const MainAgentStats = compose(
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb(({ agent }) => [
     {
       text: endpointSummary.breadcrumbLabel,

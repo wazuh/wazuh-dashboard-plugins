@@ -14,7 +14,6 @@ export * from './withPluginPlatformContext';
 export * from './withUserPermissions';
 export * from './withUserAuthorization';
 export * from './withGlobalBreadcrumb';
-export * from './withReduxProvider';
 export * from './withGuard';
 export * from './withButtonOpenOnClick';
 export * from './withAgentSupportModule';

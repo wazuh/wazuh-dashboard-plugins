@@ -1,12 +1,8 @@
 import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { withGuardAsync, withReduxProvider } from '../../../../common/hocs';
-import {
-  getAngularModule,
-  getCore,
-  getSavedObjects,
-} from '../../../../../kibana-services';
+import { withGuardAsync } from '../../../../common/hocs';
+import { getCore, getSavedObjects } from '../../../../../kibana-services';
 import { SavedObject } from '../../../../../react-services';
 import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/constants';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
@@ -159,7 +155,6 @@ const mapStateToProps = state => ({
 });
 
 export const withVulnerabilitiesStateDataSource = compose(
-  withReduxProvider,
   connect(mapStateToProps),
   withGuardAsync(
     validateVulnerabilitiesStateDataSources,

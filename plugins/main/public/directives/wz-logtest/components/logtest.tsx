@@ -26,7 +26,6 @@ import { WzRequest } from '../../../react-services';
 import {
   withErrorBoundary,
   withGlobalBreadcrumb,
-  withReduxProvider,
   withUserAuthorizationPrompt,
 } from '../../../components/common/hocs';
 import { compose } from 'redux';
@@ -50,7 +49,6 @@ type LogstestProps = {
 
 export const Logtest = compose(
   withErrorBoundary,
-  withReduxProvider,
   withUserAuthorizationPrompt([{ action: 'logtest:run', resource: '*:*:*' }]),
 )((props: LogstestProps) => {
   const [events, setEvents] = useState([]);
