@@ -52,6 +52,7 @@ import {
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
+import { wzDiscoverRenderColumns } from '../../../common/wazuh-discover/render-columns';
 
 const plugins = getPlugins();
 
@@ -112,6 +113,7 @@ const DashboardTH: React.FC = () => {
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Threat Hunting Table',
     defaultColumns: threatHuntingTableDefaultColumns,
+    renderColumns: wzDiscoverRenderColumns,
     results,
     indexPattern: dataSource?.indexPattern,
     DocViewInspectButton,
@@ -282,18 +284,18 @@ const DashboardTH: React.FC = () => {
                       <HitsCounter
                         hits={results?.hits?.total}
                         showResetButton={false}
-                        onResetQuery={() => {}}
+                        onResetQuery={() => { }}
                         tooltip={
                           results?.hits?.total &&
-                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
                             ? {
-                                ariaLabel: 'Warning',
-                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits.`,
-                                iconType: 'alert',
-                                position: 'top',
-                              }
+                              ariaLabel: 'Warning',
+                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                MAX_ENTRIES_PER_QUERY,
+                              )} hits.`,
+                              iconType: 'alert',
+                              position: 'top',
+                            }
                             : undefined
                         }
                       />
