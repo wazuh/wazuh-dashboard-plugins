@@ -25,10 +25,9 @@ import {
 } from '../../../common/data-source';
 import { GitHubDataSource } from '../../../common/data-source/pattern/alerts/github/github-data-source';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
+import { WzSearchBar } from '../../../common/search-bar';
 
 const plugins = getPlugins();
-
-const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
@@ -105,8 +104,8 @@ const DashboardGitHubComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
+            <div className='wz-search-bar'>
+              <WzSearchBar
                 appName='github-searchbar'
                 {...searchBarProps}
                 showDatePicker={true}

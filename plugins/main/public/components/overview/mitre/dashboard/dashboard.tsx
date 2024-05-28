@@ -23,9 +23,9 @@ import {
   useDataSource,
 } from '../../../common/data-source';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
+import { WzSearchBar } from '../../../common/search-bar';
 
 const plugins = getPlugins();
-const SearchBar = getPlugins().data.ui.SearchBar;
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 export const DashboardMITRE: React.FC = () => {
@@ -94,8 +94,8 @@ export const DashboardMITRE: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
+            <div className='wz-search-bar'>
+              <WzSearchBar
                 appName='mitre-detector-searchbar'
                 {...searchBarProps}
                 showQueryInput={true}

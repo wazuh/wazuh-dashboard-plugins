@@ -25,10 +25,9 @@ import {
 } from '../../../common/data-source';
 import { HIPAADataSource } from '../../../common/data-source/pattern/alerts/hipaa/hipaa-data-source';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
+import { WzSearchBar } from '../../../common/search-bar';
 
 const plugins = getPlugins();
-
-const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
@@ -102,8 +101,8 @@ const DashboardHIPAAComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
+            <div className='wz-search-bar'>
+              <WzSearchBar
                 appName='hipaa-searchbar'
                 {...searchBarProps}
                 showDatePicker={true}

@@ -19,7 +19,6 @@ import { gdprRequirementsFile } from '../../../../common/compliance-requirements
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
-import { getPlugins } from '../../../kibana-services';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   UI_LOGGER_LEVELS,
@@ -39,8 +38,7 @@ import useSearchBar from '../../common/search-bar/use-search-bar';
 import { LoadingSpinner } from '../../common/loading-spinner/loading-spinner';
 import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
-
-const SearchBar = getPlugins().data.ui.SearchBar;
+import { WzSearchBar } from '../../common/search-bar';
 
 function buildComplianceObject({ section }) {
   try {
@@ -277,8 +275,8 @@ export const ComplianceTable = withAgentSupportModule(props => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
+            <div className='wz-search-bar'>
+              <WzSearchBar
                 appName='compliance-controls'
                 {...searchBarProps}
                 showDatePicker={true}
@@ -293,47 +291,49 @@ export const ComplianceTable = withAgentSupportModule(props => {
           <EuiPanel paddingSize='none'>
             <EuiFlexGroup paddingSize='none'>
               <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
-                {!!Object.keys(complianceData.complianceObject).length && (
-                  <EuiFlexGroup>
-                    <EuiFlexItem
-                      grow={false}
-                      style={{
-                        width: '15%',
-                        minWidth: 145,
-                        maxHeight: 'calc(100vh - 320px)',
-                        overflowX: 'hidden',
-                      }}
-                    >
-                      <ComplianceRequirements
-                        section={props.section}
-                        onChangeSelectedRequirements={selectedRequirements =>
-                          setComplianceData(state => ({
-                            ...state,
-                            selectedRequirements,
-                          }))
-                        }
-                        requirementsCount={action.data || []}
-                        loadingAlerts={action.running}
-                        {...complianceData}
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem style={{ width: '15%' }}>
-                      <ComplianceSubrequirements
-                        section={props.section}
-                        onSelectedTabChanged={id =>
-                          props.onSelectedTabChanged(id)
-                        }
-                        requirementsCount={action.data || []}
-                        loadingAlerts={action.running}
-                        fetchFilters={fetchFilters}
-                        getRegulatoryComplianceRequirementFilter={
-                          getRegulatoryComplianceRequirementFilter
-                        }
-                        {...complianceData}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )}
+                <EuiPanel paddingSize='none'>
+                  {!!Object.keys(complianceData.complianceObject).length && (
+                    <EuiFlexGroup>
+                      <EuiFlexItem
+                        grow={false}
+                        style={{
+                          width: '15%',
+                          minWidth: 145,
+                          maxHeight: 'calc(100vh - 320px)',
+                          overflowX: 'hidden',
+                        }}
+                      >
+                        <ComplianceRequirements
+                          section={props.section}
+                          onChangeSelectedRequirements={selectedRequirements =>
+                            setComplianceData(state => ({
+                              ...state,
+                              selectedRequirements,
+                            }))
+                          }
+                          requirementsCount={action.data || []}
+                          loadingAlerts={action.running}
+                          {...complianceData}
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem style={{ width: '15%' }}>
+                        <ComplianceSubrequirements
+                          section={props.section}
+                          onSelectedTabChanged={id =>
+                            props.onSelectedTabChanged(id)
+                          }
+                          requirementsCount={action.data || []}
+                          loadingAlerts={action.running}
+                          fetchFilters={fetchFilters}
+                          getRegulatoryComplianceRequirementFilter={
+                            getRegulatoryComplianceRequirementFilter
+                          }
+                          {...complianceData}
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  )}
+                </EuiPanel>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiPanel>

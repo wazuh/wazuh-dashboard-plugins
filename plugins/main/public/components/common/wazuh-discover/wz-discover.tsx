@@ -197,7 +197,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-discover hide-filter-control wz-search-bar'>
+            <div className='wz-discover wz-search-bar'>
               <WzSearchBar
                 appName='wazuh-discover-search-bar'
                 {...searchBarProps}

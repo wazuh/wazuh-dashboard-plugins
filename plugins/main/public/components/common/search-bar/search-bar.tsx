@@ -6,6 +6,8 @@ import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiBadge } from '@elastic/eui';
 export const WzSearchBar = ({ fixedFilters, userFilters, ...restProps }) => {
   const SearchBar = getPlugins().data.ui.SearchBar;
 
+  console.log({ fixedFilters, userFilters, restProps })
+
   return <EuiPanel
     className='wz-search-bar'
     paddingSize='s'
@@ -24,7 +26,7 @@ export const WzSearchBar = ({ fixedFilters, userFilters, ...restProps }) => {
           {fixedFilters?.map((filter, idx) =>
             <EuiFlexItem grow={false} key={idx}>
               <EuiBadge className='globalFilterItem'>
-                {`${filter.meta.key}: ${filter.meta.params.query}`}
+                {`${filter.meta.key}: ${typeof filter.meta.value === 'function' ? filter.meta.value() : filter.meta.value}`}
               </EuiBadge>
             </EuiFlexItem>
           )}

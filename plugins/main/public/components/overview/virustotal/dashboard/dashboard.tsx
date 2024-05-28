@@ -25,10 +25,9 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { VirusTotalDataSource } from '../../../common/data-source/pattern/alerts/virustotal/virustotal-data-source';
 import './virustotal_dashboard.scss';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
+import { WzSearchBar } from '../../../common/search-bar';
 
 const plugins = getPlugins();
-
-const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 const DashboardVT: React.FC = () => {
@@ -100,8 +99,8 @@ const DashboardVT: React.FC = () => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
-          <div className='wz-search-bar hide-filter-control'>
-            <SearchBar
+          <div className='wz-search-bar'>
+            <WzSearchBar
               appName='virustotal-searchbar'
               {...searchBarProps}
               showDatePicker={true}
