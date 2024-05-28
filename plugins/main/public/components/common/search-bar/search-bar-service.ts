@@ -178,22 +178,24 @@ export const hideCloseButtonOnFixedFilters = (
         filter?.value === filterValue &&
         filter?.index === index,
     );
+    const removeButton = element.querySelector('.euiBadge__iconButton');
+    const badgeButton = element.querySelector(
+      '.euiBadge__content .euiBadge__childButton',
+    ) as HTMLElement;
     if (filter) {
-      // hide the remove button
-      const iconButton = element.querySelector(
-        '.euiBadge__iconButton',
-      ) as HTMLElement;
-      iconButton?.style?.setProperty('display', 'none');
-      // change the cursor to not-allowed
-      const badgeButton = element.querySelector(
-        '.euiBadge__content .euiBadge__childButton',
-      ) as HTMLElement;
-      badgeButton?.style?.setProperty('cursor', 'not-allowed');
-      // remove the popup on click to prevent the filter from being removed
-      element.addEventListener('click', event => {
-        event.preventDefault();
-        event.stopPropagation();
+      $(removeButton).addClass('hide-close-button');
+      $(removeButton).on('click', ev => {
+        ev.stopPropagation();
       });
+      $(badgeButton).on('click', ev => {
+        ev.stopPropagation();
+      });
+      $(badgeButton).css('cursor', 'not-allowed');
+    } else {
+      $(removeButton).removeClass('hide-close-button');
+      $(removeButton).off('click');
+      $(badgeButton).off('click');
+      $(badgeButton).css('cursor', 'pointer');
     }
   });
 };

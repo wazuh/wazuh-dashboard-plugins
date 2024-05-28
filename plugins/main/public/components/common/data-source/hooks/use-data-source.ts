@@ -140,24 +140,25 @@ export function useDataSource<
 
   useEffect(() => {
     if (dataSourceFilterManager && dataSource) {
-      const filteredPinnedAgent = dataSourceFilterManager
-        .getFilters()
-        .filter(
-          (filter: tFilter) =>
-            filter.meta.controlledBy !==
-            PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
-        );
       if (pinnedAgentManager.isPinnedAgent()) {
         const pinnedAgent = PatternDataSourceFilterManager.getPinnedAgentFilter(
           dataSource.id,
         );
 
-        dataSourceFilterManager.setFilters([
-          ...filteredPinnedAgent,
-          ...pinnedAgent,
-        ]);
+        dataSourceFilterManager.addFilters([...pinnedAgent]);
       } else {
-        dataSourceFilterManager.setFilters([...filteredPinnedAgent]);
+        const pinnedAgentFilter = dataSourceFilterManager
+        .getFilters()
+        .filter(
+          (filter: tFilter) =>
+            filter.meta.controlledBy ===
+            PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
+        );
+
+        if(pinnedAgentFilter.length){
+          dataSourceFilterManager.removeFilter(pinnedAgentFilter[0])
+        }
+
       }
     }
   }, [JSON.stringify(pinnedAgent)]);

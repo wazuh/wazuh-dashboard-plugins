@@ -58,25 +58,27 @@ const useSearchBarConfiguration = (
     useState<IndexPattern>(indexPattern);
   const TIMEOUT_MILISECONDS = 100;
 
-  const hideRemoveFilter = (retry: number = 0) => {
+  const hideRemoveFilter = (filters, retry: number = 0) => {
+    const allFilters = filters;
     let elements = document.querySelectorAll(
       '.wz-search-bar .globalFilterItem',
     );
-    if ((!elements || !filters.length) && retry < 10) {
+    // when the filters are not empty in DOM and the length is equal to the filters length
+    if (elements.length > 0 && elements.length === allFilters.length) {
+      hideCloseButtonOnFixedFilters(allFilters, elements);
+    } else if (retry < 10) {
       // the setTimeout is used to wait for the DOM elements to be rendered
       setTimeout(() => {
         // this is a workaround to hide the close button on fixed filters via vanilla js
-        hideRemoveFilter(++retry);
+        hideRemoveFilter(allFilters, ++retry);
       }, TIMEOUT_MILISECONDS);
-    } else {
-      hideCloseButtonOnFixedFilters(filters, elements);
     }
   };
 
   useLayoutEffect(() => {
     setTimeout(() => {
       // this is a workaround to hide the close button on fixed filters via vanilla js
-      hideRemoveFilter();
+      hideRemoveFilter(filters);
     }, TIMEOUT_MILISECONDS);
   }, [filters]);
 
