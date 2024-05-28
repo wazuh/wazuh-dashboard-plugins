@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import NavigationService from '../../../react-services/navigation-service';
 
 function getSearchParamsAsObject(location) {
   const searchParams = new URLSearchParams(location.search);
@@ -8,7 +8,8 @@ function getSearchParamsAsObject(location) {
 
 // See changes in the location object and returns the search parameters
 export const useRouterSearch = () => {
-  const location = useLocation();
+  const navigationService = NavigationService.getInstance();
+  const location = navigationService.getLocation();
   const [state, setState] = useState(getSearchParamsAsObject(location));
   useEffect(() => {
     setState(getSearchParamsAsObject(location));

@@ -5,7 +5,6 @@ import { WzButtonType } from '../common/buttons/button';
 import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import './button-explore-agent.scss';
-import { WzAgentSelectorWrapper } from './wz-agent-selector-wrapper';
 
 const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
   const pinnedAgentManager = new PinnedAgentManager();
@@ -49,7 +48,6 @@ const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
           />
         ) : null}
       </div>
-      <WzAgentSelectorWrapper />
     </>
   );
 };

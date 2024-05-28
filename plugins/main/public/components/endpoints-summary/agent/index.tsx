@@ -2,11 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress } from '@elastic/eui';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
 import { Agent } from '../types';
-import { getCore } from '../../../kibana-services';
 import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
-import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
-import { endpointSummary } from '../../../utils/applications';
 import { withErrorBoundary, withRouteResolvers } from '../../common/hocs';
 import { compose } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
@@ -17,16 +14,16 @@ import {
   nestedResolve,
   savedSearch,
 } from '../../../services/resolves';
-import { useHistory } from 'react-router-dom';
 import { useRouterSearch } from '../../common/hooks/use-router-search';
 import { Redirect, Route, Switch } from '../../router-search';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const AgentView = compose(
   withErrorBoundary,
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
 )(() => {
   const { tab = 'welcome' } = useRouterSearch();
-  const history = useHistory();
+  const navigationService = NavigationService.getInstance();
 
   //TODO: Replace with useDatasource and useSearchBar when replace WzDatePicker with SearchBar in AgentsWelcome component
   /* const savedTimefilter = $commonData.getTimefilter();
@@ -53,7 +50,7 @@ export const AgentView = compose(
   }, [tab]);
 
   const switchTab = (tab: string) => {
-    history.push(`/agents?tab=${tab}&agent=${agent?.id}`);
+    navigationService.navigate(`/agents?tab=${tab}&agent=${agent?.id}`);
   };
 
   if (isLoadingAgent) {

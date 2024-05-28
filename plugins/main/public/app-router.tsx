@@ -25,6 +25,7 @@ import { Overview } from './components/overview/overview';
 import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
 import $ from 'jquery';
+import NavigationService from './react-services/navigation-service';
 
 export function Application(props) {
   const dispatch = useDispatch();
@@ -63,8 +64,8 @@ export function Application(props) {
       <div className='wazuhNotReadyYet'></div>{' '}
       {/* TODO: The plugins/main/public/components/wz-menu/wz-menu.js defines a portal to mount here. We could avoid the usage of the React portal and render the component instead*/}
       <WzMenuWrapper />
-      <WzAgentSelectorWrapper />
       <ToastNotificationsModal /> {/* TODO: check if this is being used */}
+      <WzAgentSelectorWrapper />
       <WzUpdatesNotification />
       <AppRouter {...props} />
     </>
@@ -72,12 +73,11 @@ export function Application(props) {
 }
 
 export function AppRouter(props) {
-  const { history } = props.params;
+  const navigationService = NavigationService.getInstance();
+  const history = navigationService.getHistory();
 
   return (
-    <Router basename={props.params.appBasePath} history={history}>
-      {' '}
-      {/* TODO: the base path is duplicated in the URL. See dashboard security plugin. */}
+    <Router history={history}>
       <Switch>
         <Route path={'/health-check'} exact render={HealthCheck}></Route>
         <Route

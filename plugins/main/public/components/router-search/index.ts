@@ -1,6 +1,6 @@
 import { useEffect, ReactNode } from 'react';
 import { useRouterSearch } from '../common/hooks';
-import { useHistory, useLocation } from 'react-router-dom';
+import NavigationService from '../../react-services/navigation-service';
 
 const childrenMatchSearchRoute = (routeSearch, search) => {
   const searchParams = new URLSearchParams(routeSearch);
@@ -38,11 +38,10 @@ export const Route = ({
 }) => null;
 
 export const Redirect = ({ to }) => {
-  const location = useLocation();
-  const history = useHistory();
+  const navigationService = NavigationService.getInstance();
   useEffect(() => {
-    history.push({
-      pathname: location.pathname,
+    navigationService.navigate({
+      pathname: navigationService.getPathname(),
       search: to,
     });
   }, []);

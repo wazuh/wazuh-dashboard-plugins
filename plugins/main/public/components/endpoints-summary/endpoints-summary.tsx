@@ -14,7 +14,6 @@
 import React, { Component } from 'react';
 import { EuiPage, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { AgentsTable } from './table/agents-table';
-import { WazuhConfig } from '../../react-services/wazuh-config';
 import {
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
@@ -41,8 +40,8 @@ export const EndpointsSummary = compose(
 )(
   class EndpointsSummary extends Component {
     _isMount = false;
-    constructor() {
-      super();
+    constructor(props) {
+      super(props);
       this.state = {
         agentTableFilters: {},
         reload: 0,
@@ -50,7 +49,6 @@ export const EndpointsSummary = compose(
         isLoadingOutdatedAgents: true,
         showOnlyOutdatedAgents: false,
       };
-      this.wazuhConfig = new WazuhConfig();
       this.filterAgentByStatus = this.filterAgentByStatus.bind(this);
       this.filterAgentByOS = this.filterAgentByOS.bind(this);
       this.filterAgentByGroup = this.filterAgentByGroup.bind(this);

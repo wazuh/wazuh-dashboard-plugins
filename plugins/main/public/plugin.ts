@@ -46,6 +46,7 @@ import {
 import { Applications, Categories } from './utils/applications';
 import { euiPaletteColorBlind } from '@elastic/eui';
 import NavigationService from './react-services/navigation-service';
+import { createHashHistory } from 'history';
 
 export class WazuhPlugin
   implements
@@ -156,7 +157,7 @@ export class WazuhPlugin
             setScopedHistory(params.history);
             // This allows you to add the selectors to the navbar
             setHeaderActionMenuMounter(params.setHeaderActionMenu);
-            NavigationService.getInstance(params.history);
+            NavigationService.getInstance(createHashHistory());
             // Load application bundle
             const { renderApp } = await import('./application');
             setErrorOrchestrator(ErrorOrchestratorService);
