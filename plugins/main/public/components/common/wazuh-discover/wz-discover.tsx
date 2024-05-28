@@ -86,7 +86,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     [results],
   );
 
-
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
@@ -209,7 +208,12 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
           {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-            <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+            <EuiPanel
+              paddingSize='s'
+              hasShadow={false}
+              hasBorder={false}
+              color='transparent'
+            >
               <EuiFlexGroup gutterSize='s' direction='column'>
                 <EuiFlexItem grow={false} className='discoverChartContainer'>
                   <EuiPanel

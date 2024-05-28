@@ -31,7 +31,7 @@ const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-const DashboardAWSComponents: React.FC = ({ }) => {
+const DashboardAWSComponents: React.FC = ({}) => {
   const {
     filters,
     dataSource,
