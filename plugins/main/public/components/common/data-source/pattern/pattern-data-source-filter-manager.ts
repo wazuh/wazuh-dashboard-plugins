@@ -20,12 +20,11 @@ const AGENT_ID_KEY = 'agent.id';
 function getParameterByName(name, url = window.location.href) {
   name = name.replace(/[\[\]]/g, '\\$&');
   var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-      results = regex.exec(url);
+    results = regex.exec(url);
   if (!results) return null;
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
-
 
 /**
  * Get the filter that excludes the data related to Wazuh servers
@@ -90,6 +89,14 @@ export function getFilterAllowedAgents(
   };
 }
 
+type tFilterType =
+  | 'is'
+  | 'is not'
+  | 'exists'
+  | 'does not exist'
+  | 'is one of'
+  | 'is not one of';
+
 export class PatternDataSourceFilterManager
   implements tDataSourceFilterManager
 {
@@ -137,33 +144,31 @@ export class PatternDataSourceFilterManager
     this.filterManager && this.filterManager.setFilters(cleanedFilters);
   }
 
-
   getFiltersFromQueryParams() {
     const filtersParams = getParameterByName('filters');
-    if(!filtersParams){
+    if (!filtersParams) {
       return [];
     }
     try {
       const urlFilters = JSON.parse(filtersParams);
       let filtersList = [];
-      urlFilters?.forEach( item => {
+      urlFilters?.forEach(item => {
         const key = Object.keys(item)[0];
         const value = item[key];
-        if(key && value){
-          const urlFilter = this.createFilter(key,value);
+        if (key && value) {
+          const urlFilter = this.createFilter('is', key, value);
           filtersList.push(urlFilter);
         }
-      })
+      });
       return filtersList;
-    }catch(error){
-      return []
-    }finally{
+    } catch (error) {
+      return [];
+    } finally {
       window.location.href = window.location.href.replace(
         new RegExp('&filters=' + '[^&]*', 'g'),
         '',
       );
     }
-    
   }
 
   /**
@@ -178,7 +183,7 @@ export class PatternDataSourceFilterManager
     return [
       ...this.getFixedFilters(),
       ...(this.filterUserFilters(defaultFilters) || []),
-      ...urlQueryFilters
+      ...urlQueryFilters,
     ];
   }
 
@@ -251,14 +256,14 @@ export class PatternDataSourceFilterManager
     ];
   }
 
-  /**
-   * Returns a filter with the field and value received
-   * @param field
-   * @param value
-   * @returns
-   */
-  createFilter(field: string, value: string, query?: tFilter['query']): tFilter {
-    return this.generateFilter(field, value, this.dataSource.id, query);
+  public removeFilterByControlledBy(value: string) {
+    let filters = this.filterManager.getFilters();
+    const controlledBy = filters.filter(
+      filter => filter.meta?.controlledBy === value,
+    );
+    controlledBy.forEach(filter => {
+      this.filterManager.removeFilter(filter);
+    });
   }
 
   /**
@@ -266,16 +271,17 @@ export class PatternDataSourceFilterManager
    * @param field
    * @param value
    */
-  removeFilter(field: string, value: string): void {
+  removeFilter(field: string, value: string | string[]): void {
     let filters = this.filterManager.getFilters();
-    const filterIndex = filters.findIndex(
-      f => f.meta?.key === field && f.meta?.value === value,
+    const filterIndex = filters.findIndex(f =>
+      f.meta?.key === field && f.meta?.value === Array.isArray(value)
+        ? value?.join(', ')
+        : value,
     );
-    // only remove when exists the filter
-    if (filterIndex > -1) {
-      filters.splice(filterIndex, 1);
-      this.setFilters(filters);
-    }
+
+    if (filterIndex < 0) return;
+
+    this.filterManager.removeFilter(filters[filterIndex]);
   }
 
   /**
@@ -414,6 +420,141 @@ export class PatternDataSourceFilterManager
     return [];
   }
 
+  /******************************************************************/
+  /********************** FILTERS FACTORY ***************************/
+  /******************************************************************/
+
+  /**
+   * Returns a filter with the field and value received
+   * @param field
+   * @param value
+   * @returns
+   */
+  createFilter(
+    type: tFilterType,
+    key: string,
+    value: string,
+    controlledBy?: string,
+  ): tFilter {
+    switch (type) {
+      case 'is':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              match_phrase: {
+                [key]: {
+                  query: value,
+                },
+              },
+            },
+          },
+          controlledBy,
+        );
+      case 'is not':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              match_phrase: {
+                [key]: {
+                  query: value,
+                },
+              },
+            },
+          },
+          controlledBy,
+          true,
+        );
+      case 'exists':
+        // '{"meta":{"index":"wazuh-alerts-*","alias":null,"negate":false,"disabled":false,"type":"exists","key":"agent.id","value":"exists"},"exists":{"field":"agent.id"},"$state":{"store":"appState"}}'
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            value: 'exists',
+            negate: false,
+            type: 'exists',
+            index: this.dataSource.id,
+            controlledBy,
+          },
+          exists: { field: key },
+          $state: { store: 'appState' },
+        };
+      case 'does not exist':
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            value: 'exists',
+            negate: true,
+            type: 'exists',
+            index: this.dataSource.id,
+            controlledBy,
+          },
+          exists: { field: key },
+          $state: { store: 'appState' },
+        };
+      case 'is one of':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              bool: {
+                minimum_should_match: 1,
+                should: value.map((v: string) => ({
+                  match_phrase: {
+                    [key]: {
+                      query: v,
+                    },
+                  },
+                })),
+              },
+            },
+          },
+          controlledBy,
+        );
+      case 'is not one of':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              bool: {
+                minimum_should_match: 1,
+                should: value.map((v: string) => ({
+                  match_phrase: {
+                    [key]: {
+                      query: v,
+                    },
+                  },
+                })),
+              },
+            },
+          },
+          controlledBy,
+          true,
+        );
+      default:
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          undefined,
+          controlledBy,
+        );
+    }
+  }
+
   /**
    * Return a simple filter object with the field, value and index pattern received
    *
@@ -423,26 +564,26 @@ export class PatternDataSourceFilterManager
    */
   private generateFilter(
     field: string,
-    value: string | string[],
+    value: string | string[],
     indexPatternTitle: string,
-    customQuery?: tFilter['query']
+    query: tFilter['query'] | tFilter['exists'],
+    controlledBy?: string,
+    negate: boolean = false,
   ) {
-    const meta = {
-      disabled: false,
-      negate: false,
-      key: field,
-      params: { query: value },
-      alias: null,
-      type: 'phrases',
-      value: value,
-      index: indexPatternTitle,
+    return {
+      meta: {
+        alias: null,
+        disabled: false,
+        key: field,
+        value: Array.isArray(value) ? value.join(', ') : value,
+        params: value,
+        negate,
+        type: 'phrases',
+        index: indexPatternTitle,
+        controlledBy,
+      },
+      ...query,
+      $state: { store: 'appState' },
     };
-    const $state = {
-      store: 'appState',
-    };
-
-    let query = customQuery || { match_phrase: { [field]: value }};
-
-    return { meta, $state, query };
   }
 }
