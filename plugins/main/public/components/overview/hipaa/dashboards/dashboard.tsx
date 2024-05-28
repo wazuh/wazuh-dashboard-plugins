@@ -101,15 +101,13 @@ const DashboardHIPAAComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar'>
-              <WzSearchBar
-                appName='hipaa-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            </div>
+            <WzSearchBar
+              appName='hipaa-searchbar'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+            />
           )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />

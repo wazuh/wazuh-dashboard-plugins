@@ -104,15 +104,13 @@ const DashboardGitHubComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar'>
-              <WzSearchBar
-                appName='github-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            </div>
+            <WzSearchBar
+              appName='github-searchbar'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+            />
           )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />

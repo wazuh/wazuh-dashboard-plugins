@@ -94,15 +94,13 @@ export const DashboardMITRE: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar'>
-              <WzSearchBar
-                appName='mitre-detector-searchbar'
-                {...searchBarProps}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            </div>
+            <WzSearchBar
+              appName='mitre-detector-searchbar'
+              {...searchBarProps}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
           )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />

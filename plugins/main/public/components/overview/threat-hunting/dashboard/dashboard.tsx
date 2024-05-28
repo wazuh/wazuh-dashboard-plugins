@@ -212,16 +212,14 @@ const DashboardTH: React.FC = () => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
-          <div className='wz-search-bar'>
-            <WzSearchBar
-              appName='th-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          </div>
+          <WzSearchBar
+            appName='th-searchbar'
+            {...searchBarProps}
+            showDatePicker={true}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
         )}
         {!isDataSourceLoading && dataSource && results?.hits?.total === 0 ? (
           <DiscoverNoResults />

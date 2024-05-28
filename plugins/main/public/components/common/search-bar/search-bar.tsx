@@ -2,14 +2,18 @@ import React from 'react';
 import { getPlugins } from '../../../kibana-services';
 import './search-bar.scss'
 import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiBadge } from '@elastic/eui';
+import { SearchBarProps, Filter } from '../../../../../../src/plugins/data/public';
 
-export const WzSearchBar = ({ fixedFilters, userFilters, ...restProps }) => {
+export interface WzSearchBarProps extends SearchBarProps {
+  fixedFilters?: Filter[],
+  userFilters?: Filter[],
+}
+
+export const WzSearchBar = ({ fixedFilters = [], userFilters = [], ...restProps }: WzSearchBarProps) => {
   const SearchBar = getPlugins().data.ui.SearchBar;
 
-  console.log({ fixedFilters, userFilters, restProps })
-
   return <EuiPanel
-    className='wz-search-bar'
+    className='wz-search-bar wz-search-bar-no-padding'
     paddingSize='s'
     hasShadow={false}
     hasBorder={false}
@@ -22,6 +26,8 @@ export const WzSearchBar = ({ fixedFilters, userFilters, ...restProps }) => {
       <EuiFlexItem grow={false}>
         <EuiFlexGroup gutterSize='xs'
           className='globalFilterBar globalFilterGroup__filterBar'
+          responsive={false}
+          wrap={true}
         >
           {fixedFilters?.map((filter, idx) =>
             <EuiFlexItem grow={false} key={idx}>

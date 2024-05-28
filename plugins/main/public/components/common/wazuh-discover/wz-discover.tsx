@@ -197,15 +197,13 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-discover wz-search-bar'>
-              <WzSearchBar
-                appName='wazuh-discover-search-bar'
-                {...searchBarProps}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            </div>
+            <WzSearchBar
+              appName='wazuh-discover-search-bar'
+              {...searchBarProps}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
           )}
           {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />

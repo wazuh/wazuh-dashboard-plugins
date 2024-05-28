@@ -99,16 +99,14 @@ const DashboardVT: React.FC = () => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
-          <div className='wz-search-bar'>
-            <WzSearchBar
-              appName='virustotal-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          </div>
+          <WzSearchBar
+            appName='virustotal-searchbar'
+            {...searchBarProps}
+            showDatePicker={true}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
         )}
         {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
           <SampleDataWarning />
