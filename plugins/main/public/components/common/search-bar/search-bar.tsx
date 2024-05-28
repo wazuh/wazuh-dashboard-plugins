@@ -18,11 +18,11 @@ export const WzSearchBar = ({ fixedFilters = [], userFilters = [], ...restProps 
     hasShadow={false}
     hasBorder={false}
   >
-    <SearchBar
+    {!(restProps.showQueryBar === false) && <SearchBar
       {...restProps}
       showFilterBar={false}
-    />
-    <EuiFlexGroup gutterSize='s'>
+    />}
+    {!(restProps.showFilterBar === false) && <EuiFlexGroup gutterSize='s'>
       <EuiFlexItem grow={false}>
         <EuiFlexGroup gutterSize='xs'
           className='globalFilterBar globalFilterGroup__filterBar'
@@ -46,6 +46,6 @@ export const WzSearchBar = ({ fixedFilters = [], userFilters = [], ...restProps 
           useDefaultBehaviors={false}
         />
       </EuiFlexItem>
-    </EuiFlexGroup>
+    </EuiFlexGroup>}
   </EuiPanel>
 }
