@@ -89,6 +89,7 @@ export function useDataSource<
   };
 
   useEffect(() => {
+    let isMounted = true;
     let subscription;
     (async () => {
       setIsLoading(true);
@@ -103,31 +104,38 @@ export function useDataSource<
       if (!dataSource) {
         throw new Error('No valid data source found');
       }
-      setDataSource(dataSource);
-      const dataSourceFilterManager = new PatternDataSourceFilterManager(
-        dataSource,
-        initialFilters,
-        injectedFilterManager,
-        initialFetchFilters,
-      );
-      // what the filters update
-      subscription = dataSourceFilterManager.getUpdates$().subscribe({
-        next: () => {
-          // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-          dataSourceFilterManager.setFilters(
-            dataSourceFilterManager.getFilters(),
-          );
-          setAllFilters(dataSourceFilterManager.getFilters());
-          setFetchFilters(dataSourceFilterManager.getFetchFilters());
-        },
-      });
-      setAllFilters(dataSourceFilterManager.getFilters());
-      setFetchFilters(dataSourceFilterManager.getFetchFilters());
-      setDataSourceFilterManager(dataSourceFilterManager);
-      setIsLoading(false);
+      if (isMounted) {
+        setDataSource(dataSource);
+        const dataSourceFilterManager = new PatternDataSourceFilterManager(
+          dataSource,
+          initialFilters,
+          injectedFilterManager,
+          initialFetchFilters,
+        );
+        // what the filters update
+        subscription = dataSourceFilterManager.getUpdates$().subscribe({
+          next: () => {
+            // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
+            if (isMounted) {
+              dataSourceFilterManager.setFilters(
+                dataSourceFilterManager.getFilters(),
+              );
+              setAllFilters(dataSourceFilterManager.getFilters());
+              setFetchFilters(dataSourceFilterManager.getFetchFilters());
+            }
+          },
+        });
+        setAllFilters(dataSourceFilterManager.getFilters());
+        setFetchFilters(dataSourceFilterManager.getFetchFilters());
+        setDataSourceFilterManager(dataSourceFilterManager);
+        setIsLoading(false);
+      }
     })();
-  
-    return () => subscription && subscription.unsubscribe();
+
+    return () => {
+      isMounted = false;
+      if (subscription) subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
