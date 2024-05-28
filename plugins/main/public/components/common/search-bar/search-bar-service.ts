@@ -133,10 +133,10 @@ export const search = async (
 };
 
 const getValueDisplayedOnFilter = (filter: tFilter) => {
-  return filter.query?.bool?.minimum_should_match === 1 ? 
-    `is one of ${filter.meta?.value}` :
-    filter.meta?.params?.query || filter.meta?.value;
-}
+  return filter.query?.bool?.minimum_should_match === 1
+    ? `is one of ${filter.meta?.value}`
+    : filter.meta?.params?.query || filter.meta?.value;
+};
 
 export const hideCloseButtonOnFixedFilters = (
   filters: tFilter[],
@@ -152,7 +152,7 @@ export const hideCloseButtonOnFixedFilters = (
           index,
           filter,
           field: filter.meta?.key,
-          value: getValueDisplayedOnFilter(filter)
+          value: getValueDisplayedOnFilter(filter),
         };
       }
     })
@@ -173,22 +173,24 @@ export const hideCloseButtonOnFixedFilters = (
         filter?.value === filterValue &&
         filter?.index === index,
     );
+    const removeButton = element.querySelector('.euiBadge__iconButton');
+    const badgeButton = element.querySelector(
+      '.euiBadge__content .euiBadge__childButton',
+    ) as HTMLElement;
     if (filter) {
-      // hide the remove button
-      const iconButton = element.querySelector(
-        '.euiBadge__iconButton',
-      ) as HTMLElement;
-      iconButton?.style?.setProperty('display', 'none');
-      // change the cursor to not-allowed
-      const badgeButton = element.querySelector(
-        '.euiBadge__content .euiBadge__childButton',
-      ) as HTMLElement;
-      badgeButton?.style?.setProperty('cursor', 'not-allowed');
-      // remove the popup on click to prevent the filter from being removed
-      element.addEventListener('click', event => {
-        event.preventDefault();
-        event.stopPropagation();
+      $(removeButton).addClass('hide-close-button');
+      $(removeButton).on('click', ev => {
+        ev.stopPropagation();
       });
+      $(badgeButton).on('click', ev => {
+        ev.stopPropagation();
+      });
+      $(badgeButton).css('cursor', 'not-allowed');
+    } else {
+      $(removeButton).removeClass('hide-close-button');
+      $(removeButton).off('click');
+      $(badgeButton).off('click');
+      $(badgeButton).css('cursor', 'pointer');
     }
   });
 };
