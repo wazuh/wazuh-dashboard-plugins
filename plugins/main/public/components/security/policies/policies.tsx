@@ -18,7 +18,7 @@ import { closeFlyout } from '../../common/flyouts/close-flyout-security';
 export const Policies = withUserAuthorizationPrompt([
   { action: 'security:read', resource: 'policy:id:*' },
 ])(() => {
-  const [policies, setPolicies] = useState('');
+  const [policies, setPolicies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isCreatingPolicy, setIsCreatingPolicy] = useState(false);
   const [isEditingPolicy, setIsEditingPolicy] = useState(false);
