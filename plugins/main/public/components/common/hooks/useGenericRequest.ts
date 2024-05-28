@@ -12,33 +12,44 @@ import {
 export function useGenericRequest(method, path, params, formatFunction) {
   const [items, setItems] = useState({});
   const [isLoading, setisLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
-  useEffect( () => {
-    try{
-      setisLoading(true);
-      const fetchData = async() => {
-          const response = await GenericRequest.request(method, path, params);
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        setisLoading(true);
+        const response = await GenericRequest.request(method, path, params);
+        if (isMounted) {
           setItems(response);
           setisLoading(false);
         }
-        fetchData();
-    } catch(error) {
-      setError(error);
-      setisLoading(false);
-      const options: UIErrorLog = {
-        context: `${useGenericRequest.name}.fetchData`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-        severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }, [params]);
+      } catch (error) {
+        if (isMounted) {
+          setError(error);
+          setisLoading(false);
+          const options: UIErrorLog = {
+            context: `${useGenericRequest.name}.fetchData`,
+            level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+            severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: error.name || error,
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
+      }
+    };
 
-  return {isLoading, data: formatFunction(items), error};
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [method, path, params]);
+
+  return { isLoading, data: formatFunction(items), error };
 }
