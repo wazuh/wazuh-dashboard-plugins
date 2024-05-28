@@ -198,6 +198,14 @@ export class PatternDataSourceFilterManager
     );
   }
 
+  addFilters(filter: tFilter) {
+    this.filterManager.addFilters(filter);
+  }
+
+  removeAll() {
+    this.filterManager.setFilters([]);
+  }
+
   /**
    * Concatenate the filters to fetch the data from the data source
    * @returns
@@ -217,7 +225,7 @@ export class PatternDataSourceFilterManager
    * @returns
    */
   createFilter(field: string, value: string): tFilter {
-    return this.generateFilter(field, value, this.dataSource.id);
+    return this.generateFilter(field, value, this.dataSource.id) as tFilter;
   }
 
   /**
@@ -225,16 +233,8 @@ export class PatternDataSourceFilterManager
    * @param field
    * @param value
    */
-  removeFilter(field: string, value: string): void {
-    let filters = this.filterManager.getFilters();
-    const filterIndex = filters.findIndex(
-      f => f.meta?.key === field && f.meta?.value === value,
-    );
-    // only remove when exists the filter
-    if (filterIndex > -1) {
-      filters.splice(filterIndex, 1);
-      this.setFilters(filters);
-    }
+  removeFilter(filter: tFilter): void {
+    this.filterManager.removeFilter(filter);
   }
 
   /**

@@ -4,7 +4,6 @@ import {
   EuiDataGridProps,
   EuiDataGridSorting,
 } from '@elastic/eui';
-import dompurify from 'dompurify';
 import React, { useEffect, useMemo, useState, Fragment } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
 // ToDo: check how create this methods
@@ -19,16 +18,17 @@ const MAX_ENTRIES_PER_QUERY = 10000;
 const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 
 export type tDataGridColumn = {
-  render?: (
-    value: any,
-    rowItem: object
-  ) => string | React.ReactNode;
+  render?: (value: any, rowItem: object) => string | React.ReactNode;
 } & EuiDataGridColumn;
+
+export type tDataGridRenderColumn = Required<Pick<tDataGridColumn, 'render'>> &
+  Omit<tDataGridColumn, 'render'>;
 
 export type tDataGridProps = {
   indexPattern: IndexPattern;
   results: SearchResponse;
   defaultColumns: tDataGridColumn[];
+  renderColumns?: tDataGridRenderColumn[];
   DocViewInspectButton: ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => React.JSX.Element;
@@ -42,6 +42,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     DocViewInspectButton,
     results,
     defaultColumns,
+    renderColumns,
     pagination: defaultPagination,
   } = props;
   /** Columns **/
@@ -115,11 +116,19 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       // check if column have render method initialized
       const column = columns.find(column => column.id === columnId);
       if (column && column.render) {
-        return column.render(
+        return column.render(fieldFormatted, rowsParsed[relativeRowIndex]);
+      }
+      // check if column have render method in renderColumns prop
+      const renderColumn = renderColumns?.find(
+        column => column.id === columnId,
+      );
+      if (renderColumn) {
+        return renderColumn.render(
           fieldFormatted,
-          rowsParsed[relativeRowIndex]
+          rowsParsed[relativeRowIndex],
         );
       }
+
       return fieldFormatted;
     }
     return null;
