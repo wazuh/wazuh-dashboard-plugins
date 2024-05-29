@@ -709,9 +709,11 @@ const WzRuleInfo = compose(
         return;
       }
 
-      window.location.href = window.location.href.replace(
-        new RegExp('redirectRule=' + '[^&]*'),
-        `redirectRule=${ruleId}`,
+      const search = new URLSearchParams(this.props.location.search);
+      search.delete('redirectRule');
+      search.append('redirectRule', ruleId);
+      this.props.history.push(
+        `${this.props.location.pathname}?${search.toString()}`,
       );
       this.setState({ currentRuleId: ruleId, isLoading: true });
     }
