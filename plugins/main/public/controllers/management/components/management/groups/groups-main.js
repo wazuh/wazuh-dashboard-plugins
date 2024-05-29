@@ -25,9 +25,13 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { compose } from 'redux';
-import { withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import {
+  withGlobalBreadcrumb,
+  withRouterSearch,
+} from '../../../../../components/common/hocs';
 import { endpointGroups } from '../../../../../utils/applications';
 import { MultipleAgentSelector } from '../../../../../components/management/groups/multiple-agent-selector';
+import { withRouter } from 'react-router-dom';
 
 class WzGroups extends Component {
   constructor(props) {
@@ -37,13 +41,16 @@ class WzGroups extends Component {
 
   async componentDidMount() {
     // Check if there is a group in the URL
-    const [_, group] =
-      window.location.href.match(new RegExp('group=' + '([^&]*)')) || [];
-    window.location.href = window.location.href.replace(
-      new RegExp('group=' + '[^&]*'),
-      '',
-    );
+    const { group } = this.props.search;
     if (group) {
+      // This removes the group from the search URL parameters.
+      // TODO: the view to display the specific group should be managed through the routing based on
+      // the URL instead of a component state. This lets refreshing the page and display the same view
+      const search = new URLSearchParams(this.props.location.search);
+      search.delete('group');
+      this.props.history.push(
+        `${this.props.location.pathname}?${search.toString()}`,
+      );
       try {
         // Try if the group can be accesed
         const responseGroup = await WzRequest.apiReq('GET', '/groups', {
@@ -113,4 +120,6 @@ export default compose(
   withGlobalBreadcrumb(props => {
     return [{ text: endpointGroups.breadcrumbLabel }];
   }),
+  withRouter,
+  withRouterSearch,
 )(WzGroups);
