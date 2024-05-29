@@ -35,6 +35,7 @@ export const WzSearchBar = ({
       paddingSize='s'
       hasShadow={false}
       hasBorder={false}
+      color='transparent'
     >
       {showQuery ? (
         <EuiFlexGroup
@@ -62,8 +63,8 @@ export const WzSearchBar = ({
                 <EuiFlexItem grow={false} key={idx}>
                   <EuiBadge className='globalFilterItem' color='hollow'>
                     {`${filter.meta.key}: ${typeof filter.meta.value === 'function'
-                        ? filter.meta.value()
-                        : filter.meta.value
+                      ? filter.meta.value()
+                      : filter.meta.value
                       }`}
                   </EuiBadge>
                 </EuiFlexItem>
