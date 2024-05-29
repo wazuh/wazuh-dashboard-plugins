@@ -4,6 +4,7 @@ import { AgentsWelcome } from '../../common/welcome/agents-welcome';
 import { Agent } from '../types';
 import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
+import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
 import { withErrorBoundary, withRouteResolvers } from '../../common/hocs';
 import { compose } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
@@ -75,7 +76,7 @@ export const AgentView = compose(
       </Route>
       <Route path='?tab=configuration'>
         <MainModuleAgent agent={agent} section={tab} />
-        <MainAgentStats agent={agent} />
+        <WzManagementConfiguration agent={agent} />
       </Route>
       <Route path='?tab=welcome'>
         <AgentsWelcome
