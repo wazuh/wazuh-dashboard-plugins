@@ -275,48 +275,50 @@ const DashboardTH: React.FC = () => {
                   hidePanelTitles: false,
                 }}
               />
-              <EuiDataGrid
-                {...dataGridProps}
-                className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                toolbarVisibility={{
-                  additionalControls: (
-                    <>
-                      <HitsCounter
-                        hits={results?.hits?.total}
-                        showResetButton={false}
-                        onResetQuery={() => { }}
-                        tooltip={
-                          results?.hits?.total &&
-                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                            ? {
-                              ariaLabel: 'Warning',
-                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                MAX_ENTRIES_PER_QUERY,
-                              )} hits.`,
-                              iconType: 'alert',
-                              position: 'top',
-                            }
-                            : undefined
-                        }
-                      />
-                      <EuiButtonEmpty
-                        disabled={
-                          results?.hits?.total === 0 ||
-                          !columnVisibility?.visibleColumns?.length
-                        }
-                        size='xs'
-                        iconType='exportAction'
-                        color='primary'
-                        isLoading={isExporting}
-                        className='euiDataGrid__controlBtn'
-                        onClick={onClickExportResults}
-                      >
-                        Export Formated
-                      </EuiButtonEmpty>
-                    </>
-                  ),
-                }}
-              />
+              <div style={{ margin: '8px' }}>
+                <EuiDataGrid
+                  {...dataGridProps}
+                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                  toolbarVisibility={{
+                    additionalControls: (
+                      <>
+                        <HitsCounter
+                          hits={results?.hits?.total}
+                          showResetButton={false}
+                          onResetQuery={() => { }}
+                          tooltip={
+                            results?.hits?.total &&
+                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                              ? {
+                                ariaLabel: 'Warning',
+                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                  MAX_ENTRIES_PER_QUERY,
+                                )} hits.`,
+                                iconType: 'alert',
+                                position: 'top',
+                              }
+                              : undefined
+                          }
+                        />
+                        <EuiButtonEmpty
+                          disabled={
+                            results?.hits?.total === 0 ||
+                            !columnVisibility?.visibleColumns?.length
+                          }
+                          size='xs'
+                          iconType='exportAction'
+                          color='primary'
+                          isLoading={isExporting}
+                          className='euiDataGrid__controlBtn'
+                          onClick={onClickExportResults}
+                        >
+                          Export Formated
+                        </EuiButtonEmpty>
+                      </>
+                    ),
+                  }}
+                />
+              </div>
               {inspectedHit && (
                 <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
                   <EuiFlyoutHeader>
