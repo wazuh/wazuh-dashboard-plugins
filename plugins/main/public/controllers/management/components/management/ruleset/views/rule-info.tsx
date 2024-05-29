@@ -17,7 +17,6 @@ import {
 } from '@elastic/eui';
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
-
 import {
   ResourcesHandler,
   ResourcesConstants,
@@ -756,9 +755,9 @@ export default class WzRuleInfo extends Component {
                 iconType='popout'
                 aria-label='popout'
                 href={getCore().application.getUrlForApp(threatHunting.id, {
-                  path: `#/overview/?tab=general&tabView=panels&filters=[{"rule.id":"${id}"}]`,
+                  path: `#/overview/?tab=general&tabView=panels&_g=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:rule.id,negate:!f,params:(query:'${id}'),type:phrase),query:(match_phrase:(rule.id:'${id}')))),query:(language:kuery,query:''))`,
                 })}
-                target='blank'
+                target='_blank'
               >
                 View alerts of this Rule
               </EuiButtonEmpty>

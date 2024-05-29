@@ -63,11 +63,11 @@ export const GitHubPanel = withErrorBoundary(() => {
     const { field, value } = selectedFilter;
     const controlledByFilter = 'github-panel-row-filter';
     if (value) {
-      const filter = filterManager.createFilter('exists', field, null, controlledByFilter);
+      const filter = filterManager?.createFilter('is one of', field, [value], controlledByFilter);
       // this hide the remove filter button in the filter bar
       setFilters([...filters, filter]);
     } else {
-      filterManager.removeFilterByControlledBy(controlledByFilter);
+      filterManager?.removeFilterByControlledBy(controlledByFilter);
     }
     setCurrentSelectedFilter(selectedFilter);
   }
