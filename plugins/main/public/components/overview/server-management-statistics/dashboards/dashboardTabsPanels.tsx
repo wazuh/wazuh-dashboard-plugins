@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { getPlugins } from '../../../../kibana-services';
-import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import {
   EuiFlexItem,
