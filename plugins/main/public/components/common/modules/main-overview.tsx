@@ -34,7 +34,11 @@ export const MainModuleOverview = connect(mapStateToProps)(
 
     async componentDidMount() {
       // Redirect to the initial tab view if the selected is not available for the module
-      if (!module.tabs.map(({ id }) => id).includes(this.props.selectView)) {
+      if (
+        !this.props.module.tabs
+          .map(({ id }) => id)
+          .includes(this.props.selectView)
+      ) {
         this.props.onSelectedTabChanged(this.props.module.init);
       }
     }
