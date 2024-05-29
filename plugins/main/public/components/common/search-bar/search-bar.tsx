@@ -60,12 +60,11 @@ export const WzSearchBar = ({
             >
               {fixedFilters?.map((filter, idx) => (
                 <EuiFlexItem grow={false} key={idx}>
-                  <EuiBadge className='globalFilterItem'>
-                    {`${filter.meta.key}: ${
-                      typeof filter.meta.value === 'function'
+                  <EuiBadge className='globalFilterItem' color='hollow'>
+                    {`${filter.meta.key}: ${typeof filter.meta.value === 'function'
                         ? filter.meta.value()
                         : filter.meta.value
-                    }`}
+                      }`}
                   </EuiBadge>
                 </EuiFlexItem>
               ))}
