@@ -84,7 +84,6 @@ export default function CommandOutput(props: ICommandSectionProps) {
             </EuiCopy>
           )}
         </div>
-        <EuiSpacer size='s' />
         {showCommand && havePassword ? (
           <EuiSwitch
             checked={showPassword}
@@ -92,6 +91,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
             onChange={onChangeShowPassword}
           />
         ) : null}
+        <EuiSpacer size='s' />
       </EuiText>
     </Fragment>
   );
