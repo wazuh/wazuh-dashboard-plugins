@@ -1,10 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  HashRouter as Router,
-  Route,
-  Switch,
-  Redirect,
-} from 'react-router-dom';
+import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
 import { getWazuhCorePlugin, getWzMainParams } from './kibana-services';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';

@@ -18,8 +18,7 @@ import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { useHistory } from 'react-router-dom';
-import { useRouterSearch } from '../../../common/hooks';
+import NavigationService from '../../../../react-services/navigation-service';
 
 export const ModuleMitreAttackIntelligenceResource = ({
   label,
@@ -30,19 +29,28 @@ export const ModuleMitreAttackIntelligenceResource = ({
   resourceFilters,
 }) => {
   const [details, setDetails] = useState(null);
-  const history = useHistory();
-  const search = useRouterSearch();
+  const navigationService = NavigationService.getInstance();
 
+  // TODO: fix this behavior so that details are not lost when removing the query params and adding the path to the history
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.href);
-    const redirectTab = search.tabRedirect;
-    const idToRedirect = search.idToRedirect;
-    if (redirectTab && idToRedirect) {
+    const urlParams = navigationService.getParams();
+    const hasRedirectTabParam = urlParams.has('tabRedirect');
+    const hasIdToRedirectParam = urlParams.has('idToRedirect');
+    if (hasRedirectTabParam && hasIdToRedirectParam) {
+      const redirectTab = urlParams.get('tabRedirect');
+      const idToRedirect = urlParams.get('idToRedirect');
       const endpoint = `/mitre/${redirectTab}?q=external_id=${idToRedirect}`;
       getMitreItemToRedirect(endpoint);
       urlParams.delete('tabRedirect');
       urlParams.delete('idToRedirect');
-      // TODO: replace window.history.pushState({}, document.title, '#/overview/?tab=mitre');
+      /* const newQueryParams = urlParams.toString();
+      navigationService.replace(
+        {
+          pathname: '#/overview',
+          search: `tab=mitre${newQueryParams ? `&${newQueryParams}` : ''}`,
+        },
+        {},
+      ); */
     }
   }, []);
 

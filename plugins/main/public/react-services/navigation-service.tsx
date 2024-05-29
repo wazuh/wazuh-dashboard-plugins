@@ -21,6 +21,10 @@ class NavigationService {
     return this.history;
   }
 
+  public getLocation(): Location {
+    return this.history.location;
+  }
+
   public getHash(): string {
     return this.history.location.hash;
   }
@@ -53,11 +57,19 @@ class NavigationService {
   }
 
   public navigate(path: string | Partial<Path>, state?: any): void {
-    this.history.push(path, state);
+    if (typeof path === 'string') {
+      this.history.push(path, state);
+    } else {
+      this.history.push(path, state || path.state);
+    }
   }
 
   public replace(path: string | Partial<Path>, state?: any): void {
-    this.history.replace(path, state);
+    if (typeof path === 'string') {
+      this.history.replace(path, state);
+    } else {
+      this.history.replace(path, state || path.state);
+    }
   }
 
   public goBack(): void {
@@ -72,8 +84,8 @@ class NavigationService {
     this.history.go(n);
   }
 
-  public getLocation(): Location {
-    return this.history.location;
+  public reload(): void {
+    window.location.reload();
   }
 
   public listen(

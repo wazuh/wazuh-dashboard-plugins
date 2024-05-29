@@ -36,7 +36,6 @@ import {
   savedSearch,
 } from '../../services/resolves';
 import { Redirect, Route, Switch } from '../router-search';
-import { useHistory } from 'react-router-dom';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
 
@@ -68,7 +67,6 @@ export const WzSecurity = compose(
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([{ text: security.breadcrumbLabel }]),
 )(() => {
-  const history = useHistory();
   const navigationService = NavigationService.getInstance();
   const { tab: selectedTabId } = useRouterSearch();
 

@@ -26,13 +26,13 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
-import { useHistory, useLocation } from 'react-router-dom';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const SettingsMiscellaneous = () => {
-  const history = useHistory();
-  const location = useLocation();
+  const navigationService = NavigationService.getInstance();
+  const location = navigationService.getLocation();
   const redirectHealthCheckDebugMode = useCallback(() => {
-    history.push({
+    navigationService.navigate({
       pathname: '/health-check',
       search: '?debug',
       state: { prevLocation: location },
