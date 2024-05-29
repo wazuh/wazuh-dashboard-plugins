@@ -173,15 +173,7 @@ export const DrilldownConfigRepository = (
                 { id: 'data.github.actor', displayAsText: 'Actor' },
                 { id: 'data.github.action', displayAsText: 'Action' },
                 { id: 'rule.level' },
-                {
-                  id: 'rule.id', render: value => (
-                    <EuiLink
-                      href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-                    >
-                      {value}
-                    </EuiLink >
-                  ),
-                },
+                { id: 'rule.id' },
               ]
 
               return (

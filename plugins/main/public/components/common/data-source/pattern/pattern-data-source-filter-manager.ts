@@ -206,6 +206,14 @@ export class PatternDataSourceFilterManager
     );
   }
 
+  addFilters(filter: tFilter) {
+    this.filterManager.addFilters(filter);
+  }
+
+  removeAll() {
+    this.filterManager.setFilters([]);
+  }
+
   /**
    * Concatenate the filters to fetch the data from the data source
    * @returns
