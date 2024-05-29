@@ -24,6 +24,7 @@ import {
   EuiSpacer,
   EuiProgress,
 } from '@elastic/eui';
+import { I18nProvider } from '@osd/i18n/react';
 
 import { clusterReq, clusterNodes } from '../configuration/utils/wz-fetch';
 import { compose } from 'redux';
@@ -160,57 +161,59 @@ export class WzStatisticsOverview extends Component {
 
   render() {
     return (
-      <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiTitle>
-                    <h2>Statistics</h2>
-                  </EuiTitle>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-            {this.props.configurationUIEditable && (
-              <EuiFlexItem grow={false}>
-                <RedirectAppLinks application={getCore().application}>
-                  <EuiButtonEmpty
-                    href={getCore().application.getUrlForApp(appSettings.id, {
-                      path: '#/settings?tab=configuration&category=Task:Statistics',
-                    })}
-                    iconType='gear'
-                    iconSide='left'
-                  >
-                    Settings
-                  </EuiButtonEmpty>
-                </RedirectAppLinks>
+      <I18nProvider>
+        <EuiPage style={{ background: 'transparent' }}>
+          <EuiPanel>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiTitle>
+                      <h2>Statistics</h2>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </EuiFlexItem>
-            )}
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText color='subdued'>
-                From here you can see daemon statistics.
-              </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiTabs>{this.renderTabs()}</EuiTabs>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer size={'m'} />
-          <DashboardTabsPanels
-            selectedTab={this.state.selectedTabId}
-            loadingNode={this.state.loadingNode}
-            isClusterMode={this.state.isClusterMode}
-            clusterNodes={this.state.clusterNodes}
-            clusterNodeSelected={this.state.clusterNodeSelected}
-            onSelectNode={this.onSelectNode}
-          />
-        </EuiPanel>
-      </EuiPage>
+              {this.props.configurationUIEditable && (
+                <EuiFlexItem grow={false}>
+                  <RedirectAppLinks application={getCore().application}>
+                    <EuiButtonEmpty
+                      href={getCore().application.getUrlForApp(appSettings.id, {
+                        path: '#/settings?tab=configuration&category=Task:Statistics',
+                      })}
+                      iconType='gear'
+                      iconSide='left'
+                    >
+                      Settings
+                    </EuiButtonEmpty>
+                  </RedirectAppLinks>
+                </EuiFlexItem>
+              )}
+            </EuiFlexGroup>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiText color='subdued'>
+                  From here you can see daemon statistics.
+                </EuiText>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTabs>{this.renderTabs()}</EuiTabs>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer size={'m'} />
+            <DashboardTabsPanels
+              selectedTab={this.state.selectedTabId}
+              loadingNode={this.state.loadingNode}
+              isClusterMode={this.state.isClusterMode}
+              clusterNodes={this.state.clusterNodes}
+              clusterNodeSelected={this.state.clusterNodeSelected}
+              onSelectNode={this.onSelectNode}
+            />
+          </EuiPanel>
+        </EuiPage>
+      </I18nProvider>
     );
   }
 }
