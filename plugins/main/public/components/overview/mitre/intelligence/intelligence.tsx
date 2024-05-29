@@ -12,7 +12,7 @@
  */
 
 import React, { useCallback, useState, useRef, useEffect } from 'react';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { EuiPanel } from '@elastic/eui';
 
 import { MitreAttackResources } from './resources';
 import { ModuleMitreAttackIntelligenceLeftPanel } from './intelligence_left_panel';
@@ -50,8 +50,8 @@ export const ModuleMitreAttackIntelligence = compose(
                 params: {
                   ...(searchTerm
                     ? {
-                        q: fields.map(key => `${key}~${searchTerm}`).join(','),
-                      }
+                      q: fields.map(key => `${key}~${searchTerm}`).join(','),
+                    }
                     : {}),
                   limit: limitResults,
                 },
@@ -70,13 +70,13 @@ export const ModuleMitreAttackIntelligence = compose(
                   setResourceFilters({
                     ...(searchTermAllResourcesLastSearch.current
                       ? {
-                          q: fields
-                            .map(
-                              key =>
-                                `${key}~${searchTermAllResourcesLastSearch.current}`,
-                            )
-                            .join(','),
-                        }
+                        q: fields
+                          .map(
+                            key =>
+                              `${key}~${searchTermAllResourcesLastSearch.current}`,
+                          )
+                          .join(','),
+                      }
                       : {}),
                   });
                   setSelectedResource(resource.id);
@@ -105,7 +105,7 @@ export const ModuleMitreAttackIntelligence = compose(
       setResourceFilters({});
       setSelectedResource(prevSelectedResource =>
         prevSelectedResource === resourceID &&
-        searchTermAllResourcesUsed.current
+          searchTermAllResourcesUsed.current
           ? null
           : resourceID,
       );
@@ -118,37 +118,35 @@ export const ModuleMitreAttackIntelligence = compose(
   }, []);
 
   return (
-    <EuiFlexGroup style={{ margin: '0 8px' }}>
-      <EuiFlexItem>
-        <PanelSplit
-          side={
-            <ModuleMitreAttackIntelligenceLeftPanel
-              onSearchTermAllResourcesChange={onSearchTermAllResourcesChange}
-              onSearchTermAllResourcesSearch={searchTermAllResourcesAction.run}
-              onSelectResource={onSelectResource}
-              selectedResource={selectedResource}
-            />
-          }
-          sideProps={{
-            style: { width: '15%', minWidth: 145, overflowX: 'hidden' },
-          }}
-          content={
-            <ModuleMitreAttackIntelligenceRightPanel
-              results={searchTermAllResourcesAction.data}
-              loading={searchTermAllResourcesAction.running}
-              selectedResource={selectedResource}
-              resourceFilters={resourceFilters}
-            />
-          }
-          contentProps={{
-            style: {
-              maxHeight: 'calc(100vh - 255px)',
-              overflowY: 'auto',
-              overflowX: 'hidden',
-            },
-          }}
-        />
-      </EuiFlexItem>
-    </EuiFlexGroup>
+    <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+      <PanelSplit
+        side={
+          <ModuleMitreAttackIntelligenceLeftPanel
+            onSearchTermAllResourcesChange={onSearchTermAllResourcesChange}
+            onSearchTermAllResourcesSearch={searchTermAllResourcesAction.run}
+            onSelectResource={onSelectResource}
+            selectedResource={selectedResource}
+          />
+        }
+        sideProps={{
+          style: { width: '15%', minWidth: 145, overflowX: 'hidden' },
+        }}
+        content={
+          <ModuleMitreAttackIntelligenceRightPanel
+            results={searchTermAllResourcesAction.data}
+            loading={searchTermAllResourcesAction.running}
+            selectedResource={selectedResource}
+            resourceFilters={resourceFilters}
+          />
+        }
+        contentProps={{
+          style: {
+            maxHeight: 'calc(100vh - 255px)',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+          },
+        }}
+      />
+    </EuiPanel>
   );
 });
