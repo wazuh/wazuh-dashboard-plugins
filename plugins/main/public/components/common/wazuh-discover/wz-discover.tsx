@@ -192,90 +192,88 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         paddingSize='none'
         pageContentProps={{ color: 'transparent' }}
       >
-        <>
-          {isDataSourceLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <WzSearchBar
-              appName='wazuh-discover-search-bar'
-              {...searchBarProps}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          )}
-          {!isDataSourceLoading && results?.hits?.total === 0 ? (
-            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-          ) : null}
-          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-            <EuiPanel
-              paddingSize='s'
-              hasShadow={false}
-              hasBorder={false}
-              color='transparent'
-            >
-              <EuiFlexGroup gutterSize='s' direction='column'>
-                <EuiFlexItem grow={false} className='discoverChartContainer'>
-                  <EuiPanel
-                    hasBorder={false}
-                    hasShadow={false}
-                    color='transparent'
-                    paddingSize='none'
-                  >
-                    <EuiPanel>
-                      <DashboardByRenderer
-                        input={histogramChartInput(
-                          dataSource?.title,
-                          fetchFilters,
-                          query,
-                          dateRangeFrom,
-                          dateRangeTo,
-                        )}
-                      />
-                    </EuiPanel>
+        {isDataSourceLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <WzSearchBar
+            appName='wazuh-discover-search-bar'
+            {...searchBarProps}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
+        )}
+        {!isDataSourceLoading && results?.hits?.total === 0 ? (
+          <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+        ) : null}
+        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+          <EuiPanel
+            paddingSize='s'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
+            <EuiFlexGroup gutterSize='s' direction='column'>
+              <EuiFlexItem grow={false} className='discoverChartContainer'>
+                <EuiPanel
+                  hasBorder={false}
+                  hasShadow={false}
+                  color='transparent'
+                  paddingSize='none'
+                >
+                  <EuiPanel>
+                    <DashboardByRenderer
+                      input={histogramChartInput(
+                        dataSource?.title,
+                        fetchFilters,
+                        query,
+                        dateRangeFrom,
+                        dateRangeTo,
+                      )}
+                    />
                   </EuiPanel>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false} className='discoverDataGrid'>
-                  <EuiDataGrid
-                    {...dataGridProps}
-                    className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                    toolbarVisibility={{
-                      additionalControls: (
-                        <>
-                          <DiscoverDataGridAdditionalControls
-                            totalHits={results.hits.total}
-                            isExporting={isExporting}
-                            onClickExportResults={onClickExportResults}
-                            maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                          />
-                        </>
-                      ),
-                    }}
+                </EuiPanel>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} className='discoverDataGrid'>
+                <EuiDataGrid
+                  {...dataGridProps}
+                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                  toolbarVisibility={{
+                    additionalControls: (
+                      <>
+                        <DiscoverDataGridAdditionalControls
+                          totalHits={results.hits.total}
+                          isExporting={isExporting}
+                          onClickExportResults={onClickExportResults}
+                          maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                        />
+                      </>
+                    ),
+                  }}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPanel>
+        ) : null}
+        {inspectedHit && (
+          <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+            <EuiFlyoutHeader>
+              <EuiTitle>
+                <h2>Document Details</h2>
+              </EuiTitle>
+            </EuiFlyoutHeader>
+            <EuiFlyoutBody>
+              <EuiFlexGroup direction='column'>
+                <EuiFlexItem>
+                  <DocumentViewTableAndJson
+                    document={inspectedHit}
+                    indexPattern={indexPattern}
                   />
                 </EuiFlexItem>
               </EuiFlexGroup>
-            </EuiPanel>
-          ) : null}
-          {inspectedHit && (
-            <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-              <EuiFlyoutHeader>
-                <EuiTitle>
-                  <h2>Document Details</h2>
-                </EuiTitle>
-              </EuiFlyoutHeader>
-              <EuiFlyoutBody>
-                <EuiFlexGroup direction='column'>
-                  <EuiFlexItem>
-                    <DocumentViewTableAndJson
-                      document={inspectedHit}
-                      indexPattern={indexPattern}
-                    />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlyoutBody>
-            </EuiFlyout>
-          )}
-        </>
+            </EuiFlyoutBody>
+          </EuiFlyout>
+        )}
       </EuiPageTemplate>
     </IntlProvider>
   );

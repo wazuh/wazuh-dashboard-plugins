@@ -36,6 +36,7 @@ export const WzSearchBar = ({
       hasShadow={false}
       hasBorder={false}
       color='transparent'
+      grow={false}
     >
       {showQuery ? (
         <EuiFlexGroup
