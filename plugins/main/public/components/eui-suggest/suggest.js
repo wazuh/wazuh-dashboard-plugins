@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiSuggestItem } from './suggest_item';
+import { EuiSuggestItem } from '@elastic/eui';
 import { EuiSuggestInput } from './suggest_input';
 
 export class EuiSuggest extends Component {
   state = {
     value: '',
-    status: 'unsaved'
+    status: 'unsaved',
   };
 
   getValue = val => {
     this.setState({
-      value: val
+      value: val,
     });
   };
 
@@ -76,9 +76,9 @@ EuiSuggest.propTypes = {
   onInputChange: PropTypes.func,
   isOpen: PropTypes.bool,
   onClosePopover: PropTypes.func,
-  onPopoverFocus: PropTypes.func
+  onPopoverFocus: PropTypes.func,
 };
 
 EuiSuggestInput.defaultProps = {
-  status: 'unchanged'
+  status: 'unchanged',
 };
