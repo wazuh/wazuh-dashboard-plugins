@@ -38,6 +38,7 @@ import {
 import { Redirect, Route, Switch } from '../router-search';
 import { useHistory } from 'react-router-dom';
 import { useRouterSearch } from '../common/hooks';
+import NavigationService from '../../react-services/navigation-service';
 
 const tabs = [
   {
@@ -68,6 +69,7 @@ export const WzSecurity = compose(
   withGlobalBreadcrumb([{ text: security.breadcrumbLabel }]),
 )(() => {
   const history = useHistory();
+  const navigationService = NavigationService.getInstance();
   const { tab: selectedTabId } = useRouterSearch();
 
   const checkRunAsUser = async () => {
@@ -111,7 +113,7 @@ export const WzSecurity = compose(
     return tabs.map((tab, index) => (
       <EuiTab
         {...(tab.href && { href: tab.href, target: '_blank' })}
-        onClick={() => history.push(`/security?tab=${tab.id}`)}
+        onClick={() => navigationService.navigate(`/security?tab=${tab.id}`)}
         isSelected={tab.id === selectedTabId}
         disabled={tab.disabled}
         key={index}
