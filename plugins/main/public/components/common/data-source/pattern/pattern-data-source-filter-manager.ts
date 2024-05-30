@@ -441,7 +441,6 @@ export class PatternDataSourceFilterManager
           true,
         );
       case 'exists':
-        // '{"meta":{"index":"wazuh-alerts-*","alias":null,"negate":false,"disabled":false,"type":"exists","key":"agent.id","value":"exists"},"exists":{"field":"agent.id"},"$state":{"store":"appState"}}'
         return {
           meta: {
             alias: null,
