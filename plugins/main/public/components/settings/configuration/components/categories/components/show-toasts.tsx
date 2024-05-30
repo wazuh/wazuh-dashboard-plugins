@@ -11,7 +11,10 @@ export const toastRequiresReloadingBrowserTab = () => {
     text: (
       <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
         <EuiFlexItem grow={false}>
-          <EuiButton onClick={() => window.location.reload()} size='s'>
+          <EuiButton
+            onClick={() => NavigationService.getInstance().reload()}
+            size='s'
+          >
             Reload page
           </EuiButton>
         </EuiFlexItem>

@@ -164,7 +164,7 @@ export class WazuhPlugin
             setHttp(core.http);
             setCookies(new Cookies());
             if (!AppState.checkCookies()) {
-              window.location.reload();
+              NavigationService.getInstance().reload();
             }
             params.element.classList.add('dscAppWrapper', 'wz-app');
             const unmount = await renderApp(params);
