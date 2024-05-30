@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Filter,
   IndexPattern,
@@ -14,8 +14,8 @@ import { tFilter } from '../data-source';
 import { MultiSelect } from './components';
 import { getCustomValueSuggestion } from '../../../components/overview/office/panel/config/helpers/helper-value-suggestion';
 import { I18nProvider } from '@osd/i18n/react';
-import { getPlugins } from '../../../kibana-services';
 import { tUseSearchBarProps } from '../search-bar/use-search-bar';
+import { WzSearchBar } from '../search-bar/search-bar';
 
 type CustomSearchBarProps = {
   filterInputs: {
@@ -29,16 +29,15 @@ type CustomSearchBarProps = {
   setFilters: (filters: tFilter[]) => void;
 };
 
-const SearchBar = getPlugins().data.ui.SearchBar;
-
 export const CustomSearchBar = ({
   filterInputs,
   filterDrillDownValue = { field: '', value: '' },
   searchBarProps,
   indexPattern,
-  setFilters
+  setFilters,
 }: CustomSearchBarProps) => {
-  const { filters } = searchBarProps;
+  const { filters, fixedFilters } = searchBarProps;
+
   const defaultSelectedOptions = () => {
     const array = [];
     filterInputs.forEach(item => {
@@ -60,7 +59,7 @@ export const CustomSearchBar = ({
   }, [values]);
 
   useEffect(() => {
-    onFiltersUpdated();
+    refreshCustomSelectedFilter();
   }, [filters]);
 
   const checkSelectDrillDownValue = key => {
@@ -69,8 +68,9 @@ export const CustomSearchBar = ({
       ? true
       : false;
   };
-  const onFiltersUpdated = () => {
-    refreshCustomSelectedFilter();
+
+  const onFiltersUpdated = (filters?: Filter[]) => {
+    setFilters([...fixedFilters, filters]);
   };
 
   const changeSwitch = () => {
@@ -138,7 +138,16 @@ export const CustomSearchBar = ({
 
     const getFilterCustom = item => {
       // ToDo: Make this generic, without office 365 hardcode
-      return item.params.map((element) => ({ checked: 'on', label: item.key === 'data.office365.UserType' ? getLabelUserType(element) : element, value: item.key, key: element, filterByKey: item.key === 'data.office365.UserType' ? true : false }));
+      return item.params.map(element => ({
+        checked: 'on',
+        label:
+          item.key === 'data.office365.UserType'
+            ? getLabelUserType(element)
+            : element,
+        value: item.key,
+        key: element,
+        filterByKey: item.key === 'data.office365.UserType' ? true : false,
+      }));
     };
     const getLabelUserType = element => {
       const userTypeOptions = getCustomValueSuggestion(
@@ -148,7 +157,8 @@ export const CustomSearchBar = ({
         (item, index) => index.toString() === element,
       );
     };
-    const filterCustom = currentFilters.map(item => getFilterCustom(item)) || [];
+    const filterCustom =
+      currentFilters.map(item => getFilterCustom(item)) || [];
     if (filterCustom.length != 0) {
       filterCustom.forEach(item => {
         item.forEach(element => {
@@ -191,46 +201,33 @@ export const CustomSearchBar = ({
 
   return (
     <I18nProvider>
-      <EuiFlexGroup
-        className='custom-kbn-search-bar'
-        alignItems='center'
-        style={{ margin: '0 8px' }}
-      >
-        {!avancedFiltersState
-          ? filterInputs.map((item, key) => (
-            <EuiFlexItem key={key}>{getComponent(item)}</EuiFlexItem>
-          ))
-          : ''}
-        <EuiFlexItem>
-          <div className='wz-search-bar hide-filter-control'>
-            <SearchBar
-              {...searchBarProps}
-              showFilterBar={false}
-              showQueryInput={avancedFiltersState}
-              onFiltersUpdated={onFiltersUpdated}
+      <div style={{ margin: '20px 20px 0px 20px' }}>
+        <WzSearchBar
+          {...searchBarProps}
+          showQueryInput={avancedFiltersState}
+          onFiltersUpdated={onFiltersUpdated}
+          preQueryBar={
+            !avancedFiltersState ? (
+              <EuiFlexGroup
+                className='custom-kbn-search-bar'
+                alignItems='center'
+                gutterSize='s'
+              >
+                {filterInputs.map((item, key) => (
+                  <EuiFlexItem key={key}>{getComponent(item)}</EuiFlexItem>
+                ))}
+              </EuiFlexGroup>
+            ) : null
+          }
+          postFilters={
+            <EuiSwitch
+              label='Advanced filters'
+              checked={avancedFiltersState}
+              onChange={() => changeSwitch()}
             />
-          </div>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiFlexGroup justifyContent='flexEnd' style={{ margin: '0 20px' }}>
-        <EuiFlexItem className={'filters-search-bar'} style={{ margin: '0px' }}>
-          <div className='wz-search-bar hide-filter-control'>
-            <SearchBar
-              {...searchBarProps}
-              showDatePicker={false}
-              showQueryInput={false}
-              onFiltersUpdated={onFiltersUpdated}
-            />
-          </div>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiSwitch
-            label='Advanced filters'
-            checked={avancedFiltersState}
-            onChange={() => changeSwitch()}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+          }
+        />
+      </div>
     </I18nProvider>
   );
 };

@@ -17,7 +17,7 @@ import {
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
 import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
-import { getPlugins, getWazuhCorePlugin } from '../../../../../kibana-services';
+import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import {
   ErrorHandler,
   ErrorFactory,
@@ -47,6 +47,7 @@ import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { DocumentViewTableAndJson } from '../../common/components/document-view-table-and-json';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
+import { WzSearchBar } from '../../../../common/search-bar';
 
 const InventoryVulsComponent = () => {
   const {
@@ -67,13 +68,11 @@ const InventoryVulsComponent = () => {
   });
   const { query } = searchBarProps;
 
-  const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
   );
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
 
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
@@ -182,16 +181,14 @@ const InventoryVulsComponent = () => {
             {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
-              <div className='wz-search-bar hide-filter-control'>
-                <SearchBar
-                  appName='inventory-vuls'
-                  {...searchBarProps}
-                  showDatePicker={false}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                  showSaveQuery={true}
-                />
-              </div>
+              <WzSearchBar
+                appName='inventory-vuls'
+                {...searchBarProps}
+                showDatePicker={false}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
             )}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />

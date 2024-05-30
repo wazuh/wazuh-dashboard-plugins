@@ -282,11 +282,12 @@ jest.mock('../../../kibana-services', () => ({
       getUrlForApp: () => 'http://url',
     },
   }),
+  getAngularModule: () => { }
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => {},
+    handleError: options => { },
   }),
 }));
 
