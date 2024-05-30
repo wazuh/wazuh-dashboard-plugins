@@ -25,7 +25,7 @@ export function parseCron(interval: string) {
       // 60 seconds / 1 minute
       throw new Error('Interval too low');
     }
-    if (intervalToNumber >= 84600) {
+    if (intervalToNumber >= 86400) {
       throw new Error('Interval too high');
     }
 
