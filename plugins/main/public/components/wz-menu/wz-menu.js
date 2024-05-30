@@ -379,7 +379,7 @@ export const WzMenu = withWindowSize(
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
-                  onClick={() => location.reload()}
+                  onClick={() => NavigationService.getInstance().reload()}
                   className='WzNotReadyButton'
                 >
                   <span> Reload </span>
