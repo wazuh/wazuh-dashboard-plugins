@@ -41,6 +41,7 @@ import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboar
 import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
 import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
+import NavigationService from '../../react-services/navigation-service';
 
 const sections = {
   overview: 'overview',
@@ -329,7 +330,13 @@ export const WzMenu = withWindowSize(
           this.pinnedAgentManager.unPinAgent();
         }
         if (this.state.currentMenuTab !== 'wazuh-dev') {
-          // TODO: port to ReactJS this.router.reload();
+          /* TODO: this reloads the page to force the components are remounted with the new
+          selection of. To avoid this refresh, we would have to do the components are able to react
+          to this changes redoing the requests, etc... This will need a considerable time to
+          apply the changes. The reload of the pages is the same behavior used for the routing based
+          on AngularJS.
+          */
+          NavigationService.getInstance().reload();
         }
       } catch (error) {
         const options = {
@@ -418,7 +425,13 @@ export const WzMenu = withWindowSize(
       try {
         this.setState({ currentSelectedPattern: pattern.id });
         if (this.state.currentMenuTab !== 'wazuh-dev') {
-          // TODO: port to ReactJS this.router.reload();
+          /* TODO: this reloads the page to force the components are remounted with the new
+          selection of. To avoid this refresh, we would have to do the components are able to react
+          to this changes redoing the requests, etc... This will need a considerable time to
+          apply the changes. The reload of the pages is the same behavior used for the routing based
+          on AngularJS.
+          */
+          NavigationService.getInstance().reload();
         }
         await this.updatePatternAndApi();
       } catch (error) {
