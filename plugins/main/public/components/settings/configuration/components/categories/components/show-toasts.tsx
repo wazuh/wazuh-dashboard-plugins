@@ -2,6 +2,7 @@ import React from 'react';
 import { EuiButton, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { PLUGIN_PLATFORM_NAME } from '../../../../../../../common/constants';
 import { getToasts } from '../../../../../../kibana-services';
+import NavigationService from '../../../../../../react-services/navigation-service';
 
 export const toastRequiresReloadingBrowserTab = () => {
   getToasts().add({
@@ -19,7 +20,9 @@ export const toastRequiresReloadingBrowserTab = () => {
   });
 };
 
-export const toastRequiresRunningHealthcheck = ({ history, location }) => {
+export const toastRequiresRunningHealthcheck = () => {
+  const navigationService = NavigationService.getInstance();
+  const location = navigationService.getLocation();
   const toast = getToasts().add({
     color: 'warning',
     title: 'Run a health check to apply the changes.',
@@ -30,7 +33,7 @@ export const toastRequiresRunningHealthcheck = ({ history, location }) => {
           <EuiButton
             onClick={() => {
               getToasts().remove(toast);
-              history.push({
+              navigationService.navigate({
                 pathname: '/health-check',
                 state: { prevLocation: location },
               });

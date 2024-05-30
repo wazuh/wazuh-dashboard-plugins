@@ -1,10 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  HashRouter as Router,
-  Route,
-  Switch,
-  Redirect,
-} from 'react-router-dom';
+import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
 import { getWazuhCorePlugin, getWzMainParams } from './kibana-services';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
@@ -29,6 +24,8 @@ import NavigationService from './react-services/navigation-service';
 
 export function Application(props) {
   const dispatch = useDispatch();
+  const navigationService = NavigationService.getInstance();
+  const history = navigationService.getHistory();
 
   useEffect(() => {
     // Get the dashboard security
@@ -47,6 +44,7 @@ export function Application(props) {
     // Load the app state
     loadAppConfig();
 
+    // TODO: Replace this with document insteat
     // Bind deleteExistentToken on Log out component.
     $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
       'mouseleave',
@@ -60,24 +58,13 @@ export function Application(props) {
   }, []);
 
   return (
-    <>
-      <div className='wazuhNotReadyYet'></div>{' '}
+    <Router history={history}>
+      <div className='wazuhNotReadyYet'></div>
       {/* TODO: The plugins/main/public/components/wz-menu/wz-menu.js defines a portal to mount here. We could avoid the usage of the React portal and render the component instead*/}
       <WzMenuWrapper />
       <ToastNotificationsModal /> {/* TODO: check if this is being used */}
       <WzAgentSelectorWrapper />
       <WzUpdatesNotification />
-      <AppRouter {...props} />
-    </>
-  );
-}
-
-export function AppRouter(props) {
-  const navigationService = NavigationService.getInstance();
-  const history = navigationService.getHistory();
-
-  return (
-    <Router history={history}>
       <Switch>
         <Route path={'/health-check'} exact render={HealthCheck}></Route>
         <Route

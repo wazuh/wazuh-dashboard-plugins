@@ -51,7 +51,6 @@ import {
   toastSuccessUpdateConfiguration,
 } from './components/categories/components/show-toasts';
 import { getWazuhCorePlugin } from '../../../kibana-services';
-import { useHistory, useLocation } from 'react-router-dom';
 
 export type ISetting = {
   key: string;
@@ -151,8 +150,6 @@ const WzConfigurationSettingsProvider = props => {
   const [loading, setLoading] = useKbnLoadingIndicator();
   const [query, setQuery] = useState('');
   const currentConfiguration = useSelector(state => state.appConfig.data);
-  const history = useHistory();
-  const location = useLocation();
 
   const {
     fields,
@@ -282,7 +279,7 @@ const WzConfigurationSettingsProvider = props => {
             data: { requiresRunningHealthCheck },
           },
         }) => requiresRunningHealthCheck,
-      ) && toastRequiresRunningHealthcheck({ history, location });
+      ) && toastRequiresRunningHealthcheck();
       responses.some(
         ({
           data: {

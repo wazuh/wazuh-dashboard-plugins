@@ -5,13 +5,11 @@ import { AppState, WzRequest } from '../../react-services';
 import { OverviewWelcome } from '../common/welcome/overview-welcome';
 import { MainModule } from '../common/modules/main';
 import { WzCurrentOverviewSectionWrapper } from '../common/modules/overview-current-section-wrapper';
-import { createHashHistory } from 'history';
 import {
   connectToQueryState,
   opensearchFilters,
   syncQueryStateWithUrl,
 } from '../../../../../src/plugins/data/public';
-import { once } from 'lodash';
 import {
   createOsdUrlStateStorage,
   createStateContainer,
@@ -26,7 +24,7 @@ import {
   savedSearch,
 } from '../../services/resolves';
 import { useRouterSearch } from '../common/hooks';
-import { useHistory } from 'react-router-dom';
+import NavigationService from '../../react-services/navigation-service';
 
 export const Overview: React.FC = withRouteResolvers({
   enableMenu,
@@ -36,7 +34,7 @@ export const Overview: React.FC = withRouteResolvers({
 })(({ location }) => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
   const { tab = 'welcome', tabView = 'dashboard' } = useRouterSearch();
-  const history = useHistory();
+  const navigationService = NavigationService.getInstance();
   const pinnedAgentManager = new PinnedAgentManager();
 
   useEffect(() => {
@@ -45,13 +43,14 @@ export const Overview: React.FC = withRouteResolvers({
       getSummary();
     }
 
+    // TODO: Analyze if this behavior should be added to Navigationsservice
     // This is the code to sync the state of the URL with the state of the app
     const data = getDataPlugin();
     const config = getUiSettings();
-    const getHistory = once(() => createHashHistory());
+    const history = navigationService.getHistory();
     const osdUrlStateStorage = createOsdUrlStateStorage({
       useHash: config.get('state:storeInSessionStorage'),
-      history: getHistory(),
+      history: history,
     });
 
     const appStateFromUrl = osdUrlStateStorage.get('_a') as AppState;
@@ -122,13 +121,17 @@ export const Overview: React.FC = withRouteResolvers({
   function switchTab(newTab: any, force: any) {
     const urlSearchParams = new URLSearchParams(location.search);
     urlSearchParams.set('tab', newTab);
-    history.push(`${location.pathname}?${urlSearchParams.toString()}`);
+    navigationService.navigate(
+      `${location.pathname}?${urlSearchParams.toString()}`,
+    );
   }
 
   const switchSubTab = (subTab: string) => {
     const urlSearchParams = new URLSearchParams(location.search);
     urlSearchParams.set('tabView', subTab);
-    history.push(`${location.pathname}?${urlSearchParams.toString()}`);
+    navigationService.navigate(
+      `${location.pathname}?${urlSearchParams.toString()}`,
+    );
   };
 
   return (
