@@ -7,6 +7,8 @@ export interface IInputFormType {
   isInvalid?: boolean;
   options: any;
   setInputRef: (reference: any) => void;
+  placeholder: string;
+  dataTestSubj: string;
 }
 
 export interface IInputForm {
