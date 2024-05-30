@@ -31,7 +31,6 @@ export const ModuleMitreAttackIntelligenceResource = ({
   const [details, setDetails] = useState(null);
   const navigationService = NavigationService.getInstance();
 
-  // TODO: fix this behavior so that details are not lost when removing the query params and adding the path to the history
   useEffect(() => {
     const urlParams = navigationService.getParams();
     const hasRedirectTabParam = urlParams.has('tabRedirect');
@@ -43,14 +42,9 @@ export const ModuleMitreAttackIntelligenceResource = ({
       getMitreItemToRedirect(endpoint);
       urlParams.delete('tabRedirect');
       urlParams.delete('idToRedirect');
-      /* const newQueryParams = urlParams.toString();
       navigationService.replace(
-        {
-          pathname: '#/overview',
-          search: `tab=mitre${newQueryParams ? `&${newQueryParams}` : ''}`,
-        },
-        {},
-      ); */
+        `${navigationService.getPathname()}?${urlParams.toString()}`,
+      );
     }
   }, []);
 
