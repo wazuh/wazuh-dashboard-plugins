@@ -7,9 +7,6 @@ export const InputFormSelect = ({
   value,
   onChange,
   placeholder,
-  selectedOptions,
-  isDisabled,
-  isClearable,
   dataTestSubj,
 }: IInputFormType) => {
   return (
@@ -18,9 +15,6 @@ export const InputFormSelect = ({
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      selectedOptions={selectedOptions}
-      isDisabled={isDisabled}
-      isClearable={isClearable}
       data-test-subj={dataTestSubj}
     />
   );
