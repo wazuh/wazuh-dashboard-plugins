@@ -19,7 +19,6 @@ import { gdprRequirementsFile } from '../../../../common/compliance-requirements
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
-import { getPlugins } from '../../../kibana-services';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   UI_LOGGER_LEVELS,
@@ -39,8 +38,7 @@ import useSearchBar from '../../common/search-bar/use-search-bar';
 import { LoadingSpinner } from '../../common/loading-spinner/loading-spinner';
 import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
-
-const SearchBar = getPlugins().data.ui.SearchBar;
+import { WzSearchBar } from '../../common/search-bar';
 
 function buildComplianceObject({ section }) {
   try {
@@ -277,16 +275,14 @@ export const ComplianceTable = withAgentSupportModule(props => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='compliance-controls'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            </div>
+            <WzSearchBar
+              appName='compliance-controls'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
           )}
         </EuiPanel>
         <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">

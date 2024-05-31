@@ -12,12 +12,12 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiButtonEmpty,
-  EuiPanel
+  EuiPanel,
 } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
 import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
-import { getPlugins, getWazuhCorePlugin } from '../../../../../kibana-services';
+import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import {
   ErrorHandler,
   ErrorFactory,
@@ -47,6 +47,7 @@ import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { DocumentViewTableAndJson } from '../../common/components/document-view-table-and-json';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
+import { WzSearchBar } from '../../../../common/search-bar';
 
 const InventoryVulsComponent = () => {
   const {
@@ -67,13 +68,11 @@ const InventoryVulsComponent = () => {
   });
   const { query } = searchBarProps;
 
-  const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
   );
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
 
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
@@ -89,7 +88,7 @@ const InventoryVulsComponent = () => {
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect document details';
+    const inspectHintMsg = 'Inspect vulnerability details';
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -182,22 +181,25 @@ const InventoryVulsComponent = () => {
             {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
-              <div className='wz-search-bar hide-filter-control'>
-                <SearchBar
-                  appName='inventory-vuls'
-                  {...searchBarProps}
-                  showDatePicker={false}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                  showSaveQuery={true}
-                />
-              </div>
+              <WzSearchBar
+                appName='inventory-vuls'
+                {...searchBarProps}
+                showDatePicker={false}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
             )}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
             ) : null}
             {!isDataSourceLoading && results?.hits?.total > 0 ? (
-              <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+              <EuiPanel
+                paddingSize='s'
+                hasShadow={false}
+                hasBorder={false}
+                color='transparent'
+              >
                 <div className='vulsInventoryDataGrid'>
                   <EuiDataGrid
                     {...dataGridProps}
@@ -210,15 +212,15 @@ const InventoryVulsComponent = () => {
                             showResetButton={false}
                             tooltip={
                               results?.hits?.total &&
-                                results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
-                                  ariaLabel: 'Warning',
-                                  content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                    MAX_ENTRIES_PER_QUERY,
-                                  )} hits.`,
-                                  iconType: 'alert',
-                                  position: 'top',
-                                }
+                                    ariaLabel: 'Warning',
+                                    content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                      MAX_ENTRIES_PER_QUERY,
+                                    )} hits.`,
+                                    iconType: 'alert',
+                                    position: 'top',
+                                  }
                                 : undefined
                             }
                           />
@@ -247,7 +249,7 @@ const InventoryVulsComponent = () => {
               <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
                 <EuiFlyoutHeader>
                   <EuiTitle>
-                    <h2>Document details</h2>
+                    <h2>Vulnerability details</h2>
                   </EuiTitle>
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>

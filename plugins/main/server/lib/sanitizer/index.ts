@@ -1,0 +1,1 @@
+export { sanitizeSVG } from './sanitizer';

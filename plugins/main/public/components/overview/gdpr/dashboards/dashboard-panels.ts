@@ -145,7 +145,7 @@ const getVisStateRequirements = (indexPatternId: string) => {
       },
       radiusRatio: 50,
     },
-    uiState: { vis: { legendOpen: false } },
+    uiState: { vis: { legendOpen: true } },
     data: {
       searchSource: {
         query: {

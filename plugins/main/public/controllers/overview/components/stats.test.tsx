@@ -46,6 +46,7 @@ jest.mock('../../../kibana-services', () => ({
       get: () => true
     }
   }),
+  getAngularModule: () => { }
 }));
 
 jest.mock('../../../react-services/common-services', () => ({

@@ -60,15 +60,14 @@ export const GitHubPanel = withErrorBoundary(() => {
     if (!selectedFilter) {
       return;
     }
-
-    if (selectedFilter?.value) {
-      const filter = filterManager.createFilter(selectedFilter.field, selectedFilter.value);
+    const { field, value } = selectedFilter;
+    const controlledByFilter = 'github-panel-row-filter';
+    if (value) {
+      const filter = filterManager?.createFilter('is one of', field, [value], controlledByFilter);
       // this hide the remove filter button in the filter bar
-      filter.meta.controlledBy = 'github-panel-row-filter';
       setFilters([...filters, filter]);
     } else {
-      // the previous filter is stored in currentSelectedFilter
-      filterManager.removeFilter(currentSelectedFilter.field, currentSelectedFilter.value);
+      filterManager?.removeFilterByControlledBy(controlledByFilter);
     }
     setCurrentSelectedFilter(selectedFilter);
   }

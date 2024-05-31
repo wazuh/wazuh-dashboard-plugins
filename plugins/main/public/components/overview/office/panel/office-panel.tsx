@@ -61,14 +61,14 @@ export const OfficePanel = withErrorBoundary(() => {
       return;
     }
 
-    if (selectedFilter?.value) {
-      const filter = filterManager.createFilter(selectedFilter.field, selectedFilter.value);
-      // this hide the remove filter button in the filter bar
-      filter.meta.controlledBy = 'office-panel-row-filter';
+    const { field, value } = selectedFilter;
+    const controlledByFilter = 'office-panel-row-filter';
+    if (value) {
+      const filter = filterManager?.createFilter('is one of', field, [value], controlledByFilter);
       setFilters([...filters, filter]);
     } else {
       // the previous filter is stored in currentSelectedFilter
-      filterManager.removeFilter(currentSelectedFilter.field, currentSelectedFilter.value);
+      filterManager?.removeFilterByControlledBy(controlledByFilter);
     }
     setCurrentSelectedFilter(selectedFilter);
   }
@@ -78,29 +78,29 @@ export const OfficePanel = withErrorBoundary(() => {
       {isDataSourceLoading ? (
         <LoadingSpinner />
       ) : (
-          <>
-            <CustomSearchBar
-              filterInputs={filtersValues}
-              filterDrillDownValue={drillDownValue}
-              searchBarProps={searchBarProps}
-              setFilters={setFilters}
-              indexPattern={dataSource.indexPattern}
-            />
-            <MainPanel
-              moduleConfig={ModuleConfig}
-              filterDrillDownValue={filterDrillDownValue}
-              sidePanelChildren={<ModuleConfiguration />}
-              onChangeView={handleChangeView}
-              dataSourceProps={{
-                fetchData,
-                fetchFilters,
-                searchBarProps,
-                indexPattern: dataSource?.indexPattern,
-              }}
-              isLoading={isDataSourceLoading}
-            />
-          </>
-        )}
+        <>
+          <CustomSearchBar
+            filterInputs={filtersValues}
+            filterDrillDownValue={drillDownValue}
+            searchBarProps={searchBarProps}
+            setFilters={setFilters}
+            indexPattern={dataSource.indexPattern}
+          />
+          <MainPanel
+            moduleConfig={ModuleConfig}
+            filterDrillDownValue={filterDrillDownValue}
+            sidePanelChildren={<ModuleConfiguration />}
+            onChangeView={handleChangeView}
+            dataSourceProps={{
+              fetchData,
+              fetchFilters,
+              searchBarProps,
+              indexPattern: dataSource?.indexPattern,
+            }}
+            isLoading={isDataSourceLoading}
+          />
+        </>
+      )}
     </>
   );
 });

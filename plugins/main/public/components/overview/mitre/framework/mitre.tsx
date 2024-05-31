@@ -18,7 +18,6 @@ import {
   Query,
   IndexPattern,
 } from '../../../../../../../src/plugins/data/common';
-import { getPlugins } from '../../../../kibana-services';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
@@ -34,12 +33,11 @@ import {
   PatternDataSource,
   tFilter,
 } from '../../../common/data-source';
+import { WzSearchBar } from '../../../common/search-bar';
 
 export interface ITactic {
   [key: string]: string[];
 }
-
-const SearchBar = getPlugins().data.ui.SearchBar;
 
 export type tFilterParams = {
   filters: tFilter[];
@@ -158,15 +156,13 @@ const MitreComponent = props => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-mitre-framework wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='mitre-attack-searchbar'
-                {...searchBarProps}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            </div>
+            <WzSearchBar
+              appName='mitre-attack-searchbar'
+              {...searchBarProps}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
           )}
         </EuiPanel>
         <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">

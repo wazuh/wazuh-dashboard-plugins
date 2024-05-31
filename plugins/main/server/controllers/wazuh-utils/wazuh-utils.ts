@@ -27,6 +27,7 @@ import {
   routeDecoratorConfigurationAPIEditable,
   routeDecoratorProtectedAdministrator,
 } from '../decorators';
+import { sanitizeSVG } from '../../lib/sanitizer';
 
 // TODO: these controllers have no logs. We should include them.
 export class WazuhUtilsCtrl {
@@ -126,7 +127,7 @@ export class WazuhUtilsCtrl {
       response: KibanaResponseFactory,
     ) => {
       const { key } = request.params;
-      const { file: bufferFile } = request.body;
+      let { file: bufferFile } = request.body;
 
       const pluginSetting = context.wazuh_core.configuration._settings.get(key);
 
@@ -142,6 +143,13 @@ export class WazuhUtilsCtrl {
             ', ',
           )}`,
         });
+      }
+
+      // Sanitize SVG content to prevent prevents XSS attacks
+      if (fileExtension === 'svg') {
+        const svgString = bufferFile.toString();
+        const cleanSVG = sanitizeSVG(svgString);
+        bufferFile = Buffer.from(cleanSVG);
       }
 
       const fileNamePath = `${key}.${fileExtension}`;
