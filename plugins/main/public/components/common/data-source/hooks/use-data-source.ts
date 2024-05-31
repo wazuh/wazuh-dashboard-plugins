@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   IDataSourceFactoryConstructor,
   tDataSourceRepository,
@@ -11,6 +11,7 @@ import {
   PatternDataSourceFilterManager,
   tFilterManager,
 } from '../index';
+import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   DataSource: IDataSourceFactoryConstructor<K>;
@@ -26,7 +27,6 @@ type tUseDataSourceLoadedReturns<K> = {
   dataSource: K;
   filters: tFilter[];
   fetchFilters: tFilter[];
-  fixedFilters: tFilter[];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: PatternDataSourceFilterManager;
@@ -37,14 +37,16 @@ type tUseDataSourceNotLoadedReturns = {
   dataSource: undefined;
   filters: [];
   fetchFilters: [];
-  fixedFilters: [];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: null;
 };
 
-export function useDataSource<T extends tParsedIndexPattern, K extends PatternDataSource>(
-  props: tUseDataSourceProps<T, K>
+export function useDataSource<
+  T extends tParsedIndexPattern,
+  K extends PatternDataSource,
+>(
+  props: tUseDataSourceProps<T, K>,
 ): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
   const {
     filters: initialFilters = [],
@@ -65,6 +67,8 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
+  const pinnedAgentManager = new PinnedAgentManager();
+  const pinnedAgent = pinnedAgentManager.getPinnedAgent();
 
   const setFilters = (filters: tFilter[]) => {
     if (!dataSourceFilterManager) {
@@ -83,41 +87,69 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
   };
 
   useEffect(() => {
-
     let subscription;
     (async () => {
-    setIsLoading(true);
-    const factory = injectedFactory || new PatternDataSourceFactory();
-    const patternsData = await repository.getAll();
-    const dataSources = await factory.createAll(DataSourceConstructor, patternsData);
-    const selector = new PatternDataSourceSelector(dataSources, repository);
-    const dataSource = await selector.getSelectedDataSource();
-    if (!dataSource) {
-      throw new Error('No valid data source found');
-    }
-    setDataSource(dataSource);
-    const dataSourceFilterManager = new PatternDataSourceFilterManager(
-      dataSource,
-      initialFilters,
-      injectedFilterManager,
-      initialFetchFilters
-    );
-    // what the filters update
-    subscription = dataSourceFilterManager.getUpdates$().subscribe({
-      next: () => {
-        // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-        dataSourceFilterManager.setFilters(dataSourceFilterManager.getFilters());
-        setAllFilters(dataSourceFilterManager.getFilters());
-        setFetchFilters(dataSourceFilterManager.getFetchFilters());
-      },
-    });
-    setAllFilters(dataSourceFilterManager.getFilters());
-    setFetchFilters(dataSourceFilterManager.getFetchFilters());
-    setDataSourceFilterManager(dataSourceFilterManager);
-    setIsLoading(false);
-  })();
-    return () => subscription.unsubscribe();
+      setIsLoading(true);
+      const factory = injectedFactory || new PatternDataSourceFactory();
+      const patternsData = await repository.getAll();
+      const dataSources = await factory.createAll(
+        DataSourceConstructor,
+        patternsData,
+      );
+      const selector = new PatternDataSourceSelector(dataSources, repository);
+      const dataSource = await selector.getSelectedDataSource();
+      if (!dataSource) {
+        throw new Error('No valid data source found');
+      }
+      setDataSource(dataSource);
+      const dataSourceFilterManager = new PatternDataSourceFilterManager(
+        dataSource,
+        initialFilters,
+        injectedFilterManager,
+        initialFetchFilters,
+      );
+      // what the filters update
+      subscription = dataSourceFilterManager.getUpdates$().subscribe({
+        next: () => {
+          // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
+          dataSourceFilterManager.setFilters(
+            dataSourceFilterManager.getFilters(),
+          );
+          setAllFilters(dataSourceFilterManager.getFilters());
+          setFetchFilters(dataSourceFilterManager.getFetchFilters());
+        },
+      });
+      setAllFilters(dataSourceFilterManager.getFilters());
+      setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      setDataSourceFilterManager(dataSourceFilterManager);
+      setIsLoading(false);
+    })();
+
+    return () => subscription && subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (dataSourceFilterManager && dataSource) {
+      const pinnedAgentFilter = dataSourceFilterManager
+        .getFilters()
+        .filter(
+          (filter: tFilter) =>
+            filter.meta.controlledBy ===
+            PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
+        );
+
+      if (pinnedAgentFilter.length) {
+        dataSourceFilterManager.removeFilter(pinnedAgentFilter[0]);
+      }
+      if (pinnedAgentManager.isPinnedAgent()) {
+        const pinnedAgent = PatternDataSourceFilterManager.getPinnedAgentFilter(
+          dataSource.id,
+        );
+
+        dataSourceFilterManager.addFilters([...pinnedAgent]);
+      }
+    }
+  }, [JSON.stringify(pinnedAgent)]);
 
   if (isLoading) {
     return {
@@ -125,7 +157,6 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
       dataSource: undefined,
       filters: [],
       fetchFilters: [],
-      fixedFilters: [],
       fetchData,
       setFilters,
       filterManager: null,
@@ -136,7 +167,6 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
       dataSource: dataSource as K,
       filters: allFilters,
       fetchFilters,
-      fixedFilters: dataSourceFilterManager?.getFixedFilters() || [],
       fetchData,
       setFilters,
       filterManager: dataSourceFilterManager as PatternDataSourceFilterManager,

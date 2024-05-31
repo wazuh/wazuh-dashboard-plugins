@@ -6,7 +6,6 @@ import { loggingSystemMock } from '../../../../../src/core/server/logging/loggin
 import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
 import { WazuhUtilsRoutes } from './wazuh-utils';
-import { WazuhUtilsCtrl } from '../../controllers/wazuh-utils/wazuh-utils';
 import fs from 'fs';
 import path from 'path';
 import glob from 'glob';
@@ -34,19 +33,21 @@ const context = {
       get: jest.fn(),
       set: jest.fn(),
     },
+    dashboardSecurity: {
+      isAdministratorUser: jest.fn(),
+    },
   },
 };
+
+// Register settings
+context.wazuh_core.configuration._settings.set('pattern', {
+  validate: () => undefined,
+  isConfigurableFromSettings: true,
+});
 
 const enhanceWithContext = (fn: (...args: any[]) => any) =>
   fn.bind(null, context);
 let server, innerServer;
-
-jest.mock('../../controllers/decorators', () => ({
-  routeDecoratorProtectedAdministrator:
-    handler =>
-    async (...args) =>
-      handler(...args),
-}));
 
 beforeAll(async () => {
   // Create server
@@ -87,6 +88,48 @@ afterAll(async () => {
 
   // Clear all mocks
   jest.clearAllMocks();
+});
+
+describe('[endpoint] PUT /utils/configuration - protected route', () => {
+  it.each`
+    title     | isConfigurationAPIEditable | isAdmin  | responseStatusCode | responseBodyMessage
+    ${'test'} | ${true}                    | ${false} | ${403}             | ${'403 - Mock: User has no permissions'}
+    ${'test'} | ${false}                   | ${true}  | ${403}             | ${'The ability to edit the configuration from API is disabled. This can be enabled using configuration.ui_api_editable setting from the configuration file. Contact with an administrator.'}
+  `(
+    '$title',
+    async ({
+      isConfigurationAPIEditable,
+      isAdmin,
+      responseStatusCode,
+      responseBodyMessage,
+    }: {
+      isConfigurationAPIEditable: boolean;
+      isAdmin: boolean;
+      responseStatusCode: number;
+      responseBodyMessage: string | null;
+    }) => {
+      context.wazuh_core.configuration.get.mockReturnValueOnce(
+        isConfigurationAPIEditable,
+      );
+      context.wazuh_core.dashboardSecurity.isAdministratorUser.mockReturnValueOnce(
+        {
+          administrator: isAdmin,
+          administrator_requirements: !isAdmin
+            ? 'Mock: User has no permissions'
+            : null,
+        },
+      );
+      const settings = { pattern: 'test-alerts-groupA-*' };
+      const response = await supertest(innerServer.listener)
+        .put('/utils/configuration')
+        .send(settings)
+        .expect(responseStatusCode);
+
+      if (responseBodyMessage) {
+        expect(response.body.message).toBe(responseBodyMessage);
+      }
+    },
+  );
 });
 
 describe.skip('[endpoint] GET /utils/configuration', () => {
@@ -240,8 +283,6 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
         .send(settings)
         .expect(responseStatusCode);
 
-      console.log(response.body);
-
       responseStatusCode === 200 &&
         expect(response.body.data.updatedConfiguration).toEqual(settings);
       responseStatusCode === 200 &&
@@ -292,6 +333,8 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
     ${'checks.template'}                | ${0}                                                             | ${400}             | ${'[request body.checks.template]: expected value of type [boolean] but got [number]'}
     ${'checks.timeFilter'}              | ${true}                                                          | ${200}             | ${null}
     ${'checks.timeFilter'}              | ${0}                                                             | ${400}             | ${'[request body.checks.timeFilter]: expected value of type [boolean] but got [number]'}
+    ${'configuration.ui_api_editable'}  | ${true}                                                          | ${200}             | ${null}
+    ${'configuration.ui_api_editable'}  | ${true}                                                          | ${400}             | ${'[request body.configuration.ui_api_editable]: expected value of type [boolean] but got [number]'}
     ${'cron.prefix'}                    | ${'test'}                                                        | ${200}             | ${null}
     ${'cron.prefix'}                    | ${'test space'}                                                  | ${400}             | ${'[request body.cron.prefix]: No whitespaces allowed.'}
     ${'cron.prefix'}                    | ${''}                                                            | ${400}             | ${'[request body.cron.prefix]: Value can not be empty.'}

@@ -62,20 +62,10 @@ export function LastAlertsStat({ severity }: { severity: string }) {
         setCountLastAlerts(count);
         const core = getCore();
 
-        // Check if the new discover is enabled to build the URL
-        const v2Enabled = await core.uiSettings.get<boolean>('discover:v2');
-
         let discoverLocation = {
           app: 'data-explorer',
           basePath: 'discover',
         };
-
-        if (!v2Enabled) {
-          discoverLocation = {
-            app: 'discoverLegacy',
-            basePath: '',
-          };
-        }
 
         // TODO: find a better way to get the query discover URL
         const destURL = core.application.getUrlForApp(discoverLocation.app, {

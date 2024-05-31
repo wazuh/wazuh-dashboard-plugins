@@ -10,7 +10,11 @@ import {
   EuiForm,
   EuiFormRow,
   EuiComboBox,
-  EuiBadge,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiDescriptionList,
+  EuiDescriptionListTitle,
+  EuiDescriptionListDescription,
 } from '@elastic/eui';
 import { compose } from 'redux';
 import { withErrorBoundary, withReduxProvider } from '../../../common/hocs';
@@ -125,23 +129,44 @@ export const EditAgentGroupsModal = compose(
 
   const form = (
     <EuiForm component='form'>
-      <EuiFormRow label='Agent'>
-        <EuiBadge color='hollow'>{agent.name}</EuiBadge>
-      </EuiFormRow>
-      <EuiFormRow
-        label='Groups'
-        isInvalid={!selectedGroups?.length}
-        error={['You must add at least one group']}
-      >
-        <EuiComboBox
-          placeholder='Select groups'
-          options={groups?.map(group => ({ label: group })) || []}
-          selectedOptions={selectedGroups}
-          onChange={selectedGroups => setSelectedGroups(selectedGroups)}
-          isLoading={isGroupsLoading}
-          clearOnBlur
-        />
-      </EuiFormRow>
+      <EuiFlexGroup direction='column' gutterSize='m'>
+        <EuiFlexItem>
+          <EuiFlexGroup gutterSize='m'>
+            <EuiFlexItem>
+              <EuiDescriptionList compressed>
+                <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                <EuiDescriptionListDescription>
+                  {agent.id}
+                </EuiDescriptionListDescription>
+              </EuiDescriptionList>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiDescriptionList compressed>
+                <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
+                <EuiDescriptionListDescription>
+                  {agent.name}
+                </EuiDescriptionListDescription>
+              </EuiDescriptionList>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiFormRow
+            label='Groups'
+            isInvalid={!selectedGroups?.length}
+            error={['You must add at least one group']}
+          >
+            <EuiComboBox
+              placeholder='Select groups'
+              options={groups?.map(group => ({ label: group })) || []}
+              selectedOptions={selectedGroups}
+              onChange={selectedGroups => setSelectedGroups(selectedGroups)}
+              isLoading={isGroupsLoading}
+              clearOnBlur
+            />
+          </EuiFormRow>
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </EuiForm>
   );
 

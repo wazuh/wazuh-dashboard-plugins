@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCore, getPlugins } from '../../../../kibana-services';
+import { getCore } from '../../../../kibana-services';
 import { SearchResponse } from '../../../../../../../src/core/server';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import { I18nProvider } from '@osd/i18n/react';
@@ -19,14 +19,13 @@ import { WzRequest } from '../../../../react-services';
 import { ConfigurationCards } from '../components/configuration_cards';
 import { NodeList } from '../node-list';
 import {
-  AlertsDataSource,
+  ClusterDataSource,
   AlertsDataSourceRepository,
   PatternDataSource,
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-
-const SearchBar = getPlugins().data.ui.SearchBar;
+import { WzSearchBar } from '../../../common/search-bar'
 
 interface DashboardCTProps {
   statusRunning: string;
@@ -51,7 +50,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsDataSource,
+    DataSource: ClusterDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
@@ -160,21 +159,19 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : !state.showNodes ? (
-          <div className='wz-search-bar'>
-            <SearchBar
-              appName='ct-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-            />
-          </div>
+          <WzSearchBar
+            appName='ct-searchbar'
+            {...searchBarProps}
+            showDatePicker={true}
+            showQueryInput={true}
+            showQueryBar={true}
+          />
         ) : null}
         <EuiSpacer size='m' />
         {!isDataSourceLoading &&
-        dataSource &&
-        !state.showConfig &&
-        !state.showNodes ? (
+          dataSource &&
+          !state.showConfig &&
+          !state.showNodes ? (
           <OverviewCards
             goNodes={goNodes}
             goAgents={goAgents}

@@ -167,9 +167,7 @@ If this case happens, the implicit filters are regenerated and the function is c
           ? AppState.getClusterInfo().cluster
           : AppState.getClusterInfo().manager,
         isCluster,
-        VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER[
-          AppState.getClusterInfo().status
-        ],
+        VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
       ),
     );
     filters.push(filterHandler.pciQuery());

@@ -101,7 +101,7 @@ export default class SummaryTable {
 
     this._rows = rawResponse[firstKey].buckets.reduce((totalRows, bucket) => {
       const nextKey = firstKey + 1;
-      this._buildRow(bucket, nextKey, totalRows);
+      this._buildRow(bucket, nextKey, totalRows, this._columns.length);
       return totalRows;
     }, []);
 
@@ -122,17 +122,41 @@ export default class SummaryTable {
     bucket: any,
     nextAggKey: number,
     totalRows: any[],
+    totalColumns: number,
     row: any[] = [],
   ): any[] {
     const newRow = [...row, bucket.key];
-    // If there is a next aggregation, repeat the process
-    if (bucket[nextAggKey.toString()]?.buckets?.length) {
-      bucket[nextAggKey.toString()].buckets.forEach(newBucket => {
-        this._buildRow(newBucket, nextAggKey + 1, totalRows, newRow);
-      });
-    }
-    // Add the Count as the last item in the row
-    else if (bucket.doc_count) {
+    const indexColumn = newRow.length - 1;
+
+    if (indexColumn < totalColumns - 1) {
+      // If there is a next aggregation, repeat the process
+      if (bucket[nextAggKey.toString()]?.buckets?.length) {
+        bucket[nextAggKey.toString()].buckets.forEach(newBucket => {
+          this._buildRow(
+            newBucket,
+            nextAggKey + 1,
+            totalRows,
+            totalColumns,
+            newRow,
+          );
+        });
+      } else {
+        // Calculate the cells to fill due to the aggregation buckets are missing
+        // The last column is the Count and this value is coming from the last bucket available
+        // totalColumns starts from 1. totalColumns - 1 gets the index of the last column
+        // indexColumn starts from 0
+        const fillCellsLength = totalColumns - 1 - indexColumn - 1;
+        /* Fill the row with undefined values.
+          Note: The undefined values are mapped to `"-"` on the methods of the reporting.
+        */
+        if (fillCellsLength) {
+          newRow.push(...Array.from({ length: fillCellsLength }));
+        }
+        newRow.push(bucket.doc_count);
+        totalRows.push(newRow);
+      }
+      // Add the Count as the last item in the row
+    } else {
       newRow.push(bucket.doc_count);
       totalRows.push(newRow);
     }
