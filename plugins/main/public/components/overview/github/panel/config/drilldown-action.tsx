@@ -174,17 +174,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                 { id: 'data.github.repo', displayAsText: 'Repository' },
                 { id: 'data.github.actor', displayAsText: 'Actor' },
                 { id: 'rule.level' },
-                {
-                  id: 'rule.id', render: value => (
-                    <RedirectAppLinks application={getCore().application}>
-                      <EuiLink
-                        href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-                      >
-                        {value}
-                      </EuiLink >
-                    </RedirectAppLinks>
-                  ),
-                },
+                { id: 'rule.id' },
               ]
 
               return (

@@ -718,11 +718,11 @@ function init(editorInput, editorOutput) {
   window.onresize = () => {
     $('#wz-dev-left-column').attr(
       'style',
-      'width: calc(30% - 7px); !important',
+      'width: calc(45% - 7px); !important',
     );
     $('#wz-dev-right-column').attr(
       'style',
-      'width: calc(70% - 7px); !important',
+      'width: calc(55% - 7px); !important',
     );
     dynamicHeight();
   };

@@ -17,7 +17,6 @@ import {
 } from '@elastic/eui';
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
-
 import {
   ResourcesHandler,
   ResourcesConstants,
@@ -34,7 +33,7 @@ import { withRouterSearch } from '../../../../../../components/common/hocs';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 
-const WzRuleInfo = compose(
+export default compose(
   withRouter,
   withRouterSearch,
 )(
@@ -781,7 +780,7 @@ const WzRuleInfo = compose(
                   iconType='popout'
                   aria-label='popout'
                   href={getCore().application.getUrlForApp(threatHunting.id, {
-                    path: `#/overview/?tab=general&tabView=dashboard&addRuleFilter=${id}`,
+                    path: `#/overview/?tab=general&tabView=dashboard&_g=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:rule.id,negate:!f,params:(query:'${id}'),type:phrase),query:(match_phrase:(rule.id:'${id}')))),query:(language:kuery,query:''))`,
                   })}
                   target='blank'
                 >
@@ -909,5 +908,3 @@ const WzRuleInfo = compose(
     }
   },
 );
-
-export default WzRuleInfo;

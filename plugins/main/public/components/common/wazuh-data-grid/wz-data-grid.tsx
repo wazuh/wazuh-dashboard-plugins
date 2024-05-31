@@ -29,6 +29,7 @@ import { DiscoverNoResults } from '../no-results/no-results';
 import { DocumentViewTableAndJson } from '../wazuh-discover/components/document-view-table-and-json';
 import DiscoverDataGridAdditionalControls from '../wazuh-discover/components/data-grid-additional-controls';
 import './wazuh-data-grid.scss';
+import { wzDiscoverRenderColumns } from '../wazuh-discover/render-columns';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -93,6 +94,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Actions data grid',
     defaultColumns,
+    renderColumns: wzDiscoverRenderColumns,
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,

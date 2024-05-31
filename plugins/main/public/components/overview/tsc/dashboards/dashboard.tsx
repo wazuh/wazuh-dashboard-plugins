@@ -25,10 +25,9 @@ import {
   useDataSource,
 } from '../../../common/data-source';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
+import { WzSearchBar } from '../../../common/search-bar';
 
 const plugins = getPlugins();
-
-const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
@@ -101,15 +100,13 @@ const DashboardTSCComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='tsc-searchbar'
-                {...searchBarProps}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            </div>
+            <WzSearchBar
+              appName='tsc-searchbar'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+            />
           )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
