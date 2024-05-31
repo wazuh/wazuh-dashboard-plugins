@@ -174,7 +174,7 @@ export default class WzRuleInfo extends Component {
       currentRuleId: this.props.item,
       isLoading: true,
       mitreLoading: true,
-      currentIndexPattern: currentIndexPattern.title,
+      currentIndexPattern: currentIndexPattern.id,
     });
   }
 
