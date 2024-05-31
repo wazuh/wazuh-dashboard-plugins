@@ -11,7 +11,7 @@ const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
 export const ProcessesTable = withSOPlatformGuard(({ agent, soPlatform }) => {
   return (
-    <EuiPanel paddingSize='m' className='wz-agent-inventory-panel'>
+    <EuiPanel paddingSize='m'>
       <TableWzAPI
         title='Processes'
         tableColumns={processColumns[soPlatform]}

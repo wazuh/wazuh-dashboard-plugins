@@ -1,6 +1,6 @@
 {
   "data": {
-    "target": [
+    "socket": [
       {
         "name": "custom_socket",
         "location": "/var/run/custom.sock",

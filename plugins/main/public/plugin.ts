@@ -61,10 +61,6 @@ export class WazuhPlugin
     core: CoreSetup,
     plugins: WazuhSetupPlugins,
   ): Promise<WazuhSetup> {
-    // Hide the discover deprecation notice
-    // After opensearch version 2.11.0 this line may be deleted
-    localStorage.setItem('discover:deprecation-notice:show', 'false');
-
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState = {};
     try {
@@ -149,9 +145,9 @@ export class WazuhPlugin
                   ? undefined
                   : 'Interval is not valid.';
               });
+            setWzCurrentAppID(id);
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
-            setWzCurrentAppID(id);
             initializeInterceptor(core);
             if (!this.initializeInnerAngular) {
               throw Error(

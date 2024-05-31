@@ -341,7 +341,7 @@ const WzConfigurationSettingsProvider = props => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error saving the configuration: ${error.message || error}`,
+          title: 'Error saving the configuration',
         },
       };
 

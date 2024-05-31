@@ -34,7 +34,7 @@ function parseQueryString() {
 /**
  * Get the forceNow query parameter
  */
-function getForceNow() {
+export function getForceNow() {
   const forceNow = parseQueryString().forceNow as string;
   if (!forceNow) {
     return;
@@ -71,7 +71,7 @@ export const search = async (
   const fromField =
     (pagination?.pageIndex || 0) * (pagination?.pageSize || 100);
   const sortOrder: OpenSearchQuerySortValue[] =
-    sorting?.columns.map(column => {
+    sorting?.columns?.map(column => {
       const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
       return { [column?.id || '']: sortDirection } as OpenSearchQuerySortValue;
     }) || [];
@@ -90,7 +90,7 @@ export const search = async (
             gte: dateMath.parse(from).toISOString(),
             /* roundUp: true is used to transform the osd dateform to a generic date format
               For instance: the "This week" date range in the date picker.
-              To: now/w 
+              To: now/w
               From: now/w
               Without the roundUp the to and from date will be the same and the search will return no results or error
 
@@ -132,6 +132,12 @@ export const search = async (
   }
 };
 
+const getValueDisplayedOnFilter = (filter: tFilter) => {
+  return filter.query?.bool?.minimum_should_match === 1
+    ? `is one of ${filter.meta?.value}`
+    : filter.meta?.params?.query || filter.meta?.value;
+};
+
 export const hideCloseButtonOnFixedFilters = (
   filters: tFilter[],
   elements: NodeListOf<Element>,
@@ -146,7 +152,7 @@ export const hideCloseButtonOnFixedFilters = (
           index,
           filter,
           field: filter.meta?.key,
-          value: filter.meta?.params?.query || filter.meta?.value,
+          value: getValueDisplayedOnFilter(filter),
         };
       }
     })
@@ -167,22 +173,24 @@ export const hideCloseButtonOnFixedFilters = (
         filter?.value === filterValue &&
         filter?.index === index,
     );
+    const removeButton = element.querySelector('.euiBadge__iconButton');
+    const badgeButton = element.querySelector(
+      '.euiBadge__content .euiBadge__childButton',
+    ) as HTMLElement;
     if (filter) {
-      // hide the remove button
-      const iconButton = element.querySelector(
-        '.euiBadge__iconButton',
-      ) as HTMLElement;
-      iconButton?.style?.setProperty('display', 'none');
-      // change the cursor to not-allowed
-      const badgeButton = element.querySelector(
-        '.euiBadge__content .euiBadge__childButton',
-      ) as HTMLElement;
-      badgeButton?.style?.setProperty('cursor', 'not-allowed');
-      // remove the popup on click to prevent the filter from being removed
-      element.addEventListener('click', event => {
-        event.preventDefault();
-        event.stopPropagation();
+      $(removeButton).addClass('hide-close-button');
+      $(removeButton).on('click', ev => {
+        ev.stopPropagation();
       });
+      $(badgeButton).on('click', ev => {
+        ev.stopPropagation();
+      });
+      $(badgeButton).css('cursor', 'not-allowed');
+    } else {
+      $(removeButton).removeClass('hide-close-button');
+      $(removeButton).off('click');
+      $(badgeButton).off('click');
+      $(badgeButton).css('cursor', 'pointer');
     }
   });
 };

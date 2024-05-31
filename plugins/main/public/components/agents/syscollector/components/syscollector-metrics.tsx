@@ -43,7 +43,7 @@ export function InventoryMetrics({ agent }) {
   }
 
   return (
-    <EuiPanel paddingSize='s' style={{ margin: 16 }}>
+    <EuiPanel paddingSize='s'>
       <EuiFlexGroup>
         <EuiFlexItem grow={false}>
           <EuiText>

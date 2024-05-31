@@ -49,7 +49,7 @@ export const WAZUH_STATISTICS_DEFAULT_FREQUENCY = 900;
 export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 
 // Wazuh vulnerabilities
-export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities';
+export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities-*';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 
 // Job - Wazuh initialize
@@ -848,6 +848,38 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.switch,
     defaultValue: true,
     isConfigurableFromSettings: true,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        },
+      },
+    },
+    uiFormTransformChangedInputValue: function (
+      value: boolean | string,
+    ): boolean {
+      return Boolean(value);
+    },
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.isBoolean,
+  },
+  'configuration.ui_api_editable': {
+    title: 'Configuration UI editable',
+    description:
+      'Enable or disable the ability to edit the configuration from UI or API endpoints. When disabled, this can only be edited from the configuration file, the related API endpoints are disabled, and the UI is inaccessible.',
+    store: {
+      file: {
+        configurableManaged: false,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    isConfigurableFromSettings: false,
+    requiresRestartingPluginPlatform: true,
     options: {
       switch: {
         values: {

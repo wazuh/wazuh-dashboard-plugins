@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import {
   EuiFlexGroup,
@@ -19,15 +19,12 @@ import {
   EuiCallOut,
   EuiToolTip,
   EuiLoadingSpinner,
-  EuiFormRow,
   EuiSelect,
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
-import WzReduxProvider from '../../redux/wz-redux-provider';
-import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import {
   getAngularModule,
@@ -43,13 +40,8 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
-import {
-  DataSourceSelector,
-  PatternDataSource,
-  AlertsDataSourceRepository,
-  PatternDataSourceFactory,
-} from '../common/data-source';
 import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
+import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 
 const sections = {
   overview: 'overview',
@@ -85,6 +77,7 @@ export const WzMenu = withWindowSize(
       this.wazuhConfig = new WazuhConfig();
       this.indexPatterns = getDataPlugin().indexPatterns;
       this.isLoading = false;
+      this.pinnedAgentManager = new PinnedAgentManager();
     }
 
     async componentDidMount() {
@@ -367,7 +360,10 @@ export const WzMenu = withWindowSize(
         AppState.setCurrentAPI(
           JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
         );
-
+        const isPinnedAgent = this.pinnedAgentManager.isPinnedAgent();
+        if (isPinnedAgent) {
+          this.pinnedAgentManager.unPinAgent();
+        }
         if (this.state.currentMenuTab !== 'wazuh-dev') {
           this.router.reload();
         }
@@ -423,23 +419,6 @@ export const WzMenu = withWindowSize(
         </EuiCallOut>,
         container[0],
       );
-    }
-
-    removeSelectedAgent() {
-      store.dispatch(updateCurrentAgentData({}));
-      if (window.location.href.includes('/agents?')) {
-        window.location.href = '#/agents-preview';
-        this.router.reload();
-        return;
-      }
-      const { filterManager } = getDataPlugin().query;
-      const currentAppliedFilters = filterManager.getFilters();
-      const agentFilters = currentAppliedFilters.filter(x => {
-        return x.meta.key === 'agent.id';
-      });
-      agentFilters.map(x => {
-        filterManager.removeFilter(x);
-      });
     }
 
     getApiSelectorComponent() {
@@ -508,9 +487,10 @@ export const WzMenu = withWindowSize(
           </EuiFlexItem>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
-              <WzDataSourceSelector 
-                onChange={this.onChangePattern} 
-                name="index pattern"/>
+              <WzDataSourceSelector
+                onChange={this.onChangePattern}
+                name='index pattern'
+              />
             </div>
           </EuiFlexItem>
         </>
@@ -543,7 +523,7 @@ export const WzMenu = withWindowSize(
             <EuiFlexGroup
               alignItems='center'
               responsive={false}
-              className='wz-margin-left-10 wz-margin-right-10'
+              className='wz-margin-left-10 wz-margin-right-10 font-size-14'
             >
               {!this.showSelectorsInPopover &&
                 this.state.patternList.length > 1 &&

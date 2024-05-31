@@ -393,6 +393,7 @@ export class WazuhReportingCtrl {
           body: {
             success: true,
             message: `Report ${context.wazuhEndpointParams.filename} was created`,
+            filename: context.wazuhEndpointParams.filename,
           },
         });
       } catch (error) {
@@ -687,6 +688,7 @@ export class WazuhReportingCtrl {
           body: {
             success: true,
             message: `Report ${context.wazuhEndpointParams.filename} was created`,
+            filename: context.wazuhEndpointParams.filename,
           },
         });
       } catch (error) {
@@ -1026,6 +1028,7 @@ export class WazuhReportingCtrl {
             body: {
               success: true,
               message: `Report ${context.wazuhEndpointParams.filename} was created`,
+              filename: context.wazuhEndpointParams.filename,
             },
           });
         } catch (error) {
@@ -1317,6 +1320,7 @@ export class WazuhReportingCtrl {
             body: {
               success: true,
               message: `Report ${context.wazuhEndpointParams.filename} was created`,
+              filename: context.wazuhEndpointParams.filename,
             },
           });
         } catch (error) {

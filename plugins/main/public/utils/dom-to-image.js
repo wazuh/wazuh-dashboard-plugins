@@ -477,7 +477,9 @@
           resolve(image);
         };
         image.onerror = reject;
-        image.src = uri;
+        // Wazuh: fix an error creating image from map visualizations
+        // https://github.com/tsayen/dom-to-image/issues/243#issuecomment-414955354
+        image.src = encodeURI(uri);
       });
     }
 

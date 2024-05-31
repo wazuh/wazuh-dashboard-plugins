@@ -10,10 +10,10 @@ import {
   tFilterManager,
 } from '../index';
 import {
-  DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT,
   DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
   AUTHORIZED_AGENTS,
 } from '../../../../../common/constants';
+import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 const MANAGER_AGENT_ID = '000';
 const AGENT_ID_KEY = 'agent.id';
 
@@ -79,6 +79,14 @@ export function getFilterAllowedAgents(
     },
   };
 }
+
+type tFilterType =
+  | 'is'
+  | 'is not'
+  | 'exists'
+  | 'does not exist'
+  | 'is one of'
+  | 'is not one of';
 
 export class PatternDataSourceFilterManager
   implements tDataSourceFilterManager
@@ -198,6 +206,14 @@ export class PatternDataSourceFilterManager
     );
   }
 
+  addFilters(filter: tFilter) {
+    this.filterManager.addFilters(filter);
+  }
+
+  removeAll() {
+    this.filterManager.setFilters([]);
+  }
+
   /**
    * Concatenate the filters to fetch the data from the data source
    * @returns
@@ -208,6 +224,34 @@ export class PatternDataSourceFilterManager
       ...this.dataSource.getFetchFilters(),
       ...this.getFilters(),
     ];
+  }
+
+  public removeFilterByControlledBy(value: string) {
+    let filters = this.filterManager.getFilters();
+    const controlledBy = filters.filter(
+      filter => filter.meta?.controlledBy === value,
+    );
+    controlledBy.forEach(filter => {
+      this.filterManager.removeFilter(filter);
+    });
+  }
+
+  /**
+   * Search the the field and value received and remove the filter when exists
+   * @param field
+   * @param value
+   */
+  removeFilter(field: string, value: string | string[]): void {
+    let filters = this.filterManager.getFilters();
+    const filterIndex = filters.findIndex(f =>
+      f.meta?.key === field && f.meta?.value === Array.isArray(value)
+        ? value?.join(', ')
+        : value,
+    );
+
+    if (filterIndex < 0) return;
+
+    this.filterManager.removeFilter(filters[filterIndex]);
   }
 
   /**
@@ -283,29 +327,28 @@ export class PatternDataSourceFilterManager
    * Returns the filter when the an agent is pinned (saved in the session storage or redux store)
    */
   static getPinnedAgentFilter(indexPatternTitle: string): tFilter[] {
-    const agentId = store.getState().appStateReducers?.currentAgentData?.id;
-    const url = window.location.href;
-    const regex = new RegExp('agentId=' + '[^&]*');
-    const match = url.match(regex);
-    const isPinnedAgentByUrl = match && match[0];
-    if (!agentId && !isPinnedAgentByUrl) return [];
-    const agentValueUrl = isPinnedAgentByUrl?.split('=')[1];
+    const pinnedAgentManager = new PinnedAgentManager();
+    const isPinnedAgent = pinnedAgentManager.isPinnedAgent();
+    if (!isPinnedAgent) {
+      return [];
+    }
+    const currentPinnedAgent = pinnedAgentManager.getPinnedAgent();
     return [
       {
         meta: {
           alias: null,
           disabled: false,
-          key: AGENT_ID_KEY,
+          key: PinnedAgentManager.AGENT_ID_KEY,
           negate: false,
-          params: { query: agentId || agentValueUrl },
+          params: { query: currentPinnedAgent.id },
           type: 'phrase',
           index: indexPatternTitle,
-          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT,
+          controlledBy: PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
         },
         query: {
           match: {
-            [AGENT_ID_KEY]: {
-              query: agentId || agentValueUrl,
+            [PinnedAgentManager.AGENT_ID_KEY]: {
+              query: currentPinnedAgent.id,
               type: 'phrase',
             },
           },
@@ -345,5 +388,171 @@ export class PatternDataSourceFilterManager
       return [allowAgentsFilter];
     }
     return [];
+  }
+
+  /******************************************************************/
+  /********************** FILTERS FACTORY ***************************/
+  /******************************************************************/
+
+  /**
+   * Returns a filter with the field and value received
+   * @param field
+   * @param value
+   * @returns
+   */
+  createFilter(
+    type: tFilterType,
+    key: string,
+    value: string | [],
+    controlledBy?: string,
+  ): tFilter {
+    switch (type) {
+      case 'is':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              match_phrase: {
+                [key]: {
+                  query: value,
+                },
+              },
+            },
+          },
+          controlledBy,
+        );
+      case 'is not':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              match_phrase: {
+                [key]: {
+                  query: value,
+                },
+              },
+            },
+          },
+          controlledBy,
+          true,
+        );
+      case 'exists':
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            value: 'exists',
+            negate: false,
+            type: 'exists',
+            index: this.dataSource.id,
+            controlledBy,
+          },
+          exists: { field: key },
+          $state: { store: 'appState' },
+        };
+      case 'does not exist':
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            value: 'exists',
+            negate: true,
+            type: 'exists',
+            index: this.dataSource.id,
+            controlledBy,
+          },
+          exists: { field: key },
+          $state: { store: 'appState' },
+        };
+      case 'is one of':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              bool: {
+                minimum_should_match: 1,
+                should: value.map((v: string) => ({
+                  match_phrase: {
+                    [key]: {
+                      query: v,
+                    },
+                  },
+                })),
+              },
+            },
+          },
+          controlledBy,
+        );
+      case 'is not one of':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              bool: {
+                minimum_should_match: 1,
+                should: value.map((v: string) => ({
+                  match_phrase: {
+                    [key]: {
+                      query: v,
+                    },
+                  },
+                })),
+              },
+            },
+          },
+          controlledBy,
+          true,
+        );
+      default:
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          undefined,
+          controlledBy,
+        );
+    }
+  }
+
+  /**
+   * Return a simple filter object with the field, value and index pattern received
+   *
+   * @param field
+   * @param value
+   * @param indexPatternTitle
+   */
+  private generateFilter(
+    field: string,
+    value: string | string[],
+    indexPatternTitle: string,
+    query: tFilter['query'] | tFilter['exists'],
+    controlledBy?: string,
+    negate: boolean = false,
+  ) {
+    return {
+      meta: {
+        alias: null,
+        disabled: false,
+        key: field,
+        value: Array.isArray(value) ? value.join(', ') : value,
+        params: value,
+        negate,
+        type: 'phrases',
+        index: indexPatternTitle,
+        controlledBy,
+      },
+      ...query,
+      $state: { store: 'appState' },
+    };
   }
 }

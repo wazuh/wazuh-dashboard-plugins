@@ -1,4 +1,4 @@
-import { useEffect, useState, useLayoutEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SearchBarProps,
   TimeRange,
@@ -9,7 +9,7 @@ import {
 } from '../../../../../../src/plugins/data/public';
 import { getDataPlugin } from '../../../kibana-services';
 import { useQueryManager, useTimeFilter } from '../hooks';
-import { hideCloseButtonOnFixedFilters } from './search-bar-service';
+
 // Input - types
 type tUseSearchBarCustomInputs = {
   indexPattern: IndexPattern;
@@ -46,7 +46,9 @@ const useSearchBarConfiguration = (
     timeHistory,
     setTimeFilter: setGlobalTimeFilter,
   } = useTimeFilter();
-  const filters = defaultFilters ? defaultFilters : [];
+  const filters = defaultFilters ?? [];
+  const fixedFilters = filters.filter(filter => filter.meta.controlledBy);
+  const userFilters = filters.filter(filter => !filter.meta.controlledBy);
   const [timeFilter, setTimeFilter] = useState(globalTimeFilter);
   const [query, setQuery] = props?.setQuery
     ? useState(props?.query || { query: '', language: 'kuery' })
@@ -56,29 +58,6 @@ const useSearchBarConfiguration = (
   const [isLoading, setIsLoading] = useState(true);
   const [indexPatternSelected, setIndexPatternSelected] =
     useState<IndexPattern>(indexPattern);
-  const TIMEOUT_MILISECONDS = 100;
-
-  const hideRemoveFilter = (retry: number = 0) => {
-    let elements = document.querySelectorAll(
-      '.wz-search-bar .globalFilterItem',
-    );
-    if ((!elements || !filters.length) && retry < 10) {
-      // the setTimeout is used to wait for the DOM elements to be rendered
-      setTimeout(() => {
-        // this is a workaround to hide the close button on fixed filters via vanilla js
-        hideRemoveFilter(++retry);
-      }, TIMEOUT_MILISECONDS);
-    } else {
-      hideCloseButtonOnFixedFilters(filters, elements);
-    }
-  };
-
-  useLayoutEffect(() => {
-    setTimeout(() => {
-      // this is a workaround to hide the close button on fixed filters via vanilla js
-      hideRemoveFilter();
-    }, TIMEOUT_MILISECONDS);
-  }, [filters]);
 
   useEffect(() => {
     if (indexPattern) {
@@ -123,16 +102,19 @@ const useSearchBarConfiguration = (
   > = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
-    filters: filters,
+    filters,
+    fixedFilters,
+    userFilters,
     query,
     timeHistory,
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
-    onFiltersUpdated: (filters: Filter[]) => {
+    onFiltersUpdated: (userFilters: Filter[]) => {
+      const allFilters = [...fixedFilters, ...userFilters];
       setFilters
-        ? setFilters(filters)
+        ? setFilters(allFilters)
         : console.warn('setFilters function is not defined');
-      props?.onFiltersUpdated && props?.onFiltersUpdated(filters);
+      props?.onFiltersUpdated && props?.onFiltersUpdated(allFilters);
     },
     onQuerySubmit: (
       payload: { dateRange: TimeRange; query?: Query },

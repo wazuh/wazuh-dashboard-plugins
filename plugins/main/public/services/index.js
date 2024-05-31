@@ -14,11 +14,9 @@ import './theming';
 import './routes';
 import { CSVRequest } from './csv-request';
 import { CommonData } from './common-data';
-import { ReportingService } from './reporting';
 import { VisFactoryService } from './vis-factory-handler';
 import './region-maps';
 import './order-object-by';
-import { ConfigHandler } from './config-handler';
 import { CheckDaemonsStatus } from './check-daemon-status';
 import { getAngularModule } from '../kibana-services';
 
@@ -28,7 +26,5 @@ app
   .service('errorHandler', ErrorHandler)
   .service('csvReq', CSVRequest)
   .service('commonData', CommonData)
-  .service('reportingService', ReportingService)
   .service('visFactoryService', VisFactoryService)
-  .service('configHandler', ConfigHandler)
   .service('checkDaemonsStatus', CheckDaemonsStatus);

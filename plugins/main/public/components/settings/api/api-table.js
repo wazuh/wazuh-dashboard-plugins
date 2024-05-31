@@ -229,7 +229,7 @@ export const ApiTable = compose(
             ? error
             : (error || {}).message ||
               ((error || {}).data || {}).message ||
-              'Wazuh is not reachable';
+              'API is not reachable';
         const status = code === 3099 ? 'down' : 'unknown';
         APIconnection.status = { status, downReason };
         if (APIconnection.id === this.state.selectedAPIConnection) {
@@ -296,7 +296,7 @@ export const ApiTable = compose(
               ? error
               : (error || {}).message ||
                 ((error || {}).data || {}).message ||
-                'Wazuh is not reachable';
+                'API is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
           throw error;
@@ -727,7 +727,7 @@ export const ApiTable = compose(
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiCallOut
-                    title='The API connections could be down or inaccesible'
+                    title='The API connections could be down or inaccessible'
                     iconType='alert'
                     color='warning'
                   >
@@ -735,7 +735,7 @@ export const ApiTable = compose(
                       <EuiFlexItem grow={false}>
                         <WzButtonOpenFlyout
                           flyoutTitle={
-                            'The API connections could be down or inaccesible'
+                            'The API connections could be down or inaccessible'
                           }
                           flyoutBody={() => {
                             const steps = [

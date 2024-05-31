@@ -28,9 +28,9 @@ import {
 } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
+import { WzSearchBar } from '../../../../common/search-bar';
 
 const plugins = getPlugins();
-const SearchBar = getPlugins().data.ui.SearchBar;
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 /* The vulnerabilities dashboard is made up of 3 dashboards because the filters need
@@ -84,16 +84,14 @@ const DashboardVulsComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <div className='wz-search-bar hide-filter-control'>
-              <SearchBar
-                appName='vulnerability-detector-searchbar'
-                {...searchBarProps}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            </div>
+            <WzSearchBar
+              appName='vulnerability-detector-searchbar'
+              {...searchBarProps}
+              showDatePicker={false}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
           )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
