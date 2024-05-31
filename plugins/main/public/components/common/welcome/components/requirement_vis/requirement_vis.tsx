@@ -17,12 +17,12 @@ import { EuiFlexItem, EuiPanel, euiPaletteColorBlind } from '@elastic/eui';
 import { VisualizationBasicWidgetSelector } from '../../../charts/visualizations/basic';
 import { getRequirementAlerts } from './lib';
 import { useTimeFilter } from '../../../hooks';
-import { getCore } from '../../../../../kibana-services';
 import { getIndexPattern } from '../../../../../react-services';
 import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
 import rison from 'rison-node';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 const selectionOptionsCompliance = [
   { value: 'pci_dss', text: 'PCI DSS' },
@@ -69,10 +69,13 @@ export function RequirementVis(props) {
       const url = Object.entries(params)
         .map(e => e.join('='))
         .join('&');
-      // TODO: redirection to gdpr will fail
-      getCore().application.navigateToApp(WAZUH_MODULES[params.tab].appId, {
-        path: `#/overview?${url}`,
-      });
+      // TODO: check redirection to gdpr
+      NavigationService.getInstance().navigateToApp(
+        WAZUH_MODULES[params.tab].appId,
+        {
+          path: `#/overview?${url}`,
+        },
+      );
     } catch (error) {}
   };
 

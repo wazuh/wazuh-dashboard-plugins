@@ -1,4 +1,6 @@
 import { Location, Action, History, Path } from 'history';
+import { getCore } from '../kibana-services';
+import { NavigateToAppOptions } from '../../../../src/core/public';
 
 class NavigationService {
   private static instance: NavigationService;
@@ -93,6 +95,24 @@ class NavigationService {
   ): () => void {
     const unlisten = this.history.listen(listener);
     return unlisten;
+  }
+
+  public async navigateToApp(
+    appId: string,
+    options?: NavigateToAppOptions,
+  ): Promise<void> {
+    await getCore().application.navigateToApp(appId, options);
+  }
+
+  public async navigateToUrl(url: string): Promise<void> {
+    await getCore().application.navigateToUrl(url);
+  }
+
+  public getUrlForApp(
+    appId: string,
+    options?: { path?: string; absolute?: boolean },
+  ): string {
+    return getCore().application.getUrlForApp(appId, options);
   }
 }
 

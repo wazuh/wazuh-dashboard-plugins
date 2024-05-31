@@ -15,7 +15,6 @@ import {
   EuiButtonEmpty,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import {
   ResourcesHandler,
@@ -26,12 +25,12 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orch
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
-import { getCore } from '../../../../../../kibana-services';
 import { threatHunting } from '../../../../../../utils/applications';
 import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 import { withRouterSearch } from '../../../../../../components/common/hocs';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import NavigationService from '../../../../../../react-services/navigation-service';
 
 export default compose(
   withRouter,
@@ -779,9 +778,12 @@ export default compose(
                 <EuiButtonEmpty
                   iconType='popout'
                   aria-label='popout'
-                  href={getCore().application.getUrlForApp(threatHunting.id, {
-                    path: `#/overview/?tab=general&tabView=dashboard&_g=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:rule.id,negate:!f,params:(query:'${id}'),type:phrase),query:(match_phrase:(rule.id:'${id}')))),query:(language:kuery,query:''))`,
-                  })}
+                  href={NavigationService.getInstance().getUrlForApp(
+                    threatHunting.id,
+                    {
+                      path: `#/overview/?tab=general&tabView=dashboard&_g=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:rule.id,negate:!f,params:(query:'${id}'),type:phrase),query:(match_phrase:(rule.id:'${id}')))),query:(language:kuery,query:''))`,
+                    },
+                  )}
                   target='blank'
                 >
                   View alerts of this Rule

@@ -18,6 +18,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getCore } from '../../../kibana-services';
 import { sampleData } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const SampleDataWarning = ({ ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
@@ -61,7 +62,7 @@ export const SampleDataWarning = ({ ...props }) => {
           <p>
             {'The data displayed may contain sample alerts. Go '}
             <EuiLink
-              href={getCore().application.getUrlForApp(sampleData.id)}
+              href={NavigationService.getInstance().getUrlForApp(sampleData.id)}
               aria-label='go to configure sample data'
             >
               {'here'}

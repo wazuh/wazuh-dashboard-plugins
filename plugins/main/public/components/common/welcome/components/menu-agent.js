@@ -24,6 +24,7 @@ import { getCore, getToasts } from '../../../../kibana-services';
 import { Applications, Categories } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
+import NavigationService from '../../../../react-services/navigation-service';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -101,7 +102,7 @@ class WzMenuAgent extends Component {
           >
             <RedirectAppLinks application={getCore().application}>
               <EuiLink
-                href={getCore().application.getUrlForApp(item.id)}
+                href={NavigationService.getInstance().getUrlForApp(item.id)}
                 style={{ cursor: 'pointer' }}
               >
                 {item.title}

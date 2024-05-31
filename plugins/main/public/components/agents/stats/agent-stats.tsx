@@ -46,7 +46,7 @@ import {
 } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
-import { getCore } from '../../../kibana-services';
+import NavigationService from '../../../react-services/navigation-service';
 
 const tableColumns = [
   {
@@ -106,7 +106,7 @@ export const MainAgentStats = compose(
   withGlobalBreadcrumb(({ agent }) => [
     {
       text: endpointSummary.breadcrumbLabel,
-      href: getCore().application.getUrlForApp(endpointSummary.id, {
+      href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
         path: `#/agents-preview`,
       }),
     },

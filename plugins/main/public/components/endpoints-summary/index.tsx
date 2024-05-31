@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   EuiPage,
   EuiPageBody,
@@ -14,18 +14,17 @@ import {
 } from '../common/hocs';
 import { compose } from 'redux';
 import { WzButtonPermissions } from '../common/permissions/button';
-import { getCore } from '../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { useGetTotalAgents } from './hooks';
-
 import {
   enableMenu,
   ip,
   nestedResolve,
   savedSearch,
 } from '../../services/resolves';
+import NavigationService from '../../react-services/navigation-service';
 
 export const MainEndpointsSummary = compose(
   withErrorBoundary,
@@ -71,9 +70,12 @@ export const MainEndpointsSummary = compose(
             fill
             permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
             iconType='plusInCircle'
-            href={getCore().application.getUrlForApp(endpointSummary.id, {
-              path: `#${endpointSummary.redirectTo()}deploy`,
-            })}
+            href={NavigationService.getInstance().getUrlForApp(
+              endpointSummary.id,
+              {
+                path: `#${endpointSummary.redirectTo()}deploy`,
+              },
+            )}
           >
             Deploy new agent
           </WzButtonPermissions>

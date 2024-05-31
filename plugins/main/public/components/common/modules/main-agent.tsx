@@ -26,7 +26,6 @@ import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AgentInfo } from '../../common/welcome/agents-info';
-import { getCore } from '../../../kibana-services';
 import { compose } from 'redux';
 import { withGlobalBreadcrumb } from '../hocs';
 import { endpointSummary } from '../../../utils/applications';
@@ -39,6 +38,7 @@ import {
 } from '../data-source';
 import { useAsyncAction } from '../hooks';
 import { withRouter } from 'react-router-dom';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const MainModuleAgent = withRouter(
   class MainModuleAgent extends Component {
@@ -211,9 +211,12 @@ export default compose(
       return [
         {
           text: endpointSummary.breadcrumbLabel,
-          href: getCore().application.getUrlForApp(endpointSummary.id, {
-            path: `#/agents-preview`,
-          }),
+          href: NavigationService.getInstance().getUrlForApp(
+            endpointSummary.id,
+            {
+              path: `#/agents-preview`,
+            },
+          ),
         },
         { text: agent.id },
       ];
@@ -221,9 +224,12 @@ export default compose(
       return [
         {
           text: endpointSummary.breadcrumbLabel,
-          href: getCore().application.getUrlForApp(endpointSummary.id, {
-            path: `#/agents-preview`,
-          }),
+          href: NavigationService.getInstance().getUrlForApp(
+            endpointSummary.id,
+            {
+              path: `#/agents-preview`,
+            },
+          ),
         },
         { agent: agent },
         {

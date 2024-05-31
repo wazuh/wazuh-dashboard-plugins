@@ -1,4 +1,5 @@
 import { getCore } from '../../../kibana-services';
+import NavigationService from '../../../react-services/navigation-service';
 import { endpointSummary } from '../../../utils/applications';
 
 export const setBreadcrumbs = (breadcrumbs, router) => {
@@ -12,11 +13,9 @@ export const setBreadcrumbs = (breadcrumbs, router) => {
             'euiLink euiLink--subdued osdBreadcrumbs wz-vertical-align-middle',
           onClick: ev => {
             ev.stopPropagation();
-            getCore().application.navigateToApp(endpointSummary.id, {
+            NavigationService.getInstance().navigateToApp(endpointSummary.id, {
               path: `#/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
             });
-            // TODO: Replace router with another mechanism that does not depend on Angular
-            /* router.reload(); */
           },
           truncate: true,
           text: breadcrumb.agent.name,

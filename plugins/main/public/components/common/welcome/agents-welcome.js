@@ -62,6 +62,7 @@ import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashb
 import { EventsCount } from './dashboard/events-count';
 import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const AgentsWelcome = compose(
   withErrorBoundary,
@@ -69,7 +70,7 @@ export const AgentsWelcome = compose(
     return [
       {
         text: endpointSummary.breadcrumbLabel,
-        href: getCore().application.getUrlForApp(endpointSummary.id, {
+        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
           path: `#/agents-preview`,
         }),
       },
@@ -242,7 +243,9 @@ export const AgentsWelcome = compose(
                 >
                   <RedirectAppLinks application={getCore().application}>
                     <EuiButtonEmpty
-                      href={getCore().application.getUrlForApp(applicationId)}
+                      href={NavigationService.getInstance().getUrlForApp(
+                        applicationId,
+                      )}
                       style={{ cursor: 'pointer' }}
                     >
                       <span>
@@ -428,7 +431,7 @@ export const AgentsWelcome = compose(
                       <EuiButtonIcon
                         iconType='popout'
                         color='primary'
-                        href={`${getCore().application.getUrlForApp(
+                        href={`${NavigationService.getInstance().getUrlForApp(
                           mitreAttack.id,
                         )}`}
                         aria-label='Open MITRE ATT&CK'

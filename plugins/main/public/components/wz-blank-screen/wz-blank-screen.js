@@ -29,6 +29,7 @@ import { overview } from '../../utils/applications';
 import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { withRouteResolvers } from '../common/hocs';
 import { enableMenu } from '../../services/resolves/enable-menu';
+import NavigationService from '../../react-services/navigation-service';
 
 export const WzBlankScreen = withRouteResolvers({ enableMenu })(
   class WzBlankScreen extends Component {
@@ -74,7 +75,7 @@ export const WzBlankScreen = withRouteResolvers({ enableMenu })(
      * This navigate to overview
      */
     goOverview() {
-      getCore().application.navigateToApp(overview.id);
+      NavigationService.getInstance().navigateToApp(overview.id);
     }
 
     render() {
@@ -113,7 +114,9 @@ export const WzBlankScreen = withRouteResolvers({ enableMenu })(
 
               <RedirectAppLinks application={getCore().application}>
                 <EuiButton
-                  href={getCore().application.getUrlForApp(overview.id)}
+                  href={NavigationService.getInstance().getUrlForApp(
+                    overview.id,
+                  )}
                   style={{ cursor: 'pointer' }}
                   color='primary'
                   fill

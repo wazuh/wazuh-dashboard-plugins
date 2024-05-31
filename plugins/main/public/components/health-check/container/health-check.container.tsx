@@ -44,6 +44,7 @@ import { serverApis } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { ip, wzConfig } from '../../../services/resolves';
 import { compose } from 'redux';
+import NavigationService from '../../../react-services/navigation-service';
 
 const checks = {
   api: {
@@ -335,7 +336,9 @@ function HealthCheckComponent({ location, history }) {
                 <RedirectAppLinks application={getCore().application}>
                   <EuiButton
                     fill
-                    href={getCore().application.getUrlForApp(serverApis.id)}
+                    href={NavigationService.getInstance().getUrlForApp(
+                      serverApis.id,
+                    )}
                   >
                     Go to Settings
                   </EuiButton>

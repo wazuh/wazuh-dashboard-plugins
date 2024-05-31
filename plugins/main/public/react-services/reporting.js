@@ -37,6 +37,7 @@ import {
   getOpenSearchQueryConfig,
 } from '../../../../src/plugins/data/common';
 import { getForceNow } from '../components/common/search-bar/search-bar-service';
+import NavigationService from './navigation-service';
 
 const app = getAngularModule();
 
@@ -86,9 +87,12 @@ export class ReportingService {
                 <RedirectAppLinks application={getCore().application}>
                   <EuiLink
                     aria-label='go to Endpoint summary'
-                    href={getCore().application.getUrlForApp(reporting.id, {
-                      path: '',
-                    })}
+                    href={NavigationService.getInstance().getUrlForApp(
+                      reporting.id,
+                      {
+                        path: '',
+                      },
+                    )}
                   >
                     {reporting.title}
                   </EuiLink>

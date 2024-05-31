@@ -37,7 +37,7 @@ import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constant
 import { configurationAssessment } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
-import { withRouter } from 'react-router-dom';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 type Props = {
   agent: { [key in string]: any };
@@ -148,9 +148,12 @@ export const ScaScan = compose(
           'scaPolicies',
           JSON.stringify(this.state.policies),
         );
-        getCore().application.navigateToApp(configurationAssessment.id, {
-          path: `#/overview?tab=sca&redirectPolicy=${policy.policy_id}&agentId=${this.props.agent.id}`,
-        });
+        NavigationService.getInstance().navigateToApp(
+          configurationAssessment.id,
+          {
+            path: `#/overview?tab=sca&redirectPolicy=${policy.policy_id}&agentId=${this.props.agent.id}`,
+          },
+        );
       });
     };
 
@@ -211,7 +214,7 @@ export const ScaScan = compose(
                     onClick={() => {
                       this.pinnedAgentManager.pinAgent(this.props.agent);
                     }}
-                    href={getCore().application.getUrlForApp(
+                    href={NavigationService.getInstance().getUrlForApp(
                       configurationAssessment.id,
                       {
                         path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
@@ -290,7 +293,7 @@ export const ScaScan = compose(
                         onClick={() => {
                           this.pinnedAgentManager.pinAgent(this.props.agent);
                         }}
-                        href={getCore().application.getUrlForApp(
+                        href={NavigationService.getInstance().getUrlForApp(
                           configurationAssessment.id,
                           {
                             path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
@@ -312,7 +315,7 @@ export const ScaScan = compose(
                         onClick={() => {
                           this.pinnedAgentManager.pinAgent(this.props.agent);
                         }}
-                        href={getCore().application.getUrlForApp(
+                        href={NavigationService.getInstance().getUrlForApp(
                           configurationAssessment.id,
                         )}
                         aria-label='Open SCA Scans'

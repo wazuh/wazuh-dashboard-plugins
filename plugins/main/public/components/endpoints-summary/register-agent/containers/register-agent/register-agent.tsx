@@ -36,7 +36,7 @@ import { OsCard } from '../../components/os-selector/os-card/os-card';
 import { validateAgentName } from '../../utils/validations';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
-import { getCore, getWazuhCorePlugin } from '../../../../../kibana-services';
+import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import {
   enableMenu,
@@ -44,6 +44,7 @@ import {
   nestedResolve,
   savedSearch,
 } from '../../../../../services/resolves';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
@@ -191,7 +192,7 @@ export const RegisterAgent = compose(
                 <div className='register-agent-wizard-close'>
                   <EuiButtonEmpty
                     size='s'
-                    href={getCore().application.getUrlForApp(
+                    href={NavigationService.getInstance().getUrlForApp(
                       endpointSummary.id,
                       {
                         path: `#${endpointSummary.redirectTo()}`,
@@ -241,7 +242,7 @@ export const RegisterAgent = compose(
                       className='close-button'
                       fill
                       color='primary'
-                      href={getCore().application.getUrlForApp(
+                      href={NavigationService.getInstance().getUrlForApp(
                         endpointSummary.id,
                         {
                           path: `#${endpointSummary.redirectTo()}`,

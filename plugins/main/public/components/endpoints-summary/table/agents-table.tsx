@@ -30,7 +30,6 @@ import {
 import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
-import { getCore } from '../../../kibana-services';
 import { endpointSummary } from '../../../utils/applications';
 import { EditAgentGroupsModal } from './actions/edit-groups-modal';
 import { useUserPermissionsRequirements } from '../../common/hooks/useUserPermissions';
@@ -46,6 +45,7 @@ import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-prog
 import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
 import { WzButton } from '../../common/buttons';
 import { withRouter } from 'react-router-dom';
+import NavigationService from '../../../react-services/navigation-service';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -273,9 +273,12 @@ export const AgentsTable = compose(
                   buttonType='empty'
                   permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
                   iconType='plusInCircle'
-                  href={getCore().application.getUrlForApp(endpointSummary.id, {
-                    path: `#${endpointSummary.redirectTo()}deploy`,
-                  })}
+                  href={NavigationService.getInstance().getUrlForApp(
+                    endpointSummary.id,
+                    {
+                      path: `#${endpointSummary.redirectTo()}deploy`,
+                    },
+                  )}
                 >
                   Deploy new agent
                 </WzButtonPermissions>
