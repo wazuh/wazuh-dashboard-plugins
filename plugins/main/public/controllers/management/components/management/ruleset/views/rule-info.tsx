@@ -31,6 +31,11 @@ import { withRouterSearch } from '../../../../../../components/common/hocs';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 import NavigationService from '../../../../../../react-services/navigation-service';
+import { AppState } from '../../../../../../react-services';
+import {
+  getDataPlugin,
+  getWazuhCorePlugin,
+} from '../../../../../../kibana-services';
 
 export default compose(
   withRouter,
@@ -58,6 +63,7 @@ export default compose(
         mitreIds: [],
         currentRuleInfo: {},
         isLoading: true,
+        currentIndexPattern: '',
       };
       this.resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
 
@@ -165,10 +171,16 @@ export default compose(
       document.body.scrollTop = 0; // For Safari
       document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 
+      const currentIndexPattern = await getDataPlugin().indexPatterns.get(
+        AppState.getCurrentPattern() ||
+          getWazuhCorePlugin().configuration.getSettingValue('pattern'),
+      );
+
       this.setState({
         currentRuleId: this.props.item,
         isLoading: true,
         mitreLoading: true,
+        currentIndexPattern: currentIndexPattern.id,
       });
     }
 
@@ -781,7 +793,7 @@ export default compose(
                   href={NavigationService.getInstance().getUrlForApp(
                     threatHunting.id,
                     {
-                      path: `#/overview/?tab=general&tabView=dashboard&_g=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:rule.id,negate:!f,params:(query:'${id}'),type:phrase),query:(match_phrase:(rule.id:'${id}')))),query:(language:kuery,query:''))`,
+                      path: `#/overview/?tab=general&tabView=dashboard&_g=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'${this.state.currentIndexPattern}',key:rule.id,negate:!f,params:(query:'${id}'),type:phrase),query:(match_phrase:(rule.id:'${id}')))),query:(language:kuery,query:''))`,
                     },
                   )}
                   target='blank'

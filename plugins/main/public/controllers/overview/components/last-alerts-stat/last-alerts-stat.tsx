@@ -77,7 +77,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
             cluster.name
           }),type:phrase),query:(match_phrase:(${cluster.field}:${
             cluster.name
-          }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:rule.level,negate:!f,params:(gte:${
+          }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:rule.level,negate:!f,params:(gte:${
             severityLabel[severity].ruleLevelRange.minRuleLevel
           },lte:${
             severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'

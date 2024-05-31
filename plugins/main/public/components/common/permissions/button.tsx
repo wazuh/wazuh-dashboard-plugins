@@ -59,13 +59,12 @@ export const WzButtonPermissions = ({
           ...(!['link', 'switch'].includes(buttonType)
             ? { isDisabled: disabled }
             : { disabled }),
-          onClick:
-            disabled || !rest.onClick || buttonType == 'switch'
-              ? undefined
-              : rest.onClick,
-          onChange: disabled || !rest.onChange ? undefined : rest.onChange,
+          onClick: disabled || !rest.onClick ? undefined : rest.onClick,
+          onChange:
+            !disabled || rest.onChange || buttonType === 'switch'
+              ? rest.onChange
+              : undefined,
         };
-
         if (buttonType == 'switch') delete additionalProps.onClick;
 
         return additionalProps;
