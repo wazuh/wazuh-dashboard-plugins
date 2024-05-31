@@ -140,8 +140,8 @@ export const getMacOsInstallCommand = (
   if (optionalsForCommand?.wazuhPassword) {
     /**
      * We use the JSON.stringify to prevent that the scaped specials characters will be removed
-     * and mantain the format of the password
-      The JSON.stringify mantain the password format but adds " to wrap the characters
+     * and maintain the format of the password
+      The JSON.stringify maintain the password format but adds " to wrap the characters
     */
     const scapedPasswordLength = JSON.stringify(
       optionalsForCommand?.wazuhPassword,
