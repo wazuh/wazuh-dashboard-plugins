@@ -44,7 +44,7 @@ export const getLast24HoursAlerts = async (
         field: isCluster ? 'cluster.name' : 'manager.name',
         name: clusterValue,
       },
-      indexPatternName: currentIndexPattern.title,
+      indexPatternName: currentIndexPattern.id,
     };
   } catch (error) {
     return Promise.reject(error);

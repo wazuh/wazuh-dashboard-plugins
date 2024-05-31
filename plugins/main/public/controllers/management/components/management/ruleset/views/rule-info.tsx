@@ -26,9 +26,14 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orch
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
-import { getCore } from '../../../../../../kibana-services';
+import {
+  getCore,
+  getDataPlugin,
+  getWazuhCorePlugin,
+} from '../../../../../../kibana-services';
 import { threatHunting } from '../../../../../../utils/applications';
 import { euiThemeVars } from '@osd/ui-shared-deps/theme';
+import { AppState } from '../../../../../../react-services';
 
 export default class WzRuleInfo extends Component {
   constructor(props) {
@@ -52,6 +57,7 @@ export default class WzRuleInfo extends Component {
       mitreIds: [],
       currentRuleInfo: {},
       isLoading: true,
+      currentIndexPattern: '',
     };
     this.resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
 
@@ -159,10 +165,16 @@ export default class WzRuleInfo extends Component {
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 
+    const currentIndexPattern = await getDataPlugin().indexPatterns.get(
+      AppState.getCurrentPattern() ||
+        getWazuhCorePlugin().configuration.getSettingValue('pattern'),
+    );
+
     this.setState({
       currentRuleId: this.props.item,
       isLoading: true,
       mitreLoading: true,
+      currentIndexPattern: currentIndexPattern.id,
     });
   }
 
@@ -755,7 +767,7 @@ export default class WzRuleInfo extends Component {
                 iconType='popout'
                 aria-label='popout'
                 href={getCore().application.getUrlForApp(threatHunting.id, {
-                  path: `#/overview/?tab=general&tabView=panels&_g=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:rule.id,negate:!f,params:(query:'${id}'),type:phrase),query:(match_phrase:(rule.id:'${id}')))),query:(language:kuery,query:''))`,
+                  path: `#/overview/?tab=general&tabView=panels&_g=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'${this.state.currentIndexPattern}',key:rule.id,negate:!f,params:(query:'${id}'),type:phrase),query:(match_phrase:(rule.id:'${id}')))),query:(language:kuery,query:''))`,
                 })}
                 target='_blank'
               >

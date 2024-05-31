@@ -139,7 +139,9 @@ export function useDataSource<
         );
 
       if (pinnedAgentFilter.length) {
-        dataSourceFilterManager.removeFilter(pinnedAgentFilter[0]);
+        dataSourceFilterManager.removeFilterByControlledBy(
+          PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
+        );
       }
       if (pinnedAgentManager.isPinnedAgent()) {
         const pinnedAgent = PatternDataSourceFilterManager.getPinnedAgentFilter(
