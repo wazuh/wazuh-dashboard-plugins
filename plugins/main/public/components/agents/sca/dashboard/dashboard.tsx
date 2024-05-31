@@ -79,8 +79,9 @@ const Dashboard = ({ currentAgentData }) => {
   };
 
   useEffect(() => {
-    let storedPolicies = JSON.parse(localStorage.getItem('scaPolicies')) || [];
-    let lastStoredPolicy = storedPolicies[storedPolicies.length - 1];
+    const storedPolicies =
+      JSON.parse(localStorage.getItem('scaPolicies')) || [];
+    const lastStoredPolicy = storedPolicies[storedPolicies.length - 1];
     setLookingPolicy(lastStoredPolicy);
 
     if (lastStoredPolicy === undefined) {
@@ -88,7 +89,7 @@ const Dashboard = ({ currentAgentData }) => {
     }
 
     return () => {
-      localStorage.clear();
+      localStorage.removeItem('scaPolicies');
     };
   }, [currentAgentData]);
 
