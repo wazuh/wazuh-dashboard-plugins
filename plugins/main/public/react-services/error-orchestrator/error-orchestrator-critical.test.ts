@@ -15,7 +15,25 @@
 import { ErrorOrchestrator, UIErrorLog } from './types';
 import { ErrorOrchestratorCritical } from './error-orchestrator-critical';
 import { WzMisc } from '../../factories/misc';
+import NavigationService from '../navigation-service';
 
+jest.mock('../navigation-service', () => {
+  let url = '';
+  return {
+    getInstance() {
+      return {
+        navigate(str: string) {
+          url = str;
+        },
+      };
+    },
+    _getURL() {
+      return url;
+    },
+  };
+});
+
+NavigationService;
 describe('Wazuh Error Orchestrator Critical', () => {
   describe('Given a valid options params ', () => {
     it('Should be called mockSetBlankScr and redirect to BlankScreen', () => {
@@ -34,11 +52,12 @@ describe('Wazuh Error Orchestrator Critical', () => {
 
       const mockSetBlankScr = (WzMisc.prototype.setBlankScr = jest.fn());
 
-      const errorOrchestratorCritical: ErrorOrchestrator = new ErrorOrchestratorCritical();
+      const errorOrchestratorCritical: ErrorOrchestrator =
+        new ErrorOrchestratorCritical();
       errorOrchestratorCritical.loadErrorLog(options);
 
       expect(mockSetBlankScr).toBeCalledTimes(1);
-      expect(window.location.href).toEqual('http://localhost/#/blank-screen');
+      expect(NavigationService._getURL()).toEqual('/blank-screen');
     });
   });
 });

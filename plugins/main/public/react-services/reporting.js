@@ -39,8 +39,6 @@ import {
 import { getForceNow } from '../components/common/search-bar/search-bar-service';
 import NavigationService from './navigation-service';
 
-const app = getAngularModule();
-
 export class ReportingService {
   constructor() {
     this.wazuhConfig = new WazuhConfig();

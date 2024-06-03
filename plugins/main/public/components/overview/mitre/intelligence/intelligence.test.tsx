@@ -45,6 +45,10 @@ jest.mock('react', () => ({
   useLayoutEffect: jest.requireActual('react').useEffect,
 }));
 
+jest.mock('../../../../react-services/navigation-service', () => ({
+  getInstance() {},
+}));
+
 const mockStore = configureMockStore();
 
 describe('Module Mitre Att&ck intelligence container', () => {

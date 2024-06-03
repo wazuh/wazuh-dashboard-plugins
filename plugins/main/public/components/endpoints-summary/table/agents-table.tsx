@@ -44,7 +44,6 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
 import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
 import { WzButton } from '../../common/buttons';
-import { withRouter } from 'react-router-dom';
 import NavigationService from '../../../react-services/navigation-service';
 
 const searchBarWQLOptions = {
@@ -68,10 +67,7 @@ interface AgentsTableProps {
   setExternalReload?: (newValue: number) => void;
 }
 
-export const AgentsTable = compose(
-  withErrorBoundary,
-  withRouter,
-)((props: AgentsTableProps) => {
+export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const defaultFilters = {
     default: { q: 'id!=000' },
     ...(sessionStorage.getItem('wz-agents-overview-table-filter')
@@ -151,7 +147,9 @@ export const AgentsTable = compose(
     }
     return {
       onClick: ev => {
-        props.history.push(`/agents?tab=welcome&agent=${item.id}`);
+        NavigationService.getInstance().navigate(
+          `/agents?tab=welcome&agent=${item.id}`,
+        );
       },
     };
   };
