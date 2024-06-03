@@ -39,7 +39,7 @@ import { agentsTableColumns } from './columns';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { Agent } from '../types';
 import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
-import { getOutdatedAgents } from '../services';
+import { getOutdatedAgentsService } from '../services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
@@ -61,8 +61,6 @@ type AgentList = {
 interface AgentsTableProps {
   filters: any;
   externalReload?: boolean;
-  showOnlyOutdated: boolean;
-  setShowOnlyOutdated: (newValue: boolean) => void;
   totalOutdated?: number;
   setExternalReload?: (newValue: number) => void;
 }
@@ -96,15 +94,45 @@ export const AgentsTable = compose(withErrorBoundary)(
       { action: 'task:status', resource: '*:*:*' },
     ]);
 
+    const [totalOutdated, setTotalOutdated] = useState<number>();
+    const [isLoadingTotalOutdated, setIsLoadingTotalOutdated] = useState(true);
+    const [showOnlyOutdated, setShowOnlyOutdated] = useState(false);
     const [outdatedAgents, setOutdatedAgents] = useState<Agent[]>([]);
+
     const [isUpgradeTasksModalVisible, setIsUpgradeTasksModalVisible] =
       useState(false);
     const [isUpgradePanelClosed, setIsUpgradePanelClosed] = useState(false);
+
+    const getOutdatedAgents = async () => {
+      try {
+        setIsLoadingTotalOutdated(true);
+        const { total_affected_items } = await getOutdatedAgentsService({
+          limit: 1,
+        });
+        setTotalOutdated(total_affected_items);
+      } catch (error) {
+        const options = {
+          context: `EndpointsSummary.getOutdatedAgents`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error,
+            message: error.message || error,
+            title: `Could not get total outdated agents`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      } finally {
+        setIsLoadingTotalOutdated(false);
+      }
+    };
 
     useEffect(() => {
       if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
+      getOutdatedAgents();
     }, []);
 
     useEffect(() => {
@@ -172,7 +200,7 @@ export const AgentsTable = compose(withErrorBoundary)(
 
       try {
         const outdatedAgents = agentIds?.length
-          ? (await getOutdatedAgents({ agentIds })).affected_items
+          ? (await getOutdatedAgentsService({ agentIds })).affected_items
           : [];
         setOutdatedAgents(outdatedAgents);
       } catch (error) {
@@ -230,20 +258,24 @@ export const AgentsTable = compose(withErrorBoundary)(
             </EuiFlexGroup>
           </EuiFlexItem>
         ) : null}
-        <EuiFlexItem grow={false}>
-          <WzButton
-            buttonType='switch'
-            label='Show only outdated'
-            checked={props.showOnlyOutdated}
-            disabled={!props.totalOutdated}
-            tooltip={
-              !props.totalOutdated && {
-                content: 'There are no outdated agents',
+        {!isLoadingTotalOutdated ? (
+          <EuiFlexItem grow={false}>
+            <WzButton
+              buttonType='switch'
+              label={`Show only outdated${
+                totalOutdated ? ` (${totalOutdated})` : ''
+              }`}
+              checked={showOnlyOutdated}
+              disabled={!totalOutdated}
+              tooltip={
+                !totalOutdated && {
+                  content: 'There are no outdated agents',
+                }
               }
-            }
-            onChange={() => props.setShowOnlyOutdated(!props.showOnlyOutdated)}
-          />
-        </EuiFlexItem>
+              onChange={() => setShowOnlyOutdated(!showOnlyOutdated)}
+            />
+          </EuiFlexItem>
+        ) : null}
       </EuiFlexGroup>
     );
 
@@ -303,7 +335,7 @@ export const AgentsTable = compose(withErrorBoundary)(
                   />
                 </EuiFlexItem>
               )}
-              endpoint={props.showOnlyOutdated ? '/agents/outdated' : '/agents'}
+              endpoint={showOnlyOutdated ? '/agents/outdated' : '/agents'}
               tableColumns={agentsTableColumns(
                 !denyEditGroups,
                 !denyUpgrade,

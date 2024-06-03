@@ -1,6 +1,6 @@
 import { WzRequest } from '../../../react-services/wz-request';
 
-export const getOutdatedAgents = async ({
+export const getOutdatedAgentsService = async ({
   agentIds,
   limit,
 }: {
