@@ -12,7 +12,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { AppNavigate } from '../../../../react-services/app-navigate';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -26,6 +25,7 @@ import { EuiFormErrorText } from '@elastic/eui';
 import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION } from '../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { getWazuhCorePlugin } from '../../../../kibana-services';
+import NavigationService from '../../../../react-services/navigation-service';
 
 export const Header = ({ query, setQuery, searchBarFilters }) => {
   return (
@@ -116,6 +116,8 @@ const SearchBar = ({ query, setQuery, searchBarFilters }) => {
 };
 
 const getDefaultCategory = setQuery => {
-  const category: string | undefined = AppNavigate.getUrlParameter('category');
-  category && setQuery(`category:(${category})`);
+  const defaultCategory = NavigationService.getInstance()
+    .getParams()
+    .get('category');
+  defaultCategory && setQuery(`category:(${defaultCategory})`);
 };

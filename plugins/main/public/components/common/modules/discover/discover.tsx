@@ -17,13 +17,11 @@ import {
 } from '../../../../../../../src/plugins/data/public/';
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services/app-state';
-import { AppNavigate } from '../../../../react-services/app-navigate';
 import { RowDetails } from './row-details';
 import DateMatch from '@elastic/datemath';
 import { WazuhConfig } from '../../../../react-services/wazuh-config';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { KbnSearchBar } from '../../../kbn-search-bar';
-import { FlyoutTechnique } from '../../../../components/overview/mitre/components/techniques/components/flyout-technique';
 import { withErrorBoundary } from '../../../common/hocs';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -31,7 +29,6 @@ import _ from 'lodash';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-
 import {
   EuiBasicTable,
   EuiLoadingContent,
@@ -53,13 +50,13 @@ import {
   buildPhraseFilter,
   getOpenSearchQueryConfig,
   buildOpenSearchQuery,
-  IFieldType,
 } from '../../../../../../../src/plugins/data/common';
 import {
   getDataPlugin,
   getToasts,
   getUiSettings,
 } from '../../../../kibana-services';
+import NavigationService from '../../../../react-services/navigation-service';
 
 const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -477,6 +474,7 @@ export const Discover = compose(
       this.setState(columns);
     }
 
+    // TODO: Change the mechanism for generating column links
     columns = () => {
       var columnsList = [...this.state.columns];
       const columns = columnsList.map(item => {
@@ -521,7 +519,7 @@ export const Discover = compose(
 
         if (item === 'agent.id') {
           link = (ev, x) => {
-            AppNavigate.navigateToModule(ev, 'agents', {
+            NavigationService.getInstance().navigateToModule(ev, 'agents', {
               tab: 'welcome',
               agent: x,
             });
@@ -536,7 +534,7 @@ export const Discover = compose(
         }
         if (item === 'rule.id') {
           link = (ev, x) =>
-            AppNavigate.navigateToModule(ev, 'manager', {
+            NavigationService.getInstance().navigateToModule(ev, 'manager', {
               tab: 'rules',
               redirectRule: x,
             });
@@ -727,7 +725,7 @@ export const Discover = compose(
     };
 
     openDiscover(e, techniqueID) {
-      AppNavigate.navigateToModule(e, 'overview', {
+      NavigationService.getInstance().navigateToModule(e, 'overview', {
         tab: 'mitre',
         tabView: 'discover',
         filters: { 'rule.mitre.id': techniqueID },
@@ -735,7 +733,7 @@ export const Discover = compose(
     }
 
     openDashboard(e, techniqueID) {
-      AppNavigate.navigateToModule(e, 'overview', {
+      NavigationService.getInstance().navigateToModule(e, 'overview', {
         tab: 'mitre',
         tabView: 'dashboard',
         filters: { 'rule.mitre.id': techniqueID },
@@ -743,7 +741,7 @@ export const Discover = compose(
     }
 
     openIntelligence(e, redirectTo, itemID) {
-      AppNavigate.navigateToModule(e, 'overview', {
+      NavigationService.getInstance().navigateToModule(e, 'overview', {
         tab: 'mitre',
         tabView: 'intelligence',
         tabRedirect: redirectTo,

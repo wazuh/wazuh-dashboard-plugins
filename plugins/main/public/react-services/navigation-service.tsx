@@ -1,6 +1,9 @@
 import { Location, Action, History, Path } from 'history';
 import { getCore } from '../kibana-services';
 import { NavigateToAppOptions } from '../../../../src/core/public';
+import { getIndexPattern } from './elastic_helpers';
+import { buildPhraseFilter } from '../../../../src/plugins/data/common';
+import rison from 'rison-node';
 
 class NavigationService {
   private static instance: NavigationService;
@@ -113,6 +116,65 @@ class NavigationService {
     options?: { path?: string; absolute?: boolean },
   ): string {
     return getCore().application.getUrlForApp(appId, options);
+  }
+
+  /*
+  TODO: Analyze and improve this function taking into account whether buildFilter_w is still used and whether the implementation with respect to the middle button is correct in navigateToModule
+  */
+  private buildFilter_w(filters, indexPattern) {
+    const filtersArray: any[] = [];
+    Object.keys(filters).forEach(currentFilter => {
+      filtersArray.push({
+        ...buildPhraseFilter(
+          { name: currentFilter, type: 'text' },
+          filters[currentFilter],
+          indexPattern,
+        ),
+        $state: { isImplicit: false, store: 'appState' },
+      });
+    });
+    return rison.encode({ filters: filtersArray });
+  }
+
+  navigateToModule(e: any, section: string, params: any, navigateMethod?: any) {
+    e.persist(); // needed to access this event asynchronously
+    if (e.button == 0) {
+      // left button clicked
+      if (navigateMethod) {
+        navigateMethod();
+        return;
+      }
+    }
+    getIndexPattern().then(indexPattern => {
+      const urlParams = {};
+
+      if (Object.keys(params).length) {
+        Object.keys(params).forEach(key => {
+          if (key === 'filters') {
+            urlParams['_w'] = this.buildFilter_w(params[key], indexPattern);
+          } else {
+            urlParams[key] = params[key];
+          }
+        });
+      }
+      const url = Object.entries(urlParams)
+        .map(e => e.join('='))
+        .join('&');
+      const currentUrl = window.location.href.split('#/')[0];
+      const newUrl = currentUrl + `#/${section}?` + url;
+
+      if (e && (e.which == 2 || e.button == 1)) {
+        // middlebutton clicked
+        window.open(newUrl, '_blank', 'noreferrer');
+      } else if (e.button == 0) {
+        // left button clicked
+        if (navigateMethod) {
+          navigateMethod();
+        } else {
+          this.replace(`${this.getPathname()}?${url}`);
+        }
+      }
+    });
   }
 }
 

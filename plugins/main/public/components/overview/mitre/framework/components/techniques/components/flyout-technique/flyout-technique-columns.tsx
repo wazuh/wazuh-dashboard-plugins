@@ -1,22 +1,23 @@
 import React from 'react';
-import { formatUIDate, AppNavigate } from '../../../../../../../../react-services';
+import { formatUIDate } from '../../../../../../../../react-services';
 import { tDataGridColumn } from '../../../../../../../common/data-grid';
 import { EuiLink, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { getCore } from '../../../../../../../../kibana-services';
 import { rules } from '../../../../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import NavigationService from '../../../../../../../../react-services/navigation-service';
 
 const navigateTo = (ev, section, params) => {
-  AppNavigate.navigateToModule(ev, section, params);
+  NavigationService.getInstance().navigateToModule(ev, section, params);
 };
 
 const renderTechniques = (value: []) => {
-  const techniques = value.map((technique) => {
+  const techniques = value.map(technique => {
     return (
       <EuiFlexItem key={technique}>
         <EuiLink
           key={technique}
-          onClick={(e) =>
+          onClick={e =>
             navigateTo(e, 'overview', {
               tab: 'mitre',
               tabView: 'intelligence',
@@ -32,19 +33,25 @@ const renderTechniques = (value: []) => {
   });
 
   return (
-    <EuiFlexGroup gutterSize="s" direction="column">
+    <EuiFlexGroup gutterSize='s' direction='column'>
       {techniques}
     </EuiFlexGroup>
   );
 };
 
 export const techniquesColumns: tDataGridColumn[] = [
-  { id: 'timestamp', displayAsText: 'Time', render: (value) => formatUIDate(value) },
+  {
+    id: 'timestamp',
+    displayAsText: 'Time',
+    render: value => formatUIDate(value),
+  },
   {
     id: 'agent.id',
     displayAsText: 'Agent',
-    render: (value) => (
-      <EuiLink onClick={(e) => navigateTo(e, 'agents', { tab: 'welcome', agent: value })}>
+    render: value => (
+      <EuiLink
+        onClick={e => navigateTo(e, 'agents', { tab: 'welcome', agent: value })}
+      >
         {value}
       </EuiLink>
     ),
@@ -53,20 +60,18 @@ export const techniquesColumns: tDataGridColumn[] = [
   {
     id: 'rule.mitre.id',
     displayAsText: 'Technique(s)',
-    render: (value) => renderTechniques(value),
+    render: value => renderTechniques(value),
   },
   { id: 'rule.mitre.tactic', displayAsText: 'Tactic(s)' },
   { id: 'rule.level', displayAsText: 'Level' },
   {
     id: 'rule.id',
     displayAsText: 'Rule ID',
-    render: (value) => (
+    render: value => (
       <RedirectAppLinks application={getCore().application}>
-        <EuiLink
-          href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-        >
+        <EuiLink href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}>
           {value}
-        </EuiLink >
+        </EuiLink>
       </RedirectAppLinks>
     ),
   },
@@ -78,20 +83,18 @@ export const agentTechniquesColumns: tDataGridColumn[] = [
   {
     id: 'rule.mitre.id',
     displayAsText: 'Technique(s)',
-    render: (value) => renderTechniques(value),
+    render: value => renderTechniques(value),
   },
   { id: 'rule.mitre.tactic', displayAsText: 'Tactic(s)' },
   { id: 'rule.level', displayAsText: 'Level' },
   {
     id: 'rule.id',
     displayAsText: 'Rule ID',
-    render: (value) => (
+    render: value => (
       <RedirectAppLinks application={getCore().application}>
-        <EuiLink
-          href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-        >
+        <EuiLink href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}>
           {value}
-        </EuiLink >
+        </EuiLink>
       </RedirectAppLinks>
     ),
   },

@@ -32,13 +32,13 @@ import {
   IIndexPattern,
 } from '../../../../../../../src/plugins/data/common';
 import moment from 'moment-timezone';
-import { AppNavigate } from '../../../../react-services/app-navigate';
 import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { getIndexPattern } from '../../../../react-services';
 import { RegistryValues } from './registryValues';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
 import { ErrorHandler } from '../../../../react-services/error-management';
+import NavigationService from '../../../../react-services/navigation-service';
 
 export class FileDetails extends Component {
   props!: {
@@ -201,14 +201,14 @@ export class FileDetails extends Component {
   viewInEvents = ev => {
     const { file } = this.props.currentFile;
     if (this.props.view === 'extern') {
-      AppNavigate.navigateToModule(ev, 'overview', {
+      NavigationService.getInstance().navigateToModule(ev, 'overview', {
         agentId: this.props?.agent?.id,
         tab: 'fim',
         tabView: 'events',
         filters: { 'syscheck.path': file },
       });
     } else {
-      AppNavigate.navigateToModule(
+      NavigationService.getInstance().navigateToModule(
         ev,
         'overview',
         {

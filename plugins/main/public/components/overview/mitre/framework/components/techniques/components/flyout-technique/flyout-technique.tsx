@@ -27,7 +27,6 @@ import {
   EuiIcon,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
-import { AppNavigate } from '../../../../../../../../react-services/app-navigate';
 import { getUiSettings } from '../../../../../../../../kibana-services';
 import {
   FilterManager,
@@ -37,13 +36,17 @@ import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../../components/common/flyouts';
-import { techniquesColumns, agentTechniquesColumns } from './flyout-technique-columns';
+import {
+  techniquesColumns,
+  agentTechniquesColumns,
+} from './flyout-technique-columns';
 import { PatternDataSource } from '../../../../../../../../components/common/data-source';
 import { WazuhFlyoutDiscover } from '../../../../../../../common/wazuh-discover/wz-flyout-discover';
 import { tFilterParams } from '../../../../mitre';
 import TechniqueRowDetails from './technique-row-details';
 import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/data/common';
 import store from '../../../../../../../../redux/store';
+import NavigationService from '../../../../../../../../react-services/navigation-service';
 
 const md = new MarkdownIt({
   html: true,
@@ -87,7 +90,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   };
 
   useEffect(() => {
-    const componentDidUpdate = async (prevProps) => {
+    const componentDidUpdate = async prevProps => {
       const { currentTechnique } = props;
       if (prevProps.currentTechnique !== currentTechnique) {
         await getTechniqueData();
@@ -104,7 +107,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         state.techniqueData.replaced_external_references &&
         state.techniqueData.replaced_external_references.length > 0
       ) {
-        state.techniqueData.replaced_external_references.forEach((reference) => {
+        state.techniqueData.replaced_external_references.forEach(reference => {
           $(`.technique-reference-${reference.index}`).each(function () {
             $(this).off();
           });
@@ -119,12 +122,12 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       state.techniqueData.replaced_external_references &&
       state.techniqueData.replaced_external_references.length > 0
     ) {
-      state.techniqueData.replaced_external_references.forEach((reference) => {
+      state.techniqueData.replaced_external_references.forEach(reference => {
         $(`.technique-reference-citation-${reference.index}`).each(function () {
           $(this).off();
           $(this).click(() => {
             $(`.euiFlyoutBody__overflow`).scrollTop(
-              $(`#technique-reference-${reference.index}`).position().top - 150
+              $(`#technique-reference-${reference.index}`).position().top - 150,
             );
           });
         });
@@ -137,18 +140,31 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       setIsLoading(true);
       setState({ techniqueData: {} });
       const { currentTechnique } = props;
-      const techniqueResponse = await WzRequest.apiReq('GET', '/mitre/techniques', {
-        params: {
-          q: `external_id=${currentTechnique}`,
+      const techniqueResponse = await WzRequest.apiReq(
+        'GET',
+        '/mitre/techniques',
+        {
+          params: {
+            q: `external_id=${currentTechnique}`,
+          },
         },
-      });
-      const [techniqueData] = (((techniqueResponse || {}).data || {}).data || {}).affected_items;
-      const tacticsResponse = await WzRequest.apiReq('GET', '/mitre/tactics', {});
-      const tacticsData = (((tacticsResponse || {}).data || {}).data || {}).affected_items;
+      );
+      const [techniqueData] = (
+        ((techniqueResponse || {}).data || {}).data || {}
+      ).affected_items;
+      const tacticsResponse = await WzRequest.apiReq(
+        'GET',
+        '/mitre/tactics',
+        {},
+      );
+      const tacticsData = (((tacticsResponse || {}).data || {}).data || {})
+        .affected_items;
 
       techniqueData.tactics &&
-        (techniqueData.tactics = techniqueData.tactics.map((tacticID) => {
-          const tactic = tacticsData.find((tacticData) => tacticData.id === tacticID);
+        (techniqueData.tactics = techniqueData.tactics.map(tacticID => {
+          const tactic = tacticsData.find(
+            tacticData => tacticData.id === tacticID,
+          );
           return { id: tactic.external_id, name: tactic.name };
         }));
       const { name, mitre_version, tactics } = techniqueData;
@@ -184,8 +200,8 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
             <EuiLoadingContent lines={1} />
           </div>
         )) || (
-          <EuiTitle size="m">
-            <h2 id="flyoutSmallTitle">{techniqueData.name}</h2>
+          <EuiTitle size='m'>
+            <h2 id='flyoutSmallTitle'>{techniqueData.name}</h2>
           </EuiTitle>
         )}
       </EuiFlyoutHeader>
@@ -197,8 +213,12 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     const key = Object.keys(filter)[0];
     const value = filter[key];
     const valuesArray = Array.isArray(value) ? [...value] : [value];
-    valuesArray.map((item) => {
-      const formattedFilter = buildPhraseFilter({ name: key, type: 'string' }, item, indexPattern);
+    valuesArray.map(item => {
+      const formattedFilter = buildPhraseFilter(
+        { name: key, type: 'string' },
+        item,
+        indexPattern,
+      );
       if (formattedFilter) {
         filtersToAdd.push(formattedFilter);
       }
@@ -229,7 +249,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
     const formattedDescription = techniqueData.description ? (
       <div
-        className="wz-markdown-margin wz-markdown-wrapper"
+        className='wz-markdown-margin wz-markdown-wrapper'
         dangerouslySetInnerHTML={{
           __html: md.render(techniqueData.description),
         }}
@@ -242,17 +262,21 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         title: 'ID',
         description: (
           <EuiToolTip
-            position="top"
+            position='top'
             content={`Open ${currentTechnique} details in the Intelligence section`}
           >
             <EuiLink
-              onClick={(e) => {
-                AppNavigate.navigateToModule(e, 'overview', {
-                  tab: 'mitre',
-                  tabView: 'intelligence',
-                  tabRedirect: 'techniques',
-                  idToRedirect: currentTechnique,
-                });
+              onClick={e => {
+                NavigationService.getInstance().navigateToModule(
+                  e,
+                  'overview',
+                  {
+                    tab: 'mitre',
+                    tabView: 'intelligence',
+                    tabRedirect: 'techniques',
+                    idToRedirect: currentTechnique,
+                  },
+                );
                 e.stopPropagation();
               }}
             >
@@ -264,21 +288,25 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       {
         title: 'Tactics',
         description: techniqueData.tactics
-          ? techniqueData.tactics.map((tactic) => {
+          ? techniqueData.tactics.map(tactic => {
               return (
                 <>
                   <EuiToolTip
-                    position="top"
+                    position='top'
                     content={`Open ${tactic.name} details in the Intelligence section`}
                   >
                     <EuiLink
-                      onClick={(e) => {
-                        AppNavigate.navigateToModule(e, 'overview', {
-                          tab: 'mitre',
-                          tabView: 'intelligence',
-                          tabRedirect: 'tactics',
-                          idToRedirect: tactic.id,
-                        });
+                      onClick={e => {
+                        NavigationService.getInstance().navigateToModule(
+                          e,
+                          'overview',
+                          {
+                            tab: 'mitre',
+                            tabView: 'intelligence',
+                            tabRedirect: 'tactics',
+                            idToRedirect: tactic.id,
+                          },
+                        );
                         e.stopPropagation();
                       }}
                     >
@@ -299,16 +327,16 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     return (
       <EuiFlyoutBody>
         <EuiAccordion
-          id="details"
+          id='details'
           buttonContent={
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h3>Technique details</h3>
             </EuiTitle>
           }
           initialIsOpen={true}
         >
-          <div className="flyout-row details-row">
-            <EuiFlexGroup direction="column" gutterSize="none">
+          <div className='flyout-row details-row'>
+            <EuiFlexGroup direction='column' gutterSize='none'>
               {(Object.keys(techniqueData).length === 0 && (
                 <EuiFlexItem>
                   <EuiLoadingContent lines={2} />
@@ -323,42 +351,42 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           </div>
         </EuiAccordion>
 
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
         <EuiAccordion
           style={{ textDecoration: 'none' }}
           id={'recent_events'}
-          className="events-accordion"
+          className='events-accordion'
           buttonContent={
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h3>
                 Recent events
                 <span style={{ marginLeft: 16 }}>
                   <span>
                     <EuiToolTip
-                      position="top"
+                      position='top'
                       content={'Show ' + currentTechnique + ' in Dashboard'}
                     >
                       <EuiIcon
-                        onMouseDown={(e) => {
+                        onMouseDown={e => {
                           openDashboard(e, currentTechnique);
                           e.stopPropagation();
                         }}
-                        color="primary"
-                        type="visualizeApp"
+                        color='primary'
+                        type='visualizeApp'
                         style={{ marginRight: '10px' }}
                       ></EuiIcon>
                     </EuiToolTip>
                     <EuiToolTip
-                      position="top"
+                      position='top'
                       content={'Inspect ' + currentTechnique + ' in Events'}
                     >
                       <EuiIcon
-                        onMouseDown={(e) => {
+                        onMouseDown={e => {
                           openDiscover(e, currentTechnique);
                           e.stopPropagation();
                         }}
-                        color="primary"
-                        type="discoverApp"
+                        color='primary'
+                        type='discoverApp'
                       ></EuiIcon>
                     </EuiToolTip>
                   </span>
@@ -366,10 +394,10 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
               </h3>
             </EuiTitle>
           }
-          paddingSize="none"
+          paddingSize='none'
           initialIsOpen={true}
         >
-          <div className="details-row">
+          <div className='details-row'>
             <WazuhFlyoutDiscover
               DataSource={PatternDataSource}
               tableColumns={getDiscoverColums()}
