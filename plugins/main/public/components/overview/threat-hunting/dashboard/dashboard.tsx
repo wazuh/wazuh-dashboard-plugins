@@ -53,10 +53,9 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { wzDiscoverRenderColumns } from '../../../common/wazuh-discover/render-columns';
+import { WzSearchBar } from '../../../common/search-bar';
 
 const plugins = getPlugins();
-
-const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
@@ -213,16 +212,14 @@ const DashboardTH: React.FC = () => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
-          <div className='wz-search-bar hide-filter-control'>
-            <SearchBar
-              appName='th-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          </div>
+          <WzSearchBar
+            appName='th-searchbar'
+            {...searchBarProps}
+            showDatePicker={true}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
         )}
         {!isDataSourceLoading && dataSource && results?.hits?.total === 0 ? (
           <DiscoverNoResults />
@@ -275,48 +272,50 @@ const DashboardTH: React.FC = () => {
                   hidePanelTitles: false,
                 }}
               />
-              <EuiDataGrid
-                {...dataGridProps}
-                className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                toolbarVisibility={{
-                  additionalControls: (
-                    <>
-                      <HitsCounter
-                        hits={results?.hits?.total}
-                        showResetButton={false}
-                        onResetQuery={() => { }}
-                        tooltip={
-                          results?.hits?.total &&
-                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                            ? {
-                              ariaLabel: 'Warning',
-                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                MAX_ENTRIES_PER_QUERY,
-                              )} hits.`,
-                              iconType: 'alert',
-                              position: 'top',
-                            }
-                            : undefined
-                        }
-                      />
-                      <EuiButtonEmpty
-                        disabled={
-                          results?.hits?.total === 0 ||
-                          !columnVisibility?.visibleColumns?.length
-                        }
-                        size='xs'
-                        iconType='exportAction'
-                        color='primary'
-                        isLoading={isExporting}
-                        className='euiDataGrid__controlBtn'
-                        onClick={onClickExportResults}
-                      >
-                        Export Formated
-                      </EuiButtonEmpty>
-                    </>
-                  ),
-                }}
-              />
+              <div style={{ margin: '8px' }}>
+                <EuiDataGrid
+                  {...dataGridProps}
+                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                  toolbarVisibility={{
+                    additionalControls: (
+                      <>
+                        <HitsCounter
+                          hits={results?.hits?.total}
+                          showResetButton={false}
+                          onResetQuery={() => { }}
+                          tooltip={
+                            results?.hits?.total &&
+                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                              ? {
+                                ariaLabel: 'Warning',
+                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                  MAX_ENTRIES_PER_QUERY,
+                                )} hits.`,
+                                iconType: 'alert',
+                                position: 'top',
+                              }
+                              : undefined
+                          }
+                        />
+                        <EuiButtonEmpty
+                          disabled={
+                            results?.hits?.total === 0 ||
+                            !columnVisibility?.visibleColumns?.length
+                          }
+                          size='xs'
+                          iconType='exportAction'
+                          color='primary'
+                          isLoading={isExporting}
+                          className='euiDataGrid__controlBtn'
+                          onClick={onClickExportResults}
+                        >
+                          Export Formated
+                        </EuiButtonEmpty>
+                      </>
+                    ),
+                  }}
+                />
+              </div>
               {inspectedHit && (
                 <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
                   <EuiFlyoutHeader>

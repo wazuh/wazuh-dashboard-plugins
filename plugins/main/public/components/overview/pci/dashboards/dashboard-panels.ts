@@ -132,11 +132,20 @@ const getVisStateTopRequirements = (indexPatternId: string) => {
           },
         },
         {
-          id: '4',
+          id: '3',
           enabled: true,
-          type: 'count',
-          schema: 'radius',
-          params: {},
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.pci_dss',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
         },
         {
           id: '4',
@@ -197,131 +206,6 @@ const getVisStateTopAgentsByCount = (indexPatternId: string) => {
             size: 10,
             order: 'desc',
             orderBy: '1',
-          },
-        },
-      ],
-    },
-  };
-};
-
-const getVisStateRequirementsOverTime = (indexPatternId: string) => {
-  return {
-    id: 'Wazuh-App-Overview-PCI-DSS-Requirements-over-time',
-    title: 'Top requirements over time',
-    type: 'area',
-    params: {
-      type: 'area',
-      grid: {
-        categoryLines: true,
-        style: { color: '#eee' },
-        valueAxis: 'ValueAxis-1',
-      },
-      categoryAxes: [
-        {
-          id: 'CategoryAxis-1',
-          type: 'category',
-          position: 'bottom',
-          show: true,
-          style: {},
-          scale: { type: 'linear' },
-          labels: { show: true, filter: true, truncate: 100 },
-          title: {},
-        },
-      ],
-      valueAxes: [
-        {
-          id: 'ValueAxis-1',
-          name: 'LeftAxis-1',
-          type: 'value',
-          position: 'left',
-          show: true,
-          style: {},
-          scale: { type: 'linear', mode: 'normal' },
-          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
-        },
-      ],
-      seriesParams: [
-        {
-          show: 'true',
-          type: 'area',
-          mode: 'stacked',
-          data: { label: 'Count', id: '1' },
-          drawLinesBetweenPoints: true,
-          showCircles: true,
-          interpolate: 'cardinal',
-          valueAxis: 'ValueAxis-1',
-        },
-      ],
-      addTooltip: true,
-      addLegend: true,
-      legendPosition: 'right',
-      times: [],
-      addTimeMarker: false,
-    },
-    uiState: {},
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          schema: 'metric',
-          params: {},
-        },
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          schema: 'metric',
-          params: {},
-        },
-        {
-          id: '3',
-          enabled: true,
-          type: 'terms',
-          schema: 'group',
-          params: {
-            field: 'rule.pci_dss',
-            size: '5',
-            order: 'desc',
-            orderBy: '1',
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-          },
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'date_histogram',
-          schema: 'segment',
-          params: {
-            field: 'timestamp',
-            timeRange: { from: 'now-24h', to: 'now', mode: 'quick' },
-            useNormalizedEsInterval: true,
-            interval: 'auto',
-            time_zone: 'Europe/Berlin',
-            drop_partials: false,
-            customInterval: '2h',
-            min_doc_count: 1,
-            extended_bounds: {},
           },
         },
       ],
@@ -927,7 +811,7 @@ export const getDashboardPanels = (
     g3: {
       gridData: {
         w: 48,
-        h: 11,
+        h: 19,
         x: 0,
         y: 14,
         i: 'g3',
@@ -935,34 +819,20 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g3',
-        savedVis: getVisStateRequirementsOverTime(indexPatternId),
+        savedVis: getVisStateRequirementsHeatmap(indexPatternId),
       },
     },
     g4: {
       gridData: {
         w: 48,
-        h: 19,
+        h: 9,
         x: 0,
-        y: 25,
+        y: 33,
         i: 'g4',
       },
       type: 'visualization',
       explicitInput: {
         id: 'g4',
-        savedVis: getVisStateRequirementsHeatmap(indexPatternId),
-      },
-    },
-    g5: {
-      gridData: {
-        w: 48,
-        h: 9,
-        x: 0,
-        y: 43,
-        i: 'g5',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'g5',
         savedVis: getVisStateRequirementsByAgent(indexPatternId),
       },
     },

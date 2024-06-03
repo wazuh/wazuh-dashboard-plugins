@@ -1,0 +1,19 @@
+name: 'Comment Test Coverage with delete filter by title'
+description: 'Read a Test Coverage json-summary test report and add stats on to PR using a table that rewrites itself on successive pushes.'
+inputs:
+  token:
+    description: 'The GitHub authentication token'
+    required: true
+  path:
+    description: 'Filepath to json-summary file'
+    required: true
+  title:
+    description: 'Comment title in PR conversation'
+    required: false
+    default: 'Test Coverage'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'message-square'
+  color: 'gray-dark'

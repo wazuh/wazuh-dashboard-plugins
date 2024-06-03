@@ -80,6 +80,14 @@ export function getFilterAllowedAgents(
   };
 }
 
+type tFilterType =
+  | 'is'
+  | 'is not'
+  | 'exists'
+  | 'does not exist'
+  | 'is one of'
+  | 'is not one of';
+
 export class PatternDataSourceFilterManager
   implements tDataSourceFilterManager
 {
@@ -218,14 +226,14 @@ export class PatternDataSourceFilterManager
     ];
   }
 
-  /**
-   * Returns a filter with the field and value received
-   * @param field
-   * @param value
-   * @returns
-   */
-  createFilter(field: string, value: string): tFilter {
-    return this.generateFilter(field, value, this.dataSource.id) as tFilter;
+  public removeFilterByControlledBy(value: string) {
+    let filters = this.filterManager.getFilters();
+    const controlledBy = filters.filter(
+      filter => filter.meta?.controlledBy === value,
+    );
+    controlledBy.forEach(filter => {
+      this.filterManager.removeFilter(filter);
+    });
   }
 
   /**
@@ -233,8 +241,17 @@ export class PatternDataSourceFilterManager
    * @param field
    * @param value
    */
-  removeFilter(filter: tFilter): void {
-    this.filterManager.removeFilter(filter);
+  removeFilter(field: string, value: string | string[]): void {
+    let filters = this.filterManager.getFilters();
+    const filterIndex = filters.findIndex(f =>
+      f.meta?.key === field && f.meta?.value === Array.isArray(value)
+        ? value?.join(', ')
+        : value,
+    );
+
+    if (filterIndex < 0) return;
+
+    this.filterManager.removeFilter(filters[filterIndex]);
   }
 
   /**
@@ -373,6 +390,140 @@ export class PatternDataSourceFilterManager
     return [];
   }
 
+  /******************************************************************/
+  /********************** FILTERS FACTORY ***************************/
+  /******************************************************************/
+
+  /**
+   * Returns a filter with the field and value received
+   * @param field
+   * @param value
+   * @returns
+   */
+  createFilter(
+    type: tFilterType,
+    key: string,
+    value: string | [],
+    controlledBy?: string,
+  ): tFilter {
+    switch (type) {
+      case 'is':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              match_phrase: {
+                [key]: {
+                  query: value,
+                },
+              },
+            },
+          },
+          controlledBy,
+        );
+      case 'is not':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              match_phrase: {
+                [key]: {
+                  query: value,
+                },
+              },
+            },
+          },
+          controlledBy,
+          true,
+        );
+      case 'exists':
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            value: 'exists',
+            negate: false,
+            type: 'exists',
+            index: this.dataSource.id,
+            controlledBy,
+          },
+          exists: { field: key },
+          $state: { store: 'appState' },
+        };
+      case 'does not exist':
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            value: 'exists',
+            negate: true,
+            type: 'exists',
+            index: this.dataSource.id,
+            controlledBy,
+          },
+          exists: { field: key },
+          $state: { store: 'appState' },
+        };
+      case 'is one of':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              bool: {
+                minimum_should_match: 1,
+                should: value.map((v: string) => ({
+                  match_phrase: {
+                    [key]: {
+                      query: v,
+                    },
+                  },
+                })),
+              },
+            },
+          },
+          controlledBy,
+        );
+      case 'is not one of':
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          {
+            query: {
+              bool: {
+                minimum_should_match: 1,
+                should: value.map((v: string) => ({
+                  match_phrase: {
+                    [key]: {
+                      query: v,
+                    },
+                  },
+                })),
+              },
+            },
+          },
+          controlledBy,
+          true,
+        );
+      default:
+        return this.generateFilter(
+          key,
+          value,
+          this.dataSource.id,
+          undefined,
+          controlledBy,
+        );
+    }
+  }
+
   /**
    * Return a simple filter object with the field, value and index pattern received
    *
@@ -382,37 +533,26 @@ export class PatternDataSourceFilterManager
    */
   private generateFilter(
     field: string,
-    value: string,
+    value: string | string[],
     indexPatternTitle: string,
+    query: tFilter['query'] | tFilter['exists'],
+    controlledBy?: string,
+    negate: boolean = false,
   ) {
-    const meta = {
-      disabled: false,
-      negate: false,
-      key: field,
-      params: [value],
-      alias: null,
-      type: 'phrases',
-      value: value,
-      index: indexPatternTitle,
-    };
-    const $state = {
-      store: 'appState',
-    };
-    const query = {
-      bool: {
-        minimum_should_match: 1,
-        should: [
-          {
-            match_phrase: {
-              [field]: {
-                query: value,
-              },
-            },
-          },
-        ],
+    return {
+      meta: {
+        alias: null,
+        disabled: false,
+        key: field,
+        value: Array.isArray(value) ? value.join(', ') : value,
+        params: value,
+        negate,
+        type: 'phrases',
+        index: indexPatternTitle,
+        controlledBy,
       },
+      ...query,
+      $state: { store: 'appState' },
     };
-
-    return { meta, $state, query };
   }
 }

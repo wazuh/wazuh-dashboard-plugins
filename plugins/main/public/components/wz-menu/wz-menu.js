@@ -523,7 +523,7 @@ export const WzMenu = withWindowSize(
             <EuiFlexGroup
               alignItems='center'
               responsive={false}
-              className='wz-margin-left-10 wz-margin-right-10'
+              className='wz-margin-left-10 wz-margin-right-10 font-size-14'
             >
               {!this.showSelectorsInPopover &&
                 this.state.patternList.length > 1 &&

@@ -1,28 +1,28 @@
 .discoverContainer {
-    height: calc(100vh - 104px);
+  height: calc(100vh - 104px);
 
-    .euiDataGrid--fullScreen {
-        height: calc(100vh - 49px);
-        bottom: 0;
-        top: auto;
-    }
- 
-    .discoverDataGrid {
-        height: calc(100vh - 496px);
-    }
+  .euiDataGrid--fullScreen {
+    height: calc(100vh - 49px);
+    bottom: 0;
+    top: auto;
+  }
 
-    .discoverChartContainer {
-        min-height: 234px;
-        .dshLayout-isMaximizedPanel {
-            top: 0;
-            left: 0;
-            min-height: calc(100vh - 49px);
-            position: fixed;
-            z-index: 9999;
-        }
+  .discoverDataGrid {
+    height: calc(100vh - 458px);
+  }
+
+  .discoverChartContainer {
+    min-height: 234px;
+    .dshLayout-isMaximizedPanel {
+      top: 0;
+      left: 0;
+      min-height: calc(100vh - 49px);
+      position: fixed;
+      z-index: 9999;
     }
+  }
 }
 
 .headerIsExpanded .discoverContainer {
-    height: calc(100vh - 153px);
+  height: calc(100vh - 153px);
 }

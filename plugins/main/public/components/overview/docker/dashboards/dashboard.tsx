@@ -25,10 +25,9 @@ import {
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
+import { WzSearchBar } from '../../../common/search-bar';
 
 const plugins = getPlugins();
-
-const SearchBar = getPlugins().data.ui.SearchBar;
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
@@ -100,16 +99,14 @@ const DashboardDockerComponent: React.FC = ({ }) => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <div className='wz-search-bar hide-filter-control'>
-                <SearchBar
-                  appName='docker-searchbar'
-                  {...searchBarProps}
-                  showDatePicker={true}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                />
-              </div>
-            )}
+            <WzSearchBar
+              appName='docker-searchbar'
+              {...searchBarProps}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+            />
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

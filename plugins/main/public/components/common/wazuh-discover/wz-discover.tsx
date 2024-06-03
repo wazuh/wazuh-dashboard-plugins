@@ -11,7 +11,6 @@ import {
   EuiFlyoutBody,
   EuiFlyoutHeader,
   EuiTitle,
-  EuiSpacer,
   EuiPanel,
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
@@ -43,6 +42,7 @@ import {
 } from '../data-source';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
+import { WzSearchBar } from '../search-bar';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -58,7 +58,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     throw new Error('DataSource is required');
   }
 
-  const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
@@ -86,7 +85,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     },
     [results],
   );
-
 
   const DocViewInspectButton = ({
     rowIndex,
@@ -191,26 +189,31 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         restrictWidth='100%'
         fullHeight={true}
         grow
+        paddingSize='none'
+        pageContentProps={{ color: 'transparent' }}
       >
-        <>
-          {isDataSourceLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <div className='wz-discover hide-filter-control wz-search-bar'>
-              <SearchBar
-                appName='wazuh-discover-search-bar'
-                {...searchBarProps}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            </div>
-          )}
-          {!isDataSourceLoading && results?.hits?.total === 0 ? (
-            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-          ) : null}
-          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-            <>
+        {isDataSourceLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <WzSearchBar
+            appName='wazuh-discover-search-bar'
+            {...searchBarProps}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
+        )}
+        {!isDataSourceLoading && results?.hits?.total === 0 ? (
+          <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+        ) : null}
+        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+          <EuiPanel
+            paddingSize='s'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
+            <EuiFlexGroup gutterSize='s' direction='column'>
               <EuiFlexItem grow={false} className='discoverChartContainer'>
                 <EuiPanel
                   hasBorder={false}
@@ -231,8 +234,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   </EuiPanel>
                 </EuiPanel>
               </EuiFlexItem>
-              <EuiSpacer size='m' />
-              <div className='discoverDataGrid'>
+              <EuiFlexItem grow={false} className='discoverDataGrid'>
                 <EuiDataGrid
                   {...dataGridProps}
                   className={sideNavDocked ? 'dataGridDockedNav' : ''}
@@ -249,29 +251,29 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     ),
                   }}
                 />
-              </div>
-            </>
-          ) : null}
-          {inspectedHit && (
-            <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-              <EuiFlyoutHeader>
-                <EuiTitle>
-                  <h2>Document Details</h2>
-                </EuiTitle>
-              </EuiFlyoutHeader>
-              <EuiFlyoutBody>
-                <EuiFlexGroup direction='column'>
-                  <EuiFlexItem>
-                    <DocumentViewTableAndJson
-                      document={inspectedHit}
-                      indexPattern={indexPattern}
-                    />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlyoutBody>
-            </EuiFlyout>
-          )}
-        </>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPanel>
+        ) : null}
+        {inspectedHit && (
+          <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+            <EuiFlyoutHeader>
+              <EuiTitle>
+                <h2>Document Details</h2>
+              </EuiTitle>
+            </EuiFlyoutHeader>
+            <EuiFlyoutBody>
+              <EuiFlexGroup direction='column'>
+                <EuiFlexItem>
+                  <DocumentViewTableAndJson
+                    document={inspectedHit}
+                    indexPattern={indexPattern}
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiFlyoutBody>
+          </EuiFlyout>
+        )}
       </EuiPageTemplate>
     </IntlProvider>
   );
