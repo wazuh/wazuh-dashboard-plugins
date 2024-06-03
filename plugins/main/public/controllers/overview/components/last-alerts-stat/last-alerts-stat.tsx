@@ -15,12 +15,12 @@ import {
   ErrorFactory,
   HttpError,
 } from '../../../../react-services/error-management';
+import { useIsMounted } from '../../../../components/common/hooks/use-is-mounted';
 
 export function LastAlertsStat({ severity }: { severity: string }) {
   const [countLastAlerts, setCountLastAlerts] = useState<number | null>(null);
   const [discoverLocation, setDiscoverLocation] = useState<string>('');
-  const isMounted = useRef(true);
-
+  const isMounted = useIsMounted();
   const severityLabel = {
     low: {
       label: 'Low',
@@ -64,8 +64,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           severityLabel[severity].ruleLevelRange,
           { signal },
         );
-
-        if (isMounted.current) {
+        if (isMounted()) {
           setCountLastAlerts(count);
           const core = getCore();
 
@@ -74,27 +73,28 @@ export function LastAlertsStat({ severity }: { severity: string }) {
             basePath: 'discover',
           };
 
-        // TODO: find a better way to get the query discover URL
-        const destURL = core.application.getUrlForApp(discoverLocation.app, {
-          path: `${
-            discoverLocation.basePath
-          }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:${
-            cluster.field
-          },negate:!f,params:(query:${
-            cluster.name
-          }),type:phrase),query:(match_phrase:(${cluster.field}:${
-            cluster.name
-          }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:rule.level,negate:!f,params:(gte:${
-            severityLabel[severity].ruleLevelRange.minRuleLevel
-          },lte:${
-            severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
-          }),type:range),range:(rule.level:(gte:${
-            severityLabel[severity].ruleLevelRange.minRuleLevel
-          },lte:${
-            severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
-          })))),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))&_q=(filters:!(),query:(language:kuery,query:''))`,
-        });
-        setDiscoverLocation(destURL);
+          // TODO: find a better way to get the query discover URL
+          const destURL = core.application.getUrlForApp(discoverLocation.app, {
+            path: `${
+              discoverLocation.basePath
+            }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:${
+              cluster.field
+            },negate:!f,params:(query:${
+              cluster.name
+            }),type:phrase),query:(match_phrase:(${cluster.field}:${
+              cluster.name
+            }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:rule.level,negate:!f,params:(gte:${
+              severityLabel[severity].ruleLevelRange.minRuleLevel
+            },lte:${
+              severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
+            }),type:range),range:(rule.level:(gte:${
+              severityLabel[severity].ruleLevelRange.minRuleLevel
+            },lte:${
+              severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
+            })))),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))&_q=(filters:!(),query:(language:kuery,query:''))`,
+          });
+          setDiscoverLocation(destURL);
+        }
       } catch (error) {
         if (error.name !== 'AbortError') {
           const searchError = ErrorFactory.create(HttpError, {
@@ -107,12 +107,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
     };
 
     getCountLastAlerts();
-
-    return () => {
-      isMounted.current = false;
-      controller.abort();
-    };
-  }, [severity]);
+  }, [isMounted]);
 
   return (
     <EuiFlexItem>
