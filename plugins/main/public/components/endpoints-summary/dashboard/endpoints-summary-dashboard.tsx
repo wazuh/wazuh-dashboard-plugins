@@ -30,7 +30,7 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
       </EuiFlexItem>
       <EuiFlexItem>
         <DonutCard
-          betaBadgeLabel='Top 5 agents by OS'
+          betaBadgeLabel='Top 5 OS'
           onClickLabel={filterAgentByOS}
           getInfo={getAgentsByOs}
           reload={reloadDashboard}
@@ -38,7 +38,7 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
       </EuiFlexItem>
       <EuiFlexItem>
         <DonutCard
-          betaBadgeLabel='Top 5 agents by Group'
+          betaBadgeLabel='Top 5 groups'
           onClickLabel={filterAgentByGroup}
           getInfo={getAgentsByGroup}
           reload={reloadDashboard}
