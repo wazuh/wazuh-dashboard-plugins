@@ -14,13 +14,7 @@ import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { AppState } from './app-state';
 import { WzRequest } from './wz-request';
-import {
-  getAngularModule,
-  getCore,
-  getHttp,
-  getToasts,
-  getUiSettings,
-} from '../kibana-services';
+import { getCore, getHttp, getToasts, getUiSettings } from '../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';

@@ -7,7 +7,6 @@ jest.mock('../../kibana-services', () => ({
   getWazuhCheckUpdatesPlugin: jest.fn().mockReturnValue({
     UpdatesNotification: () => <div>Updates notification</div>,
   }),
-  getAngularModule: () => {},
 }));
 
 describe('WzUpdatesNotification tests', () => {

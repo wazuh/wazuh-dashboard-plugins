@@ -17,10 +17,9 @@ import { mount } from 'enzyme';
 import { AgentStatTable } from './table';
 
 jest.mock('../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
 }));
@@ -28,7 +27,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 const tableColumns = [
@@ -57,10 +56,10 @@ describe('AgentStatTable component', () => {
         loading={false}
         start={''}
         end={''}
-        title="Test"
+        title='Test'
         items={[]}
         exportCSVFilename={`agent-stats-10101-logcollector-global`}
-      />
+      />,
     );
     expect(wrapper).toMatchSnapshot();
   });
@@ -72,10 +71,10 @@ describe('AgentStatTable component', () => {
         loading={true}
         start={''}
         end={''}
-        title="Test"
+        title='Test'
         items={[]}
         exportCSVFilename={`agent-stats-10101-logcollector-global`}
-      />
+      />,
     );
 
     expect(wrapper.find('EuiLoadingSpinner').exists()).toBeTruthy();
@@ -89,10 +88,10 @@ describe('AgentStatTable component', () => {
         loading={true}
         start={''}
         end={''}
-        title="Test"
+        title='Test'
         items={[]}
         exportCSVFilename={`agent-stats-10101-logcollector-global`}
-      />
+      />,
     );
 
     const mockOnClick = jest.fn();
