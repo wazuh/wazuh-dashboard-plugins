@@ -197,7 +197,7 @@ exports[`Reporting component renders correctly to match the snapshot 1`] = `
                   </div>
                   <table
                     class="euiTable euiTable--responsive"
-                    id="__table_fa08a611-21b6-11ef-9ef6-81695dac7033"
+                    id="htmlId"
                     tabindex="-1"
                   >
                     <caption

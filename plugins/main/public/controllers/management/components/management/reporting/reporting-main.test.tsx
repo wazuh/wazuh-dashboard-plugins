@@ -24,6 +24,13 @@ jest.mock('../../../../../kibana-services', () => ({
   }),
 }));
 
+jest.mock(
+  '../../../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  }),
+);
+
 describe('Reporting component', () => {
   it('renders correctly to match the snapshot', () => {
     const { container } = renderWithProviders(<WzReporting />);
