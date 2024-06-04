@@ -359,4 +359,12 @@ describe('PatternDataSourceFilterManager', () => {
         })
 
     })
+
+    it.only('should return a filter transformed to the URL format', () => {
+        const filter = createFilter('agent.id', '1', 'my-index');
+        const URLFilter = PatternDataSourceFilterManager.filterToURLFormat(filter);
+        console.log('filter', URLFilter);
+    })
+
+
 })
