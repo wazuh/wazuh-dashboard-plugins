@@ -22,8 +22,9 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import NavigationService from '../../react-services/navigation-service';
 
-export function getSavedSearch({ location, history }) {
+export function getSavedSearch() {
   try {
     const services = {
       savedObjectsClient: getSavedObjects().client,
@@ -35,7 +36,9 @@ export function getSavedSearch({ location, history }) {
     };
 
     const savedSearches = createSavedSearchesLoader(services);
-    const currentParams = new URLSearchParams(location.search);
+    const currentParams = new URLSearchParams(
+      NavigationService.getInstance().getSearch(),
+    );
     const targetedAgent =
       currentParams &&
       (currentParams.get('agent') || currentParams.get('agent') === '000');
@@ -44,9 +47,9 @@ export function getSavedSearch({ location, history }) {
       currentParams.get('tab') === 'ruleset' &&
       currentParams.get('ruleid');
     if (!targetedAgent && !targetedRule && healthCheck()) {
-      history.push({
+      NavigationService.getInstance().navigate({
         pathname: '/health-check',
-        state: { prevLocation: location },
+        state: { prevLocation: NavigationService.getInstance().getLocation() },
       });
       return Promise.reject();
     } else {

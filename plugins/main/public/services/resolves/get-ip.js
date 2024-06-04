@@ -19,8 +19,9 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { StatisticsDataSource } from '../../components/common/data-source/pattern/statistics';
+import NavigationService from '../../react-services/navigation-service';
 
-export async function getIp({ location, history }) {
+export async function getIp() {
   const checkWazuhPatterns = async indexPatterns => {
     const configuration = await getWzConfig(new WazuhConfig());
     const STATISTICS_PATTERN_IDENTIFIER =
@@ -53,10 +54,16 @@ export async function getIp({ location, history }) {
         !savedObjects.find(element => element.id === currentPattern) ||
         !(await checkWazuhPatterns(savedObjects))
       ) {
-        if (!location.pathname.includes('/health-check')) {
-          history.push({
+        if (
+          !NavigationService.getInstance()
+            .getPathname()
+            .includes('/health-check')
+        ) {
+          NavigationService.getInstance().navigate({
             pathname: '/health-check',
-            state: { prevLocation: location },
+            state: {
+              prevLocation: NavigationService.getInstance().getLocation(),
+            },
           });
         }
       }
@@ -102,15 +109,17 @@ export async function getIp({ location, history }) {
     }
   };
 
-  const currentParams = new URLSearchParams(location.search);
+  const currentParams = new URLSearchParams(
+    NavigationService.getInstance().getSearch(),
+  );
   const targetedRule =
     currentParams &&
     currentParams.get('tab') === 'ruleset' &&
     currentParams.get('ruleid');
   if (!targetedRule && healthCheck()) {
-    history.push({
+    NavigationService.getInstance().navigate({
       pathname: '/health-check',
-      state: { prevLocation: location },
+      state: { prevLocation: NavigationService.getInstance().getLocation() },
     });
   } else {
     await buildSavedObjectsClient();

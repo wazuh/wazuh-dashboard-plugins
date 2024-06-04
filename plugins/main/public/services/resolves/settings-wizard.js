@@ -15,12 +15,11 @@ import { AppState } from '../../react-services/app-state';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { GenericRequest } from '../../react-services';
+import NavigationService from '../../react-services/navigation-service';
+import { getWzCurrentAppID } from '../../kibana-services';
+import { settings } from '../../utils/applications';
 
-export function settingsWizard(
-  { history, location },
-  wzMisc,
-  disableErrors = false,
-) {
+export function settingsWizard(_, wzMisc, disableErrors = false) {
   try {
     const callCheckStored = async () => {
       let currentApi = false;
@@ -39,10 +38,14 @@ export function settingsWizard(
       if (redirect) {
         AppState.setCurrentAPI(redirect);
       } else if (
-        !location.pathname.includes('/settings') &&
-        !location.pathname.includes('/blank-screen')
+        !NavigationService.getInstance().getPathname().includes('/settings') &&
+        !NavigationService.getInstance().getPathname().includes('/blank-screen')
       ) {
-        history.push('/settings?tab=api');
+        if (getWzCurrentAppID() === settings.id) {
+          NavigationService.getInstance().navigate('/settings?tab=api');
+        } else {
+          NavigationService.getInstance().navigateToApp(settings.id);
+        }
       }
     };
 
@@ -85,7 +88,9 @@ export function settingsWizard(
     };
 
     AppState.setWzMenu();
-    const currentParams = new URLSearchParams(location.search);
+    const currentParams = new URLSearchParams(
+      NavigationService.getInstance().getSearch(),
+    );
     const targetedAgent =
       currentParams &&
       (currentParams.get('agent') || currentParams.get('agent') === '000');
@@ -94,9 +99,9 @@ export function settingsWizard(
       currentParams.get('tab') === 'ruleset' &&
       currentParams.get('ruleid');
     if (!targetedAgent && !targetedRule && !disableErrors && healthCheck()) {
-      history.push({
+      NavigationService.getInstance().navigate({
         pathname: '/health-check',
-        state: { prevLocation: location },
+        state: { prevLocation: NavigationService.getInstance().getLocation() },
       });
     } else {
       // There's no cookie for current API
@@ -108,9 +113,11 @@ export function settingsWizard(
               // Try to set some API entry as default
               const defaultApi = await tryToSetDefault(data.data);
               setUpCredentials('Default API has been updated.', defaultApi);
-              history.push({
+              NavigationService.getInstance().navigate({
                 pathname: '/health-check',
-                state: { prevLocation: location },
+                state: {
+                  prevLocation: NavigationService.getInstance().getLocation(),
+                },
               });
             } else {
               setUpCredentials('Please set up API credentials.');
@@ -119,8 +126,16 @@ export function settingsWizard(
           .catch(error => {
             !disableErrors && ErrorHandler.handle(error);
             wzMisc.setWizard(true);
-            if (!location.pathname.includes('/settings')) {
-              history.push('/settings?tab=api');
+            if (
+              !NavigationService.getInstance()
+                .getPathname()
+                .includes('/settings')
+            ) {
+              if (getWzCurrentAppID() === settings.id) {
+                NavigationService.getInstance().navigate('/settings?tab=api');
+              } else {
+                NavigationService.getInstance().navigateToApp(settings.id);
+              }
             }
           });
       } else {
@@ -138,9 +153,11 @@ export function settingsWizard(
                 // Try to set some as default
                 const defaultApi = await tryToSetDefault(data.data);
                 setUpCredentials('Default API has been updated.', defaultApi);
-                history.push({
+                NavigationService.getInstance().navigate({
                   pathname: '/health-check',
-                  state: { prevLocation: location },
+                  state: {
+                    prevLocation: NavigationService.getInstance().getLocation(),
+                  },
                 });
               } else {
                 setUpCredentials('Please set up API credentials.', false);
