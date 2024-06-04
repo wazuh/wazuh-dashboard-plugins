@@ -103,11 +103,12 @@ export const AgentsTable = compose(withErrorBoundary)(
       useState(false);
     const [isUpgradePanelClosed, setIsUpgradePanelClosed] = useState(false);
 
-    const getOutdatedAgents = async () => {
+    const getOutdatedAgents = async q => {
       try {
         setIsLoadingTotalOutdated(true);
         const { total_affected_items } = await getOutdatedAgentsService({
           limit: 1,
+          q,
         });
         setTotalOutdated(total_affected_items);
       } catch (error) {
@@ -132,7 +133,6 @@ export const AgentsTable = compose(withErrorBoundary)(
       if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
-      getOutdatedAgents();
     }, []);
 
     useEffect(() => {
@@ -263,11 +263,12 @@ export const AgentsTable = compose(withErrorBoundary)(
             <WzButton
               buttonType='switch'
               label={`Show only outdated${
-                totalOutdated ? ` (${totalOutdated})` : ''
+                totalOutdated || showOnlyOutdated ? ` (${totalOutdated})` : ''
               }`}
               checked={showOnlyOutdated}
-              disabled={!totalOutdated}
+              disabled={!showOnlyOutdated && !totalOutdated}
               tooltip={
+                !showOnlyOutdated &&
                 !totalOutdated && {
                   content: 'There are no outdated agents',
                 }
@@ -367,6 +368,10 @@ export const AgentsTable = compose(withErrorBoundary)(
               }}
               rowProps={getRowProps}
               filters={filters}
+              onFiltersChange={filters => {
+                const q = filters.q ?? filters.default.q;
+                getOutdatedAgents(q);
+              }}
               onDataChange={handleOnDataChange}
               downloadCsv
               showReload
