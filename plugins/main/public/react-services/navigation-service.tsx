@@ -14,7 +14,7 @@ class NavigationService {
   }
 
   public static getInstance(history?: History): NavigationService {
-    if (!NavigationService.instance && history) {
+    if (history) {
       NavigationService.instance = new NavigationService(history);
     } else if (!NavigationService.instance) {
       throw new Error('NavigationService must be initialized with a history.');
