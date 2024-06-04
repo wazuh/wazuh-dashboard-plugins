@@ -1,3 +1,4 @@
+import rison from 'rison-node';
 import store from '../../../../redux/store';
 import { AppState } from '../../../../react-services/app-state';
 import { getDataPlugin } from '../../../../kibana-services';
@@ -555,4 +556,19 @@ export class PatternDataSourceFilterManager
       $state: { store: 'appState' },
     };
   }
+
+  /**
+   * Transform the filter format to the format used in the URL
+   * Receives a filter object and returns a filter object with the format used in the URL using rison-node
+   */
+
+  // _g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))
+  //_a=(filters:!(('$state':(store:appState),meta:(alias:!n,controlledBy:cluster-manager,disabled:!f,index:'wazuh-alerts-*',key:cluster.name,negate:!f,params:(query:wazuh),removable:!f,type:phrase),query:(match:(cluster.name:(query:wazuh,type:phrase))))),language:kuery,query:'')
+  static filterToURLFormat(filters: tFilter[]) {
+    const filterCopy = filters || [];
+    return rison.encode({
+      filters: filterCopy,
+    });
+  }
+
 }
