@@ -19,8 +19,7 @@ import { TableWzAPI } from '../../../common/tables';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../common/constants';
 import { withRouterSearch } from '../../../common/hocs';
 import { Route, Switch } from '../../../router-search';
-import { withRouter } from 'react-router-dom';
-import { compose } from 'redux';
+import NavigationService from '../../../../react-services/navigation-service';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -31,10 +30,7 @@ const searchBarWQLOptions = {
 
 const searchBarWQLFilters = { default: { q: 'type=registry_key' } };
 
-export const RegistryTable = compose(
-  withRouter,
-  withRouterSearch,
-)(
+export const RegistryTable = withRouterSearch(
   class RegistryTable extends Component {
     state: {
       syscheck: [];
@@ -66,10 +62,12 @@ export const RegistryTable = compose(
     }
 
     closeFlyout() {
-      const search = new URLSearchParams(this.props.location.search);
+      const search = new URLSearchParams(
+        NavigationService.getInstance().getSearch(),
+      );
       search.delete('file');
-      this.props.history.push(
-        `${this.props.location.pathname}?${search.toString()}`,
+      NavigationService.getInstance().navigate(
+        `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
       );
     }
 
@@ -108,10 +106,12 @@ export const RegistryTable = compose(
         return {
           'data-test-subj': `row-${file}`,
           onClick: () => {
-            const search = new URLSearchParams(this.props.location.search);
+            const search = new URLSearchParams(
+              NavigationService.getInstance().getSearch(),
+            );
             search.append('file', file);
-            this.props.history.push(
-              `${this.props.location.pathname}?${search.toString()}`,
+            NavigationService.getInstance().navigate(
+              `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
             );
           },
         };

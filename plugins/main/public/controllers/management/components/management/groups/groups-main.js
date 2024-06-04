@@ -31,7 +31,7 @@ import {
 } from '../../../../../components/common/hocs';
 import { endpointGroups } from '../../../../../utils/applications';
 import { MultipleAgentSelector } from '../../../../../components/management/groups/multiple-agent-selector';
-import { withRouter } from 'react-router-dom';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 class WzGroups extends Component {
   constructor(props) {
@@ -46,10 +46,12 @@ class WzGroups extends Component {
       // This removes the group from the search URL parameters.
       // TODO: the view to display the specific group should be managed through the routing based on
       // the URL instead of a component state. This lets refreshing the page and display the same view
-      const search = new URLSearchParams(this.props.location.search);
+      const search = new URLSearchParams(
+        NavigationService.getInstance().getSearch(),
+      );
       search.delete('group');
-      this.props.history.push(
-        `${this.props.location.pathname}?${search.toString()}`,
+      NavigationService.getInstance().navigate(
+        `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
       );
       try {
         // Try if the group can be accesed
@@ -120,6 +122,5 @@ export default compose(
   withGlobalBreadcrumb(props => {
     return [{ text: endpointGroups.breadcrumbLabel }];
   }),
-  withRouter,
   withRouterSearch,
 )(WzGroups);

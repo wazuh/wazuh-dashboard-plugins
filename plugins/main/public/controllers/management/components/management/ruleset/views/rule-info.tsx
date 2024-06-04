@@ -28,8 +28,6 @@ import { getErrorOrchestrator } from '../../../../../../react-services/common-se
 import { threatHunting } from '../../../../../../utils/applications';
 import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 import { withRouterSearch } from '../../../../../../components/common/hocs';
-import { withRouter } from 'react-router-dom';
-import { compose } from 'redux';
 import NavigationService from '../../../../../../react-services/navigation-service';
 import { AppState } from '../../../../../../react-services';
 import {
@@ -37,10 +35,7 @@ import {
   getWazuhCorePlugin,
 } from '../../../../../../kibana-services';
 
-export default compose(
-  withRouter,
-  withRouterSearch,
-)(
+export default withRouterSearch(
   class WzRuleInfo extends Component {
     constructor(props) {
       super(props);
@@ -321,10 +316,12 @@ export default compose(
       // TODO: the view of the rule flyout should be managed through the routing instead component
       // states
       if (this.props.search.redirectRule) {
-        const search = new URLSearchParams(this.props.location.search);
+        const search = new URLSearchParams(
+          NavigationService.getInstance().getSearch(),
+        );
         search.delete('redirectRule');
-        this.props.history.push(
-          `${this.props.location.pathname}?${search.toString()}`,
+        NavigationService.getInstance().navigate(
+          `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
         );
       }
       this.props.cleanFilters();
@@ -719,11 +716,13 @@ export default compose(
         return;
       }
 
-      const search = new URLSearchParams(this.props.location.search);
+      const search = new URLSearchParams(
+        NavigationService.getInstance().getSearch(),
+      );
       search.delete('redirectRule');
       search.append('redirectRule', ruleId);
-      this.props.history.push(
-        `${this.props.location.pathname}?${search.toString()}`,
+      NavigationService.getInstance().navigate(
+        `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
       );
       this.setState({ currentRuleId: ruleId, isLoading: true });
     }

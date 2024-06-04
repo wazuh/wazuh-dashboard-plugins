@@ -43,8 +43,8 @@ import {
   savedSearch,
 } from '../../services/resolves';
 import { Route, Switch } from '../router-search';
-import { withRouter } from 'react-router-dom';
 import { useRouterSearch } from '../common/hooks';
+import NavigationService from '../../react-services/navigation-service';
 
 const configurationTabID = 'configuration';
 
@@ -62,7 +62,6 @@ const mapDispatchToProps = dispatch => ({
 export const Settings = compose(
   withErrorBoundary,
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
-  withRouter,
   connect(mapStateToProps, mapDispatchToProps),
 )(props => {
   const { tab } = useRouterSearch();
@@ -159,7 +158,7 @@ class SettingsComponent extends React.Component {
     const isConfigurationUIEditable = this.isConfigurationUIEditable();
     if (currentTab === configurationTabID && !isConfigurationUIEditable) {
       // Change the inaccessible configuration to another accessible
-      this.props.history.replace(
+      NavigationService.getInstance().replace(
         `/settings?tab=${
           this.tabsConfiguration.find(({ id }) => id !== configurationTabID)!.id
         }`,
@@ -203,7 +202,7 @@ class SettingsComponent extends React.Component {
         });
       } catch (error) {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-        this.history.push('/blank-screen');
+        NavigationService.getInstance().navigate('/blank-screen');
         return;
       }
 
@@ -404,7 +403,9 @@ class SettingsComponent extends React.Component {
                       key={`settings-tab-${tab.name}`}
                       isSelected={tab.id === this.props.tab}
                       onClick={() =>
-                        this.props.history.push(`/settings?tab=${tab.id}`)
+                        NavigationService.getInstance().navigate(
+                          `/settings?tab=${tab.id}`,
+                        )
                       }
                     >
                       {tab.name}

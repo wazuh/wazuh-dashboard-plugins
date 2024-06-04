@@ -94,7 +94,7 @@ const checks = {
   },
 };
 
-function HealthCheckComponent({ location, history }) {
+function HealthCheckComponent({ location }) {
   const [checkWarnings, setCheckWarnings] = useState<{ [key: string]: [] }>({});
   const [checkErrors, setCheckErrors] = useState<{ [key: string]: [] }>({});
   const [checksReady, setChecksReady] = useState<{ [key: string]: boolean }>(
@@ -114,9 +114,9 @@ function HealthCheckComponent({ location, history }) {
       // update browser url
       const relativePath =
         location.state.prevLocation.pathname + '?' + searchParams.toString();
-      history.push(relativePath);
+      NavigationService.getInstance().navigate(relativePath);
     } else {
-      history.push('/');
+      NavigationService.getInstance().navigate('/');
     }
   };
 

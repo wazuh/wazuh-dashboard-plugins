@@ -19,8 +19,7 @@ import { TableWzAPI } from '../../../common/tables';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../common/constants';
 import { withRouterSearch } from '../../../common/hocs';
 import { Route, Switch } from '../../../router-search';
-import { withRouter } from 'react-router-dom';
-import { compose } from 'redux';
+import NavigationService from '../../../../react-services/navigation-service';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -31,10 +30,7 @@ const searchBarWQLOptions = {
 
 const searchBarWQLFilters = { default: { q: 'type=file' } };
 
-export const InventoryTable = compose(
-  withRouter,
-  withRouterSearch,
-)(
+export const InventoryTable = withRouterSearch(
   class InventoryTable extends Component {
     state: {
       syscheck: [];
@@ -67,19 +63,14 @@ export const InventoryTable = compose(
     }
 
     closeFlyout() {
-      const search = new URLSearchParams(this.props.location.search);
+      const search = new URLSearchParams(
+        NavigationService.getInstance().getSearch(),
+      );
       search.delete('file');
-      this.props.history.push(
-        `${this.props.location.pathname}?${search.toString()}`,
+      NavigationService.getInstance().navigate(
+        `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
       );
     }
-
-    // TODO: connect to total items change on parent component
-    /*
-    tis.props.onTotalItemsChange(
-        (((syscheck || {}).data || {}).data || {}).total_affected_items
-      );
-  */
 
     columns() {
       let width;
@@ -160,10 +151,12 @@ export const InventoryTable = compose(
         return {
           'data-test-subj': `row-${file}`,
           onClick: () => {
-            const search = new URLSearchParams(this.props.location.search);
+            const search = new URLSearchParams(
+              NavigationService.getInstance().getSearch(),
+            );
             search.append('file', file);
-            this.props.history.push(
-              `${this.props.location.pathname}?${search.toString()}`,
+            NavigationService.getInstance().navigate(
+              `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
             );
           },
         };
