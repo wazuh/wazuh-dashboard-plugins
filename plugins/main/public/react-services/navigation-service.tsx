@@ -1,4 +1,4 @@
-import { Location, Action, History, Path } from 'history';
+import { Location, Action, History } from 'history';
 import { getCore } from '../kibana-services';
 import { NavigateToAppOptions } from '../../../../src/core/public';
 import { getIndexPattern } from './elastic_helpers';
@@ -61,19 +61,25 @@ class NavigationService {
     );
   }
 
-  public navigate(path: string | Partial<Path>, state?: any): void {
-    if (typeof path === 'string') {
-      this.history.push(path, state);
+  public navigate(path: string, state?: any): void {
+    if(!state){
+      this.history.push(path);
     } else {
-      this.history.push(path, state || path.state);
+      this.history.push({
+        pathname: path,
+        state
+      });
     }
   }
 
-  public replace(path: string | Partial<Path>, state?: any): void {
-    if (typeof path === 'string') {
-      this.history.replace(path, state);
+  public replace(path: string, state?: any): void {
+    if(!state){
+      this.history.replace(path);
     } else {
-      this.history.replace(path, state || path.state);
+      this.history.replace({
+        pathname: path,
+        state
+      });
     }
   }
 
