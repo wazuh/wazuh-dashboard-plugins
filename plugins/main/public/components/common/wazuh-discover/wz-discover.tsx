@@ -187,7 +187,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       <EuiPageTemplate
         className='discoverContainer'
         restrictWidth='100%'
-        fullHeight={true}
         grow
         paddingSize='none'
         pageContentProps={{ color: 'transparent' }}

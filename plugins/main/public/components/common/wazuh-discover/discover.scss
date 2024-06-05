@@ -8,7 +8,9 @@
   }
 
   .discoverDataGrid {
-    height: calc(100vh - 458px);
+    .euiDataGrid__virtualized {
+      height: fit-content !important;
+    }
   }
 
   .discoverChartContainer {
