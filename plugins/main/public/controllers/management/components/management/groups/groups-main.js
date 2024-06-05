@@ -50,7 +50,7 @@ class WzGroups extends Component {
         NavigationService.getInstance().getSearch(),
       );
       search.delete('group');
-      NavigationService.getInstance().navigate(
+      NavigationService.getInstance().replace(
         `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
       );
       try {
