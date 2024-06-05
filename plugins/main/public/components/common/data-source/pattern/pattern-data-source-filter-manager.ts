@@ -395,24 +395,29 @@ export class PatternDataSourceFilterManager
   /********************** FILTERS FACTORY ***************************/
   /******************************************************************/
 
-  /**
-   * Returns a filter with the field and value received
-   * @param field
-   * @param value
-   * @returns
-   */
-  createFilter(
+  static createFilter(
     type: tFilterType,
     key: string,
     value: string | [],
+    indexPatternId: string,
     controlledBy?: string,
-  ): tFilter {
-    switch (type) {
+  ) {
+    if (!key || !value || !indexPatternId) {
+      throw new Error('key, value and indexPatternId params are required');
+    }
+
+    if (type === 'is one of' || type === 'is not one of') {
+      if (!Array.isArray(value)) {
+        throw new Error('The value must be an array');
+      }
+    }
+
+    switch (type.toLocaleLowerCase()) {
       case 'is':
-        return this.generateFilter(
+        return PatternDataSourceFilterManager.generateFilter(
           key,
           value,
-          this.dataSource.id,
+          indexPatternId,
           {
             query: {
               match_phrase: {
@@ -425,10 +430,10 @@ export class PatternDataSourceFilterManager
           controlledBy,
         );
       case 'is not':
-        return this.generateFilter(
+        return PatternDataSourceFilterManager.generateFilter(
           key,
           value,
-          this.dataSource.id,
+          indexPatternId,
           {
             query: {
               match_phrase: {
@@ -450,7 +455,7 @@ export class PatternDataSourceFilterManager
             value: 'exists',
             negate: false,
             type: 'exists',
-            index: this.dataSource.id,
+            index: indexPatternId,
             controlledBy,
           },
           exists: { field: key },
@@ -465,17 +470,17 @@ export class PatternDataSourceFilterManager
             value: 'exists',
             negate: true,
             type: 'exists',
-            index: this.dataSource.id,
+            index: indexPatternId,
             controlledBy,
           },
           exists: { field: key },
           $state: { store: 'appState' },
         };
       case 'is one of':
-        return this.generateFilter(
+        return PatternDataSourceFilterManager.generateFilter(
           key,
           value,
-          this.dataSource.id,
+          indexPatternId,
           {
             query: {
               bool: {
@@ -493,10 +498,10 @@ export class PatternDataSourceFilterManager
           controlledBy,
         );
       case 'is not one of':
-        return this.generateFilter(
+        return PatternDataSourceFilterManager.generateFilter(
           key,
           value,
-          this.dataSource.id,
+          indexPatternId,
           {
             query: {
               bool: {
@@ -515,14 +520,29 @@ export class PatternDataSourceFilterManager
           true,
         );
       default:
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          undefined,
-          controlledBy,
-        );
+        throw new Error('Invalid filter type');
     }
+  }
+
+  /**
+   * Returns a filter with the field and value received
+   * @param field
+   * @param value
+   * @returns
+   */
+  createFilter(
+    type: tFilterType,
+    key: string,
+    value: string | [],
+    controlledBy?: string,
+  ): tFilter {
+    return PatternDataSourceFilterManager.createFilter(
+      type,
+      key,
+      value,
+      this.dataSource.id,
+      controlledBy,
+    );
   }
 
   /**
@@ -532,10 +552,10 @@ export class PatternDataSourceFilterManager
    * @param value
    * @param indexPatternTitle
    */
-  private generateFilter(
+  static generateFilter(
     field: string,
     value: string | string[],
-    indexPatternTitle: string,
+    indexPatternId: string,
     query: tFilter['query'] | tFilter['exists'],
     controlledBy?: string,
     negate: boolean = false,
@@ -549,7 +569,7 @@ export class PatternDataSourceFilterManager
         params: value,
         negate,
         type: 'phrases',
-        index: indexPatternTitle,
+        index: indexPatternId,
         controlledBy,
       },
       ...query,
@@ -562,13 +582,10 @@ export class PatternDataSourceFilterManager
    * Receives a filter object and returns a filter object with the format used in the URL using rison-node
    */
 
-  // _g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))
-  //_a=(filters:!(('$state':(store:appState),meta:(alias:!n,controlledBy:cluster-manager,disabled:!f,index:'wazuh-alerts-*',key:cluster.name,negate:!f,params:(query:wazuh),removable:!f,type:phrase),query:(match:(cluster.name:(query:wazuh,type:phrase))))),language:kuery,query:'')
   static filterToURLFormat(filters: tFilter[]) {
-    const filterCopy = filters || [];
+    const filterCopy = filters || [];
     return rison.encode({
       filters: filterCopy,
     });
   }
-
 }
