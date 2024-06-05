@@ -5,6 +5,9 @@ import {
   tFilterManager,
   PatternDataSource,
 } from '../index';
+import {
+  FILTER_OPERATOR,
+} from './pattern-data-source-filter-manager';
 import store from '../../../../redux/store';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT,
@@ -435,7 +438,7 @@ describe('PatternDataSourceFilterManager', () => {
     });
   });
 
-  describe.only('createFilter', () => {
+  describe('createFilter', () => {
 
     it('should return ERROR when the key is not defined', () => {
       try {
@@ -452,7 +455,7 @@ describe('PatternDataSourceFilterManager', () => {
 
     it('should return and filter with controlledBy property when is received', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'is',
+        FILTER_OPERATOR.IS,
         'rule.id',
         '1',
         'my-index',
@@ -463,7 +466,7 @@ describe('PatternDataSourceFilterManager', () => {
 
     it('should return a "IS" filter with the received values', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'is',
+        FILTER_OPERATOR.IS,
         'agent.id',
         '1',
         'my-index',
@@ -484,7 +487,7 @@ describe('PatternDataSourceFilterManager', () => {
 
     it('should return a "IS NOT" filter with the received values', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'is not',
+        FILTER_OPERATOR.IS_NOT,
         'agent.id',
         '1',
         'my-index',
@@ -505,13 +508,13 @@ describe('PatternDataSourceFilterManager', () => {
 
     it('should return a "EXISTS" filter with the received values', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'exists',
+        FILTER_OPERATOR.EXISTS,
         'agent.id',
         '1',
         'my-index',
       );
       expect(filter.meta.key).toBe('agent.id');
-      expect(filter.meta.value).toBe('exists');
+      expect(filter.meta.value).toBe(FILTER_OPERATOR.EXISTS);
       expect(filter.meta.index).toBe('my-index');
       expect(filter.meta.negate).toBe(false);
       expect(filter.exists).toBeDefined();
@@ -520,13 +523,13 @@ describe('PatternDataSourceFilterManager', () => {
 
     it('should return a "DOES NOT EXIST" filter with the received values', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'does not exist',
+        FILTER_OPERATOR.DOES_NOT_EXISTS,
         'agent.id',
         '1',
         'my-index',
       );
       expect(filter.meta.key).toBe('agent.id');
-      expect(filter.meta.value).toBe('exists');
+      expect(filter.meta.value).toBe(FILTER_OPERATOR.EXISTS);
       expect(filter.meta.index).toBe('my-index');
       expect(filter.meta.negate).toBe(true);
       expect(filter.exists).toBeDefined();
@@ -536,7 +539,7 @@ describe('PatternDataSourceFilterManager', () => {
     it('should return an ERROR when the filter is "IS ONE OF" and the value is not an array', () => {
       try {
         PatternDataSourceFilterManager.createFilter(
-          'is one of',
+          FILTER_OPERATOR.IS_ONE_OF,
           'agent.id',
           '1',
           'my-index',
@@ -549,7 +552,7 @@ describe('PatternDataSourceFilterManager', () => {
     it('should return an ERROR when the filter is "IS NOT ONE OF" and the value is not an array', () => {
       try {
         PatternDataSourceFilterManager.createFilter(
-          'is not one of',
+          FILTER_OPERATOR.IS_NOT_ONE_OF,
           'agent.id',
           '1',
           'my-index',
@@ -561,7 +564,7 @@ describe('PatternDataSourceFilterManager', () => {
 
     it('should return a "IS ONE OF" filter with the received values with an only one item', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'is one of',
+        FILTER_OPERATOR.IS_ONE_OF,
         'agent.id',
         ['1'],
         'my-index',
@@ -588,7 +591,7 @@ describe('PatternDataSourceFilterManager', () => {
 
     it('should return a "IS ONE OF" filter with the received values with multiple items', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'is one of',
+        FILTER_OPERATOR.IS_ONE_OF,
         'agent.id',
         ['1', '2'],
         'my-index',
@@ -622,7 +625,7 @@ describe('PatternDataSourceFilterManager', () => {
 
     it('should return a "IS NOT ONE OF" filter with the received values with an only one item', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'is not one of',
+        FILTER_OPERATOR.IS_NOT_ONE_OF,
         'agent.id',
         ['1'],
         'my-index',
@@ -649,7 +652,7 @@ describe('PatternDataSourceFilterManager', () => {
 
     it('should return a "IS NOT ONE OF" filter with the received values with multiple items', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'is not one of',
+        FILTER_OPERATOR.IS_NOT_ONE_OF,
         'agent.id',
         ['1', '2'],
         'my-index',
@@ -682,10 +685,10 @@ describe('PatternDataSourceFilterManager', () => {
     });
   });
 
-  describe.only('filterToURLFormat', () => {
+  describe('filterToURLFormat', () => {
     it('should return a filter transformed to the URL format', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
-        'is',
+        FILTER_OPERATOR.IS,
         'rule.id',
         '1',
         'my-index',

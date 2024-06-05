@@ -81,13 +81,14 @@ export function getFilterAllowedAgents(
   };
 }
 
-type tFilterType =
-  | 'is'
-  | 'is not'
-  | 'exists'
-  | 'does not exist'
-  | 'is one of'
-  | 'is not one of';
+export enum FILTER_OPERATOR {
+  IS = 'is',
+  IS_NOT = 'is not',
+  EXISTS = 'exists',
+  DOES_NOT_EXISTS = 'does not exists',
+  IS_ONE_OF = 'is one of',
+  IS_NOT_ONE_OF = 'is not one of',
+}
 
 export class PatternDataSourceFilterManager
   implements tDataSourceFilterManager
@@ -396,20 +397,20 @@ export class PatternDataSourceFilterManager
   /******************************************************************/
 
   static createFilter(
-    type: tFilterType,
+    type: keyof typeof FILTER_OPERATOR,
     key: string,
     value: string | [],
     indexPatternId: string,
     controlledBy?: string,
   ) {
-    if (type === 'is one of' || type === 'is not one of') {
+    if (type === FILTER_OPERATOR.IS_ONE_OF || type === FILTER_OPERATOR.IS_NOT_ONE_OF) {
       if (!Array.isArray(value)) {
         throw new Error('The value must be an array');
       }
     }
 
     switch (type.toLocaleLowerCase()) {
-      case 'is':
+      case FILTER_OPERATOR.IS:
         return PatternDataSourceFilterManager.generateFilter(
           key,
           value,
@@ -425,7 +426,7 @@ export class PatternDataSourceFilterManager
           },
           controlledBy,
         );
-      case 'is not':
+      case FILTER_OPERATOR.IS_NOT:
         return PatternDataSourceFilterManager.generateFilter(
           key,
           value,
@@ -442,7 +443,7 @@ export class PatternDataSourceFilterManager
           controlledBy,
           true,
         );
-      case 'exists':
+      case FILTER_OPERATOR.EXISTS:
         return {
           meta: {
             alias: null,
@@ -457,7 +458,7 @@ export class PatternDataSourceFilterManager
           exists: { field: key },
           $state: { store: 'appState' },
         };
-      case 'does not exist':
+      case FILTER_OPERATOR.DOES_NOT_EXISTS:
         return {
           meta: {
             alias: null,
@@ -472,7 +473,7 @@ export class PatternDataSourceFilterManager
           exists: { field: key },
           $state: { store: 'appState' },
         };
-      case 'is one of':
+      case FILTER_OPERATOR.IS_ONE_OF:
         return PatternDataSourceFilterManager.generateFilter(
           key,
           value,
@@ -493,7 +494,7 @@ export class PatternDataSourceFilterManager
           },
           controlledBy,
         );
-      case 'is not one of':
+      case FILTER_OPERATOR.IS_NOT_ONE_OF:
         return PatternDataSourceFilterManager.generateFilter(
           key,
           value,
@@ -527,7 +528,7 @@ export class PatternDataSourceFilterManager
    * @returns
    */
   createFilter(
-    type: tFilterType,
+    type: keyof typeof FILTER_OPERATOR,
     key: string,
     value: string | [],
     controlledBy?: string,
