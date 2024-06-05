@@ -3,7 +3,6 @@ import {
   VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
 } from '../../../../../../common/constants';
 import { tFilter, PatternDataSourceFilterManager } from '../../index';
-import { AppState } from '../../../../../react-services/app-state';
 import { PatternDataSource } from '../pattern-data-source';
 
 export class VulnerabilitiesDataSource extends PatternDataSource {

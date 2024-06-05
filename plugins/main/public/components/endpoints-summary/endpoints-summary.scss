@@ -101,21 +101,3 @@
     white-space: nowrap;
   }
 }
-
-.endpoints-summary-container-indicators {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  min-height: 200px;
-
-  @media (min-width: 1024px) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (min-width: 1440px) {
-    grid-template-columns:
-      minmax(375px, 1fr) minmax(375px, 1fr) minmax(375px, 1fr)
-      minmax(150px, 300px);
-  }
-}

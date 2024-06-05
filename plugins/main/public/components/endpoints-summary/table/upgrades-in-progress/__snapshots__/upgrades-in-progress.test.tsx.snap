@@ -3,7 +3,7 @@
 exports[`AgentUpgradesInProgress component should return the component 1`] = `
 <div>
   <div
-    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--subdued euiPanel--noShadow euiPanel--noBorder"
+    class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
   >
     <div
       class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--alignItemsFlexStart euiFlexGroup--directionRow"
@@ -151,5 +151,8 @@ exports[`AgentUpgradesInProgress component should return the component 1`] = `
       </div>
     </div>
   </div>
+  <div
+    class="euiSpacer euiSpacer--s"
+  />
 </div>
 `;
