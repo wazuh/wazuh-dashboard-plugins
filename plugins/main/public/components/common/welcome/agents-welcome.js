@@ -18,7 +18,6 @@ import {
   EuiFlexGroup,
   EuiSpacer,
   EuiText,
-  EuiFlexGrid,
   EuiButtonEmpty,
   EuiPage,
   EuiPopover,
@@ -82,11 +81,11 @@ export const AgentsWelcome = compose(
       },
       ...(agent?.name
         ? [
-            {
-              text: `${agent.name}`,
-              truncate: true,
-            },
-          ]
+          {
+            text: `${agent.name}`,
+            truncate: true,
+          },
+        ]
         : []),
     ];
   }),
@@ -209,13 +208,13 @@ export const AgentsWelcome = compose(
         )
           ? JSON.parse(window.localStorage.getItem('wz-menu-agent-apps-pinned'))
           : [
-              // Default pinned applications
-              threatHunting.id,
-              fileIntegrityMonitoring.id,
-              configurationAssessment.id,
-              mitreAttack.id,
-              malwareDetection.id,
-            ];
+            // Default pinned applications
+            threatHunting.id,
+            fileIntegrityMonitoring.id,
+            configurationAssessment.id,
+            mitreAttack.id,
+            malwareDetection.id,
+          ];
       }
 
       // Ensure the pinned applications are supported
@@ -423,32 +422,30 @@ export const AgentsWelcome = compose(
     renderMitrePanel() {
       return (
         <Fragment>
-          <EuiPanel paddingSize='s' height={{ height: 300 }}>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <h2 className='embPanel__title wz-headline-title'>
-                    <EuiText size='xs'>
-                      <h2>MITRE ATT&CK</h2>
-                    </EuiText>
-                  </h2>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
-                  <EuiToolTip position='top' content='Open MITRE ATT&CK'>
-                    <RedirectAppLinks application={getCore().application}>
-                      <EuiButtonIcon
-                        iconType='popout'
-                        color='primary'
-                        href={`${getCore().application.getUrlForApp(
-                          mitreAttack.id,
-                        )}`}
-                        aria-label='Open MITRE ATT&CK'
-                      />
-                    </RedirectAppLinks>
-                  </EuiToolTip>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
+          <EuiPanel paddingSize='m' height={{ height: 300 }}>
+            <EuiFlexGroup gutterSize='s'>
+              <EuiFlexItem>
+                <h2 className='embPanel__title wz-headline-title'>
+                  <EuiText size='xs'>
+                    <h2>MITRE ATT&CK</h2>
+                  </EuiText>
+                </h2>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
+                <EuiToolTip position='top' content='Open MITRE ATT&CK'>
+                  <RedirectAppLinks application={getCore().application}>
+                    <EuiButtonIcon
+                      iconType='popout'
+                      color='primary'
+                      href={`${getCore().application.getUrlForApp(
+                        mitreAttack.id,
+                      )}`}
+                      aria-label='Open MITRE ATT&CK'
+                    />
+                  </RedirectAppLinks>
+                </EuiToolTip>
+              </EuiFlexItem>
+            </EuiFlexGroup>
             <EuiSpacer size='m' />
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -523,19 +520,19 @@ export const AgentsWelcome = compose(
                     >
                       {' '}
                       {/* TODO: Replace with SearchBar and replace implementation to get the time range in AgentView component*/}
-                      <WzDatePicker condensed={true} onTimeChange={() => {}} />
+                      <WzDatePicker condensed={true} onTimeChange={() => { }} />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                   {(this.state.widthWindow < 1150 && (
                     <Fragment>
-                      <EuiFlexGrid columns={2}>
+                      <EuiFlexGroup wrap>
                         <EuiFlexItem
                           key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
                         >
                           {this.renderMitrePanel()}
                         </EuiFlexItem>
                         {this.renderCompliancePanel()}
-                      </EuiFlexGrid>
+                      </EuiFlexGroup>
                       <EuiSpacer size='m' />
                       <EuiFlexGroup>
                         <FimEventsTable agent={this.props.agent} />
@@ -556,33 +553,33 @@ export const AgentsWelcome = compose(
                       </EuiFlexGroup>
                     </Fragment>
                   )) || (
-                    <Fragment>
-                      <EuiFlexGrid columns={2}>
-                        <EuiFlexItem>
-                          <EuiFlexGroup>
-                            <EuiFlexItem
-                              key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                            >
-                              {this.renderMitrePanel()}
-                            </EuiFlexItem>
-                            {this.renderCompliancePanel()}
-                          </EuiFlexGroup>
-                        </EuiFlexItem>
-                        <FimEventsTable agent={this.props.agent} />
-                      </EuiFlexGrid>
-                      <EuiSpacer size='l' />
-                      <EuiFlexGroup>
-                        <EuiFlexItem
-                          key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                        >
-                          {' '}
-                          {/* Events count evolution */}
-                          {this.renderEventCountVisualization()}
-                        </EuiFlexItem>
-                        <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
-                      </EuiFlexGroup>
-                    </Fragment>
-                  )}
+                      <Fragment>
+                        <EuiFlexGroup>
+                          <EuiFlexItem>
+                            <EuiFlexGroup>
+                              <EuiFlexItem
+                                key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
+                              >
+                                {this.renderMitrePanel()}
+                              </EuiFlexItem>
+                              {this.renderCompliancePanel()}
+                            </EuiFlexGroup>
+                          </EuiFlexItem>
+                          <FimEventsTable agent={this.props.agent} />
+                        </EuiFlexGroup>
+                        <EuiSpacer size='l' />
+                        <EuiFlexGroup>
+                          <EuiFlexItem
+                            key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                          >
+                            {' '}
+                            {/* Events count evolution */}
+                            {this.renderEventCountVisualization()}
+                          </EuiFlexItem>
+                          <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
+                        </EuiFlexGroup>
+                      </Fragment>
+                    )}
                 </EuiPageBody>
               </EuiPage>
             </div>

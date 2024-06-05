@@ -88,115 +88,118 @@ export const AgentUpgradesInProgress = ({
   if (isPanelClosed || !showTasks) return null;
 
   return (
-    <EuiPanel color='subdued'>
-      <EuiFlexGroup
-        gutterSize='s'
-        alignItems='flexStart'
-        wrap={false}
-        responsive={false}
-      >
+    <>
+      <EuiPanel color='plain'>
         <EuiFlexGroup
           gutterSize='s'
-          alignItems='center'
+          alignItems='flexStart'
           wrap={false}
           responsive={false}
         >
+          <EuiFlexGroup
+            gutterSize='s'
+            alignItems='center'
+            wrap={false}
+            responsive={false}
+          >
+            <EuiFlexItem grow={false}>
+              <EuiText>Upgrade tasks</EuiText>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                color='primary'
+                onClick={() => setIsModalVisible(true)}
+                iconType='eye'
+              >
+                Task details
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+          </EuiFlexGroup>
           <EuiFlexItem grow={false}>
-            <EuiText>Upgrade tasks</EuiText>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
-              color='primary'
-              onClick={() => setIsModalVisible(true)}
-              iconType='eye'
-            >
-              Task details
-            </EuiButtonEmpty>
+            <EuiButtonIcon
+              onClick={() => setIsPanelClosed(true)}
+              color='text'
+              iconType='cross'
+              aria-label='Close'
+            />
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiFlexItem grow={false}>
-          <EuiButtonIcon
-            onClick={() => setIsPanelClosed(true)}
-            color='text'
-            iconType='cross'
-            aria-label='Close'
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+        <EuiSpacer size='s' />
+        <EuiFlexGroup gutterSize='s' alignItems='center'>
+          {totalInProgressTasks > 0 ? (
+            <EuiFlexItem grow={false}>
+              <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
+                <EuiProgress size='xs' color='warning' position='absolute' />
+                <EuiText size='s'>
+                  <b>{totalInProgressTasks}</b>
+                  {` ${API_NAME_TASK_STATUS.IN_PROGRESS}`}
+                </EuiText>
+              </EuiPanel>
+            </EuiFlexItem>
+          ) : null}
+          {totalSuccessTasks > 0 ? (
+            <EuiFlexItem grow={false}>
+              <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
+                <EuiProgress
+                  value={100}
+                  max={100}
+                  size='xs'
+                  color='success'
+                  position='absolute'
+                />
+                <span>
+                  <EuiText size='s'>
+                    <b>{totalSuccessTasks}</b>
+                    {` ${API_NAME_TASK_STATUS.DONE} `}
+                    <EuiIconTip content='Last 60 minutes' color='primary' />
+                  </EuiText>
+                </span>
+              </EuiPanel>
+            </EuiFlexItem>
+          ) : null}
+          {totalErrorUpgradeTasks > 0 ? (
+            <EuiFlexItem grow={false}>
+              <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
+                <EuiProgress
+                  value={100}
+                  max={100}
+                  size='xs'
+                  color='danger'
+                  position='absolute'
+                />
+                <span>
+                  <EuiText size='s'>
+                    <b>{totalErrorUpgradeTasks}</b>
+                    {` ${API_NAME_TASK_STATUS.FAILED} `}
+                    <EuiIconTip content='Last 60 minutes' color='primary' />
+                  </EuiText>
+                </span>
+              </EuiPanel>
+            </EuiFlexItem>
+          ) : null}
+          {totalTimeoutUpgradeTasks > 0 ? (
+            <EuiFlexItem grow={false}>
+              <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
+                <EuiProgress
+                  value={100}
+                  max={100}
+                  size='xs'
+                  color='subdued'
+                  position='absolute'
+                />
+                <span>
+                  <EuiText size='s'>
+                    <b>{totalTimeoutUpgradeTasks}</b>
+                    {` ${API_NAME_TASK_STATUS.TIMEOUT} `}
+                    <EuiIconTip content='Last 60 minutes' color='primary' />
+                  </EuiText>
+                </span>
+              </EuiPanel>
+            </EuiFlexItem>
+          ) : null}
+        </EuiFlexGroup>
+      </EuiPanel>
       <EuiSpacer size='s' />
-      <EuiFlexGroup gutterSize='s' alignItems='center'>
-        {totalInProgressTasks > 0 ? (
-          <EuiFlexItem grow={false}>
-            <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
-              <EuiProgress size='xs' color='warning' position='absolute' />
-              <EuiText size='s'>
-                <b>{totalInProgressTasks}</b>
-                {` ${API_NAME_TASK_STATUS.IN_PROGRESS}`}
-              </EuiText>
-            </EuiPanel>
-          </EuiFlexItem>
-        ) : null}
-        {totalSuccessTasks > 0 ? (
-          <EuiFlexItem grow={false}>
-            <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
-              <EuiProgress
-                value={100}
-                max={100}
-                size='xs'
-                color='success'
-                position='absolute'
-              />
-              <span>
-                <EuiText size='s'>
-                  <b>{totalSuccessTasks}</b>
-                  {` ${API_NAME_TASK_STATUS.DONE} `}
-                  <EuiIconTip content='Last 60 minutes' color='primary' />
-                </EuiText>
-              </span>
-            </EuiPanel>
-          </EuiFlexItem>
-        ) : null}
-        {totalErrorUpgradeTasks > 0 ? (
-          <EuiFlexItem grow={false}>
-            <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
-              <EuiProgress
-                value={100}
-                max={100}
-                size='xs'
-                color='danger'
-                position='absolute'
-              />
-              <span>
-                <EuiText size='s'>
-                  <b>{totalErrorUpgradeTasks}</b>
-                  {` ${API_NAME_TASK_STATUS.FAILED} `}
-                  <EuiIconTip content='Last 60 minutes' color='primary' />
-                </EuiText>
-              </span>
-            </EuiPanel>
-          </EuiFlexItem>
-        ) : null}
-        {totalTimeoutUpgradeTasks > 0 ? (
-          <EuiFlexItem grow={false}>
-            <EuiPanel paddingSize='s' style={{ position: 'relative' }}>
-              <EuiProgress
-                value={100}
-                max={100}
-                size='xs'
-                color='subdued'
-                position='absolute'
-              />
-              <span>
-                <EuiText size='s'>
-                  <b>{totalTimeoutUpgradeTasks}</b>
-                  {` ${API_NAME_TASK_STATUS.TIMEOUT} `}
-                  <EuiIconTip content='Last 60 minutes' color='primary' />
-                </EuiText>
-              </span>
-            </EuiPanel>
-          </EuiFlexItem>
-        ) : null}
-      </EuiFlexGroup>
-    </EuiPanel>
+    </>
   );
 };

@@ -43,75 +43,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                   >
                     <div
                       class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
-                    >
-                      <div
-                        class="euiFlexItem euiFlexItem--flexGrowZero"
-                      >
-                        <span
-                          class="euiToolTipAnchor"
-                        >
-                          <div
-                            class="euiSwitch"
-                          >
-                            <button
-                              aria-checked="false"
-                              aria-labelledby="htmlId"
-                              class="euiSwitch__button"
-                              disabled=""
-                              id="htmlId"
-                              role="switch"
-                              type="button"
-                            >
-                              <span
-                                class="euiSwitch__body"
-                              >
-                                <span
-                                  class="euiSwitch__thumb"
-                                />
-                                <span
-                                  class="euiSwitch__track"
-                                >
-                                  <svg
-                                    aria-hidden="true"
-                                    class="euiIcon euiIcon--medium euiIcon-isLoading euiSwitch__icon"
-                                    focusable="false"
-                                    height="16"
-                                    role="img"
-                                    viewBox="0 0 16 16"
-                                    width="16"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                                    />
-                                  </svg>
-                                  <svg
-                                    aria-hidden="true"
-                                    class="euiIcon euiIcon--medium euiIcon-isLoading euiSwitch__icon euiSwitch__icon--checked"
-                                    focusable="false"
-                                    height="16"
-                                    role="img"
-                                    viewBox="0 0 16 16"
-                                    width="16"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                                    />
-                                  </svg>
-                                </span>
-                              </span>
-                            </button>
-                            <span
-                              class="euiSwitch__label"
-                              id="htmlId"
-                            >
-                              Show only outdated
-                            </span>
-                          </div>
-                        </span>
-                      </div>
-                    </div>
+                    />
                   </div>
                 </div>
               </div>
@@ -777,76 +709,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                   >
                     <div
                       class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
-                    >
-                      <div
-                        class="euiFlexItem euiFlexItem--flexGrowZero"
-                      >
-                        <span
-                          class="euiToolTipAnchor"
-                        >
-                          <div
-                            class="euiSwitch"
-                          >
-                            <button
-                              aria-checked="false"
-                              aria-labelledby="htmlId"
-                              class="euiSwitch__button"
-                              disabled=""
-                              id="htmlId"
-                              role="switch"
-                              type="button"
-                            >
-                              <span
-                                class="euiSwitch__body"
-                              >
-                                <span
-                                  class="euiSwitch__thumb"
-                                />
-                                <span
-                                  class="euiSwitch__track"
-                                >
-                                  <svg
-                                    aria-hidden="true"
-                                    class="euiIcon euiIcon--medium euiSwitch__icon"
-                                    focusable="false"
-                                    height="16"
-                                    role="img"
-                                    viewBox="0 0 16 16"
-                                    width="16"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M7.293 8 3.146 3.854a.5.5 0 1 1 .708-.708L8 7.293l4.146-4.147a.5.5 0 0 1 .708.708L8.707 8l4.147 4.146a.5.5 0 0 1-.708.708L8 8.707l-4.146 4.147a.5.5 0 0 1-.708-.708L7.293 8Z"
-                                    />
-                                  </svg>
-                                  <svg
-                                    aria-hidden="true"
-                                    class="euiIcon euiIcon--medium euiSwitch__icon euiSwitch__icon--checked"
-                                    focusable="false"
-                                    height="16"
-                                    role="img"
-                                    viewBox="0 0 16 16"
-                                    width="16"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M6.5 12a.502.502 0 0 1-.354-.146l-4-4a.502.502 0 0 1 .708-.708L6.5 10.793l6.646-6.647a.502.502 0 0 1 .708.708l-7 7A.502.502 0 0 1 6.5 12"
-                                      fill-rule="evenodd"
-                                    />
-                                  </svg>
-                                </span>
-                              </span>
-                            </button>
-                            <span
-                              class="euiSwitch__label"
-                              id="htmlId"
-                            >
-                              Show only outdated
-                            </span>
-                          </div>
-                        </span>
-                      </div>
-                    </div>
+                    />
                   </div>
                 </div>
               </div>
@@ -1471,76 +1334,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                   >
                     <div
                       class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
-                    >
-                      <div
-                        class="euiFlexItem euiFlexItem--flexGrowZero"
-                      >
-                        <span
-                          class="euiToolTipAnchor"
-                        >
-                          <div
-                            class="euiSwitch"
-                          >
-                            <button
-                              aria-checked="false"
-                              aria-labelledby="htmlId"
-                              class="euiSwitch__button"
-                              disabled=""
-                              id="htmlId"
-                              role="switch"
-                              type="button"
-                            >
-                              <span
-                                class="euiSwitch__body"
-                              >
-                                <span
-                                  class="euiSwitch__thumb"
-                                />
-                                <span
-                                  class="euiSwitch__track"
-                                >
-                                  <svg
-                                    aria-hidden="true"
-                                    class="euiIcon euiIcon--medium euiSwitch__icon"
-                                    focusable="false"
-                                    height="16"
-                                    role="img"
-                                    viewBox="0 0 16 16"
-                                    width="16"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M7.293 8 3.146 3.854a.5.5 0 1 1 .708-.708L8 7.293l4.146-4.147a.5.5 0 0 1 .708.708L8.707 8l4.147 4.146a.5.5 0 0 1-.708.708L8 8.707l-4.146 4.147a.5.5 0 0 1-.708-.708L7.293 8Z"
-                                    />
-                                  </svg>
-                                  <svg
-                                    aria-hidden="true"
-                                    class="euiIcon euiIcon--medium euiSwitch__icon euiSwitch__icon--checked"
-                                    focusable="false"
-                                    height="16"
-                                    role="img"
-                                    viewBox="0 0 16 16"
-                                    width="16"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M6.5 12a.502.502 0 0 1-.354-.146l-4-4a.502.502 0 0 1 .708-.708L6.5 10.793l6.646-6.647a.502.502 0 0 1 .708.708l-7 7A.502.502 0 0 1 6.5 12"
-                                      fill-rule="evenodd"
-                                    />
-                                  </svg>
-                                </span>
-                              </span>
-                            </button>
-                            <span
-                              class="euiSwitch__label"
-                              id="htmlId"
-                            >
-                              Show only outdated
-                            </span>
-                          </div>
-                        </span>
-                      </div>
-                    </div>
+                    />
                   </div>
                 </div>
               </div>
