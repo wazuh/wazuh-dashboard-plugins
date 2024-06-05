@@ -1,24 +1,19 @@
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react-hooks';
 
 import { useIsMounted } from './use-is-mounted';
 
 describe('useIsMounted()', () => {
   it('should return true when component is mounted', () => {
-    const {
-      result: { current: isMounted },
-    } = renderHook(() => useIsMounted());
+    const { result } = renderHook(() => useIsMounted());
 
-    expect(isMounted()).toBe(true);
+    expect(result.current.isComponentMounted()).toBe(true);
   });
 
   it('should return false when component is unmounted', () => {
-    const {
-      result: { current: isMounted },
-      unmount,
-    } = renderHook(() => useIsMounted());
+    const { result, unmount } = renderHook(() => useIsMounted());
 
     unmount();
 
-    expect(isMounted()).toBe(false);
+    expect(result.current.isComponentMounted()).toBe(false);
   });
 });
