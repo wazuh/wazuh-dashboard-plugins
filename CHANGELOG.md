@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added AngularJS dependencies [#6145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6145)
 - Added a migration task to setup the configuration using a configuration file [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Improve fleet management by adding 'Edit Agent Groups' and 'Upgrade Agents' actions, as well as a filter to show only outdated agents [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250) [#6476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6476) [#6274](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6274) [#6501](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6501) [#6529](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6529) [#6648](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6648)
-- Added propagation of updates from the table to dashboard visualizations in Endpoints summary [#6460](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6460)
+- Added propagation of updates from the table to dashboard visualizations in Endpoints summary [#6460](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6460) [#6737](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6737)
 - Handle index pattern selector on new discover [#6499](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6499)
 - Added macOS log collector tab [#6545](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6545)
 - Add ability to disable the edition of configuration through API endpoints and UI [#6557](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6557)
