@@ -436,15 +436,6 @@ describe('PatternDataSourceFilterManager', () => {
   });
 
   describe.only('createFilter', () => {
-    it('should return ERROR when the params any params are not defined', () => {
-      try {
-        PatternDataSourceFilterManager.createFilter('', '', '', '');
-      } catch (error) {
-        expect(error.message).toBe(
-          'key, value and indexPatternId params are required',
-        );
-      }
-    });
 
     it('should return ERROR when the key is not defined', () => {
       try {

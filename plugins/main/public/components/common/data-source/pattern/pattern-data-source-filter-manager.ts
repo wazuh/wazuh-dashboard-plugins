@@ -402,10 +402,6 @@ export class PatternDataSourceFilterManager
     indexPatternId: string,
     controlledBy?: string,
   ) {
-    if (!key || !value || !indexPatternId) {
-      throw new Error('key, value and indexPatternId params are required');
-    }
-
     if (type === 'is one of' || type === 'is not one of') {
       if (!Array.isArray(value)) {
         throw new Error('The value must be an array');
