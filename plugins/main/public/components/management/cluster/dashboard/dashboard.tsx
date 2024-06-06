@@ -25,7 +25,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-import { WzSearchBar } from '../../../common/search-bar'
+import { WzSearchBar } from '../../../common/search-bar';
 
 interface DashboardCTProps {
   statusRunning: string;
@@ -169,9 +169,9 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         ) : null}
         <EuiSpacer size='m' />
         {!isDataSourceLoading &&
-          dataSource &&
-          !state.showConfig &&
-          !state.showNodes ? (
+        dataSource &&
+        !state.showConfig &&
+        !state.showNodes ? (
           <OverviewCards
             goNodes={goNodes}
             goAgents={goAgents}
@@ -185,7 +185,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
             agentsCount={state?.agentsCount}
             searchBarProps={searchBarProps}
             results={results}
-            indexPatternId={dataSource?.id}
+            indexPattern={dataSource?.indexPattern}
             filters={fetchFilters ?? []}
           />
         ) : null}

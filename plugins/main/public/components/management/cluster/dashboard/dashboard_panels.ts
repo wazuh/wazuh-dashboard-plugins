@@ -1,15 +1,16 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { tParsedIndexPattern } from '../../../common/data-source';
 
 /* WARNING: The panel id must be unique including general and agents visualizations. Otherwise, the visualizations will not refresh when we pin an agent, because they are cached by id */
 
 /* Overview visualizations */
 
 const getVisStateClusterAlertsSummary = (
-  indexPatternId: string,
+  indexPattern: tParsedIndexPattern,
   clusterName?: string,
 ) => {
-  let expression = `.es(index=${indexPatternId},q="cluster.name: ${clusterName}").label("${clusterName} cluster")`;
+  let expression = `.es(index=${indexPattern.title},q="cluster.name: ${clusterName}").label("${clusterName} cluster")`;
   expression = expression.replace(/'/g, '"');
   return {
     id: 'Wazuh-App-Cluster-monitoring-Overview-Manager',
@@ -23,13 +24,13 @@ const getVisStateClusterAlertsSummary = (
           query: '',
         },
         filter: [],
-        index: indexPatternId,
+        index: indexPattern.id,
       },
       references: [
         {
           name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
           type: 'index-pattern',
-          id: indexPatternId,
+          id: indexPattern.id,
         },
       ],
       aggs: [],
@@ -38,13 +39,13 @@ const getVisStateClusterAlertsSummary = (
 };
 
 const getVisStateAlertsByNodeSummary = (
-  indexPatternId: string,
+  indexPattern: tParsedIndexPattern,
   nodeList: any[],
   clusterName?: string,
 ) => {
   let expression = '';
   for (const node of nodeList) {
-    expression += `.es(index=${indexPatternId},q="cluster.name: ${clusterName} AND cluster.node: ${node.name}").label("${node.name}"),`;
+    expression += `.es(index=${indexPattern.title},q="cluster.name: ${clusterName} AND cluster.node: ${node.name}").label("${node.name}"),`;
   }
   expression = expression.substring(0, expression.length - 1);
   expression = expression.replace(/'/g, '"');
@@ -60,13 +61,13 @@ const getVisStateAlertsByNodeSummary = (
           query: '',
         },
         filter: [],
-        index: indexPatternId,
+        index: indexPattern.id,
       },
       references: [
         {
           name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
           type: 'index-pattern',
-          id: indexPatternId,
+          id: indexPattern.id,
         },
       ],
       aggs: [],
@@ -77,7 +78,7 @@ const getVisStateAlertsByNodeSummary = (
 /* Definition of panels */
 
 export const getDashboardPanels = (
-  indexPatternId: string,
+  indexPattern: tParsedIndexPattern,
   nodeList: any[],
   clusterName?: string,
 ): {
@@ -97,7 +98,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getVisStateClusterAlertsSummary(indexPatternId, clusterName),
+        savedVis: getVisStateClusterAlertsSummary(indexPattern, clusterName),
       },
     },
     '2': {
@@ -112,7 +113,7 @@ export const getDashboardPanels = (
       explicitInput: {
         id: '2',
         savedVis: getVisStateAlertsByNodeSummary(
-          indexPatternId,
+          indexPattern,
           nodeList,
           clusterName,
         ),
