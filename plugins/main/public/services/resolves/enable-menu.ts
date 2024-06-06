@@ -1,7 +1,10 @@
 import { AppState } from '../../react-services';
+import NavigationService from '../../react-services/navigation-service';
 
-export function enableMenu({ location }) {
-  if (!location.pathname.includes('/health-check')) {
+export function enableMenu() {
+  if (
+    !NavigationService.getInstance().getPathname().includes('/health-check')
+  ) {
     AppState.setWzMenu();
   }
 }
