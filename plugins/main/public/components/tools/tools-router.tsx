@@ -21,6 +21,5 @@ export const ToolsRouter = compose(
     <Route path='?tab=logtest'>
       <LogtestWithBreadCrumb />
     </Route>
-    <Redirect to='?tab=devTools'></Redirect>
   </Switch>
 ));
