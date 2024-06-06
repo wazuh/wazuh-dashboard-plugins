@@ -31,7 +31,7 @@ export const Overview: React.FC = withRouteResolvers({
   ip,
   nestedResolve,
   savedSearch,
-})(({ location }) => {
+})(() => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
   const { tab = 'welcome', tabView = 'dashboard' } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
@@ -119,18 +119,18 @@ export const Overview: React.FC = withRouteResolvers({
   };
 
   function switchTab(newTab: any, force: any) {
-    const urlSearchParams = new URLSearchParams(location.search);
+    const urlSearchParams = new URLSearchParams(navigationService.getSearch());
     urlSearchParams.set('tab', newTab);
     navigationService.navigate(
-      `${location.pathname}?${urlSearchParams.toString()}`,
+      `${navigationService.getPathname()}?${urlSearchParams.toString()}`,
     );
   }
 
   const switchSubTab = (subTab: string) => {
-    const urlSearchParams = new URLSearchParams(location.search);
+    const urlSearchParams = new URLSearchParams(navigationService.getSearch());
     urlSearchParams.set('tabView', subTab);
     navigationService.navigate(
-      `${location.pathname}?${urlSearchParams.toString()}`,
+      `${navigationService.getPathname()}?${urlSearchParams.toString()}`,
     );
   };
 

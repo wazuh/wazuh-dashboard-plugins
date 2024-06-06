@@ -94,7 +94,7 @@ const checks = {
   },
 };
 
-function HealthCheckComponent({ location }) {
+function HealthCheckComponent() {
   const [checkWarnings, setCheckWarnings] = useState<{ [key: string]: [] }>({});
   const [checkErrors, setCheckErrors] = useState<{ [key: string]: [] }>({});
   const [checksReady, setChecksReady] = useState<{ [key: string]: boolean }>(
@@ -107,13 +107,16 @@ function HealthCheckComponent({ location }) {
 
   const redirectionPassHealthcheck = () => {
     // This uses the previous location that is passed in as an state
-    if (location?.state?.prevLocation) {
+    if (NavigationService.getInstance().getLocation()?.state?.prevLocation) {
       const searchParams = new URLSearchParams(
-        location?.state?.prevLocation?.search,
+        NavigationService.getInstance().getLocation()?.state?.prevLocation?.search,
       );
       // update browser url
       const relativePath =
-        location.state.prevLocation.pathname + '?' + searchParams.toString();
+        NavigationService.getInstance().getLocation().state.prevLocation
+          .pathname +
+        '?' +
+        searchParams.toString();
       NavigationService.getInstance().navigate(relativePath);
     } else {
       NavigationService.getInstance().navigate('/');
