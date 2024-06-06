@@ -88,6 +88,8 @@ export enum FILTER_OPERATOR {
   DOES_NOT_EXISTS = 'does not exists',
   IS_ONE_OF = 'is one of',
   IS_NOT_ONE_OF = 'is not one of',
+  IS_BETWEEN = 'is between',
+  IS_NOT_BETWEEN = 'is not between',
 }
 
 export class PatternDataSourceFilterManager
@@ -397,7 +399,7 @@ export class PatternDataSourceFilterManager
   /******************************************************************/
 
   static createFilter(
-    type: keyof typeof FILTER_OPERATOR,
+    type: FILTER_OPERATOR,
     key: string,
     value: string | [],
     indexPatternId: string,
@@ -409,23 +411,14 @@ export class PatternDataSourceFilterManager
       }
     }
 
+    if(type === FILTER_OPERATOR.IS_BETWEEN) {
+      if (!Array.isArray(value) && value.length <= 2 && value.length > 0 && value.some(v => isNaN(Number(v)))) {
+        throw new Error('The value must be an array with one or two numbers');
+      }
+    }
+
     switch (type.toLocaleLowerCase()) {
       case FILTER_OPERATOR.IS:
-        return PatternDataSourceFilterManager.generateFilter(
-          key,
-          value,
-          indexPatternId,
-          {
-            query: {
-              match_phrase: {
-                [key]: {
-                  query: value,
-                },
-              },
-            },
-          },
-          controlledBy,
-        );
       case FILTER_OPERATOR.IS_NOT:
         return PatternDataSourceFilterManager.generateFilter(
           key,
@@ -441,23 +434,9 @@ export class PatternDataSourceFilterManager
             },
           },
           controlledBy,
-          true,
+          type === FILTER_OPERATOR.IS_NOT,
         );
       case FILTER_OPERATOR.EXISTS:
-        return {
-          meta: {
-            alias: null,
-            disabled: false,
-            key: key,
-            value: 'exists',
-            negate: false,
-            type: 'exists',
-            index: indexPatternId,
-            controlledBy,
-          },
-          exists: { field: key },
-          $state: { store: 'appState' },
-        };
       case FILTER_OPERATOR.DOES_NOT_EXISTS:
         return {
           meta: {
@@ -465,7 +444,7 @@ export class PatternDataSourceFilterManager
             disabled: false,
             key: key,
             value: 'exists',
-            negate: true,
+            negate: type === FILTER_OPERATOR.DOES_NOT_EXISTS,
             type: 'exists',
             index: indexPatternId,
             controlledBy,
@@ -474,26 +453,6 @@ export class PatternDataSourceFilterManager
           $state: { store: 'appState' },
         };
       case FILTER_OPERATOR.IS_ONE_OF:
-        return PatternDataSourceFilterManager.generateFilter(
-          key,
-          value,
-          indexPatternId,
-          {
-            query: {
-              bool: {
-                minimum_should_match: 1,
-                should: value.map((v: string) => ({
-                  match_phrase: {
-                    [key]: {
-                      query: v,
-                    },
-                  },
-                })),
-              },
-            },
-          },
-          controlledBy,
-        );
       case FILTER_OPERATOR.IS_NOT_ONE_OF:
         return PatternDataSourceFilterManager.generateFilter(
           key,
@@ -514,8 +473,32 @@ export class PatternDataSourceFilterManager
             },
           },
           controlledBy,
-          true,
+          type === FILTER_OPERATOR.IS_NOT_ONE_OF,
         );
+      case FILTER_OPERATOR.IS_BETWEEN:
+      case FILTER_OPERATOR.IS_NOT_BETWEEN:
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            params: {
+              gte: value[0],
+              lte: value[1] || NaN, 
+            },
+            negate: type === FILTER_OPERATOR.IS_NOT_BETWEEN,
+            type: 'range',
+            index: indexPatternId,
+            controlledBy,
+          },
+          range: {
+            [key]: {
+              gte: value[0],
+              lte: value[1] || NaN, 
+            },
+          },
+          $state: { store: 'appState' },
+        };
       default:
         throw new Error('Invalid filter type');
     }
@@ -528,7 +511,7 @@ export class PatternDataSourceFilterManager
    * @returns
    */
   createFilter(
-    type: keyof typeof FILTER_OPERATOR,
+    type: FILTER_OPERATOR,
     key: string,
     value: string | [],
     controlledBy?: string,

@@ -683,6 +683,159 @@ describe('PatternDataSourceFilterManager', () => {
         },
       });
     });
+
+    it('should return an ERROR when the filter is "IS BETWEEN" and the value is not an array with one or two items', () => {
+      try {
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS_BETWEEN,
+          'agent.id',
+          [],
+          'my-index',
+        );
+      } catch (error) {
+        expect(error.message).toBe('The value must be an array with one or two numbers');
+      }
+    });
+
+    it('should return an ERROR when the filter is "IS BETWEEN" and the value is not an array', () => {
+      try {
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS_BETWEEN,
+          'agent.id',
+          'value not array',
+          'my-index',
+        );
+      } catch (error) {
+        expect(error.message).toBe('The value must be an array with one or two numbers');
+      }
+
+    });
+
+    it('should return an ERROR when the filter is "IS BETWEEN" and the value is an array with more than two items', () => {
+      try {
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS_BETWEEN,
+          'agent.id',
+          [1, 2, 3],
+          'my-index',
+        );
+      } catch (error) {
+        expect(error.message).toBe('The value must be an array with one or two numbers');
+      }
+    });
+
+    it('should return a "IS BETWEEN" filter with the received values with one item', () => {
+      const filter = PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS_BETWEEN,
+        'agent.id',
+        [1],
+        'my-index',
+      );
+      expect(filter.meta.key).toBe('agent.id');
+      expect(filter.meta.index).toBe('my-index');
+      expect(filter.meta.negate).toBe(false);
+      expect(filter.range).toEqual({
+          'agent.id': {
+            gte: 1,
+            lte: NaN
+          }
+      });
+    });
+
+    it('should return a "IS BETWEEN" filter with the received values with two items', () => {
+      const filter = PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS_BETWEEN,
+        'agent.id',
+        [1, 2],
+        'my-index',
+      );
+      expect(filter.meta.key).toBe('agent.id');
+      expect(filter.meta.index).toBe('my-index');
+      expect(filter.meta.negate).toBe(false);
+      expect(filter.range).toEqual({
+          'agent.id': {
+            gte: 1,
+            lte: 2
+          }
+      });
+    });
+
+    it('should return an ERROR when the filter is "IS NOT BETWEEN" and the value is not an array with one or two items', () => {
+      try {
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS_NOT_BETWEEN,
+          'agent.id',
+          [],
+          'my-index',
+        );
+      } catch (error) {
+        expect(error.message).toBe('The value must be an array with one or two numbers');
+      }
+    });
+
+    it('should return an ERROR when the filter is "IS NOT BETWEEN" and the value is not an array', () => {
+      try {
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS_NOT_BETWEEN,
+          'agent.id',
+          'value not array',
+          'my-index',
+        );
+      } catch (error) {
+        expect(error.message).toBe('The value must be an array with one or two numbers');
+      }
+
+    });
+
+    it('should return an ERROR when the filter is "IS NOT BETWEEN" and the value is an array with more than two items', () => {
+      try {
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS_NOT_BETWEEN,
+          'agent.id',
+          [1, 2, 3],
+          'my-index',
+        );
+      } catch (error) {
+        expect(error.message).toBe('The value must be an array with one or two numbers');
+      }
+    });
+
+    it('should return a "IS NOT BETWEEN" filter with the received values with one item', () => {
+      const filter = PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS_NOT_BETWEEN,
+        'agent.id',
+        [1],
+        'my-index',
+      );
+      expect(filter.meta.key).toBe('agent.id');
+      expect(filter.meta.index).toBe('my-index');
+      expect(filter.meta.negate).toBe(true);
+      expect(filter.range).toEqual({
+          'agent.id': {
+            gte: 1,
+            lte: NaN
+          }
+      });
+    });
+
+    it('should return a "IS NOT BETWEEN" filter with the received values with two items', () => {
+      const filter = PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS_NOT_BETWEEN,
+        'agent.id',
+        [1, 2],
+        'my-index',
+      );
+      expect(filter.meta.key).toBe('agent.id');
+      expect(filter.meta.index).toBe('my-index');
+      expect(filter.meta.negate).toBe(true);
+      expect(filter.range).toEqual({
+          'agent.id': {
+            gte: 1,
+            lte: 2
+          }
+      });
+    });
+      
   });
 
   describe('filterToURLFormat', () => {
