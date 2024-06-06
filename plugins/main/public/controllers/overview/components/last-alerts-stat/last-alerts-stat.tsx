@@ -15,6 +15,7 @@ import {
   ErrorFactory,
   HttpError,
 } from '../../../../react-services/error-management';
+import { FILTER_OPERATOR, PatternDataSourceFilterManager } from '../../../../components/common/data-source/pattern/pattern-data-source-filter-manager';
 
 export function LastAlertsStat({ severity }: { severity: string }) {
   const [countLastAlerts, setCountLastAlerts] = useState<number | null>(null);
@@ -67,25 +68,14 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           basePath: 'discover',
         };
 
-        // TODO: find a better way to get the query discover URL
+        // add predefined filters with URL filter format
+        const clusterNameFilter = PatternDataSourceFilterManager.createFilter(FILTER_OPERATOR.IS, cluster.field, cluster.name, indexPatternName);
+        const ruleLevelRangeFilter = PatternDataSourceFilterManager.createFilter(FILTER_OPERATOR.IS_BETWEEN, 'rule.level', [severityLabel[severity].ruleLevelRange.minRuleLevel, severityLabel[severity].ruleLevelRange.maxRuleLevel], indexPatternName);
+        const predefinedFilters = PatternDataSourceFilterManager.filtersToURLFormat([clusterNameFilter, ruleLevelRangeFilter]);
+
         const destURL = core.application.getUrlForApp(discoverLocation.app, {
-          path: `${
-            discoverLocation.basePath
-          }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:${
-            cluster.field
-          },negate:!f,params:(query:${
-            cluster.name
-          }),type:phrase),query:(match_phrase:(${cluster.field}:${
-            cluster.name
-          }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:rule.level,negate:!f,params:(gte:${
-            severityLabel[severity].ruleLevelRange.minRuleLevel
-          },lte:${
-            severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
-          }),type:range),range:(rule.level:(gte:${
-            severityLabel[severity].ruleLevelRange.minRuleLevel
-          },lte:${
-            severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
-          })))),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))&_q=(filters:!(),query:(language:kuery,query:''))`,
+          path: `${discoverLocation.basePath
+            }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=${predefinedFilters}&_q=(filters:!(),query:(language:kuery,query:''))`,
         });
         setDiscoverLocation(destURL);
       } catch (error) {
@@ -106,15 +96,14 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           title={
             <EuiToolTip
               position='top'
-              content={`Click to see rule.level ${
+              content={`Click to see rule.level ${severityLabel[severity].ruleLevelRange.maxRuleLevel
+                ? 'between ' +
+                severityLabel[severity].ruleLevelRange.minRuleLevel +
+                ' to ' +
                 severityLabel[severity].ruleLevelRange.maxRuleLevel
-                  ? 'between ' +
-                    severityLabel[severity].ruleLevelRange.minRuleLevel +
-                    ' to ' +
-                    severityLabel[severity].ruleLevelRange.maxRuleLevel
-                  : severityLabel[severity].ruleLevelRange.minRuleLevel +
-                    ' or higher'
-              }`}
+                : severityLabel[severity].ruleLevelRange.minRuleLevel +
+                ' or higher'
+                }`}
             >
               <EuiLink
                 className='statWithLink'

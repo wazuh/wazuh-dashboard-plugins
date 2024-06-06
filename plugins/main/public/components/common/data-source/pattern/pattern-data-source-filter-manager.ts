@@ -425,7 +425,7 @@ export class PatternDataSourceFilterManager
       }
     }
 
-    switch (type.toLocaleLowerCase()) {
+    switch (type) {
       case FILTER_OPERATOR.IS:
       case FILTER_OPERATOR.IS_NOT:
         return PatternDataSourceFilterManager.generateFilter(
@@ -570,7 +570,7 @@ export class PatternDataSourceFilterManager
    * Receives a filter object and returns a filter object with the format used in the URL using rison-node
    */
 
-  static filterToURLFormat(filters: tFilter[]) {
+  static filtersToURLFormat(filters: tFilter[]) {
     const filterCopy = filters || [];
     return rison.encode({
       filters: filterCopy,

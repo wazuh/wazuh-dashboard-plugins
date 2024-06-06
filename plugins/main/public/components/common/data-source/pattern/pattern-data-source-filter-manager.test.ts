@@ -844,7 +844,7 @@ describe('PatternDataSourceFilterManager', () => {
     });
   });
 
-  describe('filterToURLFormat', () => {
+  describe('filtersToURLFormat', () => {
     it('should return a filter transformed to the URL format', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
@@ -853,7 +853,7 @@ describe('PatternDataSourceFilterManager', () => {
         'my-index',
       );
       const urlFilter =
-        PatternDataSourceFilterManager.filterToURLFormat(filter);
+        PatternDataSourceFilterManager.filtersToURLFormat(filter);
       expect(urlFilter).toBe(`(filters:${rison.encode(filter)})`);
     });
   });
