@@ -234,7 +234,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   </EuiPanel>
                 </EuiPanel>
               </EuiFlexItem>
-              <EuiFlexItem grow={false}>
+              <EuiFlexItem>
                 <EuiDataGrid
                   {...dataGridProps}
                   className={sideNavDocked ? 'dataGridDockedNav' : ''}
