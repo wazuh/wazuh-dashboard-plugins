@@ -5,9 +5,7 @@ import {
   tFilterManager,
   PatternDataSource,
 } from '../index';
-import {
-  FILTER_OPERATOR,
-} from './pattern-data-source-filter-manager';
+import { FILTER_OPERATOR } from './pattern-data-source-filter-manager';
 import store from '../../../../redux/store';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT,
@@ -439,7 +437,6 @@ describe('PatternDataSourceFilterManager', () => {
   });
 
   describe('createFilter', () => {
-
     it('should return ERROR when the key is not defined', () => {
       try {
         PatternDataSourceFilterManager.createFilter(
@@ -693,7 +690,9 @@ describe('PatternDataSourceFilterManager', () => {
           'my-index',
         );
       } catch (error) {
-        expect(error.message).toBe('The value must be an array with one or two numbers');
+        expect(error.message).toBe(
+          'The value must be an array with one or two numbers',
+        );
       }
     });
 
@@ -706,9 +705,10 @@ describe('PatternDataSourceFilterManager', () => {
           'my-index',
         );
       } catch (error) {
-        expect(error.message).toBe('The value must be an array with one or two numbers');
+        expect(error.message).toBe(
+          'The value must be an array with one or two numbers',
+        );
       }
-
     });
 
     it('should return an ERROR when the filter is "IS BETWEEN" and the value is an array with more than two items', () => {
@@ -720,7 +720,9 @@ describe('PatternDataSourceFilterManager', () => {
           'my-index',
         );
       } catch (error) {
-        expect(error.message).toBe('The value must be an array with one or two numbers');
+        expect(error.message).toBe(
+          'The value must be an array with one or two numbers',
+        );
       }
     });
 
@@ -735,10 +737,10 @@ describe('PatternDataSourceFilterManager', () => {
       expect(filter.meta.index).toBe('my-index');
       expect(filter.meta.negate).toBe(false);
       expect(filter.range).toEqual({
-          'agent.id': {
-            gte: 1,
-            lte: NaN
-          }
+        'agent.id': {
+          gte: 1,
+          lte: NaN,
+        },
       });
     });
 
@@ -753,10 +755,10 @@ describe('PatternDataSourceFilterManager', () => {
       expect(filter.meta.index).toBe('my-index');
       expect(filter.meta.negate).toBe(false);
       expect(filter.range).toEqual({
-          'agent.id': {
-            gte: 1,
-            lte: 2
-          }
+        'agent.id': {
+          gte: 1,
+          lte: 2,
+        },
       });
     });
 
@@ -769,7 +771,9 @@ describe('PatternDataSourceFilterManager', () => {
           'my-index',
         );
       } catch (error) {
-        expect(error.message).toBe('The value must be an array with one or two numbers');
+        expect(error.message).toBe(
+          'The value must be an array with one or two numbers',
+        );
       }
     });
 
@@ -782,9 +786,10 @@ describe('PatternDataSourceFilterManager', () => {
           'my-index',
         );
       } catch (error) {
-        expect(error.message).toBe('The value must be an array with one or two numbers');
+        expect(error.message).toBe(
+          'The value must be an array with one or two numbers',
+        );
       }
-
     });
 
     it('should return an ERROR when the filter is "IS NOT BETWEEN" and the value is an array with more than two items', () => {
@@ -796,7 +801,9 @@ describe('PatternDataSourceFilterManager', () => {
           'my-index',
         );
       } catch (error) {
-        expect(error.message).toBe('The value must be an array with one or two numbers');
+        expect(error.message).toBe(
+          'The value must be an array with one or two numbers',
+        );
       }
     });
 
@@ -811,10 +818,10 @@ describe('PatternDataSourceFilterManager', () => {
       expect(filter.meta.index).toBe('my-index');
       expect(filter.meta.negate).toBe(true);
       expect(filter.range).toEqual({
-          'agent.id': {
-            gte: 1,
-            lte: NaN
-          }
+        'agent.id': {
+          gte: 1,
+          lte: NaN,
+        },
       });
     });
 
@@ -829,13 +836,12 @@ describe('PatternDataSourceFilterManager', () => {
       expect(filter.meta.index).toBe('my-index');
       expect(filter.meta.negate).toBe(true);
       expect(filter.range).toEqual({
-          'agent.id': {
-            gte: 1,
-            lte: 2
-          }
+        'agent.id': {
+          gte: 1,
+          lte: 2,
+        },
       });
     });
-      
   });
 
   describe('filterToURLFormat', () => {

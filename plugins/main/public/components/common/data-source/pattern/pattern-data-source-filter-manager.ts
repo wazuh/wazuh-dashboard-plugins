@@ -405,14 +405,22 @@ export class PatternDataSourceFilterManager
     indexPatternId: string,
     controlledBy?: string,
   ) {
-    if (type === FILTER_OPERATOR.IS_ONE_OF || type === FILTER_OPERATOR.IS_NOT_ONE_OF) {
+    if (
+      type === FILTER_OPERATOR.IS_ONE_OF ||
+      type === FILTER_OPERATOR.IS_NOT_ONE_OF
+    ) {
       if (!Array.isArray(value)) {
         throw new Error('The value must be an array');
       }
     }
 
-    if(type === FILTER_OPERATOR.IS_BETWEEN) {
-      if (!Array.isArray(value) && value.length <= 2 && value.length > 0 && value.some(v => isNaN(Number(v)))) {
+    if (type === FILTER_OPERATOR.IS_BETWEEN) {
+      if (
+        !Array.isArray(value) &&
+        value.length <= 2 &&
+        value.length > 0 &&
+        value.some(v => isNaN(Number(v)))
+      ) {
         throw new Error('The value must be an array with one or two numbers');
       }
     }
@@ -484,7 +492,7 @@ export class PatternDataSourceFilterManager
             key: key,
             params: {
               gte: value[0],
-              lte: value[1] || NaN, 
+              lte: value[1] || NaN,
             },
             negate: type === FILTER_OPERATOR.IS_NOT_BETWEEN,
             type: 'range',
@@ -494,7 +502,7 @@ export class PatternDataSourceFilterManager
           range: {
             [key]: {
               gte: value[0],
-              lte: value[1] || NaN, 
+              lte: value[1] || NaN,
             },
           },
           $state: { store: 'appState' },
