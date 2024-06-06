@@ -332,7 +332,7 @@ export const WzMenu = withWindowSize(
         if (this.state.currentMenuTab !== 'wazuh-dev') {
           /* TODO: this reloads the page to force the components are remounted with the new
           selection of. To avoid this refresh, we would have to do the components are able to react
-          to this changes redoing the requests, etc... This will need a considerable time to
+          to these changes redoing the requests, etc... This will need a considerable time to
           apply the changes. The reload of the pages is the same behavior used for the routing based
           on AngularJS.
           */
@@ -427,7 +427,7 @@ export const WzMenu = withWindowSize(
         if (this.state.currentMenuTab !== 'wazuh-dev') {
           /* TODO: this reloads the page to force the components are remounted with the new
           selection of. To avoid this refresh, we would have to do the components are able to react
-          to this changes redoing the requests, etc... This will need a considerable time to
+          to these changes redoing the requests, etc... This will need a considerable time to
           apply the changes. The reload of the pages is the same behavior used for the routing based
           on AngularJS.
           */
