@@ -1013,13 +1013,9 @@ export const ToolDevTools = withGlobalBreadcrumb([
 
   return (
     <div
-      // flex='auto'
-      // ng-controller='devToolsController as ctrl'
       style={{ display: 'flex', flexDirection: 'column' }}
       className='dev-tools-max-height'
     >
-      {/* <md-content flex layout='column' class='md-padding' layout-align='start'> */}
-
       <div className='wz-dev-box'>
         <div
           id='wz-dev-left-column'
