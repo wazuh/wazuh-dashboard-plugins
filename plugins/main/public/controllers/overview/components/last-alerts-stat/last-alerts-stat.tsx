@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiStat,
   EuiFlexItem,
@@ -20,7 +20,9 @@ import { useIsMounted } from '../../../../components/common/hooks/use-is-mounted
 export function LastAlertsStat({ severity }: { severity: string }) {
   const [countLastAlerts, setCountLastAlerts] = useState<number | null>(null);
   const [discoverLocation, setDiscoverLocation] = useState<string>('');
-  const isMounted = useIsMounted();
+
+  const { isComponentMounted, getAbortController } = useIsMounted();
+
   const severityLabel = {
     low: {
       label: 'Low',
@@ -56,15 +58,13 @@ export function LastAlertsStat({ severity }: { severity: string }) {
   };
 
   useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
     const getCountLastAlerts = async () => {
       try {
         const { indexPatternName, cluster, count } = await getLast24HoursAlerts(
           severityLabel[severity].ruleLevelRange,
           { signal },
         );
-        if (isMounted()) {
+        if (isComponentMounted()) {
           setCountLastAlerts(count);
           const core = getCore();
 
@@ -107,7 +107,12 @@ export function LastAlertsStat({ severity }: { severity: string }) {
     };
 
     getCountLastAlerts();
-  }, [isMounted]);
+
+    return () => {
+      const abortController = getAbortController();
+      abortController.abort();
+    };
+  }, [severity, isComponentMounted, getAbortController]);
 
   return (
     <EuiFlexItem>

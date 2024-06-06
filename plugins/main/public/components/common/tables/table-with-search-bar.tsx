@@ -17,7 +17,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { SearchBar, SearchBarProps } from '../../search-bar';
-
+import { useIsMounted } from '../hooks/use-is-mounted';
 export interface ITableWithSearcHBarProps<T> {
   /**
    * Function to fetch the data
@@ -123,32 +123,17 @@ export function TableWithSearchBar<T>({
   });
   const [refresh, setRefresh] = useState(Date.now());
 
-  const isMounted = useRef(false);
+  const { isComponentMounted, getAbortController } = useIsMounted();
   const tableRef = useRef();
 
   useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
-    // We don't want to set the pagination state because there is another effect that has this dependency
-    // and will cause the effect is triggered (redoing the onSearch function).
-    if (isMounted.current) {
-      // Reset the page index when the endpoint or reload changes.
-      // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
+    if (isComponentMounted()) {
       updateRefresh();
     }
   }, [endpoint, reload]);
 
   useEffect(() => {
-    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
-    // We don't want to set the filters state because there is another effect that has this dependency
-    // and will cause the effect is triggered (redoing the onSearch function).
-    if (isMounted.current && !_.isEqual(rest.filters, filters)) {
+    if (isComponentMounted() && !_.isEqual(rest.filters, filters)) {
       setFilters(rest.filters || {});
       updateRefresh();
     }
@@ -174,7 +159,7 @@ export function TableWithSearchBar<T>({
   }
 
   function tableOnChange({ page = {}, sort = {} }) {
-    if (isMounted.current) {
+    if (isComponentMounted()) {
       const { index: pageIndex, size: pageSize } = page;
       const { field, direction } = sort;
       setPagination({
@@ -195,8 +180,10 @@ export function TableWithSearchBar<T>({
       try {
         setLoading(true);
 
-        //Reset the table selection in case is enabled
-        tableRef.current.setSelection([]);
+        // Reset the table selection in case is enabled
+        if (tableRef.current) {
+          tableRef.current.setSelection([]);
+        }
 
         const { items, totalItems } = await onSearch(
           endpoint,
@@ -204,12 +191,12 @@ export function TableWithSearchBar<T>({
           pagination,
           sorting,
         );
-        if (isMounted.current) {
+        if (isComponentMounted()) {
           setItems(items);
           setTotalItems(totalItems);
         }
       } catch (error) {
-        if (isMounted.current) {
+        if (isComponentMounted()) {
           setItems([]);
           setTotalItems(0);
           const options = {
@@ -225,7 +212,7 @@ export function TableWithSearchBar<T>({
           getErrorOrchestrator().handleError(options);
         }
       }
-      if (isMounted.current) {
+      if (isComponentMounted()) {
         setLoading(false);
       }
     })();
@@ -236,6 +223,7 @@ export function TableWithSearchBar<T>({
     totalItemCount: totalItems,
     pageSizeOptions: tablePageSizeOptions,
   };
+
   return (
     <>
       <SearchBar

@@ -12,6 +12,7 @@ import {
   tFilterManager,
 } from '../index';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
+import { useIsMounted } from '../../../common/hooks/use-is-mounted';
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   DataSource: IDataSourceFactoryConstructor<K>;
@@ -70,6 +71,8 @@ export function useDataSource<
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
 
+  const { isComponentMounted, getAbortController } = useIsMounted();
+
   const setFilters = (filters: tFilter[]) => {
     if (!dataSourceFilterManager) {
       return;
@@ -83,11 +86,11 @@ export function useDataSource<
     if (!dataSourceFilterManager) {
       return;
     }
-    return await dataSourceFilterManager?.fetch(params);
+    const paramsWithSignal = { ...params, signal: getAbortController().signal };
+    return await dataSourceFilterManager.fetch(paramsWithSignal);
   };
 
   useEffect(() => {
-    let isMounted = true;
     let subscription;
     (async () => {
       setIsLoading(true);
@@ -102,7 +105,7 @@ export function useDataSource<
       if (!dataSource) {
         throw new Error('No valid data source found');
       }
-      if (isMounted) {
+      if (isComponentMounted()) {
         setDataSource(dataSource);
         const dataSourceFilterManager = new PatternDataSourceFilterManager(
           dataSource,
@@ -110,11 +113,9 @@ export function useDataSource<
           injectedFilterManager,
           initialFetchFilters,
         );
-        // what the filters update
         subscription = dataSourceFilterManager.getUpdates$().subscribe({
           next: () => {
-            // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-            if (isMounted) {
+            if (isComponentMounted()) {
               dataSourceFilterManager.setFilters(
                 dataSourceFilterManager.getFilters(),
               );

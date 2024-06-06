@@ -9,14 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-import React, {
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-} from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   EuiTitle,
   EuiLoadingSpinner,
@@ -33,6 +26,7 @@ import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
 import { useStateStorage } from '../hooks';
+import { useIsMounted } from '../../common/hooks/use-is-mounted';
 
 /**
  * Search input custom filter button
@@ -84,7 +78,7 @@ export function TableWzAPI({
   const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const isMounted = useRef(false);
+  const { isComponentMounted, getAbortController } = useIsMounted();
 
   const onFiltersChange = filters =>
     typeof rest.onFiltersChange === 'function'
@@ -110,13 +104,11 @@ export function TableWzAPI({
   );
   const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
 
-  const controller = new AbortController();
-  const signal = controller.signal;
-
   const onSearch = useCallback(
     async function (endpoint, filters, pagination, sorting) {
+      const abortController = getAbortController();
       try {
-        if (isMounted.current == false) {
+        if (!isComponentMounted()) {
           const error = new Error('Abort error onSearch callback');
           error.name = 'AbortError';
           throw error;
@@ -131,7 +123,7 @@ export function TableWzAPI({
           offset: pageIndex * pageSize,
           limit: pageSize,
           sort: `${direction === 'asc' ? '+' : '-'}${field}`,
-          signal,
+          signal: abortController.signal,
         };
 
         const response = await WzRequest.apiReq('GET', endpoint, { params });
@@ -170,7 +162,7 @@ export function TableWzAPI({
         };
       }
     },
-    [isMounted],
+    [isComponentMounted, getAbortController],
   );
 
   const renderActionButtons = (actionButtons, filters) => {
@@ -202,12 +194,10 @@ export function TableWzAPI({
   };
 
   useEffect(() => {
-    isMounted.current = true;
-    if (rest.reload && isMounted.current == true) triggerReload();
+    if (rest.reload && isComponentMounted()) triggerReload();
 
     return () => {
-      isMounted.current = false;
-      controller.abort();
+      getAbortController().abort();
     };
   }, [rest.reload]);
 

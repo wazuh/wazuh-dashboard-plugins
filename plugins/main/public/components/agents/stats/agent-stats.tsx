@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -48,6 +48,7 @@ import {
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
+import { useIsMounted } from '../../common/hooks/use-is-mounted';
 
 const tableColumns = [
   {
@@ -145,29 +146,30 @@ export const MainAgentStats = compose(
 )(AgentStats);
 
 function AgentStats({ agent }) {
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
   const [dataStatLogcollector, setDataStatLogcollector] = useState({});
   const [dataStatAgent, setDataStatAgent] = useState();
-  const isMounted = useRef(false);
+
+  const { isComponentMounted, getAbortController } = useIsMounted();
 
   useEffect(() => {
-    isMounted.current = true;
-
     const fetchData = async () => {
       setLoading(true);
       try {
+        const signal = getAbortController().signal;
+
         const responseDataStatLogcollector = await WzRequest.apiReq(
           'GET',
           `/agents/${agent.id}/stats/logcollector`,
-          {},
+          { signal },
         );
         const responseDataStatAgent = await WzRequest.apiReq(
           'GET',
           `/agents/${agent.id}/stats/agent`,
-          {},
+          { signal },
         );
 
-        if (isMounted.current) {
+        if (isComponentMounted()) {
           setDataStatLogcollector(
             responseDataStatLogcollector?.data?.data?.affected_items?.[0] || {},
           );
@@ -176,8 +178,8 @@ function AgentStats({ agent }) {
           );
         }
       } catch (error) {
-        if (isMounted.current) {
-          const options: UIErrorLog = {
+        if (isComponentMounted()) {
+          const options = {
             context: `${AgentStats.name}.useEffect`,
             level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
             severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
@@ -190,17 +192,13 @@ function AgentStats({ agent }) {
           getErrorOrchestrator().handleError(options);
         }
       } finally {
-        if (isMounted.current) {
+        if (isComponentMounted()) {
           setLoading(false);
         }
       }
     };
 
     fetchData();
-
-    return () => {
-      isMounted.current = false;
-    };
   }, [agent.id]);
 
   return (
