@@ -17,7 +17,7 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { GenericRequest } from '../../react-services';
 import NavigationService from '../../react-services/navigation-service';
 import { getWzCurrentAppID } from '../../kibana-services';
-import { settings } from '../../utils/applications';
+import { serverApis } from '../../utils/applications';
 
 export function settingsWizard(_, wzMisc, disableErrors = false) {
   try {
@@ -41,10 +41,10 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
         !NavigationService.getInstance().getPathname().includes('/settings') &&
         !NavigationService.getInstance().getPathname().includes('/blank-screen')
       ) {
-        if (getWzCurrentAppID() === settings.id) {
+        if (getWzCurrentAppID() === serverApis.id) {
           NavigationService.getInstance().navigate('/settings?tab=api');
         } else {
-          NavigationService.getInstance().navigateToApp(settings.id);
+          NavigationService.getInstance().navigateToApp(serverApis.id);
         }
       }
     };
@@ -131,10 +131,10 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
                 .getPathname()
                 .includes('/settings')
             ) {
-              if (getWzCurrentAppID() === settings.id) {
+              if (getWzCurrentAppID() === serverApis.id) {
                 NavigationService.getInstance().navigate('/settings?tab=api');
               } else {
-                NavigationService.getInstance().navigateToApp(settings.id);
+                NavigationService.getInstance().navigateToApp(serverApis.id);
               }
             }
           });
