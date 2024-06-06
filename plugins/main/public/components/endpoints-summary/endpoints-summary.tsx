@@ -12,7 +12,7 @@
  */
 
 import React, { Component } from 'react';
-import { EuiPage, EuiFlexItem, EuiSpacer } from '@elastic/eui';
+import { EuiSpacer } from '@elastic/eui';
 import { AgentsTable } from './table/agents-table';
 import {
   withGlobalBreadcrumb,
@@ -23,10 +23,6 @@ import { compose } from 'redux';
 import { endpointSummary } from '../../utils/applications';
 import './endpoints-summary.scss';
 import { EndpointsSummaryDashboard } from './dashboard/endpoints-summary-dashboard';
-import { getOutdatedAgents } from './services';
-import { UI_LOGGER_LEVELS } from '../../../common/constants';
-import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../react-services/common-services';
 
 export const EndpointsSummary = compose(
   withErrorBoundary,
@@ -45,53 +41,20 @@ export const EndpointsSummary = compose(
       this.state = {
         agentTableFilters: {},
         reload: 0,
-        outdatedAgents: 0,
-        isLoadingOutdatedAgents: true,
-        showOnlyOutdatedAgents: false,
       };
       this.filterAgentByStatus = this.filterAgentByStatus.bind(this);
       this.filterAgentByOS = this.filterAgentByOS.bind(this);
       this.filterAgentByGroup = this.filterAgentByGroup.bind(this);
-      this.filterByOutdatedAgent = this.filterByOutdatedAgent.bind(this);
     }
-
-    getOutdatedAgents = async () => {
-      try {
-        this.setState({ isLoadingOutdatedAgents: true });
-        const { total_affected_items } = await getOutdatedAgents({ limit: 1 });
-        this.setState({ outdatedAgents: total_affected_items });
-      } catch (error) {
-        const options = {
-          context: `EndpointsSummary.getOutdatedAgents`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          error: {
-            error,
-            message: error.message || error,
-            title: `Could not get outdated agents`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      } finally {
-        this.setState({ isLoadingOutdatedAgents: false });
-      }
-    };
 
     setReload = (newValue: number) => {
       this.setState({
         reload: newValue,
       });
-      this.getOutdatedAgents();
-    };
-
-    setShowOnlyOutdatedAgents = (newValue: boolean) => {
-      this.setState({ showOnlyOutdatedAgents: newValue });
     };
 
     async componentDidMount() {
       this._isMount = true;
-      this.getOutdatedAgents();
     }
 
     componentWillUnmount() {
@@ -135,34 +98,22 @@ export const EndpointsSummary = compose(
         });
     }
 
-    filterByOutdatedAgent() {
-      this._isMount && this.setShowOnlyOutdatedAgents(true);
-    }
-
     render() {
       return (
-        <EuiPage className='flex-column'>
-          <EuiFlexItem>
-            <EndpointsSummaryDashboard
-              filterAgentByStatus={this.filterAgentByStatus}
-              filterAgentByOS={this.filterAgentByOS}
-              filterAgentByGroup={this.filterAgentByGroup}
-              outdatedAgents={this.state.outdatedAgents}
-              isLoadingOutdatedAgents={this.state.isLoadingOutdatedAgents}
-              filterByOutdatedAgent={this.filterByOutdatedAgent}
-              reloadDashboard={this.state.reload}
-            />
-            <EuiSpacer size='m' />
-            <AgentsTable
-              filters={this.state.agentTableFilters}
-              externalReload={this.state.reload}
-              setExternalReload={this.setReload}
-              showOnlyOutdated={this.state.showOnlyOutdatedAgents}
-              setShowOnlyOutdated={this.setShowOnlyOutdatedAgents}
-              totalOutdated={this.state.outdatedAgents}
-            />
-          </EuiFlexItem>
-        </EuiPage>
+        <>
+          <EndpointsSummaryDashboard
+            filterAgentByStatus={this.filterAgentByStatus}
+            filterAgentByOS={this.filterAgentByOS}
+            filterAgentByGroup={this.filterAgentByGroup}
+            reloadDashboard={this.state.reload}
+          />
+          <EuiSpacer size='m' />
+          <AgentsTable
+            filters={this.state.agentTableFilters}
+            externalReload={this.state.reload}
+            setExternalReload={this.setReload}
+          />
+        </>
       );
     }
   },
