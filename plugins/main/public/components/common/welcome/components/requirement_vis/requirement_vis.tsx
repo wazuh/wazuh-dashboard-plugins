@@ -17,11 +17,13 @@ import { EuiFlexItem, EuiPanel, euiPaletteColorBlind } from '@elastic/eui';
 import { VisualizationBasicWidgetSelector } from '../../../charts/visualizations/basic';
 import { getRequirementAlerts } from './lib';
 import { useTimeFilter } from '../../../hooks';
-import { getIndexPattern } from '../../../../../react-services';
-import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
-import rison from 'rison-node';
+import { AppState } from '../../../../../react-services';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../../../data-source/pattern/pattern-data-source-filter-manager';
 import NavigationService from '../../../../../react-services/navigation-service';
 
 const selectionOptionsCompliance = [
@@ -48,35 +50,26 @@ export function RequirementVis(props) {
   const pinnedAgentManager = new PinnedAgentManager();
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
-    try {
-      pinnedAgentManager.pinAgent(agent);
-      const indexPattern = getIndexPattern();
-      const filters = [
-        {
-          ...buildPhraseFilter(
-            { name: `rule.${requirement}`, type: 'text' },
-            key,
-            indexPattern,
-          ),
-          $state: { isImplicit: false, store: 'appState' },
-        },
-      ];
-      const _w = { filters };
-      const params = {
-        tab: requirementNameModuleID[requirement],
-        _w: rison.encode(_w),
-      };
-      const url = Object.entries(params)
-        .map(e => e.join('='))
-        .join('&');
-      // TODO: check redirection to gdpr
-      NavigationService.getInstance().navigateToApp(
-        WAZUH_MODULES[params.tab].appId,
-        {
-          path: `#/overview?${url}`,
-        },
-      );
-    } catch (error) {}
+    pinnedAgentManager.pinAgent(agent);
+    const indexPatternId = AppState.getCurrentPattern();
+    const filters = [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        `rule.${requirement}`,
+        key,
+        indexPatternId,
+      ),
+    ];
+    const tabName = requirementNameModuleID[requirement];
+    const params = `tab=${tabName}&agentId=${
+      agent.id
+    }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`;
+    NavigationService.getInstance().navigateToApp(
+      WAZUH_MODULES[tabName].appId,
+      {
+        path: `#/overview?${params}`,
+      },
+    );
   };
 
   const fetchData = useCallback(

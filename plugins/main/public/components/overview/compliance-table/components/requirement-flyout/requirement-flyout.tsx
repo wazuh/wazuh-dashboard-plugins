@@ -116,18 +116,13 @@ export const RequirementFlyout = connect(mapStateToProps)(
               id: 'agent.id',
               displayAsText: 'Agent',
               render: value => (
-                <EuiLink
-                  onClick={e => {
-                    NavigationService.getInstance().navigateToApp(
-                      endpointSummary.id,
-                      {
-                        path: `#/agents/?tab=welcome&agent=${value}`,
-                      },
-                    );
-                  }}
-                >
-                  {value}
-                </EuiLink>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiLink
+                    href={`${endpointSummary.id}#/agents/?tab=welcome&agent=${value}`}
+                  >
+                    {value}
+                  </EuiLink>
+                </RedirectAppLinks>
               ),
             },
             {

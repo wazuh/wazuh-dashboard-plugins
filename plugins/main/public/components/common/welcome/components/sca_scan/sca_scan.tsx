@@ -34,7 +34,10 @@ import { withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
 import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
-import { configurationAssessment } from '../../../../../utils/applications';
+import {
+  configurationAssessment,
+  endpointSummary,
+} from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../../../../react-services/navigation-service';
@@ -148,12 +151,9 @@ export const ScaScan = compose(
           'scaPolicies',
           JSON.stringify(this.state.policies),
         );
-        NavigationService.getInstance().navigateToApp(
-          configurationAssessment.id,
-          {
-            path: `#/overview?tab=sca&redirectPolicy=${policy.policy_id}&agentId=${this.props.agent.id}`,
-          },
-        );
+        NavigationService.getInstance().navigateToApp(endpointSummary.id, {
+          path: `#/overview?tab=sca&redirectPolicy=${policy.policy_id}&agentId=${this.props.agent.id}`,
+        });
       });
     };
 

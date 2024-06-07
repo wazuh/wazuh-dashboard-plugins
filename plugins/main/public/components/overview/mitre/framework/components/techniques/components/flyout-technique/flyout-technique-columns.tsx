@@ -3,7 +3,10 @@ import { formatUIDate } from '../../../../../../../../react-services';
 import { tDataGridColumn } from '../../../../../../../common/data-grid';
 import { EuiLink, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { getCore } from '../../../../../../../../kibana-services';
-import { rules } from '../../../../../../../../utils/applications';
+import {
+  rules,
+  endpointSummary,
+} from '../../../../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
 
@@ -13,6 +16,12 @@ const navigateTo = (ev, section, params) => {
 
 const renderTechniques = (value: []) => {
   const techniques = value.map(technique => {
+    /*
+      ToDo:
+      This link redirect to the Intelligence tab and open the flyout technique detail
+      This must be replaced by the RedirectAppLinks but right now the RedirectAppLinks is not working,
+      doesn't open the tab and the flyout technique, so we are using the AppNavigate.navigateToModule
+    */
     return (
       <EuiFlexItem key={technique}>
         <EuiLink
@@ -48,12 +57,14 @@ export const techniquesColumns: tDataGridColumn[] = [
   {
     id: 'agent.id',
     displayAsText: 'Agent',
-    render: value => (
-      <EuiLink
-        onClick={e => navigateTo(e, 'agents', { tab: 'welcome', agent: value })}
-      >
-        {value}
-      </EuiLink>
+    render: agentId => (
+      <RedirectAppLinks application={getCore().application}>
+        <EuiLink
+          href={`${endpointSummary.id}#/agents?tab=welcome&agent=${agentId}`}
+        >
+          {agentId}
+        </EuiLink>
+      </RedirectAppLinks>
     ),
   },
   { id: 'agent.name', displayAsText: 'Agent Name' },

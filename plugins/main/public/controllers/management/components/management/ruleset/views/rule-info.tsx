@@ -25,15 +25,17 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orch
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
-import { threatHunting } from '../../../../../../utils/applications';
-import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 import { withRouterSearch } from '../../../../../../components/common/hocs';
 import NavigationService from '../../../../../../react-services/navigation-service';
-import { AppState } from '../../../../../../react-services';
 import {
   getDataPlugin,
   getWazuhCorePlugin,
 } from '../../../../../../kibana-services';
+import { threatHunting } from '../../../../../../utils/applications';
+import { euiThemeVars } from '@osd/ui-shared-deps/theme';
+import { AppState } from '../../../../../../react-services';
+import { PatternDataSourceFilterManager as DSFilterManager } from '../../../../../../components/common/data-source';
+import { FILTER_OPERATOR } from '../../../../../../components/common/data-source/pattern/pattern-data-source-filter-manager';
 
 export default withRouterSearch(
   class WzRuleInfo extends Component {
@@ -792,10 +794,19 @@ export default withRouterSearch(
                   href={NavigationService.getInstance().getUrlForApp(
                     threatHunting.id,
                     {
-                      path: `#/overview/?tab=general&tabView=dashboard&_g=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'${this.state.currentIndexPattern}',key:rule.id,negate:!f,params:(query:'${id}'),type:phrase),query:(match_phrase:(rule.id:'${id}')))),query:(language:kuery,query:''))`,
+                      path: `#/overview/?tab=general&tabView=panels&_g=${DSFilterManager.filtersToURLFormat(
+                        [
+                          DSFilterManager.createFilter(
+                            FILTER_OPERATOR.IS,
+                            'rule.id',
+                            id,
+                            this.state.currentIndexPattern,
+                          ),
+                        ],
+                      )}`,
                     },
                   )}
-                  target='blank'
+                  target='_blank'
                 >
                   View alerts of this Rule
                 </EuiButtonEmpty>

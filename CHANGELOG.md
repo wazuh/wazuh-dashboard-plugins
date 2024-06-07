@@ -42,7 +42,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed agent log collector socket API response controller component [#6660](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6660)
 - Improve margins and paddins in the Events, Inventory and Control tabs [#6708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6708)
 - Refactored the search bar to correctly handle fixed and user-added filters [#6716](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6716)
-- Migrated AngularJS routing to React [#6689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6689)
 
 ### Fixed
 
