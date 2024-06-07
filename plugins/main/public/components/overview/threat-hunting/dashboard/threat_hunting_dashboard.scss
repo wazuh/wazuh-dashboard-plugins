@@ -9,6 +9,10 @@
   }
 }
 
+.euiDataGrid__virtualized {
+  height: max-content !important;
+}
+
 .th-container {
   .euiDataGrid--fullScreen {
     height: calc(100vh - 49px);

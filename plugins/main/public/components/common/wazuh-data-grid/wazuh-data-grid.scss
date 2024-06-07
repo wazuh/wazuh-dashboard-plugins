@@ -2,6 +2,10 @@
   max-width: 100%;
   min-width: 100%;
 
+  .euiDataGrid__virtualized {
+    height: max-content !important;
+  }
+
   .euiDataGrid--fullScreen {
     height: calc(100vh - 49px);
     bottom: 0;

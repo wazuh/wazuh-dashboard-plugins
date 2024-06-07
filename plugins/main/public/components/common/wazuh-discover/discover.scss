@@ -1,4 +1,8 @@
 .discoverContainer {
+  .euiDataGrid__virtualized {
+    height: max-content !important;
+  }
+
   .euiDataGrid--fullScreen {
     height: calc(100vh - 49px);
     bottom: 0;
