@@ -20,10 +20,10 @@ const AGENT_ID_KEY = 'agent.id';
 
 /**
  * Get the filter that excludes the data related to Wazuh servers
- * @param indexPatternTitle Index pattern title
+ * @param indexPatternId Index pattern id
  * @returns
  */
-export function getFilterExcludeManager(indexPatternTitle: string) {
+export function getFilterExcludeManager(indexPatternId: string) {
   return {
     meta: {
       alias: null,
@@ -32,7 +32,7 @@ export function getFilterExcludeManager(indexPatternTitle: string) {
       negate: true,
       params: { query: MANAGER_AGENT_ID },
       type: 'phrase',
-      index: indexPatternTitle,
+      index: indexPatternId,
       controlledBy: DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
     },
     query: { match_phrase: { [AGENT_ID_KEY]: MANAGER_AGENT_ID } },
@@ -43,17 +43,17 @@ export function getFilterExcludeManager(indexPatternTitle: string) {
 /**
  * Get the filter that restrict the search to the allowed agents
  * @param agentsIds
- * @param indexPatternTitle
+ * @param indexPatternId
  * @returns
  */
 export function getFilterAllowedAgents(
   agentsIds: string[],
-  indexPatternTitle: string,
+  indexPatternId: string,
 ) {
   const field = AGENT_ID_KEY;
   return {
     meta: {
-      index: indexPatternTitle,
+      index: indexPatternId,
       type: 'phrases',
       key: field,
       value: agentsIds.toString(),
@@ -301,7 +301,7 @@ export class PatternDataSourceFilterManager
    * Return the filter when the cluster or manager are enabled
    */
   static getClusterManagerFilters(
-    indexPatternTitle: string,
+    indexPatternId: string,
     controlledByValue: string,
     key?: string,
   ): tFilter[] {
@@ -317,7 +317,7 @@ export class PatternDataSourceFilterManager
     managerFilter.meta = {
       ...managerFilter.meta,
       controlledBy: controlledByValue,
-      index: indexPatternTitle,
+      index: indexPatternId,
     };
     //@ts-ignore
     managerFilter.$state = {
@@ -330,7 +330,7 @@ export class PatternDataSourceFilterManager
   /**
    * Returns the filter when the an agent is pinned (saved in the session storage or redux store)
    */
-  static getPinnedAgentFilter(indexPatternTitle: string): tFilter[] {
+  static getPinnedAgentFilter(indexPatternId: string): tFilter[] {
     const pinnedAgentManager = new PinnedAgentManager();
     const isPinnedAgent = pinnedAgentManager.isPinnedAgent();
     if (!isPinnedAgent) {
@@ -346,7 +346,7 @@ export class PatternDataSourceFilterManager
           negate: false,
           params: { query: currentPinnedAgent.id },
           type: 'phrase',
-          index: indexPatternTitle,
+          index: indexPatternId,
           controlledBy: PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
         },
         query: {
@@ -367,10 +367,10 @@ export class PatternDataSourceFilterManager
   /**
    * Return the filter to exclude the data related to servers (managers) due to the setting hideManagerAlerts is enabled
    */
-  static getExcludeManagerFilter(indexPatternTitle: string): tFilter[] {
+  static getExcludeManagerFilter(indexPatternId: string): tFilter[] {
     if (store.getState().appConfig?.data?.hideManagerAlerts) {
       let excludeManagerFilter = getFilterExcludeManager(
-        indexPatternTitle,
+        indexPatternId,
       ) as tFilter;
       return [excludeManagerFilter];
     }
@@ -381,13 +381,13 @@ export class PatternDataSourceFilterManager
      * Return the allowed agents related to the user permissions to read data from agents in the
       API server
      */
-  static getAllowAgentsFilter(indexPatternTitle: string): tFilter[] {
+  static getAllowAgentsFilter(indexPatternId: string): tFilter[] {
     const allowedAgents =
       store.getState().appStateReducers?.allowedAgents || [];
     if (allowedAgents.length > 0) {
       const allowAgentsFilter = getFilterAllowedAgents(
         allowedAgents,
-        indexPatternTitle,
+        indexPatternId,
       ) as tFilter;
       return [allowAgentsFilter];
     }
@@ -538,7 +538,7 @@ export class PatternDataSourceFilterManager
    *
    * @param field
    * @param value
-   * @param indexPatternTitle
+   * @param indexPatternId
    */
   static generateFilter(
     field: string,
