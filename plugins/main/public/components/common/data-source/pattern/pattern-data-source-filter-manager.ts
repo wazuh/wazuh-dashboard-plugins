@@ -1,3 +1,4 @@
+import rison from 'rison-node';
 import store from '../../../../redux/store';
 import { AppState } from '../../../../react-services/app-state';
 import { getDataPlugin } from '../../../../kibana-services';
@@ -80,13 +81,16 @@ export function getFilterAllowedAgents(
   };
 }
 
-type tFilterType =
-  | 'is'
-  | 'is not'
-  | 'exists'
-  | 'does not exist'
-  | 'is one of'
-  | 'is not one of';
+export enum FILTER_OPERATOR {
+  IS = 'is',
+  IS_NOT = 'is not',
+  EXISTS = 'exists',
+  DOES_NOT_EXISTS = 'does not exists',
+  IS_ONE_OF = 'is one of',
+  IS_NOT_ONE_OF = 'is not one of',
+  IS_BETWEEN = 'is between',
+  IS_NOT_BETWEEN = 'is not between',
+}
 
 export class PatternDataSourceFilterManager
   implements tDataSourceFilterManager
@@ -394,134 +398,138 @@ export class PatternDataSourceFilterManager
   /********************** FILTERS FACTORY ***************************/
   /******************************************************************/
 
+  static createFilter(
+    type: FILTER_OPERATOR,
+    key: string,
+    value: string | [],
+    indexPatternId: string,
+    controlledBy?: string,
+  ) {
+    if (
+      type === FILTER_OPERATOR.IS_ONE_OF ||
+      type === FILTER_OPERATOR.IS_NOT_ONE_OF
+    ) {
+      if (!Array.isArray(value)) {
+        throw new Error('The value must be an array');
+      }
+    }
+
+    if (type === FILTER_OPERATOR.IS_BETWEEN) {
+      if (
+        !Array.isArray(value) &&
+        value.length <= 2 &&
+        value.length > 0 &&
+        value.some(v => isNaN(Number(v)))
+      ) {
+        throw new Error('The value must be an array with one or two numbers');
+      }
+    }
+
+    switch (type) {
+      case FILTER_OPERATOR.IS:
+      case FILTER_OPERATOR.IS_NOT:
+        return PatternDataSourceFilterManager.generateFilter(
+          key,
+          value,
+          indexPatternId,
+          {
+            query: {
+              match_phrase: {
+                [key]: {
+                  query: value,
+                },
+              },
+            },
+          },
+          controlledBy,
+          type === FILTER_OPERATOR.IS_NOT,
+        );
+      case FILTER_OPERATOR.EXISTS:
+      case FILTER_OPERATOR.DOES_NOT_EXISTS:
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            value: 'exists',
+            negate: type === FILTER_OPERATOR.DOES_NOT_EXISTS,
+            type: 'exists',
+            index: indexPatternId,
+            controlledBy,
+          },
+          exists: { field: key },
+          $state: { store: 'appState' },
+        };
+      case FILTER_OPERATOR.IS_ONE_OF:
+      case FILTER_OPERATOR.IS_NOT_ONE_OF:
+        return PatternDataSourceFilterManager.generateFilter(
+          key,
+          value,
+          indexPatternId,
+          {
+            query: {
+              bool: {
+                minimum_should_match: 1,
+                should: value.map((v: string) => ({
+                  match_phrase: {
+                    [key]: {
+                      query: v,
+                    },
+                  },
+                })),
+              },
+            },
+          },
+          controlledBy,
+          type === FILTER_OPERATOR.IS_NOT_ONE_OF,
+        );
+      case FILTER_OPERATOR.IS_BETWEEN:
+      case FILTER_OPERATOR.IS_NOT_BETWEEN:
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            params: {
+              gte: value[0],
+              lte: value[1] || NaN,
+            },
+            negate: type === FILTER_OPERATOR.IS_NOT_BETWEEN,
+            type: 'range',
+            index: indexPatternId,
+            controlledBy,
+          },
+          range: {
+            [key]: {
+              gte: value[0],
+              lte: value[1] || NaN,
+            },
+          },
+          $state: { store: 'appState' },
+        };
+      default:
+        throw new Error('Invalid filter type');
+    }
+  }
+
   /**
-   * Returns a filter with the field and value received
-   * @param field
-   * @param value
+   * Returns a filter object depending on the type of filter received
+   *
    * @returns
    */
   createFilter(
-    type: tFilterType,
+    type: FILTER_OPERATOR,
     key: string,
     value: string | [],
     controlledBy?: string,
   ): tFilter {
-    switch (type) {
-      case 'is':
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          {
-            query: {
-              match_phrase: {
-                [key]: {
-                  query: value,
-                },
-              },
-            },
-          },
-          controlledBy,
-        );
-      case 'is not':
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          {
-            query: {
-              match_phrase: {
-                [key]: {
-                  query: value,
-                },
-              },
-            },
-          },
-          controlledBy,
-          true,
-        );
-      case 'exists':
-        return {
-          meta: {
-            alias: null,
-            disabled: false,
-            key: key,
-            value: 'exists',
-            negate: false,
-            type: 'exists',
-            index: this.dataSource.id,
-            controlledBy,
-          },
-          exists: { field: key },
-          $state: { store: 'appState' },
-        };
-      case 'does not exist':
-        return {
-          meta: {
-            alias: null,
-            disabled: false,
-            key: key,
-            value: 'exists',
-            negate: true,
-            type: 'exists',
-            index: this.dataSource.id,
-            controlledBy,
-          },
-          exists: { field: key },
-          $state: { store: 'appState' },
-        };
-      case 'is one of':
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          {
-            query: {
-              bool: {
-                minimum_should_match: 1,
-                should: value.map((v: string) => ({
-                  match_phrase: {
-                    [key]: {
-                      query: v,
-                    },
-                  },
-                })),
-              },
-            },
-          },
-          controlledBy,
-        );
-      case 'is not one of':
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          {
-            query: {
-              bool: {
-                minimum_should_match: 1,
-                should: value.map((v: string) => ({
-                  match_phrase: {
-                    [key]: {
-                      query: v,
-                    },
-                  },
-                })),
-              },
-            },
-          },
-          controlledBy,
-          true,
-        );
-      default:
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          undefined,
-          controlledBy,
-        );
-    }
+    return PatternDataSourceFilterManager.createFilter(
+      type,
+      key,
+      value,
+      this.dataSource.id,
+      controlledBy,
+    );
   }
 
   /**
@@ -531,7 +539,7 @@ export class PatternDataSourceFilterManager
    * @param value
    * @param indexPatternId
    */
-  private generateFilter(
+  static generateFilter(
     field: string,
     value: string | string[],
     indexPatternId: string,
@@ -554,5 +562,17 @@ export class PatternDataSourceFilterManager
       ...query,
       $state: { store: 'appState' },
     };
+  }
+
+  /**
+   * Transform the filter format to the format used in the URL
+   * Receives a filter object and returns a filter object with the format used in the URL using rison-node
+   */
+
+  static filtersToURLFormat(filters: tFilter[]) {
+    const filterCopy = filters || [];
+    return rison.encode({
+      filters: filterCopy,
+    });
   }
 }
