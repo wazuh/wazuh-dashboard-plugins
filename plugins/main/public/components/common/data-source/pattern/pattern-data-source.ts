@@ -10,7 +10,7 @@ import {
   IndexPattern,
 } from '../../../../../../../src/plugins/data/public';
 import { search } from '../../search-bar/search-bar-service';
-import { PatternDataSourceFilterManager } from '../index';
+import { PatternDataSourceFilterManager } from './pattern-data-source-filter-manager';
 
 export class PatternDataSource implements tDataSource {
   id: string;
