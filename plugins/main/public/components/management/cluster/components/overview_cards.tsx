@@ -14,7 +14,7 @@ import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import '../dashboard/cluster_dashboard.scss';
 import { getPlugins } from '../../../../kibana-services';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { tFilter } from '../../../common/data-source';
+import { tFilter, tParsedIndexPattern } from '../../../common/data-source';
 
 interface OverviewCardsProps {
   goAgents: () => void;
@@ -28,7 +28,7 @@ interface OverviewCardsProps {
   agentsCount: number;
   searchBarProps: any;
   results: any;
-  indexPatternId: string;
+  indexPattern: tParsedIndexPattern;
   clusterName?: string;
   filters: tFilter[];
 }
@@ -49,7 +49,7 @@ export const OverviewCards = ({
   agentsCount,
   searchBarProps,
   results,
-  indexPatternId,
+  indexPattern,
   clusterName,
   filters,
 }: OverviewCardsProps) => {
@@ -206,7 +206,7 @@ export const OverviewCards = ({
           <DashboardByRenderer
             input={{
               viewMode: ViewMode.VIEW,
-              panels: getDashboardPanels(indexPatternId, nodeList, clusterName),
+              panels: getDashboardPanels(indexPattern, nodeList, clusterName),
               isFullScreenMode: false,
               filters: filters,
               useMargins: true,

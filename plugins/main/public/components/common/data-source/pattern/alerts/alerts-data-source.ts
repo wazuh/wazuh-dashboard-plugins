@@ -49,7 +49,7 @@ export class AlertsDataSource extends PatternDataSource {
 
   getClusterManagerFilters() {
     return PatternDataSourceFilterManager.getClusterManagerFilters(
-      this.title,
+      this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
     );
   }

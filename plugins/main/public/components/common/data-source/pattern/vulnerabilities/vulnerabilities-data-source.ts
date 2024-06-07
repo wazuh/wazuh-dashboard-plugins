@@ -16,7 +16,7 @@ export class VulnerabilitiesDataSource extends PatternDataSource {
 
   getClusterManagerFilters() {
     return PatternDataSourceFilterManager.getClusterManagerFilters(
-      this.title,
+      this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
       VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
     );
