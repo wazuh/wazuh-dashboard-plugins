@@ -10,7 +10,7 @@ import {
   IndexPattern,
 } from '../../../../../../../src/plugins/data/public';
 import { search } from '../../search-bar/search-bar-service';
-import { PatternDataSourceFilterManager } from '../pattern/pattern-data-source-filter-manager';
+import { PatternDataSourceFilterManager } from '../index';
 
 export class PatternDataSource implements tDataSource {
   id: string;
@@ -117,17 +117,17 @@ export class PatternDataSource implements tDataSource {
   }
 
   /**
-   * Returns the filter when the an agent is pinned (saved in the session storage or redux store)
+   * Returns the filter when an agent is pinned (saved in session storage or redux store)
    */
   getPinnedAgentFilter(): tFilter[] {
-    return PatternDataSourceFilterManager.getPinnedAgentFilter(this.title);
+    return PatternDataSourceFilterManager.getPinnedAgentFilter(this.id);
   }
 
   getAllowAgentsFilter(): tFilter[] {
-    return PatternDataSourceFilterManager.getAllowAgentsFilter(this.title);
+    return PatternDataSourceFilterManager.getAllowAgentsFilter(this.id);
   }
 
   getExcludeManagerFilter(): tFilter[] {
-    return PatternDataSourceFilterManager.getExcludeManagerFilter(this.title);
+    return PatternDataSourceFilterManager.getExcludeManagerFilter(this.id);
   }
 }

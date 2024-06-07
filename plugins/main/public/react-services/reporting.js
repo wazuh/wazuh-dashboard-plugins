@@ -140,13 +140,13 @@ export class ReportingService {
       const timeFilter =
         dataSourceContext.time && dataSourceContext.indexPattern.timeFieldName
           ? buildRangeFilter(
-              {
-                name: dataSourceContext.indexPattern.timeFieldName,
-                type: 'date',
-              },
-              dataSourceContext.time,
-              dataSourceContext.indexPattern,
-            )
+            {
+              name: dataSourceContext.indexPattern.timeFieldName,
+              type: 'date',
+            },
+            dataSourceContext.time,
+            dataSourceContext.indexPattern,
+          )
           : null;
       // Build the filters to use in the server side
       // Based on https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.13.0/src/plugins/data/public/query/query_service.ts#L103-L113
@@ -166,12 +166,12 @@ export class ReportingService {
         tab === 'syscollector'
           ? { to: dataSourceContext.time.to, from: dataSourceContext.time.from }
           : {
-              to: dateMath.parse(dataSourceContext.time.to, {
-                roundUp: true,
-                forceNow: getForceNow(),
-              }),
-              from: dateMath.parse(dataSourceContext.time.from),
-            };
+            to: dateMath.parse(dataSourceContext.time.to, {
+              roundUp: true,
+              forceNow: getForceNow(),
+            }),
+            from: dateMath.parse(dataSourceContext.time.from),
+          };
 
       const data = {
         array: visualizations,

@@ -22,9 +22,9 @@ async function checkExistenceIndexPattern(indexPatternID: string) {
   return response?.error?.statusCode !== 404;
 }
 
-async function checkExistenceIndices(indexPatternTitle: string) {
+async function checkExistenceIndices(indexPatternId: string) {
   try {
-    const fields = await SavedObject.getIndicesFields(indexPatternTitle);
+    const fields = await SavedObject.getIndicesFields(indexPatternId);
     return { exist: true, fields };
   } catch (error) {
     return { exist: false };

@@ -185,7 +185,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
             agentsCount={state?.agentsCount}
             searchBarProps={searchBarProps}
             results={results}
-            indexPatternId={dataSource?.id}
+            indexPattern={dataSource?.indexPattern}
             filters={fetchFilters ?? []}
           />
         ) : null}
