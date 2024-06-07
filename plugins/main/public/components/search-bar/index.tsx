@@ -77,7 +77,6 @@ export const SearchBar = ({
   const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) =>
     setInput(event.target.value);
 
-  // Handler when pressing a key
   const onKeyPressHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       _onSearch(queryLanguageOutputRun.output);
@@ -89,6 +88,7 @@ export const SearchBar = ({
   );
 
   useEffect(() => {
+    let isMounted = true;
     // React to external changes and set the internal input text. Use the `transformInput` of
     // the query language in use
     rest.input &&
@@ -102,15 +102,14 @@ export const SearchBar = ({
           },
         ),
       );
-  }, [rest.input]);
 
-  useEffect(() => {
     (async () => {
       // Set the query language output
       debounceUpdateSearchBarTimer.current &&
         clearTimeout(debounceUpdateSearchBarTimer.current);
       // Debounce the updating of the search bar state
       debounceUpdateSearchBarTimer.current = setTimeout(async () => {
+        if (!isMounted) return;
         const queryLanguageOutput = await searchBarQueryLanguages[
           queryLanguage.id
         ].run(input, {
@@ -137,16 +136,26 @@ export const SearchBar = ({
         setQueryLanguageOutputRun(queryLanguageOutput);
       }, SEARCH_BAR_DEBOUNCE_UPDATE_TIME);
     })();
+
+    return () => {
+      isMounted = false;
+      debounceUpdateSearchBarTimer.current &&
+        clearTimeout(debounceUpdateSearchBarTimer.current);
+    };
   }, [input, queryLanguage, selectedQueryLanguageParameters?.options]);
 
   useEffect(() => {
-    onChange &&
+    if (!onChange) return;
+
+    if (
       // Ensure the previous output is different to the new one
       !_.isEqual(
         queryLanguageOutputRun.output,
         queryLanguageOutputRunPreviousOutput.current,
-      ) &&
+      )
+    ) {
       onChange(queryLanguageOutputRun.output);
+    }
   }, [queryLanguageOutputRun.output]);
 
   const onQueryLanguagePopoverSwitch = () =>

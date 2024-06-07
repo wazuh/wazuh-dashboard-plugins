@@ -51,8 +51,13 @@ export function getForceNow() {
 
 ////////////////////////////////////////////////////////////////////////////////////
 
+interface Options {
+  signal?: AbortSignal;
+}
+
 export const search = async (
   params: SearchParams,
+  options: Options = {},
 ): Promise<SearchResponse | void> => {
   const {
     indexPattern,
@@ -123,7 +128,7 @@ export const search = async (
     searchSource.setField('aggs', aggs);
   }
   try {
-    return await searchParams.fetch();
+    return await searchParams.fetch({ signal: options.signal });
   } catch (error) {
     if (error.body) {
       throw error.body;

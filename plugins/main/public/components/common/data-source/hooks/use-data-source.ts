@@ -12,6 +12,7 @@ import {
   tFilterManager,
 } from '../index';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
+import { useIsMounted } from '../../../common/hooks/use-is-mounted';
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   DataSource: IDataSourceFactoryConstructor<K>;
@@ -70,6 +71,8 @@ export function useDataSource<
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
 
+  const { isComponentMounted, getAbortController } = useIsMounted();
+
   const setFilters = (filters: tFilter[]) => {
     if (!dataSourceFilterManager) {
       return;
@@ -83,7 +86,8 @@ export function useDataSource<
     if (!dataSourceFilterManager) {
       return;
     }
-    return await dataSourceFilterManager?.fetch(params);
+    const paramsWithSignal = { ...params, signal: getAbortController().signal };
+    return await dataSourceFilterManager.fetch(paramsWithSignal);
   };
 
   useEffect(() => {
@@ -101,28 +105,30 @@ export function useDataSource<
       if (!dataSource) {
         throw new Error('No valid data source found');
       }
-      setDataSource(dataSource);
-      const dataSourceFilterManager = new PatternDataSourceFilterManager(
-        dataSource,
-        initialFilters,
-        injectedFilterManager,
-        initialFetchFilters,
-      );
-      // what the filters update
-      subscription = dataSourceFilterManager.getUpdates$().subscribe({
-        next: () => {
-          // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-          dataSourceFilterManager.setFilters(
-            dataSourceFilterManager.getFilters(),
-          );
-          setAllFilters(dataSourceFilterManager.getFilters());
-          setFetchFilters(dataSourceFilterManager.getFetchFilters());
-        },
-      });
-      setAllFilters(dataSourceFilterManager.getFilters());
-      setFetchFilters(dataSourceFilterManager.getFetchFilters());
-      setDataSourceFilterManager(dataSourceFilterManager);
-      setIsLoading(false);
+      if (isComponentMounted()) {
+        setDataSource(dataSource);
+        const dataSourceFilterManager = new PatternDataSourceFilterManager(
+          dataSource,
+          initialFilters,
+          injectedFilterManager,
+          initialFetchFilters,
+        );
+        subscription = dataSourceFilterManager.getUpdates$().subscribe({
+          next: () => {
+            if (isComponentMounted()) {
+              dataSourceFilterManager.setFilters(
+                dataSourceFilterManager.getFilters(),
+              );
+              setAllFilters(dataSourceFilterManager.getFilters());
+              setFetchFilters(dataSourceFilterManager.getFetchFilters());
+            }
+          },
+        });
+        setAllFilters(dataSourceFilterManager.getFilters());
+        setFetchFilters(dataSourceFilterManager.getFetchFilters());
+        setDataSourceFilterManager(dataSourceFilterManager);
+        setIsLoading(false);
+      }
     })();
 
     return () => subscription && subscription.unsubscribe();

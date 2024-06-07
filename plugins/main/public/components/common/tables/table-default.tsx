@@ -15,6 +15,7 @@ import { EuiBasicTable } from '@elastic/eui';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { useIsMounted } from '../hooks/use-is-mounted';
 
 export function TableDefault({
   onSearch,
@@ -43,7 +44,7 @@ export function TableDefault({
     },
   });
 
-  const isMounted = useRef(false);
+  const { isComponentMounted, getAbortController } = useIsMounted();
 
   function tableOnChange({ page = {}, sort = {} }) {
     const { index: pageIndex, size: pageSize } = page;
@@ -61,58 +62,59 @@ export function TableDefault({
   }
 
   useEffect(() => {
-    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
-    // We don't want to set the pagination state because there is another effect that has this dependency
-    // and will cause the effect is triggered (redoing the onSearch function).
-    if (isMounted.current) {
-      // Reset the page index when the endpoint changes.
-      // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
+    if (isComponentMounted()) {
       setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
     }
   }, [endpoint]);
 
   useEffect(() => {
     (async function () {
+      const abortController = getAbortController();
       try {
         setLoading(true);
-        const { items, totalItems } = await onSearch(endpoint, [], pagination, sorting);
-        setItems(items);
-        setTotalItems(totalItems);
+        const { items, totalItems } = await onSearch(
+          endpoint,
+          [],
+          pagination,
+          sorting,
+        );
+        if (isComponentMounted()) {
+          setItems(items);
+          setTotalItems(totalItems);
+        }
       } catch (error) {
-        setItems([]);
-        setTotalItems(0);
-        const options = {
-          context: `${TableDefault.name}.useEffect`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `${error.name}: Error fetching items`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
+        if (isComponentMounted()) {
+          setItems([]);
+          setTotalItems(0);
+          const options = {
+            context: `${TableDefault.name}.useEffect`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: `${error.name}: Error fetching items`,
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
       }
-      setLoading(false);
+      if (isComponentMounted()) {
+        setLoading(false);
+      }
     })();
   }, [endpoint, pagination, sorting, reload]);
-
-  // It is required that this effect runs after other effects that use isMounted
-  // to avoid that these effects run when the component is mounted, only running
-  // when one of its dependencies changes.
-  useEffect(() => {
-    isMounted.current = true;
-  }, []);
 
   const tablePagination = {
     ...pagination,
     totalItemCount: totalItems,
     pageSizeOptions: tablePageSizeOptions,
-    hidePerPageOptions
+    hidePerPageOptions,
   };
+
   return (
     <EuiBasicTable
-      columns={tableColumns.map(({show, ...rest}) => ({...rest}))}
+      columns={tableColumns.map(({ show, ...rest }) => ({ ...rest }))}
       items={items}
       loading={loading}
       pagination={tablePagination}

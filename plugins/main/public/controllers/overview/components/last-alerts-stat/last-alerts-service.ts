@@ -12,12 +12,17 @@ interface Last24HoursAlerts {
   indexPatternName: string;
 }
 
+interface Options {
+  signal?: AbortSignal;
+}
+
 /**
  * This fetch the last 24 hours alerts from the selected cluster
  * TODO: The search function should be moved to a common place
  */
 export const getLast24HoursAlerts = async (
   ruleLevelRange,
+  options: Options = {},
 ): Promise<Last24HoursAlerts> => {
   try {
     const currentIndexPattern = await getDataPlugin().indexPatterns.get(
@@ -36,7 +41,7 @@ export const getLast24HoursAlerts = async (
       ruleLevelRange,
     );
 
-    const result = await search(lastAlertsQuery);
+    const result = await search(lastAlertsQuery, options);
     const count = result?.hits?.total;
     return {
       count,

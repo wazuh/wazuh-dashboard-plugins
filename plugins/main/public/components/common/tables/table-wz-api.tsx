@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   EuiTitle,
@@ -27,6 +26,7 @@ import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
 import { useStateStorage } from '../hooks';
+import { useIsMounted } from '../../common/hooks/use-is-mounted';
 
 /**
  * Search input custom filter button
@@ -78,6 +78,8 @@ export function TableWzAPI({
   const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  const { isComponentMounted, getAbortController } = useIsMounted();
+
   const onFiltersChange = filters =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
@@ -102,56 +104,66 @@ export function TableWzAPI({
   );
   const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
 
-  const onSearch = useCallback(async function (
-    endpoint,
-    filters,
-    pagination,
-    sorting,
-  ) {
-    try {
-      const { pageIndex, pageSize } = pagination;
-      const { field, direction } = sorting.sort;
-      setIsLoading(true);
-      setFilters(filters);
-      onFiltersChange(filters);
-      const params = {
-        ...getFilters(filters),
-        offset: pageIndex * pageSize,
-        limit: pageSize,
-        sort: `${direction === 'asc' ? '+' : '-'}${field}`,
-      };
+  const onSearch = useCallback(
+    async function (endpoint, filters, pagination, sorting) {
+      const abortController = getAbortController();
+      try {
+        if (!isComponentMounted()) {
+          const error = new Error('Abort error onSearch callback');
+          error.name = 'AbortError';
+          throw error;
+        }
+        const { pageIndex, pageSize } = pagination;
+        const { field, direction } = sorting.sort;
+        setIsLoading(true);
+        setFilters(filters);
+        onFiltersChange(filters);
+        const params = {
+          ...getFilters(filters),
+          offset: pageIndex * pageSize,
+          limit: pageSize,
+          sort: `${direction === 'asc' ? '+' : '-'}${field}`,
+          signal: abortController.signal,
+        };
 
-      const response = await WzRequest.apiReq('GET', endpoint, { params });
+        const response = await WzRequest.apiReq('GET', endpoint, { params });
 
-      const { affected_items: items, total_affected_items: totalItems } = (
-        (response || {}).data || {}
-      ).data;
-      setIsLoading(false);
-      setTotalItems(totalItems);
+        const { affected_items: items, total_affected_items: totalItems } = (
+          (response || {}).data || {}
+        ).data;
+        setIsLoading(false);
+        setTotalItems(totalItems);
 
-      const result = {
-        items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
-        totalItems,
-      };
+        const result = {
+          items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
+          totalItems,
+        };
 
-      onDataChange(result);
+        onDataChange(result);
 
-      return result;
-    } catch (error) {
-      setIsLoading(false);
-      setTotalItems(0);
-      if (error?.name) {
-        /* This replaces the error name. The intention is that an AxiosError
+        return result;
+      } catch (error) {
+        setIsLoading(false);
+        setTotalItems(0);
+        if (error.name !== 'AbortError') {
+          if (error?.name) {
+            /* This replaces the error name. The intention is that an AxiosError
           doesn't appear in the toast message.
           TODO: This should be managed by the service that does the request instead of only changing
           the name in this case.
         */
-        error.name = 'RequestError';
+            error.name = 'RequestError';
+          }
+          throw error;
+        }
+        return {
+          items: [],
+          totalItems,
+        };
       }
-      throw error;
-    }
-  },
-  []);
+    },
+    [isComponentMounted, getAbortController],
+  );
 
   const renderActionButtons = (actionButtons, filters) => {
     if (Array.isArray(actionButtons)) {
@@ -182,7 +194,11 @@ export function TableWzAPI({
   };
 
   useEffect(() => {
-    if (rest.reload) triggerReload();
+    if (rest.reload && isComponentMounted()) triggerReload();
+
+    return () => {
+      getAbortController().abort();
+    };
   }, [rest.reload]);
 
   const ReloadButton = (

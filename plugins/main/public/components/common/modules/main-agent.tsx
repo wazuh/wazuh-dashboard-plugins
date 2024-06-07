@@ -39,20 +39,31 @@ import {
 } from '../data-source';
 import { useAsyncAction } from '../hooks';
 
-export class MainModuleAgent extends Component {
-  props!: {
-    [key: string]: any;
-  };
-  state: {
-    selectView: Boolean;
-    loadingReport: Boolean;
-    switchModule: Boolean;
-    showAgentInfo: Boolean;
-  };
+interface MainModuleAgentProps {
+  agent: any;
+  section: string;
+  selectView: boolean;
+  tabs?: any[];
+  renderTabs: () => React.ReactNode;
+}
+
+interface MainModuleAgentState {
+  selectView: boolean;
+  loadingReport: boolean;
+  switchModule: boolean;
+  showAgentInfo: boolean;
+}
+
+export class MainModuleAgent extends Component<
+  MainModuleAgentProps,
+  MainModuleAgentState
+> {
+  isMounted: boolean;
   reportingService: ReportingService;
   filterHandler: FilterHandler;
+  router: any;
 
-  constructor(props) {
+  constructor(props: MainModuleAgentProps) {
     super(props);
     this.reportingService = new ReportingService();
     this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
@@ -62,11 +73,17 @@ export class MainModuleAgent extends Component {
       switchModule: false,
       showAgentInfo: false,
     };
+    this.isMounted = false;
   }
 
   async componentDidMount() {
+    this.isMounted = true;
     const $injector = getAngularModule().$injector;
     this.router = $injector.get('$route');
+  }
+
+  componentWillUnmount() {
+    this.isMounted = false;
   }
 
   renderTitle() {

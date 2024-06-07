@@ -15,10 +15,14 @@ import {
   ErrorFactory,
   HttpError,
 } from '../../../../react-services/error-management';
+import { useIsMounted } from '../../../../components/common/hooks/use-is-mounted';
 
 export function LastAlertsStat({ severity }: { severity: string }) {
   const [countLastAlerts, setCountLastAlerts] = useState<number | null>(null);
   const [discoverLocation, setDiscoverLocation] = useState<string>('');
+
+  const { isComponentMounted, getAbortController } = useIsMounted();
+
   const severityLabel = {
     low: {
       label: 'Low',
@@ -58,46 +62,57 @@ export function LastAlertsStat({ severity }: { severity: string }) {
       try {
         const { indexPatternName, cluster, count } = await getLast24HoursAlerts(
           severityLabel[severity].ruleLevelRange,
+          { signal },
         );
-        setCountLastAlerts(count);
-        const core = getCore();
+        if (isComponentMounted()) {
+          setCountLastAlerts(count);
+          const core = getCore();
 
-        let discoverLocation = {
-          app: 'data-explorer',
-          basePath: 'discover',
-        };
+          let discoverLocation = {
+            app: 'data-explorer',
+            basePath: 'discover',
+          };
 
-        // TODO: find a better way to get the query discover URL
-        const destURL = core.application.getUrlForApp(discoverLocation.app, {
-          path: `${
-            discoverLocation.basePath
-          }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:${
-            cluster.field
-          },negate:!f,params:(query:${
-            cluster.name
-          }),type:phrase),query:(match_phrase:(${cluster.field}:${
-            cluster.name
-          }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:rule.level,negate:!f,params:(gte:${
-            severityLabel[severity].ruleLevelRange.minRuleLevel
-          },lte:${
-            severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
-          }),type:range),range:(rule.level:(gte:${
-            severityLabel[severity].ruleLevelRange.minRuleLevel
-          },lte:${
-            severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
-          })))),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))&_q=(filters:!(),query:(language:kuery,query:''))`,
-        });
-        setDiscoverLocation(destURL);
+          // TODO: find a better way to get the query discover URL
+          const destURL = core.application.getUrlForApp(discoverLocation.app, {
+            path: `${
+              discoverLocation.basePath
+            }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:${
+              cluster.field
+            },negate:!f,params:(query:${
+              cluster.name
+            }),type:phrase),query:(match_phrase:(${cluster.field}:${
+              cluster.name
+            }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:rule.level,negate:!f,params:(gte:${
+              severityLabel[severity].ruleLevelRange.minRuleLevel
+            },lte:${
+              severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
+            }),type:range),range:(rule.level:(gte:${
+              severityLabel[severity].ruleLevelRange.minRuleLevel
+            },lte:${
+              severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
+            })))),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))&_q=(filters:!(),query:(language:kuery,query:''))`,
+          });
+          setDiscoverLocation(destURL);
+        }
       } catch (error) {
-        const searchError = ErrorFactory.create(HttpError, {
-          error,
-          message: 'Error fetching last alerts',
-        });
-        ErrorHandler.handleError(searchError);
+        if (error.name !== 'AbortError') {
+          const searchError = ErrorFactory.create(HttpError, {
+            error,
+            message: 'Error fetching last alerts',
+          });
+          ErrorHandler.handleError(searchError);
+        }
       }
     };
+
     getCountLastAlerts();
-  }, []);
+
+    return () => {
+      const abortController = getAbortController();
+      abortController.abort();
+    };
+  }, [severity, isComponentMounted, getAbortController]);
 
   return (
     <EuiFlexItem>
