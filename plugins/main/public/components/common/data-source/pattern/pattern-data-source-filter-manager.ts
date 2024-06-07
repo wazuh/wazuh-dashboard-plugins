@@ -513,9 +513,8 @@ export class PatternDataSourceFilterManager
   }
 
   /**
-   * Returns a filter with the field and value received
-   * @param field
-   * @param value
+   * Returns a filter object depending on the type of filter received
+   *
    * @returns
    */
   createFilter(

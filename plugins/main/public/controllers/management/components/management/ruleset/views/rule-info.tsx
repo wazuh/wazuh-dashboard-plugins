@@ -169,7 +169,7 @@ export default class WzRuleInfo extends Component {
 
     const currentIndexPattern = await getDataPlugin().indexPatterns.get(
       AppState.getCurrentPattern() ||
-        getWazuhCorePlugin().configuration.getSettingValue('pattern'),
+      getWazuhCorePlugin().configuration.getSettingValue('pattern'),
     );
 
     this.setState({
