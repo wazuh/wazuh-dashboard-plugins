@@ -224,7 +224,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   <EuiPanel>
                     <DashboardByRenderer
                       input={histogramChartInput(
-                        dataSource?.title,
+                        dataSource?.id,
                         fetchFilters,
                         query,
                         dateRangeFrom,
