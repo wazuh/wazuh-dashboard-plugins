@@ -3,7 +3,7 @@ import { formatUIDate, AppNavigate } from '../../../../../../../../react-service
 import { tDataGridColumn } from '../../../../../../../common/data-grid';
 import { EuiLink, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { getCore } from '../../../../../../../../kibana-services';
-import { rules, mitreAttack } from '../../../../../../../../utils/applications';
+import { rules, endpointSummary } from '../../../../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const navigateTo = (ev, section, params) => {
@@ -52,7 +52,7 @@ export const techniquesColumns: tDataGridColumn[] = [
     render: (agentId) => (
       <RedirectAppLinks application={getCore().application}>
         <EuiLink
-          href={`${mitreAttack.id}#/agents?tab=welcome&agent=${agentId}`}
+          href={`${endpointSummary.id}#/agents?tab=welcome&agent=${agentId}`}
         >
           {agentId}
         </EuiLink >
