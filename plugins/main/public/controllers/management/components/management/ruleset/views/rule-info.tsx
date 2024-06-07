@@ -34,7 +34,7 @@ import {
 import { threatHunting } from '../../../../../../utils/applications';
 import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 import { AppState } from '../../../../../../react-services';
-import { PatternDataSourceFilterManager as DSFilterManager } from '../../../../../../components/common/data-source'
+import { PatternDataSourceFilterManager as DSFilterManager } from '../../../../../../components/common/data-source';
 import { FILTER_OPERATOR } from '../../../../../../components/common/data-source/pattern/pattern-data-source-filter-manager';
 
 export default class WzRuleInfo extends Component {
@@ -169,7 +169,7 @@ export default class WzRuleInfo extends Component {
 
     const currentIndexPattern = await getDataPlugin().indexPatterns.get(
       AppState.getCurrentPattern() ||
-      getWazuhCorePlugin().configuration.getSettingValue('pattern'),
+        getWazuhCorePlugin().configuration.getSettingValue('pattern'),
     );
 
     this.setState({
@@ -769,7 +769,16 @@ export default class WzRuleInfo extends Component {
                 iconType='popout'
                 aria-label='popout'
                 href={getCore().application.getUrlForApp(threatHunting.id, {
-                  path: `#/overview/?tab=general&tabView=panels&_g=${DSFilterManager.filterToURLFormat([DSFilterManager.createFilter(FILTER_OPERATOR.IS, 'rule.id', id, this.state.currentIndexPattern)])}`,
+                  path: `#/overview/?tab=general&tabView=panels&_g=${DSFilterManager.filtersToURLFormat(
+                    [
+                      DSFilterManager.createFilter(
+                        FILTER_OPERATOR.IS,
+                        'rule.id',
+                        id,
+                        this.state.currentIndexPattern,
+                      ),
+                    ],
+                  )}`,
                 })}
                 target='_blank'
               >

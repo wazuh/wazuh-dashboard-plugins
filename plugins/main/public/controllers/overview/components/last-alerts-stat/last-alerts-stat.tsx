@@ -15,7 +15,10 @@ import {
   ErrorFactory,
   HttpError,
 } from '../../../../react-services/error-management';
-import { FILTER_OPERATOR, PatternDataSourceFilterManager } from '../../../../components/common/data-source/pattern/pattern-data-source-filter-manager';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../../../../components/common/data-source/pattern/pattern-data-source-filter-manager';
 
 export function LastAlertsStat({ severity }: { severity: string }) {
   const [countLastAlerts, setCountLastAlerts] = useState<number | null>(null);
@@ -69,13 +72,30 @@ export function LastAlertsStat({ severity }: { severity: string }) {
         };
 
         // add predefined filters with URL filter format
-        const clusterNameFilter = PatternDataSourceFilterManager.createFilter(FILTER_OPERATOR.IS, cluster.field, cluster.name, indexPatternName);
-        const ruleLevelRangeFilter = PatternDataSourceFilterManager.createFilter(FILTER_OPERATOR.IS_BETWEEN, 'rule.level', [severityLabel[severity].ruleLevelRange.minRuleLevel, severityLabel[severity].ruleLevelRange.maxRuleLevel], indexPatternName);
-        const predefinedFilters = PatternDataSourceFilterManager.filtersToURLFormat([clusterNameFilter, ruleLevelRangeFilter]);
+        const clusterNameFilter = PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS,
+          cluster.field,
+          cluster.name,
+          indexPatternName,
+        );
+        const ruleLevelRangeFilter =
+          PatternDataSourceFilterManager.createFilter(
+            FILTER_OPERATOR.IS_BETWEEN,
+            'rule.level',
+            [
+              severityLabel[severity].ruleLevelRange.minRuleLevel,
+              severityLabel[severity].ruleLevelRange.maxRuleLevel,
+            ],
+            indexPatternName,
+          );
+        const predefinedFilters =
+          PatternDataSourceFilterManager.filtersToURLFormat([
+            clusterNameFilter,
+            ruleLevelRangeFilter,
+          ]);
 
         const destURL = core.application.getUrlForApp(discoverLocation.app, {
-          path: `${discoverLocation.basePath
-            }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=${predefinedFilters}&_q=(filters:!(),query:(language:kuery,query:''))`,
+          path: `${discoverLocation.basePath}#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=${predefinedFilters}&_q=(filters:!(),query:(language:kuery,query:''))`,
         });
         setDiscoverLocation(destURL);
       } catch (error) {
@@ -96,14 +116,15 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           title={
             <EuiToolTip
               position='top'
-              content={`Click to see rule.level ${severityLabel[severity].ruleLevelRange.maxRuleLevel
-                ? 'between ' +
-                severityLabel[severity].ruleLevelRange.minRuleLevel +
-                ' to ' +
+              content={`Click to see rule.level ${
                 severityLabel[severity].ruleLevelRange.maxRuleLevel
-                : severityLabel[severity].ruleLevelRange.minRuleLevel +
-                ' or higher'
-                }`}
+                  ? 'between ' +
+                    severityLabel[severity].ruleLevelRange.minRuleLevel +
+                    ' to ' +
+                    severityLabel[severity].ruleLevelRange.maxRuleLevel
+                  : severityLabel[severity].ruleLevelRange.minRuleLevel +
+                    ' or higher'
+              }`}
             >
               <EuiLink
                 className='statWithLink'
