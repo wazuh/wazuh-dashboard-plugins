@@ -11,6 +11,9 @@ import {
   EuiBadge,
 } from '@elastic/eui';
 import WzTextWithTooltipTruncated from '../../../../../../common/wz-text-with-tooltip-if-truncated';
+import { RedirectAppLinks } from '../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { getCore } from '../../../../../../../kibana-services';
+import { rules } from '../../../../../../../utils/applications';
 
 type Props = {
   data: any;
@@ -282,15 +285,17 @@ const RuleDetails = (props: Props) => {
             </EuiTitle>
           }
           extraAction={
-            <EuiLink
-              href={`#/manager/rules?tab=rules&redirectRule=${id}`}
-              target='_blank'
-              style={{ paddingTop: 5 }}
-              rel='noopener noreferrer'
-            >
-              <EuiIcon type='popout' color='primary' />
-              &nbsp; View in Rules
-            </EuiLink>
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                target='_blank'
+                style={{ paddingTop: 5 }}
+                rel='noopener noreferrer'
+                href={`${rules.id}#/manager/?tab=rules&redirectRule=${id}`}
+              >
+                <EuiIcon type='popout' color='primary' />
+                &nbsp; View in Rules
+              </EuiLink>
+            </RedirectAppLinks>
           }
           initialIsOpen={true}
         >

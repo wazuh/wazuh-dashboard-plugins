@@ -18,11 +18,10 @@ import { VisualizationBasicWidgetSelector } from '../../../charts/visualizations
 import { getRequirementAlerts } from './lib';
 import { useTimeFilter } from '../../../hooks';
 import { getCore } from '../../../../../kibana-services';
-import { getIndexPattern } from '../../../../../react-services';
-import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
-import rison from 'rison-node';
+import { AppState } from '../../../../../react-services';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
+import { FILTER_OPERATOR, PatternDataSourceFilterManager } from '../../../data-source/pattern/pattern-data-source-filter-manager';
 
 const selectionOptionsCompliance = [
   { value: 'pci_dss', text: 'PCI DSS' },
@@ -48,32 +47,16 @@ export function RequirementVis(props) {
   const pinnedAgentManager = new PinnedAgentManager();
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
-    try {
-      pinnedAgentManager.pinAgent(agent);
-      const indexPattern = getIndexPattern();
-      const filters = [
-        {
-          ...buildPhraseFilter(
-            { name: `rule.${requirement}`, type: 'text' },
-            key,
-            indexPattern,
-          ),
-          $state: { isImplicit: false, store: 'appState' },
-        },
-      ];
-      const _w = { filters };
-      const params = {
-        tab: requirementNameModuleID[requirement],
-        _w: rison.encode(_w),
-      };
-      const url = Object.entries(params)
-        .map(e => e.join('='))
-        .join('&');
-      // TODO: redirection to gdpr will fail
-      getCore().application.navigateToApp(WAZUH_MODULES[params.tab].appId, {
-        path: `#/overview?${url}`,
-      });
-    } catch (error) {}
+    pinnedAgentManager.pinAgent(agent);
+    const indexPatternId = AppState.getCurrentPattern();
+    const filters = [
+      PatternDataSourceFilterManager.createFilter(FILTER_OPERATOR.IS, `rule.${requirement}`, key, indexPatternId)
+    ];
+    const tabName = requirementNameModuleID[requirement];
+    const params = `tab=${tabName}&agentId=${agent.id}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`
+    getCore().application.navigateToApp(WAZUH_MODULES[tabName].appId, {
+      path: `#/overview?${params}`,
+    });
   };
 
   const fetchData = useCallback(
@@ -85,15 +68,15 @@ export function RequirementVis(props) {
       );
       return buckets?.length
         ? buckets.map(({ key, doc_count }, index) => ({
-            label: key,
-            value: doc_count,
-            color: colors[index],
-            onClick:
-              selectedOptionValue === 'gpg13'
-                ? undefined
-                : () =>
-                    goToDashboardWithFilter(selectedOptionValue, key, agent),
-          }))
+          label: key,
+          value: doc_count,
+          color: colors[index],
+          onClick:
+            selectedOptionValue === 'gpg13'
+              ? undefined
+              : () =>
+                goToDashboardWithFilter(selectedOptionValue, key, agent),
+        }))
         : null;
     },
     [],
