@@ -171,3 +171,4 @@ export const FlyoutDetail = withRouterSearch(
     );
   }
 }
+);
