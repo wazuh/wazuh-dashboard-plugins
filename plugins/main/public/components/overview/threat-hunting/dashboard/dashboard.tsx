@@ -225,7 +225,7 @@ const DashboardTH: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-          <>
+          <div className='th-container'>
             <SampleDataWarning />
             <div className='th-dashboard-responsive'>
               <DashboardByRenderer
@@ -282,18 +282,18 @@ const DashboardTH: React.FC = () => {
                         <HitsCounter
                           hits={results?.hits?.total}
                           showResetButton={false}
-                          onResetQuery={() => { }}
+                          onResetQuery={() => {}}
                           tooltip={
                             results?.hits?.total &&
-                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
                               ? {
-                                ariaLabel: 'Warning',
-                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits.`,
-                                iconType: 'alert',
-                                position: 'top',
-                              }
+                                  ariaLabel: 'Warning',
+                                  content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                    MAX_ENTRIES_PER_QUERY,
+                                  )} hits.`,
+                                  iconType: 'alert',
+                                  position: 'top',
+                                }
                               : undefined
                           }
                         />
@@ -333,7 +333,7 @@ const DashboardTH: React.FC = () => {
                 </EuiFlyout>
               )}
             </div>
-          </>
+          </div>
         ) : null}
       </>
     </I18nProvider>

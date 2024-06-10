@@ -90,7 +90,11 @@ export const techniquesColumns: tDataGridColumn[] = [
 ];
 
 export const agentTechniquesColumns: tDataGridColumn[] = [
-  { id: 'timestamp', displayAsText: 'Time' },
+  {
+    id: 'timestamp',
+    displayAsText: 'Time',
+    render: value => formatUIDate(value),
+  },
   {
     id: 'rule.mitre.id',
     displayAsText: 'Technique(s)',

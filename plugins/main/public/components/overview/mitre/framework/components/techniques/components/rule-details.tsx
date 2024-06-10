@@ -200,8 +200,6 @@ const RuleDetails = (props: Props) => {
       .filter(key => key !== 'group')
       .forEach(key => {
         const detail = details[key];
-        const detailValue =
-          typeof detail === 'object' ? JSON.stringify(detail) : detail;
         detailsToRender.push(
           <EuiFlexItem
             key={key}
@@ -209,7 +207,7 @@ const RuleDetails = (props: Props) => {
             style={{ maxWidth: 'calc(25% - 24px)', maxHeight: 45 }}
           >
             <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>
-            {detailValue === '' ? 'true' : getFormattedDetails(detailValue)}
+            {detail === '' ? 'true' : getFormattedDetails(detail)}
           </EuiFlexItem>,
         );
       });

@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useEffect, useState, useMemo } from 'react';
-import MarkdownIt from 'markdown-it';
 import $ from 'jquery';
 import {
   EuiFlyoutHeader,
@@ -47,13 +46,6 @@ import TechniqueRowDetails from './technique-row-details';
 import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/data/common';
 import store from '../../../../../../../../redux/store';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
-
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  breaks: true,
-  typographer: true,
-});
 
 type tFlyoutTechniqueProps = {
   currentTechnique: string;
@@ -237,7 +229,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     return <TechniqueRowDetails {...props} onRuleItemClick={onItemClick} />;
   };
 
-  const getDiscoverColums = () => {
+  const getDiscoverColumns = () => {
     // when the agent is pinned
     const agentId = store.getState().appStateReducers?.currentAgentData?.id;
     return agentId ? agentTechniquesColumns : techniquesColumns;
@@ -246,17 +238,6 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   const renderBody = () => {
     const { currentTechnique } = props;
     const { techniqueData } = state;
-    const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
-    const formattedDescription = techniqueData.description ? (
-      <div
-        className='wz-markdown-margin wz-markdown-wrapper'
-        dangerouslySetInnerHTML={{
-          __html: md.render(techniqueData.description),
-        }}
-      ></div>
-    ) : (
-      techniqueData.description
-    );
     const data = [
       {
         title: 'ID',
@@ -400,7 +381,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           <div className='details-row'>
             <WazuhFlyoutDiscover
               DataSource={PatternDataSource}
-              tableColumns={getDiscoverColums()}
+              tableColumns={getDiscoverColumns()}
               filterManager={filterManager}
               initialFetchFilters={filterParams.filters}
               expandedRowComponent={expandedRow}

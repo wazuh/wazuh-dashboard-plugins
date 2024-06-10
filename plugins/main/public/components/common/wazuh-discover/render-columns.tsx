@@ -86,8 +86,4 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
         <div>{renderMitreTechnique(value)}</div>
       ),
   },
-  {
-    id: 'timestamp',
-    render: value => formatUIDate(value),
-  },
 ];
