@@ -241,7 +241,8 @@
 /* Others */
 
 .wz-no-display {
-  display: none !important;
+  height: 0;
+  overflow: hidden;
 }
 
 .wz-display-inline-grid {
