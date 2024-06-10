@@ -17,12 +17,7 @@ import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spi
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
 async function checkExistenceIndexPattern(indexPatternID: string) {
-  const response = await getSavedObjects().client.get(
-    'index-pattern',
-    indexPatternID,
-  );
-
-  return response?.error?.statusCode !== 404;
+  return await getSavedObjects().client.get('index-pattern', indexPatternID);
 }
 
 async function checkExistenceIndices(indexPatternId: string) {
@@ -59,9 +54,10 @@ export async function validateVulnerabilitiesStateDataSources({
   try {
     // Check the existence of related index pattern
     const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
+    let indexPattern = existIndexPattern;
 
     // If the idnex pattern does not exist, then check the existence of index
-    if (!existIndexPattern) {
+    if (existIndexPattern?.error?.statusCode === 404) {
       // Check the existence of indices
       const { exist, fields } = await checkExistenceIndices(indexPatternID);
 
@@ -104,7 +100,7 @@ export async function validateVulnerabilitiesStateDataSources({
     }
     return {
       ok: false,
-      data: {},
+      data: { indexPattern },
     };
   } catch (error) {
     return {

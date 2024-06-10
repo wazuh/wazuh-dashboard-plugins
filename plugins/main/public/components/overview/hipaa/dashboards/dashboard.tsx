@@ -32,6 +32,7 @@ const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 const DashboardHIPAAComponent: React.FC = () => {
+  const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
     dataSource,
@@ -41,7 +42,7 @@ const DashboardHIPAAComponent: React.FC = () => {
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: HIPAADataSource,
-    repository: new AlertsDataSourceRepository(),
+    repository: AlertsRepository,
   });
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
@@ -90,7 +91,6 @@ const DashboardHIPAAComponent: React.FC = () => {
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
     JSON.stringify(dateRangeFrom),
-    ,
     JSON.stringify(dateRangeTo),
   ]);
 
@@ -112,38 +112,40 @@ const DashboardHIPAAComponent: React.FC = () => {
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
-          {dataSource && results?.hits?.total > 0 ? (
-            <>
-              <SampleDataWarning />
-              <div className='hipaa-dashboard-responsive'>
-                <DashboardByRenderer
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    panels: getDashboardPanels(
-                      dataSource?.id,
-                      Boolean(dataSource.getPinnedAgentFilter()?.length),
-                    ),
-                    isFullScreenMode: false,
-                    filters: fetchFilters ?? [],
-                    useMargins: true,
-                    id: 'hipaa-dashboard-tab',
-                    timeRange: {
-                      from: searchBarProps.dateRangeFrom,
-                      to: searchBarProps.dateRangeTo,
-                    },
-                    title: 'HIPAA dashboard',
-                    description: 'Dashboard of the HIPAA',
-                    query: searchBarProps.query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles: false,
-                  }}
-                />
-              </div>
-            </>
-          ) : null}
+          <div
+            className={
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }
+          >
+            <SampleDataWarning />
+            <div className='hipaa-dashboard-responsive'>
+              <DashboardByRenderer
+                input={{
+                  viewMode: ViewMode.VIEW,
+                  panels: getDashboardPanels(
+                    AlertsRepository.getStoreIndexPatternId(),
+                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                  ),
+                  isFullScreenMode: false,
+                  filters: fetchFilters ?? [],
+                  useMargins: true,
+                  id: 'hipaa-dashboard-tab',
+                  timeRange: {
+                    from: searchBarProps.dateRangeFrom,
+                    to: searchBarProps.dateRangeTo,
+                  },
+                  title: 'HIPAA dashboard',
+                  description: 'Dashboard of the HIPAA',
+                  query: searchBarProps.query,
+                  refreshConfig: {
+                    pause: false,
+                    value: 15,
+                  },
+                  hidePanelTitles: false,
+                }}
+              />
+            </div>
+          </div>
         </>
       </I18nProvider>
     </>
