@@ -226,11 +226,11 @@ const DashboardTH: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         <div
-          className={
+          className={`th-container ${
             !isDataSourceLoading && dataSource && results?.hits?.total > 0
               ? ''
               : 'wz-no-display'
-          }
+          }`}
         >
           <SampleDataWarning />
           <div className='th-dashboard-responsive'>
