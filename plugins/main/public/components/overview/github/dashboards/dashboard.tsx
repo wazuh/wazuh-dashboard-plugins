@@ -31,11 +31,8 @@ const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-/* The vulnerabilities dashboard is made up of 3 dashboards because the filters need
-a wrapper for visual adjustments, while the Kpi, the Open vs Close visualization and
-the rest of the visualizations have different configurations at the dashboard level. */
-
 const DashboardGitHubComponent: React.FC = () => {
+  const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
     dataSource,
@@ -45,7 +42,7 @@ const DashboardGitHubComponent: React.FC = () => {
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: GitHubDataSource,
-    repository: new AlertsDataSourceRepository(),
+    repository: AlertsRepository,
   });
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
@@ -116,14 +113,18 @@ const DashboardGitHubComponent: React.FC = () => {
             <DiscoverNoResults />
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
-            <div className='github-dashboard-responsive'>
+            <div
+              className={`github-dashboard-responsive ${
+                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }`}
+            >
               <SampleDataWarning />
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
                   panels: getDashboardPanels(
-                    dataSource?.id,
-                    Boolean(dataSource.getPinnedAgentFilter()?.length),
+                    AlertsRepository.getStoreIndexPatternId(),
+                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
                   ),
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],

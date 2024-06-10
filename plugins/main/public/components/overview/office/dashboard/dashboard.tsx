@@ -32,6 +32,7 @@ const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 const DashboardOffice365Component: React.FC = () => {
+  const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
     dataSource,
@@ -41,7 +42,7 @@ const DashboardOffice365Component: React.FC = () => {
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: Office365DataSource,
-    repository: new AlertsDataSourceRepository(),
+    repository: AlertsRepository,
   });
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -111,55 +112,60 @@ const DashboardOffice365Component: React.FC = () => {
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
-          {dataSource && results?.hits?.total > 0 ? (
-            <div className='office-365-dashboard-responsive'>
-              <SampleDataWarning />
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getKPIsPanel(dataSource.id),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'kpis-th-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'KPIs Office 365 dashboard',
-                  description: 'KPIs Dashboard of the Office 365',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: true,
-                }}
-              />
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(dataSource.id),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'office-365-detector-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'Office 365 detector dashboard',
-                  description: 'Dashboard of the Office 365',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
-            </div>
-          ) : null}
+
+          <div
+            className={`office-365-dashboard-responsive ${
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }`}
+          >
+            <SampleDataWarning />
+            <DashboardByRenderer
+              input={{
+                viewMode: ViewMode.VIEW,
+                panels: getKPIsPanel(AlertsRepository.getStoreIndexPatternId()),
+                isFullScreenMode: false,
+                filters: fetchFilters ?? [],
+                useMargins: true,
+                id: 'kpis-th-dashboard-tab',
+                timeRange: {
+                  from: searchBarProps.dateRangeFrom,
+                  to: searchBarProps.dateRangeTo,
+                },
+                title: 'KPIs Office 365 dashboard',
+                description: 'KPIs Dashboard of the Office 365',
+                query: searchBarProps.query,
+                refreshConfig: {
+                  pause: false,
+                  value: 15,
+                },
+                hidePanelTitles: true,
+              }}
+            />
+            <DashboardByRenderer
+              input={{
+                viewMode: ViewMode.VIEW,
+                panels: getDashboardPanels(
+                  AlertsRepository.getStoreIndexPatternId(),
+                ),
+                isFullScreenMode: false,
+                filters: fetchFilters ?? [],
+                useMargins: true,
+                id: 'office-365-detector-dashboard-tab',
+                timeRange: {
+                  from: searchBarProps.dateRangeFrom,
+                  to: searchBarProps.dateRangeTo,
+                },
+                title: 'Office 365 detector dashboard',
+                description: 'Dashboard of the Office 365',
+                query: searchBarProps.query,
+                refreshConfig: {
+                  pause: false,
+                  value: 15,
+                },
+                hidePanelTitles: false,
+              }}
+            />
+          </div>
         </>
       </I18nProvider>
     </>
