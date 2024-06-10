@@ -225,7 +225,7 @@ const DashboardTH: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-          <>
+          <div className='th-container'>
             <SampleDataWarning />
             <div className='th-dashboard-responsive'>
               <DashboardByRenderer
@@ -333,7 +333,7 @@ const DashboardTH: React.FC = () => {
                 </EuiFlyout>
               )}
             </div>
-          </>
+          </div>
         ) : null}
       </>
     </I18nProvider>
