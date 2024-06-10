@@ -50,7 +50,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error of malformed table row on the generation of PDF reports [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
 - Fixed the sample alerts scripts to generate valid IP ranges and file hashes [#6667](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6667)
 - Fixed cronjob max seconds interval validation [#6730](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6730)
-
+- Fixed styles in small height viewports [#6747](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6747)
+  
 ### Removed
 
 - Removed some branding references across the application. [#6155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6155)
