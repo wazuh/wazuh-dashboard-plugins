@@ -4,7 +4,6 @@ import {
   withErrorBoundary,
   withGlobalBreadcrumb,
   withGuardAsync,
-  withReduxProvider,
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
 import { cluster } from '../../../../../utils/applications';
@@ -47,7 +46,6 @@ const checkClusterIsEnabledAndRunning = async () => {
 
 export const ClusterOverview = compose(
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb([{ text: cluster.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },

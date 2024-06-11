@@ -10,7 +10,7 @@ import {
   IndexPattern,
 } from '../../../../../../../src/plugins/data/public';
 import { search } from '../../search-bar/search-bar-service';
-import { PatternDataSourceFilterManager } from '../index';
+import { PatternDataSourceFilterManager } from './pattern-data-source-filter-manager';
 
 export class PatternDataSource implements tDataSource {
   id: string;
@@ -117,7 +117,7 @@ export class PatternDataSource implements tDataSource {
   }
 
   /**
-   * Returns the filter when the an agent is pinned (saved in the session storage or redux store)
+   * Returns the filter when an agent is pinned (saved in session storage or redux store)
    */
   getPinnedAgentFilter(): tFilter[] {
     return PatternDataSourceFilterManager.getPinnedAgentFilter(this.id);

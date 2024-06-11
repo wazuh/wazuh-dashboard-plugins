@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { getCore } from '../../../../kibana-services';
 import { SearchResponse } from '../../../../../../../src/core/server';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import { I18nProvider } from '@osd/i18n/react';
@@ -26,6 +25,7 @@ import {
   useDataSource,
 } from '../../../common/data-source';
 import { WzSearchBar } from '../../../common/search-bar';
+import NavigationService from '../../../../react-services/navigation-service';
 
 interface DashboardCTProps {
   statusRunning: string;
@@ -110,7 +110,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
   };
 
   const goAgents = () => {
-    getCore().application.navigateToApp(endpointSummary.id, {
+    NavigationService.getInstance().navigateToApp(endpointSummary.id, {
       path: '#/agents-preview',
     });
   };

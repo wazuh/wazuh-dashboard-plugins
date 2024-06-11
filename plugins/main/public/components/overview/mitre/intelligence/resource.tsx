@@ -18,6 +18,7 @@ import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import NavigationService from '../../../../react-services/navigation-service';
 
 export const ModuleMitreAttackIntelligenceResource = ({
   label,
@@ -28,17 +29,22 @@ export const ModuleMitreAttackIntelligenceResource = ({
   resourceFilters,
 }) => {
   const [details, setDetails] = useState(null);
+  const navigationService = NavigationService.getInstance();
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.href);
-    const redirectTab = urlParams.get('tabRedirect');
-    const idToRedirect = urlParams.get('idToRedirect');
-    if (redirectTab && idToRedirect) {
+    const urlParams = navigationService.getParams();
+    const hasRedirectTabParam = urlParams.has('tabRedirect');
+    const hasIdToRedirectParam = urlParams.has('idToRedirect');
+    if (hasRedirectTabParam && hasIdToRedirectParam) {
+      const redirectTab = urlParams.get('tabRedirect');
+      const idToRedirect = urlParams.get('idToRedirect');
       const endpoint = `/mitre/${redirectTab}?q=external_id=${idToRedirect}`;
       getMitreItemToRedirect(endpoint);
       urlParams.delete('tabRedirect');
       urlParams.delete('idToRedirect');
-      window.history.pushState({}, document.title, '#/overview/?tab=mitre');
+      navigationService.replace(
+        `${navigationService.getPathname()}?${urlParams.toString()}`,
+      );
     }
   }, []);
 

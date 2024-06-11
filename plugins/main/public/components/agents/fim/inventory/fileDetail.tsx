@@ -25,14 +25,12 @@ import {
   EuiCodeBlock,
   EuiLink,
 } from '@elastic/eui';
-import { ModulesHelper } from '../../../common/modules/modules-helper';
 import { ICustomBadges } from '../../../wz-search-bar/components';
 import {
   buildPhraseFilter,
   IIndexPattern,
 } from '../../../../../../../src/plugins/data/common';
 import moment from 'moment-timezone';
-import { AppNavigate } from '../../../../react-services/app-navigate';
 import {
   getCore,
   getDataPlugin,
@@ -53,6 +51,7 @@ import { endpointSummary, rules } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import TechniqueRowDetails from '../../../overview/mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../../../../../common/constants';
+import NavigationService from '../../../../react-services/navigation-service';
 
 export class FileDetails extends Component {
   props!: {
@@ -214,14 +213,14 @@ export class FileDetails extends Component {
   viewInEvents = ev => {
     const { file } = this.props.currentFile;
     if (this.props.view === 'extern') {
-      AppNavigate.navigateToModule(ev, 'overview', {
+      NavigationService.getInstance().navigateToModule(ev, 'overview', {
         agentId: this.props?.agent?.id,
         tab: 'fim',
         tabView: 'events',
         filters: { 'syscheck.path': file },
       });
     } else {
-      AppNavigate.navigateToModule(
+      NavigationService.getInstance().navigateToModule(
         ev,
         'overview',
         {
@@ -264,8 +263,6 @@ export class FileDetails extends Component {
           filterManager.removeFilter(x);
         });
         filterManager.addFilters([filters]);
-        const scope = await ModulesHelper.getDiscoverScope();
-        scope.updateQueryAndFetch && scope.updateQueryAndFetch({ query: null });
       } else {
         setTimeout(() => {
           this.checkFilterManager(filters);

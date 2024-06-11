@@ -11,24 +11,19 @@
  */
 
 import React from 'react';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withReduxProvider,
-} from '../../common/hocs';
+import { withErrorBoundary, withGlobalBreadcrumb } from '../../common/hocs';
 import { SyscollectorInventory } from './inventory';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../utils/applications';
-import { getCore } from '../../../kibana-services';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const MainSyscollector = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(({ agent }) => {
     return [
       {
         text: endpointSummary.breadcrumbLabel,
-        href: getCore().application.getUrlForApp(endpointSummary.id, {
+        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
           path: `#/agents-preview`,
         }),
       },

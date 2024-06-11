@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState } from 'react';
-import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzRulesetOverview from './views/ruleset-overview';
 import WzFileEditor from '../common/file-editor';
 import { SECTION_RULES_SECTION } from '../common/constants';
@@ -26,7 +25,7 @@ export default function WzRuleset() {
   };
 
   return (
-    <WzReduxProvider>
+    <>
       {((fileContent || addingFile) && (
         <WzFileEditor
           section={SECTION_RULES_SECTION}
@@ -51,6 +50,6 @@ export default function WzRuleset() {
           showingFiles={showingFiles}
         />
       )}
-    </WzReduxProvider>
+    </>
   );
 }

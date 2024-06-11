@@ -26,7 +26,6 @@ import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AgentInfo } from '../../common/welcome/agents-info';
-import { getAngularModule, getCore } from '../../../kibana-services';
 import { compose } from 'redux';
 import { withGlobalBreadcrumb } from '../hocs';
 import { endpointSummary } from '../../../utils/applications';
@@ -38,6 +37,7 @@ import {
   useDataSource,
 } from '../data-source';
 import { useAsyncAction } from '../hooks';
+import NavigationService from '../../../react-services/navigation-service';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -64,11 +64,6 @@ export class MainModuleAgent extends Component {
     };
   }
 
-  async componentDidMount() {
-    const $injector = getAngularModule().$injector;
-    this.router = $injector.get('$route');
-  }
-
   renderTitle() {
     return (
       <EuiFlexGroup>
@@ -81,8 +76,9 @@ export class MainModuleAgent extends Component {
                     <span
                       style={{ color: euiThemeVars.euiColorPrimaryText }}
                       onClick={() => {
-                        window.location.href = `#/agents?agent=${this.props.agent.id}`;
-                        this.router.reload();
+                        NavigationService.getInstance().navigate(
+                          `/agents?tab=welcome&agent=${this.props.agent.id}`,
+                        );
                       }}
                     >
                       <span>
@@ -209,9 +205,12 @@ export default compose(
       return [
         {
           text: endpointSummary.breadcrumbLabel,
-          href: getCore().application.getUrlForApp(endpointSummary.id, {
-            path: `#/agents-preview`,
-          }),
+          href: NavigationService.getInstance().getUrlForApp(
+            endpointSummary.id,
+            {
+              path: `#/agents-preview`,
+            },
+          ),
         },
         { text: agent.id },
       ];
@@ -219,9 +218,12 @@ export default compose(
       return [
         {
           text: endpointSummary.breadcrumbLabel,
-          href: getCore().application.getUrlForApp(endpointSummary.id, {
-            path: `#/agents-preview`,
-          }),
+          href: NavigationService.getInstance().getUrlForApp(
+            endpointSummary.id,
+            {
+              path: `#/agents-preview`,
+            },
+          ),
         },
         { agent: agent },
         {

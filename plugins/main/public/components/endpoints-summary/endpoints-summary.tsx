@@ -14,10 +14,7 @@
 import React, { Component } from 'react';
 import { EuiSpacer } from '@elastic/eui';
 import { AgentsTable } from './table/agents-table';
-import WzReduxProvider from '../../redux/wz-redux-provider';
-import { WazuhConfig } from '../../react-services/wazuh-config';
 import {
-  withReduxProvider,
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
   withErrorBoundary,
@@ -29,7 +26,6 @@ import { EndpointsSummaryDashboard } from './dashboard/endpoints-summary-dashboa
 
 export const EndpointsSummary = compose(
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     [
@@ -40,13 +36,12 @@ export const EndpointsSummary = compose(
 )(
   class EndpointsSummary extends Component {
     _isMount = false;
-    constructor() {
-      super();
+    constructor(props) {
+      super(props);
       this.state = {
         agentTableFilters: {},
         reload: 0,
       };
-      this.wazuhConfig = new WazuhConfig();
       this.filterAgentByStatus = this.filterAgentByStatus.bind(this);
       this.filterAgentByOS = this.filterAgentByOS.bind(this);
       this.filterAgentByGroup = this.filterAgentByGroup.bind(this);
@@ -113,13 +108,11 @@ export const EndpointsSummary = compose(
             reloadDashboard={this.state.reload}
           />
           <EuiSpacer size='m' />
-          <WzReduxProvider>
-            <AgentsTable
-              filters={this.state.agentTableFilters}
-              externalReload={this.state.reload}
-              setExternalReload={this.setReload}
-            />
-          </WzReduxProvider>
+          <AgentsTable
+            filters={this.state.agentTableFilters}
+            externalReload={this.state.reload}
+            setExternalReload={this.setReload}
+          />
         </>
       );
     }

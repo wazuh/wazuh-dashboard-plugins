@@ -1,5 +1,4 @@
 export * from './action-agents';
-export * from './app-navigate';
 export * from './app-state';
 export * from './check-daemons-status';
 export * from './error-handler';
@@ -12,7 +11,6 @@ export * from './reporting';
 export * from './saved-objects';
 export * from './time-service';
 export * from './toast-notifications';
-export * from './vis-factory-handler';
 export * from './wazuh-config';
 export * from './wz-agents';
 export * from './wz-api-check';

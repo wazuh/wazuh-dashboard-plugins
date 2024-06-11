@@ -134,7 +134,9 @@ const DocViewer = (props: tDocViewerProps) => {
                             {...fieldIconProps}
                           />
                         </EuiFlexItem>
-                        <EuiFlexItem style={{ maxWidth: '25vw', minWidth: '200px' }}>
+                        <EuiFlexItem
+                          style={{ maxWidth: '25vw', minWidth: '200px' }}
+                        >
                           <span style={{ wordBreak: 'break-all' }}>
                             <b>{displayName}</b>
                           </span>

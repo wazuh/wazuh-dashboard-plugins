@@ -29,21 +29,23 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { WzFlyout } from '../../../common/flyouts';
+import { withRouterSearch } from '../../../common/hocs';
 
-export class FlyoutDetail extends Component {
-  state: {
-    currentFile: boolean | { [key: string]: string };
-    isLoading: boolean;
-    error: boolean;
-    type: 'file' | 'registry_key';
-  };
+export const FlyoutDetail = withRouterSearch(
+  class FlyoutDetail extends Component {
+    state: {
+      currentFile: boolean | { [key: string]: string };
+      isLoading: boolean;
+      error: boolean;
+      type: 'file' | 'registry_key';
+    };
 
-  props!: {
-    fileName: string;
-    agentId: string;
-    view: 'inventory' | 'events' | 'extern';
-    closeFlyout(): void;
-  };
+    props!: {
+      fileName: string;
+      agentId: string;
+      view: 'inventory' | 'events' | 'extern';
+      closeFlyout(): void;
+    };
 
   constructor(props) {
     super(props);
@@ -104,20 +106,20 @@ export class FlyoutDetail extends Component {
         currentFile: { file: this.props.fileName },
       });
 
-      const options: UIErrorLog = {
-        context: `${FlyoutDetail.name}.componentDidMount`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
+        const options: UIErrorLog = {
+          context: `${FlyoutDetail.name}.componentDidMount`,
+          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
     }
-  }
 
   componentWillUnmount() {
     window.location.href = window.location.href.replace(
@@ -169,3 +171,4 @@ export class FlyoutDetail extends Component {
     );
   }
 }
+);

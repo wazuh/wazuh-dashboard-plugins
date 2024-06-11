@@ -17,11 +17,14 @@ import { EuiFlexItem, EuiPanel, euiPaletteColorBlind } from '@elastic/eui';
 import { VisualizationBasicWidgetSelector } from '../../../charts/visualizations/basic';
 import { getRequirementAlerts } from './lib';
 import { useTimeFilter } from '../../../hooks';
-import { getCore } from '../../../../../kibana-services';
 import { AppState } from '../../../../../react-services';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
-import { FILTER_OPERATOR, PatternDataSourceFilterManager } from '../../../data-source/pattern/pattern-data-source-filter-manager';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../../../data-source/pattern/pattern-data-source-filter-manager';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 const selectionOptionsCompliance = [
   { value: 'pci_dss', text: 'PCI DSS' },
@@ -50,13 +53,23 @@ export function RequirementVis(props) {
     pinnedAgentManager.pinAgent(agent);
     const indexPatternId = AppState.getCurrentPattern();
     const filters = [
-      PatternDataSourceFilterManager.createFilter(FILTER_OPERATOR.IS, `rule.${requirement}`, key, indexPatternId)
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        `rule.${requirement}`,
+        key,
+        indexPatternId,
+      ),
     ];
     const tabName = requirementNameModuleID[requirement];
-    const params = `tab=${tabName}&agentId=${agent.id}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`
-    getCore().application.navigateToApp(WAZUH_MODULES[tabName].appId, {
-      path: `#/overview?${params}`,
-    });
+    const params = `tab=${tabName}&agentId=${
+      agent.id
+    }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`;
+    NavigationService.getInstance().navigateToApp(
+      WAZUH_MODULES[tabName].appId,
+      {
+        path: `#/overview?${params}`,
+      },
+    );
   };
 
   const fetchData = useCallback(
@@ -68,15 +81,15 @@ export function RequirementVis(props) {
       );
       return buckets?.length
         ? buckets.map(({ key, doc_count }, index) => ({
-          label: key,
-          value: doc_count,
-          color: colors[index],
-          onClick:
-            selectedOptionValue === 'gpg13'
-              ? undefined
-              : () =>
-                goToDashboardWithFilter(selectedOptionValue, key, agent),
-        }))
+            label: key,
+            value: doc_count,
+            color: colors[index],
+            onClick:
+              selectedOptionValue === 'gpg13'
+                ? undefined
+                : () =>
+                    goToDashboardWithFilter(selectedOptionValue, key, agent),
+          }))
         : null;
     },
     [],

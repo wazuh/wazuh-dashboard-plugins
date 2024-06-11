@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  formatUIDate,
-  AppNavigate,
-} from '../../../../../../../../react-services';
+import { formatUIDate } from '../../../../../../../../react-services';
 import { tDataGridColumn } from '../../../../../../../common/data-grid';
 import { EuiLink, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { getCore } from '../../../../../../../../kibana-services';
@@ -11,9 +8,10 @@ import {
   endpointSummary,
 } from '../../../../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import NavigationService from '../../../../../../../../react-services/navigation-service';
 
 const navigateTo = (ev, section, params) => {
-  AppNavigate.navigateToModule(ev, section, params);
+  NavigationService.getInstance().navigateToModule(ev, section, params);
 };
 
 const renderTechniques = (value: []) => {

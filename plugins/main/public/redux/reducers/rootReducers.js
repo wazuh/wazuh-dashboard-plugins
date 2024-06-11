@@ -16,7 +16,6 @@ import statusReducers from './statusReducers';
 import reportingReducers from './reportingReducers';
 import configurationReducers from './configurationReducers';
 import appStateReducers from './appStateReducers';
-import visualizationsReducers from './visualizationsReducers';
 import globalBreadcrumbReducers from './globalBreadcrumbReducers';
 import appConfig from './appConfigReducers';
 
@@ -26,7 +25,6 @@ export default combineReducers({
   reportingReducers,
   configurationReducers,
   appStateReducers,
-  visualizationsReducers,
   globalBreadcrumbReducers,
   appConfig,
 });

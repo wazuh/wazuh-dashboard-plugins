@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useEffect, useState, useMemo } from 'react';
-import MarkdownIt from 'markdown-it';
 import $ from 'jquery';
 import {
   EuiFlyoutHeader,
@@ -27,7 +26,6 @@ import {
   EuiIcon,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
-import { AppNavigate } from '../../../../../../../../react-services/app-navigate';
 import { getUiSettings } from '../../../../../../../../kibana-services';
 import {
   FilterManager,
@@ -47,6 +45,7 @@ import { tFilterParams } from '../../../../mitre';
 import TechniqueRowDetails from './technique-row-details';
 import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/data/common';
 import store from '../../../../../../../../redux/store';
+import NavigationService from '../../../../../../../../react-services/navigation-service';
 
 type tFlyoutTechniqueProps = {
   currentTechnique: string;
@@ -249,12 +248,16 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           >
             <EuiLink
               onClick={e => {
-                AppNavigate.navigateToModule(e, 'overview', {
-                  tab: 'mitre',
-                  tabView: 'intelligence',
-                  tabRedirect: 'techniques',
-                  idToRedirect: currentTechnique,
-                });
+                NavigationService.getInstance().navigateToModule(
+                  e,
+                  'overview',
+                  {
+                    tab: 'mitre',
+                    tabView: 'intelligence',
+                    tabRedirect: 'techniques',
+                    idToRedirect: currentTechnique,
+                  },
+                );
                 e.stopPropagation();
               }}
             >
@@ -275,12 +278,16 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                   >
                     <EuiLink
                       onClick={e => {
-                        AppNavigate.navigateToModule(e, 'overview', {
-                          tab: 'mitre',
-                          tabView: 'intelligence',
-                          tabRedirect: 'tactics',
-                          idToRedirect: tactic.id,
-                        });
+                        NavigationService.getInstance().navigateToModule(
+                          e,
+                          'overview',
+                          {
+                            tab: 'mitre',
+                            tabView: 'intelligence',
+                            tabRedirect: 'tactics',
+                            idToRedirect: tactic.id,
+                          },
+                        );
                         e.stopPropagation();
                       }}
                     >

@@ -275,19 +275,9 @@ const localStorageMock = (function () {
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-jest.mock('../../../kibana-services', () => ({
-  getCore: jest.fn().mockReturnValue({
-    application: {
-      navigateToApp: () => 'http://url',
-      getUrlForApp: () => 'http://url',
-    },
-  }),
-  getAngularModule: () => { }
-}));
-
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => { },
+    handleError: options => {},
   }),
 }));
 
@@ -301,6 +291,15 @@ jest.mock(
     htmlIdGenerator: () => () => 'htmlId',
   }),
 );
+
+jest.mock('../../../react-services/navigation-service', () => ({
+  getInstance() {
+    return {
+      navigateToApp: () => 'http://url',
+      getUrlForApp: () => 'http://url',
+    };
+  },
+}));
 
 const permissionsStore = {
   appStateReducers: {

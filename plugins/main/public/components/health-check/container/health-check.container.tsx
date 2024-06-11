@@ -21,7 +21,10 @@ import {
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { AppState, ErrorHandler } from '../../../react-services';
-import { useAppConfig, useRootScope } from '../../../components/common/hooks';
+import {
+  useAppConfig,
+  useRouterSearch,
+} from '../../../components/common/hooks';
 import {
   checkApiService,
   checkIndexPatternService,
@@ -29,18 +32,19 @@ import {
   checkSetupService,
 } from '../services';
 import { CheckResult } from '../components/check-result';
-import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
+import { withErrorBoundary, withRouteResolvers } from '../../common/hocs';
 import { getCore, getHttp, getWzCurrentAppID } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../../../common/constants';
-
-import { compose } from 'redux';
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 import { serverApis } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { ip, wzConfig } from '../../../services/resolves';
+import { compose } from 'redux';
+import NavigationService from '../../../react-services/navigation-service';
 
 const checks = {
   api: {
@@ -99,19 +103,24 @@ function HealthCheckComponent() {
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
   const appConfig = useAppConfig();
   const checksInitiated = useRef(false);
-  const $rootScope = useRootScope();
+  const search = useRouterSearch();
 
   const redirectionPassHealthcheck = () => {
-    const params = $rootScope.previousParams || {};
-    const queryString = Object.keys(params)
-      .map(key => key + '=' + params[key])
-      .join('&');
-    const url =
-      `/app/${getWzCurrentAppID()}#` +
-      ($rootScope.previousLocation || '') +
-      '?' +
-      queryString;
-    window.location.href = getHttp().basePath.prepend(url);
+    // This uses the previous location that is passed in as an state
+    if (NavigationService.getInstance().getLocation()?.state?.prevLocation) {
+      const searchParams = new URLSearchParams(
+        NavigationService.getInstance().getLocation()?.state?.prevLocation?.search,
+      );
+      // update browser url
+      const relativePath =
+        NavigationService.getInstance().getLocation().state.prevLocation
+          .pathname +
+        '?' +
+        searchParams.toString();
+      NavigationService.getInstance().navigate(relativePath);
+    } else {
+      NavigationService.getInstance().navigate('/');
+    }
   };
 
   const thereAreErrors = Object.keys(checkErrors).length > 0;
@@ -138,7 +147,7 @@ function HealthCheckComponent() {
 
   useEffect(() => {
     // Check if Health should not redirect automatically (Debug mode)
-    setIsDebugMode(window.location.href.includes('debug'));
+    setIsDebugMode(typeof search.debug !== 'undefined');
   }, []);
 
   const handleWarnings = (checkID, warnings, parsed) => {
@@ -330,7 +339,9 @@ function HealthCheckComponent() {
                 <RedirectAppLinks application={getCore().application}>
                   <EuiButton
                     fill
-                    href={getCore().application.getUrlForApp(serverApis.id)}
+                    href={NavigationService.getInstance().getUrlForApp(
+                      serverApis.id,
+                    )}
                   >
                     Go to Settings
                   </EuiButton>
@@ -355,7 +366,7 @@ function HealthCheckComponent() {
 
 export const HealthCheck = compose(
   withErrorBoundary,
-  withReduxProvider,
+  withRouteResolvers({ ip, wzConfig }),
 )(HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;

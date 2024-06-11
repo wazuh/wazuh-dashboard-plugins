@@ -14,19 +14,16 @@ import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { getDataPlugin, getSavedObjects } from '../../kibana-services';
 import { WazuhConfig } from '../../react-services/wazuh-config';
-import { GenericRequest } from '../../react-services/generic-request';
 import { getWzConfig } from './get-config';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { StatisticsDataSource } from '../../components/common/data-source/pattern/statistics';
+import NavigationService from '../../react-services/navigation-service';
 
-export function getIp($q, $window, $location, wzMisc) {
-  const deferred = $q.defer();
-
+export async function getIp() {
   const checkWazuhPatterns = async indexPatterns => {
-    const wazuhConfig = new WazuhConfig();
-    const configuration = await getWzConfig($q, GenericRequest, wazuhConfig);
+    const configuration = await getWzConfig(new WazuhConfig());
     const STATISTICS_PATTERN_IDENTIFIER =
       StatisticsDataSource.getIdentifierDataSourcePattern();
     const wazuhPatterns = [
@@ -57,8 +54,17 @@ export function getIp($q, $window, $location, wzMisc) {
         !savedObjects.find(element => element.id === currentPattern) ||
         !(await checkWazuhPatterns(savedObjects))
       ) {
-        if (!$location.path().includes('/health-check')) {
-          $location.path('/health-check');
+        if (
+          !NavigationService.getInstance()
+            .getPathname()
+            .includes('/health-check')
+        ) {
+          NavigationService.getInstance().navigate({
+            pathname: '/health-check',
+            state: {
+              prevLocation: NavigationService.getInstance().getLocation(),
+            },
+          });
         }
       }
 
@@ -69,22 +75,20 @@ export function getIp($q, $window, $location, wzMisc) {
       if (!onlyWazuhAlerts || !onlyWazuhAlerts.length) {
         // There's now selected ip
         AppState.removeCurrentPattern();
-        deferred.resolve('No ip');
-        return;
+        return 'No ip';
       }
 
       const courierData = await getDataPlugin().indexPatterns.get(
         currentPattern,
       );
 
-      deferred.resolve({
+      return {
         list: onlyWazuhAlerts,
         loaded: courierData,
         stateVal: null,
         stateValFound: false,
-      });
+      };
     } catch (error) {
-      deferred.reject(error);
       const options = {
         context: `${getIp.name}.checkWazuhPatterns`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -101,17 +105,23 @@ export function getIp($q, $window, $location, wzMisc) {
         },
       };
       getErrorOrchestrator().handleError(options);
+      throw error;
     }
   };
 
-  const currentParams = $location.search();
+  const currentParams = new URLSearchParams(
+    NavigationService.getInstance().getSearch(),
+  );
   const targetedRule =
-    currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
-  if (!targetedRule && healthCheck($window)) {
-    deferred.reject();
-    $location.path('/health-check');
+    currentParams &&
+    currentParams.get('tab') === 'ruleset' &&
+    currentParams.get('ruleid');
+  if (!targetedRule && healthCheck()) {
+    NavigationService.getInstance().navigate({
+      pathname: '/health-check',
+      state: { prevLocation: NavigationService.getInstance().getLocation() },
+    });
   } else {
-    buildSavedObjectsClient();
+    await buildSavedObjectsClient();
   }
-  return deferred.promise;
 }

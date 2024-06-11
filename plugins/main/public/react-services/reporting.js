@@ -14,16 +14,7 @@ import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { AppState } from './app-state';
 import { WzRequest } from './wz-request';
-import { Vis2PNG } from '../factories/vis2png';
-import { RawVisualizations } from '../factories/raw-visualizations';
-import { VisHandlers } from '../factories/vis-handlers';
-import {
-  getAngularModule,
-  getCore,
-  getHttp,
-  getToasts,
-  getUiSettings,
-} from '../kibana-services';
+import { getCore, getHttp, getToasts, getUiSettings } from '../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
@@ -40,15 +31,10 @@ import {
   getOpenSearchQueryConfig,
 } from '../../../../src/plugins/data/common';
 import { getForceNow } from '../components/common/search-bar/search-bar-service';
-
-const app = getAngularModule();
+import NavigationService from './navigation-service';
 
 export class ReportingService {
   constructor() {
-    this.$rootScope = app.$injector.get('$rootScope');
-    this.vis2png = new Vis2PNG();
-    this.rawVisualizations = new RawVisualizations();
-    this.visHandlers = new VisHandlers();
     this.wazuhConfig = new WazuhConfig();
   }
 
@@ -93,9 +79,12 @@ export class ReportingService {
                 <RedirectAppLinks application={getCore().application}>
                   <EuiLink
                     aria-label='go to Endpoint summary'
-                    href={getCore().application.getUrlForApp(reporting.id, {
-                      path: '',
-                    })}
+                    href={NavigationService.getInstance().getUrlForApp(
+                      reporting.id,
+                      {
+                        path: '',
+                      },
+                    )}
                   >
                     {reporting.title}
                   </EuiLink>
@@ -144,10 +133,6 @@ export class ReportingService {
 
   async startVis2Png(tab, agents = false, searchContext = null) {
     try {
-      this.$rootScope.reportBusy = true;
-      this.$rootScope.reportStatus = 'Generating report...0%';
-      this.$rootScope.$applyAsync();
-
       const dataSourceContext =
         searchContext || (await this.getDataSourceSearchContext());
       const visualizations = await this.getVisualizationsFromDOM();
@@ -209,14 +194,8 @@ export class ReportingService {
           : `/reports/modules/${tab}`;
       const response = await WzRequest.genericReq('POST', apiEndpoint, data);
 
-      this.$rootScope.reportBusy = false;
-      this.$rootScope.reportStatus = false;
-      this.$rootScope.$applyAsync();
       this.renderSucessReportsToast({ filename: response.data.filename });
     } catch (error) {
-      this.$rootScope.reportBusy = false;
-      this.$rootScope.reportStatus = false;
-      this.$rootScope.$applyAsync();
       const options = {
         context: `${ReportingService.name}.startVis2Png`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -234,10 +213,6 @@ export class ReportingService {
 
   async startConfigReport(obj, type, components) {
     try {
-      this.$rootScope.reportBusy = true;
-      this.$rootScope.reportStatus = 'Generating PDF document...';
-      this.$rootScope.$applyAsync();
-
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
@@ -253,15 +228,8 @@ export class ReportingService {
           ? `/reports/agents/${obj.id}`
           : `/reports/groups/${obj.name}`;
       const response = await WzRequest.genericReq('POST', apiEndpoint, data);
-
-      this.$rootScope.reportBusy = false;
-      this.$rootScope.reportStatus = false;
-      this.$rootScope.$applyAsync();
       this.renderSucessReportsToast({ filename: response.data.filename });
     } catch (error) {
-      this.$rootScope.reportBusy = false;
-      this.$rootScope.reportStatus = false;
-      this.$rootScope.$applyAsync();
       const options = {
         context: `${ReportingService.name}.startConfigReport`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -273,7 +241,6 @@ export class ReportingService {
           title: `Error configuring report`,
         },
       };
-      this.$rootScope.$applyAsync();
       getErrorOrchestrator().handleError(options);
     }
   }

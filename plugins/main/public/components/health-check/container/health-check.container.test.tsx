@@ -16,6 +16,16 @@ import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { HealthCheckTest } from './health-check.container';
 
+jest.mock('../../../react-services/navigation-service', () => ({
+  getInstance() {
+    return {
+      getUrlForApp(appID) {
+        return appID;
+      },
+    };
+  },
+}));
+
 jest.mock('../../../components/common/hooks', () => ({
   useAppConfig: () => ({
     isReady: true,
@@ -32,7 +42,7 @@ jest.mock('../../../components/common/hooks', () => ({
       'checks.fields': true,
     },
   }),
-  useRootScope: () => ({}),
+  useRouterSearch: () => ({}),
 }));
 
 jest.mock('../services', () => ({

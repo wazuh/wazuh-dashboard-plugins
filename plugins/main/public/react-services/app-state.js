@@ -15,18 +15,11 @@ import {
   updateCurrentApi,
   updateShowMenu,
 } from '../redux/actions/appStateActions';
-import { GenericRequest } from '../react-services/generic-request';
-import { WazuhConfig } from './wazuh-config';
 import { CSVRequest } from '../services/csv-request';
-import { getToasts, getCookies, getAngularModule } from '../kibana-services';
+import { getToasts, getCookies } from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
-import {
-  UI_ERROR_SEVERITIES,
-  UIErrorLog,
-  UIErrorSeverity,
-  UILogLevel,
-} from './error-orchestrator/types';
+import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { getErrorOrchestrator } from './common-services';
 
@@ -221,8 +214,7 @@ export class AppState {
    */
   static setPatternSelector(value) {
     const encodedPattern = encodeURI(value);
-    getCookies().set('patternSelector', encodedPattern, {
-    });
+    getCookies().set('patternSelector', encodedPattern, {});
   }
 
   /**

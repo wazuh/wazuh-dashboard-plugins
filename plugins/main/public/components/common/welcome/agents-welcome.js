@@ -33,19 +33,13 @@ import {
   RequirementVis,
 } from './components';
 import { AgentInfo } from './agents-info';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { getChrome, getCore } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withGuard,
-  withReduxProvider,
-} from '../hocs';
+import { withErrorBoundary, withGlobalBreadcrumb, withGuard } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
@@ -67,25 +61,25 @@ import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashb
 import { EventsCount } from './dashboard/events-count';
 import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const AgentsWelcome = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(({ agent }) => {
     return [
       {
         text: endpointSummary.breadcrumbLabel,
-        href: getCore().application.getUrlForApp(endpointSummary.id, {
+        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
           path: `#/agents-preview`,
         }),
       },
       ...(agent?.name
         ? [
-          {
-            text: `${agent.name}`,
-            truncate: true,
-          },
-        ]
+            {
+              text: `${agent.name}`,
+              truncate: true,
+            },
+          ]
         : []),
     ];
   }),
@@ -208,13 +202,13 @@ export const AgentsWelcome = compose(
         )
           ? JSON.parse(window.localStorage.getItem('wz-menu-agent-apps-pinned'))
           : [
-            // Default pinned applications
-            threatHunting.id,
-            fileIntegrityMonitoring.id,
-            configurationAssessment.id,
-            mitreAttack.id,
-            malwareDetection.id,
-          ];
+              // Default pinned applications
+              threatHunting.id,
+              fileIntegrityMonitoring.id,
+              configurationAssessment.id,
+              mitreAttack.id,
+              malwareDetection.id,
+            ];
       }
 
       // Ensure the pinned applications are supported
@@ -248,7 +242,9 @@ export const AgentsWelcome = compose(
                 >
                   <RedirectAppLinks application={getCore().application}>
                     <EuiButtonEmpty
-                      href={getCore().application.getUrlForApp(applicationId)}
+                      href={NavigationService.getInstance().getUrlForApp(
+                        applicationId,
+                      )}
                       style={{ cursor: 'pointer' }}
                     >
                       <span>
@@ -283,20 +279,18 @@ export const AgentsWelcome = compose(
               anchorPosition='downCenter'
             >
               <div>
-                <WzReduxProvider>
-                  <div style={{ maxWidth: 730 }}>
-                    <MenuAgent
-                      isAgent={this.props.agent}
-                      pinnedApplications={this.state.menuAgent}
-                      updatePinnedApplications={applications =>
-                        this.updatePinnedApplications(applications)
-                      }
-                      closePopover={() => {
-                        this.setState({ switchModule: false });
-                      }}
-                    ></MenuAgent>
-                  </div>
-                </WzReduxProvider>
+                <div style={{ maxWidth: 730 }}>
+                  <MenuAgent
+                    isAgent={this.props.agent}
+                    pinnedApplications={this.state.menuAgent}
+                    updatePinnedApplications={applications =>
+                      this.updatePinnedApplications(applications)
+                    }
+                    closePopover={() => {
+                      this.setState({ switchModule: false });
+                    }}
+                  ></MenuAgent>
+                </div>
               </div>
             </EuiPopover>
           </EuiFlexItem>
@@ -338,20 +332,18 @@ export const AgentsWelcome = compose(
                     anchorPosition='downCenter'
                   >
                     <div>
-                      <WzReduxProvider>
-                        <div style={{ maxWidth: 730 }}>
-                          <MenuAgent
-                            isAgent={this.props.agent}
-                            pinnedApplications={this.state.menuAgent}
-                            updatePinnedApplications={applications =>
-                              this.updatePinnedApplications(applications)
-                            }
-                            closePopover={() => {
-                              this.setState({ switchModule: false });
-                            }}
-                          ></MenuAgent>
-                        </div>
-                      </WzReduxProvider>
+                      <div style={{ maxWidth: 730 }}>
+                        <MenuAgent
+                          isAgent={this.props.agent}
+                          pinnedApplications={this.state.menuAgent}
+                          updatePinnedApplications={applications =>
+                            this.updatePinnedApplications(applications)
+                          }
+                          closePopover={() => {
+                            this.setState({ switchModule: false });
+                          }}
+                        ></MenuAgent>
+                      </div>
                     </div>
                   </EuiPopover>
                 </EuiFlexItem>
@@ -437,7 +429,7 @@ export const AgentsWelcome = compose(
                     <EuiButtonIcon
                       iconType='popout'
                       color='primary'
-                      href={`${getCore().application.getUrlForApp(
+                      href={`${NavigationService.getInstance().getUrlForApp(
                         mitreAttack.id,
                       )}`}
                       aria-label='Open MITRE ATT&CK'
@@ -520,7 +512,7 @@ export const AgentsWelcome = compose(
                     >
                       {' '}
                       {/* TODO: Replace with SearchBar and replace implementation to get the time range in AgentView component*/}
-                      <WzDatePicker condensed={true} onTimeChange={() => { }} />
+                      <WzDatePicker condensed={true} onTimeChange={() => {}} />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                   {(this.state.widthWindow < 1150 && (
@@ -553,33 +545,33 @@ export const AgentsWelcome = compose(
                       </EuiFlexGroup>
                     </Fragment>
                   )) || (
-                      <Fragment>
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <EuiFlexGroup>
-                              <EuiFlexItem
-                                key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                              >
-                                {this.renderMitrePanel()}
-                              </EuiFlexItem>
-                              {this.renderCompliancePanel()}
-                            </EuiFlexGroup>
-                          </EuiFlexItem>
-                          <FimEventsTable agent={this.props.agent} />
-                        </EuiFlexGroup>
-                        <EuiSpacer size='l' />
-                        <EuiFlexGroup>
-                          <EuiFlexItem
-                            key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                          >
-                            {' '}
-                            {/* Events count evolution */}
-                            {this.renderEventCountVisualization()}
-                          </EuiFlexItem>
-                          <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
-                        </EuiFlexGroup>
-                      </Fragment>
-                    )}
+                    <Fragment>
+                      <EuiFlexGroup>
+                        <EuiFlexItem>
+                          <EuiFlexGroup>
+                            <EuiFlexItem
+                              key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
+                            >
+                              {this.renderMitrePanel()}
+                            </EuiFlexItem>
+                            {this.renderCompliancePanel()}
+                          </EuiFlexGroup>
+                        </EuiFlexItem>
+                        <FimEventsTable agent={this.props.agent} />
+                      </EuiFlexGroup>
+                      <EuiSpacer size='l' />
+                      <EuiFlexGroup>
+                        <EuiFlexItem
+                          key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                        >
+                          {' '}
+                          {/* Events count evolution */}
+                          {this.renderEventCountVisualization()}
+                        </EuiFlexItem>
+                        <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
+                      </EuiFlexGroup>
+                    </Fragment>
+                  )}
                 </EuiPageBody>
               </EuiPage>
             </div>

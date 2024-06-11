@@ -24,11 +24,7 @@ import {
   EuiPage,
 } from '@elastic/eui';
 import './welcome.scss';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withReduxProvider,
-} from '../hocs';
+import { withErrorBoundary, withGlobalBreadcrumb } from '../hocs';
 import { compose } from 'redux';
 import {
   Applications,
@@ -39,6 +35,7 @@ import {
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { WzButtonPermissions } from '../../common/permissions/button';
+import NavigationService from '../../../react-services/navigation-service';
 
 const appCategories = Applications.reduce((categories, app) => {
   const existingCategory = categories.find(
@@ -63,7 +60,6 @@ const appCategories = Applications.reduce((categories, app) => {
 });
 
 export const OverviewWelcome = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(props => {
     return [{ text: overview.breadcrumbLabel }];
@@ -91,7 +87,7 @@ export const OverviewWelcome = compose(
                           { action: 'agent:create', resource: '*:*:*' },
                         ]}
                         iconType='plusInCircle'
-                        href={getCore().application.getUrlForApp(
+                        href={NavigationService.getInstance().getUrlForApp(
                           endpointSummary.id,
                           {
                             path: `#${endpointSummary.redirectTo()}deploy`,
@@ -151,7 +147,7 @@ export const OverviewWelcome = compose(
                                     }
                                     className='homSynopsis__card'
                                     title={app.title}
-                                    href={getCore().application.getUrlForApp(
+                                    href={NavigationService.getInstance().getUrlForApp(
                                       app.id,
                                     )}
                                     data-test-subj={`overviewWelcome${this.strtools.capitalize(

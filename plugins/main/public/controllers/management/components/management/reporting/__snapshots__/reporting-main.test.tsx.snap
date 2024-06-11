@@ -1,7 +1,344 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Reporting component renders correctly to match the snapshot 1`] = `
-<WzReduxProvider>
-  <Component />
-</WzReduxProvider>
+<div>
+  <div
+    class="euiPage euiPage--paddingMedium euiPage--grow"
+    style="background: transparent;"
+  >
+    <div
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div
+          class="euiFlexItem"
+        >
+          <div
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+          >
+            <div
+              class="euiFlexItem"
+            >
+              <h2
+                class="euiTitle euiTitle--medium"
+              >
+                Reporting
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        >
+          <button
+            class="euiButtonEmpty euiButtonEmpty--primary"
+            type="button"
+          >
+            <span
+              class="euiButtonContent euiButtonEmpty__content"
+            >
+              <svg
+                aria-hidden="true"
+                class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                focusable="false"
+                height="16"
+                role="img"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                />
+              </svg>
+              <span
+                class="euiButtonEmpty__text"
+              >
+                Refresh
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div
+          class="euiFlexItem"
+        >
+          <div
+            class="euiText euiText--medium"
+            style="padding-bottom: 15px;"
+          >
+            <div
+              class="euiTextColor euiTextColor--subdued"
+            >
+              From here you can check all your reports.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div
+          class="euiFlexItem"
+        >
+          <div>
+            <div>
+              <div
+                class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+              >
+                <div
+                  class="euiFlexItem euiSearchBar__searchHolder"
+                >
+                  <div
+                    class="euiFormControlLayout euiFormControlLayout--fullWidth"
+                  >
+                    <div
+                      class="euiFormControlLayout__childrenWrapper"
+                    >
+                      <input
+                        aria-label="This is a search bar. As you type, the results lower in the page will automatically filter."
+                        class="euiFieldSearch euiFieldSearch--fullWidth"
+                        placeholder="Search..."
+                        type="search"
+                        value=""
+                      />
+                      <div
+                        class="euiFormControlLayoutIcons"
+                      >
+                        <span
+                          class="euiFormControlLayoutCustomIcon"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            class="euiIcon euiIcon--medium euiIcon-isLoading euiFormControlLayoutCustomIcon__icon"
+                            focusable="false"
+                            height="16"
+                            role="img"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                            />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="euiSpacer euiSpacer--l"
+              />
+              <div
+                class="euiBasicTable euiBasicTable-loading"
+              >
+                <div>
+                  <div
+                    class="euiTableHeaderMobile"
+                  >
+                    <div
+                      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
+                    >
+                      <div
+                        class="euiFlexItem euiFlexItem--flexGrowZero"
+                      />
+                      <div
+                        class="euiFlexItem euiFlexItem--flexGrowZero"
+                      >
+                        <div
+                          class="euiTableSortMobile"
+                        >
+                          <div
+                            class="euiPopover euiPopover--anchorDownRight"
+                          >
+                            <div
+                              class="euiPopover__anchor"
+                            >
+                              <button
+                                class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
+                                type="button"
+                              >
+                                <span
+                                  class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                                >
+                                  <svg
+                                    aria-hidden="true"
+                                    class="euiIcon euiIcon--small euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                                    focusable="false"
+                                    height="16"
+                                    role="img"
+                                    viewBox="0 0 16 16"
+                                    width="16"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                                    />
+                                  </svg>
+                                  <span
+                                    class="euiButtonEmpty__text"
+                                  >
+                                    Sorting
+                                  </span>
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <table
+                    class="euiTable euiTable--responsive"
+                    id="htmlId"
+                    tabindex="-1"
+                  >
+                    <caption
+                      class="euiScreenReaderOnly euiTableCaption"
+                    />
+                    <thead>
+                      <tr>
+                        <th
+                          aria-live="polite"
+                          aria-sort="none"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_name_0"
+                          role="columnheader"
+                          scope="col"
+                        >
+                          <button
+                            class="euiTableHeaderButton"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
+                              <span
+                                class="euiTableCellContent__text"
+                                title="File"
+                              >
+                                File
+                              </span>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          aria-live="polite"
+                          aria-sort="none"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_size_1"
+                          role="columnheader"
+                          scope="col"
+                        >
+                          <button
+                            class="euiTableHeaderButton"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
+                              <span
+                                class="euiTableCellContent__text"
+                                title="Size"
+                              >
+                                Size
+                              </span>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          aria-live="polite"
+                          aria-sort="descending"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_date_2"
+                          role="columnheader"
+                          scope="col"
+                        >
+                          <button
+                            class="euiTableHeaderButton euiTableHeaderButton-isSorted"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
+                              <span
+                                class="euiTableCellContent__text"
+                                title="Created"
+                              >
+                                Created
+                              </span>
+                              <svg
+                                aria-hidden="true"
+                                class="euiIcon euiIcon--medium euiIcon-isLoading euiTableSortIcon"
+                                focusable="false"
+                                height="16"
+                                role="img"
+                                viewBox="0 0 16 16"
+                                width="16"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                                />
+                              </svg>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_Actions_3"
+                          role="columnheader"
+                          scope="col"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                              title="Actions"
+                            >
+                              Actions
+                            </span>
+                          </span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        class="euiTableRow"
+                      >
+                        <td
+                          class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
+                          colspan="4"
+                        >
+                          <div
+                            class="euiTableCellContent euiTableCellContent--alignCenter"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 `;

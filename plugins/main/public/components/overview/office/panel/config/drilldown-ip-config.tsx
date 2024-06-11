@@ -13,7 +13,7 @@
  */
 
 import React from 'react';
-import { EuiFlexItem, EuiPanel, EuiLink } from '@elastic/eui';
+import { EuiFlexItem, EuiLink } from '@elastic/eui';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
@@ -24,7 +24,6 @@ import {
   getVisStateOfficeUserOperationLevel,
   getVisStateOfficeAlertsEvolutionByUser,
 } from './visualizations';
-import { AppNavigate } from '../../../../../react-services';
 import DrillDownDataGrid from '../../../github/panel/config/drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -99,24 +98,16 @@ const getDashboardPanels = (
   };
 };
 
-export const drilldownIPConfig = (props) => {
-
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern
-  } = props;
+export const drilldownIPConfig = props => {
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } = props;
 
   return {
-
     rows: [
       {
         columns: [
           {
             width: 100,
             component: props => {
-
               const defaultTableColumns = [
                 { id: 'timestamp' },
                 { id: 'rule.description', displayAsText: 'Description' },
@@ -127,18 +118,18 @@ export const drilldownIPConfig = (props) => {
                 },
                 { id: 'rule.level', displayAsText: 'Level' },
                 {
-                  id: 'rule.id', render: value => (
+                  id: 'rule.id',
+                  render: value => (
                     <RedirectAppLinks application={getCore().application}>
                       <EuiLink
                         href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
                       >
                         {value}
-                      </EuiLink >
+                      </EuiLink>
                     </RedirectAppLinks>
                   ),
                 },
-              ]
-
+              ];
 
               return (
                 <div style={{ width: '100%' }}>
@@ -155,7 +146,8 @@ export const drilldownIPConfig = (props) => {
                         to: searchBarProps.dateRangeTo,
                       },
                       title: 'Office drilldown ip config dashboard',
-                      description: 'Dashboard of the Office drilldown ip config',
+                      description:
+                        'Dashboard of the Office drilldown ip config',
                       query: searchBarProps.query,
                       refreshConfig: {
                         pause: false,
@@ -163,7 +155,7 @@ export const drilldownIPConfig = (props) => {
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                   <EuiFlexItem>
                     <DrillDownDataGrid
@@ -182,5 +174,4 @@ export const drilldownIPConfig = (props) => {
       },
     ],
   };
-
 };

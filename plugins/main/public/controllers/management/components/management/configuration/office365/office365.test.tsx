@@ -17,7 +17,6 @@ import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 
 jest.mock('../../../../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getUiSettings: () => ({
     get: (uiSetting: string) => {
       if (uiSetting === 'theme:darkMode') {
@@ -42,7 +41,7 @@ describe('WzConfigurationOffice365 component', () => {
           updateBadge={() => {}}
           updateConfigurationSection={() => {}}
         />
-      </Provider>
+      </Provider>,
     );
     expect(wrapper).toMatchSnapshot();
   });

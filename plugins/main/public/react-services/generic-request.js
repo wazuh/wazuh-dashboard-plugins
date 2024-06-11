@@ -14,9 +14,10 @@ import { AppState } from './app-state';
 import { WazuhConfig } from './wazuh-config';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
-import { getHttp, getDataPlugin, getWzCurrentAppID } from '../kibana-services';
+import { getHttp, getDataPlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
+import NavigationService from './navigation-service';
 
 export class GenericRequest {
   static async request(method, path, payload = null, returnError = false) {
@@ -101,13 +102,14 @@ export class GenericRequest {
           wzMisc.setApiIsDown(true);
 
           if (
-            !window.location.hash.includes('#/settings') &&
-            !window.location.hash.includes('#/health-check') &&
-            !window.location.hash.includes('#/blank-screen')
+            ['/settings', '/health-check', '/blank-screen'].every(
+              pathname =>
+                !NavigationService.getInstance()
+                  .getPathname()
+                  .startsWith(pathname),
+            )
           ) {
-            window.location.href = getHttp().basePath.prepend(
-              `/app/${getWzCurrentAppID()}#/health-check`,
-            );
+            NavigationService.getInstance().navigate('/health-check');
           }
         }
       }

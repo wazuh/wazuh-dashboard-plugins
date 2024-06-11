@@ -1,18 +1,15 @@
 import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { withGuardAsync, withReduxProvider } from '../../../../common/hocs';
-import {
-  getAngularModule,
-  getCore,
-  getSavedObjects,
-} from '../../../../../kibana-services';
+import { withGuardAsync } from '../../../../common/hocs';
+import { getSavedObjects } from '../../../../../kibana-services';
 import { SavedObject } from '../../../../../react-services';
 import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/constants';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
 import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
@@ -96,7 +93,7 @@ export async function validateVulnerabilitiesStateDataSources({
         problem in the Events tabs related there are no implicit filters when accessing if the HOC
         that protect the view is passed.
       */
-      getCore().application.navigateToApp(vulnerabilityDetection.id);
+      NavigationService.getInstance().navigateToApp(vulnerabilityDetection.id);
     }
     return {
       ok: false,
@@ -155,7 +152,6 @@ const mapStateToProps = state => ({
 });
 
 export const withVulnerabilitiesStateDataSource = compose(
-  withReduxProvider,
   connect(mapStateToProps),
   withGuardAsync(
     validateVulnerabilitiesStateDataSources,

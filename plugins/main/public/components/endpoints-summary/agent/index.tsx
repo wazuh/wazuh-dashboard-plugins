@@ -2,40 +2,41 @@ import React, { useState, useEffect } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress } from '@elastic/eui';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
 import { Agent } from '../types';
-import {
-  getAngularModule,
-  getCore,
-  getDataPlugin,
-} from '../../../kibana-services';
 import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
-import { endpointSummary } from '../../../utils/applications';
-import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
+import { withErrorBoundary, withRouteResolvers } from '../../common/hocs';
 import { compose } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 import { MainModuleAgent } from '../../common/modules/main-agent';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../../services/resolves';
+import { useRouterSearch } from '../../common/hooks/use-router-search';
+import { Redirect, Route, Switch } from '../../router-search';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const AgentView = compose(
   withErrorBoundary,
-  withReduxProvider,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
 )(() => {
-  //TODO: Replace when implement React router
-  const $injector = getAngularModule().$injector;
-  const $commonData = $injector.get('commonData');
+  const { tab = 'welcome' } = useRouterSearch();
+  const navigationService = NavigationService.getInstance();
 
   //TODO: Replace with useDatasource and useSearchBar when replace WzDatePicker with SearchBar in AgentsWelcome component
-  const savedTimefilter = $commonData.getTimefilter();
+  /* const savedTimefilter = $commonData.getTimefilter();
   if (savedTimefilter) {
     getDataPlugin().query.timefilter.timefilter.setTime(savedTimefilter);
     $commonData.removeTimefilter();
-  }
+  } */
 
   const pinnedAgentManager = new PinnedAgentManager();
 
   const [agent, setAgent] = useState<Agent>();
   const [isLoadingAgent, setIsLoadingAgent] = useState(true);
-  const [tab, setTab] = useState<string>($commonData.checkTabLocation());
 
   const getAgent = async () => {
     setIsLoadingAgent(true);
@@ -50,10 +51,7 @@ export const AgentView = compose(
   }, [tab]);
 
   const switchTab = (tab: string) => {
-    setTab(tab);
-    getCore().application.navigateToApp(endpointSummary.id, {
-      path: `#/agents?tab=${tab}&agent=${agent?.id}`,
-    });
+    navigationService.navigate(`/agents?tab=${tab}&agent=${agent?.id}`);
   };
 
   if (isLoadingAgent) {
@@ -66,39 +64,29 @@ export const AgentView = compose(
     );
   }
 
-  if (tab === 'syscollector' && agent) {
-    return (
-      <>
+  return (
+    <Switch>
+      <Route path='?tab=syscollector'>
         <MainModuleAgent agent={agent} section={tab} />
         <MainSyscollector agent={agent} />
-      </>
-    );
-  }
-
-  if (tab === 'stats' && agent) {
-    return (
-      <>
+      </Route>
+      <Route path='?tab=stats'>
         <MainModuleAgent agent={agent} section={tab} />
         <MainAgentStats agent={agent} />
-      </>
-    );
-  }
-
-  if (tab === 'configuration' && agent) {
-    return (
-      <>
+      </Route>
+      <Route path='?tab=configuration'>
         <MainModuleAgent agent={agent} section={tab} />
         <WzManagementConfiguration agent={agent} />
-      </>
-    );
-  }
-
-  return (
-    <AgentsWelcome
-      switchTab={switchTab}
-      agent={agent}
-      pinAgent={pinnedAgentManager.pinAgent}
-      unPinAgent={pinnedAgentManager.unPinAgent}
-    />
+      </Route>
+      <Route path='?tab=welcome'>
+        <AgentsWelcome
+          switchTab={switchTab}
+          agent={agent}
+          pinAgent={pinnedAgentManager.pinAgent}
+          unPinAgent={pinnedAgentManager.unPinAgent}
+        />
+      </Route>
+      <Redirect to='?tab=welcome'></Redirect>
+    </Switch>
   );
 });
