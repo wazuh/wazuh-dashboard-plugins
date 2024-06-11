@@ -12,12 +12,14 @@ export interface WzSearchBarProps extends SearchBarProps {
   userFilters?: Filter[];
   preQueryBar?: React.ReactElement;
   postFilters?: React.ReactElement;
+  hideFixedFilters?: boolean;
 }
 
 export const WzSearchBar = ({
   fixedFilters = [],
   userFilters = [],
   preQueryBar,
+  hideFixedFilters,
   postFilters,
   ...restProps
 }: WzSearchBarProps) => {
@@ -53,25 +55,28 @@ export const WzSearchBar = ({
       ) : null}
       {showFilters ? (
         <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem grow={false}>
-            <EuiFlexGroup
-              gutterSize='xs'
-              className='globalFilterBar globalFilterGroup__filterBar'
-              responsive={false}
-              wrap={true}
-            >
-              {fixedFilters?.map((filter, idx) => (
-                <EuiFlexItem grow={false} key={idx}>
-                  <EuiBadge className='globalFilterItem' color='hollow'>
-                    {`${filter.meta.key}: ${typeof filter.meta.value === 'function'
-                      ? filter.meta.value()
-                      : filter.meta.value
+          {hideFixedFilters ? null : (
+            <EuiFlexItem grow={false}>
+              <EuiFlexGroup
+                gutterSize='xs'
+                className='globalFilterBar globalFilterGroup__filterBar'
+                responsive={false}
+                wrap={true}
+              >
+                {fixedFilters?.map((filter, idx) => (
+                  <EuiFlexItem grow={false} key={idx}>
+                    <EuiBadge className='globalFilterItem' color='hollow'>
+                      {`${filter.meta.key}: ${
+                        typeof filter.meta.value === 'function'
+                          ? filter.meta.value()
+                          : filter.meta.value
                       }`}
-                  </EuiBadge>
-                </EuiFlexItem>
-              ))}
-            </EuiFlexGroup>
-          </EuiFlexItem>
+                    </EuiBadge>
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGroup>
+            </EuiFlexItem>
+          )}
           <EuiFlexItem>
             <EuiFlexGroup
               gutterSize='s'
