@@ -21,7 +21,6 @@ import {
   HttpError,
 } from '../../../react-services/error-management';
 import useSearchBar, { tUseSearchBarProps } from '../search-bar/use-search-bar';
-import { getPlugins } from '../../../kibana-services';
 import { withErrorBoundary } from '../hocs';
 import { useTimeFilter } from '../hooks';
 import {
@@ -34,6 +33,7 @@ import {
   tFilter,
 } from '../data-source';
 import DocDetails from './components/doc-details';
+import { WzSearchBar } from '../search-bar/search-bar';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 export const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
@@ -69,7 +69,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     throw new Error('DataSource is required');
   }
 
-  const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
@@ -251,8 +250,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
         indexPattern,
       })
     ) : (
-        <DocDetails doc={doc} item={item} indexPattern={indexPattern} />
-      );
+      <DocDetails doc={doc} item={item} indexPattern={indexPattern} />
+    );
   };
 
   const parsedItems = useMemo(() => {
@@ -275,14 +274,13 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-              <div className='wz-search-bar'>
-                <SearchBar
-                  appName='wazuh-discover-search-bar'
-                  {...searchBarProps}
-                  useDefaultBehaviors={false}
-                />
-              </div>
-            )}
+            <WzSearchBar
+              appName='wazuh-discover-search-bar'
+              {...searchBarProps}
+              useDefaultBehaviors={false}
+              hideFixedFilters
+            />
+          )}
           {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
@@ -299,15 +297,15 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                   showResetButton={false}
                   tooltip={
                     results?.hits?.total &&
-                      results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                    results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
-                        ariaLabel: 'Warning',
-                        content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                          MAX_ENTRIES_PER_QUERY,
-                        )} hits.`,
-                        iconType: 'alert',
-                        position: 'top',
-                      }
+                          ariaLabel: 'Warning',
+                          content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY,
+                          )} hits.`,
+                          iconType: 'alert',
+                          position: 'top',
+                        }
                       : undefined
                   }
                 />
