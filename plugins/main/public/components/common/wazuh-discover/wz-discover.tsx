@@ -208,77 +208,80 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         {!isDataSourceLoading && results?.hits?.total === 0 ? (
           <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
         ) : null}
-        <EuiPanel
-          paddingSize='s'
-          hasShadow={false}
-          hasBorder={false}
-          color='transparent'
+        <div
           className={
             !isDataSourceLoading && dataSource && results?.hits?.total > 0
               ? ''
               : 'wz-no-display'
           }
         >
-          <EuiFlexGroup gutterSize='s' direction='column'>
-            <EuiFlexItem grow={false} className='discoverChartContainer'>
-              <EuiPanel
-                hasBorder={false}
-                hasShadow={false}
-                color='transparent'
-                paddingSize='none'
-              >
-                <EuiPanel>
-                  <DashboardByRenderer
-                    input={histogramChartInput(
-                      AlertsRepository.getStoreIndexPatternId(),
-                      fetchFilters,
-                      query,
-                      dateRangeFrom,
-                      dateRangeTo,
-                    )}
-                  />
+          <EuiPanel
+            paddingSize='s'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
+            <EuiFlexGroup gutterSize='s' direction='column'>
+              <EuiFlexItem grow={false} className='discoverChartContainer'>
+                <EuiPanel
+                  hasBorder={false}
+                  hasShadow={false}
+                  color='transparent'
+                  paddingSize='none'
+                >
+                  <EuiPanel>
+                    <DashboardByRenderer
+                      input={histogramChartInput(
+                        AlertsRepository.getStoreIndexPatternId(),
+                        fetchFilters,
+                        query,
+                        dateRangeFrom,
+                        dateRangeTo,
+                      )}
+                    />
+                  </EuiPanel>
                 </EuiPanel>
-              </EuiPanel>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiDataGrid
-                {...dataGridProps}
-                className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                toolbarVisibility={{
-                  additionalControls: (
-                    <>
-                      <DiscoverDataGridAdditionalControls
-                        totalHits={results?.hits?.total || 0}
-                        isExporting={isExporting}
-                        onClickExportResults={onClickExportResults}
-                        maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                      />
-                    </>
-                  ),
-                }}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPanel>
-        {inspectedHit && (
-          <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-            <EuiFlyoutHeader>
-              <EuiTitle>
-                <h2>Document Details</h2>
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody>
-              <EuiFlexGroup direction='column'>
-                <EuiFlexItem>
-                  <DocumentViewTableAndJson
-                    document={inspectedHit}
-                    indexPattern={indexPattern}
-                  />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlyoutBody>
-          </EuiFlyout>
-        )}
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiDataGrid
+                  {...dataGridProps}
+                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                  toolbarVisibility={{
+                    additionalControls: (
+                      <>
+                        <DiscoverDataGridAdditionalControls
+                          totalHits={results?.hits?.total || 0}
+                          isExporting={isExporting}
+                          onClickExportResults={onClickExportResults}
+                          maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                        />
+                      </>
+                    ),
+                  }}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPanel>
+          {inspectedHit && (
+            <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+              <EuiFlyoutHeader>
+                <EuiTitle>
+                  <h2>Document Details</h2>
+                </EuiTitle>
+              </EuiFlyoutHeader>
+              <EuiFlyoutBody>
+                <EuiFlexGroup direction='column'>
+                  <EuiFlexItem>
+                    <DocumentViewTableAndJson
+                      document={inspectedHit}
+                      indexPattern={indexPattern}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlyoutBody>
+            </EuiFlyout>
+          )}
+        </div>
       </EuiPageTemplate>
     </IntlProvider>
   );
