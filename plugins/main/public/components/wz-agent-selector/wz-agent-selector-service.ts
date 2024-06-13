@@ -1,8 +1,8 @@
 import store from '../../redux/store';
 import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from '../../../common/constants';
-import { getAngularModule } from '../../kibana-services';
 import { WzRequest } from '../../react-services';
+import NavigationService from '../../react-services/navigation-service';
 
 export class PinnedAgentManager {
   public static NO_AGENT_DATA = {};
@@ -13,16 +13,13 @@ export class PinnedAgentManager {
     DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT;
   private AGENT_VIEW_URL = '/agents';
   private store: any;
-  private location: any;
-  private route: any;
-  private rootScope: any;
+  private params: URLSearchParams;
+  private navigationService: NavigationService;
 
   constructor(inputStore?: any) {
     this.store = inputStore ?? store;
-    const $injector = getAngularModule().$injector;
-    this.location = $injector.get('$location');
-    this.route = $injector.get('$route');
-    this.rootScope = $injector.get('$rootScope');
+    this.navigationService = NavigationService.getInstance();
+    this.params = this.navigationService.getParams();
   }
 
   private equalToPinnedAgent(agentData: any): boolean {
@@ -44,45 +41,28 @@ export class PinnedAgentManager {
       return;
     }
     this.store.dispatch(updateCurrentAgentData(agentData));
-    /* The following code is a workaround so that both overview and agent overview are re-rendered when a pinned agent changes, including the URL as a source. This will surely change when Angular is permanently removed and the routing system changes. */
-    setTimeout(() => {
-      const includesAgentViewURL = window.location.href.includes(
-        this.AGENT_VIEW_URL,
-      );
-      this.location.search(
-        includesAgentViewURL
-          ? PinnedAgentManager.AGENT_ID_VIEW_KEY
-          : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
-        String(agentData?.id),
-      );
-      if (includesAgentViewURL) {
-        this.route.reload();
-      } else {
-        this.rootScope.$applyAsync();
-      }
-    }, 1);
+    const includesAgentViewURL = this.navigationService
+      .getPathname()
+      .includes(this.AGENT_VIEW_URL);
+    this.params.set(
+      includesAgentViewURL
+        ? PinnedAgentManager.AGENT_ID_VIEW_KEY
+        : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
+      String(agentData?.id),
+    );
+    this.navigationService.renewURL(this.params);
   }
 
   unPinAgent(): void {
     this.store.dispatch(
       updateCurrentAgentData(PinnedAgentManager.NO_AGENT_DATA),
     );
-    /* The following code is a workaround so that both overview and agent overview are re-rendered when a pinned agent changes, including the URL as a source. This will surely change when Angular is permanently removed and the routing system changes. */
     ['agent', 'agentId'].forEach(param => {
-      if (this.location.search()[param]) {
-        setTimeout(() => {
-          const includesAgentViewURL = window.location.href.includes(
-            this.AGENT_VIEW_URL,
-          );
-          this.location.search(param, null);
-          if (includesAgentViewURL) {
-            this.route.reload();
-          } else {
-            this.rootScope.$applyAsync();
-          }
-        }, 1);
+      if (this.params.has(param)) {
+        this.params.delete(param);
       }
     });
+    this.navigationService.renewURL(this.params);
   }
 
   isPinnedAgent(): boolean {

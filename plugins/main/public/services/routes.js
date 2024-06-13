@@ -18,16 +18,6 @@ import 'angular-route';
 import { settingsWizard, getSavedSearch, getIp, getWzConfig } from './resolves';
 
 // HTML templates
-import healthCheckTemplate from '../templates/health-check/health-check.html';
-import agentsTemplate from '../templates/agents/dashboards.html';
-import agentDeployTemplate from '../templates/agents/deploy/agent-deploy.html';
-import agentsPrevTemplate from '../templates/agents-prev/agents-prev.html';
-import managementTemplate from '../templates/management/management.html';
-import overviewTemplate from '../templates/visualize/dashboards.html';
-import settingsTemplate from '../templates/settings/settings.html';
-import securityTemplate from '../templates/security/security.html';
-import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
-import toolsTemplate from '../templates/tools/tools.html';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { GenericRequest } from '../react-services/generic-request';
 import { WzMisc } from '../factories/misc';

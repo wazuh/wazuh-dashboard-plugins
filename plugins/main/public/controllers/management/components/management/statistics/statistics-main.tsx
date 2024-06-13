@@ -9,18 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
-
-import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh statistics overview
 import WzStatisticsOverview from './statistics-overview';
-
-function WzStatistics() {
-  return (
-    <WzReduxProvider>
-      <WzStatisticsOverview />
-    </WzReduxProvider>
-  );
-}
-
-export default WzStatistics;
+export default WzStatisticsOverview;

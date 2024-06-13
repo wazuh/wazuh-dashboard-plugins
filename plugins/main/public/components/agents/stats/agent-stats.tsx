@@ -23,7 +23,6 @@ import {
 
 import {
   withGlobalBreadcrumb,
-  withReduxProvider,
   withGuard,
   withUserAuthorizationPrompt,
   withErrorBoundary,
@@ -47,7 +46,7 @@ import {
 } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
-import { getCore } from '../../../kibana-services';
+import NavigationService from '../../../react-services/navigation-service';
 
 const tableColumns = [
   {
@@ -104,11 +103,10 @@ const statsAgents: { title: string; field: string; render?: (value) => any }[] =
 
 export const MainAgentStats = compose(
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb(({ agent }) => [
     {
       text: endpointSummary.breadcrumbLabel,
-      href: getCore().application.getUrlForApp(endpointSummary.id, {
+      href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
         path: `#/agents-preview`,
       }),
     },

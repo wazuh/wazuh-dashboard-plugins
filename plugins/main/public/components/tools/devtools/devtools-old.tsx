@@ -23,6 +23,8 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { withGlobalBreadcrumb } from '../../common/hocs';
+import { devTools } from '../../../utils/applications';
 
 /**
  * Detect de groups of instructions
@@ -878,7 +880,9 @@ function exportOutput(editor) {
   }
 }
 
-export const ToolDevTools = () => {
+export const ToolDevTools = withGlobalBreadcrumb([
+  { text: devTools.breadcrumbLabel },
+])(() => {
   const [multipleKeyPressed, setMultipleKeyPressed] = useState([]);
   const editorInputRef = useRef();
   const editorOutputRef = useRef();
@@ -1009,13 +1013,9 @@ export const ToolDevTools = () => {
 
   return (
     <div
-      // flex='auto'
-      // ng-controller='devToolsController as ctrl'
       style={{ display: 'flex', flexDirection: 'column' }}
       className='dev-tools-max-height'
     >
-      {/* <md-content flex layout='column' class='md-padding' layout-align='start'> */}
-
       <div className='wz-dev-box'>
         <div
           id='wz-dev-left-column'
@@ -1082,4 +1082,4 @@ export const ToolDevTools = () => {
       {/* </md-content> */}
     </div>
   );
-};
+});

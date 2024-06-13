@@ -29,6 +29,7 @@ const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 export const DashboardMITRE: React.FC = () => {
+  const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
     dataSource,
@@ -38,7 +39,7 @@ export const DashboardMITRE: React.FC = () => {
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: MitreAttackDataSource,
-    repository: new AlertsDataSourceRepository(),
+    repository: AlertsRepository,
   });
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -105,38 +106,40 @@ export const DashboardMITRE: React.FC = () => {
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
-          {dataSource && results?.hits?.total > 0 ? (
-            <div className='mitre-dashboard-responsive'>
-              <SampleDataWarning />
-              <div className='mitre-dashboard-filters-wrapper'>
-                <DashboardByRenderer
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    panels: getDashboardPanels(
-                      dataSource?.id,
-                      dataSource?.getPinnedAgentFilter().length > 0,
-                    ),
-                    isFullScreenMode: false,
-                    filters: fetchFilters ?? [],
-                    useMargins: true,
-                    id: 'mitre-dashboard-tab-filters',
-                    timeRange: {
-                      from: dateRangeFrom,
-                      to: dateRangeTo,
-                    },
-                    title: 'MITRE dashboard filters',
-                    description: 'Dashboard of the MITRE filters',
-                    query: query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles: false,
-                  }}
-                />
-              </div>
+          <div
+            className={`mitre-dashboard-responsive ${
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }`}
+          >
+            <SampleDataWarning />
+            <div className='mitre-dashboard-filters-wrapper'>
+              <DashboardByRenderer
+                input={{
+                  viewMode: ViewMode.VIEW,
+                  panels: getDashboardPanels(
+                    AlertsRepository.getStoreIndexPatternId(),
+                    Boolean(dataSource?.getPinnedAgentFilter().length),
+                  ),
+                  isFullScreenMode: false,
+                  filters: fetchFilters ?? [],
+                  useMargins: true,
+                  id: 'mitre-dashboard-tab-filters',
+                  timeRange: {
+                    from: dateRangeFrom,
+                    to: dateRangeTo,
+                  },
+                  title: 'MITRE dashboard filters',
+                  description: 'Dashboard of the MITRE filters',
+                  query: query,
+                  refreshConfig: {
+                    pause: false,
+                    value: 15,
+                  },
+                  hidePanelTitles: false,
+                }}
+              />
             </div>
-          ) : null}
+          </div>
         </>
       </I18nProvider>
     </>

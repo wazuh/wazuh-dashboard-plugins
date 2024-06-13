@@ -13,28 +13,27 @@
  */
 
 import React from 'react';
-import { mount } from 'enzyme';
 import WzStatus from './status-main';
+import { renderWithProviders } from '../../../../../redux/render-with-redux-provider';
 
 jest.mock('../../../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
   getUiSettings: () => ({
     get: (setting: string): any => {
-      if(setting === 'theme:darkMode'){
-        return false
+      if (setting === 'theme:darkMode') {
+        return false;
       }
-    }
-  })
+    },
+  }),
 }));
 
 describe('Status component', () => {
   it('renders correctly to match the snapshot', () => {
-    const wrapper = mount(<WzStatus />);
-    expect(wrapper).toMatchSnapshot();
+    const { container } = renderWithProviders(<WzStatus />);
+    expect(container).toMatchSnapshot();
   });
 });

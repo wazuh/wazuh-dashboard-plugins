@@ -14,15 +14,13 @@ import WzConfigurationSwitch from './configuration-switch';
 import {
   withErrorBoundary,
   withGlobalBreadcrumb,
-  withReduxProvider,
 } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 import { endpointSummary, settings } from '../../../../../utils/applications';
-import { getCore } from '../../../../../kibana-services';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 export default compose(
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb(props => {
     let breadcrumb = false;
     if (props.agent.id === '000') {
@@ -31,9 +29,12 @@ export default compose(
       breadcrumb = [
         {
           text: endpointSummary.breadcrumbLabel,
-          href: getCore().application.getUrlForApp(endpointSummary.id, {
-            path: `#/agents-preview`,
-          }),
+          href: NavigationService.getInstance().getUrlForApp(
+            endpointSummary.id,
+            {
+              path: `#/agents-preview`,
+            },
+          ),
         },
         { agent: props.agent },
         { text: 'Configuration' },

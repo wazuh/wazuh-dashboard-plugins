@@ -11,6 +11,9 @@ import {
   EuiBadge,
 } from '@elastic/eui';
 import WzTextWithTooltipTruncated from '../../../../../../common/wz-text-with-tooltip-if-truncated';
+import { RedirectAppLinks } from '../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { getCore } from '../../../../../../../kibana-services';
+import { rules } from '../../../../../../../utils/applications';
 
 type Props = {
   data: any;
@@ -26,7 +29,7 @@ const complianceEquivalences = {
   'nist-800-53': 'NIST-800-53',
 };
 
-const getValueAsString = (value) => {
+const getValueAsString = value => {
   if (value && typeof value === 'object' && value.constructor === Object) {
     let list: any[] = [];
     Object.keys(value).forEach((key, idx) => {
@@ -36,7 +39,7 @@ const getValueAsString = (value) => {
           {value[key]}
           {idx < Object.keys(value).length - 1 && ', '}
           <br />
-        </span>
+        </span>,
       );
     });
     return (
@@ -53,28 +56,36 @@ const getValueAsString = (value) => {
  * Build an object with the compliance info about a rule
  * @param {Object} ruleInfo
  */
-const buildCompliance = (ruleInfo) => {
+const buildCompliance = ruleInfo => {
   if (!ruleInfo) return {};
   const compliance = {};
-  const complianceKeys = ['gdpr', 'gpg13', 'hipaa', 'nist-800-53', 'pci', 'mitre'];
-  Object.keys(ruleInfo).forEach((key) => {
-    if (complianceKeys.includes(key) && ruleInfo[key].length) compliance[key] = ruleInfo[key];
+  const complianceKeys = [
+    'gdpr',
+    'gpg13',
+    'hipaa',
+    'nist-800-53',
+    'pci',
+    'mitre',
+  ];
+  Object.keys(ruleInfo).forEach(key => {
+    if (complianceKeys.includes(key) && ruleInfo[key].length)
+      compliance[key] = ruleInfo[key];
   });
   return compliance || {};
 };
 
-const getFormattedDetails = (value) => {
+const getFormattedDetails = value => {
   if (Array.isArray(value) && value[0].type) {
     let link = '';
     let name = '';
 
-    value.forEach((item) => {
+    value.forEach(item => {
       if (item.type === 'cve') {
         name = item.name;
       }
       if (item.type === 'link') {
         link = (
-          <EuiLink href={item.name} target="_blank" rel="noopener noreferrer">
+          <EuiLink href={item.name} target='_blank' rel='noopener noreferrer'>
             {item.name}
           </EuiLink>
         );
@@ -87,11 +98,15 @@ const getFormattedDetails = (value) => {
     );
   } else {
     const _value = typeof value === 'string' ? value : getValueAsString(value);
-    return <WzTextWithTooltipTruncated position="top">{_value}</WzTextWithTooltipTruncated>;
+    return (
+      <WzTextWithTooltipTruncated position='top'>
+        {_value}
+      </WzTextWithTooltipTruncated>
+    );
   }
 };
 
-const getComplianceKey = (key) => {
+const getComplianceKey = key => {
   if (key === 'pci') {
     return 'rule.pci_dss';
   }
@@ -120,11 +135,11 @@ const RuleDetails = (props: Props) => {
   const compliance = useMemo(() => buildCompliance(ruleData), [ruleData]);
   const id = ruleData.id;
 
-  const addFilter = (value) => {
+  const addFilter = value => {
     onClick && onClick(value);
   };
 
-  const renderCompliance = (compliance) => {
+  const renderCompliance = compliance => {
     if (!compliance || Object.keys(compliance).length === 0) {
       return <div>No compliance information available</div>;
     }
@@ -136,11 +151,15 @@ const RuleDetails = (props: Props) => {
           .sort()
           .map((complianceCategory, index) => {
             return (
-              <EuiFlexItem key={`rule-compliance-${complianceCategory}-${index}`}>
-                <div style={styleTitle}>{complianceEquivalences[complianceCategory]}</div>
+              <EuiFlexItem
+                key={`rule-compliance-${complianceCategory}-${index}`}
+              >
+                <div style={styleTitle}>
+                  {complianceEquivalences[complianceCategory]}
+                </div>
                 <div>
                   {compliance[complianceCategory]
-                    .map((comp) => {
+                    .map(comp => {
                       const filter = {
                         [getComplianceKey(complianceCategory)]: comp,
                       };
@@ -149,11 +168,11 @@ const RuleDetails = (props: Props) => {
                           key={`rule-compliance-tooltip-${complianceCategory}-${
                             Math.random() * (index - 0) + index
                           }`}
-                          position="top"
+                          position='top'
                           content={`Filter by this compliance`}
                         >
                           <EuiBadge
-                            color="hollow"
+                            color='hollow'
                             onClick={() => addFilter(filter)}
                             onClickAriaLabel={comp}
                             title={null}
@@ -171,41 +190,48 @@ const RuleDetails = (props: Props) => {
       </EuiFlexGrid>
     );
   };
-  const renderDetails = (details) => {
+  const renderDetails = details => {
     if (!details) return null;
 
     const detailsToRender: any = [];
-    const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
+    const capitalize = str => str[0].toUpperCase() + str.slice(1);
     // Exclude group key of details
     Object.keys(details)
-      .filter((key) => key !== 'group')
-      .forEach((key) => {
+      .filter(key => key !== 'group')
+      .forEach(key => {
         const detail = details[key];
-        const detailValue = typeof detail === 'object' ? JSON.stringify(detail) : detail;
         detailsToRender.push(
-          <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)', maxHeight: 45 }}>
+          <EuiFlexItem
+            key={key}
+            grow={1}
+            style={{ maxWidth: 'calc(25% - 24px)', maxHeight: 45 }}
+          >
             <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>
-            {detailValue === '' ? 'true' : getFormattedDetails(detailValue)}
-          </EuiFlexItem>
+            {detail === '' ? 'true' : getFormattedDetails(detail)}
+          </EuiFlexItem>,
         );
       });
     return <EuiFlexGrid columns={4}>{detailsToRender}</EuiFlexGrid>;
   };
 
-  const renderGroups = (groups) => {
+  const renderGroups = groups => {
     if (!groups) return null;
     const listGroups: any = [];
     groups.forEach((group, index) => {
-      const groupValue = typeof group === 'object' ? JSON.stringify(group) : group;
+      const groupValue =
+        typeof group === 'object' ? JSON.stringify(group) : group;
       listGroups.push(
         <span key={groupValue}>
           <EuiLink onClick={() => addFilter({ 'rule.groups': groupValue })}>
-            <EuiToolTip position="top" content={`Filter by this group: ${groupValue}`}>
+            <EuiToolTip
+              position='top'
+              content={`Filter by this group: ${groupValue}`}
+            >
               <span>{groupValue}</span>
             </EuiToolTip>
           </EuiLink>
           {index < groups.length - 1 && ', '}
-        </span>
+        </span>,
       );
     });
     return (
@@ -218,27 +244,29 @@ const RuleDetails = (props: Props) => {
   const renderInfo = (id, level, file, path, groups) => {
     return (
       <EuiFlexGrid columns={4}>
-        <EuiFlexItem key="id" grow={1}>
+        <EuiFlexItem key='id' grow={1}>
           <b style={{ paddingBottom: 6 }}>ID</b>
-          <EuiToolTip position="top" content={`Filter by this rule ID: ${id}`}>
+          <EuiToolTip position='top' content={`Filter by this rule ID: ${id}`}>
             <EuiLink onClick={() => addFilter({ 'rule.id': id })}>{id}</EuiLink>
           </EuiToolTip>
         </EuiFlexItem>
-        <EuiFlexItem key="level" grow={1}>
+        <EuiFlexItem key='level' grow={1}>
           <b style={{ paddingBottom: 6 }}>Level</b>
-          <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
-            <EuiLink onClick={async () => addFilter({ 'rule.level': level })}>{level}</EuiLink>
+          <EuiToolTip position='top' content={`Filter by this level: ${level}`}>
+            <EuiLink onClick={async () => addFilter({ 'rule.level': level })}>
+              {level}
+            </EuiLink>
           </EuiToolTip>
         </EuiFlexItem>
-        <EuiFlexItem key="file" grow={1}>
+        <EuiFlexItem key='file' grow={1}>
           <b style={{ paddingBottom: 6 }}>File</b>
           {file}
         </EuiFlexItem>
-        <EuiFlexItem key="path" grow={1}>
+        <EuiFlexItem key='path' grow={1}>
           <b style={{ paddingBottom: 6 }}>Path</b>
           {path}
         </EuiFlexItem>
-        <EuiFlexItem key="Groups" grow={1}>
+        <EuiFlexItem key='Groups' grow={1}>
           <b style={{ paddingBottom: 6 }}>Groups</b>
           {renderGroups(groups)}
         </EuiFlexItem>
@@ -247,55 +275,61 @@ const RuleDetails = (props: Props) => {
   };
 
   return (
-    <EuiFlexGroup direction="column" gutterSize="none">
+    <EuiFlexGroup direction='column' gutterSize='none'>
       <EuiFlexItem style={{ marginTop: 8 }}>
         <EuiAccordion
-          id="Info"
+          id='Info'
           buttonContent={
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h3>Information</h3>
             </EuiTitle>
           }
           extraAction={
-            <EuiLink
-              href={`#/manager/rules?tab=rules&redirectRule=${id}`}
-              target="_blank"
-              style={{ paddingTop: 5 }}
-              rel="noopener noreferrer"
-            >
-              <EuiIcon type="popout" color="primary" />
-              &nbsp; View in Rules
-            </EuiLink>
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                target='_blank'
+                style={{ paddingTop: 5 }}
+                rel='noopener noreferrer'
+                href={`${rules.id}#/manager/?tab=rules&redirectRule=${id}`}
+              >
+                <EuiIcon type='popout' color='primary' />
+                &nbsp; View in Rules
+              </EuiLink>
+            </RedirectAppLinks>
           }
           initialIsOpen={true}
         >
-          <div className="flyout-row details-row">{renderInfo(id, level, file, path, groups)}</div>
+          <div className='flyout-row details-row'>
+            {renderInfo(id, level, file, path, groups)}
+          </div>
         </EuiAccordion>
       </EuiFlexItem>
       <EuiFlexItem style={{ marginTop: 8 }}>
         <EuiAccordion
-          id="Details"
+          id='Details'
           buttonContent={
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h3>Details</h3>
             </EuiTitle>
           }
           initialIsOpen={true}
         >
-          <div className="flyout-row details-row">{renderDetails(details)}</div>
+          <div className='flyout-row details-row'>{renderDetails(details)}</div>
         </EuiAccordion>
       </EuiFlexItem>
       <EuiFlexItem style={{ marginTop: 8 }}>
         <EuiAccordion
-          id="Compliance"
+          id='Compliance'
           buttonContent={
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h3>Compliance</h3>
             </EuiTitle>
           }
           initialIsOpen={true}
         >
-          <div className="flyout-row details-row">{renderCompliance(compliance)}</div>
+          <div className='flyout-row details-row'>
+            {renderCompliance(compliance)}
+          </div>
         </EuiAccordion>
       </EuiFlexItem>
     </EuiFlexGroup>

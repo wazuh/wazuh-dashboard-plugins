@@ -17,17 +17,16 @@ import { mount } from 'enzyme';
 import { ExportTableCsv } from './export-table-csv';
 
 jest.mock('../../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
 }));
 
 jest.mock('../../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: (options) => {},
+    handleError: options => {},
   }),
 }));
 

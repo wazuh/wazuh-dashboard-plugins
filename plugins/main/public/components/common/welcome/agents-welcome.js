@@ -18,7 +18,6 @@ import {
   EuiFlexGroup,
   EuiSpacer,
   EuiText,
-  EuiFlexGrid,
   EuiButtonEmpty,
   EuiPage,
   EuiPopover,
@@ -34,19 +33,13 @@ import {
   RequirementVis,
 } from './components';
 import { AgentInfo } from './agents-info';
-import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { getChrome, getCore } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withGuard,
-  withReduxProvider,
-} from '../hocs';
+import { withErrorBoundary, withGlobalBreadcrumb, withGuard } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
@@ -68,15 +61,15 @@ import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashb
 import { EventsCount } from './dashboard/events-count';
 import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const AgentsWelcome = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(({ agent }) => {
     return [
       {
         text: endpointSummary.breadcrumbLabel,
-        href: getCore().application.getUrlForApp(endpointSummary.id, {
+        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
           path: `#/agents-preview`,
         }),
       },
@@ -249,7 +242,9 @@ export const AgentsWelcome = compose(
                 >
                   <RedirectAppLinks application={getCore().application}>
                     <EuiButtonEmpty
-                      href={getCore().application.getUrlForApp(applicationId)}
+                      href={NavigationService.getInstance().getUrlForApp(
+                        applicationId,
+                      )}
                       style={{ cursor: 'pointer' }}
                     >
                       <span>
@@ -284,20 +279,18 @@ export const AgentsWelcome = compose(
               anchorPosition='downCenter'
             >
               <div>
-                <WzReduxProvider>
-                  <div style={{ maxWidth: 730 }}>
-                    <MenuAgent
-                      isAgent={this.props.agent}
-                      pinnedApplications={this.state.menuAgent}
-                      updatePinnedApplications={applications =>
-                        this.updatePinnedApplications(applications)
-                      }
-                      closePopover={() => {
-                        this.setState({ switchModule: false });
-                      }}
-                    ></MenuAgent>
-                  </div>
-                </WzReduxProvider>
+                <div style={{ maxWidth: 730 }}>
+                  <MenuAgent
+                    isAgent={this.props.agent}
+                    pinnedApplications={this.state.menuAgent}
+                    updatePinnedApplications={applications =>
+                      this.updatePinnedApplications(applications)
+                    }
+                    closePopover={() => {
+                      this.setState({ switchModule: false });
+                    }}
+                  ></MenuAgent>
+                </div>
               </div>
             </EuiPopover>
           </EuiFlexItem>
@@ -339,20 +332,18 @@ export const AgentsWelcome = compose(
                     anchorPosition='downCenter'
                   >
                     <div>
-                      <WzReduxProvider>
-                        <div style={{ maxWidth: 730 }}>
-                          <MenuAgent
-                            isAgent={this.props.agent}
-                            pinnedApplications={this.state.menuAgent}
-                            updatePinnedApplications={applications =>
-                              this.updatePinnedApplications(applications)
-                            }
-                            closePopover={() => {
-                              this.setState({ switchModule: false });
-                            }}
-                          ></MenuAgent>
-                        </div>
-                      </WzReduxProvider>
+                      <div style={{ maxWidth: 730 }}>
+                        <MenuAgent
+                          isAgent={this.props.agent}
+                          pinnedApplications={this.state.menuAgent}
+                          updatePinnedApplications={applications =>
+                            this.updatePinnedApplications(applications)
+                          }
+                          closePopover={() => {
+                            this.setState({ switchModule: false });
+                          }}
+                        ></MenuAgent>
+                      </div>
                     </div>
                   </EuiPopover>
                 </EuiFlexItem>
@@ -423,32 +414,30 @@ export const AgentsWelcome = compose(
     renderMitrePanel() {
       return (
         <Fragment>
-          <EuiPanel paddingSize='s' height={{ height: 300 }}>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <h2 className='embPanel__title wz-headline-title'>
-                    <EuiText size='xs'>
-                      <h2>MITRE ATT&CK</h2>
-                    </EuiText>
-                  </h2>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
-                  <EuiToolTip position='top' content='Open MITRE ATT&CK'>
-                    <RedirectAppLinks application={getCore().application}>
-                      <EuiButtonIcon
-                        iconType='popout'
-                        color='primary'
-                        href={`${getCore().application.getUrlForApp(
-                          mitreAttack.id,
-                        )}`}
-                        aria-label='Open MITRE ATT&CK'
-                      />
-                    </RedirectAppLinks>
-                  </EuiToolTip>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
+          <EuiPanel paddingSize='m' height={{ height: 300 }}>
+            <EuiFlexGroup gutterSize='s'>
+              <EuiFlexItem>
+                <h2 className='embPanel__title wz-headline-title'>
+                  <EuiText size='xs'>
+                    <h2>MITRE ATT&CK</h2>
+                  </EuiText>
+                </h2>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
+                <EuiToolTip position='top' content='Open MITRE ATT&CK'>
+                  <RedirectAppLinks application={getCore().application}>
+                    <EuiButtonIcon
+                      iconType='popout'
+                      color='primary'
+                      href={`${NavigationService.getInstance().getUrlForApp(
+                        mitreAttack.id,
+                      )}`}
+                      aria-label='Open MITRE ATT&CK'
+                    />
+                  </RedirectAppLinks>
+                </EuiToolTip>
+              </EuiFlexItem>
+            </EuiFlexGroup>
             <EuiSpacer size='m' />
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -528,14 +517,14 @@ export const AgentsWelcome = compose(
                   </EuiFlexGroup>
                   {(this.state.widthWindow < 1150 && (
                     <Fragment>
-                      <EuiFlexGrid columns={2}>
+                      <EuiFlexGroup wrap>
                         <EuiFlexItem
                           key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
                         >
                           {this.renderMitrePanel()}
                         </EuiFlexItem>
                         {this.renderCompliancePanel()}
-                      </EuiFlexGrid>
+                      </EuiFlexGroup>
                       <EuiSpacer size='m' />
                       <EuiFlexGroup>
                         <FimEventsTable agent={this.props.agent} />
@@ -557,7 +546,7 @@ export const AgentsWelcome = compose(
                     </Fragment>
                   )) || (
                     <Fragment>
-                      <EuiFlexGrid columns={2}>
+                      <EuiFlexGroup>
                         <EuiFlexItem>
                           <EuiFlexGroup>
                             <EuiFlexItem
@@ -569,7 +558,7 @@ export const AgentsWelcome = compose(
                           </EuiFlexGroup>
                         </EuiFlexItem>
                         <FimEventsTable agent={this.props.agent} />
-                      </EuiFlexGrid>
+                      </EuiFlexGroup>
                       <EuiSpacer size='l' />
                       <EuiFlexGroup>
                         <EuiFlexItem

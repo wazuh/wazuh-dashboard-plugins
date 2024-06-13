@@ -38,6 +38,7 @@ import {
 } from '../../common/actions-buttons';
 
 import apiSuggestsItems from './ruleset-suggestions';
+import { useRouterSearch } from '../../../../../../components/common/hooks';
 
 const searchBarWQLOptions = {
   searchTermFields: [
@@ -161,16 +162,17 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
   const [filters, setFilters] = useState([]);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
+  const search = useRouterSearch();
 
   const [tableFootprint, setTableFootprint] = useState(0);
 
   const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
 
   useEffect(() => {
-    const regex = new RegExp('redirectRule=' + '[^&]*');
-    const match = window.location.href.match(regex);
-    if (match && match[0]) {
-      setCurrentItem(parseInt(match[0].split('=')[1]));
+    if (search.redirectRule) {
+      // TODO: the view to display the specific group should be managed through the routing based on
+      // the URL instead of a component state. This lets refreshing the page and display the same view
+      setCurrentItem(parseInt(search.redirectRule));
       setIsFlyoutVisible(true);
     }
   }, []);

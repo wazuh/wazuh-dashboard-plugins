@@ -15,9 +15,10 @@ import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 import IApiResponse from './interfaces/api-response.interface';
-import { getHttp, getWzCurrentAppID } from '../kibana-services';
+import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
+import NavigationService from './navigation-service';
 
 export class WzRequest {
   static wazuhConfig: any;
@@ -92,10 +93,12 @@ export class WzRequest {
           } catch (error) {
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
-            if (!window.location.hash.includes('#/settings')) {
-              window.location.href = getHttp().basePath.prepend(
-                `/app/${getWzCurrentAppID()}#/health-check`,
-              );
+            if (
+              !NavigationService.getInstance()
+                .getPathname()
+                .startsWith('/settings')
+            ) {
+              NavigationService.getInstance().navigate('/health-check');
             }
             throw new Error(error);
           }

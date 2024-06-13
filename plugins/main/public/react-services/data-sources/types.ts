@@ -1,3 +1,3 @@
 export interface IDataSourcesFilterManager {
-  getFilters(searchBarFilters: any[], indexPatternTitle: string): any[];
+  getFilters(searchBarFilters: any[], indexPatternId: string): any[];
 }

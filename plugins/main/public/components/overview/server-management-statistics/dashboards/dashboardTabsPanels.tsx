@@ -133,7 +133,7 @@ export const DashboardTabsPanels = ({
     },
   };
   return (
-    <I18nProvider>
+    <>
       {isDataSourceLoading && !dataSource ? (
         <LoadingSpinner />
       ) : (
@@ -194,6 +194,6 @@ export const DashboardTabsPanels = ({
           )}
         </>
       ) : null}
-    </I18nProvider>
+    </>
   );
 };

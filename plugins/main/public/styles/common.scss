@@ -1818,14 +1818,6 @@ iframe.width-changed {
   z-index: 9999;
 }
 
-/* OSD Data grid full screen with dock navigation left sidebar */
-
-.dataGridDockedNav {
-  &.euiDataGrid--fullScreen {
-    left: 320px;
-  }
-}
-
 .wz-app {
   .euiPage {
     background-color: transparent;

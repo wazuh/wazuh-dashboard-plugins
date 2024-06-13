@@ -17,17 +17,16 @@ import { mount } from 'enzyme';
 import { TableWithSearchBar } from './table-with-search-bar';
 
 jest.mock('../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: (options) => {},
+    handleError: options => {},
   }),
 }));
 
@@ -35,7 +34,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 const columns = [
@@ -64,8 +63,8 @@ const columns = [
 ];
 
 const searchBarWQLOptions = {
-  searchTermFields: []
-}
+  searchTermFields: [],
+};
 
 const tableProps = {
   onSearch: () => {},
@@ -87,7 +86,7 @@ const tableProps = {
         return [];
       },
     },
-  }
+  },
 };
 
 describe('Table With Search Bar component', () => {

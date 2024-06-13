@@ -10,23 +10,32 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from "react";
-import { useUserPermissions, useUserPermissionsRequirements, useUserPermissionsPrivate } from '../hooks/useUserPermissions';
+import React from 'react';
+import {
+  useUserPermissions,
+  useUserPermissionsRequirements,
+} from '../hooks/useUserPermissions';
 
 // This HOC passes permissionsValidation to wrapped component
 export const withUserPermissions = WrappedComponent => props => {
   const userPermissions = useUserPermissions();
-  return <WrappedComponent {...props} userPermissions={userPermissions}/>;
-}
+  return <WrappedComponent {...props} userPermissions={userPermissions} />;
+};
 
 // This HOC hides the wrapped component if user has not permissions
-export const withUserPermissionsRequirements = requiredUserPermissions => WrappedComponent => props => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsRequirements(typeof requiredUserPermissions === 'function' ? requiredUserPermissions(props) : requiredUserPermissions);
-  return <WrappedComponent {...props} userPermissionsRequirements={userPermissionsValidation} userPermissions={userPermissions}/>;
-}
-
-// This HOC redirects to redirectURL if user has not permissions
-export const withUserPermissionsPrivate = (requiredUserPermissions, redirectURL) => WrappedComponent => props => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsPrivate(requiredUserPermissions, redirectURL);
-  return userPermissionsValidation ? <WrappedComponent {...props} userPermissionsValidation={userPermissionsValidation} userPermissions={userPermissions}/> : null;
-}
+export const withUserPermissionsRequirements =
+  requiredUserPermissions => WrappedComponent => props => {
+    const [userPermissionsValidation, userPermissions] =
+      useUserPermissionsRequirements(
+        typeof requiredUserPermissions === 'function'
+          ? requiredUserPermissions(props)
+          : requiredUserPermissions,
+      );
+    return (
+      <WrappedComponent
+        {...props}
+        userPermissionsRequirements={userPermissionsValidation}
+        userPermissions={userPermissions}
+      />
+    );
+  };

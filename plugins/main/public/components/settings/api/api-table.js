@@ -34,7 +34,7 @@ import {
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { AppState } from '../../../react-services/app-state';
-import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
+import { withErrorBoundary } from '../../common/hocs';
 import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
@@ -57,10 +57,7 @@ import {
 } from '../../../react-services';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 
-export const ApiTable = compose(
-  withErrorBoundary,
-  withReduxProvider,
-)(
+export const ApiTable = compose(withErrorBoundary)(
   class ApiTable extends Component {
     constructor(props) {
       super(props);

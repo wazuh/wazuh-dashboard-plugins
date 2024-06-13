@@ -66,6 +66,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
+  const AlertsRepository = new AlertsDataSourceRepository();
+
   const {
     dataSource,
     filters,
@@ -74,7 +76,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
+    repository: AlertsRepository, // this makes only works with alerts index pattern
     DataSource,
   });
 
@@ -206,7 +208,13 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         {!isDataSourceLoading && results?.hits?.total === 0 ? (
           <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
         ) : null}
-        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+        <div
+          className={
+            !isDataSourceLoading && dataSource && results?.hits?.total > 0
+              ? ''
+              : 'wz-no-display'
+          }
+        >
           <EuiPanel
             paddingSize='s'
             hasShadow={false}
@@ -224,7 +232,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   <EuiPanel>
                     <DashboardByRenderer
                       input={histogramChartInput(
-                        dataSource?.title,
+                        AlertsRepository.getStoreIndexPatternId(),
                         fetchFilters,
                         query,
                         dateRangeFrom,
@@ -234,7 +242,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   </EuiPanel>
                 </EuiPanel>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} className='discoverDataGrid'>
+              <EuiFlexItem>
                 <EuiDataGrid
                   {...dataGridProps}
                   className={sideNavDocked ? 'dataGridDockedNav' : ''}
@@ -242,7 +250,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     additionalControls: (
                       <>
                         <DiscoverDataGridAdditionalControls
-                          totalHits={results.hits.total}
+                          totalHits={results?.hits?.total || 0}
                           isExporting={isExporting}
                           onClickExportResults={onClickExportResults}
                           maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
@@ -254,26 +262,26 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiPanel>
-        ) : null}
-        {inspectedHit && (
-          <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-            <EuiFlyoutHeader>
-              <EuiTitle>
-                <h2>Document Details</h2>
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody>
-              <EuiFlexGroup direction='column'>
-                <EuiFlexItem>
-                  <DocumentViewTableAndJson
-                    document={inspectedHit}
-                    indexPattern={indexPattern}
-                  />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlyoutBody>
-          </EuiFlyout>
-        )}
+          {inspectedHit && (
+            <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+              <EuiFlyoutHeader>
+                <EuiTitle>
+                  <h2>Document Details</h2>
+                </EuiTitle>
+              </EuiFlyoutHeader>
+              <EuiFlyoutBody>
+                <EuiFlexGroup direction='column'>
+                  <EuiFlexItem>
+                    <DocumentViewTableAndJson
+                      document={inspectedHit}
+                      indexPattern={indexPattern}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlyoutBody>
+            </EuiFlyout>
+          )}
+        </div>
       </EuiPageTemplate>
     </IntlProvider>
   );

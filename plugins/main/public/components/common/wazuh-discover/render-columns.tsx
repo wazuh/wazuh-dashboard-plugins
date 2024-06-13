@@ -4,12 +4,13 @@ import { tDataGridRenderColumn } from '../data-grid';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { endpointSummary, rules } from '../../../utils/applications';
-import { AppNavigate, formatUIDate } from '../../../react-services';
+import { formatUIDate } from '../../../react-services';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
 const navigateTo = (ev, section, params) => {
-  AppNavigate.navigateToModule(ev, section, params);
+  NavigationService.getInstance().navigateToModule(ev, section, params);
 };
 
 const renderMitreTechnique = (technique: string) => (
@@ -84,9 +85,5 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
       ) : (
         <div>{renderMitreTechnique(value)}</div>
       ),
-  },
-  {
-    id: 'timestamp',
-    render: value => formatUIDate(value),
   },
 ];

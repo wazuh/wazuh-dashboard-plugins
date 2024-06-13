@@ -25,10 +25,10 @@ import {
   agentStatusLabelByAgentStatus,
   agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
-import { getCore } from '../../../kibana-services';
 import { endpointSummary } from '../../../utils/applications';
 import { LastAlertsStat } from './last-alerts-stat';
 import { VisualizationBasic } from '../../../components/common/charts/visualizations/basic';
+import NavigationService from '../../../react-services/navigation-service';
 import './stats.scss';
 export const Stats = withErrorBoundary(
   class Stats extends Component {
@@ -64,7 +64,7 @@ export const Stats = withErrorBoundary(
       } else if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
-      getCore().application.navigateToApp(endpointSummary.id, {
+      NavigationService.getInstance().navigateToApp(endpointSummary.id, {
         path: `#${endpointSummary.redirectTo()}`,
       });
     }

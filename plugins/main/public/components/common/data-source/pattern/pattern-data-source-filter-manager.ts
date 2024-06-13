@@ -1,3 +1,4 @@
+import rison from 'rison-node';
 import store from '../../../../redux/store';
 import { AppState } from '../../../../react-services/app-state';
 import { getDataPlugin } from '../../../../kibana-services';
@@ -19,10 +20,10 @@ const AGENT_ID_KEY = 'agent.id';
 
 /**
  * Get the filter that excludes the data related to Wazuh servers
- * @param indexPatternTitle Index pattern title
+ * @param indexPatternId Index pattern id
  * @returns
  */
-export function getFilterExcludeManager(indexPatternTitle: string) {
+export function getFilterExcludeManager(indexPatternId: string) {
   return {
     meta: {
       alias: null,
@@ -31,7 +32,7 @@ export function getFilterExcludeManager(indexPatternTitle: string) {
       negate: true,
       params: { query: MANAGER_AGENT_ID },
       type: 'phrase',
-      index: indexPatternTitle,
+      index: indexPatternId,
       controlledBy: DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
     },
     query: { match_phrase: { [AGENT_ID_KEY]: MANAGER_AGENT_ID } },
@@ -42,17 +43,17 @@ export function getFilterExcludeManager(indexPatternTitle: string) {
 /**
  * Get the filter that restrict the search to the allowed agents
  * @param agentsIds
- * @param indexPatternTitle
+ * @param indexPatternId
  * @returns
  */
 export function getFilterAllowedAgents(
   agentsIds: string[],
-  indexPatternTitle: string,
+  indexPatternId: string,
 ) {
   const field = AGENT_ID_KEY;
   return {
     meta: {
-      index: indexPatternTitle,
+      index: indexPatternId,
       type: 'phrases',
       key: field,
       value: agentsIds.toString(),
@@ -80,13 +81,16 @@ export function getFilterAllowedAgents(
   };
 }
 
-type tFilterType =
-  | 'is'
-  | 'is not'
-  | 'exists'
-  | 'does not exist'
-  | 'is one of'
-  | 'is not one of';
+export enum FILTER_OPERATOR {
+  IS = 'is',
+  IS_NOT = 'is not',
+  EXISTS = 'exists',
+  DOES_NOT_EXISTS = 'does not exists',
+  IS_ONE_OF = 'is one of',
+  IS_NOT_ONE_OF = 'is not one of',
+  IS_BETWEEN = 'is between',
+  IS_NOT_BETWEEN = 'is not between',
+}
 
 export class PatternDataSourceFilterManager
   implements tDataSourceFilterManager
@@ -297,7 +301,7 @@ export class PatternDataSourceFilterManager
    * Return the filter when the cluster or manager are enabled
    */
   static getClusterManagerFilters(
-    indexPatternTitle: string,
+    indexPatternId: string,
     controlledByValue: string,
     key?: string,
   ): tFilter[] {
@@ -313,7 +317,7 @@ export class PatternDataSourceFilterManager
     managerFilter.meta = {
       ...managerFilter.meta,
       controlledBy: controlledByValue,
-      index: indexPatternTitle,
+      index: indexPatternId,
     };
     //@ts-ignore
     managerFilter.$state = {
@@ -326,7 +330,7 @@ export class PatternDataSourceFilterManager
   /**
    * Returns the filter when the an agent is pinned (saved in the session storage or redux store)
    */
-  static getPinnedAgentFilter(indexPatternTitle: string): tFilter[] {
+  static getPinnedAgentFilter(indexPatternId: string): tFilter[] {
     const pinnedAgentManager = new PinnedAgentManager();
     const isPinnedAgent = pinnedAgentManager.isPinnedAgent();
     if (!isPinnedAgent) {
@@ -342,7 +346,7 @@ export class PatternDataSourceFilterManager
           negate: false,
           params: { query: currentPinnedAgent.id },
           type: 'phrase',
-          index: indexPatternTitle,
+          index: indexPatternId,
           controlledBy: PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
         },
         query: {
@@ -363,10 +367,10 @@ export class PatternDataSourceFilterManager
   /**
    * Return the filter to exclude the data related to servers (managers) due to the setting hideManagerAlerts is enabled
    */
-  static getExcludeManagerFilter(indexPatternTitle: string): tFilter[] {
+  static getExcludeManagerFilter(indexPatternId: string): tFilter[] {
     if (store.getState().appConfig?.data?.hideManagerAlerts) {
       let excludeManagerFilter = getFilterExcludeManager(
-        indexPatternTitle,
+        indexPatternId,
       ) as tFilter;
       return [excludeManagerFilter];
     }
@@ -377,13 +381,13 @@ export class PatternDataSourceFilterManager
      * Return the allowed agents related to the user permissions to read data from agents in the
       API server
      */
-  static getAllowAgentsFilter(indexPatternTitle: string): tFilter[] {
+  static getAllowAgentsFilter(indexPatternId: string): tFilter[] {
     const allowedAgents =
       store.getState().appStateReducers?.allowedAgents || [];
     if (allowedAgents.length > 0) {
       const allowAgentsFilter = getFilterAllowedAgents(
         allowedAgents,
-        indexPatternTitle,
+        indexPatternId,
       ) as tFilter;
       return [allowAgentsFilter];
     }
@@ -394,134 +398,138 @@ export class PatternDataSourceFilterManager
   /********************** FILTERS FACTORY ***************************/
   /******************************************************************/
 
+  static createFilter(
+    type: FILTER_OPERATOR,
+    key: string,
+    value: string | [],
+    indexPatternId: string,
+    controlledBy?: string,
+  ) {
+    if (
+      type === FILTER_OPERATOR.IS_ONE_OF ||
+      type === FILTER_OPERATOR.IS_NOT_ONE_OF
+    ) {
+      if (!Array.isArray(value)) {
+        throw new Error('The value must be an array');
+      }
+    }
+
+    if (type === FILTER_OPERATOR.IS_BETWEEN) {
+      if (
+        !Array.isArray(value) &&
+        value.length <= 2 &&
+        value.length > 0 &&
+        value.some(v => isNaN(Number(v)))
+      ) {
+        throw new Error('The value must be an array with one or two numbers');
+      }
+    }
+
+    switch (type) {
+      case FILTER_OPERATOR.IS:
+      case FILTER_OPERATOR.IS_NOT:
+        return PatternDataSourceFilterManager.generateFilter(
+          key,
+          value,
+          indexPatternId,
+          {
+            query: {
+              match_phrase: {
+                [key]: {
+                  query: value,
+                },
+              },
+            },
+          },
+          controlledBy,
+          type === FILTER_OPERATOR.IS_NOT,
+        );
+      case FILTER_OPERATOR.EXISTS:
+      case FILTER_OPERATOR.DOES_NOT_EXISTS:
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            value: 'exists',
+            negate: type === FILTER_OPERATOR.DOES_NOT_EXISTS,
+            type: 'exists',
+            index: indexPatternId,
+            controlledBy,
+          },
+          exists: { field: key },
+          $state: { store: 'appState' },
+        };
+      case FILTER_OPERATOR.IS_ONE_OF:
+      case FILTER_OPERATOR.IS_NOT_ONE_OF:
+        return PatternDataSourceFilterManager.generateFilter(
+          key,
+          value,
+          indexPatternId,
+          {
+            query: {
+              bool: {
+                minimum_should_match: 1,
+                should: value.map((v: string) => ({
+                  match_phrase: {
+                    [key]: {
+                      query: v,
+                    },
+                  },
+                })),
+              },
+            },
+          },
+          controlledBy,
+          type === FILTER_OPERATOR.IS_NOT_ONE_OF,
+        );
+      case FILTER_OPERATOR.IS_BETWEEN:
+      case FILTER_OPERATOR.IS_NOT_BETWEEN:
+        return {
+          meta: {
+            alias: null,
+            disabled: false,
+            key: key,
+            params: {
+              gte: value[0],
+              lte: value[1] || NaN,
+            },
+            negate: type === FILTER_OPERATOR.IS_NOT_BETWEEN,
+            type: 'range',
+            index: indexPatternId,
+            controlledBy,
+          },
+          range: {
+            [key]: {
+              gte: value[0],
+              lte: value[1] || NaN,
+            },
+          },
+          $state: { store: 'appState' },
+        };
+      default:
+        throw new Error('Invalid filter type');
+    }
+  }
+
   /**
-   * Returns a filter with the field and value received
-   * @param field
-   * @param value
+   * Returns a filter object depending on the type of filter received
+   *
    * @returns
    */
   createFilter(
-    type: tFilterType,
+    type: FILTER_OPERATOR,
     key: string,
     value: string | [],
     controlledBy?: string,
   ): tFilter {
-    switch (type) {
-      case 'is':
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          {
-            query: {
-              match_phrase: {
-                [key]: {
-                  query: value,
-                },
-              },
-            },
-          },
-          controlledBy,
-        );
-      case 'is not':
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          {
-            query: {
-              match_phrase: {
-                [key]: {
-                  query: value,
-                },
-              },
-            },
-          },
-          controlledBy,
-          true,
-        );
-      case 'exists':
-        return {
-          meta: {
-            alias: null,
-            disabled: false,
-            key: key,
-            value: 'exists',
-            negate: false,
-            type: 'exists',
-            index: this.dataSource.id,
-            controlledBy,
-          },
-          exists: { field: key },
-          $state: { store: 'appState' },
-        };
-      case 'does not exist':
-        return {
-          meta: {
-            alias: null,
-            disabled: false,
-            key: key,
-            value: 'exists',
-            negate: true,
-            type: 'exists',
-            index: this.dataSource.id,
-            controlledBy,
-          },
-          exists: { field: key },
-          $state: { store: 'appState' },
-        };
-      case 'is one of':
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          {
-            query: {
-              bool: {
-                minimum_should_match: 1,
-                should: value.map((v: string) => ({
-                  match_phrase: {
-                    [key]: {
-                      query: v,
-                    },
-                  },
-                })),
-              },
-            },
-          },
-          controlledBy,
-        );
-      case 'is not one of':
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          {
-            query: {
-              bool: {
-                minimum_should_match: 1,
-                should: value.map((v: string) => ({
-                  match_phrase: {
-                    [key]: {
-                      query: v,
-                    },
-                  },
-                })),
-              },
-            },
-          },
-          controlledBy,
-          true,
-        );
-      default:
-        return this.generateFilter(
-          key,
-          value,
-          this.dataSource.id,
-          undefined,
-          controlledBy,
-        );
-    }
+    return PatternDataSourceFilterManager.createFilter(
+      type,
+      key,
+      value,
+      this.dataSource.id,
+      controlledBy,
+    );
   }
 
   /**
@@ -529,12 +537,12 @@ export class PatternDataSourceFilterManager
    *
    * @param field
    * @param value
-   * @param indexPatternTitle
+   * @param indexPatternId
    */
-  private generateFilter(
+  static generateFilter(
     field: string,
     value: string | string[],
-    indexPatternTitle: string,
+    indexPatternId: string,
     query: tFilter['query'] | tFilter['exists'],
     controlledBy?: string,
     negate: boolean = false,
@@ -548,11 +556,23 @@ export class PatternDataSourceFilterManager
         params: value,
         negate,
         type: 'phrases',
-        index: indexPatternTitle,
+        index: indexPatternId,
         controlledBy,
       },
       ...query,
       $state: { store: 'appState' },
     };
+  }
+
+  /**
+   * Transform the filter format to the format used in the URL
+   * Receives a filter object and returns a filter object with the format used in the URL using rison-node
+   */
+
+  static filtersToURLFormat(filters: tFilter[]) {
+    const filterCopy = filters || [];
+    return rison.encode({
+      filters: filterCopy,
+    });
   }
 }

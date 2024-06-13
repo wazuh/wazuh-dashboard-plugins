@@ -24,7 +24,6 @@ import {
   EuiSpacer,
   EuiProgress,
 } from '@elastic/eui';
-
 import { clusterReq, clusterNodes } from '../configuration/utils/wz-fetch';
 import { compose } from 'redux';
 import {
@@ -43,6 +42,7 @@ import { appSettings, statistics } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
 import { connect } from 'react-redux';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -176,9 +176,12 @@ export class WzStatisticsOverview extends Component {
               <EuiFlexItem grow={false}>
                 <RedirectAppLinks application={getCore().application}>
                   <EuiButtonEmpty
-                    href={getCore().application.getUrlForApp(appSettings.id, {
-                      path: '#/settings?tab=configuration&category=Task:Statistics',
-                    })}
+                    href={NavigationService.getInstance().getUrlForApp(
+                      appSettings.id,
+                      {
+                        path: '#/settings?tab=configuration&category=Task:Statistics',
+                      },
+                    )}
                     iconType='gear'
                     iconSide='left'
                   >

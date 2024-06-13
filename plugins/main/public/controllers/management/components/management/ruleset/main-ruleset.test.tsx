@@ -13,30 +13,31 @@
  */
 
 import React from 'react';
-import { mount } from 'enzyme';
 import WzRuleset from './main-ruleset';
+import { renderWithProviders } from '../../../../../redux/render-with-redux-provider';
 
 jest.mock('../../../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
   getUiSettings: () => ({
     get: (setting: string): any => {
-      if(setting === 'theme:darkMode'){
-        return false
+      if (setting === 'theme:darkMode') {
+        return false;
       }
-    }
-  })
+    },
+  }),
 }));
 
 describe('Ruleset component', () => {
   it('renders correctly to match the snapshot', () => {
     const logtestProps = '';
     const clusterStatus = '';
-    const wrapper = mount(<WzRuleset logtestProps={logtestProps} clusterStatus={clusterStatus} />);
-    expect(wrapper).toMatchSnapshot();
+    const { container } = renderWithProviders(
+      <WzRuleset logtestProps={logtestProps} clusterStatus={clusterStatus} />,
+    );
+    expect(container).toMatchSnapshot();
   });
 });

@@ -2,9 +2,9 @@ import React from 'react';
 import { EuiToolTip } from '@elastic/eui';
 import { endpointSummary } from '../../../../utils/applications';
 import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
-import { getCore } from '../../../../kibana-services';
 import { WzElementPermissions } from '../../../common/permissions/element';
 import { Agent } from '../../types';
+import NavigationService from '../../../../react-services/navigation-service';
 
 export const agentsTableActions = (
   allowEditGroups: boolean,
@@ -35,7 +35,7 @@ export const agentsTableActions = (
     color: 'primary',
     enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     onClick: agent =>
-      getCore().application.navigateToApp(endpointSummary.id, {
+      NavigationService.getInstance().navigateToApp(endpointSummary.id, {
         path: `#/agents?tab=welcome&agent=${agent.id}`,
       }),
   },
@@ -57,7 +57,7 @@ export const agentsTableActions = (
     icon: 'wrench',
     type: 'icon',
     onClick: agent =>
-      getCore().application.navigateToApp(endpointSummary.id, {
+      NavigationService.getInstance().navigateToApp(endpointSummary.id, {
         path: `#/agents?tab=configuration&agent=${agent.id}`,
       }),
     enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,

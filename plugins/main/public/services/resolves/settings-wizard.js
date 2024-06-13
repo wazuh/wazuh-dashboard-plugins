@@ -12,75 +12,16 @@
 
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
-import { WazuhConfig } from '../../react-services/wazuh-config';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { ErrorHandler } from '../../react-services/error-handler';
+import { GenericRequest } from '../../react-services';
+import NavigationService from '../../react-services/navigation-service';
+import { getWzCurrentAppID } from '../../kibana-services';
+import { serverApis } from '../../utils/applications';
 
-export function settingsWizard(
-  $location,
-  $q,
-  $window,
-  testAPI,
-  appState,
-  genericReq,
-  errorHandler,
-  wzMisc,
-  disableErrors = false,
-) {
+export function settingsWizard(_, wzMisc, disableErrors = false) {
   try {
-    const wazuhConfig = new WazuhConfig();
-    const deferred = $q.defer();
-    const checkResponse = data => {
-      let fromWazuhHosts = false;
-      if (parseInt(data.data.error) === 2) {
-        !disableErrors &&
-          ErrorHandler.handle('Please set up API credentials.', '', {
-            warning: true,
-          });
-      } else if (
-        JSON.stringify(data).includes('socket hang up') ||
-        ((data || {}).data || {}).apiIsDown ||
-        (((data || {}).data || {}).data || {}).apiIsDown
-      ) {
-        wzMisc.setApiIsDown(true);
-      } else {
-        fromWazuhHosts = true;
-        wzMisc.setBlankScr(ErrorHandler.handle(data));
-        AppState.removeCurrentAPI();
-      }
-
-      if (!fromWazuhHosts) {
-        wzMisc.setWizard(true);
-        if (!$location.path().includes('/settings')) {
-          $location.search('_a', null);
-          $location.search('tab', 'api');
-          $location.path('/settings');
-        }
-      } else {
-        if (
-          parseInt(((data || {}).data || {}).statusCode) === 500 &&
-          parseInt(((data || {}).data || {}).error) === 7 &&
-          ((data || {}).data || {}).message === '401 Unauthorized'
-        ) {
-          !disableErrors &&
-            ErrorHandler.handle(
-              'Wrong API credentials, please add a new API and/or modify the existing one',
-            );
-          if (!$location.path().includes('/settings')) {
-            $location.search('_a', null);
-            $location.search('tab', 'api');
-            $location.path('/settings');
-          }
-        } else {
-          $location.path('/blank-screen');
-        }
-      }
-
-      deferred.resolve();
-    };
-
     const callCheckStored = async () => {
-      const config = wazuhConfig.getConfig();
       let currentApi = false;
 
       try {
@@ -88,7 +29,6 @@ export function settingsWizard(
       } catch (error) {
         throw Error('Error parsing JSON (settingsWizards.callCheckStored 1)');
       }
-      deferred.resolve();
     };
 
     const setUpCredentials = (msg, redirect = false) => {
@@ -98,14 +38,15 @@ export function settingsWizard(
       if (redirect) {
         AppState.setCurrentAPI(redirect);
       } else if (
-        !$location.path().includes('/settings') &&
-        !$location.path().includes('/blank-screen')
+        !NavigationService.getInstance().getPathname().includes('/settings') &&
+        !NavigationService.getInstance().getPathname().includes('/blank-screen')
       ) {
-        $location.search('_a', null);
-        $location.search('tab', 'api');
-        $location.path('/settings');
+        if (getWzCurrentAppID() === serverApis.id) {
+          NavigationService.getInstance().navigate('/settings?tab=api');
+        } else {
+          NavigationService.getInstance().navigateToApp(serverApis.id);
+        }
       }
-      return deferred.resolve();
     };
 
     // Iterates them in order to set one as default
@@ -146,53 +87,60 @@ export function settingsWizard(
       }
     };
 
-    const currentParams = $location.search();
+    AppState.setWzMenu();
+    const currentParams = new URLSearchParams(
+      NavigationService.getInstance().getSearch(),
+    );
     const targetedAgent =
-      currentParams && (currentParams.agent || currentParams.agent === '000');
+      currentParams &&
+      (currentParams.get('agent') || currentParams.get('agent') === '000');
     const targetedRule =
-      currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
-    if (
-      !targetedAgent &&
-      !targetedRule &&
-      !disableErrors &&
-      healthCheck($window)
-    ) {
-      $location.path('/health-check');
-      deferred.resolve();
+      currentParams &&
+      currentParams.get('tab') === 'ruleset' &&
+      currentParams.get('ruleid');
+    if (!targetedAgent && !targetedRule && !disableErrors && healthCheck()) {
+      NavigationService.getInstance().navigate({
+        pathname: '/health-check',
+        state: { prevLocation: NavigationService.getInstance().getLocation() },
+      });
     } else {
       // There's no cookie for current API
       const currentApi = AppState.getCurrentAPI();
       if (!currentApi) {
-        genericReq
-          .request('GET', '/hosts/apis')
+        return GenericRequest.request('GET', '/hosts/apis')
           .then(async data => {
             if (data.data.length > 0) {
               // Try to set some API entry as default
               const defaultApi = await tryToSetDefault(data.data);
-              setUpCredentials(
-                'Default API has been updated.',
-                defaultApi,
-              );
-              $location.path('health-check');
+              setUpCredentials('Default API has been updated.', defaultApi);
+              NavigationService.getInstance().navigate({
+                pathname: '/health-check',
+                state: {
+                  prevLocation: NavigationService.getInstance().getLocation(),
+                },
+              });
             } else {
               setUpCredentials('Please set up API credentials.');
             }
-            deferred.resolve();
           })
           .catch(error => {
             !disableErrors && ErrorHandler.handle(error);
             wzMisc.setWizard(true);
-            if (!$location.path().includes('/settings')) {
-              $location.search('_a', null);
-              $location.search('tab', 'api');
-              $location.path('/settings');
+            if (
+              !NavigationService.getInstance()
+                .getPathname()
+                .includes('/settings')
+            ) {
+              if (getWzCurrentAppID() === serverApis.id) {
+                NavigationService.getInstance().navigate('/settings?tab=api');
+              } else {
+                NavigationService.getInstance().navigateToApp(serverApis.id);
+              }
             }
-            deferred.resolve();
           });
       } else {
         const apiId = (JSON.parse(currentApi) || {}).id;
-        genericReq
-          .request('GET', '/hosts/apis')
+        return GenericRequest.request('GET', '/hosts/apis')
           .then(async data => {
             if (
               data.data.length > 0 &&
@@ -204,11 +152,13 @@ export function settingsWizard(
               if (data.data.length > 0) {
                 // Try to set some as default
                 const defaultApi = await tryToSetDefault(data.data);
-                setUpCredentials(
-                  'Default API has been updated.',
-                  defaultApi,
-                );
-                $location.path('health-check');
+                setUpCredentials('Default API has been updated.', defaultApi);
+                NavigationService.getInstance().navigate({
+                  pathname: '/health-check',
+                  state: {
+                    prevLocation: NavigationService.getInstance().getLocation(),
+                  },
+                });
               } else {
                 setUpCredentials('Please set up API credentials.', false);
               }
@@ -219,8 +169,6 @@ export function settingsWizard(
           });
       }
     }
-    AppState.setWzMenu();
-    return deferred.promise;
   } catch (error) {
     const options = {
       context: `${settingsWizard.name}`,

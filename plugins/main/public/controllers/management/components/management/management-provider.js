@@ -1,6 +1,18 @@
 import { compose } from 'redux';
-import { withErrorBoundary, withReduxProvider } from '../../../../components/common/hocs';
+import {
+  withErrorBoundary,
+  withRouteResolvers,
+} from '../../../../components/common/hocs';
 // Redux
 import WzManagementMain from '../management/management-main';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../../../services/resolves';
 
-export default compose(withErrorBoundary, withReduxProvider)(WzManagementMain);
+export default compose(
+  withErrorBoundary,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+)(WzManagementMain);

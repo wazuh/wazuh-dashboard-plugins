@@ -27,8 +27,8 @@ import { FormConfiguration } from '../../../../common/form/types';
 import { useSelector } from 'react-redux';
 import {
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb,
+  withRouteResolvers,
   withUserAuthorizationPrompt,
 } from '../../../../common/hocs';
 import GroupInput from '../../components/group-input/group-input';
@@ -36,12 +36,19 @@ import { OsCard } from '../../components/os-selector/os-card/os-card';
 import { validateAgentName } from '../../utils/validations';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
-import { getCore, getWazuhCorePlugin } from '../../../../../kibana-services';
+import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../../../../services/resolves';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
-  withReduxProvider,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([
     {
       text: endpointSummary.breadcrumbLabel,
@@ -185,7 +192,7 @@ export const RegisterAgent = compose(
                 <div className='register-agent-wizard-close'>
                   <EuiButtonEmpty
                     size='s'
-                    href={getCore().application.getUrlForApp(
+                    href={NavigationService.getInstance().getUrlForApp(
                       endpointSummary.id,
                       {
                         path: `#${endpointSummary.redirectTo()}`,
@@ -235,7 +242,7 @@ export const RegisterAgent = compose(
                       className='close-button'
                       fill
                       color='primary'
-                      href={getCore().application.getUrlForApp(
+                      href={NavigationService.getInstance().getUrlForApp(
                         endpointSummary.id,
                         {
                           path: `#${endpointSummary.redirectTo()}`,
