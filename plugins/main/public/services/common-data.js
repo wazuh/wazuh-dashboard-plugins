@@ -11,7 +11,6 @@
  */
 import { AppState } from '../react-services/app-state';
 import { GenericRequest } from '../react-services/generic-request';
-import { ModulesHelper } from '../components/common/modules/modules-helper';
 import rison from 'rison-node';
 import { VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from '../../common/constants';
 
@@ -195,8 +194,8 @@ export class CommonData {
 
       if (agent) filters.push(filterHandler.agentQuery(agent));
       filters.push(...this.addWazuhParamFilters());
-      const discoverScope = await ModulesHelper.getDiscoverScope();
-      discoverScope.loadFilters(filters, tab);
+      // const discoverScope = await ModulesHelper.getDiscoverScope();
+      // discoverScope.loadFilters(filters, tab);
     } catch (error) {
       throw new Error(
         'An error occurred while creating custom filters for visualizations',

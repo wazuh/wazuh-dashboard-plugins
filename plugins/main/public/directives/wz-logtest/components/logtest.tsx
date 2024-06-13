@@ -25,7 +25,7 @@ import {
 import { WzRequest } from '../../../react-services';
 import {
   withErrorBoundary,
-  withReduxProvider,
+  withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
 } from '../../../components/common/hocs';
 import { compose } from 'redux';
@@ -41,6 +41,7 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import _ from 'lodash';
+import { rulesetTest } from '../../../utils/applications';
 
 type LogstestProps = {
   onFlyout: boolean;
@@ -48,7 +49,6 @@ type LogstestProps = {
 
 export const Logtest = compose(
   withErrorBoundary,
-  withReduxProvider,
   withUserAuthorizationPrompt([{ action: 'logtest:run', resource: '*:*:*' }]),
 )((props: LogstestProps) => {
   const [events, setEvents] = useState([]);
@@ -348,3 +348,9 @@ export const Logtest = compose(
     </Fragment>
   );
 });
+
+export const LogtestWithBreadCrumb = withGlobalBreadcrumb(() => [
+  {
+    text: rulesetTest.breadcrumbLabel,
+  },
+])(Logtest);

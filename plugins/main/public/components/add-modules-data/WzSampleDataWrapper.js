@@ -26,7 +26,6 @@ import WzSampleData from './sample-data';
 import {
   withUserAuthorizationPrompt,
   withErrorBoundary,
-  withReduxProvider,
 } from '../../components/common/hocs';
 import { compose } from 'redux';
 
@@ -66,6 +65,5 @@ export class WzSampleDataProvider extends Component {
 
 export const WzSampleDataWrapper = compose(
   withErrorBoundary,
-  withReduxProvider,
   withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
 )(WzSampleDataProvider);

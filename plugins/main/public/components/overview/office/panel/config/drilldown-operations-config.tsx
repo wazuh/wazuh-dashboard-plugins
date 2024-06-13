@@ -12,8 +12,7 @@
  */
 
 import React from 'react';
-import { VisCard } from '../../../../common/modules/panel';
-import { EuiFlexItem, EuiPanel, EuiLink } from '@elastic/eui';
+import { EuiFlexItem, EuiLink } from '@elastic/eui';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
@@ -83,14 +82,8 @@ const getDashboardPanels = (
   };
 };
 
-export const drilldownOperationsConfig = (props) => {
-
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern
-  } = props;
+export const drilldownOperationsConfig = props => {
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } = props;
 
   return {
     rows: [
@@ -109,17 +102,18 @@ export const drilldownOperationsConfig = (props) => {
                 },
                 { id: 'rule.level', displayAsText: 'Level' },
                 {
-                  id: 'rule.id', render: value => (
+                  id: 'rule.id',
+                  render: value => (
                     <RedirectAppLinks application={getCore().application}>
                       <EuiLink
                         href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
                       >
                         {value}
-                      </EuiLink >
+                      </EuiLink>
                     </RedirectAppLinks>
                   ),
                 },
-              ]
+              ];
               return (
                 <div style={{ width: '100%' }}>
                   <DashboardByRenderer
@@ -144,7 +138,7 @@ export const drilldownOperationsConfig = (props) => {
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                   <EuiFlexItem>
                     <DrillDownDataGrid

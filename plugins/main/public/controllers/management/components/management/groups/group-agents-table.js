@@ -14,7 +14,7 @@ import { EuiCallOut, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
-import { getCore, getToasts } from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 import {
   updateLoadingStatus,
   updateFileContent,
@@ -32,7 +32,6 @@ import { WzButtonPermissionsModalConfirm } from '../../../../../components/commo
 import {
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
   UI_LOGGER_LEVELS,
-  UI_ORDER_AGENT_STATUS,
 } from '../../../../../../common/constants';
 import { get as getLodash } from 'lodash';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
@@ -40,6 +39,7 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
 import { AgentStatus } from '../../../../../components/agents/agent-status';
 import { WzRequest } from '../../../../../react-services';
 import { endpointSummary } from '../../../../../utils/applications';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -119,9 +119,12 @@ class WzGroupAgentsTable extends Component {
                 aria-label='Go to the agent'
                 iconType='eye'
                 onClick={async () => {
-                  getCore().application.navigateToApp(endpointSummary.id, {
-                    path: `#/agents?agent=${item.id}`,
-                  });
+                  NavigationService.getInstance().navigateToApp(
+                    endpointSummary.id,
+                    {
+                      path: `#/agents?agent=${item.id}`,
+                    },
+                  );
                 }}
                 color='primary'
               />

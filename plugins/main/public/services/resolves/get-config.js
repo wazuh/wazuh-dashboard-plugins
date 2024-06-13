@@ -11,13 +11,14 @@
  */
 
 import { getWazuhCorePlugin } from '../../kibana-services';
+import { GenericRequest } from '../../react-services';
 
-export async function getWzConfig($q, genericReq, wazuhConfig) {
+export async function getWzConfig(wazuhConfig) {
   try {
     const defaultConfig = await getWazuhCorePlugin().configuration.get();
 
     try {
-      const config = await genericReq.request(
+      const config = await GenericRequest.request(
         'GET',
         '/utils/configuration',
         {},
@@ -45,7 +46,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
       console.log('Error getting configuration, using default values.'); // eslint-disable-line
       console.log(error.message || error); // eslint-disable-line
     }
-    return $q.resolve(defaultConfig);
+    return defaultConfig;
   } catch (error) {
     console.error(error);
   }

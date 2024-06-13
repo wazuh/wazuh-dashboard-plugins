@@ -32,6 +32,7 @@ import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { fileIntegrityMonitoring } from '../../../../../utils/applications';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 export function FimEventsTable({ agent }) {
   return (
@@ -51,7 +52,7 @@ export function FimEventsTable({ agent }) {
                     iconType='popout'
                     color='primary'
                     onClick={() => navigateToFim(agent)}
-                    href={`${getCore().application.getUrlForApp(
+                    href={`${NavigationService.getInstance().getUrlForApp(
                       fileIntegrityMonitoring.id,
                     )}`}
                     aria-label='Open FIM'

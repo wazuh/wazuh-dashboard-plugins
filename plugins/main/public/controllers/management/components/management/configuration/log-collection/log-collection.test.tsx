@@ -7,7 +7,6 @@ import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 
 jest.mock('../../../../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getUiSettings: () => ({
     get: (uiSetting: string) => {
       if (uiSetting === 'theme:darkMode') {
@@ -34,7 +33,9 @@ jest.mock('../../../../../../react-services/common-services', () => {
 });
 
 // mocked hoc withWzConfig
-jest.mock('../util-hocs/wz-config', () => () => (Component) => (props) => <Component {...props} />);
+jest.mock('../util-hocs/wz-config', () => () => Component => props => (
+  <Component {...props} />
+));
 
 // Linux Agent mocked data
 const linuxCurrentConfigMocked = {
@@ -191,7 +192,7 @@ describe('Log Collection Section', () => {
             agent={linuxAgentMocked}
             currentConfig={linuxCurrentConfigMocked}
           />
-        </Provider>
+        </Provider>,
       );
 
       expect(getByRole('tab', { name: 'Logs' })).toBeInTheDocument();
@@ -207,7 +208,7 @@ describe('Log Collection Section', () => {
             agent={linuxAgentMocked}
             currentConfig={linuxCurrentConfigMocked}
           />
-        </Provider>
+        </Provider>,
       );
 
       fireEvent.click(getByText('Commands'));
@@ -215,8 +216,8 @@ describe('Log Collection Section', () => {
       // buttons on left sidebar, showing alias
       const localFilesWithAlias = linuxCurrentConfigMocked[
         'logcollector-localfile'
-      ].localfile.filter((item) => item.alias);
-      localFilesWithAlias.forEach((item) => {
+      ].localfile.filter(item => item.alias);
+      localFilesWithAlias.forEach(item => {
         getByRole('button', { name: new RegExp(item.alias || '', 'i') });
       });
     });
@@ -228,7 +229,7 @@ describe('Log Collection Section', () => {
             agent={linuxAgentMocked}
             currentConfig={linuxCurrentConfigMocked}
           />
-        </Provider>
+        </Provider>,
       );
 
       fireEvent.click(getByText('Commands'));
@@ -236,9 +237,11 @@ describe('Log Collection Section', () => {
       // check all sidebar buttons functionality and inputs showed
       const localFilesWithAlias = linuxCurrentConfigMocked[
         'logcollector-localfile'
-      ].localfile.filter((item) => item.alias);
-      localFilesWithAlias.forEach((item) => {
-        const commandItem = getByRole('button', { name: new RegExp(item.alias || '', 'i') });
+      ].localfile.filter(item => item.alias);
+      localFilesWithAlias.forEach(item => {
+        const commandItem = getByRole('button', {
+          name: new RegExp(item.alias || '', 'i'),
+        });
         fireEvent.click(commandItem);
         getByText(/log format/i);
         expect(getByTestId('log-format')).toHaveValue(item.logformat);
@@ -248,10 +251,12 @@ describe('Log Collection Section', () => {
         expect(getByTestId('command-alias')).toHaveValue(item.alias);
         getByText(/interval between command executions/i);
         expect(getByTestId('interval-between-command-executions')).toHaveValue(
-          `${item.frequency?.toString()}`
+          `${item.frequency?.toString()}`,
         );
         getByText(/redirect output to this socket/i);
-        expect(getByTestId('redirect-output-to-this-socket')).toHaveValue(`${item.target.pop()}`);
+        expect(getByTestId('redirect-output-to-this-socket')).toHaveValue(
+          `${item.target.pop()}`,
+        );
       });
     });
   });
@@ -264,7 +269,7 @@ describe('Log Collection Section', () => {
             agent={windowAgentMocked}
             currentConfig={windowsCurrentConfigMocked}
           />
-        </Provider>
+        </Provider>,
       );
 
       expect(getByRole('tab', { name: 'Logs' })).toBeInTheDocument();
@@ -280,7 +285,7 @@ describe('Log Collection Section', () => {
             agent={windowAgentMocked}
             currentConfig={windowsCurrentConfigMocked}
           />
-        </Provider>
+        </Provider>,
       );
 
       fireEvent.click(getByText('Windows Events'));
@@ -288,9 +293,11 @@ describe('Log Collection Section', () => {
       // buttons on left sidebar, showing alias
       const localFilesWithChannel = windowsCurrentConfigMocked[
         'logcollector-localfile'
-      ].localfile.filter((item) => item.logformat === 'eventchannel');
-      localFilesWithChannel.forEach((item) => {
-        const eventBtn = getByRole('button', { name: new RegExp(`${item.channel}`, 'i') });
+      ].localfile.filter(item => item.logformat === 'eventchannel');
+      localFilesWithChannel.forEach(item => {
+        const eventBtn = getByRole('button', {
+          name: new RegExp(`${item.channel}`, 'i'),
+        });
         fireEvent.click(eventBtn);
       });
     });
@@ -302,7 +309,7 @@ describe('Log Collection Section', () => {
             agent={windowAgentMocked}
             currentConfig={windowsCurrentConfigMocked}
           />
-        </Provider>
+        </Provider>,
       );
 
       fireEvent.click(getByText('Windows Events'));
@@ -310,9 +317,11 @@ describe('Log Collection Section', () => {
       // check all sidebar buttons functionality and inputs showed
       const localFilesWithChannel = windowsCurrentConfigMocked[
         'logcollector-localfile'
-      ].localfile.filter((item) => item.logformat === 'eventchannel');
-      localFilesWithChannel.forEach((item) => {
-        const eventBtn = getByRole('button', { name: new RegExp(`${item.channel}`, 'i') });
+      ].localfile.filter(item => item.logformat === 'eventchannel');
+      localFilesWithChannel.forEach(item => {
+        const eventBtn = getByRole('button', {
+          name: new RegExp(`${item.channel}`, 'i'),
+        });
         fireEvent.click(eventBtn);
         getByText(/log format/i);
         expect(getByTestId('log-format')).toHaveValue(item.logformat);
@@ -321,9 +330,13 @@ describe('Log Collection Section', () => {
         getByText(/query/i);
         expect(getByTestId('query')).toHaveValue(item.query?.value);
         getByText(/only future events/i);
-        expect(getByTestId('only-future-events')).toHaveValue(item['only-future-events']);
+        expect(getByTestId('only-future-events')).toHaveValue(
+          item['only-future-events'],
+        );
         getByText(/reconnect time/i);
-        expect(getByTestId('reconnect-time')).toHaveValue(item.reconnect_time?.toString());
+        expect(getByTestId('reconnect-time')).toHaveValue(
+          item.reconnect_time?.toString(),
+        );
       });
     });
   });

@@ -22,25 +22,36 @@ import {
   EuiSpacer,
   EuiStat,
   EuiToolTip,
-  EuiBadge,
   EuiCodeBlock,
+  EuiLink,
 } from '@elastic/eui';
-import { Discover } from '../../../common/modules/discover';
-import { ModulesHelper } from '../../../common/modules/modules-helper';
 import { ICustomBadges } from '../../../wz-search-bar/components';
 import {
   buildPhraseFilter,
   IIndexPattern,
 } from '../../../../../../../src/plugins/data/common';
 import moment from 'moment-timezone';
-import { AppNavigate } from '../../../../react-services/app-navigate';
-import { TruncateHorizontalComponents } from '../../../common/util';
-import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
-import { getIndexPattern } from '../../../../react-services';
+import {
+  getCore,
+  getDataPlugin,
+  getUiSettings,
+} from '../../../../kibana-services';
+import { AppState, getIndexPattern } from '../../../../react-services';
 import { RegistryValues } from './registryValues';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
 import { ErrorHandler } from '../../../../react-services/error-management';
+import { WazuhFlyoutDiscover } from '../../../common/wazuh-discover/wz-flyout-discover';
+import {
+  FILTER_OPERATOR,
+  PatternDataSource,
+  PatternDataSourceFilterManager,
+} from '../../../common/data-source';
+import { endpointSummary, rules } from '../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import TechniqueRowDetails from '../../../overview/mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
+import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../../../../../common/constants';
+import NavigationService from '../../../../react-services/navigation-service';
 
 export class FileDetails extends Component {
   props!: {
@@ -64,11 +75,11 @@ export class FileDetails extends Component {
       aria-hidden='true'
     >
       <path
-        fill-rule='evenodd'
+        fillRule='evenodd'
         d='M5.482 4.344a2 2 0 10-2.963 0c-.08.042-.156.087-.23.136-.457.305-.75.704-.933 1.073A3.457 3.457 0 001 6.978V9a1 1 0 001 1h2.5a3.69 3.69 0 01.684-.962L5.171 9H2V7s0-2 2-2c1.007 0 1.507.507 1.755 1.01.225-.254.493-.47.793-.636a2.717 2.717 0 00-1.066-1.03zM4 4a1 1 0 100-2 1 1 0 000 2zm10 6h-2.5a3.684 3.684 0 00-.684-.962L10.829 9H14V7s0-2-2-2c-1.007 0-1.507.507-1.755 1.01a3.012 3.012 0 00-.793-.636 2.716 2.716 0 011.066-1.03 2 2 0 112.963 0c.08.042.156.087.23.136.457.305.75.704.933 1.073A3.453 3.453 0 0115 6.944V9a1 1 0 01-1 1zm-2-6a1 1 0 100-2 1 1 0 000 2z'
       ></path>
       <path
-        fill-rule='evenodd'
+        fillRule='evenodd'
         d='M10 8c0 .517-.196.989-.518 1.344a2.755 2.755 0 011.163 1.21A3.453 3.453 0 0111 11.977V14a1 1 0 01-1 1H6a1 1 0 01-1-1v-2.022a2.005 2.005 0 01.006-.135 3.456 3.456 0 01.35-1.29 2.755 2.755 0 011.162-1.21A2 2 0 1110 8zm-4 4v2h4v-2s0-2-2-2-2 2-2 2zm3-4a1 1 0 11-2 0 1 1 0 012 0z'
       ></path>
     </svg>
@@ -81,7 +92,6 @@ export class FileDetails extends Component {
 
     this.state = {
       hoverAddFilter: '',
-      totalHits: 0,
     };
     this.viewInEvents.bind(this);
 
@@ -203,14 +213,14 @@ export class FileDetails extends Component {
   viewInEvents = ev => {
     const { file } = this.props.currentFile;
     if (this.props.view === 'extern') {
-      AppNavigate.navigateToModule(ev, 'overview', {
+      NavigationService.getInstance().navigateToModule(ev, 'overview', {
         agentId: this.props?.agent?.id,
         tab: 'fim',
         tabView: 'events',
         filters: { 'syscheck.path': file },
       });
     } else {
-      AppNavigate.navigateToModule(
+      NavigationService.getInstance().navigateToModule(
         ev,
         'overview',
         {
@@ -253,8 +263,6 @@ export class FileDetails extends Component {
           filterManager.removeFilter(x);
         });
         filterManager.addFilters([filters]);
-        const scope = await ModulesHelper.getDiscoverScope();
-        scope.updateQueryAndFetch && scope.updateQueryAndFetch({ query: null });
       } else {
         setTimeout(() => {
           this.checkFilterManager(filters);
@@ -269,7 +277,7 @@ export class FileDetails extends Component {
     const { filters, onFiltersChange } = this.props;
     const newBadge: ICustomBadges = { field: 'q', value: '' };
     if (field === 'date' || field === 'mtime') {
-      let value_max = moment(value).add(1, 'day');
+      const value_max = moment(value).add(1, 'day');
       newBadge.value = `${field}>${moment(value).format(
         'YYYY-MM-DD',
       )} AND ${field}<${value_max.format('YYYY-MM-DD')}`;
@@ -292,11 +300,11 @@ export class FileDetails extends Component {
         ? this.registryDetails()
         : this.details();
     const generalDetails = columns.map((item, idx) => {
-      var value = this.props.currentFile[item.field] || '-';
+      let value = this.props.currentFile[item.field] || '-';
       if (item.transformValue) {
         value = item.transformValue(value, this.props);
       }
-      var link = (item.link && !['events', 'extern'].includes(view)) || false;
+      const link = (item.link && !['events', 'extern'].includes(view)) || false;
       const agentPlatform = ((this.props.agent || {}).os || {}).platform;
       if (
         !item.onlyLinux ||
@@ -378,10 +386,6 @@ export class FileDetails extends Component {
     );
   }
 
-  updateTotalHits = total => {
-    this.setState({ totalHits: total });
-  };
-
   renderFileDetailsPermissions(value) {
     if (
       ((this.props.agent || {}).os || {}).platform === 'windows' &&
@@ -425,7 +429,9 @@ export class FileDetails extends Component {
       return 0;
     }
     const b = 2;
-    if (0 === value) return '0 Bytes';
+    if (0 === value) {
+      return '0 Bytes';
+    }
     const c = 0 > b ? 0 : b,
       d = Math.floor(Math.log(value) / Math.log(1024));
     return (
@@ -435,16 +441,137 @@ export class FileDetails extends Component {
     );
   }
 
+  getDiscoverColumns() {
+    const agentId = this.props.agent?.id;
+    return agentId
+      ? [
+          {
+            id: 'timestamp',
+            displayAsText: 'Time',
+            render: value => formatUIDate(value),
+          },
+          {
+            id: 'syscheck.event',
+            displayAsText: 'Action',
+          },
+          { id: 'rule.description', displayAsText: 'Description' },
+          { id: 'rule.level', displayAsText: 'Level' },
+          {
+            id: 'rule.id',
+            displayAsText: 'Rule ID',
+            render: value => (
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink
+                  href={getCore().application.getUrlForApp(rules.id, {
+                    path: `#/manager/?tab=rules&redirectRule=${value}`,
+                  })}
+                >
+                  {value}
+                </EuiLink>
+              </RedirectAppLinks>
+            ),
+          },
+        ]
+      : [
+          {
+            id: 'timestamp',
+            displayAsText: 'Time',
+            render: value => formatUIDate(value),
+          },
+          {
+            id: 'agent.id',
+            displayAsText: 'Agent',
+            render: value => (
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink
+                  href={getCore().application.getUrlForApp(endpointSummary.id, {
+                    path: `#/agents/?tab=welcome&agent=${value}`,
+                  })}
+                >
+                  {value}
+                </EuiLink>
+              </RedirectAppLinks>
+            ),
+          },
+          {
+            id: 'agent.name',
+            displayAsText: 'Agent name',
+          },
+          {
+            id: 'syscheck.event',
+            displayAsText: 'Action',
+          },
+          { id: 'rule.description', displayAsText: 'Description' },
+          { id: 'rule.level', displayAsText: 'Level' },
+          {
+            id: 'rule.id',
+            displayAsText: 'Rule ID',
+            render: value => (
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink
+                  href={getCore().application.getUrlForApp(rules.id, {
+                    path: `#/manager/?tab=rules&redirectRule=${value}`,
+                  })}
+                >
+                  {value}
+                </EuiLink>
+              </RedirectAppLinks>
+            ),
+          },
+        ];
+  }
+
+  getImplicitFilters() {
+    return [
+      ...PatternDataSourceFilterManager.getClusterManagerFilters(
+        AppState.getCurrentPattern(),
+        DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
+      ),
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        'rule.groups',
+        'syscheck',
+        AppState.getCurrentPattern(),
+      ),
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        'syscheck.path',
+        this.props.currentFile.file,
+        AppState.getCurrentPattern(),
+      ),
+    ];
+  }
+
+  renderDiscoverExpandedRow(props: { doc: any; item: any; indexPattern: any }) {
+    return (
+      <TechniqueRowDetails
+        {...props}
+        onRuleItemClick={(value: any, indexPattern: IndexPattern) => {
+          // add filters to the filter state
+          // generate the filter
+          const key = Object.keys(value)[0];
+          const filterValue = value[key];
+          const valuesArray = Array.isArray(filterValue)
+            ? [...filterValue]
+            : [filterValue];
+          const newFilter = valuesArray
+            .map(item =>
+              buildPhraseFilter(
+                { name: key, type: 'string' },
+                item,
+                indexPattern,
+              ),
+            )
+            .filter(Boolean);
+
+          this.discoverFilterManager.addFilters(newFilter);
+        }}
+      />
+    );
+  }
+
   render() {
-    const {
-      fileName,
-      type,
-      implicitFilters,
-      view,
-      currentFile,
-      agent,
-      agentId,
-    } = this.props;
+    const { fileName, type, view, currentFile, agent, agentId } = this.props;
     const inspectButtonText =
       view === 'extern' ? 'Inspect in FIM' : 'Inspect in Events';
     return (
@@ -502,11 +629,6 @@ export class FileDetails extends Component {
               : `${fileName}_events`
           }
           className='events-accordion'
-          extraAction={
-            <div style={{ marginBottom: 5 }}>
-              <strong>{this.state.totalHits || 0}</strong> hits
-            </div>
-          }
           buttonContent={
             <EuiTitle size='s'>
               <h3>
@@ -529,37 +651,17 @@ export class FileDetails extends Component {
           paddingSize='none'
           initialIsOpen={true}
         >
-          <EuiFlexGroup className='flyout-row'>
-            <EuiFlexItem>
-              <Discover
-                kbnSearchBar
-                shareFilterManager={this.discoverFilterManager}
-                initialColumns={[
-                  { field: 'icon' },
-                  { field: 'timestamp' },
-                  { field: 'agent.id', label: 'Agent' },
-                  { field: 'agent.name', label: 'Agent name' },
-                  { field: 'syscheck.event', label: 'Action' },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
-                ]}
-                initialAgentColumns={[
-                  { field: 'icon' },
-                  { field: 'timestamp' },
-                  { field: 'syscheck.event', label: 'Action' },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
-                ]}
-                includeFilters='syscheck'
-                implicitFilters={implicitFilters}
-                initialFilters={[]}
-                type={type}
-                updateTotalHits={total => this.updateTotalHits(total)}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
+          <div className='details-row'>
+            <WazuhFlyoutDiscover
+              DataSource={PatternDataSource}
+              tableColumns={this.getDiscoverColumns()}
+              filterManager={this.discoverFilterManager}
+              initialFetchFilters={this.getImplicitFilters()}
+              expandedRowComponent={(...args) =>
+                this.renderDiscoverExpandedRow(...args)
+              }
+            />
+          </div>
         </EuiAccordion>
       </Fragment>
     );

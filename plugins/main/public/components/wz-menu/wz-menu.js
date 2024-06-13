@@ -27,7 +27,6 @@ import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
 import {
-  getAngularModule,
   getToasts,
   getDataPlugin,
   getHeaderActionMenuMounter,
@@ -42,6 +41,7 @@ import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboar
 import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
 import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
+import NavigationService from '../../react-services/navigation-service';
 
 const sections = {
   overview: 'overview',
@@ -61,7 +61,6 @@ export const WzMenu = withWindowSize(
       this.state = {
         showMenu: false,
         menuOpened: false,
-        currentMenuTab: '',
         currentAPI: '',
         APIlist: [],
         showSelector: false,
@@ -81,12 +80,7 @@ export const WzMenu = withWindowSize(
     }
 
     async componentDidMount() {
-      const $injector = getAngularModule().$injector;
-      this.router = $injector.get('$route');
-      setBreadcrumbs(
-        this.props.globalBreadcrumbReducers.breadcrumb,
-        this.router,
-      );
+      setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
       try {
         const APIlist = await this.loadApiList();
         this.setState({ APIlist: APIlist });
@@ -128,18 +122,6 @@ export const WzMenu = withWindowSize(
         toastLifeTimeMs: time,
       });
     };
-
-    getCurrentTab() {
-      const currentWindowLocation = window.location.hash;
-      let currentTab = '';
-      Object.keys(sections).some(section => {
-        if (currentWindowLocation.match(`#/${section}`)) {
-          currentTab = sections[section];
-          return true;
-        }
-      });
-      return currentTab;
-    }
 
     loadApiList = async () => {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
@@ -202,11 +184,6 @@ export const WzMenu = withWindowSize(
       let newState = {};
       const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
       const { currentAPI } = this.state;
-      const currentTab = this.getCurrentTab();
-
-      if (currentTab !== this.state.currentMenuTab) {
-        newState = { ...newState, currentMenuTab: currentTab };
-      }
 
       if (this.props.windowSize) {
         this.showSelectorsInPopover = this.props.windowSize.width < 1100;
@@ -244,10 +221,7 @@ export const WzMenu = withWindowSize(
           prevProps.globalBreadcrumbReducers.breadcrumb,
         )
       ) {
-        setBreadcrumbs(
-          this.props.globalBreadcrumbReducers.breadcrumb,
-          this.router,
-        );
+        setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
       }
 
       newState = { ...prevProps.state, ...newState };
@@ -267,14 +241,6 @@ export const WzMenu = withWindowSize(
           isSelectorsPopoverOpen: false,
         };
 
-        const currentTab = this.getCurrentTab();
-        if (currentTab !== this.state.currentMenuTab) {
-          newState = {
-            ...newState,
-            currentMenuTab: currentTab,
-            hover: currentTab,
-          };
-        }
         let list = await PatternHandler.getPatternList('api');
         if (!list || (list && !list.length)) return;
         this.props?.appConfig?.data?.['ip.ignore']?.length &&
@@ -336,7 +302,6 @@ export const WzMenu = withWindowSize(
     updatePatternAndApi = async () => {
       this.setState({
         menuOpened: false,
-        hover: this.state.currentMenuTab,
         ...{ APIlist: await this.loadApiList() },
         ...(await this.loadIndexPatternsList()),
       });
@@ -365,7 +330,13 @@ export const WzMenu = withWindowSize(
           this.pinnedAgentManager.unPinAgent();
         }
         if (this.state.currentMenuTab !== 'wazuh-dev') {
-          this.router.reload();
+          /* TODO: this reloads the page to force the components are remounted with the new
+          selection of. To avoid this refresh, we would have to do the components are able to react
+          to these changes redoing the requests, etc... This will need a considerable time to
+          apply the changes. The reload of the pages is the same behavior used for the routing based
+          on AngularJS.
+          */
+          NavigationService.getInstance().reload();
         }
       } catch (error) {
         const options = {
@@ -408,7 +379,7 @@ export const WzMenu = withWindowSize(
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
-                  onClick={() => location.reload()}
+                  onClick={() => NavigationService.getInstance().reload()}
                   className='WzNotReadyButton'
                 >
                   <span> Reload </span>
@@ -454,7 +425,13 @@ export const WzMenu = withWindowSize(
       try {
         this.setState({ currentSelectedPattern: pattern.id });
         if (this.state.currentMenuTab !== 'wazuh-dev') {
-          this.router.reload();
+          /* TODO: this reloads the page to force the components are remounted with the new
+          selection of. To avoid this refresh, we would have to do the components are able to react
+          to these changes redoing the requests, etc... This will need a considerable time to
+          apply the changes. The reload of the pages is the same behavior used for the routing based
+          on AngularJS.
+          */
+          NavigationService.getInstance().reload();
         }
         await this.updatePatternAndApi();
       } catch (error) {

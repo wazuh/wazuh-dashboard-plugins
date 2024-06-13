@@ -13,7 +13,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiPageBody } from '@elastic/eui';
 import { ModuleSidePanel } from './components/';
-import WzReduxProvider from '../../../../redux/wz-redux-provider';
 import { AppState } from '../../../../react-services/app-state';
 import { useFilterManager } from '../../hooks';
 import { Filter } from '../../../../../../../src/plugins/data/public/';
@@ -21,7 +20,7 @@ import {
   FilterMeta,
   FilterState,
   FilterStateStore,
-  IndexPattern
+  IndexPattern,
 } from '../../../../../../../src/plugins/data/common';
 import { SampleDataWarning } from '../../../visualize/components';
 import { tUseSearchBarProps } from '../../search-bar/use-search-bar';
@@ -37,7 +36,7 @@ type MainPanelProps = {
     fetchFilters: any[];
     searchBarProps: tUseSearchBarProps;
     indexPattern: IndexPattern;
-  }
+  };
 };
 
 export const MainPanel = (props: MainPanelProps) => {
@@ -47,7 +46,7 @@ export const MainPanel = (props: MainPanelProps) => {
     filterDrillDownValue,
     onChangeView,
     dataSourceProps,
-    isLoading
+    isLoading,
   } = props;
   const [viewId, setViewId] = useState('main');
   const [selectedFilter, setSelectedFilter] = useState({
@@ -65,7 +64,7 @@ export const MainPanel = (props: MainPanelProps) => {
   };
 
   useEffect(() => {
-    filterDrillDownValue(selectedFilter)
+    filterDrillDownValue(selectedFilter);
   }, [selectedFilter]);
 
   if (isLoading) {
@@ -81,15 +80,13 @@ export const MainPanel = (props: MainPanelProps) => {
     rest => {
       const View = moduleConfig[viewId].component;
       return (
-        <WzReduxProvider>
-          <View
-            {...rest}
-            {...dataSourceProps}
-            selectedFilter={selectedFilter}
-            toggleFilter={toggleFilter}
-            changeView={toggleView}
-          />
-        </WzReduxProvider>
+        <View
+          {...rest}
+          {...dataSourceProps}
+          selectedFilter={selectedFilter}
+          toggleFilter={toggleFilter}
+          changeView={toggleView}
+        />
       );
     },
     [viewId, JSON.stringify(dataSourceProps)],

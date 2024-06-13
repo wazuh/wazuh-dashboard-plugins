@@ -1,14 +1,17 @@
 .discoverContainer {
-  height: calc(100vh - 104px);
+  .euiDataGrid__virtualized {
+    height: max-content !important;
+  }
 
   .euiDataGrid--fullScreen {
     height: calc(100vh - 49px);
     bottom: 0;
     top: auto;
-  }
 
-  .discoverDataGrid {
-    height: calc(100vh - 458px);
+    .euiDataGrid__virtualized {
+      height: calc(100vh - 147px) !important;
+      width: 100% !important;
+    }
   }
 
   .discoverChartContainer {
@@ -21,8 +24,4 @@
       z-index: 9999;
     }
   }
-}
-
-.headerIsExpanded .discoverContainer {
-  height: calc(100vh - 153px);
 }

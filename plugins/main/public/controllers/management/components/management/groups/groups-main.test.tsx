@@ -18,7 +18,6 @@ import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 
 jest.mock('../../../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getHttp: () => ({
     basePath: {
       prepend: str => str,

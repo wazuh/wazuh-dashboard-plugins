@@ -37,7 +37,13 @@ const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 a wrapper for visual adjustments, while the Kpi, the Open vs Close visualization and
 the rest of the visualizations have different configurations at the dashboard level. */
 
-const DashboardVulsComponent: React.FC = () => {
+interface DashboardVulsProps {
+  indexPattern: IndexPattern;
+}
+
+const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
+  indexPattern,
+}) => {
   const {
     filters,
     dataSource,
@@ -96,22 +102,59 @@ const DashboardVulsComponent: React.FC = () => {
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
-          {dataSource && results?.hits?.total > 0 ? (
-            <div className='vulnerability-dashboard-responsive'>
+          <div
+            className={`vulnerability-dashboard-responsive ${
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }`}
+          >
+            <DashboardByRenderer
+              input={{
+                viewMode: ViewMode.VIEW,
+                // Try to use the index pattern that the dataSource has
+                // but if it is undefined use the index pattern of the hoc
+                // because the first executions of the dataSource are undefined
+                // and embeddables need index pattern.
+                panels: getKPIsPanel(dataSource?.id || indexPattern?.id),
+                isFullScreenMode: false,
+                filters: fetchFilters ?? [],
+                useMargins: true,
+                id: 'kpis-vulnerability-detector-dashboard-tab',
+                timeRange: {
+                  from: searchBarProps.dateRangeFrom,
+                  to: searchBarProps.dateRangeTo,
+                },
+                title: 'KPIs Vulnerability detector dashboard',
+                description: 'KPIs Dashboard of the Vulnerability detector',
+                query: searchBarProps.query,
+                refreshConfig: {
+                  pause: false,
+                  value: 15,
+                },
+                hidePanelTitles: true,
+              }}
+            />
+            <div className='vulnerability-dashboard-filters-wrapper'>
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
-                  panels: getKPIsPanel(dataSource?.id),
+                  // Try to use the index pattern that the dataSource has
+                  // but if it is undefined use the index pattern of the hoc
+                  // because the first executions of the dataSource are undefined
+                  // and embeddables need index pattern.
+                  panels: getDashboardFilters(
+                    dataSource?.id || indexPattern?.id,
+                  ),
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'kpis-vulnerability-detector-dashboard-tab',
+                  useMargins: false,
+                  id: 'vulnerability-detector-dashboard-tab-filters',
                   timeRange: {
                     from: searchBarProps.dateRangeFrom,
                     to: searchBarProps.dateRangeTo,
                   },
-                  title: 'KPIs Vulnerability detector dashboard',
-                  description: 'KPIs Dashboard of the Vulnerability detector',
+                  title: 'Vulnerability detector dashboard filters',
+                  description:
+                    'Dashboard of the Vulnerability detector filters',
                   query: searchBarProps.query,
                   refreshConfig: {
                     pause: false,
@@ -120,55 +163,34 @@ const DashboardVulsComponent: React.FC = () => {
                   hidePanelTitles: true,
                 }}
               />
-              <div className='vulnerability-dashboard-filters-wrapper'>
-                <DashboardByRenderer
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    panels: getDashboardFilters(dataSource?.id),
-                    isFullScreenMode: false,
-                    filters: fetchFilters ?? [],
-                    useMargins: false,
-                    id: 'vulnerability-detector-dashboard-tab-filters',
-                    timeRange: {
-                      from: searchBarProps.dateRangeFrom,
-                      to: searchBarProps.dateRangeTo,
-                    },
-                    title: 'Vulnerability detector dashboard filters',
-                    description:
-                      'Dashboard of the Vulnerability detector filters',
-                    query: searchBarProps.query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles: true,
-                  }}
-                />
-              </div>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(dataSource?.id),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'vulnerability-detector-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'Vulnerability detector dashboard',
-                  description: 'Dashboard of the Vulnerability detector',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
             </div>
-          ) : null}
+            <DashboardByRenderer
+              input={{
+                viewMode: ViewMode.VIEW,
+                // Try to use the index pattern that the dataSource has
+                // but if it is undefined use the index pattern of the hoc
+                // because the first executions of the dataSource are undefined
+                // and embeddables need index pattern.
+                panels: getDashboardPanels(dataSource?.id || indexPattern?.id),
+                isFullScreenMode: false,
+                filters: fetchFilters ?? [],
+                useMargins: true,
+                id: 'vulnerability-detector-dashboard-tab',
+                timeRange: {
+                  from: searchBarProps.dateRangeFrom,
+                  to: searchBarProps.dateRangeTo,
+                },
+                title: 'Vulnerability detector dashboard',
+                description: 'Dashboard of the Vulnerability detector',
+                query: searchBarProps.query,
+                refreshConfig: {
+                  pause: false,
+                  value: 15,
+                },
+                hidePanelTitles: false,
+              }}
+            />
+          </div>
         </>
       </I18nProvider>
     </>

@@ -5,7 +5,6 @@ import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 
 jest.mock('../../../../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getUiSettings: () => ({
     get: () => {
       return false;
@@ -31,7 +30,8 @@ const mockProps = {
     },
     'mail-alerts': 'Fetch configuration. 3013 - Error connecting with socket',
     'monitor-reports': {},
-    'csyslog-csyslog': 'Fetch configuration. 3013 - Error connecting with socket',
+    'csyslog-csyslog':
+      'Fetch configuration. 3013 - Error connecting with socket',
   },
   wazuhNotReadyYet: '',
 };
@@ -44,7 +44,7 @@ describe('WzConfigurationAlerts component mount OK', () => {
     const wrapper = shallow(
       <Provider store={store}>
         <WzConfigurationAlerts {...mockProps} />
-      </Provider>
+      </Provider>,
     );
     expect(wrapper).toMatchSnapshot();
   });

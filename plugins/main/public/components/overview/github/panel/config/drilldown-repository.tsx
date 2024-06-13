@@ -10,9 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
-import { VisCard } from '../../../../common/modules/panel/';
+import React from 'react';
+import { EuiLink } from '@elastic/eui';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
@@ -25,7 +24,11 @@ import {
   getVisStateTopOrganizations,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
+import {
+  ErrorFactory,
+  HttpError,
+  ErrorHandler,
+} from '../../../../../react-services/error-management';
 import DrillDownDataGrid from './drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
 
@@ -116,12 +119,8 @@ const getDashboardPanels = (
 export const DrilldownConfigRepository = (
   drilldownProps: ModuleConfigProps,
 ) => {
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern
-  } = drilldownProps;
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [
@@ -153,7 +152,7 @@ export const DrilldownConfigRepository = (
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );
@@ -173,8 +172,17 @@ export const DrilldownConfigRepository = (
                 { id: 'data.github.actor', displayAsText: 'Actor' },
                 { id: 'data.github.action', displayAsText: 'Action' },
                 { id: 'rule.level' },
-                { id: 'rule.id' },
-              ]
+                {
+                  id: 'rule.id',
+                  render: value => (
+                    <EuiLink
+                      href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
+                    >
+                      {value}
+                    </EuiLink>
+                  ),
+                },
+              ];
 
               return (
                 <DrillDownDataGrid
@@ -184,7 +192,7 @@ export const DrilldownConfigRepository = (
                   searchBarProps={searchBarProps}
                   indexPattern={indexPattern}
                 />
-              )
+              );
             },
           },
         ],

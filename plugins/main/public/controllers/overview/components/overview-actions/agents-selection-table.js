@@ -169,11 +169,12 @@ export class AgentSelectionTable extends Component {
   render() {
     const selectedAgent = this.pinnedAgentManager.getPinnedAgent();
 
-    const getRowProps = (item, idx) => {
+    const getRowProps = item => {
+      const { id } = item;
       return {
-        'data-test-subj': `explore-agent-${idx}`,
+        'data-test-subj': `explore-agent-${id}`,
         className: 'customRowClass',
-        onClick: () => this.selectAgentAndApply(item.id),
+        onClick: () => this.selectAgentAndApply(id),
       };
     };
 

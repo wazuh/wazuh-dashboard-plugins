@@ -27,7 +27,6 @@ import {
 import {
   withUserAuthorizationPrompt,
   withErrorBoundary,
-  withReduxProvider,
 } from '../../common/hocs';
 import {
   EpluginSettingType,
@@ -424,6 +423,5 @@ const WzConfigurationSettingsProvider = props => {
 };
 export const WzConfigurationSettings = compose(
   withErrorBoundary,
-  withReduxProvider,
   withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
 )(WzConfigurationSettingsProvider);
