@@ -37,6 +37,7 @@ const DashboardGDPRComponent: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -101,14 +102,15 @@ const DashboardGDPRComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <WzSearchBar
-              appName='gdpr-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-            />
-          )}
+              <WzSearchBar
+                appName='gdpr-searchbar'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

@@ -48,6 +48,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -90,22 +91,22 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <WzSearchBar
-              appName='vulnerability-detector-searchbar'
-              {...searchBarProps}
-              showDatePicker={false}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          )}
+              <WzSearchBar
+                appName='vulnerability-detector-searchbar'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showDatePicker={false}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
           <div
-            className={`vulnerability-dashboard-responsive ${
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }`}
+            className={`vulnerability-dashboard-responsive ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }`}
           >
             <DashboardByRenderer
               input={{

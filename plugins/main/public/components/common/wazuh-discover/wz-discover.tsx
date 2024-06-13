@@ -72,6 +72,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     dataSource,
     filters,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -197,14 +198,12 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         {isDataSourceLoading ? (
           <LoadingSpinner />
         ) : (
-          <WzSearchBar
-            appName='wazuh-discover-search-bar'
-            {...searchBarProps}
-            showQueryInput={true}
-            showQueryBar={true}
-            showSaveQuery={true}
-          />
-        )}
+            <WzSearchBar
+              appName='wazuh-discover-search-bar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+            />
+          )}
         {!isDataSourceLoading && results?.hits?.total === 0 ? (
           <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
         ) : null}

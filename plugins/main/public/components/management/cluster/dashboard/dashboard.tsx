@@ -46,6 +46,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -162,33 +163,31 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
           <WzSearchBar
             appName='ct-searchbar'
             {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={true}
-            showQueryBar={true}
+            fixedFilters={fixedFilters}
           />
         ) : null}
         <EuiSpacer size='m' />
         {!isDataSourceLoading &&
-        dataSource &&
-        !state.showConfig &&
-        !state.showNodes ? (
-          <OverviewCards
-            goNodes={goNodes}
-            goAgents={goAgents}
-            goConfiguration={goConfiguration}
-            status={statusRunning}
-            configuration={state?.configuration}
-            version={state?.version}
-            nodesCount={state?.nodesCount}
-            nodeList={state?.nodeList}
-            clusterName={state.configuration?.name}
-            agentsCount={state?.agentsCount}
-            searchBarProps={searchBarProps}
-            results={results}
-            indexPattern={dataSource?.indexPattern}
-            filters={fetchFilters ?? []}
-          />
-        ) : null}
+          dataSource &&
+          !state.showConfig &&
+          !state.showNodes ? (
+            <OverviewCards
+              goNodes={goNodes}
+              goAgents={goAgents}
+              goConfiguration={goConfiguration}
+              status={statusRunning}
+              configuration={state?.configuration}
+              version={state?.version}
+              nodesCount={state?.nodesCount}
+              nodeList={state?.nodeList}
+              clusterName={state.configuration?.name}
+              agentsCount={state?.agentsCount}
+              searchBarProps={searchBarProps}
+              results={results}
+              indexPattern={dataSource?.indexPattern}
+              filters={fetchFilters ?? []}
+            />
+          ) : null}
         {state.showConfig ? (
           <ConfigurationCards
             goBack={goBack}

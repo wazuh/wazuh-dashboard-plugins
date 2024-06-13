@@ -37,6 +37,7 @@ const DashboardOffice365Component: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -100,23 +101,23 @@ const DashboardOffice365Component: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <WzSearchBar
-              appName='google-cloud-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          )}
+              <WzSearchBar
+                appName='google-cloud-searchbar'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
 
           <div
-            className={`office-365-dashboard-responsive ${
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }`}
+            className={`office-365-dashboard-responsive ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }`}
           >
             <SampleDataWarning />
             <DashboardByRenderer

@@ -37,6 +37,7 @@ const DashboardHIPAAComponent: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -101,14 +102,14 @@ const DashboardHIPAAComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <WzSearchBar
-              appName='hipaa-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-            />
-          )}
+              <WzSearchBar
+                appName='hipaa-searchbar'
+                {...searchBarProps}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

@@ -37,6 +37,7 @@ const DashboardTSCComponent: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -101,14 +102,15 @@ const DashboardTSCComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <WzSearchBar
-              appName='tsc-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-            />
-          )}
+              <WzSearchBar
+                appName='tsc-searchbar'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

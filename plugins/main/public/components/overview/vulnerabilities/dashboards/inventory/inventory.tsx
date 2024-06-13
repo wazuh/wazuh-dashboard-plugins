@@ -181,15 +181,16 @@ const InventoryVulsComponent = () => {
             {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
-              <WzSearchBar
-                appName='inventory-vuls'
-                {...searchBarProps}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            )}
+                <WzSearchBar
+                  appName='inventory-vuls'
+                  {...searchBarProps}
+                  fixedFilters={fixedFilters}
+                  showDatePicker={false}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                  showSaveQuery={true}
+                />
+              )}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
             ) : null}
@@ -212,15 +213,15 @@ const InventoryVulsComponent = () => {
                             showResetButton={false}
                             tooltip={
                               results?.hits?.total &&
-                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                                results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
-                                    ariaLabel: 'Warning',
-                                    content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                      MAX_ENTRIES_PER_QUERY,
-                                    )} hits.`,
-                                    iconType: 'alert',
-                                    position: 'top',
-                                  }
+                                  ariaLabel: 'Warning',
+                                  content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                    MAX_ENTRIES_PER_QUERY,
+                                  )} hits.`,
+                                  iconType: 'alert',
+                                  position: 'top',
+                                }
                                 : undefined
                             }
                           />

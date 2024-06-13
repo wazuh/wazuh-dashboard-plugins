@@ -65,6 +65,7 @@ const DashboardTH: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -213,24 +214,24 @@ const DashboardTH: React.FC = () => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
-          <WzSearchBar
-            appName='th-searchbar'
-            {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={true}
-            showQueryBar={true}
-            showSaveQuery={true}
-          />
-        )}
+            <WzSearchBar
+              appName='th-searchbar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
+          )}
         {!isDataSourceLoading && dataSource && results?.hits?.total === 0 ? (
           <DiscoverNoResults />
         ) : null}
         <div
-          className={`th-container ${
-            !isDataSourceLoading && dataSource && results?.hits?.total > 0
-              ? ''
-              : 'wz-no-display'
-          }`}
+          className={`th-container ${!isDataSourceLoading && dataSource && results?.hits?.total > 0
+            ? ''
+            : 'wz-no-display'
+            }`}
         >
           <SampleDataWarning />
           <div className='th-dashboard-responsive'>
@@ -291,18 +292,18 @@ const DashboardTH: React.FC = () => {
                       <HitsCounter
                         hits={results?.hits?.total}
                         showResetButton={false}
-                        onResetQuery={() => {}}
+                        onResetQuery={() => { }}
                         tooltip={
                           results?.hits?.total &&
-                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
                             ? {
-                                ariaLabel: 'Warning',
-                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits.`,
-                                iconType: 'alert',
-                                position: 'top',
-                              }
+                              ariaLabel: 'Warning',
+                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                MAX_ENTRIES_PER_QUERY,
+                              )} hits.`,
+                              iconType: 'alert',
+                              position: 'top',
+                            }
                             : undefined
                         }
                       />

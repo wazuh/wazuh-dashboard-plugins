@@ -147,6 +147,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -275,15 +276,16 @@ export const ComplianceTable = withAgentSupportModule(props => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <WzSearchBar
-              appName='compliance-controls'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          )}
+              <WzSearchBar
+                appName='compliance-controls'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+            )}
         </EuiPanel>
         <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
           <EuiPanel paddingSize='none'>
