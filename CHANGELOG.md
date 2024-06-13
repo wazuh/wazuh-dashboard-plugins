@@ -52,6 +52,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the sample alerts scripts to generate valid IP ranges and file hashes [#6667](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6667)
 - Fixed cronjob max seconds interval validation [#6730](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6730)
 - Fixed styles in small height viewports [#6747](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6747)
+- Fixed behavior in Configuration Assessment when changing API [#6770](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6770)
 
 ### Removed
 
