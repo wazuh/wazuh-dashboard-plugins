@@ -64,7 +64,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed legacy discover references and methods [#6646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6646)
 - Removed custom EuiSuggestItem component in favor of OUI's native component [#6714](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6714)
 
-## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 11
+## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.8.1
+
+## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 12
 
 ### Added
 
