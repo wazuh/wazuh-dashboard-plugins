@@ -148,7 +148,7 @@ export class PatternDataSourceFilterManager
   private getDefaultFilters(filters: tFilter[]) {
     const defaultFilters = filters.length ? filters : this.getFilters();
     return [
-      ...this.getFixedFilters(),
+      //...this.getFixedFilters(),
       ...(this.filterUserFilters(defaultFilters) || []),
     ];
   }
@@ -225,6 +225,7 @@ export class PatternDataSourceFilterManager
   getFetchFilters(): tFilter[] {
     return [
       ...this.defaultFetchFilters,
+      ...this.getFixedFilters(),
       ...this.dataSource.getFetchFilters(),
       ...this.getFilters(),
     ];
@@ -337,31 +338,7 @@ export class PatternDataSourceFilterManager
       return [];
     }
     const currentPinnedAgent = pinnedAgentManager.getPinnedAgent();
-    return [
-      {
-        meta: {
-          alias: null,
-          disabled: false,
-          key: PinnedAgentManager.AGENT_ID_KEY,
-          negate: false,
-          params: { query: currentPinnedAgent.id },
-          type: 'phrase',
-          index: indexPatternId,
-          controlledBy: PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
-        },
-        query: {
-          match: {
-            [PinnedAgentManager.AGENT_ID_KEY]: {
-              query: currentPinnedAgent.id,
-              type: 'phrase',
-            },
-          },
-        },
-        $state: {
-          store: 'appState', // this makes that the filter is pinned and can be remove the close icon by css
-        },
-      } as tFilter,
-    ];
+    return [PatternDataSourceFilterManager.createFilter(FILTER_OPERATOR.IS, 'agent.id', currentPinnedAgent.id, indexPatternId, PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY)]
   }
 
   /**

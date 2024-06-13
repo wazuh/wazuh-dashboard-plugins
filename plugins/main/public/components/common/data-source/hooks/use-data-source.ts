@@ -66,6 +66,7 @@ export function useDataSource<
     useState<PatternDataSourceFilterManager | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
+  const [fixedFilters, setFixedFilters] = useState<tFilter[]>([]);
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
@@ -77,6 +78,7 @@ export function useDataSource<
     dataSourceFilterManager?.setFilters(filters);
     setAllFilters(dataSourceFilterManager?.getFilters() || []);
     setFetchFilters(dataSourceFilterManager?.getFetchFilters() || []);
+    setFixedFilters(dataSourceFilterManager?.getFixedFilters() || []);
   };
 
   const fetchData = async (params: Omit<tSearchParams, 'filters'>) => {
@@ -117,10 +119,12 @@ export function useDataSource<
           );
           setAllFilters(dataSourceFilterManager.getFilters());
           setFetchFilters(dataSourceFilterManager.getFetchFilters());
+          setFixedFilters(dataSourceFilterManager.getFixedFilters());
         },
       });
       setAllFilters(dataSourceFilterManager.getFilters());
       setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      setFixedFilters(dataSourceFilterManager.getFixedFilters());
       setDataSourceFilterManager(dataSourceFilterManager);
       setIsLoading(false);
     })();
@@ -130,25 +134,19 @@ export function useDataSource<
 
   useEffect(() => {
     if (dataSourceFilterManager && dataSource) {
-      const pinnedAgentFilter = dataSourceFilterManager
-        .getFilters()
-        .filter(
-          (filter: tFilter) =>
-            filter.meta.controlledBy ===
-            PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
-        );
-
-      if (pinnedAgentFilter.length) {
-        dataSourceFilterManager.removeFilterByControlledBy(
-          PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
-        );
-      }
       if (pinnedAgentManager.isPinnedAgent()) {
         const pinnedAgent = PatternDataSourceFilterManager.getPinnedAgentFilter(
           dataSource.id,
         );
 
-        dataSourceFilterManager.addFilters([...pinnedAgent]);
+        if (pinnedAgent) {
+          setFixedFilters([
+            ...fixedFilters,
+            pinnedAgent,
+          ])
+        }
+      }else{
+        setFixedFilters(dataSourceFilterManager.getFixedFilters() || []);
       }
     }
   }, [JSON.stringify(pinnedAgent)]);
@@ -169,6 +167,7 @@ export function useDataSource<
       dataSource: dataSource as K,
       filters: allFilters,
       fetchFilters,
+      fixedFilters,
       fetchData,
       setFilters,
       filterManager: dataSourceFilterManager as PatternDataSourceFilterManager,
