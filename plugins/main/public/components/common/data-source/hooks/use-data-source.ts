@@ -137,6 +137,7 @@ export function useDataSource<
   useEffect(() => {
     if (dataSourceFilterManager && dataSource) {
       setFixedFilters(dataSourceFilterManager.getFixedFilters());
+      setFetchFilters(dataSourceFilterManager.getFetchFilters());
     }
   }, [JSON.stringify(pinnedAgent)]);
 

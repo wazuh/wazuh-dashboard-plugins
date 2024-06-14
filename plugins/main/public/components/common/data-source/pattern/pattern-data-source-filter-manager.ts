@@ -147,10 +147,7 @@ export class PatternDataSourceFilterManager
    */
   private getDefaultFilters(filters: tFilter[]) {
     const defaultFilters = filters.length ? filters : this.getFilters();
-    return [
-      //...this.getFixedFilters(),
-      ...(this.filterUserFilters(defaultFilters) || []),
-    ];
+    return [...(this.filterUserFilters(defaultFilters) || [])];
   }
 
   /**
@@ -224,10 +221,10 @@ export class PatternDataSourceFilterManager
    */
   getFetchFilters(): tFilter[] {
     return [
-      ...this.defaultFetchFilters,
       ...this.getFixedFilters(),
-      ...this.dataSource.getFetchFilters(),
       ...this.getFilters(),
+      ...this.defaultFetchFilters,
+      ...this.dataSource.getFetchFilters(),
     ];
   }
 
@@ -338,7 +335,15 @@ export class PatternDataSourceFilterManager
       return [];
     }
     const currentPinnedAgent = pinnedAgentManager.getPinnedAgent();
-    return [PatternDataSourceFilterManager.createFilter(FILTER_OPERATOR.IS, 'agent.id', currentPinnedAgent.id, indexPatternId, PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY)]
+    return [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        'agent.id',
+        currentPinnedAgent.id,
+        indexPatternId,
+        PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
+      ),
+    ];
   }
 
   /**
