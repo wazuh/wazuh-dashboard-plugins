@@ -54,6 +54,7 @@ const InventoryVulsComponent = () => {
     dataSource,
     filters,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
