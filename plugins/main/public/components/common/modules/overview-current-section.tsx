@@ -29,7 +29,7 @@ class WzCurrentOverviewSection extends Component {
 
     const section = Applications.find(
       ({ id }) => getWzCurrentAppID() === id,
-    )?.title;
+    )?.breadcrumbLabel;
 
     if (section) {
       const breadcrumb = currentAgent.id

@@ -16,6 +16,8 @@ import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
 import { WzRequest } from '../../../../../react-services';
 import { ErrorHandler } from '../../../../../react-services/error-management/error-handler/error-handler';
+import { WzButtonPermissions } from '../../../../common/permissions/button';
+import { useAppConfig } from '../../../../common/hooks';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -49,6 +51,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
   const [defaultServerAddress, setDefaultServerAddress] = useState(
     formField?.initialValue ? formField?.initialValue : '',
   );
+  const appConfig = useAppConfig();
 
   const handleToggleRememberAddress = async event => {
     setRememberServerAddress(event.target.checked);
@@ -145,16 +148,20 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiFlexGroup wrap>
-        <EuiFlexItem grow={false}>
-          <EuiSwitch
-            disabled={rememberToggleIsDisabled()}
-            label='Remember server address'
-            checked={rememberServerAddress}
-            onChange={e => handleToggleRememberAddress(e)}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      {appConfig?.data?.['configuration.ui_api_editable'] && (
+        <EuiFlexGroup wrap>
+          <EuiFlexItem grow={false}>
+            <WzButtonPermissions
+              buttonType='switch'
+              administrator
+              disabled={rememberToggleIsDisabled()}
+              label='Remember server address'
+              checked={rememberServerAddress}
+              onChange={e => handleToggleRememberAddress(e)}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      )}
     </Fragment>
   );
 };

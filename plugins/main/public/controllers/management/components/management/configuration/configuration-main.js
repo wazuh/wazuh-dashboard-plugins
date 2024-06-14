@@ -14,22 +14,27 @@ import WzConfigurationSwitch from './configuration-switch';
 import {
   withErrorBoundary,
   withGlobalBreadcrumb,
-  withReduxProvider,
 } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
-import { itHygiene, settings } from '../../../../../utils/applications';
+import { endpointSummary, settings } from '../../../../../utils/applications';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 export default compose(
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb(props => {
     let breadcrumb = false;
     if (props.agent.id === '000') {
-      breadcrumb = [{ text: settings.title }];
+      breadcrumb = [{ text: settings.breadcrumbLabel }];
     } else {
       breadcrumb = [
         {
-          text: itHygiene.title,
+          text: endpointSummary.breadcrumbLabel,
+          href: NavigationService.getInstance().getUrlForApp(
+            endpointSummary.id,
+            {
+              path: `#/agents-preview`,
+            },
+          ),
         },
         { agent: props.agent },
         { text: 'Configuration' },

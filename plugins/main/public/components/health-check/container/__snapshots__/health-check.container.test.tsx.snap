@@ -31,7 +31,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="api"
         shouldCheck={true}
         showLogButton={false}
-        title="Check Wazuh API connection"
+        title="Check API connection"
         validationService={[Function]}
       />
       <CheckResult
@@ -51,7 +51,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="setup"
         shouldCheck={true}
         showLogButton={false}
-        title="Check Wazuh API version"
+        title="Check API version"
         validationService={[Function]}
       />
       <CheckResult
@@ -103,40 +103,6 @@ exports[`Health Check container should render a Health check screen 1`] = `
         shouldCheck={true}
         showLogButton={false}
         title="Check statistics index pattern"
-        validationService={[Function]}
-      />
-      <CheckResult
-        awaitFor={Array []}
-        canRetry={true}
-        checksReady={Object {}}
-        cleanErrors={[Function]}
-        cleanWarnings={[Function]}
-        handleCheckReady={[Function]}
-        handleErrors={[Function]}
-        handleWarnings={[Function]}
-        isLoading={false}
-        key="health_check_check_vulnerabilities.pattern"
-        name="vulnerabilities.pattern"
-        shouldCheck={true}
-        showLogButton={false}
-        title="Check vulnerabilities index pattern"
-        validationService={[Function]}
-      />
-      <CheckResult
-        awaitFor={Array []}
-        canRetry={true}
-        checksReady={Object {}}
-        cleanErrors={[Function]}
-        cleanWarnings={[Function]}
-        handleCheckReady={[Function]}
-        handleErrors={[Function]}
-        handleWarnings={[Function]}
-        isLoading={false}
-        key="health_check_check_fim.pattern"
-        name="fim.pattern"
-        shouldCheck={true}
-        showLogButton={false}
-        title="Check fim index pattern"
         validationService={[Function]}
       />
     </EuiDescriptionList>

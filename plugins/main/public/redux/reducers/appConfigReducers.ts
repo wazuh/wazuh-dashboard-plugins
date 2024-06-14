@@ -11,7 +11,6 @@
  */
 
 import { Reducer } from 'redux';
-import { getSettingsDefault } from '../../../common/services/settings';
 import { AppConfigState, ResolverAction } from '../types';
 
 const initialState: AppConfigState = {
@@ -19,8 +18,8 @@ const initialState: AppConfigState = {
   isReady: false,
   hasError: false,
   data: {
+    // TODO: this should use the configuration service
     'vulnerabilities.pattern': 'wazuh-states-vulnerabilities',
-    'fim.pattern': 'wazuh-states-fim',
   },
 };
 
@@ -50,14 +49,6 @@ const appConfigReducer: Reducer<AppConfigState, ResolverAction> = (
         isReady: true,
         hasError: false,
         data: { ...state.data, ...action.payload },
-      };
-    case 'UPDATE_FIM_PATTERN':
-      return {
-        ...state,
-        data: {
-          ...state.data,
-          'fim.pattern': action.payload,
-        },
       };
     default:
       return state;

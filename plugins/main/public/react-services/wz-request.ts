@@ -15,9 +15,10 @@ import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 import IApiResponse from './interfaces/api-response.interface';
-import { getHttp, getWzCurrentAppID } from '../kibana-services';
+import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
+import NavigationService from './navigation-service';
 
 export class WzRequest {
   static wazuhConfig: any;
@@ -92,10 +93,12 @@ export class WzRequest {
           } catch (error) {
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
-            if (!window.location.hash.includes('#/settings')) {
-              window.location.href = getHttp().basePath.prepend(
-                `/app/${getWzCurrentAppID()}#/health-check`,
-              );
+            if (
+              !NavigationService.getInstance()
+                .getPathname()
+                .startsWith('/settings')
+            ) {
+              NavigationService.getInstance().navigate('/health-check');
             }
             throw new Error(error);
           }
@@ -141,20 +144,41 @@ export class WzRequest {
     method,
     path,
     body,
-    options: { checkCurrentApiIsUp?: boolean } = { checkCurrentApiIsUp: true },
+    options: {
+      checkCurrentApiIsUp?: boolean;
+      returnOriginalResponse?: boolean;
+    } = { checkCurrentApiIsUp: true, returnOriginalResponse: false },
   ): Promise<IApiResponse<any>> {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
       }
+
+      const getGenericReqOptions = (options: {
+        checkCurrentApiIsUp?: boolean;
+        returnOriginalResponse?: boolean;
+      }) => {
+        const { returnOriginalResponse, ...restOptions } = options;
+        return restOptions;
+      };
+
+      const returnOriginalResponse = options?.returnOriginalResponse;
+      const optionsToGenericReq = returnOriginalResponse
+        ? getGenericReqOptions(options)
+        : options;
+
       const id = JSON.parse(AppState.getCurrentAPI()).id;
       const requestData = { method, path, body, id };
       const response = await this.genericReq(
         'POST',
         '/api/request',
         requestData,
-        options,
+        optionsToGenericReq,
       );
+
+      if (returnOriginalResponse) {
+        return response;
+      }
 
       const hasFailed =
         (((response || {}).data || {}).data || {}).total_failed_items || 0;

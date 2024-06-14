@@ -324,6 +324,7 @@ export class WazuhReportingCtrl {
         // Init
         const printer = new ReportPrinter(
           context.wazuh.logger.get('report-printer'),
+          context.wazuh_core.configuration,
         );
 
         createDataDirectoryIfNotExists();
@@ -369,7 +370,8 @@ export class WazuhReportingCtrl {
             new Date(to).getTime(),
             serverSideQuery,
             agentsFilter,
-            indexPatternTitle,
+            indexPatternTitle ||
+              context.wazuh_core.configuration.getSettingValue('pattern'),
             agents,
           );
         }
@@ -391,6 +393,7 @@ export class WazuhReportingCtrl {
           body: {
             success: true,
             message: `Report ${context.wazuhEndpointParams.filename} was created`,
+            filename: context.wazuhEndpointParams.filename,
           },
         });
       } catch (error) {
@@ -423,6 +426,7 @@ export class WazuhReportingCtrl {
         // Init
         const printer = new ReportPrinter(
           context.wazuh.logger.get('report-printer'),
+          context.wazuh_core.configuration,
         );
 
         createDataDirectoryIfNotExists();
@@ -684,6 +688,7 @@ export class WazuhReportingCtrl {
           body: {
             success: true,
             message: `Report ${context.wazuhEndpointParams.filename} was created`,
+            filename: context.wazuhEndpointParams.filename,
           },
         });
       } catch (error) {
@@ -716,6 +721,7 @@ export class WazuhReportingCtrl {
 
           const printer = new ReportPrinter(
             context.wazuh.logger.get('report-printer'),
+            context.wazuh_core.configuration,
           );
           createDataDirectoryIfNotExists();
           createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
@@ -1022,6 +1028,7 @@ export class WazuhReportingCtrl {
             body: {
               success: true,
               message: `Report ${context.wazuhEndpointParams.filename} was created`,
+              filename: context.wazuhEndpointParams.filename,
             },
           });
         } catch (error) {
@@ -1062,6 +1069,7 @@ export class WazuhReportingCtrl {
           // Init
           const printer = new ReportPrinter(
             context.wazuh.logger.get('report-printer'),
+            context.wazuh_core.configuration,
           );
 
           const { hashUsername } = await context.wazuh.security.getCurrentUser(
@@ -1294,7 +1302,8 @@ export class WazuhReportingCtrl {
               to,
               serverSideQuery,
               agentsFilter,
-              indexPatternTitle,
+              indexPatternTitle ||
+                context.wazuh_core.configuration.getSettingValue('pattern'),
               agentID,
             );
           }
@@ -1311,6 +1320,7 @@ export class WazuhReportingCtrl {
             body: {
               success: true,
               message: `Report ${context.wazuhEndpointParams.filename} was created`,
+              filename: context.wazuhEndpointParams.filename,
             },
           });
         } catch (error) {

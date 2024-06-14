@@ -13,21 +13,27 @@
  */
 
 import React from 'react';
-import { shallow } from 'enzyme';
 import WzReporting from './reporting-main';
+import { renderWithProviders } from '../../../../../redux/render-with-redux-provider';
 
 jest.mock('../../../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
 }));
 
+jest.mock(
+  '../../../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  }),
+);
+
 describe('Reporting component', () => {
   it('renders correctly to match the snapshot', () => {
-    const wrapper = shallow(<WzReporting />);
-    expect(wrapper).toMatchSnapshot();
+    const { container } = renderWithProviders(<WzReporting />);
+    expect(container).toMatchSnapshot();
   });
 });

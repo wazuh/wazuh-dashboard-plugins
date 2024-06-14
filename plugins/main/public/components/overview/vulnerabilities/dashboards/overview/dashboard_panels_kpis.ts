@@ -60,7 +60,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: ' ',
+            customLabel: 'Severity',
           },
           schema: 'metric',
         },
@@ -75,7 +75,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"Critical"',
                   language: 'kuery',
                 },
-                label: '- Critical severity alerts',
+                label: 'Critical',
               },
             ],
           },
@@ -126,7 +126,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
     uiState: {
       vis: {
         colors: {
-          'High Severity Alerts - Count': '#38D1BA',
+          'High Severity - Count': '#38D1BA',
         },
       },
     },
@@ -152,7 +152,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: ' ',
+            customLabel: 'Severity',
           },
           schema: 'metric',
         },
@@ -167,7 +167,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"High"',
                   language: 'kuery',
                 },
-                label: '- High severity alerts',
+                label: 'High',
               },
             ],
           },
@@ -237,7 +237,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: ' ',
+            customLabel: 'Severity',
           },
           schema: 'metric',
         },
@@ -252,7 +252,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"Medium"',
                   language: 'kuery',
                 },
-                label: '- Medium severity alerts',
+                label: 'Medium',
               },
             ],
           },
@@ -322,7 +322,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: ' ',
+            customLabel: 'Severity',
           },
           schema: 'metric',
         },
@@ -337,7 +337,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"Low"',
                   language: 'kuery',
                 },
-                label: '- Low severity alerts',
+                label: 'Low',
               },
             ],
           },

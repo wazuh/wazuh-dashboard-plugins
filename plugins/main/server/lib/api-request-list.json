@@ -1155,7 +1155,14 @@
             "description": "Filter by log level",
             "schema": {
               "type": "string",
-              "enum": ["critical", "debug", "debug2", "error", "info", "warning"]
+              "enum": [
+                "critical",
+                "debug",
+                "debug2",
+                "error",
+                "info",
+                "warning"
+              ]
             }
           },
           {
@@ -3895,7 +3902,7 @@
         ]
       },
       {
-        "name": "/groups/:group_id/files/:file_name/json",
+        "name": "/groups/:group_id/files/:file_name",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_group_file_json",
         "description": "Return the content of the specified group file parsed to JSON",
         "summary": "Get a file in group",
@@ -3952,7 +3959,7 @@
         ]
       },
       {
-        "name": "/groups/:group_id/files/:file_name/xml",
+        "name": "/groups/:group_id/files/:file_name?raw=true",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_group_file_xml",
         "description": "Return the contents of the specified group file parsed to XML",
         "summary": "Get a file in group",
@@ -4478,7 +4485,14 @@
             "description": "Filter by log level",
             "schema": {
               "type": "string",
-              "enum": ["critical", "debug", "debug2", "error", "info", "warning"]
+              "enum": [
+                "critical",
+                "debug",
+                "debug2",
+                "error",
+                "info",
+                "warning"
+              ]
             }
           },
           {
@@ -5949,7 +5963,15 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["pci_dss", "gdpr", "hipaa", "nist-800-53", "gpg13", "tsc", "mitre"]
+              "enum": [
+                "pci_dss",
+                "gdpr",
+                "hipaa",
+                "nist-800-53",
+                "gpg13",
+                "tsc",
+                "mitre"
+              ]
             }
           }
         ],
@@ -10394,7 +10416,13 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["all", "active", "pending", "never_connected", "disconnected"]
+                "enum": [
+                  "all",
+                  "active",
+                  "pending",
+                  "never_connected",
+                  "disconnected"
+                ]
               },
               "minItems": 1
             }

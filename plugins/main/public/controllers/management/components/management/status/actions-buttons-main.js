@@ -15,7 +15,7 @@ import {
   EuiFlexItem,
   EuiSelect,
   EuiOverlayMask,
-  EuiConfirmModal
+  EuiConfirmModal,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -30,7 +30,7 @@ import {
 } from '../../../../../redux/actions/statusActions';
 
 import StatusHandler from './utils/status-handler';
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
@@ -47,7 +47,7 @@ class WzStatusActionButtons extends Component {
     this.statusHandler = StatusHandler;
     this.state = {
       isModalVisible: false,
-      isRestarting: false
+      isRestarting: false,
     };
   }
 
@@ -72,7 +72,7 @@ class WzStatusActionButtons extends Component {
       this.showToast(
         'success',
         'Restarting cluster, it will take up to 30 seconds.',
-        3000
+        3000,
       );
     } catch (error) {
       this.setState({ isRestarting: false });
@@ -131,9 +131,11 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(true);
       this.props.updateSelectedNode(node);
 
-      const agentsCountByManagerNodes = await this.statusHandler.clusterAgentsCount();
+      const agentsCountByManagerNodes =
+        await this.statusHandler.clusterAgentsCount();
 
-      const { connection: agentsCount } = agentsCountByManagerNodes?.data?.data?.agent_status;
+      const { connection: agentsCount } =
+        agentsCountByManagerNodes?.data?.data?.agent_status;
 
       const agentsActiveCoverage = (
         (agentsCount.active / agentsCount.total) *
@@ -168,7 +170,7 @@ class WzStatusActionButtons extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Node ${node} is down`
+          title: `${error.name}: Node ${node} is down`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -192,7 +194,7 @@ class WzStatusActionButtons extends Component {
     getToasts().add({
       color: color,
       title: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 
@@ -201,7 +203,7 @@ class WzStatusActionButtons extends Component {
     for (const node of listNodes) {
       options.push({
         value: node.name,
-        text: `${node.name} (${node.type})`
+        text: `${node.name} (${node.type})`,
       });
     }
     return options;
@@ -212,33 +214,35 @@ class WzStatusActionButtons extends Component {
   };
 
   render() {
-    const {
-      isLoading,
-      listNodes,
-      selectedNode,
-      clusterEnabled,
-    } = this.props.state;
+    const { isLoading, listNodes, selectedNode, clusterEnabled } =
+      this.props.state;
 
     let options = this.transforToOptions(listNodes);
 
     // Select node
-    const selectNode = (
-      <EuiSelect
-        id="selectNode"
-        options={options}
-        value={selectedNode}
-        onChange={this.changeNode}
-        disabled={isLoading || this.state.isRestarting}
-        aria-label="Select node"
-      />
-    );
+    const selectNode = selectedNode ? (
+      <EuiFlexItem grow={false}>
+        <EuiSelect
+          id='selectNode'
+          options={options}
+          value={selectedNode}
+          onChange={this.changeNode}
+          disabled={isLoading || this.state.isRestarting}
+          aria-label='Select node'
+        />
+      </EuiFlexItem>
+    ) : null;
 
     // Restart button
     const restartButton = (
       <WzButtonPermissions
         buttonType='empty'
-        permissions={[clusterEnabled ? {action: 'cluster:restart', resource: 'node:id:*'} : {action: 'manager:restart', resource: '*:*:*'}]}
-        iconType="refresh"
+        permissions={[
+          clusterEnabled
+            ? { action: 'cluster:restart', resource: 'node:id:*' }
+            : { action: 'manager:restart', resource: '*:*:*' },
+        ]}
+        iconType='refresh'
         onClick={async () => this.setState({ isModalVisible: true })}
         isDisabled={isLoading}
         isLoading={this.state.isRestarting}
@@ -268,9 +272,9 @@ class WzStatusActionButtons extends Component {
               }
               this.setState({ isModalVisible: false });
             }}
-            cancelButtonText="Cancel"
-            confirmButtonText="Confirm"
-            defaultFocusedButton="cancel"
+            cancelButtonText='Cancel'
+            confirmButtonText='Confirm'
+            defaultFocusedButton='cancel'
           ></EuiConfirmModal>
         </EuiOverlayMask>
       );
@@ -281,7 +285,7 @@ class WzStatusActionButtons extends Component {
         {selectedNode !== null && (
           <EuiFlexItem grow={false}>{restartButton}</EuiFlexItem>
         )}
-        {selectedNode && <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>}
+        {selectNode}
         {modal}
       </Fragment>
     );
@@ -290,7 +294,7 @@ class WzStatusActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers
+    state: state.statusReducers,
   };
 };
 
@@ -299,13 +303,14 @@ const mapDispatchToProps = dispatch => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateListDaemons: listDaemons => dispatch(updateListDaemons(listDaemons)),
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
-    updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),
+    updateSelectedNode: selectedNode =>
+      dispatch(updateSelectedNode(selectedNode)),
     updateStats: stats => dispatch(updateStats(stats)),
-    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo))
+    updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
   };
 };
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(WzStatusActionButtons);

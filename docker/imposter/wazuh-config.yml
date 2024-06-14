@@ -394,11 +394,10 @@ resources:
 
   # Get a file in group
   - method: GET
-    path: /groups/{group_id}/files/{file_name}/json
-
-  # Get a file in group
-  - method: GET
-    path: /groups/{group_id}/files/{file_name}/xml
+    path: /groups/{group_id}/files/{file_name}
+    response:
+      statusCode: 200
+      scriptFile: agents/group_files.js
 
   # ===================================================== #
   #   LISTS
@@ -890,6 +889,9 @@ resources:
   # List tasks
   - method: GET
     path: /tasks/status
+    response:
+      statusCode: 200
+      scriptFile: tasks/status.js
 
   # ===================================================== #
   #   VULNERABILITY

@@ -11,12 +11,12 @@
  */
 export default [
   {
-    _id: 'Wazuh-App-Overview-PM-Emotet-Malware-Activity',
+    _id: 'Wazuh-App-Overview-PM-Malware-Activity',
     _type: 'visualization',
     _source: {
-      title: 'Emotet malware activity',
+      title: 'Malware activity',
       visState: JSON.stringify({
-        title: 'Emotet malware activity',
+        title: 'Malware activity',
         type: 'area',
         aggs: [
           {
@@ -128,7 +128,7 @@ export default [
             },
           ],
           addTooltip: true,
-          addLegend: true,
+          addLegend: false,
           legendPosition: 'right',
           times: [],
           addTimeMarker: false,
@@ -418,40 +418,6 @@ export default [
             enabled: true,
             type: 'terms',
             params: {
-              field: 'rule.mitre.id',
-              orderBy: '_key',
-              order: 'desc',
-              size: 5,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-              customLabel: 'rule.mitre.id',
-            },
-            schema: 'bucket',
-          },
-          {
-            id: '5',
-            enabled: true,
-            type: 'terms',
-            params: {
-              field: 'rule.mitre.tactic',
-              orderBy: '_key',
-              order: 'desc',
-              size: 5,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
-              customLabel: 'rule.mitre.tactic',
-            },
-            schema: 'bucket',
-          },
-          {
-            id: '6',
-            enabled: true,
-            type: 'terms',
-            params: {
               field: 'rule.description',
               orderBy: '_key',
               order: 'desc',
@@ -465,7 +431,7 @@ export default [
             schema: 'bucket',
           },
           {
-            id: '7',
+            id: '5',
             enabled: true,
             type: 'terms',
             params: {
@@ -482,7 +448,7 @@ export default [
             schema: 'bucket',
           },
           {
-            id: '8',
+            id: '6',
             enabled: true,
             type: 'terms',
             params: {
@@ -509,7 +475,28 @@ export default [
           row: false,
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          columnsWidth: [
+            {
+              colIndex: 0,
+              width: 200,
+            },
+            {
+              colIndex: 3,
+              width: 100,
+            },
+            {
+              colIndex: 4,
+              width: 100,
+            },
+            {
+              colIndex: 5,
+              width: 100,
+            },
+          ],
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {

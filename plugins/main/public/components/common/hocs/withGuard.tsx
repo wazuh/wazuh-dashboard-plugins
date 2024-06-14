@@ -9,8 +9,68 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-export const withGuard = (condition, ComponentFulfillsCondition) => WrappedComponent => props => {
-  return condition(props) ? <ComponentFulfillsCondition {...props} /> : <WrappedComponent {...props} />
-}
+export const withGuard =
+  (condition: (props: any) => boolean, ComponentFulfillsCondition) =>
+  WrappedComponent =>
+  props => {
+    return condition(props) ? (
+      <ComponentFulfillsCondition {...props} />
+    ) : (
+      <WrappedComponent {...props} />
+    );
+  };
+
+export const withGuardAsync =
+  (
+    condition: (props: any) => { ok: boolean; data: any },
+    ComponentFulfillsCondition: React.JSX.Element,
+    ComponentLoadingResolution: null | React.JSX.Element = null,
+  ) =>
+  WrappedComponent =>
+  props => {
+    const [loading, setLoading] = useState(true);
+    const [fulfillsCondition, setFulfillsCondition] = useState({
+      ok: false,
+      data: {},
+    });
+
+    const execCondition = async () => {
+      try {
+        setLoading(true);
+        setFulfillsCondition({ ok: false, data: {} });
+        setFulfillsCondition(
+          await condition({ ...props, check: execCondition }),
+        );
+      } catch (error) {
+        setFulfillsCondition({ ok: false, data: { error } });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      execCondition();
+    }, []);
+
+    if (loading) {
+      return ComponentLoadingResolution ? (
+        <ComponentLoadingResolution {...props} />
+      ) : null;
+    }
+
+    return fulfillsCondition.ok ? (
+      <ComponentFulfillsCondition
+        {...props}
+        {...(fulfillsCondition?.data ?? {})}
+        check={execCondition}
+      />
+    ) : (
+      <WrappedComponent
+        {...props}
+        {...(fulfillsCondition?.data ?? {})}
+        check={execCondition}
+      />
+    );
+  };

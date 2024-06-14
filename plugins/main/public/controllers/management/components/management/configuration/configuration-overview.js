@@ -16,7 +16,7 @@ import {
   EuiTitle,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiButtonEmpty
+  EuiButtonEmpty,
 } from '@elastic/eui';
 
 import WzConfigurationOverviewTable from './util-components/configuration-overview-table';
@@ -24,7 +24,7 @@ import WzHelpButtonPopover from './util-components/help-button-popover';
 import WzBadge from './util-components/badge';
 import WzClusterSelect from './util-components/configuration-cluster-selector';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
-import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { ExportConfiguration } from '../../../../../components/agents/export-configuration';
 import { ReportingService } from '../../../../../react-services/reporting';
 
 import configurationSettingsGroup from './configuration-settings';
@@ -38,27 +38,27 @@ import { webDocumentationLink } from '../../../../../../common/services/web_docu
 const columns = [
   {
     field: 'name',
-    name: 'Name'
+    name: 'Name',
   },
   {
     field: 'description',
-    name: 'Description'
-  }
+    name: 'Description',
+  },
 ];
 
 const helpLinks = [
   {
-    text: 'Wazuh server administration',
-    href: webDocumentationLink('user-manual/manager/index.html')
+    text: 'Server administration',
+    href: webDocumentationLink('user-manual/manager/index.html'),
   },
   {
-    text: 'Wazuh capabilities',
-    href: webDocumentationLink('user-manual/capabilities/index.html')
+    text: 'Capabilities',
+    href: webDocumentationLink('user-manual/capabilities/index.html'),
   },
   {
     text: 'Local configuration reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/index.html')
-  }
+    href: webDocumentationLink('user-manual/reference/ossec-conf/index.html'),
+  },
 ];
 
 class WzConfigurationOverview extends Component {
@@ -81,7 +81,7 @@ class WzConfigurationOverview extends Component {
           ((isString(setting.when) && setting.when === 'manager') ||
             (isFunction(setting.when) && setting.when(this.props.agent)))) ||
         (isFunction(setting.when) && setting.when(this.props.agent)) ||
-        (!setting.when && true)
+        (!setting.when && true),
     );
   }
   filterSettings(groups) {
@@ -89,7 +89,7 @@ class WzConfigurationOverview extends Component {
       .map(group => {
         return {
           title: group.title,
-          settings: this.filterSettingsIfAgentOrManager(group.settings)
+          settings: this.filterSettingsIfAgentOrManager(group.settings),
         };
       })
       .filter(group => group.settings.length);
@@ -110,7 +110,7 @@ class WzConfigurationOverview extends Component {
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize="s">
+            <EuiFlexGroup gutterSize='s'>
               {this.props.agent.id === '000' && (
                 <EuiFlexItem grow={false}>
                   <WzRefreshClusterInfoButton />
@@ -120,36 +120,51 @@ class WzConfigurationOverview extends Component {
                 <EuiFlexItem>
                   <WzButtonPermissions
                     buttonType='empty'
-                    permissions={[{action: 'cluster:status', resource: '*:*:*'}, this.props.clusterNodeSelected ? {action: 'cluster:update_config', resource: `node:id:${this.props.clusterNodeSelected}`}: {action: 'manager:update_config', resource: "*:*:*"}]}
-                    iconSide="left"
-                    iconType="pencil"
+                    permissions={[
+                      { action: 'cluster:status', resource: '*:*:*' },
+                      this.props.clusterNodeSelected
+                        ? {
+                            action: 'cluster:update_config',
+                            resource: `node:id:${this.props.clusterNodeSelected}`,
+                          }
+                        : {
+                            action: 'manager:update_config',
+                            resource: '*:*:*',
+                          },
+                    ]}
+                    iconSide='left'
+                    iconType='pencil'
                     onClick={() =>
                       this.updateConfigurationSection(
                         'edit-configuration',
-                        `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`,
+                        `${
+                          this.props.clusterNodeSelected ? 'Cluster' : 'Manager'
+                        } configuration`,
                         '',
-                        'Edit configuration'
-                      )}
+                        'Edit configuration',
+                      )
+                    }
                   >
                     Edit configuration
                   </WzButtonPermissions>
                 </EuiFlexItem>
               )}
-              {this.props.agent.id !== '000' && this.props.agent.status === API_NAME_AGENT_STATUS.ACTIVE && (
-                <EuiFlexItem>
-                  <ExportConfiguration
-                    agent={this.props.agent}
-                    type="agent"
-                    exportConfiguration={enabledComponents => {
-                      this.reportingService.startConfigReport(
-                        this.props.agent,
-                        'agentConfig',
-                        enabledComponents
-                      );
-                    }}
-                  />
-                </EuiFlexItem>
-              )}
+              {this.props.agent.id !== '000' &&
+                this.props.agent.status === API_NAME_AGENT_STATUS.ACTIVE && (
+                  <EuiFlexItem>
+                    <ExportConfiguration
+                      agent={this.props.agent}
+                      type='agent'
+                      exportConfiguration={enabledComponents => {
+                        this.reportingService.startConfigReport(
+                          this.props.agent,
+                          'agentConfig',
+                          enabledComponents,
+                        );
+                      }}
+                    />
+                  </EuiFlexItem>
+                )}
               <EuiFlexItem grow={false}>
                 <WzHelpButtonPopover links={helpLinks} />
               </EuiFlexItem>
@@ -183,7 +198,7 @@ class WzConfigurationOverview extends Component {
 
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);

@@ -1,86 +1,89 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 
-const getVisStateTopVulnerabilities = (indexPatternId: string) => {
+const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
   return {
     id: 'most_detected_vulnerabilities',
-    title: 'Most detected vulnerabilities',
+    title: 'Most common vulnerability score',
     type: 'horizontal_bar',
     params: {
-      type: 'histogram',
-      grid: {
-        categoryLines: false,
-      },
+      addLegend: false,
+      addTimeMarker: false,
+      addTooltip: true,
       categoryAxes: [
         {
           id: 'CategoryAxis-1',
-          type: 'category',
+          labels: {
+            filter: false,
+            rotate: 0,
+            show: true,
+            truncate: 200,
+          },
           position: 'left',
-          show: true,
-          style: {},
           scale: {
             type: 'linear',
           },
-          labels: {
-            show: true,
-            rotate: 0,
-            filter: false,
-            truncate: 200,
-          },
+          show: true,
+          style: {},
           title: {},
+          type: 'category',
         },
       ],
+      grid: {
+        categoryLines: false,
+        valueAxis: '',
+      },
+      labels: {
+        show: false,
+      },
+      legendPosition: 'right',
+      seriesParams: [
+        {
+          data: {
+            id: '1',
+            label: 'Count',
+          },
+          drawLinesBetweenPoints: true,
+          lineWidth: 2,
+          mode: 'normal',
+          show: true,
+          showCircles: true,
+          type: 'histogram',
+          valueAxis: 'ValueAxis-1',
+        },
+      ],
+      thresholdLine: {
+        color: '#E7664C',
+        show: false,
+        style: 'full',
+        value: 10,
+        width: 1,
+      },
+      times: [],
+      type: 'histogram',
       valueAxes: [
         {
           id: 'ValueAxis-1',
-          name: 'LeftAxis-1',
-          type: 'value',
-          position: 'bottom',
-          show: true,
-          style: {},
-          scale: {
-            type: 'linear',
-            mode: 'normal',
-          },
           labels: {
-            show: true,
-            rotate: 75,
             filter: true,
+            rotate: 75,
+            show: true,
             truncate: 100,
           },
+          name: 'LeftAxis-1',
+          position: 'bottom',
+          scale: {
+            mode: 'normal',
+            type: 'linear',
+          },
+          show: true,
+          style: {},
           title: {
             text: 'Count',
           },
+          type: 'value',
         },
       ],
-      seriesParams: [
-        {
-          show: true,
-          type: 'histogram',
-          mode: 'stacked',
-          data: {
-            label: 'Count',
-            id: '1',
-          },
-          valueAxis: 'ValueAxis-1',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          showCircles: true,
-        },
-      ],
-      addTooltip: true,
-      addLegend: false,
-      legendPosition: 'right',
-      times: [],
-      addTimeMarker: false,
-      labels: {},
-      thresholdLine: {
-        show: false,
-        value: 10,
-        width: 1,
-        style: 'full',
-        color: '#E7664C',
-      },
     },
     data: {
       searchSource: {
@@ -111,7 +114,7 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'vulnerability.id',
+            field: 'vulnerability.score.base',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -119,7 +122,7 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Vulnerability.ID',
+            customLabel: 'Vulnerability base score',
           },
           schema: 'segment',
         },
@@ -128,10 +131,10 @@ const getVisStateTopVulnerabilities = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
+const getVisStateTopVulnerableOSFamilies = (indexPatternId: string) => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
-    title: 'Most vulnerable endpoints',
+    title: 'Most vulnerable OS families',
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
@@ -245,7 +248,7 @@ const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'agent.id',
+            field: 'host.os.type',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -253,7 +256,7 @@ const getVisStateTopVulnerabilitiesEndpoints = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'package.path',
+            customLabel: 'Host OS type',
           },
           schema: 'segment',
         },
@@ -266,11 +269,11 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
   indexPatternId: string,
 ) => {
   return {
-    id: 'accumulation_most_vulnerable_vulnerabilities',
-    title: 'Accumulation of the most detected vulnerabilities',
-    type: 'line',
+    id: 'vulnerabilities_by_year_of_publication',
+    title: 'Vulnerabilities by year of publication',
+    type: 'histogram',
     params: {
-      type: 'line',
+      type: 'histogram',
       grid: {
         categoryLines: false,
       },
@@ -301,8 +304,9 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
           show: true,
           style: {},
           scale: {
-            type: 'linear',
+            type: 'log',
             mode: 'normal',
+            defaultYExtents: true,
           },
           labels: {
             show: true,
@@ -318,16 +322,15 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
       seriesParams: [
         {
           show: true,
-          type: 'line',
-          mode: 'normal',
+          type: 'histogram',
+          mode: 'stacked',
           data: {
             label: 'Count',
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
-          drawLinesBetweenPoints: false,
+          drawLinesBetweenPoints: true,
           lineWidth: 2,
-          interpolate: 'linear',
           showCircles: true,
         },
       ],
@@ -336,7 +339,9 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
       legendPosition: 'right',
       times: [],
       addTimeMarker: false,
-      labels: {},
+      labels: {
+        show: false,
+      },
       thresholdLine: {
         show: false,
         value: 10,
@@ -344,7 +349,6 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
         style: 'full',
         color: '#E7664C',
       },
-      radiusRatio: 20,
     },
     data: {
       searchSource: {
@@ -373,47 +377,37 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
         {
           id: '2',
           enabled: true,
-          type: 'count',
-          params: {},
-          schema: 'radius',
-        },
-        {
-          id: '4',
-          enabled: true,
-          type: 'terms',
-          params: {
-            field: 'vulnerability.id',
-            orderBy: '1',
-            order: 'desc',
-            size: 5,
-            otherBucket: false,
-            otherBucketLabel: 'Others',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-          },
-          schema: 'group',
-        },
-        {
-          id: '3',
-          enabled: true,
           type: 'date_histogram',
           params: {
-            field: '@timestamp',
+            field: 'vulnerability.published_at',
             timeRange: {
               from: 'now-24h',
               to: 'now',
             },
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
-            interval: 'w',
-            // eslint-disable-next-line camelcase
+            interval: 'y',
             drop_partials: false,
-            // eslint-disable-next-line camelcase
             min_doc_count: 1,
-            // eslint-disable-next-line camelcase
             extended_bounds: {},
           },
           schema: 'segment',
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'vulnerability.severity',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+          schema: 'group',
         },
       ],
     },
@@ -439,7 +433,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '6',
-        savedVis: getVisStateTopVulnerabilities(indexPatternId),
+        savedVis: getVisStateTopVulnerabilitiesScore(indexPatternId),
       },
     },
     '7': {
@@ -453,7 +447,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '7',
-        savedVis: getVisStateTopVulnerabilitiesEndpoints(indexPatternId),
+        savedVis: getVisStateTopVulnerableOSFamilies(indexPatternId),
       },
     },
     '8': {

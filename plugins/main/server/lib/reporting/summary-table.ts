@@ -10,11 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 interface SummarySetup {
   title: string;
-  aggs: any
+  aggs: any;
 }
 
 export default class SummaryTable {
@@ -25,9 +24,8 @@ export default class SummaryTable {
     filters,
     allowedAgentsFilter,
     summarySetup: SummarySetup,
-    pattern = getSettingDefaultValue('pattern')
+    pattern,
   ) {
-
     this._context = context;
     this._pattern = pattern;
     this._summarySetup = summarySetup;
@@ -36,10 +34,12 @@ export default class SummaryTable {
     this._rows = [];
     this._title = summarySetup.title;
 
-    Object.assign(this._base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(
+      this._base,
+      Base(pattern, filters, gte, lte, allowedAgentsFilter),
+    );
 
     this._parseSummarySetup(summarySetup);
-
   }
 
   /**
@@ -74,10 +74,10 @@ export default class SummaryTable {
       terms: {
         field,
         order: {
-          _count: order
+          _count: order,
         },
         size,
-      }
+      },
     };
     if (missing) {
       baseAggRef[`${key + 2}`].terms.missing = missing;
@@ -101,7 +101,7 @@ export default class SummaryTable {
 
     this._rows = rawResponse[firstKey].buckets.reduce((totalRows, bucket) => {
       const nextKey = firstKey + 1;
-      this._buildRow(bucket, nextKey, totalRows);
+      this._buildRow(bucket, nextKey, totalRows, this._columns.length);
       return totalRows;
     }, []);
 
@@ -109,7 +109,7 @@ export default class SummaryTable {
       rows: this._rows,
       columns: this._columns,
       title: this._title,
-    }
+    };
   }
 
   /**
@@ -118,16 +118,45 @@ export default class SummaryTable {
    * @param nextAggKey
    * @param row
    */
-  _buildRow(bucket: any, nextAggKey: number, totalRows: any[], row: any[] = []): any[] {
+  _buildRow(
+    bucket: any,
+    nextAggKey: number,
+    totalRows: any[],
+    totalColumns: number,
+    row: any[] = [],
+  ): any[] {
     const newRow = [...row, bucket.key];
-    // If there is a next aggregation, repeat the process
-    if (bucket[nextAggKey.toString()]?.buckets?.length) {
-      bucket[nextAggKey.toString()].buckets.forEach(newBucket => {
-        this._buildRow(newBucket, (nextAggKey + 1), totalRows, newRow);
-      });
-    }
-    // Add the Count as the last item in the row
-    else if (bucket.doc_count) {
+    const indexColumn = newRow.length - 1;
+
+    if (indexColumn < totalColumns - 1) {
+      // If there is a next aggregation, repeat the process
+      if (bucket[nextAggKey.toString()]?.buckets?.length) {
+        bucket[nextAggKey.toString()].buckets.forEach(newBucket => {
+          this._buildRow(
+            newBucket,
+            nextAggKey + 1,
+            totalRows,
+            totalColumns,
+            newRow,
+          );
+        });
+      } else {
+        // Calculate the cells to fill due to the aggregation buckets are missing
+        // The last column is the Count and this value is coming from the last bucket available
+        // totalColumns starts from 1. totalColumns - 1 gets the index of the last column
+        // indexColumn starts from 0
+        const fillCellsLength = totalColumns - 1 - indexColumn - 1;
+        /* Fill the row with undefined values.
+          Note: The undefined values are mapped to `"-"` on the methods of the reporting.
+        */
+        if (fillCellsLength) {
+          newRow.push(...Array.from({ length: fillCellsLength }));
+        }
+        newRow.push(bucket.doc_count);
+        totalRows.push(newRow);
+      }
+      // Add the Count as the last item in the row
+    } else {
       newRow.push(bucket.doc_count);
       totalRows.push(newRow);
     }
@@ -138,15 +167,17 @@ export default class SummaryTable {
    */
   async fetch() {
     try {
-      const response = await this._context.core.opensearch.client.asCurrentUser.search({
-        index: this._pattern,
-        body: this._base
-      });
-      const alertsTable = this._formatResponseToTable(response.body.aggregations);
+      const response =
+        await this._context.core.opensearch.client.asCurrentUser.search({
+          index: this._pattern,
+          body: this._base,
+        });
+      const alertsTable = this._formatResponseToTable(
+        response.body.aggregations,
+      );
       return alertsTable;
     } catch (error) {
       return Promise.reject(error);
     }
   }
-
 }

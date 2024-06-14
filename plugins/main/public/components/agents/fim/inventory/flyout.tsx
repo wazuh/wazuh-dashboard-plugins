@@ -10,9 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
-  EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiTitle,
@@ -21,7 +20,6 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FileDetails } from './fileDetail';
-import { AppState } from '../../../../react-services/app-state';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -31,28 +29,28 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { WzFlyout } from '../../../common/flyouts';
+import { withRouterSearch } from '../../../common/hocs';
 
-export class FlyoutDetail extends Component {
-  state: {
-    currentFile: boolean | { [key: string]: string };
-    clusterFilter: {};
-    isLoading: boolean;
-    error: boolean;
-    type: 'file' | 'registry_key';
-  };
+export const FlyoutDetail = withRouterSearch(
+  class FlyoutDetail extends Component {
+    state: {
+      currentFile: boolean | { [key: string]: string };
+      isLoading: boolean;
+      error: boolean;
+      type: 'file' | 'registry_key';
+    };
 
-  props!: {
-    fileName: string;
-    agentId: string;
-    view: 'inventory' | 'events' | 'extern';
-    closeFlyout(): void;
-  };
+    props!: {
+      fileName: string;
+      agentId: string;
+      view: 'inventory' | 'events' | 'extern';
+      closeFlyout(): void;
+    };
 
   constructor(props) {
     super(props);
     this.state = {
       currentFile: false,
-      clusterFilter: {},
       isLoading: true,
       error: false,
       type: 'file',
@@ -61,34 +59,42 @@ export class FlyoutDetail extends Component {
 
   async componentDidMount() {
     try {
-      const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
-      const clusterFilter = isCluster
-        ? { 'cluster.name': AppState.getClusterInfo().cluster }
-        : { 'manager.name': AppState.getClusterInfo().manager };
-      this.setState({ clusterFilter });
       let currentFile;
-      if (typeof this.props.item === 'boolean' && typeof this.props.fileName !== undefined) {
+      if (
+        typeof this.props.item === 'boolean' &&
+        typeof this.props.fileName !== undefined
+      ) {
         const regex = new RegExp('file=' + '[^&]*');
         const match = window.location.href.match(regex);
         if (match && match[0]) {
-          let file = decodeURIComponent(match[0].split('=')[1]);
-          const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
-            params: {
-              q: `file=${file};(type=file,type=registry_key)`,
+          const file = decodeURIComponent(match[0].split('=')[1]);
+          const data = await WzRequest.apiReq(
+            'GET',
+            `/syscheck/${this.props.agentId}`,
+            {
+              params: {
+                q: `file=${file};(type=file,type=registry_key)`,
+              },
             },
-          });
-          currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
+          );
+          currentFile = ((((data || {}).data || {}).data || {})
+            .affected_items || [])[0];
         }
       } else if (this.props.item) {
         currentFile = this.props.item;
       } else {
-        let file = this.props.fileName;
-        const data = await WzRequest.apiReq('GET', `/syscheck/${this.props.agentId}`, {
-          params: {
-            q: `file=${file};(type=file,type=registry_key)`,
+        const file = this.props.fileName;
+        const data = await WzRequest.apiReq(
+          'GET',
+          `/syscheck/${this.props.agentId}`,
+          {
+            params: {
+              q: `file=${file};(type=file,type=registry_key)`,
+            },
           },
-        });
-        currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
+        );
+        currentFile = ((((data || {}).data || {}).data || {}).affected_items ||
+          [])[0];
       }
       if (!currentFile) {
         throw new Error('File not found');
@@ -100,23 +106,26 @@ export class FlyoutDetail extends Component {
         currentFile: { file: this.props.fileName },
       });
 
-      const options: UIErrorLog = {
-        context: `${FlyoutDetail.name}.componentDidMount`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
+        const options: UIErrorLog = {
+          context: `${FlyoutDetail.name}.componentDidMount`,
+          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
     }
-  }
 
   componentWillUnmount() {
-    window.location.href = window.location.href.replace(new RegExp('&file=' + '[^&]*', 'g'), '');
+    window.location.href = window.location.href.replace(
+      new RegExp('&file=' + '[^&]*', 'g'),
+      '',
+    );
   }
 
   render() {
@@ -131,30 +140,30 @@ export class FlyoutDetail extends Component {
           className: 'wz-inventory wzApp',
         }}
       >
-        <EuiFlyoutHeader hasBorder className="flyout-header">
-          <EuiTitle size="s">
-            <h2 id={this.state.currentFile.file}>{this.state.currentFile.file}</h2>
+        <EuiFlyoutHeader hasBorder className='flyout-header'>
+          <EuiTitle size='s'>
+            <h2 id={this.state.currentFile.file}>
+              {this.state.currentFile.file}
+            </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         {this.state.isLoading && (
-          <EuiFlyoutBody className="flyout-body">
+          <EuiFlyoutBody className='flyout-body'>
             {(this.state.error && (
-              <EuiCallOut title={this.state.error} color="warning" iconType="alert" />
+              <EuiCallOut
+                title={this.state.error}
+                color='warning'
+                iconType='alert'
+              />
             )) || <EuiLoadingContent style={{ margin: 16 }} />}
           </EuiFlyoutBody>
         )}
         {this.state.currentFile && !this.state.isLoading && (
-          <EuiFlyoutBody className="flyout-body">
+          <EuiFlyoutBody className='flyout-body'>
             <FileDetails
               currentFile={this.state.currentFile}
               type={type}
               {...this.props}
-              implicitFilters={[
-                { 'rule.groups': 'syscheck' },
-                { 'syscheck.path': this.state.currentFile.file },
-                { 'agent.id': this.props.agentId },
-                this.state.clusterFilter,
-              ]}
             />
           </EuiFlyoutBody>
         )}
@@ -162,3 +171,4 @@ export class FlyoutDetail extends Component {
     );
   }
 }
+);

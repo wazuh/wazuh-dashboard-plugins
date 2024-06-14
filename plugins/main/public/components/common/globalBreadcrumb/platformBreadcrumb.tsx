@@ -1,5 +1,6 @@
-import { getCore } from '../../../kibana-services';
-import { itHygiene } from '../../../utils/applications';
+import { getCore, getWzCurrentAppID } from '../../../kibana-services';
+import NavigationService from '../../../react-services/navigation-service';
+import { endpointSummary } from '../../../utils/applications';
 
 export const setBreadcrumbs = (breadcrumbs, router) => {
   if (breadcrumbs === '' || breadcrumbs === undefined) {
@@ -12,10 +13,18 @@ export const setBreadcrumbs = (breadcrumbs, router) => {
             'euiLink euiLink--subdued osdBreadcrumbs wz-vertical-align-middle',
           onClick: ev => {
             ev.stopPropagation();
-            getCore().application.navigateToApp(itHygiene.id, {
-              path: `#/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
-            });
-            router.reload();
+            if (getWzCurrentAppID() === endpointSummary.id) {
+              NavigationService.getInstance().navigate(
+                `/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
+              );
+            } else {
+              NavigationService.getInstance().navigateToApp(
+                endpointSummary.id,
+                {
+                  path: `#/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
+                },
+              );
+            }
           },
           truncate: true,
           text: breadcrumb.agent.name,

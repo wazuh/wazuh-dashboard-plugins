@@ -27,25 +27,26 @@ import {
   EuiEmptyPrompt,
 } from '@elastic/eui';
 import moment from 'moment-timezone';
-import store from '../../../../../redux/store';
-import { updateCurrentAgentData } from '../../../../../redux/actions/appStateActions';
 import { WzRequest } from '../../../../../react-services';
 import { formatUIDate } from '../../../../../react-services/time-service';
-import { getAngularModule, getCore } from '../../../../../kibana-services';
-import { withReduxProvider, withUserAuthorizationPrompt } from '../../../hocs';
+import { getCore } from '../../../../../kibana-services';
+import { withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
 import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
-import { configurationAssessment } from '../../../../../utils/applications';
+import {
+  configurationAssessment,
+  endpointSummary,
+} from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 type Props = {
   agent: { [key in string]: any };
-  router: any; // its angular router
 };
 
 export const ScaScan = compose(
-  withReduxProvider,
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
@@ -59,7 +60,6 @@ export const ScaScan = compose(
 )(
   class ScaScan extends Component<Props> {
     _isMount = false;
-    router;
     state: {
       lastScan: {
         [key: string]: any;
@@ -69,8 +69,11 @@ export const ScaScan = compose(
       policies: any[];
     };
 
+    pinnedAgentManager: PinnedAgentManager;
+
     constructor(props) {
       super(props);
+      this.pinnedAgentManager = new PinnedAgentManager();
       this.state = {
         lastScan: {},
         isLoading: true,
@@ -85,8 +88,6 @@ export const ScaScan = compose(
         this.setState({ policies: JSON.parse(storedPolicies) });
       }
       this._isMount = true;
-      const $injector = getAngularModule().$injector;
-      this.router = $injector.get('$route');
       this.getLastScan(this.props.agent.id);
     }
 
@@ -150,7 +151,9 @@ export const ScaScan = compose(
           'scaPolicies',
           JSON.stringify(this.state.policies),
         );
-        window.location.href = `#/overview?tab=sca&redirectPolicy=${policy.policy_id}`;
+        NavigationService.getInstance().navigateToApp(endpointSummary.id, {
+          path: `#/overview?tab=sca&redirectPolicy=${policy.policy_id}&agentId=${this.props.agent.id}`,
+        });
       });
     };
 
@@ -209,13 +212,12 @@ export const ScaScan = compose(
                 <EuiTitle size='xs'>
                   <EuiLink
                     onClick={() => {
-                      store.dispatch(updateCurrentAgentData(this.props.agent));
-                      this.router.reload();
+                      this.pinnedAgentManager.pinAgent(this.props.agent);
                     }}
-                    href={getCore().application.getUrlForApp(
+                    href={NavigationService.getInstance().getUrlForApp(
                       configurationAssessment.id,
                       {
-                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}`,
+                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
                       },
                     )}
                   >
@@ -289,15 +291,12 @@ export const ScaScan = compose(
                       <EuiLink
                         className='agents-link-item'
                         onClick={() => {
-                          store.dispatch(
-                            updateCurrentAgentData(this.props.agent),
-                          );
-                          this.router.reload();
+                          this.pinnedAgentManager.pinAgent(this.props.agent);
                         }}
-                        href={getCore().application.getUrlForApp(
+                        href={NavigationService.getInstance().getUrlForApp(
                           configurationAssessment.id,
                           {
-                            path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}`,
+                            path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
                           },
                         )}
                       >
@@ -314,12 +313,9 @@ export const ScaScan = compose(
                         color='primary'
                         className='EuiButtonIcon'
                         onClick={() => {
-                          store.dispatch(
-                            updateCurrentAgentData(this.props.agent),
-                          );
-                          this.router.reload();
+                          this.pinnedAgentManager.pinAgent(this.props.agent);
                         }}
-                        href={getCore().application.getUrlForApp(
+                        href={NavigationService.getInstance().getUrlForApp(
                           configurationAssessment.id,
                         )}
                         aria-label='Open SCA Scans'

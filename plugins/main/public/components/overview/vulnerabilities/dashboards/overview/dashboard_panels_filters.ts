@@ -21,6 +21,16 @@ const getVisStateFilter = (
       showTotal: false,
       totalFunc: 'sum',
     },
+    uiState: {
+      vis: {
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 75,
+          },
+        ],
+      },
+    },
     data: {
       searchSource: {
         query: {
@@ -76,31 +86,31 @@ export const getDashboardFilters = (
   >;
 } => {
   return {
-    topPackageSelector: {
+    topVulnerabilities: {
       gridData: {
-        w: 12,
+        w: 9,
         h: 12,
         x: 0,
         y: 0,
-        i: 'topPackageSelector',
+        i: 'topVulnerabilities',
       },
       type: 'visualization',
       explicitInput: {
-        id: 'topPackageSelector',
+        id: 'topVulnerabilities',
         savedVis: getVisStateFilter(
-          'topPackageSelector',
+          'topVulnerabilities',
           indexPatternId,
-          'Top packages vulnerabilities',
-          'Top 5 package names',
-          'package.name',
+          'Top vulnerabilities',
+          'Top 5 vulnerabilities',
+          'vulnerability.id',
         ),
       },
     },
     topOSVulnerabilities: {
       gridData: {
-        w: 12,
+        w: 15,
         h: 12,
-        x: 12,
+        x: 9,
         y: 0,
         i: 'topOSVulnerabilities',
       },
@@ -111,14 +121,14 @@ export const getDashboardFilters = (
           'topOSVulnerabilities',
           indexPatternId,
           'Top operating system vulnerabilities',
-          'Top 5 operating systems',
+          'Top 5 OS',
           'host.os.full',
         ),
       },
     },
     topAgentVulnerabilities: {
       gridData: {
-        w: 12,
+        w: 15,
         h: 12,
         x: 24,
         y: 0,
@@ -132,27 +142,27 @@ export const getDashboardFilters = (
           indexPatternId,
           'Agent filter',
           'Top 5 agents',
-          'agent.id',
+          'agent.name',
         ),
       },
     },
-    topVulnerabilities: {
+    topPackageSelector: {
       gridData: {
-        w: 12,
+        w: 9,
         h: 12,
-        x: 36,
+        x: 39,
         y: 0,
-        i: 'topVulnerabilities',
+        i: 'topPackageSelector',
       },
       type: 'visualization',
       explicitInput: {
-        id: 'topVulnerabilities',
+        id: 'topPackageSelector',
         savedVis: getVisStateFilter(
-          'topVulnerabilities',
+          'topPackageSelector',
           indexPatternId,
-          'Top vulnerabilities',
-          'Top 5 vulnerabilities',
-          'vulnerability.id',
+          'Top packages vulnerabilities',
+          'Top 5 packages',
+          'package.name',
         ),
       },
     },

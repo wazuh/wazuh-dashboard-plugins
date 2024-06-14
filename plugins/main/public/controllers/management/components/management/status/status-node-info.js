@@ -32,13 +32,19 @@ export class WzStatusNodeInfo extends Component {
 
   render() {
     const { stats, nodeInfo, selectedNode, clusterEnabled } = this.props.state;
-    const agentsNodeCount = clusterEnabled ? (stats.agentsCountByManagerNodes.find(node => node.node_name === selectedNode) || {}).count || 0 : stats.agentsCount.total;
+    const agentsNodeCount = clusterEnabled
+      ? (
+          stats.agentsCountByManagerNodes.find(
+            node => node.node_name === selectedNode,
+          ) || {}
+        ).count || 0
+      : stats.agentsCount.total;
     const title = selectedNode
       ? selectedNode + ' information'
       : 'Manager information';
 
     const greyStyle = {
-      color: 'grey'
+      color: 'grey',
     };
 
     return (
@@ -47,7 +53,7 @@ export class WzStatusNodeInfo extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle size="m">
+                <EuiTitle size='m'>
                   <h2>{title}</h2>
                 </EuiTitle>
               </EuiFlexItem>
@@ -57,12 +63,6 @@ export class WzStatusNodeInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>Version</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.version}</EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>Compilation date</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>
-            {formatUIDate(nodeInfo.compilation_date)}
-          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>Installation path</EuiFlexItem>
@@ -83,7 +83,7 @@ export class WzStatusNodeInfo extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers
+    state: state.statusReducers,
   };
 };
 

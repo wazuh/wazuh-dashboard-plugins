@@ -12,6 +12,9 @@ switch (agentId) {
   case undefined:
     respond().withStatusCode(200).withFile('agents/agents.json');
     break;
+  case '000':
+    respond().withStatusCode(200).withFile('agents/agent_manager.json');
+    break;
   case '001':
     respond().withStatusCode(200).withFile('agents/agent_active_groups.json');
     break;

@@ -12,173 +12,155 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
         class="euiFlexItem"
       >
         <div
-          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
         >
-          <div
-            class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
-          >
-            <h1
-              class="euiTitle euiTitle--small"
-            >
-              Agents 
-              <span>
-                (0)
-              </span>
-            </h1>
-          </div>
           <div
             class="euiFlexItem"
           >
             <div
-              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
             >
               <div
-                class="euiFlexItem euiFlexItem--flexGrowZero"
+                class="euiFlexItem"
               >
-                <a
-                  class="euiButtonEmpty euiButtonEmpty--primary"
-                  href="http://url"
-                  rel="noreferrer"
+                <div
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
-                  <span
-                    class="euiButtonContent euiButtonEmpty__content"
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    />
-                    <span
-                      class="euiButtonEmpty__text"
+                    <h1
+                      class="euiTitle euiTitle--small"
                     >
-                      Deploy new agent
-                    </span>
-                  </span>
-                </a>
+                      Agents 
+                      <span>
+                        (0)
+                      </span>
+                    </h1>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
+                  >
+                    <div
+                      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+                    />
+                  </div>
+                </div>
               </div>
               <div
                 class="euiFlexItem euiFlexItem--flexGrowZero"
               >
-                <button
-                  class="euiButtonEmpty euiButtonEmpty--primary"
-                  type="button"
+                <div
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
-                  <span
-                    class="euiButtonContent euiButtonEmpty__content"
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    />
-                    <span
-                      class="euiButtonEmpty__text"
+                    <div
+                      class="euiFlexItem euiFlexItem--flexGrowZero"
                     >
-                      Refresh
-                    </span>
-                  </span>
-                </button>
-              </div>
-              <div
-                class="euiFlexItem euiFlexItem--flexGrowZero"
-              >
-                <button
-                  class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
-                  disabled=""
-                  type="button"
-                >
-                  <span
-                    class="euiButtonContent euiButtonEmpty__content"
+                      <a
+                        class="euiButtonEmpty euiButtonEmpty--primary"
+                        href="http://url"
+                        rel="noreferrer"
+                      >
+                        <span
+                          class="euiButtonContent euiButtonEmpty__content"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                            focusable="false"
+                            height="16"
+                            role="img"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                            />
+                          </svg>
+                          <span
+                            class="euiButtonEmpty__text"
+                          >
+                            Deploy new agent
+                          </span>
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    />
-                    <span
-                      class="euiButtonEmpty__text"
-                    >
-                      Export formatted
-                    </span>
-                  </span>
-                </button>
-              </div>
-              <div
-                class="euiFlexItem euiFlexItem--flexGrowZero"
-              >
-                <span
-                  class="euiToolTipAnchor"
-                >
-                  <button
-                    class="euiButtonEmpty euiButtonEmpty--primary"
-                    type="button"
-                  >
-                    <span
-                      class="euiButtonContent euiButtonEmpty__content"
+                    <button
+                      class="euiButtonEmpty euiButtonEmpty--primary"
+                      type="button"
                     >
                       <span
-                        class="euiButtonEmpty__text"
+                        class="euiButtonContent euiButtonEmpty__content"
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon--primary euiIcon-isLoading"
+                          class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                           focusable="false"
                           height="16"
                           role="img"
                           viewBox="0 0 16 16"
                           width="16"
                           xmlns="http://www.w3.org/2000/svg"
-                        />
+                        >
+                          <path
+                            d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                          />
+                        </svg>
+                        <span
+                          class="euiButtonEmpty__text"
+                        >
+                          Refresh
+                        </span>
                       </span>
-                    </span>
-                  </button>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div
-            class="euiSuggestInput"
-          >
-            <div
-              class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-              id="popover"
-            >
-              <div
-                class="euiPopover__anchor"
-              >
-                <div>
+                    </button>
+                  </div>
                   <div
-                    class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <button
+                      class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                      disabled=""
+                      type="button"
+                    >
+                      <span
+                        class="euiButtonContent euiButtonEmpty__content"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                          focusable="false"
+                          height="16"
+                          role="img"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                          />
+                        </svg>
+                        <span
+                          class="euiButtonEmpty__text"
+                        >
+                          Export formatted
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <div
-                      class="euiFormControlLayout__childrenWrapper"
-                    >
-                      <input
-                        class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                        placeholder="Search"
-                        type="text"
-                        value=""
-                      />
-                    </div>
-                    <div
-                      class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                      class="euiPopover euiPopover--anchorDownLeft"
+                      id="agentsTableGlobalActions"
                     >
                       <div
                         class="euiPopover__anchor"
@@ -188,331 +170,494 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                           type="button"
                         >
                           <span
-                            class="euiButtonContent euiButtonEmpty__content"
-                          >
-                            <span
-                              class="euiButtonEmpty__text"
-                            >
-                              WQL
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          class="euiSpacer euiSpacer--s"
-        />
-        <div
-          class="euiBasicTable"
-        >
-          <div>
-            <div
-              class="euiTableHeaderMobile"
-            >
-              <div
-                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
-              >
-                <div
-                  class="euiFlexItem euiFlexItem--flexGrowZero"
-                />
-                <div
-                  class="euiFlexItem euiFlexItem--flexGrowZero"
-                >
-                  <div
-                    class="euiTableSortMobile"
-                  >
-                    <div
-                      class="euiPopover euiPopover--anchorDownRight"
-                    >
-                      <div
-                        class="euiPopover__anchor"
-                      >
-                        <button
-                          class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
-                          type="button"
-                        >
-                          <span
                             class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
                           >
                             <svg
                               aria-hidden="true"
-                              class="euiIcon euiIcon--small euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                              class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                               focusable="false"
                               height="16"
                               role="img"
                               viewBox="0 0 16 16"
                               width="16"
                               xmlns="http://www.w3.org/2000/svg"
-                            />
+                            >
+                              <path
+                                d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                              />
+                            </svg>
                             <span
                               class="euiButtonEmpty__text"
                             >
-                              Sorting
+                              More
                             </span>
                           </span>
                         </button>
                       </div>
                     </div>
                   </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <button
+                        class="euiButtonEmpty euiButtonEmpty--primary"
+                        type="button"
+                      >
+                        <span
+                          class="euiButtonContent euiButtonEmpty__content"
+                        >
+                          <span
+                            class="euiButtonEmpty__text"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="euiIcon euiIcon--medium euiIcon--primary euiIcon-isLoading"
+                              focusable="false"
+                              height="16"
+                              role="img"
+                              viewBox="0 0 16 16"
+                              width="16"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                              />
+                            </svg>
+                          </span>
+                        </span>
+                      </button>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-            <table
-              class="euiTable euiTable--responsive euiTable--auto"
-              id="__table_d1f8f8c3-1198-11ee-ab9b-75fc624fc672"
-              tabindex="-1"
-            >
-              <caption
-                class="euiScreenReaderOnly euiTableCaption"
-              />
-              <thead>
-                <tr>
-                  <th
-                    aria-live="polite"
-                    aria-sort="ascending"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_id_0"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton euiTableHeaderButton-isSorted"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          ID
-                        </span>
-                        <svg
-                          aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon-isLoading euiTableSortIcon"
-                          focusable="false"
-                          height="16"
-                          role="img"
-                          viewBox="0 0 16 16"
-                          width="16"
-                          xmlns="http://www.w3.org/2000/svg"
-                        />
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_name_1"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Name
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_ip_2"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          IP address
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_3"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Group(s)
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os.name,os.version_4"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Operating system
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_node_name_5"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Cluster node
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_version_6"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Version
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_config_status_7"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Synced
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    class="euiTableHeaderCell"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <span
-                      class="euiTableCellContent euiTableCellContent--alignRight"
-                    >
-                      <span
-                        class="euiTableCellContent__text"
-                      >
-                        Actions
-                      </span>
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  class="euiTableRow"
+          </div>
+          <div
+            class="euiFlexItem"
+          />
+          <div
+            class="euiFlexItem"
+          >
+            <div>
+              <div
+                class="euiSuggestInput"
+              >
+                <div
+                  class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                  id="popover"
                 >
-                  <td
-                    class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="9"
+                  <div
+                    class="euiPopover__anchor"
+                  >
+                    <div>
+                      <div
+                        class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                      >
+                        <div
+                          class="euiFormControlLayout__childrenWrapper"
+                        >
+                          <input
+                            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                            placeholder="Search"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div
+                          class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonEmpty__content"
+                              >
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  WQL
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="euiSpacer euiSpacer--s"
+            />
+            <div
+              class="euiBasicTable"
+            >
+              <div>
+                <div
+                  class="euiTableHeaderMobile"
+                >
+                  <div
+                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
                   >
                     <div
-                      class="euiTableCellContent euiTableCellContent--alignCenter"
+                      class="euiFlexItem euiFlexItem--flexGrowZero"
                     >
-                      <span
-                        class="euiTableCellContent__text"
+                      <div
+                        class="euiCheckbox"
                       >
-                        No items found
-                      </span>
+                        <input
+                          aria-label="Select all rows"
+                          class="euiCheckbox__input"
+                          disabled=""
+                          id="_selection_column-checkbox_htmlId"
+                          type="checkbox"
+                        />
+                        <div
+                          class="euiCheckbox__square"
+                        />
+                        <label
+                          class="euiCheckbox__label"
+                          for="_selection_column-checkbox_htmlId"
+                        >
+                          Select all rows
+                        </label>
+                      </div>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <div
+                      class="euiFlexItem euiFlexItem--flexGrowZero"
+                    >
+                      <div
+                        class="euiTableSortMobile"
+                      >
+                        <div
+                          class="euiPopover euiPopover--anchorDownRight"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="euiIcon euiIcon--small euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                                  focusable="false"
+                                  height="16"
+                                  role="img"
+                                  viewBox="0 0 16 16"
+                                  width="16"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                                  />
+                                </svg>
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  Sorting
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <table
+                  class="euiTable euiTable--responsive euiTable--auto"
+                  id="htmlId"
+                  tabindex="-1"
+                >
+                  <caption
+                    class="euiScreenReaderOnly euiTableCaption"
+                  />
+                  <thead>
+                    <tr>
+                      <th
+                        class="euiTableHeaderCellCheckbox"
+                        scope="col"
+                      >
+                        <div
+                          class="euiTableCellContent"
+                        >
+                          <div
+                            class="euiCheckbox euiCheckbox--inList euiCheckbox--noLabel"
+                          >
+                            <input
+                              aria-label="Select all rows"
+                              class="euiCheckbox__input"
+                              data-test-subj="checkboxSelectAll"
+                              disabled=""
+                              id="_selection_column-checkbox_htmlId"
+                              type="checkbox"
+                            />
+                            <div
+                              class="euiCheckbox__square"
+                            />
+                          </div>
+                        </div>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="ascending"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_id_0"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton euiTableHeaderButton-isSorted"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              ID
+                            </span>
+                            <svg
+                              aria-hidden="true"
+                              class="euiIcon euiIcon--medium euiIcon-isLoading euiTableSortIcon"
+                              focusable="false"
+                              height="16"
+                              role="img"
+                              viewBox="0 0 16 16"
+                              width="16"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                              />
+                            </svg>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_name_1"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Name
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_ip_2"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              IP address
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_group_3"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Group(s)
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_os.name,os.version_4"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Operating system
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_node_name_5"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Cluster node
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_version_6"
+                        role="columnheader"
+                        scope="col"
+                        style="width:100px"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Version
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_group_config_status_7"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Synced
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        class="euiTableHeaderCell"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <span
+                          class="euiTableCellContent euiTableCellContent--alignRight"
+                        >
+                          <span
+                            class="euiTableCellContent__text"
+                          >
+                            Actions
+                          </span>
+                        </span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      class="euiTableRow"
+                    >
+                      <td
+                        class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
+                        colspan="10"
+                      >
+                        <div
+                          class="euiTableCellContent euiTableCellContent--alignCenter"
+                        >
+                          <span
+                            class="euiTableCellContent__text"
+                          >
+                            No items found
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -533,194 +678,156 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
         class="euiFlexItem"
       >
         <div
-          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
         >
-          <div
-            class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
-          >
-            <h1
-              class="euiTitle euiTitle--small"
-            >
-              Agents 
-              <span>
-                (0)
-              </span>
-            </h1>
-          </div>
           <div
             class="euiFlexItem"
           >
             <div
-              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
             >
               <div
-                class="euiFlexItem euiFlexItem--flexGrowZero"
+                class="euiFlexItem"
               >
-                <a
-                  class="euiButtonEmpty euiButtonEmpty--primary"
-                  href="http://url"
-                  rel="noreferrer"
+                <div
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
-                  <span
-                    class="euiButtonContent euiButtonEmpty__content"
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
+                    <h1
+                      class="euiTitle euiTitle--small"
                     >
-                      <path
-                        d="M8 7h3.5a.5.5 0 1 1 0 1H8v3.5a.5.5 0 1 1-1 0V8H3.5a.5.5 0 0 1 0-1H7V3.5a.5.5 0 0 1 1 0V7Zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0Zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882Z"
-                        fill-rule="evenodd"
-                      />
-                    </svg>
-                    <span
-                      class="euiButtonEmpty__text"
-                    >
-                      Deploy new agent
-                    </span>
-                  </span>
-                </a>
+                      Agents 
+                      <span>
+                        (0)
+                      </span>
+                    </h1>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
+                  >
+                    <div
+                      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+                    />
+                  </div>
+                </div>
               </div>
               <div
                 class="euiFlexItem euiFlexItem--flexGrowZero"
               >
-                <button
-                  class="euiButtonEmpty euiButtonEmpty--primary"
-                  type="button"
+                <div
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
-                  <span
-                    class="euiButtonContent euiButtonEmpty__content"
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
+                    <div
+                      class="euiFlexItem euiFlexItem--flexGrowZero"
                     >
-                      <path
-                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
-                      />
-                    </svg>
-                    <span
-                      class="euiButtonEmpty__text"
-                    >
-                      Refresh
-                    </span>
-                  </span>
-                </button>
-              </div>
-              <div
-                class="euiFlexItem euiFlexItem--flexGrowZero"
-              >
-                <button
-                  class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
-                  disabled=""
-                  type="button"
-                >
-                  <span
-                    class="euiButtonContent euiButtonEmpty__content"
+                      <a
+                        class="euiButtonEmpty euiButtonEmpty--primary"
+                        href="http://url"
+                        rel="noreferrer"
+                      >
+                        <span
+                          class="euiButtonContent euiButtonEmpty__content"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                            focusable="false"
+                            height="16"
+                            role="img"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M8 7h3.5a.5.5 0 1 1 0 1H8v3.5a.5.5 0 1 1-1 0V8H3.5a.5.5 0 0 1 0-1H7V3.5a.5.5 0 0 1 1 0V7Zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0Zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882Z"
+                              fill-rule="evenodd"
+                            />
+                          </svg>
+                          <span
+                            class="euiButtonEmpty__text"
+                          >
+                            Deploy new agent
+                          </span>
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
-                      />
-                    </svg>
-                    <span
-                      class="euiButtonEmpty__text"
-                    >
-                      Export formatted
-                    </span>
-                  </span>
-                </button>
-              </div>
-              <div
-                class="euiFlexItem euiFlexItem--flexGrowZero"
-              >
-                <span
-                  class="euiToolTipAnchor"
-                >
-                  <button
-                    class="euiButtonEmpty euiButtonEmpty--primary"
-                    type="button"
-                  >
-                    <span
-                      class="euiButtonContent euiButtonEmpty__content"
+                    <button
+                      class="euiButtonEmpty euiButtonEmpty--primary"
+                      type="button"
                     >
                       <span
-                        class="euiButtonEmpty__text"
+                        class="euiButtonContent euiButtonEmpty__content"
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon--primary"
+                          class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
                           focusable="false"
-                          height="32"
+                          height="16"
                           role="img"
-                          viewBox="0 0 32 32"
-                          width="32"
+                          viewBox="0 0 16 16"
+                          width="16"
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            class="euiIcon__fillSecondary"
-                            d="M16 21a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
-                          />
-                          <path
-                            d="M20 32h-8v-4.06a1 1 0 0 0-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 0 0 .2-1 .93.93 0 0 0-.86-.6H0V12h4.06a.92.92 0 0 0 .85-.58.94.94 0 0 0-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0 0 12 4.06V0h8v4.06a1 1 0 0 0 1.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 0 0-.2 1 .93.93 0 0 0 .86.6H32v8h-4.06a.92.92 0 0 0-.85.58.94.94 0 0 0 .19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 0 0-1.61.67L20 32Zm-6-2h4v-2.06a3 3 0 0 1 5-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 0 1 2.08-5H30v-4h-2.06a3 3 0 0 1-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 0 1-5-2.08V2h-4v2.06a3 3 0 0 1-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 0 1-2.08 5H2v4h2.06a3 3 0 0 1 2.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 0 1 5 2.08V30Z"
+                            d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                           />
                         </svg>
+                        <span
+                          class="euiButtonEmpty__text"
+                        >
+                          Refresh
+                        </span>
                       </span>
-                    </span>
-                  </button>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div
-            class="euiSuggestInput"
-          >
-            <div
-              class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-              id="popover"
-            >
-              <div
-                class="euiPopover__anchor"
-              >
-                <div>
+                    </button>
+                  </div>
                   <div
-                    class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <button
+                      class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                      disabled=""
+                      type="button"
+                    >
+                      <span
+                        class="euiButtonContent euiButtonEmpty__content"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                          focusable="false"
+                          height="16"
+                          role="img"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
+                          />
+                        </svg>
+                        <span
+                          class="euiButtonEmpty__text"
+                        >
+                          Export formatted
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <div
-                      class="euiFormControlLayout__childrenWrapper"
-                    >
-                      <input
-                        class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                        placeholder="Search"
-                        type="text"
-                        value=""
-                      />
-                    </div>
-                    <div
-                      class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                      class="euiPopover euiPopover--anchorDownLeft"
+                      id="agentsTableGlobalActions"
                     >
                       <div
                         class="euiPopover__anchor"
@@ -730,61 +837,11 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                           type="button"
                         >
                           <span
-                            class="euiButtonContent euiButtonEmpty__content"
-                          >
-                            <span
-                              class="euiButtonEmpty__text"
-                            >
-                              WQL
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          class="euiSpacer euiSpacer--s"
-        />
-        <div
-          class="euiBasicTable"
-        >
-          <div>
-            <div
-              class="euiTableHeaderMobile"
-            >
-              <div
-                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
-              >
-                <div
-                  class="euiFlexItem euiFlexItem--flexGrowZero"
-                />
-                <div
-                  class="euiFlexItem euiFlexItem--flexGrowZero"
-                >
-                  <div
-                    class="euiTableSortMobile"
-                  >
-                    <div
-                      class="euiPopover euiPopover--anchorDownRight"
-                    >
-                      <div
-                        class="euiPopover__anchor"
-                      >
-                        <button
-                          class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
-                          type="button"
-                        >
-                          <span
                             class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
                           >
                             <svg
                               aria-hidden="true"
-                              class="euiIcon euiIcon--small euiIcon--inherit euiButtonContent__icon"
+                              class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
                               focusable="false"
                               height="16"
                               role="img"
@@ -800,222 +857,432 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                             <span
                               class="euiButtonEmpty__text"
                             >
-                              Sorting
+                              More
                             </span>
                           </span>
                         </button>
                       </div>
                     </div>
                   </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <button
+                        class="euiButtonEmpty euiButtonEmpty--primary"
+                        type="button"
+                      >
+                        <span
+                          class="euiButtonContent euiButtonEmpty__content"
+                        >
+                          <span
+                            class="euiButtonEmpty__text"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="euiIcon euiIcon--medium euiIcon--primary"
+                              focusable="false"
+                              height="32"
+                              role="img"
+                              viewBox="0 0 32 32"
+                              width="32"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                class="euiIcon__fillSecondary"
+                                d="M16 21a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+                              />
+                              <path
+                                d="M20 32h-8v-4.06a1 1 0 0 0-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 0 0 .2-1 .93.93 0 0 0-.86-.6H0V12h4.06a.92.92 0 0 0 .85-.58.94.94 0 0 0-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0 0 12 4.06V0h8v4.06a1 1 0 0 0 1.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 0 0-.2 1 .93.93 0 0 0 .86.6H32v8h-4.06a.92.92 0 0 0-.85.58.94.94 0 0 0 .19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 0 0-1.61.67L20 32Zm-6-2h4v-2.06a3 3 0 0 1 5-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 0 1 2.08-5H30v-4h-2.06a3 3 0 0 1-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 0 1-5-2.08V2h-4v2.06a3 3 0 0 1-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 0 1-2.08 5H2v4h2.06a3 3 0 0 1 2.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 0 1 5 2.08V30Z"
+                              />
+                            </svg>
+                          </span>
+                        </span>
+                      </button>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-            <table
-              class="euiTable euiTable--responsive euiTable--auto"
-              id="__table_d203a723-1198-11ee-ab9b-75fc624fc672"
-              tabindex="-1"
-            >
-              <caption
-                class="euiScreenReaderOnly euiTableCaption"
-              />
-              <thead>
-                <tr>
-                  <th
-                    aria-live="polite"
-                    aria-sort="ascending"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_id_0"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton euiTableHeaderButton-isSorted"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          ID
-                        </span>
-                        <svg
-                          aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiTableSortIcon"
-                          focusable="false"
-                          height="16"
-                          role="img"
-                          viewBox="0 0 16 16"
-                          width="16"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
-                          />
-                        </svg>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_name_1"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Name
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_ip_2"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          IP address
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_version_3"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Version
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_status_4"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Status
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_config_status_5"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Synced
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    class="euiTableHeaderCell"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <span
-                      class="euiTableCellContent euiTableCellContent--alignRight"
-                    >
-                      <span
-                        class="euiTableCellContent__text"
-                      >
-                        Actions
-                      </span>
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  class="euiTableRow"
+          </div>
+          <div
+            class="euiFlexItem"
+          />
+          <div
+            class="euiFlexItem"
+          >
+            <div>
+              <div
+                class="euiSuggestInput"
+              >
+                <div
+                  class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                  id="popover"
                 >
-                  <td
-                    class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="7"
+                  <div
+                    class="euiPopover__anchor"
+                  >
+                    <div>
+                      <div
+                        class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                      >
+                        <div
+                          class="euiFormControlLayout__childrenWrapper"
+                        >
+                          <input
+                            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                            placeholder="Search"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div
+                          class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonEmpty__content"
+                              >
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  WQL
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="euiSpacer euiSpacer--s"
+            />
+            <div
+              class="euiBasicTable"
+            >
+              <div>
+                <div
+                  class="euiTableHeaderMobile"
+                >
+                  <div
+                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
                   >
                     <div
-                      class="euiTableCellContent euiTableCellContent--alignCenter"
+                      class="euiFlexItem euiFlexItem--flexGrowZero"
                     >
-                      <span
-                        class="euiTableCellContent__text"
+                      <div
+                        class="euiCheckbox"
                       >
-                        No items found
-                      </span>
+                        <input
+                          aria-label="Select all rows"
+                          class="euiCheckbox__input"
+                          disabled=""
+                          id="_selection_column-checkbox_htmlId"
+                          type="checkbox"
+                        />
+                        <div
+                          class="euiCheckbox__square"
+                        />
+                        <label
+                          class="euiCheckbox__label"
+                          for="_selection_column-checkbox_htmlId"
+                        >
+                          Select all rows
+                        </label>
+                      </div>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <div
+                      class="euiFlexItem euiFlexItem--flexGrowZero"
+                    >
+                      <div
+                        class="euiTableSortMobile"
+                      >
+                        <div
+                          class="euiPopover euiPopover--anchorDownRight"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="euiIcon euiIcon--small euiIcon--inherit euiButtonContent__icon"
+                                  focusable="false"
+                                  height="16"
+                                  role="img"
+                                  viewBox="0 0 16 16"
+                                  width="16"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
+                                    fill-rule="non-zero"
+                                  />
+                                </svg>
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  Sorting
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <table
+                  class="euiTable euiTable--responsive euiTable--auto"
+                  id="htmlId"
+                  tabindex="-1"
+                >
+                  <caption
+                    class="euiScreenReaderOnly euiTableCaption"
+                  />
+                  <thead>
+                    <tr>
+                      <th
+                        class="euiTableHeaderCellCheckbox"
+                        scope="col"
+                      >
+                        <div
+                          class="euiTableCellContent"
+                        >
+                          <div
+                            class="euiCheckbox euiCheckbox--inList euiCheckbox--noLabel"
+                          >
+                            <input
+                              aria-label="Select all rows"
+                              class="euiCheckbox__input"
+                              data-test-subj="checkboxSelectAll"
+                              disabled=""
+                              id="_selection_column-checkbox_htmlId"
+                              type="checkbox"
+                            />
+                            <div
+                              class="euiCheckbox__square"
+                            />
+                          </div>
+                        </div>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="ascending"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_id_0"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton euiTableHeaderButton-isSorted"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              ID
+                            </span>
+                            <svg
+                              aria-hidden="true"
+                              class="euiIcon euiIcon--medium euiTableSortIcon"
+                              focusable="false"
+                              height="16"
+                              role="img"
+                              viewBox="0 0 16 16"
+                              width="16"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
+                              />
+                            </svg>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_name_1"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Name
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_ip_2"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              IP address
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_version_3"
+                        role="columnheader"
+                        scope="col"
+                        style="width:100px"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Version
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_status_4"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Status
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_group_config_status_5"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Synced
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        class="euiTableHeaderCell"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <span
+                          class="euiTableCellContent euiTableCellContent--alignRight"
+                        >
+                          <span
+                            class="euiTableCellContent__text"
+                          >
+                            Actions
+                          </span>
+                        </span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      class="euiTableRow"
+                    >
+                      <td
+                        class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
+                        colspan="8"
+                      >
+                        <div
+                          class="euiTableCellContent euiTableCellContent--alignCenter"
+                        >
+                          <span
+                            class="euiTableCellContent__text"
+                          >
+                            No items found
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1036,194 +1303,156 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
         class="euiFlexItem"
       >
         <div
-          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
         >
-          <div
-            class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
-          >
-            <h1
-              class="euiTitle euiTitle--small"
-            >
-              Agents 
-              <span>
-                (0)
-              </span>
-            </h1>
-          </div>
           <div
             class="euiFlexItem"
           >
             <div
-              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
             >
               <div
-                class="euiFlexItem euiFlexItem--flexGrowZero"
+                class="euiFlexItem"
               >
-                <a
-                  class="euiButtonEmpty euiButtonEmpty--primary"
-                  href="http://url"
-                  rel="noreferrer"
+                <div
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
-                  <span
-                    class="euiButtonContent euiButtonEmpty__content"
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
+                    <h1
+                      class="euiTitle euiTitle--small"
                     >
-                      <path
-                        d="M8 7h3.5a.5.5 0 1 1 0 1H8v3.5a.5.5 0 1 1-1 0V8H3.5a.5.5 0 0 1 0-1H7V3.5a.5.5 0 0 1 1 0V7Zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0Zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882Z"
-                        fill-rule="evenodd"
-                      />
-                    </svg>
-                    <span
-                      class="euiButtonEmpty__text"
-                    >
-                      Deploy new agent
-                    </span>
-                  </span>
-                </a>
+                      Agents 
+                      <span>
+                        (0)
+                      </span>
+                    </h1>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
+                  >
+                    <div
+                      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+                    />
+                  </div>
+                </div>
               </div>
               <div
                 class="euiFlexItem euiFlexItem--flexGrowZero"
               >
-                <button
-                  class="euiButtonEmpty euiButtonEmpty--primary"
-                  type="button"
+                <div
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
                 >
-                  <span
-                    class="euiButtonContent euiButtonEmpty__content"
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
+                    <div
+                      class="euiFlexItem euiFlexItem--flexGrowZero"
                     >
-                      <path
-                        d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
-                      />
-                    </svg>
-                    <span
-                      class="euiButtonEmpty__text"
-                    >
-                      Refresh
-                    </span>
-                  </span>
-                </button>
-              </div>
-              <div
-                class="euiFlexItem euiFlexItem--flexGrowZero"
-              >
-                <button
-                  class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
-                  disabled=""
-                  type="button"
-                >
-                  <span
-                    class="euiButtonContent euiButtonEmpty__content"
+                      <a
+                        class="euiButtonEmpty euiButtonEmpty--primary"
+                        href="http://url"
+                        rel="noreferrer"
+                      >
+                        <span
+                          class="euiButtonContent euiButtonEmpty__content"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                            focusable="false"
+                            height="16"
+                            role="img"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M8 7h3.5a.5.5 0 1 1 0 1H8v3.5a.5.5 0 1 1-1 0V8H3.5a.5.5 0 0 1 0-1H7V3.5a.5.5 0 0 1 1 0V7Zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0Zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882Z"
+                              fill-rule="evenodd"
+                            />
+                          </svg>
+                          <span
+                            class="euiButtonEmpty__text"
+                          >
+                            Deploy new agent
+                          </span>
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
-                      />
-                    </svg>
-                    <span
-                      class="euiButtonEmpty__text"
-                    >
-                      Export formatted
-                    </span>
-                  </span>
-                </button>
-              </div>
-              <div
-                class="euiFlexItem euiFlexItem--flexGrowZero"
-              >
-                <span
-                  class="euiToolTipAnchor"
-                >
-                  <button
-                    class="euiButtonEmpty euiButtonEmpty--primary"
-                    type="button"
-                  >
-                    <span
-                      class="euiButtonContent euiButtonEmpty__content"
+                    <button
+                      class="euiButtonEmpty euiButtonEmpty--primary"
+                      type="button"
                     >
                       <span
-                        class="euiButtonEmpty__text"
+                        class="euiButtonContent euiButtonEmpty__content"
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon--primary"
+                          class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
                           focusable="false"
-                          height="32"
+                          height="16"
                           role="img"
-                          viewBox="0 0 32 32"
-                          width="32"
+                          viewBox="0 0 16 16"
+                          width="16"
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            class="euiIcon__fillSecondary"
-                            d="M16 21a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
-                          />
-                          <path
-                            d="M20 32h-8v-4.06a1 1 0 0 0-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 0 0 .2-1 .93.93 0 0 0-.86-.6H0V12h4.06a.92.92 0 0 0 .85-.58.94.94 0 0 0-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0 0 12 4.06V0h8v4.06a1 1 0 0 0 1.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 0 0-.2 1 .93.93 0 0 0 .86.6H32v8h-4.06a.92.92 0 0 0-.85.58.94.94 0 0 0 .19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 0 0-1.61.67L20 32Zm-6-2h4v-2.06a3 3 0 0 1 5-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 0 1 2.08-5H30v-4h-2.06a3 3 0 0 1-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 0 1-5-2.08V2h-4v2.06a3 3 0 0 1-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 0 1-2.08 5H2v4h2.06a3 3 0 0 1 2.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 0 1 5 2.08V30Z"
+                            d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                           />
                         </svg>
+                        <span
+                          class="euiButtonEmpty__text"
+                        >
+                          Refresh
+                        </span>
                       </span>
-                    </span>
-                  </button>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div
-            class="euiSuggestInput"
-          >
-            <div
-              class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
-              id="popover"
-            >
-              <div
-                class="euiPopover__anchor"
-              >
-                <div>
+                    </button>
+                  </div>
                   <div
-                    class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <button
+                      class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                      disabled=""
+                      type="button"
+                    >
+                      <span
+                        class="euiButtonContent euiButtonEmpty__content"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                          focusable="false"
+                          height="16"
+                          role="img"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
+                          />
+                        </svg>
+                        <span
+                          class="euiButtonEmpty__text"
+                        >
+                          Export formatted
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
                     <div
-                      class="euiFormControlLayout__childrenWrapper"
-                    >
-                      <input
-                        class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
-                        placeholder="Search"
-                        type="text"
-                        value=""
-                      />
-                    </div>
-                    <div
-                      class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                      class="euiPopover euiPopover--anchorDownLeft"
+                      id="agentsTableGlobalActions"
                     >
                       <div
                         class="euiPopover__anchor"
@@ -1233,61 +1462,11 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                           type="button"
                         >
                           <span
-                            class="euiButtonContent euiButtonEmpty__content"
-                          >
-                            <span
-                              class="euiButtonEmpty__text"
-                            >
-                              WQL
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          class="euiSpacer euiSpacer--s"
-        />
-        <div
-          class="euiBasicTable"
-        >
-          <div>
-            <div
-              class="euiTableHeaderMobile"
-            >
-              <div
-                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
-              >
-                <div
-                  class="euiFlexItem euiFlexItem--flexGrowZero"
-                />
-                <div
-                  class="euiFlexItem euiFlexItem--flexGrowZero"
-                >
-                  <div
-                    class="euiTableSortMobile"
-                  >
-                    <div
-                      class="euiPopover euiPopover--anchorDownRight"
-                    >
-                      <div
-                        class="euiPopover__anchor"
-                      >
-                        <button
-                          class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
-                          type="button"
-                        >
-                          <span
                             class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
                           >
                             <svg
                               aria-hidden="true"
-                              class="euiIcon euiIcon--small euiIcon--inherit euiButtonContent__icon"
+                              class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
                               focusable="false"
                               height="16"
                               role="img"
@@ -1303,270 +1482,480 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                             <span
                               class="euiButtonEmpty__text"
                             >
-                              Sorting
+                              More
                             </span>
                           </span>
                         </button>
                       </div>
                     </div>
                   </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <button
+                        class="euiButtonEmpty euiButtonEmpty--primary"
+                        type="button"
+                      >
+                        <span
+                          class="euiButtonContent euiButtonEmpty__content"
+                        >
+                          <span
+                            class="euiButtonEmpty__text"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="euiIcon euiIcon--medium euiIcon--primary"
+                              focusable="false"
+                              height="32"
+                              role="img"
+                              viewBox="0 0 32 32"
+                              width="32"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                class="euiIcon__fillSecondary"
+                                d="M16 21a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+                              />
+                              <path
+                                d="M20 32h-8v-4.06a1 1 0 0 0-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 0 0 .2-1 .93.93 0 0 0-.86-.6H0V12h4.06a.92.92 0 0 0 .85-.58.94.94 0 0 0-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0 0 12 4.06V0h8v4.06a1 1 0 0 0 1.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 0 0-.2 1 .93.93 0 0 0 .86.6H32v8h-4.06a.92.92 0 0 0-.85.58.94.94 0 0 0 .19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 0 0-1.61.67L20 32Zm-6-2h4v-2.06a3 3 0 0 1 5-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 0 1 2.08-5H30v-4h-2.06a3 3 0 0 1-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 0 1-5-2.08V2h-4v2.06a3 3 0 0 1-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 0 1-2.08 5H2v4h2.06a3 3 0 0 1 2.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 0 1 5 2.08V30Z"
+                              />
+                            </svg>
+                          </span>
+                        </span>
+                      </button>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-            <table
-              class="euiTable euiTable--responsive euiTable--auto"
-              id="__table_d1fddac1-1198-11ee-ab9b-75fc624fc672"
-              tabindex="-1"
-            >
-              <caption
-                class="euiScreenReaderOnly euiTableCaption"
-              />
-              <thead>
-                <tr>
-                  <th
-                    aria-live="polite"
-                    aria-sort="ascending"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_id_0"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton euiTableHeaderButton-isSorted"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          ID
-                        </span>
-                        <svg
-                          aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiTableSortIcon"
-                          focusable="false"
-                          height="16"
-                          role="img"
-                          viewBox="0 0 16 16"
-                          width="16"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
-                          />
-                        </svg>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_name_1"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Name
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_ip_2"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          IP address
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_group_3"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Group(s)
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_os.name,os.version_4"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Operating system
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_node_name_5"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Cluster node
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_version_6"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Version
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-live="polite"
-                    aria-sort="none"
-                    class="euiTableHeaderCell"
-                    data-test-subj="tableHeaderCell_status_7"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <button
-                      class="euiTableHeaderButton"
-                      data-test-subj="tableHeaderSortButton"
-                      type="button"
-                    >
-                      <span
-                        class="euiTableCellContent"
-                      >
-                        <span
-                          class="euiTableCellContent__text"
-                        >
-                          Status
-                        </span>
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    class="euiTableHeaderCell"
-                    role="columnheader"
-                    scope="col"
-                  >
-                    <span
-                      class="euiTableCellContent euiTableCellContent--alignRight"
-                    >
-                      <span
-                        class="euiTableCellContent__text"
-                      >
-                        Actions
-                      </span>
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  class="euiTableRow"
+          </div>
+          <div
+            class="euiFlexItem"
+          />
+          <div
+            class="euiFlexItem"
+          >
+            <div>
+              <div
+                class="euiSuggestInput"
+              >
+                <div
+                  class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+                  id="popover"
                 >
-                  <td
-                    class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                    colspan="9"
+                  <div
+                    class="euiPopover__anchor"
+                  >
+                    <div>
+                      <div
+                        class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+                      >
+                        <div
+                          class="euiFormControlLayout__childrenWrapper"
+                        >
+                          <input
+                            class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                            placeholder="Search"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div
+                          class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonEmpty__content"
+                              >
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  WQL
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="euiSpacer euiSpacer--s"
+            />
+            <div
+              class="euiBasicTable"
+            >
+              <div>
+                <div
+                  class="euiTableHeaderMobile"
+                >
+                  <div
+                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsBaseline euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
                   >
                     <div
-                      class="euiTableCellContent euiTableCellContent--alignCenter"
+                      class="euiFlexItem euiFlexItem--flexGrowZero"
                     >
-                      <span
-                        class="euiTableCellContent__text"
+                      <div
+                        class="euiCheckbox"
                       >
-                        No items found
-                      </span>
+                        <input
+                          aria-label="Select all rows"
+                          class="euiCheckbox__input"
+                          disabled=""
+                          id="_selection_column-checkbox_htmlId"
+                          type="checkbox"
+                        />
+                        <div
+                          class="euiCheckbox__square"
+                        />
+                        <label
+                          class="euiCheckbox__label"
+                          for="_selection_column-checkbox_htmlId"
+                        >
+                          Select all rows
+                        </label>
+                      </div>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <div
+                      class="euiFlexItem euiFlexItem--flexGrowZero"
+                    >
+                      <div
+                        class="euiTableSortMobile"
+                      >
+                        <div
+                          class="euiPopover euiPopover--anchorDownRight"
+                        >
+                          <div
+                            class="euiPopover__anchor"
+                          >
+                            <button
+                              class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
+                              type="button"
+                            >
+                              <span
+                                class="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="euiIcon euiIcon--small euiIcon--inherit euiButtonContent__icon"
+                                  focusable="false"
+                                  height="16"
+                                  role="img"
+                                  viewBox="0 0 16 16"
+                                  width="16"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
+                                    fill-rule="non-zero"
+                                  />
+                                </svg>
+                                <span
+                                  class="euiButtonEmpty__text"
+                                >
+                                  Sorting
+                                </span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <table
+                  class="euiTable euiTable--responsive euiTable--auto"
+                  id="htmlId"
+                  tabindex="-1"
+                >
+                  <caption
+                    class="euiScreenReaderOnly euiTableCaption"
+                  />
+                  <thead>
+                    <tr>
+                      <th
+                        class="euiTableHeaderCellCheckbox"
+                        scope="col"
+                      >
+                        <div
+                          class="euiTableCellContent"
+                        >
+                          <div
+                            class="euiCheckbox euiCheckbox--inList euiCheckbox--noLabel"
+                          >
+                            <input
+                              aria-label="Select all rows"
+                              class="euiCheckbox__input"
+                              data-test-subj="checkboxSelectAll"
+                              disabled=""
+                              id="_selection_column-checkbox_htmlId"
+                              type="checkbox"
+                            />
+                            <div
+                              class="euiCheckbox__square"
+                            />
+                          </div>
+                        </div>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="ascending"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_id_0"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton euiTableHeaderButton-isSorted"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              ID
+                            </span>
+                            <svg
+                              aria-hidden="true"
+                              class="euiIcon euiIcon--medium euiTableSortIcon"
+                              focusable="false"
+                              height="16"
+                              role="img"
+                              viewBox="0 0 16 16"
+                              width="16"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
+                              />
+                            </svg>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_name_1"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Name
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_ip_2"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              IP address
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_group_3"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Group(s)
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_os.name,os.version_4"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Operating system
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_node_name_5"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Cluster node
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_version_6"
+                        role="columnheader"
+                        scope="col"
+                        style="width:100px"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Version
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_status_7"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Status
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        class="euiTableHeaderCell"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <span
+                          class="euiTableCellContent euiTableCellContent--alignRight"
+                        >
+                          <span
+                            class="euiTableCellContent__text"
+                          >
+                            Actions
+                          </span>
+                        </span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      class="euiTableRow"
+                    >
+                      <td
+                        class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
+                        colspan="10"
+                      >
+                        <div
+                          class="euiTableCellContent euiTableCellContent--alignCenter"
+                        >
+                          <span
+                            class="euiTableCellContent__text"
+                          >
+                            No items found
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>

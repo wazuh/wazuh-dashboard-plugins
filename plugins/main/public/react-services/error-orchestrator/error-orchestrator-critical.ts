@@ -13,11 +13,12 @@
 import { ErrorOrchestratorBase } from './error-orchestrator-base';
 import { UIErrorLog } from './types';
 import { WzMisc } from '../../factories/misc';
+import NavigationService from '../navigation-service';
 
 export class ErrorOrchestratorCritical extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {
     const wzMisc = new WzMisc();
     wzMisc.setBlankScr(errorLog.error.message);
-    window.location.href = '#/blank-screen';
+    NavigationService.getInstance().navigate('/blank-screen');
   }
 }

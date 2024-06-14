@@ -11,56 +11,74 @@ import {
   EuiFlyoutBody,
   EuiFlyoutHeader,
   EuiTitle,
-  EuiButtonEmpty,
-  EuiSpacer,
   EuiPanel,
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
-import {
-  Filter,
-  IndexPattern,
-} from '../../../../../../src/plugins/data/common';
+import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
-import { useDocViewer } from '../doc-viewer';
-import DocViewer from '../doc-viewer/doc-viewer';
-import { DiscoverNoResults } from '../../overview/vulnerabilities/common/components/no_results';
-import { LoadingSpinner } from '../../overview/vulnerabilities/common/components/loading_spinner';
+import { DiscoverNoResults } from '../no-results/no-results';
+import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../data-grid';
+import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import {
   ErrorHandler,
   ErrorFactory,
   HttpError,
 } from '../../../react-services/error-management';
-import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
-import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
 import useSearchBar from '../search-bar/use-search-bar';
-import { search } from '../search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
-import { useDockedSideNav } from '../hooks/useDockedSideNav';
+import { getWazuhCorePlugin } from '../../../kibana-services';
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 import { withErrorBoundary } from '../hocs';
+import {
+  IDataSourceFactoryConstructor,
+  useDataSource,
+  tParsedIndexPattern,
+  PatternDataSource,
+  AlertsDataSourceRepository,
+} from '../data-source';
+import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
+import { wzDiscoverRenderColumns } from './render-columns';
+import { WzSearchBar } from '../search-bar';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
-type WazuhDiscoverProps = {
-  indexPatternName: string;
+export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
+  DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
-  const { indexPatternName, tableColumns: defaultTableColumns } = props;
-  const SearchBar = getPlugins().data.ui.SearchBar;
+  const { DataSource, tableColumns: defaultTableColumns } = props;
+
+  if (!DataSource) {
+    throw new Error('DataSource is required');
+  }
+
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
   );
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
-  const sideNavDocked = useDockedSideNav();
+  const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
+
+  const AlertsRepository = new AlertsDataSourceRepository();
+
+  const {
+    dataSource,
+    filters,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+    setFilters,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    repository: AlertsRepository, // this makes only works with alerts index pattern
+    DataSource,
+  });
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
@@ -86,20 +104,16 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   };
 
   const { searchBarProps } = useSearchBar({
-    defaultIndexPatternID: indexPatternName,
-  });
-  const {
-    isLoading,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
-    query,
-    indexPatterns,
-    dateRangeFrom,
-    dateRangeTo,
-  } = searchBarProps;
+    setFilters,
+  });
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
     defaultColumns: defaultTableColumns,
+    renderColumns: wzDiscoverRenderColumns,
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
@@ -112,43 +126,32 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
 
-  const docViewerProps = useDocViewer({
-    doc: inspectedHit,
-    indexPattern: indexPattern as IndexPattern,
-  });
-
   useEffect(() => {
-    if (!isLoading) {
-      setIsSearching(true);
-      setIndexPattern(indexPatterns?.[0] as IndexPattern);
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters,
-        query,
-        pagination,
-        sorting,
-        dateRange: {
-          from: dateRangeFrom,
-          to: dateRangeTo,
-        },
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching data',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
+    if (isDataSourceLoading) {
+      return;
     }
+    setIndexPattern(dataSource?.indexPattern);
+    fetchData({
+      query,
+      pagination,
+      sorting,
+      dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
+    })
+      .then(results => setResults(results))
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching vulnerabilities',
+        });
+        ErrorHandler.handleError(searchError);
+      });
   }, [
-    JSON.stringify(searchBarProps),
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
+    dateRangeFrom,
+    dateRangeTo,
   ]);
 
   const timeField = indexPattern?.timeFieldName
@@ -157,8 +160,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const onClickExportResults = async () => {
     const params = {
-      indexPattern: indexPatterns?.[0] as IndexPattern,
-      filters,
+      indexPattern: indexPattern as IndexPattern,
+      filters: fetchFilters,
       query,
       fields: columnVisibility.visibleColumns,
       pagination: {
@@ -188,22 +191,37 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         restrictWidth='100%'
         fullHeight={true}
         grow
+        paddingSize='none'
+        pageContentProps={{ color: 'transparent' }}
       >
-        <>
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <SearchBar
-              appName='wazuh-discover-search-bar'
-              {...searchBarProps}
-              showSaveQuery={true}
-            />
-          )}
-          {!isLoading && results?.hits?.total === 0 ? (
-            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-          ) : null}
-          {!isLoading && results?.hits?.total > 0 ? (
-            <>
+        {isDataSourceLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <WzSearchBar
+            appName='wazuh-discover-search-bar'
+            {...searchBarProps}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
+        )}
+        {!isDataSourceLoading && results?.hits?.total === 0 ? (
+          <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+        ) : null}
+        <div
+          className={
+            !isDataSourceLoading && dataSource && results?.hits?.total > 0
+              ? ''
+              : 'wz-no-display'
+          }
+        >
+          <EuiPanel
+            paddingSize='s'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
+            <EuiFlexGroup gutterSize='s' direction='column'>
               <EuiFlexItem grow={false} className='discoverChartContainer'>
                 <EuiPanel
                   hasBorder={false}
@@ -214,8 +232,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   <EuiPanel>
                     <DashboardByRenderer
                       input={histogramChartInput(
-                        indexPatternName,
-                        filters,
+                        AlertsRepository.getStoreIndexPatternId(),
+                        fetchFilters,
                         query,
                         dateRangeFrom,
                         dateRangeTo,
@@ -224,53 +242,26 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   </EuiPanel>
                 </EuiPanel>
               </EuiFlexItem>
-              <EuiSpacer size='m' />
-              <div className='discoverDataGrid'>
+              <EuiFlexItem>
                 <EuiDataGrid
                   {...dataGridProps}
                   className={sideNavDocked ? 'dataGridDockedNav' : ''}
                   toolbarVisibility={{
                     additionalControls: (
                       <>
-                        <HitsCounter
-                          hits={results?.hits?.total}
-                          showResetButton={false}
-                          onResetQuery={() => {}}
-                          tooltip={
-                            results?.hits?.total &&
-                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                              ? {
-                                  ariaLabel: 'Warning',
-                                  content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                    MAX_ENTRIES_PER_QUERY,
-                                  )} hits.`,
-                                  iconType: 'alert',
-                                  position: 'top',
-                                }
-                              : undefined
-                          }
+                        <DiscoverDataGridAdditionalControls
+                          totalHits={results?.hits?.total || 0}
+                          isExporting={isExporting}
+                          onClickExportResults={onClickExportResults}
+                          maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
                         />
-                        <EuiButtonEmpty
-                          disabled={
-                            results?.hits?.total === 0 ||
-                            columnVisibility.visibleColumns.length === 0
-                          }
-                          size='xs'
-                          iconType='exportAction'
-                          color='primary'
-                          isLoading={isExporting}
-                          className='euiDataGrid__controlBtn'
-                          onClick={onClickExportResults}
-                        >
-                          Export Formated
-                        </EuiButtonEmpty>
                       </>
                     ),
                   }}
                 />
-              </div>
-            </>
-          ) : null}
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPanel>
           {inspectedHit && (
             <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
               <EuiFlyoutHeader>
@@ -281,13 +272,16 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               <EuiFlyoutBody>
                 <EuiFlexGroup direction='column'>
                   <EuiFlexItem>
-                    <DocViewer {...docViewerProps} />
+                    <DocumentViewTableAndJson
+                      document={inspectedHit}
+                      indexPattern={indexPattern}
+                    />
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlyoutBody>
             </EuiFlyout>
           )}
-        </>
+        </div>
       </EuiPageTemplate>
     </IntlProvider>
   );

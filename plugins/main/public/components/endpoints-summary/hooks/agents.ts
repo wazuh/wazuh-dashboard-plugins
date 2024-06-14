@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getTotalAgentsService } from '../services';
+import { getAgentsService } from '../services';
 
-export const useGetTotalAgents = () => {
+export const useGetTotalAgents = (filters?: any) => {
   const [totalAgents, setTotalAgents] = useState<number>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
@@ -9,8 +9,11 @@ export const useGetTotalAgents = () => {
   const getTotalAgents = async () => {
     try {
       setIsLoading(true);
-      const totalAgents = await getTotalAgentsService();
-      setTotalAgents(totalAgents);
+      const { total_affected_items } = await getAgentsService({
+        filters,
+        limit: 1,
+      });
+      setTotalAgents(total_affected_items);
       setError(undefined);
     } catch (error: any) {
       setError(error);

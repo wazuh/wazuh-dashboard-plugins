@@ -17,17 +17,16 @@ import { mount } from 'enzyme';
 import { TableWzAPI } from './table-wz-api';
 
 jest.mock('../../../kibana-services', () => ({
-  getAngularModule: jest.fn(),
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: (options) => {},
+    handleError: options => {},
   }),
 }));
 
@@ -35,7 +34,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 const columns = [
@@ -67,12 +66,12 @@ describe('Table WZ API component', () => {
   it('renders correctly to match the snapshot', () => {
     const wrapper = mount(
       <TableWzAPI
-        title="Table"
+        title='Table'
         tableColumns={columns}
         endpoint={'/'}
         searchTable={false}
         error={false}
-      />
+      />,
     );
     expect(wrapper).toMatchSnapshot();
   });

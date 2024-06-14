@@ -2,6 +2,65 @@
   "data": {
     "localfile": [
       {
+        "logformat": "journald",
+        "ignore_binaries": "no",
+        "only-future-events": "no",
+        "target": ["agent1"],
+        "filters": [
+          [
+            {
+              "field": "_KERNEL_DEVICE",
+              "expression": ".kernel1",
+              "ignore_if_missing": false
+            }
+          ],
+          [
+            {
+              "field": "_SYSTEMD_UNIT",
+              "expression": "^cron.service$",
+              "ignore_if_missing": false
+            },
+            {
+              "field": "CUSTOM",
+              "expression": "0|1|2",
+              "ignore_if_missing": true
+            }
+          ]
+        ],
+        "filters_disabled": false
+      },
+      {
+        "logformat": "journald",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent2"]
+      },
+      {
+        "logformat": "journald",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent3"],
+        "filters": [
+          {
+            "field": "_KERNEL_DEVICE",
+            "expression": ".",
+            "ignore_if_missing": false
+          }
+        ],
+        "filters_disabled": false
+      },
+      {
+        "logformat": "macos",
+        "query": {
+          "value": "(process == \"sudo\") or (process == \"sessionlogoutd\" and message contains \"logout is complete.\") or (process == \"sshd\") or (process == \"tccd\" and message contains \"Update Access Record\") or (message contains \"SessionAgentNotificationCenter\") or (process == \"screensharingd\" and message contains \"Authentication\") or (process == \"securityd\" and eventMessage contains \"Session\" and subsystem == \"com.apple.securityd\")",
+          "level": "info",
+          "type": ["log", "activity", "trace"]
+        },
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
         "logformat": "command",
         "command": "df -P",
         "alias": "df -P",
@@ -77,6 +136,59 @@
       {
         "file": "/var/log/kern.log",
         "logformat": "syslog",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
+        "channel": "Application",
+        "logformat": "eventlog",
+        "ignore_binaries": "no",
+        "target": ["agent"]
+      },
+      {
+        "channel": "Security",
+        "logformat": "eventchannel",
+        "query": {
+          "value": "Event/System[EventID != 5145 and EventID != 5156 and EventID != 5447 and EventID != 4656 and EventID != 4658 and EventID != 4663 and EventID != 4660 and EventID != 4670 and EventID != 4690 and EventID != 4703 and EventID != 4907]"
+        },
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"],
+        "reconnect_time": 5
+      },
+      {
+        "channel": "System",
+        "logformat": "eventlog",
+        "ignore_binaries": "no",
+        "target": ["agent"]
+      },
+      {
+        "file": "active-response\\active-responses.log",
+        "logformat": "syslog",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
+        "channel": "Microsoft-Windows-Sysmon/Operational",
+        "logformat": "eventchannel",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"],
+        "reconnect_time": 5
+      },
+      {
+        "channel": "Microsoft-Windows-Windows Defender/Operational",
+        "logformat": "eventchannel",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"],
+        "reconnect_time": 5
+      },
+      {
+        "file": "C:\\inetpub\\logs\\LogFiles\\W3SVC1\\u_ex240321.log",
+        "logformat": "iis",
         "ignore_binaries": "no",
         "only-future-events": "yes",
         "target": ["agent"]

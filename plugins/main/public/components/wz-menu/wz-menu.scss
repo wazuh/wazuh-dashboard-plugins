@@ -146,10 +146,6 @@ wz-menu {
     max-height: 320px;
     margin-right: -16px;
   }
-  .euiFormRow + .euiFormRow {
-    margin-left: 16px;
-    margin-top: 0;
-  }
   .wz-menu-select {
     max-width: 150px !important;
     width: 150px !important;
@@ -243,4 +239,12 @@ md-toolbar .md-button {
   width: 16px !important;
   height: 16px !important;
   margin-right: 6px;
+}
+
+.WzManagementSideMenu {
+  padding: 16px;
+}
+
+.WzManagementSideMenu span {
+  font-size: 14px !important;
 }

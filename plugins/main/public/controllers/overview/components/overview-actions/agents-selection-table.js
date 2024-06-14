@@ -7,8 +7,6 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
-import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
-import store from '../../../../redux/store';
 import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/';
 import { get as getLodash } from 'lodash';
 import {
@@ -20,6 +18,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrat
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { AgentStatus } from '../../../../components/agents/agent-status';
 import { TableWzAPI } from '../../../../components/common/tables';
+import { PinnedAgentManager } from '../../../../components/wz-agent-selector/wz-agent-selector-service';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -34,7 +33,7 @@ export class AgentSelectionTable extends Component {
     this.state = {
       filters: { default: { q: 'id!=000' } },
     };
-
+    this.pinnedAgentManager = new PinnedAgentManager();
     this.columns = [
       {
         field: 'id',
@@ -88,22 +87,16 @@ export class AgentSelectionTable extends Component {
     ];
   }
 
-  unselectAgents() {
-    store.dispatch(updateCurrentAgentData({}));
-    this.props.removeAgentsFilter();
-  }
-
-  async selectAgentAndApply(agentID) {
+  async selectAgentAndApply(agentId) {
+    this.props.closeAgentModal();
     try {
       const data = await WzRequest.apiReq('GET', '/agents', {
-        params: { q: 'id=' + agentID },
+        params: { q: 'id=' + agentId },
       });
       const formattedData = data?.data?.data?.affected_items?.[0];
-      store.dispatch(updateCurrentAgentData(formattedData));
-      this.props.updateAgentSearch([agentID]);
+      this.pinnedAgentManager.pinAgent(formattedData);
     } catch (error) {
-      store.dispatch(updateCurrentAgentData({}));
-      this.props.removeAgentsFilter(true);
+      this.pinnedAgentManager.unPinAgent();
       const options = {
         context: `${AgentSelectionTable.name}.selectAgentAndApply`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -117,6 +110,10 @@ export class AgentSelectionTable extends Component {
 
       getErrorOrchestrator().handleError(options);
     }
+  }
+
+  unselectAgents() {
+    this.pinnedAgentManager.unPinAgent();
   }
 
   addIconPlatformRender(agent) {
@@ -170,13 +167,14 @@ export class AgentSelectionTable extends Component {
   }
 
   render() {
-    const selectedAgent = store.getState().appStateReducers.currentAgentData;
+    const selectedAgent = this.pinnedAgentManager.getPinnedAgent();
 
-    const getRowProps = (item, idx) => {
+    const getRowProps = item => {
+      const { id } = item;
       return {
-        'data-test-subj': `explore-agent-${idx}`,
+        'data-test-subj': `explore-agent-${id}`,
         className: 'customRowClass',
-        onClick: () => this.selectAgentAndApply(item.id),
+        onClick: () => this.selectAgentAndApply(id),
       };
     };
 
@@ -186,7 +184,7 @@ export class AgentSelectionTable extends Component {
           <Fragment>
             <EuiFlexGroup responsive={false} justifyContent='flexEnd'>
               {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
-              <EuiFlexItem grow={false} style={{marginRight: 0}}>
+              <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
                 <AgentStatus
                   status={selectedAgent.status}
                   agent={selectedAgent}
@@ -238,7 +236,7 @@ export class AgentSelectionTable extends Component {
             suggestions: {
               field(currentValue) {
                 return [
-                  { label: 'id', description: 'filter by id' },
+                  { label: 'id', description: 'filter by ID' },
                   { label: 'group', description: 'filter by group' },
                   { label: 'name', description: 'filter by name' },
                   {

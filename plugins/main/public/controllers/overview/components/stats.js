@@ -13,36 +13,45 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  EuiStat,
+  EuiCard,
   EuiFlexItem,
   EuiFlexGroup,
   EuiPage,
   EuiToolTip,
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
-import { UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
+import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import {
   agentStatusLabelByAgentStatus,
   agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
-import { getCore } from '../../../kibana-services';
-import { endpointSumary } from '../../../utils/applications';
-
+import { endpointSummary } from '../../../utils/applications';
+import { LastAlertsStat } from './last-alerts-stat';
+import { VisualizationBasic } from '../../../components/common/charts/visualizations/basic';
+import NavigationService from '../../../react-services/navigation-service';
+import './stats.scss';
 export const Stats = withErrorBoundary(
   class Stats extends Component {
     constructor(props) {
       super(props);
 
-      this.state = {};
-      this.agentStatus = ['total', ...UI_ORDER_AGENT_STATUS].map(status => ({
+      this.state = {
+        agentStatusSummary: {
+          active: '-',
+          disconnected: '-',
+          total: '-',
+          pending: '-',
+          never_connected: '-',
+        },
+      };
+      this.agentStatus = [
+        API_NAME_AGENT_STATUS.ACTIVE,
+        API_NAME_AGENT_STATUS.DISCONNECTED,
+      ].map(status => ({
         status,
-        label:
-          status !== 'total' ? agentStatusLabelByAgentStatus(status) : 'Total',
-        onClick: () => this.goToAgents(status !== 'total' ? status : null),
-        color:
-          status !== 'total'
-            ? agentStatusColorByAgentStatus(status)
-            : 'primary',
+        label: agentStatusLabelByAgentStatus(status),
+        onClick: () => this.goToAgents(status),
+        color: agentStatusColorByAgentStatus(status),
       }));
     }
 
@@ -55,8 +64,8 @@ export const Stats = withErrorBoundary(
       } else if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');
       }
-      getCore().application.navigateToApp(endpointSumary.id, {
-        path: '#/agents-preview',
+      NavigationService.getInstance().navigateToApp(endpointSummary.id, {
+        path: `#${endpointSummary.redirectTo()}`,
       });
     }
 
@@ -69,36 +78,48 @@ export const Stats = withErrorBoundary(
     }
 
     render() {
+      const hasResults = this.agentStatus.some(
+        ({ status }) => this.props[status],
+      );
       return (
         <EuiPage>
           <EuiFlexGroup>
-            <EuiFlexItem />
-            {this.agentStatus.map(({ status, label, onClick, color }) => (
-              <EuiFlexItem key={`agent-status-${status}`}>
-                <EuiStat
-                  title={
-                    <EuiToolTip
-                      position='top'
-                      content={`Go to ${label.toLowerCase()} agents`}
-                    >
-                      <span
-                        className='statWithLink'
-                        style={{ cursor: 'pointer' }}
-                        onClick={onClick}
-                      >
-                        {typeof this.props[status] !== 'undefined'
-                          ? this.props[status]
-                          : '-'}
-                      </span>
-                    </EuiToolTip>
+            <EuiFlexItem grow={false}>
+              <EuiCard betaBadgeLabel='Agents summary' title=''>
+                <VisualizationBasic
+                  isLoading={this.state.loadingSummary}
+                  type='donut'
+                  size={{ width: '100%', height: '150px' }}
+                  showLegend
+                  data={
+                    hasResults &&
+                    this.agentStatus.map(
+                      ({ status, label, color, onClick }) => ({
+                        onClick,
+                        label,
+                        value:
+                          typeof this.props[status] !== 'undefined'
+                            ? this.props[status]
+                            : 0,
+                        color,
+                      }),
+                    )
                   }
-                  description={`${label} agents`}
-                  titleColor={color}
-                  textAlign='center'
+                  noDataTitle='No results'
+                  noDataMessage='No results were found.'
                 />
-              </EuiFlexItem>
-            ))}
-            <EuiFlexItem />
+              </EuiCard>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
+                <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
+                  <LastAlertsStat severity='critical' />
+                  <LastAlertsStat severity='high' />
+                  <LastAlertsStat severity='medium' />
+                  <LastAlertsStat severity='low' />
+                </EuiFlexGroup>
+              </EuiCard>
+            </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPage>
       );
@@ -107,9 +128,6 @@ export const Stats = withErrorBoundary(
 );
 
 Stats.propTypes = {
-  total: PropTypes.any,
   active: PropTypes.any,
   disconnected: PropTypes.any,
-  pending: PropTypes.any,
-  never_connected: PropTypes.any,
 };

@@ -1,9 +1,11 @@
 import { renderHook } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom/extend-expect';
 // osd dependencies
-import { Start, dataPluginMock } from '../../../../../../src/plugins/data/public/mocks';
 import {
-  Filter,
+  Start,
+  dataPluginMock,
+} from '../../../../../../src/plugins/data/public/mocks';
+import {
   IndexPattern,
   Query,
   TimeRange,
@@ -13,6 +15,7 @@ import useSearchBar from './use-search-bar';
 import { getDataPlugin } from '../../../kibana-services';
 import * as timeFilterHook from '../hooks/use-time-filter';
 import * as queryManagerHook from '../hooks/use-query';
+import { AppState } from '../../../react-services/app-state';
 
 /**
  * Mocking Data Plugin
@@ -41,7 +44,7 @@ mockedGetDataPlugin.mockImplementation(
           },
         },
       },
-    } as Start)
+    } as Start),
 );
 ///////////////////////////////////////////////////////////
 
@@ -75,11 +78,15 @@ describe('[hook] useSearchBarConfiguration', () => {
 
   it('should return default app index pattern when not receiving a default index pattern', async () => {
     jest
+      .spyOn(AppState, 'getCurrentPattern')
+      .mockImplementation(() => 'default-index-pattern');
+    jest
       .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
       .mockResolvedValue(mockedDefaultIndexPatternData);
     jest
       .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
       .mockReturnValue([]);
+    // @ts-ignore
     const { result, waitForNextUpdate } = renderHook(() => useSearchBar({}));
     await waitForNextUpdate();
     expect(mockDataPlugin.indexPatterns.getDefault).toBeCalled();
@@ -96,94 +103,34 @@ describe('[hook] useSearchBarConfiguration', () => {
       title: '',
     };
     jest
+      .spyOn(AppState, 'getCurrentPattern')
+      .mockImplementation(() => 'wazuh-alerts-*');
+    jest.spyOn(AppState, 'setCurrentPattern').mockImplementation(jest.fn());
+    jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedIndexPatternData);
     const { result, waitForNextUpdate } = renderHook(() =>
       useSearchBar({
-        defaultIndexPatternID: 'wazuh-index-pattern',
+        indexPattern: mockedIndexPatternData as IndexPattern,
+        setFilters: jest.fn(),
       }),
-    );
-    await waitForNextUpdate();
-    expect(mockDataPlugin.indexPatterns.get).toBeCalledWith(
-      exampleIndexPatternId,
     );
     expect(result.current.searchBarProps.indexPatterns).toMatchObject([
       mockedIndexPatternData,
     ]);
   });
 
-  it('should show an ERROR message and get the default app index pattern when not found the index pattern data by the ID received', async () => {
-    const INDEX_NOT_FOUND_ERROR = new Error('Index Pattern not found');
-    jest.spyOn(mockDataPlugin.indexPatterns, 'get').mockImplementation(() => {
-      throw INDEX_NOT_FOUND_ERROR;
-    });
-    jest
-      .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
-      .mockResolvedValue(mockedDefaultIndexPatternData);
-    jest
-      .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
-      .mockReturnValue([]);
-
-    // mocking console error to avoid logs in test and check if is called
-    const mockedConsoleError = jest
-      .spyOn(console, 'error')
-      .mockImplementationOnce(() => {});
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useSearchBar({
-        defaultIndexPatternID: 'invalid-index-pattern-id',
-      }),
-    );
-
-    await waitForNextUpdate();
-    expect(mockDataPlugin.indexPatterns.getDefault).toBeCalled();
-    expect(mockDataPlugin.indexPatterns.get).toBeCalledWith(
-      'invalid-index-pattern-id',
-    );
-    expect(result.current.searchBarProps.indexPatterns).toMatchObject([
-      mockedDefaultIndexPatternData,
-    ]);
-    expect(mockedConsoleError).toBeCalledWith(INDEX_NOT_FOUND_ERROR);
-  });
-
-  it('should return the same filters and apply them to the filter manager when are received by props', async () => {
-    const defaultFilters: Filter[] = [
-      {
-        query: 'something to filter',
-        meta: {
-          alias: 'filter-mocked',
-          disabled: false,
-          negate: true,
-        },
-      },
-    ];
-    jest
-      .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
-      .mockResolvedValue(mockedDefaultIndexPatternData);
-    jest
-      .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
-      .mockReturnValue(defaultFilters);
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useSearchBar({
-        filters: defaultFilters,
-      }),
-    );
-
-    await waitForNextUpdate();
-
-    expect(result.current.searchBarProps.filters).toMatchObject(defaultFilters);
-    expect(mockDataPlugin.query.filterManager.setFilters).toBeCalledWith(
-      defaultFilters,
-    );
-    expect(mockDataPlugin.query.filterManager.getFilters).toBeCalled();
-  });
-
-  it('should return empty filters when the index pattern is NOT equal to the default app index pattern', async () => {
+  it('should return empty filters when NOT equal a default filters', async () => {
     const exampleIndexPatternId = 'wazuh-index-pattern';
     const mockedExampleIndexPatternData: Partial<IndexPattern> = {
       // used partial not avoid fill all the interface, it's only for testing purpose
       id: exampleIndexPatternId,
       title: '',
     };
+    jest
+      .spyOn(AppState, 'getCurrentPattern')
+      .mockImplementation(() => exampleIndexPatternId);
+    jest.spyOn(AppState, 'setCurrentPattern').mockImplementation(jest.fn());
     jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedExampleIndexPatternData);
@@ -195,13 +142,63 @@ describe('[hook] useSearchBarConfiguration', () => {
       .mockReturnValue([]);
     const { result, waitForNextUpdate } = renderHook(() =>
       useSearchBar({
-        defaultIndexPatternID: exampleIndexPatternId,
+        indexPattern: mockedExampleIndexPatternData as IndexPattern,
+        setFilters: jest.fn()
       }),
     );
-    await waitForNextUpdate();
     expect(result.current.searchBarProps.indexPatterns).toMatchObject([
       mockedExampleIndexPatternData,
     ]);
     expect(result.current.searchBarProps.filters).toStrictEqual([]);
   });
+
+  it('should reload the index pattern when the index pattern changes', async () => {
+    const exampleIndexPatternId = 'wazuh-index-pattern';
+    const mockedExampleIndexPatternData: Partial<IndexPattern> = {
+      // used partial not avoid fill all the interface, it's only for testing purpose
+      id: exampleIndexPatternId,
+      title: '',
+    };
+    jest
+      .spyOn(AppState, 'getCurrentPattern')
+      .mockImplementation(() => exampleIndexPatternId);
+    jest.spyOn(AppState, 'setCurrentPattern').mockImplementation(jest.fn());
+    jest
+      .spyOn(mockDataPlugin.indexPatterns, 'get')
+      .mockResolvedValue(mockedExampleIndexPatternData);
+    jest
+      .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
+      .mockResolvedValue(mockedDefaultIndexPatternData);
+    jest
+      .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
+      .mockReturnValue([]);
+    const { result, waitForNextUpdate, rerender } = renderHook(
+      // @ts-ignore
+      (props) => useSearchBar(props),
+      {
+        initialProps: {
+          indexPattern: mockedExampleIndexPatternData as IndexPattern,
+          setFilters: jest.fn()
+        },
+      },
+    );
+    expect(result.current.searchBarProps.indexPatterns).toMatchObject([
+      mockedExampleIndexPatternData,
+    ]);
+    const newExampleIndexPatternData: Partial<IndexPattern> = {
+      // used partial not avoid fill all the interface, it's only for testing purpose
+      id: 'new-wazuh-index-pattern',
+      title: '',
+    };
+    jest
+      .spyOn(mockDataPlugin.indexPatterns, 'get')
+      .mockResolvedValue(newExampleIndexPatternData);
+    rerender({
+      indexPattern: newExampleIndexPatternData as IndexPattern,
+      setFilters: jest.fn()
+    });
+    expect(result.current.searchBarProps.indexPatterns).toMatchObject([
+      newExampleIndexPatternData,
+    ]);
+  })
 });

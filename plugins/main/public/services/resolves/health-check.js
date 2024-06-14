@@ -9,10 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export function healthCheck($window) {
-  if (!$window.sessionStorage.getItem('healthCheck')) {
+export function healthCheck() {
+  if (!sessionStorage.getItem('healthCheck')) {
     // New session, execute health check
-    $window.sessionStorage.setItem('healthCheck', 'executed');
+    sessionStorage.setItem('healthCheck', 'executed');
     return true;
   }
 

@@ -12,22 +12,30 @@
 
 import React from 'react';
 import { EuiEmptyPrompt, EuiButton } from '@elastic/eui';
-import { AppNavigate } from '../../../../../react-services/app-navigate';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 export const PromptStatisticsDisabled = () => {
   const goToConfigure = e => {
-    AppNavigate.navigateToModule(e, 'settings', { tab: 'configuration', category: 'statistics' })
+    NavigationService.getInstance().navigateToModule(e, 'settings', {
+      tab: 'configuration',
+      category: 'statistics',
+    });
   };
 
   return (
     <EuiEmptyPrompt
-      iconType="securitySignalDetected"
+      iconType='securitySignalDetected'
       title={<h2>Statistics is disabled</h2>}
       actions={
-        <EuiButton color="primary" fill iconType="gear" onMouseDown={goToConfigure}>
+        <EuiButton
+          color='primary'
+          fill
+          iconType='gear'
+          onMouseDown={goToConfigure}
+        >
           Go to configure
-        </EuiButton>  
+        </EuiButton>
       }
     />
-  )
-}
+  );
+};

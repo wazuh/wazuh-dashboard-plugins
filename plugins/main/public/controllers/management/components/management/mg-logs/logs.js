@@ -44,7 +44,7 @@ import { WzFieldSearchDelay } from '../../../../../components/common/search';
 import { logs } from '../../../../../utils/applications';
 
 export default compose(
-  withGlobalBreadcrumb([{ text: logs.title }]),
+  withGlobalBreadcrumb([{ text: logs.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
@@ -458,7 +458,7 @@ export default compose(
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiTextColor color='subdued'>
-                <p>List and filter Wazuh logs.</p>
+                <p>List and filter logs.</p>
               </EuiTextColor>
             </EuiFlexItem>
           </EuiFlexGroup>

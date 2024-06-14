@@ -20,7 +20,8 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
             <div
               class="euiText euiText--medium"
             >
-              App version: 
+              App version:
+               
               <b>
                 4.8.0
               </b>
@@ -32,22 +33,10 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
             <div
               class="euiText euiText--medium"
             >
-              App revision: 
-              <b>
-                01
-              </b>
-            </div>
-          </div>
-          <div
-            class="euiFlexItem"
-          >
-            <div
-              class="euiText euiText--medium"
-            >
-              Install date:
+              App revision:
                
               <b>
-                Sep 25, 2023 @ 14:03:40.816
+                01
               </b>
             </div>
           </div>

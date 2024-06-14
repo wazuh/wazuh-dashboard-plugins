@@ -23,7 +23,6 @@ import {
 
 import {
   withGlobalBreadcrumb,
-  withReduxProvider,
   withGuard,
   withUserAuthorizationPrompt,
   withErrorBoundary,
@@ -46,7 +45,8 @@ import {
   UI_LOGGER_LEVELS,
 } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { itHygiene } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
+import NavigationService from '../../../react-services/navigation-service';
 
 const tableColumns = [
   {
@@ -103,10 +103,12 @@ const statsAgents: { title: string; field: string; render?: (value) => any }[] =
 
 export const MainAgentStats = compose(
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb(({ agent }) => [
     {
-      text: itHygiene.title,
+      text: endpointSummary.breadcrumbLabel,
+      href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
+        path: `#/agents-preview`,
+      }),
     },
     { agent },
     {

@@ -9,366 +9,285 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import fs from 'fs';
-import yml from 'js-yaml';
-import { UpdateRegistry } from './update-registry';
-import { initialWazuhConfig } from './initial-wazuh-config';
-import { WAZUH_DATA_CONFIG_APP_PATH } from '../../common/constants';
-import { createDataDirectoryIfNotExists } from './filesystem';
 import { Logger } from 'opensearch-dashboards/server';
+import { IConfiguration } from '../../common/services/configuration';
+import { ServerAPIClient } from './server-api-client';
+import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
+import { HTTP_STATUS_CODES } from '../../common/constants';
+
+interface IAPIHost {
+  id: string;
+  username: string;
+  password: string;
+  port: number;
+  run_as: boolean;
+}
+
+interface IAPIHostRegistry {
+  manager: string | null;
+  node: string | null;
+  status: string;
+  cluster: string;
+  allow_run_as: API_USER_STATUS_RUN_AS;
+}
 
 /**
- * This services manages the API host entries
+ * This service manages the API connections.
+ * Get API hosts configuration
+ * Get API host entries (combine configuration and registry data)
+ * Create API host
+ * Update API host
+ * Delete API host
+ * Cache the registry data for API hosts
+ * Ability to get if the configured user is allowed to use run as
  */
 export class ManageHosts {
-  busy: boolean;
-  file: string;
-  initialConfig: string;
-  constructor(private logger: Logger, private updateRegistry: UpdateRegistry) {
-    this.busy = false;
-    this.file = WAZUH_DATA_CONFIG_APP_PATH;
-    this.initialConfig = initialWazuhConfig;
+  public serverAPIClient: ServerAPIClient | null = null;
+  private cacheRegistry: Map<string, IAPIHostRegistry> = new Map();
+  constructor(private logger: Logger, private configuration: IConfiguration) {}
+
+  setServerAPIClient(client: ServerAPIClient) {
+    this.serverAPIClient = client;
+  }
+  /**
+   * Exclude fields from an API host data
+   * @param host
+   * @param exclude
+   * @returns
+   */
+  private filterAPIHostData(host: IAPIHost, exclude: string[]) {
+    return exclude?.length
+      ? Object.entries(host).reduce(
+          (accum, [key, value]) => ({
+            ...accum,
+            ...(!exclude.includes(key) ? { [key]: value } : {}),
+          }),
+          {},
+        )
+      : host;
   }
 
   /**
-   * Composes the host structure
-   * @param {Object} host
-   * @param {String} id
+   * Get hosts or host by ID from configuration
    */
-  composeHost(host, id) {
+  async get(
+    hostID?: string,
+    options: { excludePassword: boolean } = { excludePassword: false },
+  ): Promise<IAPIHost[] | IAPIHost> {
     try {
-      this.logger.debug('Composing host');
-      return `  - ${!id ? new Date().getTime() : id}:
-      url: ${host.url}
-      port: ${host.port}
-      username: ${host.username || host.user}
-      password: ${host.password}`;
-    } catch (error) {
-      this.logger.error(error.message || error);
-      throw error;
-    }
-  }
-
-  /**
-   * Regex to build the host
-   * @param {Object} host
-   */
-  composeRegex(host) {
-    try {
-      const hostId = Object.keys(host)[0];
-      const reg = `\\s*-\\s*${hostId}\\s*:\\s*\\n*\\s*url\\s*:\\s*\\S*\\s*\\n*\\s*port\\s*:\\s*\\S*\\s*\\n*\\s*username\\s*:\\s*\\S*\\s*\\n*\\s*password\\s*:\\s*\\S*`;
-      this.logger.debug('Composing regex');
-      return new RegExp(`${reg}`, 'gm');
-    } catch (error) {
-      this.logger.error(error.message || error);
-      throw error;
-    }
-  }
-
-  /**
-   * Returns the hosts in the wazuh.yml
-   */
-  async getHosts() {
-    try {
-      this.checkBusy();
-      this.busy = true;
-      createDataDirectoryIfNotExists();
-      createDataDirectoryIfNotExists('config');
-      if (!fs.existsSync(WAZUH_DATA_CONFIG_APP_PATH)) {
-        await fs.writeFileSync(this.file, this.initialConfig, {
-          encoding: 'utf8',
-          mode: 0o600,
-        });
-      }
-      const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
-      this.busy = false;
-      const content = yml.load(raw);
-      this.logger.debug('Getting hosts');
-      const entries = (content || {})['hosts'] || [];
-      return entries;
-    } catch (error) {
-      this.busy = false;
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * This function checks if the hosts: key exists in the wazuh.yml for preventing duplicate in case of there's not any host defined
-   */
-  async checkIfHostsKeyExists() {
-    try {
-      this.logger.debug('Checking hosts key');
-      this.busy = true;
-      const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
-      this.busy = false;
-      const content = yml.load(raw);
-      return Object.keys(content || {}).includes('hosts');
-    } catch (error) {
-      this.busy = false;
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Returns the IDs of the current hosts in the wazuh.yml
-   */
-  async getCurrentHostsIds() {
-    try {
-      const hosts = await this.getHosts();
-      const ids = hosts.map(h => {
-        return Object.keys(h)[0];
-      });
-      this.logger.debug('Getting hosts ids');
-      return ids;
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Get host by id
-   * @param {String} id
-   */
-  async getHostById(id) {
-    try {
-      this.logger.debug(`Getting host ${id}`);
-      const hosts = await this.getHosts();
-      const host = hosts.filter(h => {
-        return Object.keys(h)[0] == id;
-      });
-      if (host && !host.length) {
-        throw new Error('Selected API is no longer available in wazuh.yml');
-      }
-      const key = Object.keys(host[0])[0];
-      const result = Object.assign(host[0][key], { id: key }) || {};
-      return result;
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Decodes the API password
-   * @param {String} password
-   */
-  decodeApiPassword(password) {
-    return Buffer.from(password, 'base64').toString('ascii');
-  }
-
-  /**
-   *  Iterate the array with the API entries in given from the .wazuh index in order to create a valid array
-   * @param {Object} apiEntries
-   */
-  transformIndexedApis(apiEntries) {
-    const entries = [];
-    try {
-      apiEntries.map(entry => {
-        const id = entry._id;
-        const host = entry._source;
-        const api = {
-          id: id,
-          url: host.url,
-          port: host.api_port,
-          username: host.api_username,
-          password: this.decodeApiPassword(host.api_password),
-          cluster_info: host.cluster_info,
-          extensions: host.extensions,
-        };
-        entries.push(api);
-      });
-      this.logger.debug('Transforming index API schedule to wazuh.yml');
-    } catch (error) {
-      this.logger.error(error.message || error);
-      throw error;
-    }
-    return entries;
-  }
-
-  /**
-   * Calls transformIndexedApis() to get the entries to migrate and after that calls addSeveralHosts()
-   * @param {Object} apiEntries
-   */
-  async migrateFromIndex(apiEntries) {
-    try {
-      const apis = this.transformIndexedApis(apiEntries);
-      return await this.addSeveralHosts(apis);
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Receives an array of hosts and checks if any host is already in the wazuh.yml, in this case is removed from the received array and returns the resulting array
-   * @param {Array} hosts
-   */
-  async cleanExistingHosts(hosts) {
-    try {
-      const currentHosts = await this.getCurrentHostsIds();
-      const cleanHosts = hosts.filter(h => {
-        return !currentHosts.includes(h.id);
-      });
-      this.logger.debug('Preventing add existings hosts');
-      return cleanHosts;
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Throws an error is the wazuh.yml is busy
-   */
-  checkBusy() {
-    if (this.busy)
-      throw new Error('Another process is writting the configuration file');
-  }
-
-  /**
-   * Recursive function used to add several APIs entries
-   * @param {Array} hosts
-   */
-  async addSeveralHosts(hosts) {
-    try {
-      this.logger.debug('Adding several');
-      const hostsToAdd = await this.cleanExistingHosts(hosts);
-      if (!hostsToAdd.length) return 'There are not APIs entries to migrate';
-      for (let idx in hostsToAdd) {
-        const entry = hostsToAdd[idx];
-        await this.addHost(entry);
-      }
-      return 'All APIs entries were migrated to the wazuh.yml';
-    } catch (error) {
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Add a single host
-   * @param {Obeject} host
-   */
-  async addHost(host) {
-    const id = host.id || new Date().getTime();
-    const compose = this.composeHost(host, id);
-    let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
-    try {
-      this.checkBusy();
-      const hosts = (await this.getHosts()) || [];
-      this.busy = true;
-      if (!hosts.length) {
-        const hostsExists = await this.checkIfHostsKeyExists();
-        const result = !hostsExists
-          ? `${data}\nhosts:\n${compose}\n`
-          : `${data}\n${compose}\n`;
-        await fs.writeFileSync(this.file, result, 'utf8');
-      } else {
-        const lastHost = (hosts || []).pop();
-        if (lastHost) {
-          const lastHostObject = this.composeHost(
-            lastHost[Object.keys(lastHost)[0]],
-            Object.keys(lastHost)[0],
+      hostID
+        ? this.logger.debug(`Getting API connection with ID [${hostID}]`)
+        : this.logger.debug('Getting API connections');
+      const hosts = await this.configuration.get('hosts');
+      this.logger.debug(`API connections: [${JSON.stringify(hosts)}]`);
+      if (hostID) {
+        const host = hosts.find(({ id }: { id: string }) => id === hostID);
+        if (host) {
+          this.logger.debug(`API connection with ID [${hostID}] found`);
+          return this.filterAPIHostData(
+            host,
+            options.excludePassword ? ['password'] : undefined,
           );
-          const regex = this.composeRegex(lastHost);
-          const replace = data.replace(
-            regex,
-            `\n${lastHostObject}\n${compose}\n`,
-          );
-          await fs.writeFileSync(this.file, replace, 'utf8');
         }
+        const APIConnectionNotFound = `API connection with ID [${hostID}] not found`;
+        this.logger.debug(APIConnectionNotFound);
+        throw new Error(APIConnectionNotFound);
       }
-      this.busy = false;
-      this.updateRegistry.migrateToRegistry(
-        id,
-        host.cluster_info,
-        host.extensions,
+      return hosts.map(host =>
+        this.filterAPIHostData(
+          host,
+          options.excludePassword ? ['password'] : undefined,
+        ),
       );
-      this.logger.debug(`Host ${id} was properly added`);
-      return id;
     } catch (error) {
-      this.busy = false;
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
+      this.logger.error(error.message);
+      throw error;
     }
   }
 
   /**
-   * Delete a host from the wazuh.yml
-   * @param {Object} req
+   * This get all hosts entries in the plugins configuration and the related info in the wazuh-registry.json
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * API entries
    */
-  async deleteHost(req) {
-    let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
+  async getEntries(
+    options: { excludePassword: boolean } = { excludePassword: false },
+  ) {
     try {
-      this.checkBusy();
-      const hosts = (await this.getHosts()) || [];
-      this.busy = true;
-      if (!hosts.length) {
-        throw new Error('There are not configured hosts.');
+      this.logger.debug('Getting the API connections');
+      const hosts = (await this.get(undefined, options)) as IAPIHost[];
+      this.logger.debug('Getting registry');
+      const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
+      return hosts.map(host => {
+        const { id } = host;
+        return { ...host, cluster_info: registry[id] };
+      });
+    } catch (error) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  }
+
+  private isServerAPIClientResponseOk(response: { status: number }) {
+    return response.status === HTTP_STATUS_CODES.OK;
+  }
+
+  /**
+   * Get the cluster info and allow_run_as values for the API host and store into the registry cache
+   * @param host
+   * @returns
+   */
+  private async getRegistryDataByHost(
+    host: IAPIHost,
+  ): Promise<IAPIHostRegistry> {
+    const apiHostID = host.id;
+    this.logger.debug(`Getting registry data from host [${apiHostID}]`);
+    // Get cluster info data
+
+    let manager = null,
+      node = null,
+      status = 'disabled',
+      cluster = 'Disabled',
+      allow_run_as = API_USER_STATUS_RUN_AS.ALL_DISABLED;
+
+    try {
+      const responseAgents = await this.serverAPIClient.asInternalUser.request(
+        'GET',
+        `/agents`,
+        { params: { agents_list: '000' } },
+        { apiHostID },
+      );
+
+      if (this.isServerAPIClientResponseOk(responseAgents)) {
+        manager = responseAgents.data.data.affected_items[0].manager;
+      }
+
+      // Get allow_run_as
+      if (!host.run_as) {
+        allow_run_as = API_USER_STATUS_RUN_AS.HOST_DISABLED;
       } else {
-        const hostsNumber = hosts.length;
-        const target = (hosts || []).find(element => {
-          return Object.keys(element)[0] === req.params.id;
-        });
-        if (!target) {
-          throw new Error(`Host ${req.params.id} not found.`);
-        }
-        const regex = this.composeRegex(target);
-        const result = data.replace(regex, ``);
-        await fs.writeFileSync(this.file, result, 'utf8');
-        if (hostsNumber === 1) {
-          data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
-          const clearHosts = data.replace(
-            new RegExp(`hosts:\\s*[\\n\\r]`, 'gm'),
-            '',
+        const responseAllowRunAs =
+          await this.serverAPIClient.asInternalUser.request(
+            'GET',
+            '/security/users/me',
+            {},
+            { apiHostID },
           );
-          await fs.writeFileSync(this.file, clearHosts, 'utf8');
+        if (this.isServerAPIClientResponseOk(responseAllowRunAs)) {
+          allow_run_as = responseAllowRunAs.data.data.affected_items[0]
+            .allow_run_as
+            ? API_USER_STATUS_RUN_AS.ENABLED
+            : API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED;
         }
       }
-      this.busy = false;
-      this.logger.debug(`Host ${req.params.id} was properly deleted`);
-      return true;
-    } catch (error) {
-      this.busy = false;
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
+
+      const responseClusterStatus =
+        await this.serverAPIClient.asInternalUser.request(
+          'GET',
+          `/cluster/status`,
+          {},
+          { apiHostID },
+        );
+
+      if (this.isServerAPIClientResponseOk(responseClusterStatus) && responseClusterStatus.data?.data?.enabled === 'yes') {
+        status = 'enabled';
+
+        const responseClusterLocal =
+          await this.serverAPIClient.asInternalUser.request(
+            'GET',
+            `/cluster/local/info`,
+            {},
+            { apiHostID },
+          );
+
+        if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
+          node = responseClusterLocal.data.data.affected_items[0].node;
+          cluster = responseClusterLocal.data.data.affected_items[0].cluster;
+        }
+      }
+    } catch (error) {}
+
+    const data = {
+      manager,
+      node,
+      status,
+      cluster,
+      allow_run_as,
+    };
+    this.updateRegistryByHost(apiHostID, data);
+    return data;
   }
 
   /**
-   * Updates the hosts information
-   * @param {String} id
-   * @param {Object} host
+   * Initialize the service on plugin start.
+   * - Get the registry data for the configured API hosts and store into the in memory cache
+   * @returns
    */
-  async updateHost(id, host) {
-    let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
+  async start() {
     try {
-      this.checkBusy();
-      const hosts = (await this.getHosts()) || [];
-      this.busy = true;
+      this.logger.debug('Start');
+      const hosts = (await this.get(undefined, {
+        excludePassword: true,
+      })) as IAPIHost[];
       if (!hosts.length) {
-        throw new Error('There are not configured hosts.');
-      } else {
-        const target = (hosts || []).find(element => {
-          return Object.keys(element)[0] === id;
-        });
-        if (!target) {
-          throw new Error(`Host ${id} not found.`);
-        }
-        const regex = this.composeRegex(target);
-        const result = data.replace(regex, `\n${this.composeHost(host, id)}`);
-        await fs.writeFileSync(this.file, result, 'utf8');
+        this.logger.debug('No hosts found. Skip.');
+        return;
       }
-      this.busy = false;
-      this.logger.debug(`Host ${id} was properly updated`);
-      return true;
+
+      await Promise.all(
+        hosts.map(host =>
+          (async () => [host.id, await this.getRegistryDataByHost(host)])(),
+        ),
+      );
+      this.logger.debug('API hosts data stored in the registry');
     } catch (error) {
-      this.busy = false;
-      this.logger.error(error.message || error);
-      return Promise.reject(error);
+      this.logger.error(error.message);
+      throw error;
     }
+  }
+
+  private getRegistryByHost(hostID: string) {
+    this.logger.debug(`Getting cache for API host [${hostID}]`);
+    const result = this.cacheRegistry.get(hostID);
+    this.logger.debug(`Get cache for APIhost [${hostID}]`);
+    return result;
+  }
+
+  private updateRegistryByHost(hostID: string, data: any) {
+    this.logger.debug(`Updating cache for APIhost [${hostID}]`);
+    const result = this.cacheRegistry.set(hostID, data);
+    this.logger.debug(`Updated cache for APIhost [${hostID}]`);
+    return result;
+  }
+
+  private deleteRegistryByHost(hostID: string) {
+    this.logger.debug(`Deleting cache for API host [${hostID}]`);
+    const result = this.cacheRegistry.delete(hostID);
+    this.logger.debug(`Deleted cache for API host [${hostID}]`);
+    return result;
+  }
+
+  /**
+   * Check if the authentication with run_as is enabled and the API user can use it
+   * @param apiId
+   * @returns
+   */
+  isEnabledAuthWithRunAs(apiId: string): boolean {
+    this.logger.debug(`Checking if the API host [${apiId}] can use the run_as`);
+
+    const registryHost = this.getRegistryByHost(apiId);
+    if (!registryHost) {
+      throw new Error(
+        `API host with ID [${apiId}] was not found in the registry. This could be caused by a problem getting and storing the registry data or the API host was removed.`,
+      );
+    }
+    if (registryHost.allow_run_as === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED) {
+      throw new Error(
+        `API host with host ID [${apiId}] misconfigured. The configurated API user is not allowed to use [run_as]. Allow it in the API user configuration or set [run_as] host setting with [false] value.`,
+      );
+    }
+    return registryHost.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED;
   }
 }

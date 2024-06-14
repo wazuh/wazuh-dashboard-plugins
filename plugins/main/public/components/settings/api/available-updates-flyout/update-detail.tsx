@@ -1,6 +1,5 @@
 import React from 'react';
 import { Update } from '../../../../../../wazuh-check-updates/common/types';
-import { formatUIDate } from '../../../../react-services/time-service';
 import { Markdown } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import {
   EuiAccordion,
@@ -12,6 +11,7 @@ import {
   EuiBadge,
   EuiTitle,
 } from '@elastic/eui';
+import { getWazuhCorePlugin } from '../../../../kibana-services';
 
 interface UpdateDetailProps {
   update: Partial<Update>;
@@ -25,7 +25,9 @@ export const UpdateDetail = ({ update, type }: UpdateDetailProps) => {
     semver?.major &&
     (semver?.minor || semver?.minor === 0) &&
     (semver?.patch || semver?.patch === 0);
-  const minorVersion = hasVersions ? `${semver.major}.${semver.minor}` : undefined;
+  const minorVersion = hasVersions
+    ? `${semver.major}.${semver.minor}`
+    : undefined;
   const releaseNotesUrl = hasVersions
     ? `https://documentation.wazuh.com/current/release-notes/release-${semver.major}-${semver.minor}-${semver.patch}.html`
     : undefined;
@@ -36,21 +38,21 @@ export const UpdateDetail = ({ update, type }: UpdateDetailProps) => {
   return title && tag ? (
     <EuiAccordion
       id={tag}
-      className="euiAccordionForm"
-      buttonClassName="euiAccordionForm__button"
+      className='euiAccordionForm'
+      buttonClassName='euiAccordionForm__button'
       buttonContent={
-        <EuiFlexGroup alignItems="center" responsive={false}>
+        <EuiFlexGroup alignItems='center' responsive={false}>
           <EuiFlexItem grow={false}>
-            <EuiTitle size="s" className="euiAccordionForm__title">
+            <EuiTitle size='s' className='euiAccordionForm__title'>
               <h3>{title}</h3>
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiBadge color="hollow">{type}</EuiBadge>
+            <EuiBadge color='hollow'>{type}</EuiBadge>
           </EuiFlexItem>
         </EuiFlexGroup>
       }
-      paddingSize="l"
+      paddingSize='l'
     >
       {published_date ? (
         <>
@@ -58,7 +60,8 @@ export const UpdateDetail = ({ update, type }: UpdateDetailProps) => {
             listItems={[
               {
                 title: 'Published',
-                description: formatUIDate(new Date(published_date)),
+                description:
+                  getWazuhCorePlugin().utils.formatUIDate(published_date),
               },
             ]}
           />
@@ -69,12 +72,12 @@ export const UpdateDetail = ({ update, type }: UpdateDetailProps) => {
         <>
           <EuiFlexGroup responsive={false} wrap>
             <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-              <EuiLink href={releaseNotesUrl} target="_blank" external>
+              <EuiLink href={releaseNotesUrl} target='_blank' external>
                 Release notes
               </EuiLink>
             </EuiFlexItem>
             <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-              <EuiLink href={upgradeGuideUrl} target="_blank" external>
+              <EuiLink href={upgradeGuideUrl} target='_blank' external>
                 Upgrade guide
               </EuiLink>
             </EuiFlexItem>
@@ -82,7 +85,9 @@ export const UpdateDetail = ({ update, type }: UpdateDetailProps) => {
           <EuiSpacer />
         </>
       ) : null}
-      {description ? <Markdown markdown={description} openLinksInNewTab /> : null}
+      {description ? (
+        <Markdown markdown={description} openLinksInNewTab />
+      ) : null}
     </EuiAccordion>
   ) : null;
 };

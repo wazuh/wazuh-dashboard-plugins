@@ -9,7 +9,7 @@ export const useGetGroups = () => {
   const getGroups = async () => {
     try {
       setIsLoading(true);
-      const { affected_items } = await getGroupsService();
+      const { affected_items } = await getGroupsService({});
       const groups = affected_items.map(item => item.name);
       setGroups(groups);
       setError(undefined);

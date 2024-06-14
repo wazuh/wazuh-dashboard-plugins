@@ -93,7 +93,7 @@ export class ResourcesHandler {
     fileName: string,
     content: string,
     overwrite: boolean,
-    relativeDirname: string,
+    relativeDirname?: string,
   ) {
     try {
       const result = await WzRequest.apiReq(
@@ -102,7 +102,9 @@ export class ResourcesHandler {
         {
           params: {
             overwrite: overwrite,
-            relative_dirname: relativeDirname,
+            ...(this.resource !== 'lists'
+              ? { relative_dirname: relativeDirname }
+              : {}),
           },
           body: content.toString(),
           origin: 'raw',
@@ -119,7 +121,7 @@ export class ResourcesHandler {
    * @param {Resource} resource
    * @param {String} fileName
    */
-  async deleteFile(fileName: string, relativeDirname: string = '') {
+  async deleteFile(fileName: string, relativeDirname?: string) {
     try {
       const result = await WzRequest.apiReq(
         'DELETE',

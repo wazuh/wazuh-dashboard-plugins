@@ -14,19 +14,19 @@ export default class GroupsColums {
           field: 'name',
           name: 'Name',
           align: 'left',
-          sortable: true
+          sortable: true,
         },
         {
           field: 'count',
           name: 'Agents',
           align: 'left',
-          sortable: true
+          sortable: true,
         },
         {
           field: 'configSum',
           name: 'Configuration checksum',
-          align: 'left'
-        }
+          align: 'left',
+        },
       ];
       this.columns.push({
         name: 'Actions',
@@ -36,21 +36,31 @@ export default class GroupsColums {
             <div>
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'group:read', resource: `group:id:${item.name}`}]}
-                tooltip={{position: 'top', content: `View ${item.name} details`}}
-                aria-label="View group details"
-                iconType="eye"
+                permissions={[
+                  { action: 'group:read', resource: `group:id:${item.name}` },
+                ]}
+                tooltip={{
+                  position: 'top',
+                  content: `View ${item.name} details`,
+                }}
+                aria-label='View group details'
+                iconType='eye'
                 onClick={async () => {
                   this.tableProps.updateGroupDetail(item);
                 }}
-                color="primary"
+                color='primary'
               />
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'group:read', resource: `group:id:${item.name}`}]}
-                tooltip={{position: 'top', content: 'Edit group configuration'}}
-                aria-label="Edit group configuration"
-                iconType="pencil"
+                permissions={[
+                  { action: 'group:read', resource: `group:id:${item.name}` },
+                ]}
+                tooltip={{
+                  position: 'top',
+                  content: 'Edit group configuration',
+                }}
+                aria-label='Edit group configuration'
+                iconType='pencil'
                 onClick={async ev => {
                   ev.stopPropagation();
                   this.showGroupConfiguration(item.name);
@@ -58,21 +68,29 @@ export default class GroupsColums {
               />
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'group:delete', resource: `group:id:${item.name}`}]}
-                tooltip={{posiiton: 'top', content: item.name === 'default' ? `The ${item.name} group cannot be deleted`: `Delete ${item.name}`}}
-                aria-label="Delete content"
-                iconType="trash"
+                permissions={[
+                  { action: 'group:delete', resource: `group:id:${item.name}` },
+                ]}
+                tooltip={{
+                  posiiton: 'top',
+                  content:
+                    item.name === 'default'
+                      ? `The ${item.name} group cannot be deleted`
+                      : `Delete ${item.name}`,
+                }}
+                aria-label='Delete content'
+                iconType='trash'
                 onClick={async ev => {
                   ev.stopPropagation();
                   this.tableProps.updateListItemsForRemove([item]);
                   this.tableProps.updateShowModal(true);
                 }}
-                color="danger"
+                color='danger'
                 isDisabled={item.name === 'default'}
               />
             </div>
           );
-        }
+        },
       });
     };
 
@@ -81,14 +99,14 @@ export default class GroupsColums {
 
   async showGroupConfiguration(groupId) {
     const result = await this.groupsHandler.getFileContent(
-      `/groups/${groupId}/files/agent.conf/xml`
+      `/groups/${groupId}/files/agent.conf?raw=true`,
     );
 
     const file = {
       name: 'agent.conf',
       content: this.autoFormat(result),
       isEditable: true,
-      groupName: groupId
+      groupName: groupId,
     };
     this.tableProps.updateFileContent(file);
   }
@@ -121,7 +139,7 @@ export default class GroupsColums {
       'other->single': 0,
       'other->closing': -1,
       'other->opening': 0,
-      'other->other': 0
+      'other->other': 0,
     };
 
     for (var i = 0; i < lines.length; i++) {

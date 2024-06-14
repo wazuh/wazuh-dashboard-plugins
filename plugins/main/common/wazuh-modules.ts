@@ -114,20 +114,20 @@ export const WAZUH_MODULES = {
   syscollector: {
     title: 'Inventory data',
     // This appId is not used, for consistency was added.
-    appId: 'it-hygiene',
+    appId: 'endpoint-summary',
     description:
       'Applications, network configuration, open ports and processes running on your monitored systems.',
   },
   stats: {
     title: 'Stats',
     // This appId is not used, for consistency was added.
-    appId: 'it-hygiene',
+    appId: 'endpoint-summary',
     description: 'Stats for agent and logcollector',
   },
   configuration: {
     title: 'Configuration',
     // This appId is not used, for consistency was added.
-    appId: 'it-hygiene',
+    appId: 'endpoint-summary',
     description:
       'Check the current agent configuration remotely applied by its group.',
   },
@@ -158,7 +158,7 @@ export const WAZUH_MODULES = {
   devTools: {
     title: 'API console',
     appId: 'api-console',
-    description: 'Test the Wazuh API endpoints.',
+    description: 'Test the API endpoints.',
   },
   logtest: {
     title: 'Test your logs',

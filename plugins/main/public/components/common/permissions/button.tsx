@@ -34,7 +34,7 @@ interface IWzButtonPermissionsProps
 export const WzButtonPermissions = ({
   buttonType = 'default',
   permissions,
-  roles,
+  administrator,
   tooltip,
   ...rest
 }: IWzButtonPermissionsProps) => {
@@ -52,24 +52,24 @@ export const WzButtonPermissions = ({
   return (
     <WzElementPermissions
       permissions={permissions}
-      roles={roles}
+      administrator={administrator}
       tooltip={tooltip}
       getAdditionalProps={disabled => {
         const additionalProps = {
           ...(!['link', 'switch'].includes(buttonType)
             ? { isDisabled: disabled }
             : { disabled }),
-          onClick:
-            disabled || !rest.onClick || buttonType == 'switch'
-              ? undefined
-              : rest.onClick,
-          onChange: disabled || !rest.onChange ? undefined : rest.onChange,
+          onClick: disabled || !rest.onClick ? undefined : rest.onClick,
+          onChange:
+            !disabled || rest.onChange || buttonType === 'switch'
+              ? rest.onChange
+              : undefined,
         };
-
         if (buttonType == 'switch') delete additionalProps.onClick;
 
         return additionalProps;
       }}
+      {...rest}
     >
       <Button {...rest} />
     </WzElementPermissions>

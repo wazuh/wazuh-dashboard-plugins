@@ -11,9 +11,8 @@
  */
 import { AppState } from '../react-services/app-state';
 import { GenericRequest } from '../react-services/generic-request';
-import { ShareAgent } from '../factories/share-agent';
-import { ModulesHelper } from '../components/common/modules/modules-helper';
 import rison from 'rison-node';
+import { VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER } from '../../common/constants';
 
 export class CommonData {
   /**
@@ -30,7 +29,6 @@ export class CommonData {
     this.genericReq = GenericRequest;
     this.errorHandler = errorHandler;
     this.$location = $location;
-    this.shareAgent = new ShareAgent();
     //    this.globalState = globalState;
     this.savedTimefilter = null;
     this.$window = $window;
@@ -127,10 +125,7 @@ export class CommonData {
   async af(filterHandler, tab, agent = false) {
     try {
       const tabFilters = {
-        general: { group: '' },
         welcome: { group: '' },
-        fim: { group: 'syscheck' },
-        pm: { group: 'rootcheck' },
         vuls: { group: 'vulnerability-detector' },
         oscap: { group: 'oscap' },
         ciscat: { group: 'ciscat' },
@@ -140,12 +135,8 @@ export class CommonData {
         hipaa: { group: 'hipaa' },
         nist: { group: 'nist' },
         tsc: { group: 'tsc' },
-        aws: { group: 'amazon' },
-        gcp: { group: 'gcp' },
         office: { group: 'office365' },
-        virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
-        sca: { group: 'sca' },
         docker: { group: 'docker' },
         github: { group: 'github' },
       };
@@ -158,6 +149,9 @@ export class CommonData {
             ? AppState.getClusterInfo().cluster
             : AppState.getClusterInfo().manager,
           isCluster,
+          tab === 'vuls'
+            ? VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER
+            : undefined,
         ),
       );
       if (tab !== 'general' && tab !== 'welcome') {
@@ -200,8 +194,8 @@ export class CommonData {
 
       if (agent) filters.push(filterHandler.agentQuery(agent));
       filters.push(...this.addWazuhParamFilters());
-      const discoverScope = await ModulesHelper.getDiscoverScope();
-      discoverScope.loadFilters(filters, tab);
+      // const discoverScope = await ModulesHelper.getDiscoverScope();
+      // discoverScope.loadFilters(filters, tab);
     } catch (error) {
       throw new Error(
         'An error occurred while creating custom filters for visualizations',
@@ -381,28 +375,6 @@ export class CommonData {
     } else {
       this.$location.search('tabView', 'panels');
       return 'panels';
-    }
-  }
-
-  /**
-   * Check the location of a given agent
-   * @param {String} newAgentId
-   * @param {Boolean} globalAgent
-   */
-  checkLocationAgentId(newAgentId, globalAgent) {
-    if (newAgentId) {
-      this.$location.search('agent', newAgentId);
-      return newAgentId;
-    } else {
-      if (this.$location.search().agent && !globalAgent) {
-        // There's one in the url
-        return this.$location.search().agent;
-      } else {
-        this.shareAgent.deleteAgent();
-        const agentId = globalAgent?.id || null;
-        agentId && this.$location.search('agent', agentId);
-        return agentId;
-      }
     }
   }
 

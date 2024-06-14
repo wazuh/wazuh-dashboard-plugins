@@ -10,9 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PromptSelectAgent } from './';
+import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 
 export const PromptNoSelectedAgent = ({ body }) => {
+  useEffect(() => {
+    const pinnedAgentManager = new PinnedAgentManager();
+    pinnedAgentManager.syncPinnedAgentSources();
+  }, []);
   return <PromptSelectAgent body={body} title="No agent is selected" />;
 };

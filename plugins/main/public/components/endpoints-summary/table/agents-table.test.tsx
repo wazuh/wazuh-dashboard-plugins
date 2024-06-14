@@ -275,15 +275,6 @@ const localStorageMock = (function () {
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-jest.mock('../../../kibana-services', () => ({
-  getCore: jest.fn().mockReturnValue({
-    application: {
-      navigateToApp: () => 'http://url',
-      getUrlForApp: () => 'http://url',
-    },
-  }),
-}));
-
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
     handleError: options => {},
@@ -294,10 +285,28 @@ jest.mock('../../../redux/reducers/appStateReducers', () => ({
   appStateReducers: state => state,
 }));
 
+jest.mock(
+  '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  }),
+);
+
+jest.mock('../../../react-services/navigation-service', () => ({
+  getInstance() {
+    return {
+      navigateToApp: () => 'http://url',
+      getUrlForApp: () => 'http://url',
+    };
+  },
+}));
+
 const permissionsStore = {
   appStateReducers: {
+    userAccount: {
+      administrator: true,
+    },
     withUserLogged: true,
-    userRoles: ['administrator'],
     userPermissions: {
       'agent:create': { '*:*:*': 'allow' },
       rbac_mode: 'black',
@@ -334,22 +343,12 @@ describe('AgentsTable component', () => {
       <Provider store={store}>
         <AgentsTable
           filters={[]}
-          removeFilters={() => jest.fn()}
-          wzReq={WzRequest.apiReq}
-          addingNewAgent={() => jest.fn()}
-          downloadCsv={() => jest.fn()}
-          clickAction={() => jest.fn()}
-          formatUIDate={date => jest.fn()}
-          reload={() => jest.fn()}
+          showOnlyOutdated={false}
+          setShowOnlyOutdated={() => jest.fn()}
+          totalOutdated={0}
         />
       </Provider>,
     );
-
-    // Set table id to avoid snapshot changes
-
-    const tableId = '__table_d1f8f8c3-1198-11ee-ab9b-75fc624fc672';
-
-    wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
     expect(
@@ -362,22 +361,12 @@ describe('AgentsTable component', () => {
       <Provider store={store}>
         <AgentsTable
           filters={[]}
-          removeFilters={() => jest.fn()}
-          wzReq={WzRequest.apiReq}
-          addingNewAgent={() => jest.fn()}
-          downloadCsv={() => jest.fn()}
-          clickAction={() => jest.fn()}
-          formatUIDate={date => jest.fn()}
-          reload={() => jest.fn()}
+          showOnlyOutdated={false}
+          setShowOnlyOutdated={() => jest.fn()}
+          totalOutdated={0}
         />
       </Provider>,
     );
-
-    // Set table id to avoid snapshot changes
-
-    const tableId = '__table_d1fddac1-1198-11ee-ab9b-75fc624fc672';
-
-    wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
     expect(
@@ -394,22 +383,12 @@ describe('AgentsTable component', () => {
       <Provider store={store}>
         <AgentsTable
           filters={[]}
-          removeFilters={() => jest.fn()}
-          wzReq={WzRequest.apiReq}
-          addingNewAgent={() => jest.fn()}
-          downloadCsv={() => jest.fn()}
-          clickAction={() => jest.fn()}
-          formatUIDate={date => jest.fn()}
-          reload={() => jest.fn()}
+          showOnlyOutdated={false}
+          setShowOnlyOutdated={() => jest.fn()}
+          totalOutdated={0}
         />
       </Provider>,
     );
-
-    // Set table id to avoid snapshot changes
-
-    const tableId = '__table_d203a723-1198-11ee-ab9b-75fc624fc672';
-
-    wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
     expect(

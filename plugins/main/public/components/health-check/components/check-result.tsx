@@ -25,6 +25,7 @@ import {
 } from '@elastic/eui';
 import InspectLogButton from './inspect-logs-button';
 import ResultIcons from './result-icons';
+import './check-result.scss';
 
 type Result =
   | 'loading'
@@ -145,9 +146,11 @@ export function CheckResult(props) {
 
   return (
     <>
-      <EuiDescriptionListTitle>{props.title}</EuiDescriptionListTitle>
+      <EuiDescriptionListTitle className={`wz-health-check-result-${result}`}>
+        {props.title}
+      </EuiDescriptionListTitle>
       <EuiDescriptionListDescription>
-        <p>
+        <p className={`wz-health-check-result-${result}`}>
           <ResultIcons result={result} initCheck={initCheck}>
             {showLogButton ? (
               <InspectLogButton

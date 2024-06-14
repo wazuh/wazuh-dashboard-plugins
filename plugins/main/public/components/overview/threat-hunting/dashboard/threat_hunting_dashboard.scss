@@ -1,0 +1,27 @@
+.th-dashboard-responsive {
+  @media (max-width: 767px) {
+    .react-grid-layout {
+      height: auto !important;
+    }
+    .dshLayout-isMaximizedPanel {
+      height: 100% !important;
+    }
+  }
+}
+
+.euiDataGrid__virtualized {
+  height: max-content !important;
+}
+
+.th-container {
+  .euiDataGrid--fullScreen {
+    height: calc(100vh - 49px);
+    bottom: 0;
+    top: auto;
+
+    .euiDataGrid__virtualized {
+      height: calc(100vh - 147px) !important;
+      width: 100% !important;
+    }
+  }
+}

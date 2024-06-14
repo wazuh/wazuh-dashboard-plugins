@@ -45,40 +45,7 @@ span.statWithLink:hover {
   text-decoration: underline;
 }
 
-// Header buttons of IT Hygiene application
-
-// Sidebar is open and locked
-body.euiBody--hasFlyout:not(.euiBody-hasOverlayMask) {
-  @media only screen and (max-width: 1345px) {
-    // Hide button text depending on the window size
-    .wz-it-hygiene-header-button .euiButtonEmpty__text {
-      display: none;
-    }
-  }
-
-  @media only screen and (min-width: 1346px) {
-    // Hide the tooltip of button depending on the window size
-    .wz-it-hygiene-header-button-tooltip {
-      display: none;
-    }
-  }
+.wz-welcome-page .flex-redirect-app-links {
+  display: flex;
+  flex-grow: 1;
 }
-
-// Sidebar is closed
-body:not(.euiBody--hasFlyout) {
-  @media only screen and (max-width: 1025px) {
-    // Hide button text depending on the window size
-    .wz-it-hygiene-header-button .euiButtonEmpty__text {
-      display: none;
-    }
-  }
-
-  @media only screen and (min-width: 1026px) {
-    // Hide the tooltip of button depending on the window size
-    .wz-it-hygiene-header-button-tooltip {
-      display: none;
-    }
-  }
-}
-
-// Header buttons of IT Hygiene application

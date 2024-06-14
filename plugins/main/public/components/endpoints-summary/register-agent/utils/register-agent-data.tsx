@@ -34,7 +34,7 @@ export const SERVER_ADDRESS_TEXTS = [
   {
     title: 'Server address',
     subtitle:
-      'This is the address the agent uses to communicate with the server. Enter an IP address or a fully qualified domain name (FDQN).',
+      'This is the address the agent uses to communicate with the server. Enter an IP address or a fully qualified domain name (FQDN).',
   },
 ];
 

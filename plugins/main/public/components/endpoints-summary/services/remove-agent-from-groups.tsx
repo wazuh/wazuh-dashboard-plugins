@@ -1,11 +1,15 @@
 import { WzRequest } from '../../../react-services/wz-request';
 
-export const removeAgentFromGroupsService = async (
-  agentId: string,
-  groups: string[],
-) =>
+export const removeAgentFromGroupsService = async ({
+  agentId,
+  groupIds,
+}: {
+  agentId: string;
+  groupIds: string[];
+}) =>
   await WzRequest.apiReq('DELETE', `/agents/${agentId}/group`, {
     params: {
-      groups_list: groups.join(','),
+      groups_list: groupIds.join(','),
+      wait_for_complete: true,
     },
   });

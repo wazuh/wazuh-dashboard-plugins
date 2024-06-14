@@ -9,10 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
-// Redux
-import store from '../../../../redux/store';
-
+import React from 'react';
 import WzRuleset from './ruleset/main-ruleset';
 import WzCDBLists from './cdblists/main-cdblists';
 import WzDecoders from './decoders/main-decoders';
@@ -27,38 +24,49 @@ import {
   SECTION_DECODERS_SECTION,
   SECTION_RULES_SECTION,
 } from './common/constants';
+import { ClusterOverview } from './cluster/cluster-overview';
+import { Switch, Route } from '../../../../components/router-search';
 
-class WzManagementMain extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-    this.store = store;
-  }
-
-  render() {
-    const { section } = this.props;
-    return (
-      <Fragment>
-        {(section === 'groups' && <WzGroups {...this.props} />) ||
-          (section === 'status' && <WzStatus />) ||
-          (section === 'reporting' && <WzReporting />) ||
-          (section === 'statistics' && <WzStatistics />) ||
-          (section === 'logs' && <WzLogs />) ||
-          (section === 'configuration' && (
-            <WzConfiguration {...this.props.configurationProps} />
-          )) ||
-          (section === SECTION_DECODERS_SECTION && (
-            <WzDecoders logtestProps={this.props.logtestProps} />
-          )) ||
-          (section === SECTION_CDBLIST_SECTION && (
-            <WzCDBLists logtestProps={this.props.logtestProps} />
-          )) ||
-          (['ruleset', SECTION_RULES_SECTION].includes(section) && (
-            <WzRuleset logtestProps={this.props.logtestProps} />
-          ))}
-      </Fragment>
-    );
-  }
-}
+const WzManagementMain = props => (
+  <Switch>
+    <Route path='?tab=groups'>
+      <WzGroups {...props} />
+    </Route>
+    <Route path='?tab=status'>
+      <WzStatus />
+    </Route>
+    <Route path='?tab=monitoring'>
+      <ClusterOverview />
+    </Route>
+    <Route path='?tab=reporting'>
+      <WzReporting />
+    </Route>
+    <Route path='?tab=statistics'>
+      <WzStatistics />
+    </Route>
+    <Route path='?tab=logs'>
+      <WzLogs />
+    </Route>
+    <Route path='?tab=configuration'>
+      <WzConfiguration
+        agent={{
+          id: '000',
+        }}
+      />
+    </Route>
+    <Route path={`?tab=${SECTION_DECODERS_SECTION}`}>
+      <WzDecoders />
+    </Route>
+    <Route path={`?tab=${SECTION_CDBLIST_SECTION}`}>
+      <WzCDBLists />
+    </Route>
+    <Route path={`?tab=ruleset`}>
+      <WzRuleset />
+    </Route>
+    <Route path={`?tab=${SECTION_RULES_SECTION}`}>
+      <WzRuleset />
+    </Route>
+  </Switch>
+);
 
 export default WzManagementMain;

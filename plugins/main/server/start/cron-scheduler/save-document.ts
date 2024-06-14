@@ -1,12 +1,10 @@
 import { BulkIndexDocumentsParams } from 'elasticsearch';
-import { getConfiguration } from '../../lib/get-configuration';
 import { indexDate } from '../../lib/index-date';
 import {
   WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
   WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
 } from '../../../common/constants';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 export interface IIndexConfiguration {
   name: string;
@@ -27,7 +25,7 @@ export class SaveDocument {
 
   async save(doc: object[], indexConfig: IIndexConfiguration) {
     const { name, creation, mapping, shards, replicas } = indexConfig;
-    const index = this.addIndexPrefix(name);
+    const index = await this.addIndexPrefix(name);
     const indexCreation = `${index}-${indexDate(creation)}`;
     try {
       await this.checkIndexAndCreateIfNotExists(
@@ -160,10 +158,10 @@ export class SaveDocument {
     return { data: item.data };
   }
 
-  private addIndexPrefix(index): string {
-    const configFile = getConfiguration();
-    const prefix =
-      configFile['cron.prefix'] || getSettingDefaultValue('cron.prefix');
+  private async addIndexPrefix(index): string {
+    const prefix = await this.context.wazuh_core.configuration.get(
+      'cron.prefix',
+    );
     return `${prefix}-${index}`;
   }
 }

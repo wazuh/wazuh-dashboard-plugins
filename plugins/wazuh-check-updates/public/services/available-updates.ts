@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react';
-import { ApiAvailableUpdates, AvailableUpdates } from '../../common/types';
+import { AvailableUpdates } from '../../common/types';
 import { routes } from '../../common/constants';
 import { getCore } from '../plugin-services';
 
-export const getAvailableUpdates = async (forceUpdate = false): Promise<AvailableUpdates> => {
+export const getAvailableUpdates = async (
+  queryApi = false,
+  forceQuery = false,
+): Promise<AvailableUpdates> => {
   const checkUpdates = sessionStorage.getItem('checkUpdates');
   const alreadyCheckUpdates = checkUpdates === 'executed';
 
   const availableUpdates = await getCore().http.get(routes.checkUpdates, {
     query: {
-      checkAvailableUpdates: forceUpdate || !alreadyCheckUpdates,
+      query_api: queryApi || !alreadyCheckUpdates,
+      force_query: forceQuery,
     },
   });
 

@@ -22,6 +22,7 @@
               "interval": 86400,
               "java_path": "wodles/java",
               "ciscat_path": "wodles/ciscat",
+              "ciscat_binary": "CIS-CAT.sh",
               "timeout": 1800
             }
           },
@@ -59,114 +60,19 @@
             }
           },
           {
-            "vulnerability-detector": {
+            "vulnerability-detection": {
               "enabled": "yes",
-              "run_on_start": "yes",
-              "interval": 300,
-              "min_full_scan_interval": 21600,
-              "retry_interval": 30,
-              "providers": [
-                {
-                  "name": "canonical",
-                  "version": "TRUSTY",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "canonical",
-                  "version": "XENIAL",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "canonical",
-                  "version": "BIONIC",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "canonical",
-                  "version": "FOCAL",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "debian",
-                  "version": "STRETCH",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "debian",
-                  "version": "BUSTER",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "redhat",
-                  "version": "5",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "redhat",
-                  "version": "6",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "redhat",
-                  "version": "7",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "redhat",
-                  "version": "8",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "jredhat",
-                  "update_interval": 3600,
-                  "download_timeout": 0
-                },
-                {
-                  "name": "alas",
-                  "version": "Amazon-Linux",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "test",
-                  "version": "test",
-                  "url": "https://test.com",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "arch",
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                },
-                {
-                  "name": "nvd",
-                  "update_from_year": 2010,
-                  "update_interval": 3600,
-                  "download_timeout": 300
-                }
-              ]
+              "feed-update-interval": "60m"
+            }
+          },
+          {
+            "wazuh_control": {
+              "enabled": "yes"
+            }
+          },
+          {
+            "wazuh_control": {
+              "enabled": "yes"
             }
           },
           {

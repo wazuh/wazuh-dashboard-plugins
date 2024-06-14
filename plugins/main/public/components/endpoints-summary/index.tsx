@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   EuiPage,
   EuiPageBody,
@@ -6,26 +6,32 @@ import {
   EuiProgress,
 } from '@elastic/eui';
 import { EndpointsSummary } from './endpoints-summary';
-import { endpointSumary } from '../../utils/applications';
+import { endpointSummary } from '../../utils/applications';
 import {
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb,
+  withRouteResolvers,
 } from '../common/hocs';
 import { compose } from 'redux';
 import { WzButtonPermissions } from '../common/permissions/button';
-import { getCore } from '../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { useGetTotalAgents } from './hooks';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../services/resolves';
+import NavigationService from '../../react-services/navigation-service';
 
 export const MainEndpointsSummary = compose(
   withErrorBoundary,
-  withReduxProvider,
-  withGlobalBreadcrumb([{ text: endpointSumary.title }]),
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
 )(() => {
-  const { isLoading, totalAgents, error } = useGetTotalAgents();
+  const { isLoading, totalAgents, error } = useGetTotalAgents('id!=000');
 
   if (error) {
     const options = {
@@ -56,7 +62,7 @@ export const MainEndpointsSummary = compose(
     return (
       <EuiEmptyPrompt
         iconType='watchesApp'
-        title={<h2>No agents were added to this manager.</h2>}
+        title={<h2>No agents were added to the manager</h2>}
         body={<p>Add agents to fleet to start monitoring</p>}
         actions={
           <WzButtonPermissions
@@ -64,9 +70,12 @@ export const MainEndpointsSummary = compose(
             fill
             permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
             iconType='plusInCircle'
-            href={getCore().application.getUrlForApp(endpointSumary.id, {
-              path: `#${endpointSumary.redirectTo()}deploy`,
-            })}
+            href={NavigationService.getInstance().getUrlForApp(
+              endpointSummary.id,
+              {
+                path: `#${endpointSummary.redirectTo()}deploy`,
+              },
+            )}
           >
             Deploy new agent
           </WzButtonPermissions>

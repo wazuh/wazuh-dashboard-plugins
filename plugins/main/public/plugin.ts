@@ -11,7 +11,6 @@ import {
   setToasts,
   setUiSettings,
   setChrome,
-  setAngularModule,
   setNavigationPlugin,
   setVisualizationsPlugin,
   setSavedObjects,
@@ -26,6 +25,7 @@ import {
   setHeaderActionMenuMounter,
   setWazuhCorePlugin,
 } from './kibana-services';
+import { validate as validateNodeCronInterval } from 'node-cron';
 import {
   AppPluginStartDependencies,
   WazuhSetup,
@@ -44,18 +44,15 @@ import {
   unregisterInterceptor,
 } from './services/request-handler';
 import { Applications, Categories } from './utils/applications';
-import { syncHistoryLocations } from './kibana-integrations/discover/kibana_services';
 import { euiPaletteColorBlind } from '@elastic/eui';
-
-const innerAngularName = 'app/wazuh';
+import NavigationService from './react-services/navigation-service';
+import { createHashHistory } from 'history';
 
 export class WazuhPlugin
   implements
     Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins>
 {
   constructor(private readonly initializerContext: PluginInitializerContext) {}
-  public initializeInnerAngular?: () => void;
-  private innerAngularInitialized: boolean = false;
   private hideTelemetryBanner?: () => void;
   public async setup(
     core: CoreSetup,
@@ -128,15 +125,27 @@ export class WazuhPlugin
         order,
         mount: async (params: AppMountParameters) => {
           try {
+            /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
+            There is an optimization error of the frontend side source code due to some modules can
+            not be loaded
+            */
+            const setting = plugins.wazuhCore.configuration._settings.get(
+              'cron.statistics.interval',
+            );
+            !setting.validateUIForm &&
+              (setting.validateUIForm = function (value) {
+                return this.validate(value);
+              });
+            !setting.validate &&
+              (setting.validate = function (value: string) {
+                return validateNodeCronInterval(value)
+                  ? undefined
+                  : 'Interval is not valid.';
+              });
+            setWzCurrentAppID(id);
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
-            setWzCurrentAppID(id);
             initializeInterceptor(core);
-            if (!this.initializeInnerAngular) {
-              throw Error(
-                'Wazuh plugin method initializeInnerAngular is undefined',
-              );
-            }
 
             // Update redux app state logos with the custom logos
             if (logosInitialState?.logos) {
@@ -148,23 +157,17 @@ export class WazuhPlugin
             setScopedHistory(params.history);
             // This allows you to add the selectors to the navbar
             setHeaderActionMenuMounter(params.setHeaderActionMenu);
-            // Discover currently uses two history instances:
-            // one from Kibana Platform and another from history package.
-            // Below function is used every time Discover app is loaded to synchronize both instances
-            syncHistoryLocations();
+            NavigationService.getInstance(createHashHistory());
             // Load application bundle
             const { renderApp } = await import('./application');
-            // Get start services as specified in kibana.json
-            const [coreStart, depsStart] = await core.getStartServices();
             setErrorOrchestrator(ErrorOrchestratorService);
             setHttp(core.http);
             setCookies(new Cookies());
             if (!AppState.checkCookies()) {
-              window.location.reload();
+              NavigationService.getInstance().reload();
             }
-            await this.initializeInnerAngular();
             params.element.classList.add('dscAppWrapper', 'wz-app');
-            const unmount = await renderApp(innerAngularName, params.element);
+            const unmount = await renderApp(params);
             return () => {
               unmount();
               unregisterInterceptor();
@@ -193,25 +196,6 @@ export class WazuhPlugin
       this.hideTelemetryBanner = () =>
         plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
     }
-    // we need to register the application service at setup, but to render it
-    // there are some start dependencies necessary, for this reason
-    // initializeInnerAngular + initializeServices are assigned at start and used
-    // when the application/embeddable is mounted
-    this.initializeInnerAngular = async () => {
-      if (this.innerAngularInitialized) {
-        return;
-      }
-      // this is used by application mount and tests
-      const { getInnerAngularModule } = await import('./get_inner_angular');
-      const module = getInnerAngularModule(
-        innerAngularName,
-        core,
-        plugins,
-        this.initializerContext,
-      );
-      setAngularModule(module);
-      this.innerAngularInitialized = true;
-    };
     setCore(core);
     setPlugins(plugins);
     setHttp(core.http);

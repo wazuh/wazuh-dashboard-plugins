@@ -10,26 +10,31 @@
  * Find more information about this on the LICENSE file.
  */
 
-import $ from 'jquery';
 import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
 import { AppState } from './app-state';
 import { WzRequest } from './wz-request';
-import { Vis2PNG } from '../factories/vis2png';
-import { RawVisualizations } from '../factories/raw-visualizations';
-import { VisHandlers } from '../factories/vis-handlers';
-import { getAngularModule, getDataPlugin, getToasts } from '../kibana-services';
+import { getCore, getHttp, getToasts, getUiSettings } from '../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
-const app = getAngularModule();
+import store from '../redux/store';
+import domtoimage from '../utils/dom-to-image';
+import dateMath from '@elastic/datemath';
+import React from 'react';
+import { EuiFlexGroup, EuiFlexItem, EuiButton, EuiLink } from '@elastic/eui';
+import { reporting } from '../utils/applications';
+import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
+import {
+  buildOpenSearchQuery,
+  buildRangeFilter,
+  getOpenSearchQueryConfig,
+} from '../../../../src/plugins/data/common';
+import { getForceNow } from '../components/common/search-bar/search-bar-service';
+import NavigationService from './navigation-service';
 
 export class ReportingService {
   constructor() {
-    this.$rootScope = app.$injector.get('$rootScope');
-    this.vis2png = new Vis2PNG();
-    this.rawVisualizations = new RawVisualizations();
-    this.visHandlers = new VisHandlers();
     this.wazuhConfig = new WazuhConfig();
   }
 
@@ -48,9 +53,10 @@ export class ReportingService {
   }
 
   removeAgentStatusVis(idArray) {
-    const monitoringEnabled = this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
+    const monitoringEnabled =
+      this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
     if (!monitoringEnabled) {
-      const visArray = idArray.filter((vis) => {
+      const visArray = idArray.filter(vis => {
         return vis !== 'Wazuh-App-Overview-General-Agents-status';
       });
       return visArray;
@@ -58,76 +64,138 @@ export class ReportingService {
     return idArray;
   }
 
-  async startVis2Png(tab, agents = false, syscollectorFilters = null) {
+  renderSucessReportsToast({ filename }) {
+    this.showToast(
+      'success',
+      'Report created',
+      <>
+        <EuiFlexGroup alignItems='center'>
+          <EuiFlexItem>
+            <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
+              <EuiFlexItem style={{ whiteSpace: 'nowrap' }} grow={false}>
+                See the reports on
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiLink
+                    aria-label='go to Endpoint summary'
+                    href={NavigationService.getInstance().getUrlForApp(
+                      reporting.id,
+                      {
+                        path: '',
+                      },
+                    )}
+                  >
+                    {reporting.title}
+                  </EuiLink>
+                </RedirectAppLinks>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              onClick={() =>
+                window.open(
+                  getHttp().basePath.prepend(`/reports/${filename}`),
+                  '_blank',
+                )
+              }
+              size='s'
+            >
+              Open report
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </>,
+      10000,
+    );
+  }
+
+  async getVisualizationsFromDOM() {
+    const domVisualizations = document.querySelectorAll('.visualization');
+    return await Promise.all(
+      Array.from(domVisualizations).map(async node => {
+        return {
+          element: await domtoimage.toPng(node),
+          width: node.clientWidth,
+          height: node.clientHeight,
+          title: node?.parentNode?.parentNode?.parentNode?.querySelector(
+            'figcaption > h2 > .embPanel__titleInner',
+          )?.textContent,
+        };
+      }),
+    );
+  }
+
+  async getDataSourceSearchContext() {
+    return store.getState().reportingReducers?.dataSourceSearchContext;
+  }
+
+  async startVis2Png(tab, agents = false, searchContext = null) {
     try {
-      if (this.vis2png.isWorking()) {
-        this.showToast('danger', 'Error', 'Report in progress', 4000);
-        return;
-      }
-      this.$rootScope.reportBusy = true;
-      this.$rootScope.reportStatus = 'Generating report...0%';
-      this.$rootScope.$applyAsync();
+      const dataSourceContext =
+        searchContext || (await this.getDataSourceSearchContext());
+      const visualizations = await this.getVisualizationsFromDOM();
 
-      this.vis2png.clear();
-
-      const rawVisualizations = this.rawVisualizations.getList().filter(this.removeTableVis);
-
-      let idArray = [];
-      if (tab === 'general') {
-        idArray = this.removeAgentStatusVis(rawVisualizations.map((item) => item.id));
-      } else {
-        idArray = rawVisualizations.map((item) => item.id);
-      }
-
-      const visualizationIDList = [];
-      for (const item of idArray) {
-        const tmpHTMLElement = $(`#${item}`);
-        if (tmpHTMLElement[0]) {
-          this.vis2png.assignHTMLItem(item, tmpHTMLElement);
-          visualizationIDList.push(item);
-        }
-      }
-
-      const appliedFilters = await this.visHandlers.getAppliedFilters(syscollectorFilters);
-      const dataplugin = await getDataPlugin();
-      const serverSideQuery = dataplugin.query.getOpenSearchQuery();
-      const array = await this.vis2png.checkArray(visualizationIDList);
-
+      const timeFilter =
+        dataSourceContext.time && dataSourceContext.indexPattern.timeFieldName
+          ? buildRangeFilter(
+            {
+              name: dataSourceContext.indexPattern.timeFieldName,
+              type: 'date',
+            },
+            dataSourceContext.time,
+            dataSourceContext.indexPattern,
+          )
+          : null;
+      // Build the filters to use in the server side
+      // Based on https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.13.0/src/plugins/data/public/query/query_service.ts#L103-L113
+      const serverSideQuery = buildOpenSearchQuery(
+        dataSourceContext.indexPattern,
+        dataSourceContext.query,
+        [...dataSourceContext.filters, ...(timeFilter ? [timeFilter] : [])],
+        getOpenSearchQueryConfig(getUiSettings()),
+      );
       const browserTimezone = moment.tz.guess(true);
 
+      /* The report for syscollector uses the keywords for from and to properties.
+      They are used with the format epoch_millis on the server side to get alerts data from
+      vulnerable packages. If these values are parsed, will cause an error due to unexpected format.
+      */
+      const time =
+        tab === 'syscollector'
+          ? { to: dataSourceContext.time.to, from: dataSourceContext.time.from }
+          : {
+            to: dateMath.parse(dataSourceContext.time.to, {
+              roundUp: true,
+              forceNow: getForceNow(),
+            }),
+            from: dateMath.parse(dataSourceContext.time.from),
+          };
+
       const data = {
-        array,
+        array: visualizations,
         serverSideQuery, // Used for applying the same filters on the server side requests
-        filters: appliedFilters.filters,
-        time: appliedFilters.time,
-        searchBar: appliedFilters.searchBar,
-        tables: appliedFilters.tables,
+        filters: dataSourceContext.filters,
+        time,
+        searchBar: dataSourceContext?.query?.query || '',
+        tables: [], // TODO: check is this is used
         tab,
         section: agents ? 'agents' : 'overview',
         agents,
         browserTimezone,
-        indexPatternTitle: (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title,
-        apiId: JSON.parse(AppState.getCurrentAPI()).id
+        indexPatternTitle: dataSourceContext.indexPattern.title,
+        apiId: JSON.parse(AppState.getCurrentAPI()).id,
       };
 
       const apiEndpoint =
-        tab === 'syscollector' ? `/reports/agents/${agents}/inventory` : `/reports/modules/${tab}`;
-      await WzRequest.genericReq('POST', apiEndpoint, data);
+        tab === 'syscollector'
+          ? `/reports/agents/${agents}/inventory`
+          : `/reports/modules/${tab}`;
+      const response = await WzRequest.genericReq('POST', apiEndpoint, data);
 
-      this.$rootScope.reportBusy = false;
-      this.$rootScope.reportStatus = false;
-      this.$rootScope.$applyAsync();
-      this.showToast(
-        'success',
-        'Created report',
-        'Success. Go to Indexer/dashboard management > Reporting',
-        4000
-      );
-      return;
+      this.renderSucessReportsToast({ filename: response.data.filename });
     } catch (error) {
-      this.$rootScope.reportBusy = false;
-      this.$rootScope.reportStatus = false;
-      this.$rootScope.$applyAsync();
       const options = {
         context: `${ReportingService.name}.startVis2Png`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -145,36 +213,23 @@ export class ReportingService {
 
   async startConfigReport(obj, type, components) {
     try {
-      this.$rootScope.reportBusy = true;
-      this.$rootScope.reportStatus = 'Generating PDF document...';
-      this.$rootScope.$applyAsync();
-
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
-        filters: [type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }],
+        filters: [
+          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name },
+        ],
         browserTimezone,
         components,
-        apiId: JSON.parse(AppState.getCurrentAPI()).id
+        apiId: JSON.parse(AppState.getCurrentAPI()).id,
       };
       const apiEndpoint =
-        type === 'agentConfig' ? `/reports/agents/${obj.id}` : `/reports/groups/${obj.name}`;
-      await WzRequest.genericReq('POST', apiEndpoint, data);
-
-      this.$rootScope.reportBusy = false;
-      this.$rootScope.reportStatus = false;
-      this.$rootScope.$applyAsync();
-      this.showToast(
-        'success',
-        'Created report',
-        'Success. Go to Indexer/dashboard management > Reporting',
-        4000
-      );
-      return;
+        type === 'agentConfig'
+          ? `/reports/agents/${obj.id}`
+          : `/reports/groups/${obj.name}`;
+      const response = await WzRequest.genericReq('POST', apiEndpoint, data);
+      this.renderSucessReportsToast({ filename: response.data.filename });
     } catch (error) {
-      this.$rootScope.reportBusy = false;
-      this.$rootScope.reportStatus = false;
-      this.$rootScope.$applyAsync();
       const options = {
         context: `${ReportingService.name}.startConfigReport`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -186,7 +241,6 @@ export class ReportingService {
           title: `Error configuring report`,
         },
       };
-      this.$rootScope.$applyAsync();
       getErrorOrchestrator().handleError(options);
     }
   }

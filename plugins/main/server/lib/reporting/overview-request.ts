@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
  * Returns top 3 agents with level 15 alerts
@@ -20,7 +19,14 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>} E.g:['000','130','300']
  */
-export const topLevel15 = async (context, gte, lte, filters, allowedAgentsFilter, pattern = getSettingDefaultValue('pattern')) => {
+export const topLevel15 = async (
+  context,
+  gte,
+  lte,
+  filters,
+  allowedAgentsFilter,
+  pattern,
+) => {
   try {
     const base = {};
 
@@ -32,22 +38,22 @@ export const topLevel15 = async (context, gte, lte, filters, allowedAgentsFilter
           field: 'agent.id',
           size: 3,
           order: {
-            _count: 'desc'
-          }
-        }
-      }
+            _count: 'desc',
+          },
+        },
+      },
     });
 
     base.query.bool.must.push({
       match_phrase: {
         'rule.level': {
-          query: 15
-        }
-      }
+          query: 15,
+        },
+      },
     });
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
-      body: base
+      body: base,
     });
     const { buckets } = response.body.aggregations['2'];
 
@@ -55,4 +61,4 @@ export const topLevel15 = async (context, gte, lte, filters, allowedAgentsFilter
   } catch (error) {
     return Promise.reject(error);
   }
-}
+};

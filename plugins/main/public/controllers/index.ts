@@ -10,10 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import './overview';
 import './management';
 import './agent';
-import './settings';
 import './security';
-import './tools';
-import './misc';

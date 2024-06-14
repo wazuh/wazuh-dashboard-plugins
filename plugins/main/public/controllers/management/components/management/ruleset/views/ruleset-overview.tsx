@@ -60,7 +60,7 @@ function WzRulesetOverview(props) {
 
 export default compose(
   withGlobalBreadcrumb(props => {
-    return [{ text: rules.title }];
+    return [{ text: rules.breadcrumbLabel }];
   }),
   withUserAuthorizationPrompt(props => [
     {

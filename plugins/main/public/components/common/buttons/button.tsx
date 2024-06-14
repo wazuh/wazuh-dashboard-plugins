@@ -15,38 +15,42 @@ import {
   EuiButtonEmpty,
   EuiButtonIcon,
   EuiLink,
-  EuiToolTip
+  EuiToolTip,
+  EuiSwitch,
 } from '@elastic/eui';
 
-enum WzButtonType{
+export enum WzButtonType {
   default = 'default',
   empty = 'empty',
   icon = 'icon',
-  link = 'link'
+  link = 'link',
+  switch = 'switch',
 }
 
-interface WzButtonProps{
-  buttonType?: WzButtonType
-  tooltip?: any
-  rest?: any
+interface WzButtonProps {
+  buttonType?: WzButtonType;
+  tooltip?: any;
+  color?: any;
+  children?: any;
+  isDisabled?: any;
+  rest?: any;
+}
+
+const WzButtons: { [key in WzButtonType]: React.FunctionComponent } = {
+  default: EuiButton,
+  empty: EuiButtonEmpty,
+  icon: EuiButtonIcon,
+  link: EuiLink,
+  switch: EuiSwitch,
 };
 
-const WzButtons: {[key in WzButtonType]: React.FunctionComponent} = {
-  'default': EuiButton,
-  'empty': EuiButtonEmpty,
-  'icon': EuiButtonIcon,
-  'link': EuiLink,
-}
-
-export const WzButton = ({buttonType = WzButtonType.default, tooltip, ...rest}: WzButtonProps) => {
+export const WzButton = ({
+  buttonType = WzButtonType.default,
+  tooltip,
+  ...rest
+}: WzButtonProps) => {
   const Button = WzButtons[buttonType];
-  
-  const button = <Button {...rest} />
-  return tooltip ? 
-    <EuiToolTip
-      {...tooltip}
-    >
-      {button}
-    </EuiToolTip>
-  : button
-}
+
+  const button = <Button {...rest} />;
+  return tooltip ? <EuiToolTip {...tooltip}>{button}</EuiToolTip> : button;
+};

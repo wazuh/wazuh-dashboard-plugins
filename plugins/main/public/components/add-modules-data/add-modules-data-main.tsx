@@ -177,6 +177,6 @@ class WzAddModulesData extends Component<
 
 export default compose(
   withGlobalBreadcrumb(props => {
-    return [{ text: sampleData.title }];
+    return [{ text: sampleData.breadcrumbLabel }];
   }),
 )(WzAddModulesData);

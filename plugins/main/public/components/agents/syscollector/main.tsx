@@ -11,22 +11,21 @@
  */
 
 import React from 'react';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withReduxProvider,
-} from '../../common/hocs';
+import { withErrorBoundary, withGlobalBreadcrumb } from '../../common/hocs';
 import { SyscollectorInventory } from './inventory';
 import { compose } from 'redux';
-import { itHygiene } from '../../../utils/applications';
+import { endpointSummary } from '../../../utils/applications';
+import NavigationService from '../../../react-services/navigation-service';
 
 export const MainSyscollector = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(({ agent }) => {
     return [
       {
-        text: itHygiene.title,
+        text: endpointSummary.breadcrumbLabel,
+        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
+          path: `#/agents-preview`,
+        }),
       },
       { agent },
       {

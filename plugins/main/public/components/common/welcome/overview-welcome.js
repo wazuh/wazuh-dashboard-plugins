@@ -24,21 +24,18 @@ import {
   EuiPage,
 } from '@elastic/eui';
 import './welcome.scss';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withReduxProvider,
-} from '../hocs';
+import { withErrorBoundary, withGlobalBreadcrumb } from '../hocs';
 import { compose } from 'redux';
 import {
   Applications,
   Categories,
-  endpointSumary,
+  endpointSummary,
   overview,
 } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { WzButtonPermissions } from '../../common/permissions/button';
+import NavigationService from '../../../react-services/navigation-service';
 
 const appCategories = Applications.reduce((categories, app) => {
   const existingCategory = categories.find(
@@ -63,10 +60,9 @@ const appCategories = Applications.reduce((categories, app) => {
 });
 
 export const OverviewWelcome = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(props => {
-    return [{ text: overview.title }];
+    return [{ text: overview.breadcrumbLabel }];
   }),
 )(
   class OverviewWelcome extends Component {
@@ -91,10 +87,10 @@ export const OverviewWelcome = compose(
                           { action: 'agent:create', resource: '*:*:*' },
                         ]}
                         iconType='plusInCircle'
-                        href={getCore().application.getUrlForApp(
-                          endpointSumary.id,
+                        href={NavigationService.getInstance().getUrlForApp(
+                          endpointSummary.id,
                           {
-                            path: `#${endpointSumary.redirectTo()}deploy`,
+                            path: `#${endpointSummary.redirectTo()}deploy`,
                           },
                         )}
                       >
@@ -116,11 +112,11 @@ export const OverviewWelcome = compose(
     render() {
       return (
         <Fragment>
-          <EuiPage>
+          <EuiPage className='wz-welcome-page'>
             <EuiFlexGroup gutterSize='l'>
               <EuiFlexItem>
                 {this.props.agentsCountTotal === 0 && this.addAgent()}
-                <EuiFlexGroup>
+                <EuiFlexGroup gutterSize='none'>
                   <EuiFlexGrid columns={2}>
                     {appCategories.map(({ label, apps }) => (
                       <EuiFlexItem key={label}>
@@ -137,6 +133,7 @@ export const OverviewWelcome = compose(
                             {apps.map(app => (
                               <EuiFlexItem key={app.id}>
                                 <RedirectAppLinks
+                                  className='flex-redirect-app-links'
                                   application={getCore().application}
                                 >
                                   <EuiCard
@@ -150,7 +147,7 @@ export const OverviewWelcome = compose(
                                     }
                                     className='homSynopsis__card'
                                     title={app.title}
-                                    href={getCore().application.getUrlForApp(
+                                    href={NavigationService.getInstance().getUrlForApp(
                                       app.id,
                                     )}
                                     data-test-subj={`overviewWelcome${this.strtools.capitalize(

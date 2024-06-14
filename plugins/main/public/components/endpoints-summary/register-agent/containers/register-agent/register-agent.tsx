@@ -27,26 +27,33 @@ import { FormConfiguration } from '../../../../common/form/types';
 import { useSelector } from 'react-redux';
 import {
   withErrorBoundary,
-  withReduxProvider,
   withGlobalBreadcrumb,
+  withRouteResolvers,
   withUserAuthorizationPrompt,
 } from '../../../../common/hocs';
 import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
-import {
-  validateServerAddress,
-  validateAgentName,
-} from '../../utils/validations';
+import { validateAgentName } from '../../utils/validations';
 import { compose } from 'redux';
-import { endpointSumary } from '../../../../../utils/applications';
-import { getCore } from '../../../../../kibana-services';
+import { endpointSummary } from '../../../../../utils/applications';
+import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../../../../services/resolves';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
-  withReduxProvider,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([
-    { text: endpointSumary.title, href: `#${endpointSumary.redirectTo()}` },
+    {
+      text: endpointSummary.breadcrumbLabel,
+      href: `#${endpointSummary.redirectTo()}`,
+    },
     { text: 'Deploy new agent' },
   ]),
   withUserAuthorizationPrompt([
@@ -77,7 +84,9 @@ export const RegisterAgent = compose(
     serverAddress: {
       type: 'text',
       initialValue: configuration['enrollment.dns'] || '',
-      validate: validateServerAddress,
+      validate:
+        getWazuhCorePlugin().configuration._settings.get('enrollment.dns')
+          .validate,
     },
     agentName: {
       type: 'text',
@@ -183,10 +192,10 @@ export const RegisterAgent = compose(
                 <div className='register-agent-wizard-close'>
                   <EuiButtonEmpty
                     size='s'
-                    href={getCore().application.getUrlForApp(
-                      endpointSumary.id,
+                    href={NavigationService.getInstance().getUrlForApp(
+                      endpointSummary.id,
                       {
-                        path: `#${endpointSumary.redirectTo()}`,
+                        path: `#${endpointSummary.redirectTo()}`,
                       },
                     )}
                     iconType='cross'
@@ -233,10 +242,10 @@ export const RegisterAgent = compose(
                       className='close-button'
                       fill
                       color='primary'
-                      href={getCore().application.getUrlForApp(
-                        endpointSumary.id,
+                      href={NavigationService.getInstance().getUrlForApp(
+                        endpointSummary.id,
                         {
-                          path: `#${endpointSumary.redirectTo()}`,
+                          path: `#${endpointSummary.redirectTo()}`,
                         },
                       )}
                     >
