@@ -27,6 +27,7 @@ type tUseDataSourceLoadedReturns<K> = {
   dataSource: K;
   filters: tFilter[];
   fetchFilters: tFilter[];
+  fixedFilters: tFilter[];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: PatternDataSourceFilterManager;
@@ -37,6 +38,7 @@ type tUseDataSourceNotLoadedReturns = {
   dataSource: undefined;
   filters: [];
   fetchFilters: [];
+  fixedFilters: [];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: null;
@@ -134,20 +136,7 @@ export function useDataSource<
 
   useEffect(() => {
     if (dataSourceFilterManager && dataSource) {
-      if (pinnedAgentManager.isPinnedAgent()) {
-        const pinnedAgent = PatternDataSourceFilterManager.getPinnedAgentFilter(
-          dataSource.id,
-        );
-
-        if (pinnedAgent) {
-          setFixedFilters([
-            ...fixedFilters,
-            pinnedAgent,
-          ])
-        }
-      }else{
-        setFixedFilters(dataSourceFilterManager.getFixedFilters() || []);
-      }
+      setFixedFilters(dataSourceFilterManager.getFixedFilters());
     }
   }, [JSON.stringify(pinnedAgent)]);
 
@@ -157,6 +146,7 @@ export function useDataSource<
       dataSource: undefined,
       filters: [],
       fetchFilters: [],
+      fixedFilters: [],
       fetchData,
       setFilters,
       filterManager: null,
