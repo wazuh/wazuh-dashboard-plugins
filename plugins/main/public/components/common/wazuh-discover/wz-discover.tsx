@@ -202,6 +202,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               appName='wazuh-discover-search-bar'
               {...searchBarProps}
               fixedFilters={fixedFilters}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
             />
           )}
         {!isDataSourceLoading && results?.hits?.total === 0 ? (
