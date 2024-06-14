@@ -56,29 +56,29 @@ class NavigationService {
       ? params.toString()
       : this.getParams().toString();
     const locationHash = this.getHash();
-    this.replace(
+    this.navigate(
       `${newPath}${queryParams ? `?${queryParams}` : ''}${locationHash}`,
     );
   }
 
   public navigate(path: string, state?: any): void {
-    if(!state){
+    if (!state) {
       this.history.push(path);
     } else {
       this.history.push({
         pathname: path,
-        state
+        state,
       });
     }
   }
 
   public replace(path: string, state?: any): void {
-    if(!state){
+    if (!state) {
       this.history.replace(path);
     } else {
       this.history.replace({
         pathname: path,
-        state
+        state,
       });
     }
   }

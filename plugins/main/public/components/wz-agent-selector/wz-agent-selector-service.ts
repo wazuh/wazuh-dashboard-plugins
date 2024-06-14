@@ -13,13 +13,11 @@ export class PinnedAgentManager {
     DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT;
   private AGENT_VIEW_URL = '/agents';
   private store: any;
-  private params: URLSearchParams;
   private navigationService: NavigationService;
 
   constructor(inputStore?: any) {
     this.store = inputStore ?? store;
     this.navigationService = NavigationService.getInstance();
-    this.params = this.navigationService.getParams();
   }
 
   private equalToPinnedAgent(agentData: any): boolean {
@@ -44,25 +42,28 @@ export class PinnedAgentManager {
     const includesAgentViewURL = this.navigationService
       .getPathname()
       .includes(this.AGENT_VIEW_URL);
-    this.params.set(
-      includesAgentViewURL
-        ? PinnedAgentManager.AGENT_ID_VIEW_KEY
-        : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
-      String(agentData?.id),
-    );
-    this.navigationService.renewURL(this.params);
+    this.navigationService
+      .getParams()
+      .set(
+        includesAgentViewURL
+          ? PinnedAgentManager.AGENT_ID_VIEW_KEY
+          : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
+        String(agentData?.id),
+      );
+    this.navigationService.renewURL(this.navigationService.getParams());
   }
 
   unPinAgent(): void {
     this.store.dispatch(
       updateCurrentAgentData(PinnedAgentManager.NO_AGENT_DATA),
     );
+    const params = this.navigationService.getParams();
     ['agent', 'agentId'].forEach(param => {
-      if (this.params.has(param)) {
-        this.params.delete(param);
+      if (params.has(param)) {
+        params.delete(param);
       }
     });
-    this.navigationService.renewURL(this.params);
+    this.navigationService.renewURL(params);
   }
 
   isPinnedAgent(): boolean {

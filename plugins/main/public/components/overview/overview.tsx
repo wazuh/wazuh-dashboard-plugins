@@ -33,7 +33,7 @@ export const Overview: React.FC = withRouteResolvers({
   savedSearch,
 })(() => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
-  const { tab = 'welcome', tabView = 'dashboard' } = useRouterSearch();
+  const { tab = 'welcome', tabView = 'dashboard', agentId } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
   const pinnedAgentManager = new PinnedAgentManager();
 
@@ -100,7 +100,7 @@ export const Overview: React.FC = withRouteResolvers({
       stopSyncingGlobalStateWithUrl();
       stopSyncingQueryAppStateWithStateContainer();
     };
-  }, []);
+  }, [agentId]);
 
   /**
    * This fetch de agents summary

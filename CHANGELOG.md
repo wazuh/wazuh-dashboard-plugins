@@ -43,6 +43,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improve margins and paddins in the Events, Inventory and Control tabs [#6708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6708)
 - Refactored the search bar to correctly handle fixed and user-added filters [#6716](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6716) [#6755](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6755)
 - Generate URL with predefined filters [#6745](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6745)
+- Migrated AngularJS routing to ReactJS [#6689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6689)
 
 ### Fixed
 
@@ -51,6 +52,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the sample alerts scripts to generate valid IP ranges and file hashes [#6667](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6667)
 - Fixed cronjob max seconds interval validation [#6730](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6730)
 - Fixed styles in small height viewports [#6747](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6747)
+- Fixed behavior in Configuration Assessment when changing API [#6770](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6770)
 
 ### Removed
 
@@ -63,7 +65,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed legacy discover references and methods [#6646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6646)
 - Removed custom EuiSuggestItem component in favor of OUI's native component [#6714](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6714)
 
-## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 11
+## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.8.1
+
+## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 12
 
 ### Added
 
