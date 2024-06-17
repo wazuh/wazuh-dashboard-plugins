@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.8.1
 
+### Fixed
+
+- Fixed home KPI links with custom or index pattern whose title is different to the id [#6777](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6777)
+
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 12
 
 ### Added
