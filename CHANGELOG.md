@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.8.1
 
+### Fixed
+
+- Removed the unexpeted `delay` parameter on the server API requests [#6778](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6778)
+
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 12
 
 ### Added
