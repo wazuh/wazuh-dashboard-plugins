@@ -124,10 +124,10 @@ export class PatternDataSourceFilterManager
    * Get the filters necessary to fetch the data from the data source
    * @returns
    */
-  fetch(params: Omit<tSearchParams, 'filters'> = {}): Promise<any> {
+  fetch(params: tSearchParams = {}): Promise<any> {
     return this.dataSource.fetch({
       ...params,
-      filters: this.getFetchFilters(),
+      filters: params?.filters || this.getFetchFilters(),
     });
   }
 

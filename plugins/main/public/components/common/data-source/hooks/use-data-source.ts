@@ -20,6 +20,7 @@ type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   filterManager?: tFilterManager;
   filters?: tFilter[];
   fetchFilters?: tFilter[];
+  fixedFilters?: tFilter[];
 };
 
 type tUseDataSourceLoadedReturns<K> = {
@@ -53,6 +54,7 @@ export function useDataSource<
   const {
     filters: initialFilters = [],
     fetchFilters: initialFetchFilters = [],
+    fixedFilters: initialFixedFilters = [],
     DataSource: DataSourceConstructor,
     repository,
     factory: injectedFactory,

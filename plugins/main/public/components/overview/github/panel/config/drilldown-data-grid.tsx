@@ -32,6 +32,7 @@ export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
         }
         fetchData({
             query: searchBarProps.query,
+            filters: fetchFilters,
             pagination,
             sorting,
             dateRange: {
