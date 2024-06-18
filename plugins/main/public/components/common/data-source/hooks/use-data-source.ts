@@ -136,7 +136,7 @@ export function useDataSource<
         subscription.unsubscribe();
       }
     };
-  }, [isComponentMounted, getAbortController]);
+  }, []);
 
   useEffect(() => {
     if (dataSourceFilterManager && dataSource) {
