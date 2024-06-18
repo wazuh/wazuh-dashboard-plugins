@@ -12,6 +12,7 @@ import {
   tFilterManager,
 } from '../index';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
+import { useIsMounted } from '../../hooks/use-is-mounted';
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   DataSource: IDataSourceFactoryConstructor<K>;
@@ -69,6 +70,7 @@ export function useDataSource<
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
+  const { isComponentMounted, getAbortController } = useIsMounted();
 
   const setFilters = (filters: tFilter[]) => {
     if (!dataSourceFilterManager) {
@@ -83,11 +85,13 @@ export function useDataSource<
     if (!dataSourceFilterManager) {
       return;
     }
-    return await dataSourceFilterManager?.fetch(params);
+    const paramsWithSignal = { ...params, signal: getAbortController().signal };
+    return await dataSourceFilterManager?.fetch(paramsWithSignal);
   };
 
   useEffect(() => {
-    let subscription;
+    let subscription: any;
+
     (async () => {
       setIsLoading(true);
       const factory = injectedFactory || new PatternDataSourceFactory();
@@ -101,6 +105,7 @@ export function useDataSource<
       if (!dataSource) {
         throw new Error('No valid data source found');
       }
+      if (!isComponentMounted()) return;
       setDataSource(dataSource);
       const dataSourceFilterManager = new PatternDataSourceFilterManager(
         dataSource,
@@ -111,6 +116,7 @@ export function useDataSource<
       // what the filters update
       subscription = dataSourceFilterManager.getUpdates$().subscribe({
         next: () => {
+          if (!isComponentMounted()) return;
           // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
           dataSourceFilterManager.setFilters(
             dataSourceFilterManager.getFilters(),
@@ -125,7 +131,11 @@ export function useDataSource<
       setIsLoading(false);
     })();
 
-    return () => subscription && subscription.unsubscribe();
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, []);
 
   useEffect(() => {
