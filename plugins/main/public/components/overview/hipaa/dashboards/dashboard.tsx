@@ -105,6 +105,7 @@ const DashboardHIPAAComponent: React.FC = () => {
               <WzSearchBar
                 appName='hipaa-searchbar'
                 {...searchBarProps}
+                fixedFilters={fixedFilters}
                 showDatePicker={true}
                 showQueryInput={true}
                 showQueryBar={true}
