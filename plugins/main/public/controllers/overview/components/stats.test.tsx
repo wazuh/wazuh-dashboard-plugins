@@ -24,7 +24,7 @@ jest.mock(
   }),
 );
 
-jest.mock('react-use/lib/useObservable', () => () => { });
+jest.mock('react-use/lib/useObservable', () => () => {});
 jest.mock('./last-alerts-stat/last-alerts-service', () => ({
   getLast24HoursAlerts: jest.fn().mockReturnValue({
     count: 100,
@@ -32,7 +32,7 @@ jest.mock('./last-alerts-stat/last-alerts-service', () => ({
       field: 'cluster.name',
       name: 'master',
     },
-    indexPatternName: 'wazuh-alerts-*',
+    indexPatternId: 'wazuh-alerts-*',
   }),
 }));
 
@@ -43,14 +43,14 @@ jest.mock('../../../kibana-services', () => ({
       getUrlForApp: () => 'http://url',
     },
     uiSettings: {
-      get: () => true
-    }
+      get: () => true,
+    },
   }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => { },
+    handleError: options => {},
   }),
 }));
 
