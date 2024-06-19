@@ -163,9 +163,6 @@ export const ComplianceTable = withAgentSupportModule(props => {
   });
 
   const { dateRangeFrom, dateRangeTo } = searchBarProps;
-
-  console.log('dateRange', dateRangeFrom, dateRangeTo);
-
   const [complianceData, setComplianceData] = useState({
     descriptions: {},
     complianceObject: {},

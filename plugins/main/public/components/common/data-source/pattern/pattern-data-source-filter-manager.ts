@@ -338,7 +338,7 @@ export class PatternDataSourceFilterManager
     return [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        'agent.id',
+        PinnedAgentManager.AGENT_ID_KEY,
         currentPinnedAgent.id,
         indexPatternId,
         PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,

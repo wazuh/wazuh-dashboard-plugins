@@ -101,8 +101,6 @@ const useSearchBarConfiguration = (
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
     filters,
-    //fixedFilters,
-    //userFilters,
     query,
     timeHistory,
     dateRangeFrom: timeFilter.from,

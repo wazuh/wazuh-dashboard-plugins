@@ -36,6 +36,9 @@ import DocDetails from './components/doc-details';
 import { WzSearchBar } from '../search-bar/search-bar';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
+export const MAX_ENTRIES_PER_QUERY_FORMATED = formatNumWithCommas(
+  MAX_ENTRIES_PER_QUERY,
+)
 export const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 export const DEFAULT_PAGE_SIZE = 20;
 const INDEX_FIELD_NAME = '_id';
@@ -278,7 +281,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
               <WzSearchBar
                 appName='wazuh-discover-search-bar'
                 {...searchBarProps}
-                fixedFilters={fixedFilters}
                 useDefaultBehaviors={false}
                 hideFixedFilters
               />
@@ -302,9 +304,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                       results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
                         ariaLabel: 'Warning',
-                        content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                          MAX_ENTRIES_PER_QUERY,
-                        )} hits.`,
+                        content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${MAX_ENTRIES_PER_QUERY_FORMATED} hits.`,
                         iconType: 'alert',
                         position: 'top',
                       }

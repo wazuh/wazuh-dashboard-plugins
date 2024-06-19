@@ -18,16 +18,34 @@ type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   repository: tDataSourceRepository<T>;
   factory?: PatternDataSourceFactory;
   filterManager?: tFilterManager;
+  /*
+    Filters applied by the user that will be shown in the search bar
+  */
   filters?: tFilter[];
+  /*
+    Filters that will be used to make the fetch request, is a merge of the user filters, fixed filters and fetch (hidden) filters
+  */
   fetchFilters?: tFilter[];
+  /*
+    Filters applied by the data source and cannot be removed by the user
+  */
   fixedFilters?: tFilter[];
 };
 
 type tUseDataSourceLoadedReturns<K> = {
   isLoading: boolean;
   dataSource: K;
+  /*
+    Filters applied by the user that will be shown in the search bar
+  */
   filters: tFilter[];
+  /*
+    Filters that will be used to make the fetch request, is a merge of the user filters, fixed filters and fetch (hidden) filters
+  */
   fetchFilters: tFilter[];
+  /*
+    Filters applied by the data source and cannot be removed by the user
+  */
   fixedFilters: tFilter[];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
@@ -37,8 +55,17 @@ type tUseDataSourceLoadedReturns<K> = {
 type tUseDataSourceNotLoadedReturns = {
   isLoading: boolean;
   dataSource: undefined;
+  /*
+    Filters applied by the user that will be shown in the search bar
+  */
   filters: [];
+  /*
+    Filters that will be used to make the fetch request, is a merge of the user filters, fixed filters and fetch (hidden) filters
+  */
   fetchFilters: [];
+  /*
+    Filters applied by the data source and cannot be removed by the user
+  */
   fixedFilters: [];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
