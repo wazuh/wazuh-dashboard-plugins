@@ -56,7 +56,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
   useEffect(() => {
     const getCountLastAlerts = async () => {
       try {
-        const { indexPatternName, cluster, count } = await getLast24HoursAlerts(
+        const { indexPatternId, cluster, count } = await getLast24HoursAlerts(
           severityLabel[severity].ruleLevelRange,
         );
         setCountLastAlerts(count);
@@ -81,13 +81,13 @@ export function LastAlertsStat({ severity }: { severity: string }) {
         const destURL = core.application.getUrlForApp(discoverLocation.app, {
           path: `${
             discoverLocation.basePath
-          }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternName}',key:${
+          }#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternId}',view:discover))&_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternId}',key:${
             cluster.field
           },negate:!f,params:(query:${
             cluster.name
           }),type:phrase),query:(match_phrase:(${cluster.field}:${
             cluster.name
-          }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:rule.level,negate:!f,params:(gte:${
+          }))),('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:'${indexPatternId}',key:rule.level,negate:!f,params:(gte:${
             severityLabel[severity].ruleLevelRange.minRuleLevel
           },lte:${
             severityLabel[severity].ruleLevelRange.maxRuleLevel || '!n'
