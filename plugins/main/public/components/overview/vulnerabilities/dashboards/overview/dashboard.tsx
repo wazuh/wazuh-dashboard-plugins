@@ -114,7 +114,7 @@ const DashboardVulsComponent: React.FC = () => {
             <DiscoverNoResults />
           ) : null}
           {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-            <div className='vulnerability-dashboard-responsive'>
+            <div className='vulnerability-dashboard-responsive vulnerability-dashboard-metrics'>
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
