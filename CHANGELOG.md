@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added HAProxy helper settings to cluster configuration [#6653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6653)
 - Added ability to open the report file or Reporting application from the toast message [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
 - Added support for agents to Office 365 [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
+- Added timestamp columns in events tabs [#6792](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6792)
 
 ### Changed
 
