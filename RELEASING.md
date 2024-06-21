@@ -50,7 +50,7 @@ node scripts/release/bump.js --plugins-directory <plugins_directory> --manifest-
 Example:
 
 ```console
-WAZUH_SERVER_BRANCH_TAG=4.6.0 node scripts/release/bump.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --manifest-package ./plugins/main/package.json --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_SERVER_BRANCH_TAG}/api/api/spec/spec.yaml --revision 03
+WAZUH_SERVER_BRANCH_TAG=4.6.0 && node scripts/release/bump.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --manifest-package ./plugins/main/package.json --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_SERVER_BRANCH_TAG}/api/api/spec/spec.yaml --revision 03
 ```
 
 - Define the `version`:
@@ -62,7 +62,7 @@ node scripts/release/bump.js --plugins-directory <plugins_directory> --manifest-
 Example:
 
 ```console
-WAZUH_SERVER_BRANCH_TAG=4.7.0 node scripts/release/bump.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --manifest-package ./plugins/main/package.json --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_SERVER_BRANCH_TAG}/api/api/spec/spec.yaml --version 4.7.0
+WAZUH_SERVER_BRANCH_TAG=4.7.0 && node scripts/release/bump.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --manifest-package ./plugins/main/package.json --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_SERVER_BRANCH_TAG}/api/api/spec/spec.yaml --version 4.7.0
 ```
 
 - Define the `pluginPlatform.version`:
@@ -74,7 +74,7 @@ node scripts/release/bump.js --plugins-directory <plugins_directory> --manifest-
 Example:
 
 ```console
-WAZUH_SERVER_BRANCH_TAG=4.6.0 node scripts/release/bump.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --manifest-package ./plugins/main/package.json --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_SERVER_BRANCH_TAG}/api/api/spec/spec.yaml --platform-version 2.8.0
+WAZUH_SERVER_BRANCH_TAG=4.6.0 && node scripts/release/bump.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --manifest-package ./plugins/main/package.json --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_SERVER_BRANCH_TAG}/api/api/spec/spec.yaml --platform-version 2.8.0
 ```
 
 You can bump one or more values at the same time using a combination of these:
@@ -82,13 +82,13 @@ You can bump one or more values at the same time using a combination of these:
 - Define the `version`, `revision` and `pluginPlatform.version`:
 
 ```console
-WAZUH_SERVER_BRANCH_TAG=<wazuh-server-branch-tag> node scripts/release/bump.js --plugins-directory <plugins_directory> --manifest-changelog <manifest_changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --version <bump_version> --revision <bump_revision> --platform-version <bump_platform_version>
+WAZUH_SERVER_BRANCH_TAG=<wazuh-server-branch-tag> && node scripts/release/bump.js --plugins-directory <plugins_directory> --manifest-changelog <manifest_changelog_file> --plugin-main-generate-api-data-spec <url_api_spec_file> --version <bump_version> --revision <bump_revision> --platform-version <bump_platform_version>
 ```
 
 Example:
 
 ```console
-WAZUH_SERVER_BRANCH_TAG=4.7.0 node scripts/release/bump.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --manifest-package ./plugins/main/package.json --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_SERVER_BRANCH_TAG}/api/api/spec/spec.yaml --version 4.7.0 --revision 03 --platform-version 2.8.0
+WAZUH_SERVER_BRANCH_TAG=4.7.0 && node scripts/release/bump.js --plugins-directory ./plugins --manifest-changelog ./CHANGELOG.md --manifest-package ./plugins/main/package.json --plugin-main-generate-api-data-spec https://raw.githubusercontent.com/wazuh/wazuh/${WAZUH_SERVER_BRANCH_TAG}/api/api/spec/spec.yaml --version 4.7.0 --revision 03 --platform-version 2.8.0
 ```
 
 3. Depending on the case, it could be required to update the snapshots of the plugin tests:
