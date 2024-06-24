@@ -118,20 +118,12 @@ export const Overview: React.FC = withRouteResolvers({
     }
   };
 
-  function switchTab(newTab: any, force: any) {
-    const urlSearchParams = new URLSearchParams(navigationService.getSearch());
-    urlSearchParams.set('tab', newTab);
-    navigationService.navigate(
-      `${navigationService.getPathname()}?${urlSearchParams.toString()}`,
-    );
+  function switchTab(newTab: string) {
+    navigationService.switchTab(newTab);
   }
 
   const switchSubTab = (subTab: string) => {
-    const urlSearchParams = new URLSearchParams(navigationService.getSearch());
-    urlSearchParams.set('tabView', subTab);
-    navigationService.navigate(
-      `${navigationService.getPathname()}?${urlSearchParams.toString()}`,
-    );
+    navigationService.switchSubTab(subTab);
   };
 
   return (
