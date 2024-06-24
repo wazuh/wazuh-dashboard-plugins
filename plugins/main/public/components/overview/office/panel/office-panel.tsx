@@ -85,7 +85,8 @@ export const OfficePanel = withErrorBoundary(() => {
           <CustomSearchBar
             filterInputs={filtersValues}
             filterDrillDownValue={drillDownValue}
-            searchBarProps={{ ...searchBarProps, fixedFilters: [...fixedFilters, ...selectedPanelFilter] }}
+            fixedFilters={[...fixedFilters, ...selectedPanelFilter]}
+            searchBarProps={{ ...searchBarProps }}
             setFilters={setFilters}
             indexPattern={dataSource?.indexPattern}
           />

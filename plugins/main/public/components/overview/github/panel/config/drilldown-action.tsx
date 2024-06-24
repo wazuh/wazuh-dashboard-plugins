@@ -10,9 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
-import { SecurityAlerts } from '../../../../visualize/components';
+import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
@@ -25,10 +23,7 @@ import {
   getVisStateTopRepositories,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
 import DrillDownDataGrid from './drilldown-data-grid';
-import { rules } from '../../../../../utils/applications';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
