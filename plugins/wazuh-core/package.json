@@ -15,18 +15,35 @@
     "test:server": "plugin-helpers test:server",
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest --runInBand",
-    "test:jest:runner": "node scripts/runner test"
+    "test:jest:runner": "node scripts/runner test",
+    "lint": "eslint \"{public,server,common}/**/*.{js,jsx,ts,tsx,json}\"",
+    "knip": "knip --files"
   },
   "dependencies": {
     "axios": "^1.6.1",
     "json2csv": "^4.1.2",
     "jwt-decode": "^3.1.2",
     "md5": "^2.3.0",
-    "node-cron": "^3.0.2"
+    "node-cron": "^3.0.2",
+    "typescript": "^5.5.2"
   },
   "devDependencies": {
     "@testing-library/user-event": "^14.5.0",
     "@types/": "testing-library/user-event",
-    "@types/md5": "^2.3.2"
+    "@types/md5": "^2.3.2",
+    "@typescript-eslint/eslint-plugin": "^6.2.1",
+    "@typescript-eslint/parser": "^6.2.1",
+    "eslint": "^8.46.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "3.5.5",
+    "eslint-plugin-async-await": "^0.0.0",
+    "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-filenames-simple": "^0.8.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.8",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "knip": "^5.22.0",
+    "prettier": "^2.7.1"
   }
 }
