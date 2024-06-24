@@ -35,6 +35,8 @@ async function run(configuration) {
     'platform-version': platformVersion,
     'tag-suffix': tagSuffix,
     'ignore-configurmation': ignoreConfirmation,
+    'tag-sign': tagSign,
+    'tag-annotate': tagAnnotate,
   } = configuration;
   /* If version, revision or platform version are not provided, then try to use the provided
     package manifest file from a plugin.
@@ -72,6 +74,8 @@ async function run(configuration) {
   revision && logger.info(`Revision: ${revision}`);
   platformVersion && logger.info(`Platform version: ${platformVersion}`);
   tagSuffix && logger.info(`Tag suffix: ${tagSuffix}`);
+  logger.info(`Sign tag: ${tagSign ? 'yes' : 'no'}`);
+  logger.info(`Annotate tag: ${tagAnnotate ? 'yes' : 'no'}`);
   logger.info(`Tag name: ${tag}`);
 
   const branch = version;
@@ -162,9 +166,15 @@ async function run(configuration) {
   }
 
   logger.debug(`Creating tag: ${tag}`);
-  execSystem(
-    `git tag -s -a ${tag} -m "Wazuh plugins for Wazuh dashboard ${tag}"`,
-  );
+  const tagOptions = [
+    [tagSign, `-s -m "Wazuh plugins for Wazuh dashboard ${tag}"`], // sign tag with message
+    [tagAnnotate, '-a'], // annotate tag
+    [true, tag], // tag name
+  ]
+    .filter(([condition]) => condition)
+    .map(([_, option]) => option)
+    .join(' ');
+  execSystem(`git tag ${tagOptions}`);
   logger.info(`Created tag: ${tag}`);
   logger.debug(`Pushing tag ${tag} to remote`);
   execSystem(`git push origin ${tag}`);
@@ -384,6 +394,24 @@ const cli = require('../lib/cli/cli')(
           logger.error(`${parameter} parameter is not defined.`);
           process.exit(1);
         }
+      },
+    },
+    {
+      long: 'tag-sign',
+      description: 'Sign the tag.',
+      parse: (parameter, input, { logger, option }) => {
+        return {
+          [option.long]: true,
+        };
+      },
+    },
+    {
+      long: 'tag-annotate',
+      description: 'Annotate the tag.',
+      parse: (parameter, input, { logger, option }) => {
+        return {
+          [option.long]: true,
+        };
       },
     },
   ],
