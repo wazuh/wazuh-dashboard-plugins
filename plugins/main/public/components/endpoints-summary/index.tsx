@@ -4,6 +4,7 @@ import {
   EuiPageBody,
   EuiEmptyPrompt,
   EuiProgress,
+  EuiPageSideBar,
 } from '@elastic/eui';
 import { EndpointsSummary } from './endpoints-summary';
 import { endpointSummary } from '../../utils/applications';
@@ -25,13 +26,19 @@ import {
   savedSearch,
 } from '../../services/resolves';
 import NavigationService from '../../react-services/navigation-service';
+import { getWazuhFleetPlugin } from '../../kibana-services';
 
 export const MainEndpointsSummary = compose(
   withErrorBoundary,
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
-  withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
+  withGlobalBreadcrumb([
+    { text: 'Fleet management' },
+    { text: 'Agents summary' },
+  ]),
 )(() => {
   const { isLoading, totalAgents, error } = useGetTotalAgents('id!=000');
+
+  const { FleetSideMenu, FleetList } = getWazuhFleetPlugin();
 
   if (error) {
     const options = {
@@ -85,9 +92,12 @@ export const MainEndpointsSummary = compose(
   }
 
   return (
-    <EuiPage paddingSize='m'>
+    <EuiPage>
+      <EuiPageSideBar>
+        <FleetSideMenu />
+      </EuiPageSideBar>
       <EuiPageBody>
-        <EndpointsSummary />
+        <FleetList />
       </EuiPageBody>
     </EuiPage>
   );
