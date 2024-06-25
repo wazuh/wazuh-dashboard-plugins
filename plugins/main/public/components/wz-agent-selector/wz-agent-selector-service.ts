@@ -42,15 +42,16 @@ export class PinnedAgentManager {
     const includesAgentViewURL = this.navigationService
       .getPathname()
       .includes(this.AGENT_VIEW_URL);
-    this.navigationService
-      .getParams()
-      .set(
-        includesAgentViewURL
-          ? PinnedAgentManager.AGENT_ID_VIEW_KEY
-          : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
-        String(agentData?.id),
-      );
-    this.navigationService.renewURL(this.navigationService.getParams());
+
+    const urlSearchParams = this.navigationService.getParams();
+
+    urlSearchParams.set(
+      includesAgentViewURL
+        ? PinnedAgentManager.AGENT_ID_VIEW_KEY
+        : PinnedAgentManager.AGENT_ID_URL_VIEW_KEY,
+      String(agentData?.id),
+    );
+    this.navigationService.renewURL(urlSearchParams);
   }
 
   unPinAgent(): void {
