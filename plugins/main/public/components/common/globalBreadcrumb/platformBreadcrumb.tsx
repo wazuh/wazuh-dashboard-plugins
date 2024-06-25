@@ -6,34 +6,38 @@ export const setBreadcrumbs = (breadcrumbs, router) => {
   if (breadcrumbs === '' || breadcrumbs === undefined) {
     return;
   }
-  const breadcrumbsCustom = breadcrumbs?.map(breadcrumb =>
-    breadcrumb.agent
-      ? {
-          className:
-            'euiLink euiLink--subdued osdBreadcrumbs wz-vertical-align-middle',
-          onClick: ev => {
-            ev.stopPropagation();
-            if (getWzCurrentAppID() === endpointSummary.id) {
-              NavigationService.getInstance().navigate(
-                `/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
-              );
-            } else {
-              NavigationService.getInstance().navigateToApp(
-                endpointSummary.id,
-                {
-                  path: `#/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
-                },
-              );
-            }
+  const breadcrumbsCustom = breadcrumbs
+    ?.map(breadcrumb =>
+      breadcrumb?.agent?.id
+        ? {
+            className:
+              'euiLink euiLink--subdued osdBreadcrumbs wz-vertical-align-middle',
+            onClick: ev => {
+              ev.stopPropagation();
+              if (getWzCurrentAppID() === endpointSummary.id) {
+                NavigationService.getInstance().navigate(
+                  `/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
+                );
+              } else {
+                NavigationService.getInstance().navigateToApp(
+                  endpointSummary.id,
+                  {
+                    path: `#/agents?tab=welcome&agent=${breadcrumb.agent.id}`,
+                  },
+                );
+              }
+            },
+            truncate: true,
+            text: breadcrumb.agent.name,
+          }
+        : typeof breadcrumb.agent !== 'undefined'
+        ? null
+        : {
+            ...breadcrumb,
+            className: 'osdBreadcrumbs',
           },
-          truncate: true,
-          text: breadcrumb.agent.name,
-        }
-      : {
-          ...breadcrumb,
-          className: 'osdBreadcrumbs',
-        },
-  );
+    )
+    .filter(value => value);
 
   getCore().chrome.setBreadcrumbs(breadcrumbsCustom);
 

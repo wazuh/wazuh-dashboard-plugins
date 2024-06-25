@@ -19,7 +19,6 @@ import {
   EuiPageBody,
   EuiSpacer,
   EuiText,
-  EuiLink,
 } from '@elastic/eui';
 
 import {
@@ -34,7 +33,6 @@ import { AgentStatTable } from './table';
 import {
   PromptNoActiveAgentWithoutSelect,
   PromptAgentFeatureVersion,
-  PromptNoSelectedAgent,
 } from '../prompts';
 import {
   UIErrorLog,
@@ -49,8 +47,6 @@ import {
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
-import { getCore } from '../../../kibana-services';
-import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const tableColumns = [
   {
@@ -119,28 +115,6 @@ export const MainAgentStats = compose(
       text: 'Stats',
     },
   ]),
-  withGuard(
-    props => !(props.agent && props.agent.id),
-    () => (
-      <>
-        <PromptNoSelectedAgent
-          body={
-            <>
-              You need to select an agent or return to
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink
-                  aria-label='go to Endpoint summary'
-                  href={`${endpointSummary.id}#/agents-preview`}
-                >
-                  Endpoint summary
-                </EuiLink>
-              </RedirectAppLinks>
-            </>
-          }
-        />
-      </>
-    ),
-  ),
   withUserAuthorizationPrompt(({ agent }) => [
     [
       { action: 'agent:read', resource: `agent:id:${agent.id}` },

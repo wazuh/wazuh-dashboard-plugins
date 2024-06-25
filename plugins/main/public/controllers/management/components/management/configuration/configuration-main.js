@@ -18,11 +18,6 @@ import {
 import { compose } from 'redux';
 import { endpointSummary, settings } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
-import { withGuard } from '../../../../../components/common/hocs';
-import { PromptNoSelectedAgent } from '../../../../../components/agents/prompts';
-import { getCore } from '../../../../../kibana-services';
-import { EuiLink } from '@elastic/eui';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export default compose(
   withErrorBoundary,
@@ -48,26 +43,4 @@ export default compose(
     $('#breadcrumbNoTitle').attr('title', '');
     return breadcrumb;
   }),
-  withGuard(
-    props => !(props.agent && props.agent.id),
-    () => (
-      <>
-        <PromptNoSelectedAgent
-          body={
-            <>
-              You need to select an agent or return to
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink
-                  aria-label='go to Endpoint summary'
-                  href={`${endpointSummary.id}#/agents-preview`}
-                >
-                  Endpoint summary
-                </EuiLink>
-              </RedirectAppLinks>
-            </>
-          }
-        />
-      </>
-    ),
-  ),
 )(WzConfigurationSwitch);
