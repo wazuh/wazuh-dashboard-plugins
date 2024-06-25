@@ -40,11 +40,10 @@ export const ModuleMitreAttackIntelligenceResource = ({
       const idToRedirect = urlParams.get('idToRedirect');
       const endpoint = `/mitre/${redirectTab}?q=external_id=${idToRedirect}`;
       getMitreItemToRedirect(endpoint);
-      urlParams.delete('tabRedirect');
-      urlParams.delete('idToRedirect');
-      navigationService.replace(
-        `${navigationService.getPathname()}?${urlParams.toString()}`,
-      );
+      NavigationService.getInstance().updateAndNavigateSearchParams({
+        tabRedirect: null,
+        idToRedirect: null,
+      });
     }
   }, []);
 
