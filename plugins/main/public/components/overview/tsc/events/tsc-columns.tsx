@@ -2,6 +2,9 @@ import { tDataGridColumn } from '../../../common/data-grid';
 
 export const tscColumns: tDataGridColumn[] = [
   {
+    id: 'timestamp',
+  },
+  {
     id: 'agent.name',
   },
   {
