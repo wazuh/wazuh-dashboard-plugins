@@ -49,9 +49,7 @@ export const AgentView = compose(
                   aria-label='go to Endpoint summary'
                   href={`${endpointSummary.id}#/agents-preview`}
                   onClick={() =>
-                    NavigationService.getInstance().navigate(
-                      `${endpointSummary.id}#/agents-preview`,
-                    )
+                    NavigationService.getInstance().navigate(`/agents-preview`)
                   }
                 >
                   Endpoint summary

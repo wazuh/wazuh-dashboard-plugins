@@ -30,7 +30,12 @@ export const setBreadcrumbs = (breadcrumbs, router) => {
             truncate: true,
             text: breadcrumb.agent.name,
           }
-        : typeof breadcrumb.agent !== 'undefined'
+        : /*
+          Some use cases cause get Breadcrumbs to have the agent property
+          undefined. In this case a null is added and then with the filter it
+          is filtered
+        */
+        typeof breadcrumb.agent !== 'undefined'
         ? null
         : {
             ...breadcrumb,
