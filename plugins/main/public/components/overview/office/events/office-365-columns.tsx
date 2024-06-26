@@ -2,6 +2,9 @@ import { tDataGridColumn } from '../../../common/data-grid';
 
 export const office365Columns: tDataGridColumn[] = [
   {
+    id: 'timestamp',
+  },
+  {
     id: 'data.office365.Subscription',
   },
   {
@@ -17,6 +20,6 @@ export const office365Columns: tDataGridColumn[] = [
     id: 'rule.level',
   },
   {
-    id: 'rule.id'
+    id: 'rule.id',
   },
 ];
