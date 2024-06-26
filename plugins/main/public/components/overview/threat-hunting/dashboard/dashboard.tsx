@@ -214,16 +214,16 @@ const DashboardTH: React.FC = () => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
-            <WzSearchBar
-              appName='th-searchbar'
-              {...searchBarProps}
-              fixedFilters={fixedFilters}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          )}
+          <WzSearchBar
+            appName='th-searchbar'
+            {...searchBarProps}
+            fixedFilters={fixedFilters}
+            showDatePicker={true}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
+        )}
         {!isDataSourceLoading && dataSource && results?.hits?.total === 0 ? (
           <DiscoverNoResults />
         ) : null}
@@ -298,7 +298,9 @@ const DashboardTH: React.FC = () => {
                             results?.hits?.total > MAX_ENTRIES_PER_QUERY
                             ? {
                               ariaLabel: 'Warning',
-                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                              content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                                MAX_ENTRIES_PER_QUERY,
+                              )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
                                 MAX_ENTRIES_PER_QUERY,
                               )} hits.`,
                               iconType: 'alert',

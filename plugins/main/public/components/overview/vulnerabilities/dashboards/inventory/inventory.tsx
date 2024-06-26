@@ -24,7 +24,8 @@ import {
   HttpError,
 } from '../../../../../react-services/error-management';
 import './inventory.scss';
-import { MAX_ENTRIES_PER_QUERY, inventoryTableDefaultColumns } from './config';
+import { inventoryTableDefaultColumns } from './config';
+import { MAX_ENTRIES_PER_QUERY } from '../../../../common/data-grid/data-grid-service';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
 // common components/hooks
@@ -36,7 +37,6 @@ import { exportSearchToCSV } from '../../../../common/data-grid/data-grid-servic
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
-
 import {
   VulnerabilitiesDataSourceRepository,
   VulnerabilitiesDataSource,
@@ -182,16 +182,16 @@ const InventoryVulsComponent = () => {
             {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
-                <WzSearchBar
-                  appName='inventory-vuls'
-                  {...searchBarProps}
-                  fixedFilters={fixedFilters}
-                  showDatePicker={false}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                  showSaveQuery={true}
-                />
-              )}
+              <WzSearchBar
+                appName='inventory-vuls'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showDatePicker={false}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+            )}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
             ) : null}
@@ -217,7 +217,9 @@ const InventoryVulsComponent = () => {
                                 results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
                                   ariaLabel: 'Warning',
-                                  content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                  content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                                    MAX_ENTRIES_PER_QUERY,
+                                  )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
                                     MAX_ENTRIES_PER_QUERY,
                                   )} hits.`,
                                   iconType: 'alert',

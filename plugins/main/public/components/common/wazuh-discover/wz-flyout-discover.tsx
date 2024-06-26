@@ -34,8 +34,9 @@ import {
 } from '../data-source';
 import DocDetails from './components/doc-details';
 import { WzSearchBar } from '../search-bar/search-bar';
+import { MAX_ENTRIES_PER_QUERY } from '../data-grid/data-grid-service'
 
-export const MAX_ENTRIES_PER_QUERY = 10000;
+
 export const MAX_ENTRIES_PER_QUERY_FORMATED = formatNumWithCommas(
   MAX_ENTRIES_PER_QUERY,
 )
@@ -254,8 +255,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
         indexPattern,
       })
     ) : (
-        <DocDetails doc={doc} item={item} indexPattern={indexPattern} />
-      );
+      <DocDetails doc={doc} item={item} indexPattern={indexPattern} />
+    );
   };
 
   const parsedItems = useMemo(() => {
@@ -278,13 +279,13 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='wazuh-discover-search-bar'
-                {...searchBarProps}
-                useDefaultBehaviors={false}
-                hideFixedFilters
-              />
-            )}
+            <WzSearchBar
+              appName='wazuh-discover-search-bar'
+              {...searchBarProps}
+              useDefaultBehaviors={false}
+              hideFixedFilters
+            />
+          )}
           {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}
@@ -304,7 +305,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                       results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
                         ariaLabel: 'Warning',
-                        content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${MAX_ENTRIES_PER_QUERY_FORMATED} hits.`,
+                        content: `The query results has exceeded the limit of ${MAX_ENTRIES_PER_QUERY_FORMATED} hits. To provide a better experience the table only shows the first ${MAX_ENTRIES_PER_QUERY_FORMATED} hits.`,
                         iconType: 'alert',
                         position: 'top',
                       }
