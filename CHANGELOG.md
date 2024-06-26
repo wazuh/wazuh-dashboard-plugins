@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added HAProxy helper settings to cluster configuration [#6653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6653)
 - Added ability to open the report file or Reporting application from the toast message [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
 - Added support for agents to Office 365 [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
+- Added pinned agent data validation when rendering the Inventory data, Stats and Configuration tabs in Agent preview of Endpoints Summary [#6800](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6800)
 
 ### Changed
 
