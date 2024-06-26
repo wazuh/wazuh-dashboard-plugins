@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
 import WzConfigurationSwitch from './configuration-switch';
 import {
   withErrorBoundary,
@@ -23,7 +22,7 @@ export default compose(
   withErrorBoundary,
   withGlobalBreadcrumb(props => {
     let breadcrumb = false;
-    if (props.agent.id === '000') {
+    if (props.agent?.id === '000') {
       breadcrumb = [{ text: settings.breadcrumbLabel }];
     } else {
       breadcrumb = [

@@ -24,7 +24,6 @@ import {
   EuiToolTip,
   EuiButtonIcon,
   EuiPageBody,
-  EuiLink,
 } from '@elastic/eui';
 import {
   FimEventsTable,
@@ -43,10 +42,7 @@ import { withErrorBoundary, withGlobalBreadcrumb, withGuard } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import {
-  PromptAgentNeverConnected,
-  PromptNoSelectedAgent,
-} from '../../agents/prompts';
+import { PromptAgentNeverConnected } from '../../agents/prompts';
 import { WzButton } from '../buttons';
 import {
   Applications,
@@ -83,28 +79,6 @@ export const AgentsWelcome = compose(
         : []),
     ];
   }),
-  withGuard(
-    props => !(props.agent && props.agent.id),
-    () => (
-      <>
-        <PromptNoSelectedAgent
-          body={
-            <>
-              You need to select an agent or return to
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink
-                  aria-label='go to Endpoint summary'
-                  href={`${endpointSummary.id}#/agents-preview`}
-                >
-                  Endpoint summary
-                </EuiLink>
-              </RedirectAppLinks>
-            </>
-          }
-        />
-      </>
-    ),
-  ),
   withGuard(
     props => props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     PromptAgentNeverConnected,
