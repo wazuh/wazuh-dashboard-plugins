@@ -34,7 +34,7 @@ import {
 import { AgentInfo } from './agents-info';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
-import { WzDatePicker } from '../../../components/wz-date-picker/wz-date-picker';
+import { WzDatePicker } from '../../../components/wz-date-picker';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { getChrome, getCore } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';

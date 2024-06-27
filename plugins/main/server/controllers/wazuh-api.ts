@@ -710,7 +710,6 @@ export class WazuhApiCtrl {
         response.status !== HTTP_STATUS_CODES.OK ? response.status : false;
 
       if (!responseError && responseBody) {
-        //cleanKeys(response);
         return response.ok({
           body: responseToken.data,
         });
