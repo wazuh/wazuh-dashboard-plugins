@@ -34,12 +34,7 @@ import {
 } from '../data-source';
 import DocDetails from './components/doc-details';
 import { WzSearchBar } from '../search-bar/search-bar';
-import { MAX_ENTRIES_PER_QUERY } from '../data-grid/data-grid-service'
-
-
-export const MAX_ENTRIES_PER_QUERY_FORMATED = formatNumWithCommas(
-  MAX_ENTRIES_PER_QUERY,
-)
+import { MAX_ENTRIES_PER_QUERY } from '../data-grid/data-grid-service';
 export const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 export const DEFAULT_PAGE_SIZE = 20;
 const INDEX_FIELD_NAME = '_id';
@@ -302,13 +297,17 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                   showResetButton={false}
                   tooltip={
                     results?.hits?.total &&
-                      results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                    results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
-                        ariaLabel: 'Warning',
-                        content: `The query results has exceeded the limit of ${MAX_ENTRIES_PER_QUERY_FORMATED} hits. To provide a better experience the table only shows the first ${MAX_ENTRIES_PER_QUERY_FORMATED} hits.`,
-                        iconType: 'alert',
-                        position: 'top',
-                      }
+                          ariaLabel: 'Warning',
+                          content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY,
+                          )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY,
+                          )} hits.`,
+                          iconType: 'alert',
+                          position: 'top',
+                        }
                       : undefined
                   }
                 />
