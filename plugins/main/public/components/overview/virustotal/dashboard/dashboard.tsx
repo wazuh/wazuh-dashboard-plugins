@@ -84,7 +84,7 @@ const DashboardVT: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching alerts',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -102,16 +102,16 @@ const DashboardVT: React.FC = () => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : (
-            <WzSearchBar
-              appName='virustotal-searchbar'
-              {...searchBarProps}
-              fixedFilters={fixedFilters}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          )}
+          <WzSearchBar
+            appName='virustotal-searchbar'
+            {...searchBarProps}
+            fixedFilters={fixedFilters}
+            showDatePicker={true}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
+        )}
         {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
           <SampleDataWarning />
         ) : null}
@@ -119,10 +119,11 @@ const DashboardVT: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         <div
-          className={`virustotal-dashboard-responsive ${!isDataSourceLoading && dataSource && results?.hits?.total > 0
-            ? ''
-            : 'wz-no-display'
-            }`}
+          className={`virustotal-dashboard-responsive ${
+            !isDataSourceLoading && dataSource && results?.hits?.total > 0
+              ? ''
+              : 'wz-no-display'
+          }`}
         >
           <DashboardByRenderer
             input={{

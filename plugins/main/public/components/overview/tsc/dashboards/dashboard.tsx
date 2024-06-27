@@ -84,7 +84,7 @@ const DashboardTSCComponent: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching alerts',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -102,15 +102,15 @@ const DashboardTSCComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='tsc-searchbar'
-                {...searchBarProps}
-                fixedFilters={fixedFilters}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            )}
+            <WzSearchBar
+              appName='tsc-searchbar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+            />
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

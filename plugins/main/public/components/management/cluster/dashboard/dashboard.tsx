@@ -91,7 +91,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -168,26 +168,26 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         ) : null}
         <EuiSpacer size='m' />
         {!isDataSourceLoading &&
-          dataSource &&
-          !state.showConfig &&
-          !state.showNodes ? (
-            <OverviewCards
-              goNodes={goNodes}
-              goAgents={goAgents}
-              goConfiguration={goConfiguration}
-              status={statusRunning}
-              configuration={state?.configuration}
-              version={state?.version}
-              nodesCount={state?.nodesCount}
-              nodeList={state?.nodeList}
-              clusterName={state.configuration?.name}
-              agentsCount={state?.agentsCount}
-              searchBarProps={searchBarProps}
-              results={results}
-              indexPattern={dataSource?.indexPattern}
-              filters={fetchFilters ?? []}
-            />
-          ) : null}
+        dataSource &&
+        !state.showConfig &&
+        !state.showNodes ? (
+          <OverviewCards
+            goNodes={goNodes}
+            goAgents={goAgents}
+            goConfiguration={goConfiguration}
+            status={statusRunning}
+            configuration={state?.configuration}
+            version={state?.version}
+            nodesCount={state?.nodesCount}
+            nodeList={state?.nodeList}
+            clusterName={state.configuration?.name}
+            agentsCount={state?.agentsCount}
+            searchBarProps={searchBarProps}
+            results={results}
+            indexPattern={dataSource?.indexPattern}
+            filters={fetchFilters ?? []}
+          />
+        ) : null}
         {state.showConfig ? (
           <ConfigurationCards
             goBack={goBack}

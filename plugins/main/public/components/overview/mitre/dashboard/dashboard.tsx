@@ -78,7 +78,7 @@ export const DashboardMITRE: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -96,21 +96,22 @@ export const DashboardMITRE: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='mitre-detector-searchbar'
-                {...searchBarProps}
-                fixedFilters={fixedFilters}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            )}
+            <WzSearchBar
+              appName='mitre-detector-searchbar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
           <div
-            className={`mitre-dashboard-responsive ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-              }`}
+            className={`mitre-dashboard-responsive ${
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }`}
           >
             <SampleDataWarning />
             <div className='mitre-dashboard-filters-wrapper'>

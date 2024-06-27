@@ -152,7 +152,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       .catch((error: HttpError) => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching discover data',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });

@@ -77,7 +77,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -91,22 +91,23 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='vulnerability-detector-searchbar'
-                {...searchBarProps}
-                fixedFilters={fixedFilters}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            )}
+            <WzSearchBar
+              appName='vulnerability-detector-searchbar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showDatePicker={false}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
           <div
-            className={`vulnerability-dashboard-responsive ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-              }`}
+            className={`vulnerability-dashboard-responsive ${
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }`}
           >
             <DashboardByRenderer
               input={{

@@ -84,7 +84,7 @@ const DashboardGitHubComponent: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching alerts',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -102,22 +102,23 @@ const DashboardGitHubComponent: React.FC = () => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='github-searchbar'
-                {...searchBarProps}
-                fixedFilters={fixedFilters}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            )}
+            <WzSearchBar
+              appName='github-searchbar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+            />
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
           {dataSource && results?.hits?.total > 0 ? (
             <div
-              className={`github-dashboard-responsive ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-                }`}
+              className={`github-dashboard-responsive ${
+                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }`}
             >
               <SampleDataWarning />
               <DashboardByRenderer

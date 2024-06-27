@@ -142,7 +142,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -198,15 +198,15 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         {isDataSourceLoading ? (
           <LoadingSpinner />
         ) : (
-            <WzSearchBar
-              appName='wazuh-discover-search-bar'
-              {...searchBarProps}
-              fixedFilters={fixedFilters}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          )}
+          <WzSearchBar
+            appName='wazuh-discover-search-bar'
+            {...searchBarProps}
+            fixedFilters={fixedFilters}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
+        )}
         {!isDataSourceLoading && results?.hits?.total === 0 ? (
           <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
         ) : null}
