@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
-import { getWazuhCorePlugin, getWzMainParams } from './kibana-services';
+import {
+  getWazuhCorePlugin,
+  getWazuhEnginePlugin,
+  getWzMainParams,
+} from './kibana-services';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { useDispatch } from 'react-redux';
 import { checkPluginVersion } from './utils';
@@ -95,6 +99,13 @@ export function Application(props) {
           path={'/blank-screen'}
           exact
           render={props => <WzBlankScreen {...props} />}
+        ></Route>
+        <Route
+          path={'/engine'}
+          render={props => {
+            const { Engine } = getWazuhEnginePlugin();
+            return <Engine navigationService={NavigationService} {...props} />;
+          }}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>
