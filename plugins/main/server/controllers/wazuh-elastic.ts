@@ -10,11 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { ErrorResponse } from '../lib/error-response';
-import {
-  AgentsVisualizations,
-  OverviewVisualizations,
-  ClusterVisualizations,
-} from '../integration-files/visualizations';
 
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import {
@@ -430,118 +425,6 @@ export class WazuhElasticCtrl {
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
       return Promise.reject(error);
-    }
-  }
-
-  /**
-   * This creates a visualization of data in req
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} vis obj or ErrorResponse
-   */
-  async createVis(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest<{ pattern: string; tab: string }>,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      if (
-        !request.params.tab.includes('overview-') &&
-        !request.params.tab.includes('agents-')
-      ) {
-        throw new Error('Missing parameters creating visualizations');
-      }
-
-      const tabPrefix = request.params.tab.includes('overview')
-        ? 'overview'
-        : 'agents';
-
-      const tabSplit = request.params.tab.split('-');
-      const tabSufix = tabSplit[1];
-
-      const file =
-        tabPrefix === 'overview'
-          ? OverviewVisualizations[tabSufix]
-          : AgentsVisualizations[tabSufix];
-      if (!file) {
-        return response.notFound({
-          body: {
-            message: `Visualizations not found for ${request.params.tab}`,
-          },
-        });
-      }
-      context.wazuh.logger.debug(
-        `${tabPrefix}[${tabSufix}] with index pattern ${request.params.pattern}`,
-      );
-      const raw = await this.buildVisualizationsRaw(
-        context,
-        file,
-        request.params.pattern,
-      );
-      return response.ok({
-        body: { acknowledge: true, raw: raw },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(error.message || error, 4007, 500, response);
-    }
-  }
-
-  /**
-   * This creates a visualization of cluster
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} vis obj or ErrorResponse
-   */
-  async createClusterVis(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest<
-      { pattern: string; tab: string },
-      unknown,
-      any
-    >,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      if (
-        !request.params.pattern ||
-        !request.params.tab ||
-        !request.body ||
-        !request.body.nodes ||
-        !request.body.nodes.affected_items ||
-        !request.body.nodes.name ||
-        (request.params.tab && !request.params.tab.includes('cluster-'))
-      ) {
-        throw new Error('Missing parameters creating visualizations');
-      }
-
-      const type = request.params.tab.split('-')[1];
-
-      const file = ClusterVisualizations[type];
-      const nodes = request.body.nodes.affected_items;
-      const name = request.body.nodes.name;
-      const masterNode = request.body.nodes.master_node;
-
-      const { id: patternID, title: patternName } = request.body.pattern;
-
-      const raw = await this.buildClusterVisualizationsRaw(
-        context,
-        file,
-        patternID,
-        nodes,
-        name,
-        masterNode,
-        patternName,
-      );
-
-      return response.ok({
-        body: { acknowledge: true, raw: raw },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(error.message || error, 4009, 500, response);
     }
   }
 

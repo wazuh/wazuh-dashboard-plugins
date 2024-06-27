@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added HAProxy helper settings to cluster configuration [#6653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6653)
 - Added ability to open the report file or Reporting application from the toast message [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
 - Added support for agents to Office 365 [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
+- Added pinned agent data validation when rendering the Inventory data, Stats and Configuration tabs in Agent preview of Endpoints Summary [#6800](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6800)
 
 ### Changed
 
@@ -65,6 +66,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed AngularJS service `config-handler` [#6631](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6631)
 - Removed legacy discover references and methods [#6646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6646)
 - Removed custom EuiSuggestItem component in favor of OUI's native component [#6714](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6714)
+- Removed API endpoint unused endpoints from creation of old visualisations: GET /elastic/visualizations/{tab}/{pattern} and GET /elastic/visualizations/{tab}/{pattern} [#6782](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6782)
 
 ## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 00
 

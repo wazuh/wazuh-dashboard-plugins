@@ -13,7 +13,7 @@ import React, { useState, useEffect } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 //@ts-ignore
 import { ComplianceRequirements } from './components/requirements';
-import { ComplianceSubrequirements } from './components/subrequirements';
+import { ComplianceSubrequirements } from './components';
 import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
@@ -279,7 +279,12 @@ export const ComplianceTable = withAgentSupportModule(props => {
   return (
     <I18nProvider>
       <>
-        <EuiPanel paddingSize='none' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='none'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
@@ -294,7 +299,12 @@ export const ComplianceTable = withAgentSupportModule(props => {
               />
             )}
         </EuiPanel>
-        <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='s'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           <EuiPanel paddingSize='none'>
             <EuiFlexGroup paddingSize='none'>
               <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
