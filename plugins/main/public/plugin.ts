@@ -24,6 +24,7 @@ import {
   setWazuhCheckUpdatesPlugin,
   setHeaderActionMenuMounter,
   setWazuhCorePlugin,
+  setWazuhEnginePlugin,
 } from './kibana-services';
 import { validate as validateNodeCronInterval } from 'node-cron';
 import {
@@ -210,6 +211,7 @@ export class WazuhPlugin
     setErrorOrchestrator(ErrorOrchestratorService);
     setWazuhCheckUpdatesPlugin(plugins.wazuhCheckUpdates);
     setWazuhCorePlugin(plugins.wazuhCore);
+    setWazuhEnginePlugin(plugins.wazuhEngine);
     return {};
   }
 }
