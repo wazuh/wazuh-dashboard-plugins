@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { EuiSideNav, EuiPage, EuiPageSideBar, EuiPageBody } from '@elastic/eui';
+import {
+  EuiSideNav,
+  EuiPage,
+  EuiPageSideBar,
+  EuiPageBody,
+  EuiPanel,
+} from '@elastic/eui';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { Decoders } from './decoders';
 import { Filters } from './filters';
@@ -8,6 +14,45 @@ import { Rules } from './rules';
 import { Integrations } from './integrations';
 import { KVDBs } from './kvdbs';
 import { Policies } from './policies';
+import { EngineLayout } from './engine-layout';
+
+const views = [
+  {
+    name: 'Decoders',
+    id: 'decoders',
+    render: Decoders,
+  },
+  {
+    name: 'Rules',
+    id: 'rules',
+    render: Rules,
+  },
+  {
+    name: 'Outputs',
+    id: 'outputs',
+    render: Outputs,
+  },
+  {
+    name: 'Filters',
+    id: 'filters',
+    render: Filters,
+  },
+  {
+    name: 'Integrations',
+    id: 'integrations',
+    render: Integrations,
+  },
+  {
+    name: 'Policies',
+    id: 'policies',
+    render: Policies,
+  },
+  {
+    name: 'KVDBs',
+    id: 'kvdbs',
+    render: KVDBs,
+  },
+];
 
 export const Engine = props => {
   const [isSideNavOpenOnMobile, setisSideNavOpenOnMobile] = useState(false);
@@ -19,36 +64,7 @@ export const Engine = props => {
     {
       name: 'Engine',
       id: 'engine',
-      items: [
-        {
-          name: 'Decoders',
-          id: 'decoders',
-        },
-        {
-          name: 'Rules',
-          id: 'rules',
-        },
-        {
-          name: 'Outputs',
-          id: 'outputs',
-        },
-        {
-          name: 'Filters',
-          id: 'filters',
-        },
-        {
-          name: 'Integrations',
-          id: 'integrations',
-        },
-        {
-          name: 'Policies',
-          id: 'policies',
-        },
-        {
-          name: 'KVDBs',
-          id: 'kvdbs',
-        },
-      ].map(item => ({
+      items: views.map(({ render, ...item }) => ({
         ...item,
         onClick: () => {
           props.navigationService.getInstance().navigate(`/engine/${item.id}`);
@@ -72,16 +88,24 @@ export const Engine = props => {
         />
       </EuiPageSideBar>
       <EuiPageBody>
-        <Switch>
-          <Route path={'/engine/decoders'} render={Decoders} />
-          <Route path={'/engine/filters'} render={Filters} />
-          <Route path={'/engine/outputs'} render={Outputs} />
-          <Route path={'/engine/rules'} render={Rules} />
-          <Route path={'/engine/integrations'} render={Integrations} />
-          <Route path={'/engine/kvdbs'} render={KVDBs} />
-          <Route path={'/engine/policies'} render={Policies} />
-          <Redirect to={'/engine/policies'} />
-        </Switch>
+        <EuiPanel>
+          <Switch>
+            {views.map(item => (
+              <Route
+                path={`/engine/${item.id}`}
+                key={item.id}
+                render={() => {
+                  return (
+                    <EngineLayout title={item.name}>
+                      {item.render()}
+                    </EngineLayout>
+                  );
+                }}
+              />
+            ))}
+            <Redirect to={`/engine/${views[0].id}`} />
+          </Switch>
+        </EuiPanel>
       </EuiPageBody>
     </EuiPage>
   );
