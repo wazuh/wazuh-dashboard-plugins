@@ -48,6 +48,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -76,7 +77,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -93,6 +94,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
             <WzSearchBar
               appName='vulnerability-detector-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={false}
               showQueryInput={true}
               showQueryBar={true}

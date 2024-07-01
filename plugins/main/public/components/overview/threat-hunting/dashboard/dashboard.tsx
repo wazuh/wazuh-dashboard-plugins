@@ -65,6 +65,7 @@ const DashboardTH: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -168,7 +169,7 @@ const DashboardTH: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching threat hunting',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -216,6 +217,7 @@ const DashboardTH: React.FC = () => {
           <WzSearchBar
             appName='th-searchbar'
             {...searchBarProps}
+            fixedFilters={fixedFilters}
             showDatePicker={true}
             showQueryInput={true}
             showQueryBar={true}
@@ -297,7 +299,9 @@ const DashboardTH: React.FC = () => {
                           results?.hits?.total > MAX_ENTRIES_PER_QUERY
                             ? {
                                 ariaLabel: 'Warning',
-                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                                  MAX_ENTRIES_PER_QUERY,
+                                )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
                                   MAX_ENTRIES_PER_QUERY,
                                 )} hits.`,
                                 iconType: 'alert',

@@ -19,15 +19,35 @@ type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   repository: tDataSourceRepository<T>;
   factory?: PatternDataSourceFactory;
   filterManager?: tFilterManager;
+  /*
+    Filters applied by the user that will be shown in the search bar
+  */
   filters?: tFilter[];
+  /*
+    Filters that will be used to make the fetch request, is a merge of the user filters, fixed filters and fetch (hidden) filters
+  */
   fetchFilters?: tFilter[];
+  /*
+    Filters applied by the data source and cannot be removed by the user
+  */
+  fixedFilters?: tFilter[];
 };
 
 type tUseDataSourceLoadedReturns<K> = {
   isLoading: boolean;
   dataSource: K;
+  /*
+    Filters applied by the user that will be shown in the search bar
+  */
   filters: tFilter[];
+  /*
+    Filters that will be used to make the fetch request, is a merge of the user filters, fixed filters and fetch (hidden) filters
+  */
   fetchFilters: tFilter[];
+  /*
+    Filters applied by the data source and cannot be removed by the user
+  */
+  fixedFilters: tFilter[];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: PatternDataSourceFilterManager;
@@ -36,8 +56,18 @@ type tUseDataSourceLoadedReturns<K> = {
 type tUseDataSourceNotLoadedReturns = {
   isLoading: boolean;
   dataSource: undefined;
+  /*
+    Filters applied by the user that will be shown in the search bar
+  */
   filters: [];
+  /*
+    Filters that will be used to make the fetch request, is a merge of the user filters, fixed filters and fetch (hidden) filters
+  */
   fetchFilters: [];
+  /*
+    Filters applied by the data source and cannot be removed by the user
+  */
+  fixedFilters: [];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: null;
@@ -52,6 +82,7 @@ export function useDataSource<
   const {
     filters: initialFilters = [],
     fetchFilters: initialFetchFilters = [],
+    fixedFilters: initialFixedFilters = [],
     DataSource: DataSourceConstructor,
     repository,
     factory: injectedFactory,
@@ -67,6 +98,7 @@ export function useDataSource<
     useState<PatternDataSourceFilterManager | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
+  const [fixedFilters, setFixedFilters] = useState<tFilter[]>([]);
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
@@ -79,6 +111,7 @@ export function useDataSource<
     dataSourceFilterManager?.setFilters(filters);
     setAllFilters(dataSourceFilterManager?.getFilters() || []);
     setFetchFilters(dataSourceFilterManager?.getFetchFilters() || []);
+    setFixedFilters(dataSourceFilterManager?.getFixedFilters() || []);
   };
 
   const fetchData = async (params: Omit<tSearchParams, 'filters'>) => {
@@ -123,10 +156,12 @@ export function useDataSource<
           );
           setAllFilters(dataSourceFilterManager.getFilters());
           setFetchFilters(dataSourceFilterManager.getFetchFilters());
+          setFixedFilters(dataSourceFilterManager.getFixedFilters());
         },
       });
       setAllFilters(dataSourceFilterManager.getFilters());
       setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      setFixedFilters(dataSourceFilterManager.getFixedFilters());
       setDataSourceFilterManager(dataSourceFilterManager);
       setIsLoading(false);
     })();
@@ -140,26 +175,8 @@ export function useDataSource<
 
   useEffect(() => {
     if (dataSourceFilterManager && dataSource) {
-      const pinnedAgentFilter = dataSourceFilterManager
-        .getFilters()
-        .filter(
-          (filter: tFilter) =>
-            filter.meta.controlledBy ===
-            PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
-        );
-
-      if (pinnedAgentFilter.length) {
-        dataSourceFilterManager.removeFilterByControlledBy(
-          PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
-        );
-      }
-      if (pinnedAgentManager.isPinnedAgent()) {
-        const pinnedAgent = PatternDataSourceFilterManager.getPinnedAgentFilter(
-          dataSource.id,
-        );
-
-        dataSourceFilterManager.addFilters([...pinnedAgent]);
-      }
+      setFixedFilters(dataSourceFilterManager.getFixedFilters());
+      setFetchFilters(dataSourceFilterManager.getFetchFilters());
     }
   }, [JSON.stringify(pinnedAgent)]);
 
@@ -169,6 +186,7 @@ export function useDataSource<
       dataSource: undefined,
       filters: [],
       fetchFilters: [],
+      fixedFilters: [],
       fetchData,
       setFilters,
       filterManager: null,
@@ -179,6 +197,7 @@ export function useDataSource<
       dataSource: dataSource as K,
       filters: allFilters,
       fetchFilters,
+      fixedFilters,
       fetchData,
       setFilters,
       filterManager: dataSourceFilterManager as PatternDataSourceFilterManager,

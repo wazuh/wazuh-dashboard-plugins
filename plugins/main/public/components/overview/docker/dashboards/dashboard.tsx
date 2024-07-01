@@ -31,12 +31,13 @@ const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-const DashboardDockerComponent: React.FC = ({}) => {
+const DashboardDockerComponent: React.FC = ({ }) => {
   const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -100,14 +101,15 @@ const DashboardDockerComponent: React.FC = ({}) => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <WzSearchBar
-              appName='docker-searchbar'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-            />
-          )}
+              <WzSearchBar
+                appName='docker-searchbar'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+              />
+            )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

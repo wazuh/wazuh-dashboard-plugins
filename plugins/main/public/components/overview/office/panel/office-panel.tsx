@@ -21,6 +21,7 @@ import { ModuleConfiguration } from './views';
 import { ModuleConfig, filtersValues } from './config';
 import {
   AlertsDataSourceRepository,
+  FILTER_OPERATOR,
   PatternDataSource,
   tParsedIndexPattern,
   useDataSource,
@@ -34,6 +35,7 @@ export const OfficePanel = withErrorBoundary(() => {
     value: '',
   });
   const [currentSelectedFilter, setCurrentSelectedFilter] = useState();
+  const [selectedPanelFilter, setSelectedPanelFilter] = useState([]);
   const filterDrillDownValue = value => {
     setDrillDownValue(value);
   };
@@ -41,6 +43,7 @@ export const OfficePanel = withErrorBoundary(() => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -64,11 +67,11 @@ export const OfficePanel = withErrorBoundary(() => {
     const { field, value } = selectedFilter;
     const controlledByFilter = 'office-panel-row-filter';
     if (value) {
-      const filter = filterManager?.createFilter('is one of', field, [value], controlledByFilter);
-      setFilters([...filters, filter]);
+      const filter = filterManager?.createFilter(FILTER_OPERATOR.IS_ONE_OF, field, [value], controlledByFilter);
+      // this hide the remove filter button in the filter bar
+      setSelectedPanelFilter([filter]);
     } else {
-      // the previous filter is stored in currentSelectedFilter
-      filterManager?.removeFilterByControlledBy(controlledByFilter);
+      setSelectedPanelFilter([]);
     }
     setCurrentSelectedFilter(selectedFilter);
   }
@@ -82,9 +85,10 @@ export const OfficePanel = withErrorBoundary(() => {
           <CustomSearchBar
             filterInputs={filtersValues}
             filterDrillDownValue={drillDownValue}
-            searchBarProps={searchBarProps}
+            fixedFilters={[...fixedFilters, ...selectedPanelFilter]}
+            searchBarProps={{ ...searchBarProps }}
             setFilters={setFilters}
-            indexPattern={dataSource.indexPattern}
+            indexPattern={dataSource?.indexPattern}
           />
           <MainPanel
             moduleConfig={ModuleConfig}
@@ -93,7 +97,7 @@ export const OfficePanel = withErrorBoundary(() => {
             onChangeView={handleChangeView}
             dataSourceProps={{
               fetchData,
-              fetchFilters,
+              fetchFilters: [...fetchFilters, ...selectedPanelFilter],
               searchBarProps,
               indexPattern: dataSource?.indexPattern,
             }}

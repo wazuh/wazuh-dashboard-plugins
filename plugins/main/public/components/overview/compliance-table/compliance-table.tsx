@@ -147,6 +147,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -161,6 +162,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     setFilters,
   });
 
+  const { dateRangeFrom, dateRangeTo } = searchBarProps;
   const [complianceData, setComplianceData] = useState({
     descriptions: {},
     complianceObject: {},
@@ -204,7 +206,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     ];
   };
 
-  const getRequirementsCount = async ({ section, query, fetchData }) => {
+  const getRequirementsCount = async ({ section, query, fetchData, dateRange }) => {
     try {
       const mapFieldAgg = {
         pci: 'rule.pci_dss',
@@ -222,7 +224,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
         },
       };
 
-      const data = await fetchData({ aggs, query });
+      const data = await fetchData({ aggs, query, dateRange });
 
       return data?.aggregations?.tactics?.buckets || [];
     } catch (error) {
@@ -246,7 +248,10 @@ export const ComplianceTable = withAgentSupportModule(props => {
     props.section,
     dataSource,
     searchBarProps.query,
+    { from: dateRangeFrom, to: dateRangeTo },
   ]);
+
+
 
   useEffect(() => {
     const { descriptions, complianceObject, selectedRequirements } =
@@ -260,12 +265,15 @@ export const ComplianceTable = withAgentSupportModule(props => {
         section: props.section,
         fetchData,
         query: searchBarProps.query,
+        dateRange: { from: dateRangeFrom, to: dateRangeTo },
       });
     }
   }, [
     dataSource,
     JSON.stringify(searchBarProps.query),
     JSON.stringify(fetchFilters),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
   ]);
 
   return (
@@ -280,15 +288,16 @@ export const ComplianceTable = withAgentSupportModule(props => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-            <WzSearchBar
-              appName='compliance-controls'
-              {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
-          )}
+              <WzSearchBar
+                appName='compliance-controls'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showDatePicker={true}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+            )}
         </EuiPanel>
         <EuiPanel
           paddingSize='s'

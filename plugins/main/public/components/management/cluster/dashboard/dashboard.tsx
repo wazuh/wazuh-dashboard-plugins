@@ -46,6 +46,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -90,7 +91,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -162,9 +163,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
           <WzSearchBar
             appName='ct-searchbar'
             {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={true}
-            showQueryBar={true}
+            fixedFilters={fixedFilters}
           />
         ) : null}
         <EuiSpacer size='m' />
