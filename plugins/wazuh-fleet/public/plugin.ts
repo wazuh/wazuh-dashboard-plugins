@@ -4,7 +4,7 @@ import {
   WazuhFleetPluginSetup,
   WazuhFleetPluginStart,
 } from './types';
-import { FleetList, FleetSideMenu } from './components';
+import { FleetManagement } from './components';
 import { setCore, setWazuhCore } from './plugin-services';
 
 export class WazuhFleetPlugin
@@ -22,8 +22,7 @@ export class WazuhFleetPlugin
     setWazuhCore(plugins.wazuhCore);
 
     return {
-      FleetList,
-      FleetSideMenu,
+      FleetManagement,
     };
   }
 

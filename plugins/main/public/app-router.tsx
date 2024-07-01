@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
-import { getWazuhCorePlugin, getWzMainParams } from './kibana-services';
+import {
+  getWazuhCorePlugin,
+  getWazuhFleetPlugin,
+  getWzMainParams,
+} from './kibana-services';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { useDispatch } from 'react-redux';
 import { checkPluginVersion } from './utils';
@@ -21,6 +25,7 @@ import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
+import { FleetManagement } from './components/fleet-management';
 
 export function Application(props) {
   const dispatch = useDispatch();
@@ -78,6 +83,17 @@ export function Application(props) {
           exact
           render={MainEndpointsSummary}
         ></Route>
+        <Route
+          path={'/agents-summary/'}
+          exact
+          render={() => <FleetManagement activeOption='agents' />}
+        ></Route>
+        <Route
+          path={'/agents-groups/'}
+          exact
+          render={() => <FleetManagement activeOption='groups' />}
+        ></Route>
+
         <Route path={'/manager'} exact render={WzManagement}></Route>
         <Route
           path={'/overview'}

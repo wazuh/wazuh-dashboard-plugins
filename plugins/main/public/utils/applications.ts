@@ -82,6 +82,25 @@ export const fileIntegrityMonitoring = {
     }`,
 };
 
+export const fleetManagement = {
+  category: 'wz-category-server-management',
+  id: 'fleet-management',
+  title: i18n.translate('wz-app-fleet-management-title', {
+    defaultMessage: 'Fleet Management',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-fleet-management-breadcrumbLabel', {
+    defaultMessage: 'Fleet Management',
+  }),
+  description: i18n.translate('wz-app-fleet-management-description', {
+    defaultMessage: 'Fleet Management.',
+  }),
+  euiIconType: 'spacesApp',
+  order: 600,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/agents-summary',
+};
+
 export const endpointSummary = {
   category: 'wz-category-server-management',
   id: 'endpoints-summary',
@@ -855,11 +874,12 @@ export const Applications = [
   github,
   office365,
   docker,
-  endpointSummary,
+  // endpointSummary,
+  fleetManagement,
   rules,
   decoders,
   cdbLists,
-  endpointGroups,
+  // endpointGroups,
   serverStatus,
   cluster,
   statistics,
