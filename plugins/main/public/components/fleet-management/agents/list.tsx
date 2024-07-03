@@ -36,6 +36,7 @@ import { agentsDefaultColumns } from './columnst';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
 import { useDocViewer } from '../../common/doc-viewer';
+import { AgentsVisualizations } from './visualizations';
 
 export const AgentList = () => {
   const {
@@ -179,6 +180,9 @@ export const AgentList = () => {
             hasBorder={false}
             color='transparent'
           >
+            <AgentsVisualizations
+              indexPattern={indexPattern}
+            />
             <EuiDataGrid
               {...dataGridProps}
               className={sideNavDocked ? 'dataGridDockedNav' : ''}
@@ -190,15 +194,15 @@ export const AgentList = () => {
                       showResetButton={false}
                       tooltip={
                         results?.hits?.total &&
-                        results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
                           ? {
-                              ariaLabel: 'Warning',
-                              content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                MAX_ENTRIES_PER_QUERY,
-                              )} hits.`,
-                              iconType: 'alert',
-                              position: 'top',
-                            }
+                            ariaLabel: 'Warning',
+                            content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                              MAX_ENTRIES_PER_QUERY,
+                            )} hits.`,
+                            iconType: 'alert',
+                            position: 'top',
+                          }
                           : undefined
                       }
                     />
