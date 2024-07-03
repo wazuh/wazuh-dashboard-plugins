@@ -1,0 +1,25 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "filename": "test1",
+        "relative_dirname": "test/1",
+        "elements": "8",
+        "date": "2024-06-03",
+        "description": "test mock"
+      },
+      {
+        "filename": "test2",
+        "relative_dirname": "test/2",
+        "elements": "76",
+        "date": "2024-06-02",
+        "description": "test 2 mock"
+      }
+    ],
+    "total_affected_items": 2,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "message": "All specified lists were returned",
+  "error": 0
+}
