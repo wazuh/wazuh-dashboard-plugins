@@ -1,4 +1,8 @@
-import { i18n } from '@osd/i18n';
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   AppMountParameters,
   CoreSetup,
@@ -6,22 +10,34 @@ import {
   Plugin,
 } from '../../../src/core/public';
 import {
-  ReportAlertsPluginPluginSetup,
-  ReportAlertsPluginPluginStart,
+  ReportsDashboardsPluginSetup,
+  ReportsDashboardsPluginStart,
   AppPluginStartDependencies,
 } from './types';
-import { PLUGIN_NAME } from '../common';
-import { setCore } from './plugin-services';
+import { i18n } from '@osd/i18n';
+import './components/context_menu/context_menu';
+import { PLUGIN_ID, PLUGIN_NAME } from '../common';
+import { uiSettingsService } from './components/utils/settings_service';
+import { applicationService } from './components/utils/application_service';
 
-export class ReportAlertsPluginPlugin
-  implements
-    Plugin<ReportAlertsPluginPluginSetup, ReportAlertsPluginPluginStart>
+export class ReportsDashboardsPlugin
+  implements Plugin<ReportsDashboardsPluginSetup, ReportsDashboardsPluginStart>
 {
-  public setup(core: CoreSetup): ReportAlertsPluginPluginSetup {
+  public setup(core: CoreSetup): ReportsDashboardsPluginSetup {
+    uiSettingsService.init(core.uiSettings, core.http);
     // Register an application into the side navigation menu
     core.application.register({
-      id: 'reportAlertsPlugin',
-      title: PLUGIN_NAME,
+      id: PLUGIN_ID,
+      title: i18n.translate('opensearch.reports.pluginName', {
+        defaultMessage: PLUGIN_NAME,
+      }),
+      category: {
+        id: 'explore',
+        label: 'Explore',
+        order: 100,
+        euiIconType: 'search',
+      },
+      order: 2000,
       async mount(params: AppMountParameters) {
         // Load application bundle
         const { renderApp } = await import('./application');
@@ -37,20 +53,11 @@ export class ReportAlertsPluginPlugin
     });
 
     // Return methods that should be available to other plugins
-    return {
-      getGreeting() {
-        return i18n.translate('reportAlertsPlugin.greetingText', {
-          defaultMessage: 'Hello from {name}!',
-          values: {
-            name: PLUGIN_NAME,
-          },
-        });
-      },
-    };
+    return {};
   }
 
-  public start(core: CoreStart, plugins): ReportAlertsPluginPluginStart {
-    setCore(core);
+  public start(core: CoreStart): ReportsDashboardsPluginStart {
+    applicationService.init(core.application);
     return {};
   }
 

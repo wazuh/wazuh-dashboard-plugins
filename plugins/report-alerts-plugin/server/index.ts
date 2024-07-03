@@ -1,11 +1,25 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { PluginInitializerContext } from '../../../src/core/server';
-import { ReportAlertsPluginPlugin } from './plugin';
+import { ReportingConfigType } from './config';
+import { ReportsDashboardsPlugin } from './plugin';
 
-// This exports static code and TypeScript types,
-// as well as, OpenSearch Dashboards Platform `plugin()` initializer.
+export { config } from './config';
+export { ReportingConfig } from './config/config';
+export { ReportsDashboardsPlugin as Plugin };
 
-export function plugin(initializerContext: PluginInitializerContext) {
-  return new ReportAlertsPluginPlugin(initializerContext);
+//  This exports static code and TypeScript types,
+//  as well as, OpenSearch Dashboards Platform `plugin()` initializer.
+export function plugin(
+  initializerContext: PluginInitializerContext<ReportingConfigType>
+) {
+  return new ReportsDashboardsPlugin(initializerContext);
 }
 
-export { ReportAlertsPluginPluginSetup, ReportAlertsPluginPluginStart } from './types';
+export {
+  ReportsDashboardsPluginSetup,
+  ReportsDashboardsPluginStart,
+} from './types';

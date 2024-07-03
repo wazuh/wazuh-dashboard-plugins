@@ -1,0 +1,421 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ReportTrigger /> panel Render edit on-demand component 1`] = `
+<div>
+  <div
+    class="euiFormRow"
+    id="reportDefinitionTriggerTypes-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        class="euiFormLabel euiFormRow__label"
+        for="reportDefinitionTriggerTypes"
+      >
+        Report trigger
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        id="reportDefinitionTriggerTypes"
+      >
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            checked=""
+            class="euiRadio__input"
+            id="On demand"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="On demand"
+          >
+            On demand
+          </label>
+        </div>
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            class="euiRadio__input"
+            id="Schedule"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="Schedule"
+          >
+            Schedule
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+</div>
+`;
+
+exports[`<ReportTrigger /> panel render create component 1`] = `
+<div>
+  <div
+    class="euiFormRow"
+    id="reportDefinitionTriggerTypes-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        class="euiFormLabel euiFormRow__label"
+        for="reportDefinitionTriggerTypes"
+      >
+        Report trigger
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        id="reportDefinitionTriggerTypes"
+      >
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            checked=""
+            class="euiRadio__input"
+            id="On demand"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="On demand"
+          >
+            On demand
+          </label>
+        </div>
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            class="euiRadio__input"
+            id="Schedule"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="Schedule"
+          >
+            Schedule
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+</div>
+`;
+
+exports[`<ReportTrigger /> panel render edit Cron schedule component 1`] = `
+<div>
+  <div
+    class="euiFormRow"
+    id="reportDefinitionTriggerTypes-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        class="euiFormLabel euiFormRow__label"
+        for="reportDefinitionTriggerTypes"
+      >
+        Report trigger
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        id="reportDefinitionTriggerTypes"
+      >
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            checked=""
+            class="euiRadio__input"
+            id="On demand"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="On demand"
+          >
+            On demand
+          </label>
+        </div>
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            class="euiRadio__input"
+            id="Schedule"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="Schedule"
+          >
+            Schedule
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+</div>
+`;
+
+exports[`<ReportTrigger /> panel render edit recurring 5 hours schedule component 1`] = `
+<div>
+  <div
+    class="euiFormRow"
+    id="reportDefinitionTriggerTypes-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        class="euiFormLabel euiFormRow__label"
+        for="reportDefinitionTriggerTypes"
+      >
+        Report trigger
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        id="reportDefinitionTriggerTypes"
+      >
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            checked=""
+            class="euiRadio__input"
+            id="On demand"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="On demand"
+          >
+            On demand
+          </label>
+        </div>
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            class="euiRadio__input"
+            id="Schedule"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="Schedule"
+          >
+            Schedule
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+</div>
+`;
+
+exports[`<ReportTrigger /> panel render edit recurring 10 minutes schedule component 1`] = `
+<div>
+  <div
+    class="euiFormRow"
+    id="reportDefinitionTriggerTypes-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        class="euiFormLabel euiFormRow__label"
+        for="reportDefinitionTriggerTypes"
+      >
+        Report trigger
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        id="reportDefinitionTriggerTypes"
+      >
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            checked=""
+            class="euiRadio__input"
+            id="On demand"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="On demand"
+          >
+            On demand
+          </label>
+        </div>
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            class="euiRadio__input"
+            id="Schedule"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="Schedule"
+          >
+            Schedule
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+</div>
+`;
+
+exports[`<ReportTrigger /> panel render edit recurring daily schedule component 1`] = `
+<div>
+  <div
+    class="euiFormRow"
+    id="reportDefinitionTriggerTypes-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        class="euiFormLabel euiFormRow__label"
+        for="reportDefinitionTriggerTypes"
+      >
+        Report trigger
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        id="reportDefinitionTriggerTypes"
+      >
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            checked=""
+            class="euiRadio__input"
+            id="On demand"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="On demand"
+          >
+            On demand
+          </label>
+        </div>
+        <div
+          class="euiRadio euiRadioGroup__item"
+        >
+          <input
+            class="euiRadio__input"
+            id="Schedule"
+            type="radio"
+            value=""
+          />
+          <div
+            class="euiRadio__circle"
+          />
+          <label
+            class="euiRadio__label"
+            for="Schedule"
+          >
+            Schedule
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="euiSpacer euiSpacer--l"
+  />
+</div>
+`;

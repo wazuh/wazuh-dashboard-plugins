@@ -1,118 +1,149 @@
-import React, { useState } from 'react';
-import { i18n } from '@osd/i18n';
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 
 import {
-  EuiButton,
-  EuiHorizontalRule,
   EuiPage,
   EuiPageBody,
-  EuiPageContent,
   EuiPageContentBody,
   EuiPageContentHeader,
-  EuiPageHeader,
-  EuiTitle,
-  EuiText,
+  EuiPageContentHeaderSection,
 } from '@elastic/eui';
-
-import { CoreStart } from '../../../../src/core/public';
+import CSS from 'csstype';
+import {
+  CoreStart,
+  CoreSystem,
+  ChromeBreadcrumb,
+  IUiSettingsClient,
+} from '../../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
 
-import { PLUGIN_ID, PLUGIN_NAME } from '../../common';
+import { CreateReport } from './report_definitions/create/create_report_definition';
+import { Main } from './main/main';
+import { ReportDetails } from './main/report_details/report_details';
+import { ReportDefinitionDetails } from './main/report_definition_details/report_definition_details';
+import { EditReportDefinition } from './report_definitions/edit/edit_report_definition';
+import { i18n } from '@osd/i18n';
 
-interface ReportAlertsPluginAppDeps {
+export interface CoreInterface {
+  http: CoreStart['http'];
+  uiSettings: IUiSettingsClient;
+  setBreadcrumbs: (newBreadcrumbs: ChromeBreadcrumb[]) => void;
+}
+
+interface ReportsDashboardsAppDeps {
   basename: string;
   notifications: CoreStart['notifications'];
   http: CoreStart['http'];
   navigation: NavigationPublicPluginStart;
+  chrome: CoreStart['chrome'];
 }
 
-export const ReportAlertsPluginApp = ({
+const styles: CSS.Properties = {
+  float: 'left',
+  width: '100%',
+  maxWidth: '1600px',
+};
+
+export const ReportsDashboardsApp = ({
   basename,
   notifications,
   http,
   navigation,
-}: ReportAlertsPluginAppDeps) => {
-  // Use React hooks to manage state.
-  const [timestamp, setTimestamp] = useState<string | undefined>();
-
-  const onClickHandler = () => {
-    // Use the core http service to make a response to the server API.
-    http.get('/api/report_alerts_plugin/example').then((res) => {
-      setTimestamp(res.time);
-      // Use the core notifications service to display a success message.
-      notifications.toasts.addSuccess(
-        i18n.translate('reportAlertsPlugin.dataUpdated', {
-          defaultMessage: 'Data updated',
-        })
-      );
-    });
-  };
-
+  chrome,
+}: ReportsDashboardsAppDeps) => {
   // Render the application DOM.
-  // Note that `navigation.ui.TopNavMenu` is a stateful component exported on the `navigation` plugin's start contract.
   return (
-    <Router basename={basename}>
+    <Router basename={'/' + basename}>
       <I18nProvider>
-        <>
-          <navigation.ui.TopNavMenu
-            appName={PLUGIN_ID}
-            showSearchBar={true}
-            useDefaultBehaviors={true}
-          />
-          <EuiPage restrictWidth="1000px">
-            <EuiPageBody component="main">
-              <EuiPageHeader>
-                <EuiTitle size="l">
-                  <h1>
-                    <FormattedMessage
-                      id="reportAlertsPlugin.helloWorldText"
-                      defaultMessage="{name}"
-                      values={{ name: PLUGIN_NAME }}
-                    />
-                  </h1>
-                </EuiTitle>
-              </EuiPageHeader>
-              <EuiPageContent>
-                <EuiPageContentHeader>
-                  <EuiTitle>
-                    <h2>
-                      <FormattedMessage
-                        id="reportAlertsPlugin.congratulationsTitle"
-                        defaultMessage="Congratulations, you have successfully created a new OpenSearch Dashboards Plugin!"
+        <div style={styles}>
+          <EuiPage>
+            <EuiPageBody>
+              <EuiPageContentHeader>
+                <EuiPageContentHeaderSection></EuiPageContentHeaderSection>
+              </EuiPageContentHeader>
+              <EuiPageContentBody>
+                <Switch>
+                  <Route
+                    path="/report_details/:reportId"
+                    render={(props) => (
+                      <ReportDetails
+                        title={i18n.translate(
+                          'opensearch.reports.app.reportDetails',
+                          { defaultMessage: 'Report Details' }
+                        )}
+                        httpClient={http}
+                        {...props}
+                        setBreadcrumbs={chrome.setBreadcrumbs}
                       />
-                    </h2>
-                  </EuiTitle>
-                </EuiPageContentHeader>
-                <EuiPageContentBody>
-                  <EuiText>
-                    <p>
-                      <FormattedMessage
-                        id="reportAlertsPlugin.content"
-                        defaultMessage="Look through the generated code and check out the plugin development documentation."
+                    )}
+                  />
+                  <Route
+                    path="/report_definition_details/:reportDefinitionId"
+                    render={(props) => (
+                      <ReportDefinitionDetails
+                        title={i18n.translate(
+                          'opensearch.reports.app.reportDefinitionDetails',
+                          { defaultMessage: 'Report Definition Details' }
+                        )}
+                        httpClient={http}
+                        {...props}
+                        setBreadcrumbs={chrome.setBreadcrumbs}
                       />
-                    </p>
-                    <EuiHorizontalRule />
-                    <p>
-                      <FormattedMessage
-                        id="reportAlertsPlugin.timestampText"
-                        defaultMessage="Last timestamp: {time}"
-                        values={{ time: timestamp ? timestamp : 'Unknown' }}
+                    )}
+                  />
+                  <Route
+                    path="/create"
+                    render={(props) => (
+                      <CreateReport
+                        title={i18n.translate(
+                          'opensearch.reports.app.createReport',
+                          { defaultMessage: 'Create Report' }
+                        )}
+                        httpClient={http}
+                        {...props}
+                        setBreadcrumbs={chrome.setBreadcrumbs}
                       />
-                    </p>
-                    <EuiButton type="primary" size="s" onClick={onClickHandler}>
-                      <FormattedMessage
-                        id="reportAlertsPlugin.buttonText"
-                        defaultMessage="Get data"
+                    )}
+                  />
+                  <Route
+                    path="/edit/:reportDefinitionId"
+                    render={(props) => (
+                      <EditReportDefinition
+                        title={i18n.translate(
+                          'opensearch.reports.app.editReportDefinition',
+                          { defaultMessage: 'Edit Report Definition' }
+                        )}
+                        httpClient={http}
+                        {...props}
+                        setBreadcrumbs={chrome.setBreadcrumbs}
                       />
-                    </EuiButton>
-                  </EuiText>
-                </EuiPageContentBody>
-              </EuiPageContent>
+                    )}
+                  />
+                  <Route
+                    path="/"
+                    render={(props) => (
+                      <Main
+                        title={i18n.translate(
+                          'opensearch.reports.app.reportingHomepage',
+                          { defaultMessage: 'Reporting Homepage' }
+                        )}
+                        httpClient={http}
+                        {...props}
+                        setBreadcrumbs={chrome.setBreadcrumbs}
+                      />
+                    )}
+                  />
+                </Switch>
+              </EuiPageContentBody>
             </EuiPageBody>
           </EuiPage>
-        </>
+        </div>
       </I18nProvider>
     </Router>
   );

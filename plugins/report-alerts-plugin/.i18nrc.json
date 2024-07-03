@@ -1,0 +1,7 @@
+{
+  "paths": {
+    "opensearch.reports": "public"
+  },
+  "exclude": [],
+  "translations": ["translations/zh-CN.json", "translations/pl.json"]
+}

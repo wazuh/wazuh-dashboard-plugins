@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ReportDelivery /> panel render create component 1`] = `
+<div
+  class="euiPanel euiPanel--paddingLarge euiPageContent"
+>
+  <div
+    class="euiPageHeader euiPageHeader--responsive"
+  >
+    <h2
+      class="euiTitle euiTitle--medium"
+    >
+      Notification settings
+    </h2>
+  </div>
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginLarge"
+  />
+  <div
+    class="euiPageContentBody"
+  >
+    <div
+      class="euiCheckbox"
+    >
+      <input
+        class="euiCheckbox__input"
+        id="notificationsDeliveryCheckbox"
+        type="checkbox"
+      />
+      <div
+        class="euiCheckbox__square"
+      />
+      <label
+        class="euiCheckbox__label"
+        for="notificationsDeliveryCheckbox"
+      >
+        Send notification when report is available
+      </label>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ReportDelivery /> panel render edit component 1`] = `
+<div
+  class="euiPanel euiPanel--paddingLarge euiPageContent"
+>
+  <div
+    class="euiPageHeader euiPageHeader--responsive"
+  >
+    <h2
+      class="euiTitle euiTitle--medium"
+    >
+      Notification settings
+    </h2>
+  </div>
+  <hr
+    class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginLarge"
+  />
+  <div
+    class="euiPageContentBody"
+  >
+    <div
+      class="euiCheckbox"
+    >
+      <input
+        class="euiCheckbox__input"
+        id="notificationsDeliveryCheckbox"
+        type="checkbox"
+      />
+      <div
+        class="euiCheckbox__square"
+      />
+      <label
+        class="euiCheckbox__label"
+        for="notificationsDeliveryCheckbox"
+      >
+        Send notification when report is available
+      </label>
+    </div>
+  </div>
+</div>
+`;

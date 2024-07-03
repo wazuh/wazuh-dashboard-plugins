@@ -1,10 +1,17 @@
-import './index.scss';
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-import { ReportAlertsPluginPlugin } from './plugin';
+import './index.scss';
+import { ReportsDashboardsPlugin } from './plugin';
 
 // This exports static code and TypeScript types,
 // as well as, OpenSearch Dashboards Platform `plugin()` initializer.
 export function plugin() {
-  return new ReportAlertsPluginPlugin();
+  return new ReportsDashboardsPlugin();
 }
-export { ReportAlertsPluginPluginSetup, ReportAlertsPluginPluginStart } from './types';
+export {
+  ReportsDashboardsPluginSetup,
+  ReportsDashboardsPluginStart,
+} from './types';

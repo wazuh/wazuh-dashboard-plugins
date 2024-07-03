@@ -1,1 +1,32 @@
-/* stylelint-disable no-empty-source */
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.react-mde .mde-header .mde-tabs button {
+  border-radius: 2px;
+  margin: 12px 4px 0px;
+  background-color: transparent;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  padding: 0 16px;
+  min-height: 30px;
+  &.selected {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 3px solid #006bb4;
+  }
+  &:first-child {
+    margin-left: 0px;
+  }
+}
+
+.mde-preview-content {
+  ul {
+    list-style: disc;
+  }
+  ol {
+    list-style: decimal;
+  }
+}
