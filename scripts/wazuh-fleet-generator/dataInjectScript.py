@@ -12,6 +12,14 @@ def generateRandomDate(days_interval=10):
     random_date = start_date + (end_date - start_date) * random.random()
     return(random_date.strftime("%Y-%m-%dT%H:%M:%S.{}Z".format(random.randint(0, 999))))
 
+def generateRandomGroups():
+    groups = ['default', 'group1', 'group2', 'group3', 'group4', 'group5']
+    return groups
+
+def generateNodeNames():
+    nodes = ['wazuh', 'node1', 'node2', 'node3', 'node4', 'node5']
+    return nodes
+
 def generateRandomAgent():
     agent={}
     agent['build'] = {'original':'build{}'.format(random.randint(0, 9999))}
@@ -19,6 +27,8 @@ def generateRandomAgent():
     agent['name'] = 'Agent{}'.format(random.randint(0, 99))
     agent['version'] = 'v{}-stable'.format(random.randint(0, 9))
     agent['ephemeral_id'] = '{}'.format(random.randint(0, 99999))
+    agent['groups'] = random.sample(generateRandomGroups(), random.randint(1, len(generateRandomGroups())))
+    agent['node_name'] = random.choice(generateNodeNames())
     agent['created'] = generateRandomDate()
     return(agent)
 
