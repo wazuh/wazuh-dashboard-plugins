@@ -25,12 +25,21 @@ import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
-import { FleetManagement } from './components/fleet-management';
+import {
+  FleetDataSource,
+  FleetDataSourceRepository,
+  useDataSource,
+} from './components/common/data-source';
+import useSearchBar from './components/common/search-bar/use-search-bar';
+import { WzSearchBar } from './components/common/search-bar';
+import { TableIndexer } from './components/common/tables';
 
 export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
   const history = navigationService.getHistory();
+
+  const { FleetManagement } = getWazuhFleetPlugin();
 
   useEffect(() => {
     // Get the dashboard security
@@ -84,16 +93,19 @@ export function Application(props) {
           render={MainEndpointsSummary}
         ></Route>
         <Route
-          path={'/agents-summary/'}
-          exact
-          render={() => <FleetManagement activeOption='agents' />}
+          path={'/fleet-management'}
+          render={() => (
+            <FleetManagement
+              navigationService={NavigationService}
+              useDataSource={useDataSource}
+              FleetDataSource={FleetDataSource}
+              FleetDataSourceRepository={FleetDataSourceRepository}
+              useSearchBar={useSearchBar}
+              WzSearchBar={WzSearchBar}
+              TableIndexer={TableIndexer}
+            />
+          )}
         ></Route>
-        <Route
-          path={'/agents-groups/'}
-          exact
-          render={() => <FleetManagement activeOption='groups' />}
-        ></Route>
-
         <Route path={'/manager'} exact render={WzManagement}></Route>
         <Route
           path={'/overview'}

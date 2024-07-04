@@ -6,8 +6,10 @@
   "ui": true,
   "requiredPlugins": [
     "navigation",
+    "data",
+    "dashboard",
+    "embeddable",
     "opensearchDashboardsUtils",
-    "opensearchDashboardsReact",
     "wazuhCore"
   ],
   "optionalPlugins": ["securityDashboards"]

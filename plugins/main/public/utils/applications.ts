@@ -98,7 +98,7 @@ export const fleetManagement = {
   order: 600,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/agents-summary',
+  redirectTo: () => '/fleet-management/',
 };
 
 export const endpointSummary = {

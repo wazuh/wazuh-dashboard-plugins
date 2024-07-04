@@ -13,3 +13,4 @@
 export * from './table-with-search-bar';
 export * from './table-wz-api';
 export * from './table-default';
+export * from './table-indexer';

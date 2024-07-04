@@ -5,7 +5,7 @@ import {
   WazuhFleetPluginStart,
 } from './types';
 import { FleetManagement } from './components';
-import { setCore, setWazuhCore } from './plugin-services';
+import { setCore, setPlugins, setWazuhCore } from './plugin-services';
 
 export class WazuhFleetPlugin
   implements Plugin<WazuhFleetPluginSetup, WazuhFleetPluginStart>
@@ -19,6 +19,7 @@ export class WazuhFleetPlugin
     plugins: AppPluginStartDependencies,
   ): WazuhFleetPluginStart {
     setCore(core);
+    setPlugins(plugins);
     setWazuhCore(plugins.wazuhCore);
 
     return {
