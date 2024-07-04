@@ -49,9 +49,15 @@ interface ReportDetails {
   scheduleType: string;
   scheduleDetails: string;
   queryUrl: string;
+  emailRecipients: Array<string>;
+  emailSubject: string;
+  emailBody: string;
 }
 
-export const ReportDetailsComponent = (props: { reportDetailsComponentTitle: any; reportDetailsComponentContent: any; }) => {
+export const ReportDetailsComponent = (props: {
+  reportDetailsComponentTitle: any;
+  reportDetailsComponentContent: any;
+}) => {
   const { reportDetailsComponentTitle, reportDetailsComponentContent } = props;
 
   return (
@@ -80,7 +86,11 @@ export const formatEmails = (emails: string[]) => {
   return Array.isArray(emails) ? emails.join(', ') : emails;
 };
 
-export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpClient: any; }) {
+export function ReportDetails(props: {
+  match?: any;
+  setBreadcrumbs?: any;
+  httpClient: any;
+}) {
   const [reportDetails, setReportDetails] = useState<ReportDetails>({
     reportName: '',
     description: '',
@@ -95,7 +105,10 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
     triggerType: '',
     scheduleType: '',
     scheduleDetails: '',
-    queryUrl: ''
+    queryUrl: '',
+    emailRecipients: [],
+    emailSubject: '',
+    emailBody: '',
   });
   const [toasts, setToasts] = useState([]);
   const [showLoading, setShowLoading] = useState(false);
@@ -162,8 +175,8 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
     addSuccessToastHandler();
   };
 
-  const removeToast = (removedToast: { id: any; }) => {
-    setToasts(toasts.filter((toast : any) => toast.id !== removedToast.id));
+  const removeToast = (removedToast: { id: any }) => {
+    setToasts(toasts.filter((toast: any) => toast.id !== removedToast.id));
   };
 
   const handleReportDetails = (e: React.SetStateAction<ReportDetails>) => {
@@ -180,9 +193,8 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
   };
 
   const parseTimePeriod = (queryUrl: string) => {
-    let [fromDateString, toDateString] : RegExpMatchArray | null = queryUrl.match(
-      timeRangeMatcher
-    );
+    let [fromDateString, toDateString]: RegExpMatchArray | null =
+      queryUrl.match(timeRangeMatcher);
 
     fromDateString = decodeURIComponent(fromDateString.replace(/[']+/g, ''));
     toDateString = decodeURIComponent(toDateString.replace(/[']+/g, ''));
@@ -197,20 +209,18 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
     );
   };
 
-  const getReportDetailsData = (
-    report: ReportSchemaType
-  ) : ReportDetails => {
+  const getReportDetailsData = (report: ReportSchemaType): ReportDetails => {
     const {
       report_definition: reportDefinition,
       last_updated: lastUpdated,
       state,
       query_url: queryUrl,
     } = report;
-    const { report_params: reportParams, trigger } = reportDefinition;
-    const {
-      trigger_type: triggerType,
-      trigger_params: triggerParams,
-    } = trigger;
+    const { report_params: reportParams, trigger, delivery } = reportDefinition;
+    const { trigger_type: triggerType, trigger_params: triggerParams } =
+      trigger;
+    const { delivery_type: deliveryType, delivery_params: deliveryParams } =
+      delivery;
     const coreParams = reportParams.core_params;
     // covert timestamp to local date-time string
     let reportDetails = {
@@ -222,7 +232,10 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
       source: reportParams.report_source,
       // TODO:  we have all data needed, time_from, time_to, time_duration,
       // think of a way to better display
-      time_period: (reportParams.report_source !== 'Notebook') ? parseTimePeriod(queryUrl) : `\u2014`,
+      time_period:
+        reportParams.report_source !== 'Notebook'
+          ? parseTimePeriod(queryUrl)
+          : `\u2014`,
       defaultFileFormat: coreParams.report_format,
       state: state,
       reportHeader:
@@ -238,6 +251,13 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
       triggerType: triggerType,
       scheduleType: triggerParams ? triggerParams.schedule_type : `\u2014`,
       scheduleDetails: `\u2014`,
+      channel: deliveryType,
+      emailRecipients:
+        deliveryType === 'Channel' ? deliveryParams.recipients : `\u2014`,
+      emailSubject:
+        deliveryType === 'Channel' ? deliveryParams.title : `\u2014`,
+      emailBody:
+        deliveryType === 'Channel' ? deliveryParams.textDescription : `\u2014`,
       queryUrl: queryUrl,
     };
     return reportDetails;
@@ -246,34 +266,34 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
   useEffect(() => {
     const { httpClient } = props;
     httpClient
-    .get('../api/reporting/reports/' + reportId)
-    .then((response: ReportSchemaType) => {
-      handleReportDetails(getReportDetailsData(response));
-      props.setBreadcrumbs([
-        {
-          text: i18n.translate(
-            'opensearch.reports.details.breadcrumb.reporting',
-            { defaultMessage: 'Reporting' }
-          ),
-          href: '#',
-        },
-        {
-          text: i18n.translate(
-            'opensearch.reports.details.breadcrumb.reportDetails',
-            {
-              defaultMessage: 'Report details: {name}',
-              values: {
-                name: response.report_definition.report_params.report_name,
-              },
-            }
-          ),
-        },
-      ]);
-    })
-    .catch((error: any) => {
-      console.log('Error when fetching report details: ', error);
-      handleErrorToast();
-    });
+      .get('../api/reporting/reports/' + reportId)
+      .then((response: ReportSchemaType) => {
+        handleReportDetails(getReportDetailsData(response));
+        props.setBreadcrumbs([
+          {
+            text: i18n.translate(
+              'opensearch.reports.details.breadcrumb.reporting',
+              { defaultMessage: 'Report alerts' }
+            ),
+            href: '#',
+          },
+          {
+            text: i18n.translate(
+              'opensearch.reports.details.breadcrumb.reportDetails',
+              {
+                defaultMessage: 'Report details: {name}',
+                values: {
+                  name: response.report_definition.report_params.report_name,
+                },
+              }
+            ),
+          },
+        ]);
+      })
+      .catch((error: any) => {
+        console.log('Error when fetching report details: ', error);
+        handleErrorToast();
+      });
   }, []);
 
   const downloadIconDownload = async () => {
@@ -303,22 +323,23 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
     return (
       <EuiLink
         id="reportDetailsSourceURL"
-        href={`${data.queryUrl}`} target="_blank"
+        href={`${data.queryUrl}`}
+        target="_blank"
       >
         {data['source']}
       </EuiLink>
     );
   };
 
-  const triggerSection = 
+  const triggerSection =
     reportDetails.triggerType === TRIGGER_TYPE.onDemand ? (
       <ReportDetailsComponent
-      reportDetailsComponentTitle={i18n.translate(
-        'opensearch.reports.details.reportTrigger.reportType',
-        { defaultMessage: 'Report trigger' }
-      )}
-      reportDetailsComponentContent={reportDetails.triggerType}
-    />
+        reportDetailsComponentTitle={i18n.translate(
+          'opensearch.reports.details.reportTrigger.reportType',
+          { defaultMessage: 'Report trigger' }
+        )}
+        reportDetailsComponentContent={reportDetails.triggerType}
+      />
     ) : (
       <EuiFlexGroup>
         <ReportDetailsComponent
@@ -347,7 +368,7 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
           reportDetailsComponentContent={''}
         />
       </EuiFlexGroup>
-    )
+    );
 
   const showLoadingModal = showLoading ? (
     <GenerateReportLoadingModal setShowLoading={setShowLoading} />
@@ -477,6 +498,28 @@ export function ReportDetails(props: { match?: any; setBreadcrumbs?: any; httpCl
           </EuiFlexGroup>
           <EuiSpacer />
           {triggerSection}
+          <EuiTitle>
+            <h3>Notification settings</h3>
+          </EuiTitle>
+          <EuiSpacer />
+          <EuiFlexGroup>
+            <ReportDetailsComponent
+              reportDetailsComponentTitle={'Email recipient(s)'}
+              reportDetailsComponentContent={formatEmails(
+                reportDetails['emailRecipients']
+              )}
+            />
+            <ReportDetailsComponent
+              reportDetailsComponentTitle={'Email subject'}
+              reportDetailsComponentContent={reportDetails['emailSubject']}
+            />
+            <ReportDetailsComponent
+              reportDetailsComponentTitle={'Optional message'}
+              reportDetailsComponentContent={trimAndRenderAsText(
+                reportDetails['emailBody']
+              )}
+            />
+          </EuiFlexGroup>
         </EuiPageContent>
         <EuiGlobalToastList
           toasts={toasts}

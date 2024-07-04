@@ -18,7 +18,9 @@ export const definitionInputValidation = async (
   setShowTriggerIntervalNaNError,
   timeRange,
   setShowTimeRangeError,
-  setShowCronError
+  setShowCronError,
+  setShowEmailRecipientsError,
+  setEmailRecipientsErrorMessage
 ) => {
   // check report name
   // allow a-z, A-Z, 0-9, (), [], ',' - and _ and spaces
@@ -75,6 +77,35 @@ export const definitionInputValidation = async (
     ) {
       setShowCronError(true);
       error = true;
+    }
+  }
+
+  // if email delivery
+  if (metadata.delivery.delivery_type === 'Channel') {
+    // no recipients are listed
+    if (metadata.delivery.delivery_params.recipients.length === 0) {
+      setShowEmailRecipientsError(true);
+      setEmailRecipientsErrorMessage(
+        i18n.translate('odfe.reports.error.emailRecipientsListCannotBeEmpty', {
+          defaultMessage: 'Email recipients list cannot be empty.',
+        })
+      );
+      error = true;
+    }
+    // recipients have invalid email addresses: regexp checks format xxxxx@yyyy.zzz
+    let emailRegExp = /\S+@\S+\.\S+/;
+    let index;
+    let recipients = metadata.delivery.delivery_params.recipients;
+    for (index = 0; index < recipients.length; ++index) {
+      if (recipients[0].search(emailRegExp) === -1) {
+        setShowEmailRecipientsError(true);
+        setEmailRecipientsErrorMessage(
+          i18n.translate('odfe.reports.error.invalidEmailAddresses', {
+            defaultMessage: 'Invalid email addresses in recipients list.',
+          })
+        );
+        error = true;
+      }
     }
   }
   return error;

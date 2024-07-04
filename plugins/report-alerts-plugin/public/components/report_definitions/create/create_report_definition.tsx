@@ -23,6 +23,7 @@ import {
   permissionsMissingActions,
 } from '../../utils/utils';
 import { definitionInputValidation } from '../utils/utils';
+import { ReportDelivery } from '../delivery';
 
 interface reportParamsType {
   report_name: string;
@@ -134,6 +135,10 @@ export function CreateReport(props: {
     useState(false);
   const [showCronError, setShowCronError] = useState(false);
   const [showTimeRangeError, setShowTimeRangeError] = useState(false);
+  const [showEmailRecipientsError, setShowEmailRecipientsError] =
+    useState(false);
+  const [emailRecipientsErrorMessage, setEmailRecipientsErrorMessage] =
+    useState('');
 
   // preserve the state of the request after an invalid create report definition request
   if (comingFromError) {
@@ -237,7 +242,9 @@ export function CreateReport(props: {
       setShowTriggerIntervalNaNError,
       timeRange,
       setShowTimeRangeError,
-      setShowCronError
+      setShowCronError,
+      setShowEmailRecipientsError,
+      setEmailRecipientsErrorMessage
     ).then((response) => {
       error = response;
     });
@@ -323,6 +330,11 @@ export function CreateReport(props: {
           showCronError={showCronError}
         />
         <EuiSpacer />
+        <ReportDelivery
+          edit={false}
+          reportDefinitionRequest={createReportDefinitionRequest}
+          httpClientProps={props['httpClient']}
+        />
         <EuiFlexGroup justifyContent="flexEnd">
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty

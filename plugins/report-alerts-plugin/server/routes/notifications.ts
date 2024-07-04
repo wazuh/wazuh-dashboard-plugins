@@ -14,7 +14,7 @@ import {
 } from '../../../../src/core/server';
 import { joinRequestParams } from './utils/helpers';
 
-export default function(router: IRouter) {
+export default function (router: IRouter) {
   // Get all configs from Notifications
   router.get(
     {
@@ -26,7 +26,7 @@ export default function(router: IRouter) {
           query: schema.maybe(schema.string()),
           config_type: schema.oneOf([
             schema.arrayOf(schema.string()),
-            schema.string()
+            schema.string(),
           ]),
           feature_list: schema.maybe(
             schema.oneOf([schema.arrayOf(schema.string()), schema.string()])
@@ -37,8 +37,8 @@ export default function(router: IRouter) {
           config_id_list: schema.maybe(
             schema.oneOf([schema.arrayOf(schema.string()), schema.string()])
           ),
-        })
-      }
+        }),
+      },
     },
     async (context, request, response) => {
       const config_type = joinRequestParams(request.query.config_type);
@@ -46,9 +46,8 @@ export default function(router: IRouter) {
       const config_id_list = joinRequestParams(request.query.config_id_list);
       const query = request.query.query;
       // @ts-ignore
-      const client: ILegacyScopedClusterClient = context.reporting_plugin.notificationsClient.asScoped(
-        request
-      );
+      const client: ILegacyScopedClusterClient =
+        context.report_alerts_plugin.notificationsClient.asScoped(request);
       try {
         const resp = await client.callAsCurrentUser(
           'notifications.getConfigs',
@@ -86,9 +85,8 @@ export default function(router: IRouter) {
     },
     async (context, request, response) => {
       // @ts-ignore
-      const client: ILegacyScopedClusterClient = context.reporting_plugin.notificationsClient.asScoped(
-        request
-      );
+      const client: ILegacyScopedClusterClient =
+        context.report_alerts_plugin.notificationsClient.asScoped(request);
       try {
         const resp = await client.callAsCurrentUser(
           'notifications.getEventById',
@@ -102,7 +100,7 @@ export default function(router: IRouter) {
         });
       }
     }
-  )
+  );
 
   // Send test message
   router.get(
@@ -119,9 +117,8 @@ export default function(router: IRouter) {
     },
     async (context, request, response) => {
       // @ts-ignore
-      const client: ILegacyScopedClusterClient = context.reporting_plugin.notificationsClient.asScoped(
-        request
-      );
+      const client: ILegacyScopedClusterClient =
+        context.report_alerts_plugin.notificationsClient.asScoped(request);
       try {
         const resp = await client.callAsCurrentUser(
           'notifications.sendTestMessage',
