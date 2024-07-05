@@ -168,21 +168,10 @@ export function ReportDelivery(props: ReportDeliveryProps) {
           .get(
             `${REPORTING_NOTIFICATIONS_DASHBOARDS_API.SEND_TEST_MESSAGE}/${selectedChannels[i].id}`,
             {
-              query: {
-                feature: 'reports',
-              },
+              query: { feature: 'report' },
             }
           )
-          .then((response) => response.event_id);
-
-        await getNotification(eventId).then((response) => {
-          if (!response.success) {
-            const error = new Error('Failed to send the test message.');
-            failedChannels.push(response.status_list[0].config_name);
-            error.stack = JSON.stringify(response.status_list, null, 2);
-            throw error;
-          }
-        });
+          .then((response) => response.event_source.reference_id);
       } catch (error) {
         testMessageFailures = true;
       }

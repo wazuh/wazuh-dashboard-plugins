@@ -58,7 +58,6 @@ export default function (router: IRouter) {
             sort_field: request.query.sort_field,
             sort_order: request.query.sort_order,
             config_type,
-            ...(feature_list && { feature_list }),
             ...(query && { query }),
             ...(config_id_list && { config_id_list }),
           }
@@ -124,7 +123,6 @@ export default function (router: IRouter) {
           'notifications.sendTestMessage',
           {
             configId: request.params.configId,
-            feature: request.query.feature,
           }
         );
         return response.ok({ body: resp });
