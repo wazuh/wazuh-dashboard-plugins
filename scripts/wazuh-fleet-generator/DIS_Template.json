@@ -35,7 +35,7 @@
             "ignore_above": 1024,
             "type": "keyword"
           },
-          "created": {
+          "last_login": {
             "type": "date"
           },
           "version": {
@@ -91,6 +91,10 @@
                 "type": "keyword"
               },
               "version": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "ip": {
                 "ignore_above": 1024,
                 "type": "keyword"
               }

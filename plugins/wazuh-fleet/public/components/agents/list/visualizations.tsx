@@ -1,6 +1,6 @@
 import React from 'react';
-import { ViewMode } from '../../../../../src/plugins/embeddable/public'
-import { getPlugins } from '../../plugin-services';
+import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
+import { getPlugins } from '../../../plugin-services';
 
 const getVisTopOS = (indexPatternId: string) => {
   return getPieVis(indexPatternId, 'host.os.platform', 'Top 5 OS', 'top_5_os');
@@ -156,7 +156,8 @@ export const getKPIsPanel = (
 export const AgentsVisualizations = () => {
   const plugins = getPlugins();
 
-  const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
+  const DashboardByRenderer =
+    plugins.dashboard.DashboardContainerByValueRenderer;
 
   return (
     <>

@@ -56,17 +56,19 @@ export const TableIndexer = ({
   documentDetailsExtraTabs = [],
   tableSortingInitialField = '',
   tableSortingInitialDirection = '',
-  topTableComponent
+  topTableComponent,
+  tableProps,
 }: {
   DataSource: any;
   DataSourceRepository;
   columns: any;
   documentDetailsExtraTabs?:
-  | TDocumentDetailsTab[]
-  | (({ document: any, indexPattern: any }) => TDocumentDetailsTab[]);
+    | TDocumentDetailsTab[]
+    | (({ document: any, indexPattern: any }) => TDocumentDetailsTab[]);
   tableSortingInitialField?: string;
   tableSortingInitialDirection?: string;
   topTableComponent?: React.ReactNode;
+  tableProps?: any;
 }) => {
   const {
     dataSource,
@@ -263,8 +265,8 @@ export const TableIndexer = ({
             pagination={tablePagination}
             sorting={sorting}
             onChange={tableOnChange}
-          // rowProps={getRowProps}
-          // {...tableProps}
+            // rowProps={getRowProps}
+            {...tableProps}
           />
         </EuiFlexItem>
         {inspectedHit && (

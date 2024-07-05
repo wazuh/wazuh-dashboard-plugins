@@ -10,16 +10,19 @@ import { AgentList } from './agents';
 import { GroupList } from './groups';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { getCore } from '../plugin-services';
+import { AgentDetails } from './agents/details';
 
 const views = [
   {
     name: 'Agents',
     id: 'agents',
+    hasDetailsRoute: true,
     render: (props: any) => <AgentList {...props} />,
   },
   {
     name: 'Groups',
     id: 'groups',
+    hasDetailsRoute: true,
     render: (props: any) => <GroupList {...props} />,
   },
   {
@@ -56,9 +59,10 @@ export const FleetManagement = ({
             .getInstance()
             .navigate(`/fleet-management/${item.id}`);
         },
-        isSelected:
-          navigationService.getInstance().getLocation().pathname ===
-          `/fleet-management/${item.id}`,
+        isSelected: navigationService
+          .getInstance()
+          .getLocation()
+          .pathname.startsWith(`/fleet-management/${item.id}`),
       })),
     },
   ];
@@ -71,16 +75,44 @@ export const FleetManagement = ({
       <EuiPageBody>
         <EuiPanel paddingSize='l'>
           <Switch>
-            {views.map(item => (
-              <Route
-                path={`/fleet-management/${item.id}`}
-                key={item.id}
-                render={() => {
-                  getCore().chrome.setBreadcrumbs([{ text: 'Fleet Management' }, { text: item.name }]);
-                  return item.render(restProps);
-                }}
-              />
-            ))}
+            {views.reduce((acc, item) => {
+              return [
+                ...acc,
+                item.hasDetailsRoute ? (
+                  <Route
+                    key={`${item.id}-details`}
+                    path={`/fleet-management/${item.id}/:id`}
+                    render={props => {
+                      getCore().chrome.setBreadcrumbs([
+                        { text: 'Fleet Management' },
+                        {
+                          text: item.name,
+                          href: getCore().application.getUrlForApp(
+                            'fleet-management',
+                            {
+                              path: `#/fleet-management/${item.id}`,
+                            },
+                          ),
+                        },
+                        { text: `Agent ID / ${props.match.params.id}` },
+                      ]);
+                      return <AgentDetails {...restProps} />;
+                    }}
+                  />
+                ) : null,
+                <Route
+                  key={`${item.id}`}
+                  path={`/fleet-management/${item.id}`}
+                  render={() => {
+                    getCore().chrome.setBreadcrumbs([
+                      { text: 'Fleet Management' },
+                      { text: item.name },
+                    ]);
+                    return item.render(restProps);
+                  }}
+                />,
+              ];
+            }, [])}
             <Redirect to={`/fleet-management/${views[0].id}`} />
           </Switch>
         </EuiPanel>

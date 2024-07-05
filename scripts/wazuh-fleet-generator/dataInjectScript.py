@@ -4,6 +4,7 @@ import random
 import json
 import os.path
 import warnings
+import uuid
 
 warnings.filterwarnings("ignore")
 def generateRandomDate(days_interval=10):
@@ -13,38 +14,83 @@ def generateRandomDate(days_interval=10):
     return(random_date.strftime("%Y-%m-%dT%H:%M:%S.{}Z".format(random.randint(0, 999))))
 
 def generateRandomGroups():
-    groups = ['default', 'group1', 'group2', 'group3', 'group4', 'group5']
-    return groups
+    groups = ['default', 'group1', 'group2', 'group3']
+    num_groups = random.randint(1, len(groups))
+    return random.sample(groups, num_groups)
 
 def generateNodeNames():
-    nodes = ['wazuh', 'node1', 'node2', 'node3', 'node4', 'node5']
+    nodes = ['wazuh', 'node01', 'node02', 'node03', 'node04', 'node05']
     return nodes
 
-def generateRandomAgent():
+def generateRandomAgent(i):
     agent={}
     agent['build'] = {'original':'build{}'.format(random.randint(0, 9999))}
-    agent['id'] = '00{}'.format(random.randint(1, 99))
-    agent['name'] = 'Agent{}'.format(random.randint(0, 99))
-    agent['version'] = 'v{}-stable'.format(random.randint(0, 9))
+    agent['id'] = str(uuid.uuid4())
+    agent['name'] = 'Agent_{}'.format(i)
+    agent['version'] = 'v5.0.0'
     agent['ephemeral_id'] = '{}'.format(random.randint(0, 99999))
-    agent['groups'] = random.sample(generateRandomGroups(), random.randint(1, len(generateRandomGroups())))
+    agent['groups'] = generateRandomGroups()
     agent['node_name'] = random.choice(generateNodeNames())
-    agent['created'] = generateRandomDate()
+    agent['last_login'] = generateRandomDate()
     return(agent)
 
 def generateRandomHost():
     host = {}
-    family=random.choice(['debian','ubuntu','macos','ios','android','RHEL'])
-    version='{}.{}'.format(random.randint(0, 99),random.randint(0, 99))
-    host['os'] = {
-        'family': family,
-        'full': family + ' ' + version,
-        'kernel': version+'kernel{}'.format(random.randint(0, 99)),
-        'name': family + ' ' + version,
-        'platform': family,
-        'type': random.choice(['windows','linux','macos','ios','android','unix']),
-        'version': version
+    # family=random.choice(['debian','ubuntu','macos','ios','android','RHEL'])
+    # version='{}.{}'.format(random.randint(0, 99),random.randint(0, 99))
+    
+    os_versions = [
+        "Microsoft Windows 10 Home",
+        "Microsoft Windows 10 Pro",
+        "Microsoft Windows 11 Home",
+        "Microsoft Windows 11 Pro",
+        "macOS 10.15 Catalina",
+        "macOS 11 Big Sur",
+        "macOS 12 Monterey",
+        "Ubuntu 18.04 LTS",
+        "Ubuntu 20.04 LTS",
+        "Ubuntu 22.04 LTS",
+        "CentOS 7",
+        "CentOS 8",
+        "Red Hat Enterprise Linux 7",
+        "Red Hat Enterprise Linux 8",
+        "Debian 9 Stretch",
+        "Debian 10 Buster",
+        "Debian 11 Bullseye",
+        "Fedora 34",
+        "Fedora 35",
+        "Fedora 36",
+        "Arch Linux",
+        "OpenSUSE Leap 15.3",
+        "OpenSUSE Leap 15.4",
+    ]
+
+    platform_map = {
+        "Microsoft Windows": "windows",
+        "macOS": "darwin",
+        "Ubuntu": "linux",
+        "CentOS": "linux",
+        "Red Hat Enterprise Linux": "linux",
+        "Debian": "linux",
+        "Fedora": "linux",
+        "Arch Linux": "linux",
+        "OpenSUSE": "linux",
     }
+
+    os = random.choice(os_versions)
+    platform_key = next(key for key in platform_map if os.startswith(key))
+    platform = platform_map[platform_key]
+
+    host['os'] = {
+        # 'family': family,
+        # 'full': family + ' ' + version,
+        # 'kernel': version+'kernel{}'.format(random.randint(0, 99)),
+        'name': os,
+        'platform': platform,
+        # 'type': random.choice(['windows','linux','macos','ios','android','unix']),
+        # 'version': version
+    }
+    host['ip'] = f"192.168.{random.randint(0, 255)}.{random.randint(0, 255)}"
     return(host)
 
 def generateRandomWazuh():
@@ -55,7 +101,7 @@ def generateRandomWazuh():
 def generateRandomData(number):
     for i in range(0, int(number)):
         yield{
-            'agent':generateRandomAgent(),
+            'agent':generateRandomAgent(i),
             'host':generateRandomHost(),
             'wazuh':generateRandomWazuh()
         }

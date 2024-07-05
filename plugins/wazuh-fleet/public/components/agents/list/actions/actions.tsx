@@ -6,7 +6,15 @@
 // import { Agent } from '../../types';
 // import NavigationService from '../../../../react-services/navigation-service';
 
-export const agentsTableActions = () =>
+import { Agent } from '../../../../../common/types';
+
+export const agentsTableActions = ({
+  setIsFlyoutAgentVisible,
+  setAgent,
+}: {
+  setIsFlyoutAgentVisible: (isVisible: boolean) => void;
+  setAgent: (agent: Agent) => void;
+}) =>
   // allowEditGroups: boolean,
   // allowUpgrade: boolean,
   // setAgent: (agent: Agent) => void,
@@ -21,7 +29,10 @@ export const agentsTableActions = () =>
       type: 'icon',
       isPrimary: true,
       color: 'primary',
-      onClick: () => {},
+      onClick: (agent: Agent) => {
+        setAgent(agent);
+        setIsFlyoutAgentVisible(true);
+      },
       // enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
       // onClick: agent =>
       // NavigationService.getInstance().navigateToApp(endpointSummary.id, {
