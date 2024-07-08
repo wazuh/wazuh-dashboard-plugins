@@ -68,11 +68,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed custom EuiSuggestItem component in favor of OUI's native component [#6714](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6714)
 - Removed API endpoint unused endpoints from creation of old visualisations: GET /elastic/visualizations/{tab}/{pattern} and GET /elastic/visualizations/{tab}/{pattern} [#6782](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6782)
 
-## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 00
+## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 02
 
 ### Added
 
 - Support for Wazuh 4.8.1
+
+### Fixed
+
+- Removed the unexpected `delay` parameter on the server API requests [#6778](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6778)
+- Fixed home KPI links with custom or index pattern whose title is different to the id [#6777](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6777)
+- Fixed colors related to vulnerability severity levels on Vulnerability Detection dashboard [#6793](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6793)
 
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 12
 
