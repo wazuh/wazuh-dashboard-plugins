@@ -15,6 +15,7 @@ import { Integrations } from './integrations';
 import { KVDBs } from './kvdbs';
 import { Policies } from './policies';
 import { EngineLayout } from './engine-layout';
+import { getServices, setServices } from '../services';
 
 const views = [
   {
@@ -60,6 +61,12 @@ export const Engine = props => {
     setisSideNavOpenOnMobile(!isSideNavOpenOnMobile);
   };
 
+  try {
+    !getServices();
+  } catch (error) {
+    setServices(props);
+  }
+
   const sideNav = [
     {
       name: 'Engine',
@@ -97,7 +104,7 @@ export const Engine = props => {
                 render={() => {
                   return (
                     <EngineLayout title={item.name}>
-                      {item.render()}
+                      {item.render(props)}
                     </EngineLayout>
                   );
                 }}

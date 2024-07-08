@@ -9,7 +9,7 @@ import {
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { useDispatch } from 'react-redux';
 import { checkPluginVersion } from './utils';
-import { WzAuthentication, loadAppConfig } from './react-services';
+import { WzAuthentication, WzRequest, loadAppConfig } from './react-services';
 import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 import { ToastNotificationsModal } from './components/notifications/modal';
@@ -25,7 +25,14 @@ import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
-
+import { TableWzAPI } from './components/common/tables';
+import {
+  AddNewCdbListButton,
+  AddNewFileButton,
+  ManageFiles,
+  UploadFilesButton,
+} from './controllers/management/components/management/common/actions-buttons';
+import WzListEditor from './controllers/management/components/management/cdblists/views/list-editor.tsx';
 export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
@@ -104,7 +111,21 @@ export function Application(props) {
           path={'/engine'}
           render={props => {
             const { Engine } = getWazuhEnginePlugin();
-            return <Engine navigationService={NavigationService} {...props} />;
+            return (
+              <Engine
+                navigationService={NavigationService}
+                TableWzAPI={TableWzAPI}
+                WzRequest={WzRequest}
+                actionButtons={{
+                  manageFiles: ManageFiles,
+                  addNewFileButton: AddNewFileButton,
+                  addNewCdbListButton: AddNewCdbListButton,
+                  uploadFilesButton: UploadFilesButton,
+                }}
+                WzListEditor={WzListEditor}
+                {...props}
+              />
+            );
           }}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />
