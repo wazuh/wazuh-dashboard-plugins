@@ -105,7 +105,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
             <DiscoverNoResults />
           ) : null}
           <div
-            className={`vulnerability-dashboard-responsive ${
+            className={`vulnerability-dashboard-responsive vulnerability-dashboard-metrics ${
               dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
             }`}
           >

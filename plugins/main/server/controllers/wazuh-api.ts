@@ -620,6 +620,11 @@ export class WazuhApiCtrl {
       }
       const delay = (data || {}).delay || 0;
       if (delay) {
+        // Remove the delay parameter that is used to add the sever API request to the queue job.
+        // This assumes the delay parameter is not used as part of the server API request. If it
+        // was expected to do a request with a 'delay' parameter then we would have to search a
+        // way to differenciate if the parameter is related to job queue or API request.
+        delete data.delay;
         addJobToQueue({
           startAt: new Date(Date.now() + delay),
           run: async contextJob => {
