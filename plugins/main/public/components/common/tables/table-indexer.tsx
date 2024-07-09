@@ -1,15 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { IntlProvider } from 'react-intl';
-import {
-  EuiFlexGroup,
-  EuiFlyout,
-  EuiFlyoutBody,
-  EuiFlyoutHeader,
-  EuiTitle,
-  EuiButtonEmpty,
-  EuiFlexItem,
-} from '@elastic/eui';
-import { getWazuhCorePlugin } from '../../../kibana-services';
+import { EuiButtonEmpty, EuiFlexItem } from '@elastic/eui';
 import {
   ErrorHandler,
   ErrorFactory,
@@ -26,33 +17,19 @@ import {
 } from '../../common/data-source';
 import { useDataSource } from '../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../src/plugins/data/public';
-import { DocumentViewTableAndJson } from '../wazuh-discover/components/document-view-table-and-json';
 import { WzSearchBar } from '../../common/search-bar';
 import { TableData } from './table-data';
-
-type TDocumentDetailsTab = {
-  id: string;
-  name: string;
-  content: any;
-};
 
 export const TableIndexer = ({
   DataSource,
   DataSourceRepository,
-  documentDetailsExtraTabs,
   exportCSVPrefixFilename = '',
   tableProps = {},
+  onSetIndexPattern,
 }: {
   DataSource: any;
   DataSourceRepository;
-  documentDetailsExtraTabs?: {
-    pre?:
-      | TDocumentDetailsTab[]
-      | (({ document: any, indexPattern: any }) => TDocumentDetailsTab[]);
-    post?:
-      | TDocumentDetailsTab[]
-      | (({ document: any, indexPattern: any }) => TDocumentDetailsTab[]);
-  };
+  onSetIndexPattern: () => void;
   exportCSVPrefixFilename: string;
   tableProps: any; // TODO: use props of TableData?
 }) => {
@@ -75,14 +52,6 @@ export const TableIndexer = ({
   });
   const { query } = searchBarProps;
 
-  const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
-    undefined,
-  );
-  const [inspectedHit, setInspectedHit] = useState<any | null>(null);
-  const [isExporting, setIsExporting] = useState<boolean>(false);
-
-  const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
-
   const onClickExportResults = async ({
     dataSource,
     tableColumns,
@@ -104,7 +73,6 @@ export const TableIndexer = ({
       filePrefix,
     };
     try {
-      setIsExporting(true);
       await exportSearchToCSV(params);
     } catch (error) {
       const searchError = ErrorFactory.create(HttpError, {
@@ -112,10 +80,14 @@ export const TableIndexer = ({
         message: 'Error downloading csv report',
       });
       ErrorHandler.handleError(searchError);
-    } finally {
-      setIsExporting(false);
     }
   };
+
+  React.useEffect(() => {
+    if (dataSource?.indexPattern) {
+      onSetIndexPattern && onSetIndexPattern(dataSource?.indexPattern);
+    }
+  }, [dataSource?.indexPattern]);
 
   const { postActionButtons, ...restTableProps } = tableProps;
 
@@ -178,8 +150,6 @@ export const TableIndexer = ({
             showFieldSelector
             // rowProps={getRowProps}
             fetchData={({ pagination, sorting, searchParams: { query } }) => {
-              setIndexPattern(dataSource?.indexPattern);
-
               return fetchData({
                 query,
                 pagination,
@@ -211,32 +181,6 @@ export const TableIndexer = ({
             }}
             fetchParams={{ query, fetchFilters }}
           />
-        )}
-        {inspectedHit && (
-          <EuiFlyout onClose={() => setInspectedHit(null)} size='m'>
-            <EuiFlyoutHeader>
-              <EuiTitle>
-                <h2>Details</h2>
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody>
-              <EuiFlexGroup direction='column'>
-                <DocumentViewTableAndJson
-                  document={inspectedHit}
-                  indexPattern={indexPattern}
-                  extraTabs={documentDetailsExtraTabs}
-                  tableProps={{
-                    onFilter(...rest) {
-                      // TODO: implement using the dataSource
-                    },
-                    onToggleColumn() {
-                      // TODO: reseach if make sense the ability to toggle columns
-                    },
-                  }}
-                />
-              </EuiFlexGroup>
-            </EuiFlyoutBody>
-          </EuiFlyout>
         )}
       </>
     </IntlProvider>

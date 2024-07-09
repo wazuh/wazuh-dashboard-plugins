@@ -57,6 +57,7 @@ import {
   UploadFilesButton,
 } from './controllers/management/components/management/common/actions-buttons';
 import WzListEditor from './controllers/management/components/management/cdblists/views/list-editor.tsx';
+import { DocumentViewTableAndJson } from './components/common/wazuh-discover/components/document-view-table-and-json';
 export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
@@ -154,6 +155,7 @@ export function Application(props) {
                 RulesDataSourceRepository={RulesDataSourceRepository}
                 useDocViewer={useDocViewer}
                 DocViewer={DocViewer}
+                DocumentViewTableAndJson={DocumentViewTableAndJson}
                 useForm={useForm}
                 InputForm={InputForm}
                 GenericRequest={GenericRequest}

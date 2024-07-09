@@ -1,18 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import spec from '../spec.json';
-
-const transformSpecToForm = specification => {
-  return Object.fromEntries(
-    Object.entries(specification).map(([key, value]) => [
-      key,
-      { type: value.field.type, initialValue: value.field.initialValue },
-    ]),
-  );
-};
+import { transfromAssetSpecToForm } from '../utils/transform-asset-spec';
 
 export const RuleForm = props => {
   const { useForm, InputForm } = props;
-  const { fields } = useForm(transformSpecToForm(spec));
+  const specForm = useMemo(() => transfromAssetSpecToForm(spec), []);
+  const { fields } = useForm(specForm);
 
   return (
     <>
