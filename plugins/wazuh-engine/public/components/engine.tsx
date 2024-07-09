@@ -39,14 +39,14 @@ const views = [
     render: Filters,
   },
   {
-    name: 'Integrations',
-    id: 'integrations',
-    render: Integrations,
-  },
-  {
     name: 'Policies',
     id: 'policies',
     render: Policies,
+  },
+  {
+    name: 'Integrations',
+    id: 'integrations',
+    render: Integrations,
   },
   {
     name: 'KVDBs',
