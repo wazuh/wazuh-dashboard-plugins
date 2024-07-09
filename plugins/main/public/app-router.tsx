@@ -11,9 +11,10 @@ import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { useDispatch } from 'react-redux';
 import { checkPluginVersion } from './utils';
 import {
+  WzAuthentication,
   AppState,
   GenericRequest,
-  WzAuthentication,
+  WzRequest,
   loadAppConfig,
 } from './react-services';
 import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
@@ -48,6 +49,14 @@ import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../common/constan
 import { useForm } from './components/common/form/hooks';
 import { InputForm } from './components/common/form';
 
+import { TableWzAPI } from './components/common/tables';
+import {
+  AddNewCdbListButton,
+  AddNewFileButton,
+  ManageFiles,
+  UploadFilesButton,
+} from './controllers/management/components/management/common/actions-buttons';
+import WzListEditor from './controllers/management/components/management/cdblists/views/list-editor.tsx';
 export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
@@ -148,6 +157,15 @@ export function Application(props) {
                 useForm={useForm}
                 InputForm={InputForm}
                 GenericRequest={GenericRequest}
+                TableWzAPI={TableWzAPI}
+                WzRequest={WzRequest}
+                actionButtons={{
+                  manageFiles: ManageFiles,
+                  addNewFileButton: AddNewFileButton,
+                  addNewCdbListButton: AddNewCdbListButton,
+                  uploadFilesButton: UploadFilesButton,
+                }}
+                WzListEditor={WzListEditor}
                 {...props}
               />
             );
