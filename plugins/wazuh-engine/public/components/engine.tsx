@@ -97,7 +97,11 @@ export const Engine = props => {
                 render={() => {
                   return (
                     <EngineLayout title={item.name}>
-                      {item.render()}
+                      {item.render({
+                        ...props,
+                        title: item.name,
+                        basePath: `/engine/${item.id}`,
+                      })}
                     </EngineLayout>
                   );
                 }}

@@ -1,12 +1,25 @@
 import React from 'react';
 import { EuiTitle } from '@elastic/eui';
+import { getCore } from '../plugin-services';
 
 export const EngineLayout = ({ children, title }) => {
+  React.useEffect(() => {
+    getCore().chrome.setBreadcrumbs([
+      {
+        className: 'osdBreadcrumbs',
+        text: 'Engine',
+      },
+      {
+        className: 'osdBreadcrumbs',
+        text: title,
+      },
+    ]);
+  }, []);
   return (
     <>
-      <EuiTitle>
+      {/* <EuiTitle>
         <h1>{title}</h1>
-      </EuiTitle>
+      </EuiTitle> */}
       <div>{children}</div>
     </>
   );

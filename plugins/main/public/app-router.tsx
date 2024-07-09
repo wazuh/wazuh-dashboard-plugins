@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
 import {
+  getPlugins,
   getWazuhCorePlugin,
   getWazuhEnginePlugin,
   getWzMainParams,
@@ -9,7 +10,12 @@ import {
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { useDispatch } from 'react-redux';
 import { checkPluginVersion } from './utils';
-import { WzAuthentication, loadAppConfig } from './react-services';
+import {
+  AppState,
+  GenericRequest,
+  WzAuthentication,
+  loadAppConfig,
+} from './react-services';
 import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 import { ToastNotificationsModal } from './components/notifications/modal';
@@ -25,6 +31,22 @@ import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
+import { TableIndexer } from './components/common/tables/table-indexer';
+import {
+  RulesDataSource,
+  RulesDataSourceRepository,
+} from './components/common/data-source/pattern/rules';
+import { useDocViewer } from './components/common/doc-viewer';
+import DocViewer from './components/common/doc-viewer/doc-viewer';
+import { WazuhFlyoutDiscover } from './components/common/wazuh-discover/wz-flyout-discover';
+import {
+  FILTER_OPERATOR,
+  PatternDataSource,
+  PatternDataSourceFilterManager,
+} from './components/common/data-source';
+import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../common/constants';
+import { useForm } from './components/common/form/hooks';
+import { InputForm } from './components/common/form';
 
 export function Application(props) {
   const dispatch = useDispatch();
@@ -104,7 +126,31 @@ export function Application(props) {
           path={'/engine'}
           render={props => {
             const { Engine } = getWazuhEnginePlugin();
-            return <Engine navigationService={NavigationService} {...props} />;
+            return (
+              <Engine
+                navigationService={NavigationService}
+                DashboardContainerByValueRenderer={
+                  getPlugins().dashboard.DashboardContainerByValueRenderer
+                }
+                TableIndexer={TableIndexer}
+                WazuhFlyoutDiscover={WazuhFlyoutDiscover}
+                PatternDataSource={PatternDataSource}
+                PatternDataSourceFilterManager={PatternDataSourceFilterManager}
+                AppState={AppState}
+                DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER={
+                  DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER
+                }
+                FILTER_OPERATOR={FILTER_OPERATOR}
+                RulesDataSource={RulesDataSource}
+                RulesDataSourceRepository={RulesDataSourceRepository}
+                useDocViewer={useDocViewer}
+                DocViewer={DocViewer}
+                useForm={useForm}
+                InputForm={InputForm}
+                GenericRequest={GenericRequest}
+                {...props}
+              />
+            );
           }}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />

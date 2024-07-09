@@ -1,0 +1,74 @@
+{
+  "name": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.title": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.description": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.author.name": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.author.date": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.author.email": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.author.url": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.compatibility": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.integration": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.versions": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "metadata.references": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  },
+  "parents": {
+    "field": {
+      "type": "text",
+      "initialValue": ""
+    }
+  }
+}

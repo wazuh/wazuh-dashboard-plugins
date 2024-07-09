@@ -4,6 +4,11 @@ import { escapeRegExp } from 'lodash';
 import { i18n } from '@osd/i18n';
 import { FieldIcon } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { DocViewTableRowBtnFilterAdd } from './table_row_btn_filter_add';
+import { DocViewTableRowBtnFilterRemove } from './table_row_btn_filter_remove';
+import { DocViewTableRowBtnToggleColumn } from './table_row_btn_toggle_column';
+import { DocViewTableRowBtnFilterExists } from './table_row_btn_filter_exists';
+import './doc-viewer.scss';
 
 const COLLAPSE_LINE_LENGTH = 350;
 const DOT_PREFIX_RE = /(.).+?\./g;
@@ -80,7 +85,15 @@ const DocViewer = (props: tDocViewerProps) => {
   const [fieldRowOpen, setFieldRowOpen] = useState(
     {} as Record<string, boolean>,
   );
-  const { flattened, formatted, mapping, indexPattern } = props;
+  const {
+    flattened,
+    formatted,
+    mapping,
+    indexPattern,
+    onFilter,
+    onToggleColumn,
+    isColumnActive,
+  } = props;
 
   return (
     <>
@@ -90,6 +103,7 @@ const DocViewer = (props: tDocViewerProps) => {
             {Object.keys(flattened)
               .sort()
               .map((field, index) => {
+                const valueRaw = flattened[field];
                 const value = String(formatted[field]);
                 const fieldMapping = mapping(field);
                 const isCollapsible = value.length > COLLAPSE_LINE_LENGTH;
@@ -120,6 +134,29 @@ const DocViewer = (props: tDocViewerProps) => {
 
                 return (
                   <tr key={index} data-test-subj={`tableDocViewRow-${field}`}>
+                    {typeof onFilter === 'function' && (
+                      <td className='osdDocViewer__buttons'>
+                        <DocViewTableRowBtnFilterAdd
+                          disabled={!fieldMapping || !fieldMapping.filterable}
+                          onClick={() => onFilter(fieldMapping, valueRaw, '+')}
+                        />
+                        <DocViewTableRowBtnFilterRemove
+                          disabled={!fieldMapping || !fieldMapping.filterable}
+                          onClick={() => onFilter(fieldMapping, valueRaw, '-')}
+                        />
+                        {typeof onToggleColumn === 'function' && (
+                          <DocViewTableRowBtnToggleColumn
+                            active={isColumnActive}
+                            onClick={onToggleColumn}
+                          />
+                        )}
+                        <DocViewTableRowBtnFilterExists
+                          disabled={!fieldMapping || !fieldMapping.filterable}
+                          onClick={() => onFilter('_exists_', field, '+')}
+                          scripted={fieldMapping && fieldMapping.scripted}
+                        />
+                      </td>
+                    )}
                     <td className='osdDocViewer__field'>
                       <EuiFlexGroup
                         alignItems='center'
