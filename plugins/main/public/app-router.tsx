@@ -29,6 +29,8 @@ import {
   FleetDataSource,
   FleetDataSourceRepository,
   useDataSource,
+  FleetGroupsDataSource,
+  FleetGroupsDataSourceRepository
 } from './components/common/data-source';
 import useSearchBar from './components/common/search-bar/use-search-bar';
 import { WzSearchBar } from './components/common/search-bar';
@@ -48,7 +50,7 @@ export function Application(props) {
       .then(item => {
         dispatch(updateCurrentPlatform(item));
       })
-      .catch(() => {});
+      .catch(() => { });
 
     // Init the process of refreshing the user's token when app starts.
     checkPluginVersion().finally(() => {
@@ -100,6 +102,8 @@ export function Application(props) {
               useDataSource={useDataSource}
               FleetDataSource={FleetDataSource}
               FleetDataSourceRepository={FleetDataSourceRepository}
+              FleetGroupsDataSource={FleetGroupsDataSource}
+              FleetGroupsDataSourceRepository={FleetGroupsDataSourceRepository}
               useSearchBar={useSearchBar}
               WzSearchBar={WzSearchBar}
               TableIndexer={TableIndexer}

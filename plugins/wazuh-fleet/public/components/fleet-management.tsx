@@ -7,7 +7,7 @@ import {
   EuiPanel,
 } from '@elastic/eui';
 import { AgentList } from './agents';
-import { GroupList } from './groups';
+import { GroupList } from './groups/list/list';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { getCore } from '../plugin-services';
 import { AgentDetails } from './agents/details';
@@ -94,9 +94,17 @@ export const FleetManagement = ({
                             },
                           ),
                         },
-                        { text: `Agent ID / ${props.match.params.id}` },
+                        { text: `ID / ${props.match.params.id}` },
                       ]);
-                      return <AgentDetails {...restProps} />;
+
+                      if (item.id === 'agents') {
+                        return <AgentDetails {...restProps} />;
+                      }
+
+                      if (item.id === 'groups') {
+                        return <div>Group</div>
+                      }
+
                     }}
                   />
                 ) : null,
