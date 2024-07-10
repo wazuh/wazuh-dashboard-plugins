@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { GenericRequest } from '../../../../../react-services/generic-request';
-import { getPlugins } from '../../../../../kibana-services';
+import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
+import { GenericRequest } from '../../../../react-services/generic-request';
+import { getPlugins } from '../../../../kibana-services';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;

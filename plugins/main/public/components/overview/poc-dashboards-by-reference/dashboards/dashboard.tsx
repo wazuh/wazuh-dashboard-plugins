@@ -2,6 +2,6 @@ import React from 'react';
 import { DashboardSavedObject } from './dashboard-saved-object';
 
 export const DashboardVuls = () => {
-  const savedObjectId = 'c69f6ea0-3893-11ef-a08d-93dcf854882b';
+  const savedObjectId = 'a0859140-3d2f-11ef-8bcd-9dd0603434ee';
   return <DashboardSavedObject savedObjectId={savedObjectId} />;
 };
