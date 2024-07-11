@@ -1,39 +1,18 @@
 import React, { useState } from 'react';
-import { getDashboard } from '../visualization';
-import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
-import { FilterManager } from '../../../../../../src/plugins/data/public/';
-import { getCore } from '../../../plugin-services';
 import {
   EuiButton,
   EuiContextMenu,
   EuiPopover,
-  EuiFlyout,
-  EuiFlyoutHeader,
-  EuiFlyoutBody,
-  EuiFlexGroup,
-  EuiTitle,
+  EuiButtonEmpty,
 } from '@elastic/eui';
 import { Layout } from '../components';
 import specification from '../spec.json';
 import { transformAssetSpecToListTableColumn } from '../utils/transform-asset-spec';
-
-const specColumns = transformAssetSpecToListTableColumn(specification);
+import { Detail } from '../components/detail';
 
 export const RulesList = props => {
-  const {
-    TableIndexer,
-    RulesDataSource,
-    RulesDataSourceRepository,
-    DashboardContainerByValueRenderer: DashboardByRenderer,
-    WazuhFlyoutDiscover,
-    PatternDataSource,
-    AppState,
-    DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
-    PatternDataSourceFilterManager,
-    FILTER_OPERATOR,
-    title,
-    DocumentViewTableAndJson,
-  } = props;
+  const { TableIndexer, RulesDataSource, RulesDataSourceRepository, title } =
+    props;
 
   const actions = [
     <EuiButton
@@ -47,7 +26,7 @@ export const RulesList = props => {
     <EuiButton
       fill
       onClick={() => {
-        props.navigationService.getInstance().navigate('/engine/rules/new');
+        props.navigationService.getInstance().navigate('/engine/rules/create');
       }}
     >
       Create Rule
@@ -58,59 +37,84 @@ export const RulesList = props => {
   const [inspectedHit, setInspectedHit] = React.useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
 
-  const defaultColumns = [
-    ...specColumns,
-    {
-      name: 'Actions',
-      show: true,
-      actions: [
-        {
-          name: 'View',
-          isPrimary: true,
-          description: 'View details',
-          icon: 'eye',
-          type: 'icon',
-          onClick: ({ _document }) => {
-            setInspectedHit(_document);
-          },
-          'data-test-subj': 'action-view',
+  const defaultColumns = React.useMemo(
+    () => [
+      ...transformAssetSpecToListTableColumn(specification, {
+        name: {
+          render: (prop, item) => (
+            <EuiButtonEmpty onClick={() => setInspectedHit(item._document)}>
+              {prop}
+            </EuiButtonEmpty>
+          ),
         },
-        {
-          name: 'Edit',
-          isPrimary: true,
-          description: 'Edit',
-          icon: 'pencil',
-          type: 'icon',
-          onClick: (...rest) => {
-            console.log({ rest });
-          },
-          'data-test-subj': 'action-edit',
+        parents: {
+          render: (prop, item) =>
+            prop.map(parent => (
+              <EuiButtonEmpty
+                key={`parent-${parent}`}
+                onClick={() => {
+                  // TODO: implement
+                  // setInspectedHit(parent);
+                }}
+              >
+                {prop}
+              </EuiButtonEmpty>
+            )),
         },
-        {
-          name: 'Export',
-          isPrimary: true,
-          description: 'Export file',
-          icon: 'exportAction',
-          type: 'icon',
-          onClick: (...rest) => {
-            console.log({ rest });
+      }),
+      {
+        name: 'Actions',
+        show: true,
+        actions: [
+          {
+            name: 'View',
+            isPrimary: true,
+            description: 'View details',
+            icon: 'eye',
+            type: 'icon',
+            onClick: ({ _document }) => {
+              setInspectedHit(_document);
+            },
+            'data-test-subj': 'action-view',
           },
-          'data-test-subj': 'action-export',
-        },
-        {
-          name: 'Delete',
-          isPrimary: true,
-          description: 'Delete file',
-          icon: 'trash',
-          type: 'icon',
-          onClick: (...rest) => {
-            console.log({ rest });
+          {
+            name: 'Edit',
+            isPrimary: true,
+            description: 'Edit',
+            icon: 'pencil',
+            type: 'icon',
+            onClick: (...rest) => {
+              console.log({ rest });
+            },
+            'data-test-subj': 'action-edit',
           },
-          'data-test-subj': 'action-delete',
-        },
-      ],
-    },
-  ];
+          {
+            name: 'Export',
+            isPrimary: true,
+            description: 'Export file',
+            icon: 'exportAction',
+            type: 'icon',
+            onClick: (...rest) => {
+              console.log({ rest });
+            },
+            'data-test-subj': 'action-export',
+          },
+          {
+            name: 'Delete',
+            isPrimary: true,
+            description: 'Delete file',
+            icon: 'trash',
+            type: 'icon',
+            onClick: (...rest) => {
+              console.log({ rest });
+            },
+            'data-test-subj': 'action-delete',
+          },
+        ],
+      },
+    ],
+    [],
+  );
 
   return (
     <Layout title={title} actions={actions}>
@@ -119,6 +123,7 @@ export const RulesList = props => {
         DataSourceRepository={RulesDataSourceRepository}
         tableProps={{
           title: 'Catalog',
+          description: 'Manage the engine rules',
           tableColumns: defaultColumns,
           actionButtons: props => TableActions({ ...props, selectedItems }),
           tableSortingInitialField: defaultColumns[0].field,
@@ -132,117 +137,21 @@ export const RulesList = props => {
             },
             isSelectable: true,
           },
+          saveStateStorage: {
+            system: 'localStorage',
+            key: 'wz-engine:rules-main',
+          },
         }}
         exportCSVPrefixFilename='rules'
         onSetIndexPattern={setIndexPattern}
       />
       {inspectedHit && (
-        <EuiFlyout onClose={() => setInspectedHit(null)} size='m'>
-          <EuiFlyoutHeader>
-            <EuiTitle>
-              <h2>Details: {inspectedHit._source.name}</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiFlexGroup direction='column'>
-              <DocumentViewTableAndJson
-                document={inspectedHit}
-                indexPattern={indexPattern}
-                extraTabs={{
-                  post: params => [
-                    {
-                      id: 'relationship',
-                      name: 'Relationship',
-                      content: () => (
-                        <DashboardByRenderer
-                          input={{
-                            viewMode: ViewMode.VIEW,
-                            // Try to use the index pattern that the dataSource has
-                            // but if it is undefined use the index pattern of the hoc
-                            // because the first executions of the dataSource are undefined
-                            // and embeddables need index pattern.
-                            panels: getDashboard(
-                              'wazuh-rules',
-                              inspectedHit._source.name,
-                            ),
-                            isFullScreenMode: false,
-                            filters: [],
-                            useMargins: true,
-                            id: 'rule-vis',
-                            title: 'rule-vis',
-                            description: 'rule-vis',
-                            query: '',
-                            refreshConfig: {
-                              pause: false,
-                              value: 15,
-                            },
-                            hidePanelTitles: false,
-                          }}
-                        />
-                      ),
-                    },
-                    {
-                      id: 'events',
-                      name: 'Events',
-                      content: () => {
-                        const filterManager = React.useMemo(
-                          () => new FilterManager(getCore().uiSettings),
-                          [],
-                        );
-                        return (
-                          <WazuhFlyoutDiscover
-                            DataSource={PatternDataSource}
-                            tableColumns={[
-                              {
-                                id: 'timestamp',
-                                displayAsText: 'Time',
-                              },
-                              {
-                                id: 'agent.name',
-                                displayAsText: 'Agent name',
-                              },
-                              {
-                                id: 'rule.description',
-                                displayAsText: 'Description',
-                              },
-                              { id: 'rule.level', displayAsText: 'Level' },
-                            ]}
-                            filterManager={filterManager}
-                            initialFetchFilters={[
-                              ...PatternDataSourceFilterManager.getClusterManagerFilters(
-                                AppState.getCurrentPattern(),
-                                DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
-                              ),
-                              PatternDataSourceFilterManager.createFilter(
-                                FILTER_OPERATOR.IS,
-                                'rule.id',
-                                inspectedHit._source.name.match(
-                                  /^[^/]+\/([^/]+)\/[^/]+$/,
-                                )[1], // TODO: do the alerts use the name format of the rule?
-                                AppState.getCurrentPattern(),
-                              ),
-                            ]}
-                            // expandedRowComponent={(...args) =>
-                            //   this.renderDiscoverExpandedRow(...args)
-                            // }
-                          />
-                        );
-                      },
-                    },
-                  ],
-                }}
-                tableProps={{
-                  onFilter(...rest) {
-                    // TODO: implement using the dataSource
-                  },
-                  onToggleColumn() {
-                    // TODO: reseach if make sense the ability to toggle columns
-                  },
-                }}
-              />
-            </EuiFlexGroup>
-          </EuiFlyoutBody>
-        </EuiFlyout>
+        <Detail
+          {...props}
+          onClose={() => setInspectedHit(null)}
+          data={inspectedHit}
+          indexPattern={indexPattern}
+        />
       )}
     </Layout>
   );

@@ -1,0 +1,87 @@
+{
+  "metadata.author.name": {
+    "_meta": {
+      "label": "Author name"
+    }
+  },
+  "metadata.author.date": {
+    "_meta": {
+      "label": "Author date"
+    }
+  },
+  "metadata.author.url": {
+    "_meta": {
+      "label": "Author URL"
+    }
+  },
+  "metadata.author.email": {
+    "_meta": {
+      "label": "Author email"
+    }
+  },
+  "metadata.references": {
+    "type": "arrayOf",
+    "initialValue": [{ "reference": "" }],
+    "fields": {
+      "reference": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "References"
+    }
+  },
+  "metadata.integration": {
+    "_meta": {
+      "label": "Integration"
+    }
+  },
+  "metadata.title": {
+    "_meta": {
+      "label": "Title"
+    }
+  },
+  "metadata.description": {
+    "_meta": {
+      "label": "Description"
+    }
+  },
+  "metadata.compatibility": {
+    "_meta": {
+      "label": "Comptability"
+    }
+  },
+  "metadata.versions": {
+    "type": "arrayOf",
+    "initialValue": [{ "version": "" }],
+    "fields": {
+      "version": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Versions"
+    }
+  },
+  "parents": {
+    "type": "arrayOf",
+    "initialValue": [{ "parent": "" }],
+    "fields": {
+      "parent": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Parents"
+    }
+  },
+  "normalize": {
+    "type": "textarea",
+    "_meta": {
+      "label": "Normalize"
+    }
+  }
+}

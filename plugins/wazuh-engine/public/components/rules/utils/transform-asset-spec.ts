@@ -1,6 +1,5 @@
 const mapSpecTypeToInput = {
   string: 'text',
-  array: 'text',
 };
 
 function createIter(fnItem) {
@@ -26,32 +25,37 @@ function createIter(fnItem) {
   return iter;
 }
 
-export const transfromAssetSpecToForm = createIter(({ spec }) => ({
-  type: mapSpecTypeToInput[spec.type] || spec.type,
-  initialValue: '',
-  ...(spec.pattern
-    ? {
-        validate: value =>
-          new RegExp(spec.pattern).test(value)
-            ? undefined
-            : `Value does not match the pattern: ${spec.pattern}`,
-      }
-    : {}),
-}));
+export const transfromAssetSpecToForm = function (
+  spec,
+  mergeProps?: { [key: string]: string } = {},
+) {
+  return createIter(({ keyPath, spec }) => ({
+    type: mapSpecTypeToInput[spec.type] || spec.type,
+    initialValue: '',
+    ...(spec.pattern
+      ? {
+          validate: value =>
+            new RegExp(spec.pattern).test(value)
+              ? undefined
+              : `Value does not match the pattern: ${spec.pattern}`,
+        }
+      : {}),
+    ...(mergeProps?.[keyPath] ? mergeProps?.[keyPath] : {}),
+  }))(spec);
+};
 
 export const transformAssetSpecToListTableColumn = function (
   spec,
-  fieldNamesMap?: { [key: string]: string } = {},
+  mergeProps?: { [key: string]: string } = {},
 ) {
-  const t = createIter(({ spec }) => ({
-    type: mapSpecTypeToInput[spec.type] || spec.type,
-    initialValue: '',
+  const t = createIter(({ keyPath }) => ({
+    field: keyPath,
+    name: keyPath,
+    ...(mergeProps?.[keyPath] ? mergeProps?.[keyPath] : {}),
   }));
 
-  return Object.entries(t(spec)).map(([key]) => ({
+  return Object.entries(t(spec)).map(([key, value]) => ({
     field: key,
-    name: fieldNamesMap?.[key] || key,
-    sortable: true,
-    show: true,
+    ...value,
   }));
 };

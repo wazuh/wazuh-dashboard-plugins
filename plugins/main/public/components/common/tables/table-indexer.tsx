@@ -100,7 +100,7 @@ export const TableIndexer = ({
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty
             isDisabled={props.totalItems == 0}
-            iconType='importAction'
+            iconType='exportAction'
             onClick={() =>
               onClickExportResults({
                 ...props,
@@ -114,14 +114,6 @@ export const TableIndexer = ({
         </EuiFlexItem>
       </>
     );
-  };
-
-  const getRowProps = item => {
-    return {
-      onClick: () => {
-        setInspectedHit(item._document);
-      },
-    };
   };
 
   return (
@@ -143,12 +135,7 @@ export const TableIndexer = ({
                 showSaveQuery={true}
               />
             }
-            saveStateStorage={{
-              system: 'localStorage',
-              key: 'wz-engine:rules-main',
-            }}
             showFieldSelector
-            // rowProps={getRowProps}
             fetchData={({ pagination, sorting, searchParams: { query } }) => {
               return fetchData({
                 query,
@@ -156,8 +143,8 @@ export const TableIndexer = ({
                 sorting: {
                   columns: [
                     {
-                      id: sorting.field,
-                      direction: sorting.direction,
+                      id: sorting.sort.field,
+                      direction: sorting.sort.direction,
                     },
                   ],
                 },
