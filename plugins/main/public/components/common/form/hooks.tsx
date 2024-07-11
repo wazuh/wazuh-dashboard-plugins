@@ -119,11 +119,11 @@ export function enhanceFormFields(
                       state,
                       [...pathField, 'fields', _state.length],
                       Object.entries(field.fields).reduce(
-                        (accum, [key, { defaultValue }]) => ({
+                        (accum, [key, { defaultValue, initialValue }]) => ({
                           ...accum,
                           [key]: {
-                            currentValue: cloneDeep(defaultValue),
-                            initialValue: cloneDeep(defaultValue),
+                            currentValue: cloneDeep(initialValue),
+                            initialValue: cloneDeep(initialValue),
                             defaultValue: cloneDeep(defaultValue),
                           },
                         }),
