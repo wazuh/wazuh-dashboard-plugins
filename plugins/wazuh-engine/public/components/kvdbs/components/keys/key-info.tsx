@@ -2,7 +2,7 @@ import React from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiFlyoutHeader,
+  EuiButtonIcon,
   EuiFlyoutBody,
 } from '@elastic/eui';
 import { getServices } from '../../../../services';
@@ -12,11 +12,6 @@ export const KeyInfo = ({ keys, setKeysRequest }) => {
 
   return (
     <>
-      <EuiFlyoutHeader>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>View keys of this Database</EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiFlyoutHeader>
       <EuiFlyoutBody>
         <EuiFlexGroup>
           <WzListEditor

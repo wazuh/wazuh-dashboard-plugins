@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { columns } from './kvdb-columns';
-import { ResourcesHandler } from '../../../controllers/resources-handler';
-import { EuiFlyout } from '@elastic/eui';
+import { EuiFlyout, EuiButtonEmpty } from '@elastic/eui';
 import { KeyInfo } from './keys/key-info';
 import { getServices } from '../../../services';
 
 export const KVDBTable = ({ TableWzAPI }) => {
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [getKeysRequest, setKeysRequest] = useState(false);
-  const resourcesHandler = new ResourcesHandler('lists');
   const WzRequest = getServices().WzRequest;
+  const navigationService = getServices().navigationService;
+  const closeFlyout = () => setIsFlyoutVisible(false);
   const searchBarWQLOptions = {
     searchTermFields: ['filename', 'relative_dirname'],
     filterButtons: [
@@ -21,42 +21,16 @@ export const KVDBTable = ({ TableWzAPI }) => {
     ],
   };
 
-  /**
-   * Columns and Rows properties
-   */
-  const getRowProps = item => {
-    const { id, name } = item;
-
-    return {
-      'data-test-subj': `row-${id || name}`,
-      className: 'customRowClass',
-      onClick: async ev => {
-        const result = await resourcesHandler.getFileContent(
-          item.filename,
-          item.relative_dirname,
-        );
-        const file = {
-          name: item.filename,
-          content: result,
-          path: item.relative_dirname,
-        };
-        setKeysRequest(file);
-        setIsFlyoutVisible(true);
-      },
-    };
-  };
-
-  const closeFlyout = () => setIsFlyoutVisible(false);
-
-  const ManageFiles = getServices().actionButtons.manageFiles;
-  const AddNewFileButton = getServices().actionButtons.addNewFileButton;
-  const AddNewCdbListButton = getServices().actionButtons.addNewCdbListButton;
-  const UploadFilesButton = getServices().actionButtons.uploadFilesButton;
   const actionButtons = [
-    <ManageFiles section={'lists'} />,
-    <AddNewFileButton section={'lists'} />,
-    <AddNewCdbListButton section={'lists'} />,
-    <UploadFilesButton section={'lists'} />,
+    <EuiButtonEmpty
+      aria-label='Add New KVDB'
+      iconType='plusInCircle'
+      onClick={() => {
+        navigationService.getInstance().navigate('/engine/kvdbs/new');
+      }}
+    >
+      Add new database
+    </EuiButtonEmpty>,
   ];
 
   return (
@@ -65,7 +39,7 @@ export const KVDBTable = ({ TableWzAPI }) => {
         title='Databases'
         description='From here you can manage your keys databases.'
         actionButtons={actionButtons}
-        tableColumns={columns}
+        tableColumns={columns(setIsFlyoutVisible, setKeysRequest)}
         tableInitialSortingField='filename'
         searchBarWQL={{
           options: searchBarWQLOptions,
@@ -104,7 +78,6 @@ export const KVDBTable = ({ TableWzAPI }) => {
         isExpandable={true}
         downloadCsv
         showReload
-        rowProps={getRowProps}
         tablePageSizeOptions={[10, 25, 50, 100]}
       />
       {isFlyoutVisible && (

@@ -161,12 +161,6 @@ export function Application(props) {
                 GenericRequest={GenericRequest}
                 TableWzAPI={TableWzAPI}
                 WzRequest={WzRequest}
-                actionButtons={{
-                  manageFiles: ManageFiles,
-                  addNewFileButton: AddNewFileButton,
-                  addNewCdbListButton: AddNewCdbListButton,
-                  uploadFilesButton: UploadFilesButton,
-                }}
                 WzListEditor={WzListEditor}
                 {...props}
               />
