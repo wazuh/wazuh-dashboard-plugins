@@ -1,16 +1,19 @@
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiPage } from '@elastic/eui';
+import { Route, Switch } from 'react-router-dom';
 import { KVDBTable } from './components/kvdb-overview';
 import { getServices } from '../../services';
+import { AddDatabase } from './components/forms/addDatabase';
 
-export const KVDBs = () => {
+export const KVDBs = props => {
   return (
-    <EuiPage style={{ background: 'transparent' }}>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <KVDBTable TableWzAPI={getServices().TableWzAPI} />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </EuiPage>
+    <Switch>
+      <Route path={`${props.basePath}/new`}>
+        <AddDatabase></AddDatabase>
+      </Route>
+      <Route
+        path={`${props.basePath}`}
+        render={() => <KVDBTable TableWzAPI={getServices().TableWzAPI} />}
+      ></Route>
+    </Switch>
   );
 };

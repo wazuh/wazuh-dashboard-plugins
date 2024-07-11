@@ -3,14 +3,14 @@
     "affected_items": [
       {
         "filename": "test1",
-        "relative_dirname": "test/1",
+        "relative_dirname": "mockPath/test/1",
         "elements": "8",
         "date": "2024-06-03",
         "description": "test mock"
       },
       {
         "filename": "test2",
-        "relative_dirname": "test/2",
+        "relative_dirname": "mockPath/test/version2",
         "elements": "76",
         "date": "2024-06-02",
         "description": "test 2 mock"
