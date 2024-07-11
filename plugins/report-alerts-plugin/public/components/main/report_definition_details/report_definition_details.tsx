@@ -446,6 +446,9 @@ export function ReportDefinitionDetails(props: {
         ? humanReadableScheduleDetails(data.trigger)
         : `\u2014`,
       status: reportDefinition.status,
+      emailRecipients: delivery.configIds.join(', '),
+      emailSubject: delivery.title,
+      emailBody: delivery.textDescription,
     };
     return reportDefinitionDetails;
   };

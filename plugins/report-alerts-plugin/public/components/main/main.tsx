@@ -21,6 +21,7 @@ import { ReportDefinitions } from './report_definitions_table';
 import {
   addReportsTableContent,
   addReportDefinitionsTableContent,
+  getChannelsDetails,
 } from './main_utils';
 import CSS from 'csstype';
 import {
@@ -235,8 +236,9 @@ export function Main(props) {
     const { httpClient } = props;
     await httpClient
       .get('../api/reporting/reports')
-      .then((response) => {
-        setReportsTableContent(addReportsTableContent(response.data));
+      .then(async (response) => {
+        const data = await getChannelsDetails(response, httpClient);
+        setReportsTableContent(addReportsTableContent(data));
       })
       .catch((error) => {
         console.log('error when fetching all reports: ', error);

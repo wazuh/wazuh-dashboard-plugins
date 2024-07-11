@@ -7,6 +7,7 @@ import { i18n } from '@osd/i18n';
 import { HttpSetup } from '../../../../../src/core/public';
 import { uiSettingsService } from '../utils/settings_service';
 import { GENERATE_REPORT_PARAM } from '../visual_report/constants';
+import { REPORTING_NOTIFICATIONS_DASHBOARDS_API } from '../../../common';
 
 export const getAvailableNotificationsChannels = (configList: any) => {
   let availableChannels = [];
@@ -71,15 +72,19 @@ export const addReportsTableContent = (data: string | any[]) => {
       id: item._id,
       reportName: reportParams.report_name,
       type: trigger.trigger_type,
-      sender: `\u2014`,
+      channel: reportDefinition.delivery.configIds,
+      sender: reportDefinition.delivery.emailSender,
       opensearchDashboardsRecipients: `\u2014`,
-      emailRecipients: `\u2014`,
+      emailRecipients: reportDefinition.delivery.emailRecipients,
       reportSource: reportParams.report_source,
       //TODO: wrong name
       timeCreated: report.time_created,
       state: report.state,
       url: report.query_url,
       format: reportParams.core_params.report_format,
+      htmlDescription: reportDefinition.delivery.htmlDescription,
+      textDescription: reportDefinition.delivery.textDescription,
+      title: reportDefinition.delivery.title,
     };
     reportsTableItems.push(reportsTableEntry);
   }
@@ -265,4 +270,50 @@ export const generateReportById = async (
         handleErrorToast();
       }
     });
+};
+
+export const sendTestNotificationsMessage = async (
+  id: string,
+  httpClientProps: HttpSetup,
+  item: any
+) => {
+  try {
+    console.log({ id, httpClientProps, item });
+    const eventId = await httpClientProps
+      .get(
+        `${REPORTING_NOTIFICATIONS_DASHBOARDS_API.SEND_TEST_MESSAGE}/${item.channel[0]}`,
+        {
+          query: { feature: 'report' },
+        }
+      )
+      .then((response) => response.event_source.reference_id);
+
+    const configId = await httpClientProps.get(
+      `${REPORTING_NOTIFICATIONS_DASHBOARDS_API.GET_CONFIG}/${eventId}`
+    );
+  } catch (error) {
+    console.log('error', error);
+  }
+};
+
+export const getChannelsDetails = async (data: any, httpClient: HttpSetup) => {
+  try {
+    const arrayData = data.data;
+    for (let i = 0; i < arrayData.length; i++) {
+      const id = arrayData[i]._source.report_definition.delivery.configIds[0];
+      const channel = await httpClient.get(
+        `${REPORTING_NOTIFICATIONS_DASHBOARDS_API.GET_CONFIG}/${id}`
+      );
+      const sender = await httpClient.get(
+        `${REPORTING_NOTIFICATIONS_DASHBOARDS_API.GET_CONFIG}/${channel.config_list[0].config.email.email_account_id}`
+      );
+      arrayData[i]._source.report_definition.delivery.emailRecipients =
+        channel.config_list[0].config.email.recipient_list;
+      arrayData[i]._source.report_definition.delivery.emailSender =
+        sender.config_list[0].config.smtp_account.from_address;
+    }
+    return arrayData;
+  } catch (error) {
+    console.log('error', error);
+  }
 };

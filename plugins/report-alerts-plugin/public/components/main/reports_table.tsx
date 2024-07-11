@@ -18,6 +18,7 @@ import {
   fileFormatsUpper,
   humanReadableDate,
   generateReportById,
+  sendTestNotificationsMessage,
 } from './main_utils';
 import { GenerateReportLoadingModal } from './loading_modal';
 
@@ -95,7 +96,7 @@ export function ReportsTable(props) {
     setShowLoading(e);
   };
 
-  const onDemandDownload = async (id: any) => {
+  const onDemandDownload = async (id: any, item: any) => {
     handleLoading(true);
     await generateReportById(
       id,
@@ -104,6 +105,7 @@ export function ReportsTable(props) {
       handleErrorToast,
       handlePermissionsMissingToast
     );
+    await sendTestNotificationsMessage(id, httpClient, item);
     handleLoading(false);
   };
 
@@ -184,7 +186,7 @@ export function ReportsTable(props) {
           </EuiText>
         ) : (
           <EuiLink
-            onClick={() => onDemandDownload(id)}
+            onClick={() => onDemandDownload(id, item)}
             id="landingPageOnDemandDownload"
           >
             {fileFormatsUpper[item.format]} <EuiIcon type="importAction" />

@@ -43,4 +43,17 @@ export function NotificationsPlugin(Client: any, config: any, components: any) {
     },
     method: 'GET',
   });
+
+  notifications.getConfig = clientAction({
+    url: {
+      fmt: `${NOTIFICATIONS_API.CONFIGS}/<%=configId%>`,
+      req: {
+        configId: {
+          type: 'string',
+          required: true,
+        },
+      },
+    },
+    method: 'GET',
+  });
 }
