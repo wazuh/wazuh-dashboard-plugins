@@ -32,33 +32,6 @@ export const columns = (setIsFlyoutVisible, setKeysRequest) => {
 
   return [
     {
-      name: 'Open DB',
-      align: 'left',
-      render: item => {
-        return (
-          <>
-            <EuiButtonIcon
-              aria-label='Edit Button'
-              iconType='eye'
-              onClick={async () => {
-                const result = await resourcesHandler.getFileContent(
-                  item.filename,
-                  item.relative_dirname,
-                );
-                const file = {
-                  name: item.filename,
-                  content: result,
-                  path: item.relative_dirname,
-                };
-                setKeysRequest(file);
-                setIsFlyoutVisible(true);
-              }}
-            />
-          </>
-        );
-      },
-    },
-    {
       field: 'date',
       name: 'Date',
       align: 'left',
@@ -96,8 +69,20 @@ export const columns = (setIsFlyoutVisible, setKeysRequest) => {
           <>
             <EuiButtonIcon
               aria-label='Edit Button'
-              iconType='pencil'
-              onClick={async ev => {}}
+              iconType='eye'
+              onClick={async () => {
+                const result = await resourcesHandler.getFileContent(
+                  item.filename,
+                  item.relative_dirname,
+                );
+                const file = {
+                  name: item.filename,
+                  content: result,
+                  path: item.relative_dirname,
+                };
+                setKeysRequest(file);
+                setIsFlyoutVisible(true);
+              }}
             />
             <EuiButtonIcon
               aria-label='Delete Button'
