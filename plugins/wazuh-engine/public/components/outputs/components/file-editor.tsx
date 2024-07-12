@@ -39,6 +39,7 @@ export const RuleFileEditor = ({
         height={`calc(100vh - 270px)`}
         {...fields.content}
         mode='yml'
+        onChange={console.log}
         isReadOnly={!isEditable}
         wrapEnabled
         // setOptions={this.codeEditorOptions}

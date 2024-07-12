@@ -1,0 +1,112 @@
+{
+  "name": {
+    "_meta": {
+      "label": "Name",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.author.name": {
+    "_meta": {
+      "label": "Name",
+      "groupForm": "author"
+    }
+  },
+  "metadata.author.date": {
+    "_meta": {
+      "label": "Date",
+      "groupForm": "author"
+    }
+  },
+  "metadata.author.url": {
+    "_meta": {
+      "label": "URL",
+      "groupForm": "author"
+    }
+  },
+  "metadata.author.email": {
+    "_meta": {
+      "label": "Email",
+      "groupForm": "author"
+    }
+  },
+  "metadata.references": {
+    "type": "arrayOf",
+    "initialValue": [{ "reference": "" }],
+    "fields": {
+      "reference": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "References",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.integration": {
+    "_meta": {
+      "label": "Integration",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.title": {
+    "_meta": {
+      "label": "Title",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.description": {
+    "_meta": {
+      "label": "Description",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.compatibility": {
+    "_meta": {
+      "label": "Comptability",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.versions": {
+    "type": "arrayOf",
+    "initialValue": [{ "version": "" }],
+    "fields": {
+      "version": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Versions",
+      "groupForm": "metadata"
+    }
+  },
+  "parents": {
+    "type": "arrayOf",
+    "initialValue": [{ "parent": "" }],
+    "fields": {
+      "parent": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Parents",
+      "groupForm": "metadata"
+    }
+  },
+  "check": {
+    "type": "textarea",
+    "_meta": {
+      "label": "Checks",
+      "groupForm": "steps"
+    }
+  },
+  "outputs": {
+    "type": "textarea",
+    "_meta": {
+      "label": "Outputs",
+      "groupForm": "steps"
+    }
+  }
+}

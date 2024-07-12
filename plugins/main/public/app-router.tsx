@@ -58,6 +58,8 @@ import {
 } from './controllers/management/components/management/common/actions-buttons';
 import WzListEditor from './controllers/management/components/management/cdblists/views/list-editor.tsx';
 import { DocumentViewTableAndJson } from './components/common/wazuh-discover/components/document-view-table-and-json';
+import { OutputsDataSource } from './components/common/data-source/pattern/outputs/data-source';
+import { OutputsDataSourceRepository } from './components/common/data-source/pattern/outputs/data-source-repository';
 export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
@@ -153,6 +155,8 @@ export function Application(props) {
                 FILTER_OPERATOR={FILTER_OPERATOR}
                 RulesDataSource={RulesDataSource}
                 RulesDataSourceRepository={RulesDataSourceRepository}
+                OutputsDataSource={OutputsDataSource}
+                OutputsDataSourceRepository={OutputsDataSourceRepository}
                 useDocViewer={useDocViewer}
                 DocViewer={DocViewer}
                 DocumentViewTableAndJson={DocumentViewTableAndJson}
