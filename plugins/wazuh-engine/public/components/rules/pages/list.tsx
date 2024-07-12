@@ -46,6 +46,7 @@ export const RulesList = props => {
               {prop}
             </EuiButtonEmpty>
           ),
+          show: true,
         },
         parents: {
           render: (prop, item) =>
@@ -60,6 +61,12 @@ export const RulesList = props => {
                 {prop}
               </EuiButtonEmpty>
             )),
+        },
+        'metadata.title': {
+          show: true,
+        },
+        'metadata.description': {
+          show: true,
         },
       }),
       {

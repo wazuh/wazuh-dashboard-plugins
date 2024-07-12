@@ -32,6 +32,7 @@ export const transfromAssetSpecToForm = function (
   return createIter(({ keyPath, spec }) => ({
     type: mapSpecTypeToInput[spec.type] || spec.type,
     initialValue: '',
+    _spec: spec,
     ...(spec.pattern
       ? {
           validate: value =>

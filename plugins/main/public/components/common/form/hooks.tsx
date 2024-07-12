@@ -100,6 +100,7 @@ export function enhanceFormFields(
         [fieldKey]: {
           ...(field.type === 'arrayOf'
             ? {
+                ...field,
                 type: field.type,
                 fields: (() => {
                   return restFieldState.fields.map((fieldState, index) =>

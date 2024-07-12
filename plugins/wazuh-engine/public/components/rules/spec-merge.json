@@ -1,22 +1,32 @@
 {
+  "name": {
+    "_meta": {
+      "label": "Name",
+      "groupForm": "metadata"
+    }
+  },
   "metadata.author.name": {
     "_meta": {
-      "label": "Author name"
+      "label": "Name",
+      "groupForm": "author"
     }
   },
   "metadata.author.date": {
     "_meta": {
-      "label": "Author date"
+      "label": "Date",
+      "groupForm": "author"
     }
   },
   "metadata.author.url": {
     "_meta": {
-      "label": "Author URL"
+      "label": "URL",
+      "groupForm": "author"
     }
   },
   "metadata.author.email": {
     "_meta": {
-      "label": "Author email"
+      "label": "Email",
+      "groupForm": "author"
     }
   },
   "metadata.references": {
@@ -29,27 +39,32 @@
       }
     },
     "_meta": {
-      "label": "References"
+      "label": "References",
+      "groupForm": "metadata"
     }
   },
   "metadata.integration": {
     "_meta": {
-      "label": "Integration"
+      "label": "Integration",
+      "groupForm": "metadata"
     }
   },
   "metadata.title": {
     "_meta": {
-      "label": "Title"
+      "label": "Title",
+      "groupForm": "metadata"
     }
   },
   "metadata.description": {
     "_meta": {
-      "label": "Description"
+      "label": "Description",
+      "groupForm": "metadata"
     }
   },
   "metadata.compatibility": {
     "_meta": {
-      "label": "Comptability"
+      "label": "Comptability",
+      "groupForm": "metadata"
     }
   },
   "metadata.versions": {
@@ -62,7 +77,8 @@
       }
     },
     "_meta": {
-      "label": "Versions"
+      "label": "Versions",
+      "groupForm": "metadata"
     }
   },
   "parents": {
@@ -75,13 +91,15 @@
       }
     },
     "_meta": {
-      "label": "Parents"
+      "label": "Parents",
+      "groupForm": "metadata"
     }
   },
   "normalize": {
     "type": "textarea",
     "_meta": {
-      "label": "Normalize"
+      "label": "Normalize",
+      "groupForm": "steps"
     }
   }
 }
