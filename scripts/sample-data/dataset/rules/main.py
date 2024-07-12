@@ -8,6 +8,7 @@ from pathlib import Path
 index_template_file='template.json'
 default_count='10000'
 default_index_name='wazuh-rules'
+asset_identifier='rule'
 
 def generate_document(params):
   id_int = int(params["id"])
@@ -16,12 +17,12 @@ def generate_document(params):
   # https://github.com/wazuh/wazuh/blob/11334-dev-new-wazuh-engine/src/engine/ruleset/schemas/wazuh-asset.json
   data = {
     "ecs": {"version": "1.7.0"},
-    "name": f'rule/{str(id_int)}/0',
+    "name": f'{asset_identifier}/{str(id_int)}/0',
     "metadata": {
-      "title": f'Rule title {str(id_int)}',
-      "description": f'Rule description {str(id_int)}',
+      "title": f'Asset title {str(id_int)}',
+      "description": f'Asset description {str(id_int)}',
       "author": {
-        "name": f'Rule author name {str(id_int)}',
+        "name": f'Asset author name {str(id_int)}',
         "date": f'2024-07-04',
         "email": f'email@sample.com',
         "url": f'web.sample.com'
@@ -45,7 +46,7 @@ def generate_document(params):
   }
   if(bool(random.getrandbits(1))):
     top_limit = id_int - 1 if id_int - 1 > 0 else 0
-    data["parents"] = [f'rule/{str(random.randint(0, top_limit))}/0']
+    data["parents"] = [f'{asset_identifier}/{str(random.randint(0, top_limit))}/0']
 
   return data
 
