@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import spec from '../../spec.json';
+import specMerge from '../../spec-merge.json';
+
 import { transfromAssetSpecToForm } from '../../../rules/utils/transform-asset-spec';
 import { getServices } from '../../../../services';
 import {
@@ -17,7 +19,7 @@ export const AddDatabase = () => {
   const [isGoBackModalVisible, setIsGoBackModalVisible] = useState(false);
   const InputForm = getServices().InputForm;
   const useForm = getServices().useForm;
-  const specForm = useMemo(() => transfromAssetSpecToForm(spec), []);
+  const specForm = useMemo(() => transfromAssetSpecToForm(spec, specMerge), []);
   const { fields } = useForm(specForm);
   const navigationService = getServices().navigationService;
 
@@ -82,14 +84,19 @@ export const AddDatabase = () => {
           </EuiButton>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiButton iconType='save' onClick={() => {}}>
+          <EuiButton
+            iconType='save'
+            onClick={() => {
+              /*TODO=> Add funcionallity*/
+            }}
+          >
             Save
           </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiHorizontalRule margin='xs' />
       {Object.entries(fields).map(([name, formField]) => (
-        <InputForm {...formField} label={name} />
+        <InputForm {...formField} label={formField?._meta?.label || name} />
       ))}
       {modal}
     </>
