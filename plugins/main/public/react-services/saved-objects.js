@@ -205,22 +205,6 @@ export class SavedObject {
   }
 
   /**
-   * Creates a dashboard if it does not exist
-   */
-  static async existsOrCreateDashboard(dashboardID, params) {
-    const result = await SavedObject.existsDashboard(dashboardID);
-    if (!result.data) {
-      try {
-        await this.createSavedObject('dashboard', dashboardID, params);
-      } catch (error) {
-        throw ((error || {}).data || {}).message || false
-          ? new Error(error.data.message)
-          : error;
-      }
-    }
-  }
-
-  /**
    * Creates a saved object (dashboard, index-pattern, etc.)
    */
   static async createSavedObject(type, id, params, fields = '') {
