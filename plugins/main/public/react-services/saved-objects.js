@@ -170,21 +170,83 @@ export class SavedObject {
     }
   }
 
+  /**
+   * Given a dashboard ID, checks if it exists
+   */
+  static async existsDashboard(dashboardID) {
+    try {
+      const dashboardData = await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/dashboard/${dashboardID}`,
+        null,
+        true,
+      );
+
+      const title = dashboardData?.data?.attributes?.title;
+      const id = dashboardData?.data?.id;
+
+      if (title) {
+        return {
+          data: 'Dashboard found',
+          status: true,
+          statusCode: 200,
+          title,
+          id,
+        };
+      }
+    } catch (error) {
+      if (error && error.response && error.response.status == 404) return false;
+      return ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : new Error(
+            error.message || `Error getting the '${dashboardID}' dashboard`,
+          );
+    }
+  }
+
+  /**
+   * Creates a dashboard if it does not exist
+   */
+  static async existsOrCreateDashboard(dashboardID, params) {
+    const result = await SavedObject.existsDashboard(dashboardID);
+    if (!result.data) {
+      try {
+        await this.createSavedObject('dashboard', dashboardID, params);
+      } catch (error) {
+        throw ((error || {}).data || {}).message || false
+          ? new Error(error.data.message)
+          : error;
+      }
+    }
+  }
+
+  /**
+   * Creates a saved object (dashboard, index-pattern, etc.)
+   */
   static async createSavedObject(type, id, params, fields = '') {
     try {
+      // Check if the dashboard already exists
+      const dashboardExists = await this.existsDashboard(id);
+      if (dashboardExists) {
+        console.log(`Dashboard with ID ${id} already exists.`);
+        return dashboardExists;
+      }
+
+      // If it does not exist, proceed to create it
       const result = await GenericRequest.request(
         'POST',
         `/api/saved_objects/${type}/${id}`,
         {
-          ...params,
           attributes: {
-            ...params?.attributes,
-            timeFieldName:
-              params?.attributes?.timeFieldName !==
-              NOT_TIME_FIELD_NAME_INDEX_PATTERN
-                ? params?.attributes?.timeFieldName
-                : undefined,
+            title: params.title,
+            description: params.description,
+            panelsJSON: params.panelsJSON,
+            optionsJSON: params.optionsJSON,
+            version: params.version,
+            timeRestore: params.timeRestore,
+            kibanaSavedObjectMeta: params.kibanaSavedObjectMeta,
           },
+          references: params.references || [],
         },
       );
 
@@ -193,8 +255,12 @@ export class SavedObject {
           id,
           params.attributes.title,
           fields,
-          params?.attributes?.timeFieldName,
+          params.attributes.timeFieldName,
         );
+      }
+
+      if (type === 'dashboard') {
+        console.log(`Dashboard created successfully with ID: ${id}`);
       }
 
       return result;
