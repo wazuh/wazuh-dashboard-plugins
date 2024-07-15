@@ -19,7 +19,9 @@ import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
 import { InventoryVuls } from '../../overview/vulnerabilities';
-import { DashboardVuls } from '../../overview/poc-dashboards-by-reference/dashboards/dashboard';
+// import { DashboardVuls } from '../../overview/poc-dashboards-by-reference/dashboards/dashboard';
+import { DashboardVuls } from '../../overview/poc/dashboards/overview/dashboard';
+
 import { DashboardMITRE } from '../../overview/mitre/dashboard';
 import { withModuleNotForAgent } from '../hocs';
 import {
