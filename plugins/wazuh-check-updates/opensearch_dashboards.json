@@ -10,7 +10,5 @@
     "opensearchDashboardsReact",
     "wazuhCore"
   ],
-  "optionalPlugins": [
-    "securityDashboards"
-  ]
+  "optionalPlugins": ["securityDashboards"]
 }
