@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the unexpected `delay` parameter on the server API requests [#6778](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6778)
 - Fixed home KPI links with custom or index pattern whose title is different to the id [#6777](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6777)
 - Fixed colors related to vulnerability severity levels on Vulnerability Detection dashboard [#6793](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6793)
+- Fixed pinned agent error in vulnerabilities events tab [#6827](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6827)
 
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 12
 
