@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { getPlugins, getWazuhCorePlugin } from '../../../../kibana-services';
+import { getPlugins, getWazuhCorePlugin, getCore } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { SearchResponse } from '../../../../../../../src/core/server';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
@@ -19,6 +19,7 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiButtonEmpty,
+  EuiLink
 } from '@elastic/eui';
 import {
   ErrorFactory,
@@ -54,6 +55,8 @@ import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner'
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { wzDiscoverRenderColumns } from '../../../common/wazuh-discover/render-columns';
 import { WzSearchBar } from '../../../common/search-bar';
+
+import DocDetailsHeader from '../../../common/wazuh-discover/components/doc-details-header';
 
 const plugins = getPlugins();
 
@@ -228,11 +231,10 @@ const DashboardTH: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         <div
-          className={`th-container ${
-            !isDataSourceLoading && dataSource && results?.hits?.total > 0
-              ? ''
-              : 'wz-no-display'
-          }`}
+          className={`th-container ${!isDataSourceLoading && dataSource && results?.hits?.total > 0
+            ? ''
+            : 'wz-no-display'
+            }`}
         >
           <SampleDataWarning />
           <div className='th-dashboard-responsive'>
@@ -293,20 +295,20 @@ const DashboardTH: React.FC = () => {
                       <HitsCounter
                         hits={results?.hits?.total}
                         showResetButton={false}
-                        onResetQuery={() => {}}
+                        onResetQuery={() => { }}
                         tooltip={
                           results?.hits?.total &&
-                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
                             ? {
-                                ariaLabel: 'Warning',
-                                content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits.`,
-                                iconType: 'alert',
-                                position: 'top',
-                              }
+                              ariaLabel: 'Warning',
+                              content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                                MAX_ENTRIES_PER_QUERY,
+                              )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                MAX_ENTRIES_PER_QUERY,
+                              )} hits.`,
+                              iconType: 'alert',
+                              position: 'top',
+                            }
                             : undefined
                         }
                       />
@@ -332,9 +334,10 @@ const DashboardTH: React.FC = () => {
             {inspectedHit && (
               <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
                 <EuiFlyoutHeader>
-                  <EuiTitle>
-                    <h2>Document details</h2>
-                  </EuiTitle>
+                  <DocDetailsHeader
+                    doc={inspectedHit}
+                    indexPattern={dataSource?.indexPattern}
+                  />
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
                   <EuiFlexGroup direction='column'>
