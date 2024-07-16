@@ -1,15 +1,21 @@
 import { getServices } from '../services';
 
 type LISTS = 'lists';
-export type Resource = LISTS;
+type DECODERS = 'decoders';
+export type Resource = DECODERS | LISTS;
 export const ResourcesConstants = {
   LISTS: 'lists',
+  DECODERS: 'decoders',
 };
 
 export const resourceDictionary = {
   [ResourcesConstants.LISTS]: {
     resourcePath: '/lists',
     permissionResource: value => `list:file:${value}`,
+  },
+  [ResourcesConstants.DECODERS]: {
+    resourcePath: '/decoders',
+    permissionResource: value => `decoders:file:${value}`,
   },
 };
 

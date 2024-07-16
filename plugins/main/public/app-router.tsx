@@ -60,6 +60,7 @@ import WzListEditor from './controllers/management/components/management/cdblist
 import { DocumentViewTableAndJson } from './components/common/wazuh-discover/components/document-view-table-and-json';
 import { OutputsDataSource } from './components/common/data-source/pattern/outputs/data-source';
 import { OutputsDataSourceRepository } from './components/common/data-source/pattern/outputs/data-source-repository';
+import WzDecoderInfo from './controllers/management/components/management/decoders/views/decoder-info.tsx';
 export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
@@ -166,6 +167,7 @@ export function Application(props) {
                 TableWzAPI={TableWzAPI}
                 WzRequest={WzRequest}
                 WzListEditor={WzListEditor}
+                WzDecoderInfo={WzDecoderInfo}
                 {...props}
               />
             );

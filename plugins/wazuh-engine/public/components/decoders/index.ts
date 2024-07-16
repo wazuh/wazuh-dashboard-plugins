@@ -1,1 +1,1 @@
-export { Decoders } from './decoders';
+export { Decoders } from './router';
