@@ -339,7 +339,10 @@ const DashboardTH: React.FC = () => {
                 <EuiFlyoutBody>
                   <EuiFlexGroup direction='column'>
                     <EuiFlexItem>
-                      <DocViewer {...docViewerProps} />
+                      <DocViewer
+                        {...docViewerProps}
+                        renderFields={wzDiscoverRenderColumns}
+                      />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiFlyoutBody>

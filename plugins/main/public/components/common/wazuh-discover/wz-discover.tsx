@@ -277,6 +277,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     <DocumentViewTableAndJson
                       document={inspectedHit}
                       indexPattern={indexPattern}
+                      renderFields={wzDiscoverRenderColumns}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>

@@ -261,6 +261,7 @@ const InventoryVulsComponent = () => {
                     <DocumentViewTableAndJson
                       document={inspectedHit}
                       indexPattern={indexPattern}
+                      renderFields={wzDiscoverRenderColumns}
                     />
                   </EuiFlexGroup>
                 </EuiFlyoutBody>
