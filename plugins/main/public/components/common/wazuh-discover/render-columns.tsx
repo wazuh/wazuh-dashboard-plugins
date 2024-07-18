@@ -48,12 +48,12 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'agent.name',
     render: (value, row) => {
-      if (row.agent.id === '000') return value;
+      if (row.agent?.id === '000') return value;
 
       return (
         <RedirectAppLinks application={getCore().application}>
           <EuiLink
-            href={`${endpointSummary.id}#/agents?tab=welcome&agent=${row.agent.id}`}
+            href={`${endpointSummary.id}#/agents?tab=welcome&agent=${row.agent?.id}`}
           >
             {value}
           </EuiLink>
