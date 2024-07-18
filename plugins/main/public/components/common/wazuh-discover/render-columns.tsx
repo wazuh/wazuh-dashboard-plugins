@@ -3,26 +3,23 @@ import { EuiLink } from '@elastic/eui';
 import { tDataGridRenderColumn } from '../data-grid';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { endpointSummary, rules } from '../../../utils/applications';
-import { formatUIDate } from '../../../react-services';
+import {
+  endpointSummary,
+  rules,
+  mitreAttack,
+} from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
-const navigateTo = (ev, section, params) => {
-  NavigationService.getInstance().navigateToModule(ev, section, params);
-};
-
-const renderMitreTechnique = (technique: string) => (
+const renderMitreTechnique = technique => (
   <EuiLink
-    onClick={e =>
-      navigateTo(e, 'overview', {
-        tab: 'mitre',
-        tabView: 'intelligence',
-        tabRedirect: 'techniques',
-        idToRedirect: technique,
-      })
-    }
+    onClick={e => {
+      e.preventDefault();
+      NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+        path: `#/overview?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${technique}`,
+      });
+    }}
   >
     {technique}
   </EuiLink>
@@ -73,6 +70,21 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   },
   {
     id: 'rule.mitre.id',
+    render: value =>
+      Array.isArray(value) ? (
+        <div style={{ display: 'flex', gap: 10 }}>
+          {value?.map((technique, index) => (
+            <div key={`${technique}-${index}`}>
+              {renderMitreTechnique(technique)}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div>{renderMitreTechnique(value)}</div>
+      ),
+  },
+  {
+    id: 'rule.mitre_techniques',
     render: value =>
       Array.isArray(value) ? (
         <div style={{ display: 'flex', gap: 10 }}>

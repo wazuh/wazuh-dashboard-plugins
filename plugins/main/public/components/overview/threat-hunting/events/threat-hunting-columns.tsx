@@ -11,10 +11,10 @@ export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
     id: 'timestamp',
   },
   {
-    id: 'agent.id'
+    id: 'agent.id',
   },
   {
-    id: 'agent.name'
+    id: 'agent.name',
   },
   {
     id: 'rule.mitre.id',
@@ -23,13 +23,16 @@ export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
     id: 'rule.mitre.tactic',
   },
   {
+    id: 'rule.mitre_technique',
+  },
+  {
     id: 'rule.description',
   },
   {
     id: 'rule.level',
   },
   {
-    id: 'rule.id'
+    id: 'rule.id',
   },
 ];
 
@@ -45,6 +48,9 @@ export const threatHuntingTableAgentColumns: EuiDataGridColumn[] = [
   },
   {
     id: 'rule.mitre.tactic',
+  },
+  {
+    id: 'rule.mitre_technique',
   },
   {
     id: 'rule.description',
