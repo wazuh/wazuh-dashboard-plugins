@@ -1,16 +1,23 @@
 import React from 'react';
-import { EuiLink } from '@elastic/eui';
+import { EuiLink, EuiText } from '@elastic/eui';
 import { tDataGridRenderColumn } from '../data-grid';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { endpointSummary, rules } from '../../../utils/applications';
-import { formatUIDate } from '../../../react-services';
 import NavigationService from '../../../react-services/navigation-service';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
 const navigateTo = (ev, section, params) => {
   NavigationService.getInstance().navigateToModule(ev, section, params);
+};
+
+const renderRequirementsSecurityOperations = (value: []) => {
+  return (
+    <EuiText gutterSize='s' direction='column'>
+      {value.join(', ')}
+    </EuiText>
+  );
 };
 
 const renderMitreTechnique = (technique: string) => (
@@ -32,7 +39,9 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'agent.id',
     render: value => {
-      if (value === '000') return value;
+      if (value === '000') {
+        return value;
+      }
 
       return (
         <RedirectAppLinks application={getCore().application}>
@@ -48,7 +57,9 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'agent.name',
     render: (value, row) => {
-      if (row.agent.id === '000') return value;
+      if (row.agent.id === '000') {
+        return value;
+      }
 
       return (
         <RedirectAppLinks application={getCore().application}>
@@ -85,5 +96,25 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
       ) : (
         <div>{renderMitreTechnique(value)}</div>
       ),
+  },
+  {
+    id: 'rule.pci_dss',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.gdpr',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.nist_800_53',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.hipaa',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.tsc',
+    render: renderRequirementsSecurityOperations,
   },
 ];

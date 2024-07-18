@@ -22,11 +22,10 @@ import {
   EuiText,
   EuiFlexItem,
   EuiSpacer,
-  EuiLink,
 } from '@elastic/eui';
 import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
-import { getCore, getUiSettings } from '../../../../../kibana-services';
+import { getUiSettings } from '../../../../../kibana-services';
 import {
   FilterManager,
   IndexPattern,
@@ -38,20 +37,7 @@ import { formatUIDate } from '../../../../../react-services';
 import TechniqueRowDetails from '../../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
 import { connect } from 'react-redux';
-import { rules } from '../../../../../utils/applications';
-import { endpointSummary } from '../../../../../utils/applications';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import NavigationService from '../../../../../react-services/navigation-service';
-
-const renderRequirements = (value: []) => {
-  return (
-    <EuiFlexGroup gutterSize='s' direction='column'>
-      {value.map(v => {
-        return <EuiFlexItem key={v}>{v}</EuiFlexItem>;
-      })}
-    </EuiFlexGroup>
-  );
-};
+import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
 
 const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -76,80 +62,67 @@ export const RequirementFlyout = connect(mapStateToProps)(
       this._isMount = true;
     }
 
+    addRenderColumn(columns) {
+      columns.map(column => {
+        const renderColumn = wzDiscoverRenderColumns.find(
+          columnRender => columnRender.id === column.id,
+        );
+        if (renderColumn) {
+          column.render = renderColumn.render;
+        }
+        return column;
+      });
+      return columns;
+    }
+
     getDiscoverColumns() {
+      const columnsAgent = [
+        {
+          id: 'timestamp',
+          displayAsText: 'Time',
+          render: value => formatUIDate(value),
+        },
+        {
+          id: this.props.getRequirementKey(),
+          displayAsText: 'Requirement(s)',
+        },
+        { id: 'rule.description', displayAsText: 'Description' },
+        { id: 'rule.level', displayAsText: 'Level' },
+        {
+          id: 'rule.id',
+          displayAsText: 'Rule ID',
+        },
+      ];
+
+      const columnsWithoutAgent = [
+        {
+          id: 'timestamp',
+          displayAsText: 'Time',
+          render: value => formatUIDate(value),
+        },
+        {
+          id: 'agent.id',
+          displayAsText: 'Agent',
+        },
+        {
+          id: 'agent.name',
+          displayAsText: 'Agent name',
+        },
+        {
+          id: this.props.getRequirementKey(),
+          displayAsText: 'Requirement',
+        },
+        { id: 'rule.description', displayAsText: 'Description' },
+        { id: 'rule.level', displayAsText: 'Level' },
+        {
+          id: 'rule.id',
+          displayAsText: 'Rule ID',
+        },
+      ];
       const agentId = this.props.currentAgentData?.id;
       return agentId
-        ? [
-            {
-              id: 'timestamp',
-              displayAsText: 'Time',
-              render: value => formatUIDate(value),
-            },
-            {
-              id: this.props.getRequirementKey(),
-              displayAsText: 'Requirement(s)',
-              render: renderRequirements,
-            },
-            { id: 'rule.description', displayAsText: 'Description' },
-            { id: 'rule.level', displayAsText: 'Level' },
-            {
-              id: 'rule.id',
-              displayAsText: 'Rule ID',
-              render: value => (
-                <RedirectAppLinks application={getCore().application}>
-                  <EuiLink
-                    href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-                  >
-                    {value}
-                  </EuiLink>
-                </RedirectAppLinks>
-              ),
-            },
-          ]
-        : [
-            {
-              id: 'timestamp',
-              displayAsText: 'Time',
-              render: value => formatUIDate(value),
-            },
-            {
-              id: 'agent.id',
-              displayAsText: 'Agent',
-              render: value => (
-                <RedirectAppLinks application={getCore().application}>
-                  <EuiLink
-                    href={`${endpointSummary.id}#/agents/?tab=welcome&agent=${value}`}
-                  >
-                    {value}
-                  </EuiLink>
-                </RedirectAppLinks>
-              ),
-            },
-            {
-              id: 'agent.name',
-              displayAsText: 'Agent name',
-            },
-            {
-              id: this.props.getRequirementKey(),
-              displayAsText: 'Requirement',
-              render: renderRequirements,
-            },
-            { id: 'rule.description', displayAsText: 'Description' },
-            { id: 'rule.level', displayAsText: 'Level' },
-            {
-              id: 'rule.id',
-              displayAsText: 'Rule ID',
-              render: value => (
-                <RedirectAppLinks application={getCore().application}>
-                  <EuiLink
-                    href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-                  >
-                    {value}
-                  </EuiLink>
-                </RedirectAppLinks>
-              ),
-            },
-          ];
+        ? this.addRenderColumn(columnsAgent)
+        : this.addRenderColumn(columnsWithoutAgent);
     }
 
     renderHeader() {
