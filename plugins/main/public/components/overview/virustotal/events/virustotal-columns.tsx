@@ -14,11 +14,17 @@ export const virustotalColumns: tDataGridColumn[] = [
   },
   {
     id: 'data.virustotal.permalink',
-    render: value => (
-      <EuiLink href={value} target='_blank' external>
-        {value}
-      </EuiLink>
-    ),
+    render: value => {
+      if (!value) {
+        return '-';
+      } else {
+        return (
+          <EuiLink href={value} target='_blank' external>
+            {value}
+          </EuiLink>
+        );
+      }
+    },
   },
   {
     id: 'data.virustotal.malicious',
