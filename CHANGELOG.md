@@ -42,7 +42,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Upgraded versions of `follow-redirects` and `es5-ext` [#6626](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6626)
 - Changed agent log collector socket API response controller component [#6660](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6660)
 - Improve margins and paddings in the Events, Inventory and Control tabs [#6708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6708)
-- Refactored the search bar to correctly handle fixed and user-added filters [#6716](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6716) [#6755](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6755)
+- Refactored the search bar to correctly handle fixed and user-added filters [#6716](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6716) [#6755](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6755) [#6833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6833)
 - Generate URL with predefined filters [#6745](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6745)
 - Migrated AngularJS routing to ReactJS [#6689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6689) [#6775](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6775) [#6790](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6790
 - Improvement of the filter management system by implementing new standard modules [#6534](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6534) [#6772](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6772)

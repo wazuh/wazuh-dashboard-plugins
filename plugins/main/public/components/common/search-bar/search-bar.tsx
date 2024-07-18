@@ -6,7 +6,6 @@ import {
   SearchBarProps,
   Filter,
 } from '../../../../../../src/plugins/data/public';
-import useSearchBar from './use-search-bar';
 
 export interface WzSearchBarProps extends SearchBarProps {
   fixedFilters?: Filter[];
@@ -49,9 +48,7 @@ export const WzSearchBar = ({
         >
           {preQueryBar ? <EuiFlexItem>{preQueryBar}</EuiFlexItem> : null}
           <EuiFlexItem grow={!preQueryBar}>
-            <SearchBar
-              {...restProps}
-              showFilterBar={false} />
+            <SearchBar {...restProps} />
           </EuiFlexItem>
         </EuiFlexGroup>
       ) : null}
@@ -68,10 +65,11 @@ export const WzSearchBar = ({
                 {fixedFilters?.map((filter, idx) => (
                   <EuiFlexItem grow={false} key={idx}>
                     <EuiBadge className='globalFilterItem' color='hollow'>
-                      {`${filter.meta.key}: ${typeof filter.meta.value === 'function'
-                        ? filter.meta.value()
-                        : filter.meta.value
-                        }`}
+                      {`${filter.meta.key}: ${
+                        typeof filter.meta.value === 'function'
+                          ? filter.meta.value()
+                          : filter.meta.value
+                      }`}
                     </EuiBadge>
                   </EuiFlexItem>
                 ))}
