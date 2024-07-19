@@ -6,7 +6,6 @@ import {
   SearchBarProps,
   Filter,
 } from '../../../../../../src/plugins/data/public';
-import useSearchBar from './use-search-bar';
 
 export interface WzSearchBarProps extends SearchBarProps {
   fixedFilters?: Filter[];
@@ -49,7 +48,7 @@ export const WzSearchBar = ({
         >
           {preQueryBar ? <EuiFlexItem>{preQueryBar}</EuiFlexItem> : null}
           <EuiFlexItem grow={!preQueryBar}>
-            <SearchBar {...restProps} showFilterBar={false} />
+            <SearchBar {...restProps} />
           </EuiFlexItem>
         </EuiFlexGroup>
       ) : null}
