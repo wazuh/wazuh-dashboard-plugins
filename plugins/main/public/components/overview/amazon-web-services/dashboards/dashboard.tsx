@@ -31,7 +31,7 @@ const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-const DashboardAWSComponents: React.FC = ({ }) => {
+const DashboardAWSComponents: React.FC = ({}) => {
   const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
@@ -100,12 +100,12 @@ const DashboardAWSComponents: React.FC = ({ }) => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='aws-searchbar'
-                {...searchBarProps}
-                fixedFilters={fixedFilters}
-              />
-            )}
+            <WzSearchBar
+              appName='aws-searchbar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+            />
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

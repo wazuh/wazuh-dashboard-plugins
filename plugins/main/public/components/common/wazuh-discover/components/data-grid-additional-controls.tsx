@@ -11,8 +11,9 @@ type tDiscoverDataGridAdditionalControlsProps = {
   maxEntriesPerQuery?: number;
 };
 
-
-const DiscoverDataGridAdditionalControls = (props: tDiscoverDataGridAdditionalControlsProps) => {
+const DiscoverDataGridAdditionalControls = (
+  props: tDiscoverDataGridAdditionalControlsProps,
+) => {
   const {
     totalHits,
     isExporting,
@@ -32,25 +33,25 @@ const DiscoverDataGridAdditionalControls = (props: tDiscoverDataGridAdditionalCo
         tooltip={
           totalHits && totalHits > maxEntriesPerQuery
             ? {
-              ariaLabel: 'Warning',
-              content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                maxEntriesPerQuery
-              )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                maxEntriesPerQuery
-              )} hits.`,
-              iconType: 'alert',
-              position: 'top',
-            }
+                ariaLabel: 'Warning',
+                content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                  maxEntriesPerQuery,
+                )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                  maxEntriesPerQuery,
+                )} hits.`,
+                iconType: 'alert',
+                position: 'top',
+              }
             : undefined
         }
       />
       <EuiButtonEmpty
         disabled={totalHits === 0 || isExporting}
-        size="xs"
-        iconType="exportAction"
-        color="primary"
+        size='xs'
+        iconType='exportAction'
+        color='primary'
         isLoading={isExporting}
-        className="euiDataGrid__controlBtn"
+        className='euiDataGrid__controlBtn'
         onClick={onHandleExportResults}
       >
         Export Formated

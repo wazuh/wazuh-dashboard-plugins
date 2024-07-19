@@ -110,13 +110,8 @@ const getDashboardPanels = (
 };
 
 export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
-
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern
-  } = drilldownProps;
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [
@@ -148,7 +143,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );
@@ -161,7 +156,6 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
           {
             width: 100,
             component: () => {
-
               const defaultTableColumns = [
                 { id: 'timestamp' },
                 { id: 'rule.description' },
@@ -170,7 +164,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                 { id: 'data.github.actor', displayAsText: 'Actor' },
                 { id: 'rule.level' },
                 { id: 'rule.id' },
-              ]
+              ];
 
               return (
                 <DrillDownDataGrid
@@ -180,9 +174,9 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                   searchBarProps={searchBarProps}
                   indexPattern={indexPattern}
                 />
-              )
+              );
             },
-          }
+          },
         ],
       },
     ],

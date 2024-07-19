@@ -31,7 +31,7 @@ const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-const DashboardFIMComponent: React.FC = ({ }) => {
+const DashboardFIMComponent: React.FC = ({}) => {
   const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
@@ -101,15 +101,15 @@ const DashboardFIMComponent: React.FC = ({ }) => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='fim-searchbar'
-                {...searchBarProps}
-                fixedFilters={fixedFilters}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            )}
+            <WzSearchBar
+              appName='fim-searchbar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+            />
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}

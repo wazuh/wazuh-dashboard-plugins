@@ -206,7 +206,12 @@ export const ComplianceTable = withAgentSupportModule(props => {
     ];
   };
 
-  const getRequirementsCount = async ({ section, query, fetchData, dateRange }) => {
+  const getRequirementsCount = async ({
+    section,
+    query,
+    fetchData,
+    dateRange,
+  }) => {
     try {
       const mapFieldAgg = {
         pci: 'rule.pci_dss',
@@ -251,8 +256,6 @@ export const ComplianceTable = withAgentSupportModule(props => {
     { from: dateRangeFrom, to: dateRangeTo },
   ]);
 
-
-
   useEffect(() => {
     const { descriptions, complianceObject, selectedRequirements } =
       buildComplianceObject({ section: props.section });
@@ -288,16 +291,16 @@ export const ComplianceTable = withAgentSupportModule(props => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='compliance-controls'
-                {...searchBarProps}
-                fixedFilters={fixedFilters}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            )}
+            <WzSearchBar
+              appName='compliance-controls'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
+          )}
         </EuiPanel>
         <EuiPanel
           paddingSize='s'
