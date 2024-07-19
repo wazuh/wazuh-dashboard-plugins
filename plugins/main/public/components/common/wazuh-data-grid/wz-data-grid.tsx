@@ -12,7 +12,12 @@ import {
   EuiFlyoutBody,
   EuiFlexGroup,
 } from '@elastic/eui';
-import { useDataGrid, exportSearchToCSV, tDataGridColumn } from '../data-grid';
+import {
+  useDataGrid,
+  exportSearchToCSV,
+  tDataGridColumn,
+  getAllCustomRenders,
+} from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import {
   IndexPattern,
@@ -189,7 +194,10 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
                 <DocumentViewTableAndJson
                   document={inspectedHit}
                   indexPattern={indexPattern as IndexPattern}
-                  renderFields={wzDiscoverRenderColumns}
+                  renderFields={getAllCustomRenders(
+                    defaultTableColumns,
+                    wzDiscoverRenderColumns,
+                  )}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>

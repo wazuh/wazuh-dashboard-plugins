@@ -146,7 +146,7 @@ const DocViewer = (props: tDocViewerProps) => {
                     <td>
                       {renderFields &&
                       renderFields?.find(
-                        (field: string) => field.id === displayName,
+                        (field: string) => field?.id === displayName,
                       ) ? (
                         renderFields
                           ?.find((field: string) => field.id === displayName)

@@ -28,6 +28,7 @@ import {
 import {
   MAX_ENTRIES_PER_QUERY,
   exportSearchToCSV,
+  getAllCustomRenders,
 } from '../../../common/data-grid/data-grid-service';
 import { useDocViewer } from '../../../common/doc-viewer/use-doc-viewer';
 import { useDataGrid } from '../../../common/data-grid/use-data-grid';
@@ -341,7 +342,10 @@ const DashboardTH: React.FC = () => {
                     <EuiFlexItem>
                       <DocViewer
                         {...docViewerProps}
-                        renderFields={wzDiscoverRenderColumns}
+                        renderFields={getAllCustomRenders(
+                          threatHuntingTableDefaultColumns,
+                          wzDiscoverRenderColumns,
+                        )}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
