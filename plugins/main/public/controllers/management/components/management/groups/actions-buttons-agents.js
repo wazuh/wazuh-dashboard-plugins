@@ -15,12 +15,10 @@ import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
-import {
-  updateShowAddAgents,
-} from '../../../../../redux/actions/groupsActions';
+import { updateShowAddAgents } from '../../../../../redux/actions/groupsActions';
 
 import GroupsHandler from './utils/groups-handler';
-import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { ExportConfiguration } from '../../../../../components/agents/export-configuration';
 import { ReportingService } from '../../../../../react-services/reporting';
 
 class WzGroupsActionButtonsAgents extends Component {
@@ -30,22 +28,21 @@ class WzGroupsActionButtonsAgents extends Component {
     super(props);
     this.reportingService = new ReportingService();
 
-
     this.groupsHandler = GroupsHandler;
   }
 
-
   showManageAgents() {
-    const { itemDetail } = this.props.state;
-
-    this.props.groupsProps.showAddingAgents(true, itemDetail);
     this.props.updateShowAddAgents(true);
   }
 
   render() {
     // Add new group button
     const manageAgentsButton = (
-      <EuiButtonEmpty iconSide="left" iconType="folderOpen" onClick={() => this.showManageAgents()}>
+      <EuiButtonEmpty
+        iconSide='left'
+        iconType='folderOpen'
+        onClick={() => this.showManageAgents()}
+      >
         Manage agents
       </EuiButtonEmpty>
     );
@@ -53,14 +50,14 @@ class WzGroupsActionButtonsAgents extends Component {
     // Export PDF button
     const exportPDFButton = (
       <ExportConfiguration
-        exportConfiguration={(enabledComponents) =>
+        exportConfiguration={enabledComponents =>
           this.reportingService.startConfigReport(
             this.props.state.itemDetail,
             'groupConfig',
-            enabledComponents
+            enabledComponents,
           )
         }
-        type="group"
+        type='group'
       />
     );
 
@@ -73,16 +70,20 @@ class WzGroupsActionButtonsAgents extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateShowAddAgents: (showAddAgents) => dispatch(updateShowAddAgents(showAddAgents)),
+    updateShowAddAgents: showAddAgents =>
+      dispatch(updateShowAddAgents(showAddAgents)),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtonsAgents);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(WzGroupsActionButtonsAgents);

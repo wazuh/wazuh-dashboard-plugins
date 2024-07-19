@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import {
   EuiFlexGroup,
@@ -19,18 +19,14 @@ import {
   EuiCallOut,
   EuiToolTip,
   EuiLoadingSpinner,
-  EuiFormRow,
   EuiSelect,
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
-import WzReduxProvider from '../../redux/wz-redux-provider';
-import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import {
-  getAngularModule,
   getToasts,
   getDataPlugin,
   getHeaderActionMenuMounter,
@@ -43,6 +39,9 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
+import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
+import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
+import NavigationService from '../../react-services/navigation-service';
 
 const sections = {
   overview: 'overview',
@@ -62,7 +61,6 @@ export const WzMenu = withWindowSize(
       this.state = {
         showMenu: false,
         menuOpened: false,
-        currentMenuTab: '',
         currentAPI: '',
         APIlist: [],
         showSelector: false,
@@ -78,17 +76,14 @@ export const WzMenu = withWindowSize(
       this.wazuhConfig = new WazuhConfig();
       this.indexPatterns = getDataPlugin().indexPatterns;
       this.isLoading = false;
+      this.pinnedAgentManager = new PinnedAgentManager();
     }
 
     async componentDidMount() {
-      const $injector = getAngularModule().$injector;
-      this.router = $injector.get('$route');
-      setBreadcrumbs(
-        this.props.globalBreadcrumbReducers.breadcrumb,
-        this.router,
-      );
+      setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
       try {
         const APIlist = await this.loadApiList();
+        this.setState({ APIlist: APIlist });
         if (APIlist.length) {
           const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
           const filteredApi = APIlist.filter(api => api.id === apiId);
@@ -128,24 +123,10 @@ export const WzMenu = withWindowSize(
       });
     };
 
-    getCurrentTab() {
-      const currentWindowLocation = window.location.hash;
-      let currentTab = '';
-      Object.keys(sections).some(section => {
-        if (currentWindowLocation.match(`#/${section}`)) {
-          currentTab = sections[section];
-          return true;
-        }
-      });
-      return currentTab;
-    }
-
     loadApiList = async () => {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const APIlist = (result || {}).data || [];
-      if (APIlist.length) {
-        return APIlist;
-      }
+      return APIlist;
     };
 
     loadIndexPatternsList = async () => {
@@ -161,8 +142,8 @@ export const WzMenu = withWindowSize(
               ),
           ));
 
-        // Abort if we have disabled the pattern selector
-        if (!AppState.getPatternSelector()) return;
+        // When not exists patterns, not show the selector
+        if (list.length === 1) return;
 
         let filtered = false;
         // If there is no current pattern, fetch it
@@ -201,17 +182,8 @@ export const WzMenu = withWindowSize(
 
     async componentDidUpdate(prevProps) {
       let newState = {};
-      if (this.state.APIlist && !this.state.APIlist.length) {
-        const APIlist = await this.loadApiList();
-        newState = { ...newState, APIlist };
-      }
       const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
       const { currentAPI } = this.state;
-      const currentTab = this.getCurrentTab();
-
-      if (currentTab !== this.state.currentMenuTab) {
-        newState = { ...newState, currentMenuTab: currentTab };
-      }
 
       if (this.props.windowSize) {
         this.showSelectorsInPopover = this.props.windowSize.width < 1100;
@@ -249,10 +221,7 @@ export const WzMenu = withWindowSize(
           prevProps.globalBreadcrumbReducers.breadcrumb,
         )
       ) {
-        setBreadcrumbs(
-          this.props.globalBreadcrumbReducers.breadcrumb,
-          this.router,
-        );
+        setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
       }
 
       newState = { ...prevProps.state, ...newState };
@@ -272,14 +241,6 @@ export const WzMenu = withWindowSize(
           isSelectorsPopoverOpen: false,
         };
 
-        const currentTab = this.getCurrentTab();
-        if (currentTab !== this.state.currentMenuTab) {
-          newState = {
-            ...newState,
-            currentMenuTab: currentTab,
-            hover: currentTab,
-          };
-        }
         let list = await PatternHandler.getPatternList('api');
         if (!list || (list && !list.length)) return;
         this.props?.appConfig?.data?.['ip.ignore']?.length &&
@@ -289,9 +250,6 @@ export const WzMenu = withWindowSize(
                 indexPattern.title,
               ),
           ));
-
-        // Abort if we have disabled the pattern selector
-        if (!AppState.getPatternSelector()) return;
 
         let filtered = false;
         // If there is no current pattern, fetch it
@@ -341,59 +299,12 @@ export const WzMenu = withWindowSize(
       this.isLoading = false;
     }
 
-    changePattern = async event => {
-      try {
-        const newPattern = event.target;
-        if (!AppState.getPatternSelector()) return;
-        await PatternHandler.changePattern(newPattern.value);
-        this.setState({ currentSelectedPattern: newPattern.value });
-        if (this.state.currentMenuTab !== 'wazuh-dev') {
-          this.router.reload();
-        }
-
-        if (newPattern?.id === 'selectIndexPatternBar') {
-          this.updatePatternAndApi();
-        }
-      } catch (error) {
-        const options = {
-          context: `${WzMenu.name}.changePattern`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: false,
-          display: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error changing the Index Pattern`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    };
-
     updatePatternAndApi = async () => {
       this.setState({
         menuOpened: false,
-        hover: this.state.currentMenuTab,
-        ...(await this.loadApiList()),
+        ...{ APIlist: await this.loadApiList() },
         ...(await this.loadIndexPatternsList()),
       });
-    };
-
-    /**
-     * @param {String} id
-     * @param {Object} clusterInfo
-     * Updates the wazuh registry of an specific api id
-     */
-    updateClusterInfoInRegistry = async (id, clusterInfo) => {
-      try {
-        const url = `/hosts/update-hostname/${id}`;
-        await this.genericReq.request('PUT', url, {
-          cluster_info: clusterInfo,
-        });
-      } catch (error) {
-        return Promise.reject(error);
-      }
     };
 
     changeAPI = async event => {
@@ -408,16 +319,24 @@ export const WzMenu = withWindowSize(
           return item.id === apiId.value;
         });
 
-        this.updateClusterInfoInRegistry(apiId.value, clusterInfo);
         apiData[0].cluster_info = clusterInfo;
 
         AppState.setClusterInfo(apiData[0].cluster_info);
         AppState.setCurrentAPI(
           JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
         );
-
+        const isPinnedAgent = this.pinnedAgentManager.isPinnedAgent();
+        if (isPinnedAgent) {
+          this.pinnedAgentManager.unPinAgent();
+        }
         if (this.state.currentMenuTab !== 'wazuh-dev') {
-          this.router.reload();
+          /* TODO: this reloads the page to force the components are remounted with the new
+          selection of. To avoid this refresh, we would have to do the components are able to react
+          to these changes redoing the requests, etc... This will need a considerable time to
+          apply the changes. The reload of the pages is the same behavior used for the routing based
+          on AngularJS.
+          */
+          NavigationService.getInstance().reload();
         }
       } catch (error) {
         const options = {
@@ -433,38 +352,6 @@ export const WzMenu = withWindowSize(
         getErrorOrchestrator().handleError(options);
       }
     };
-
-    buildPatternSelector() {
-      return (
-        <EuiFormRow label='Selected index pattern'>
-          <EuiSelect
-            id='selectIndexPattern'
-            options={this.state.patternList.map(item => {
-              return { value: item.id, text: item.title };
-            })}
-            value={this.state.currentSelectedPattern}
-            onChange={this.changePattern}
-            aria-label='Index pattern selector'
-          />
-        </EuiFormRow>
-      );
-    }
-
-    buildApiSelector() {
-      return (
-        <EuiFormRow label='Selected API'>
-          <EuiSelect
-            id='selectAPI'
-            options={this.state.APIlist.map(item => {
-              return { value: item.id, text: item.id };
-            })}
-            value={this.state.currentAPI}
-            onChange={this.changeAPI}
-            aria-label='API selector'
-          />
-        </EuiFormRow>
-      );
-    }
 
     buildWazuhNotReadyYet() {
       const container = document.getElementsByClassName('wazuhNotReadyYet');
@@ -488,11 +375,11 @@ export const WzMenu = withWindowSize(
                 </EuiFlexItem>
               )}
             {this.props.state.wazuhNotReadyYet ===
-              'Wazuh could not be recovered.' && (
+              'Server could not be recovered.' && (
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
-                  onClick={() => location.reload()}
+                  onClick={() => NavigationService.getInstance().reload()}
                   className='WzNotReadyButton'
                 >
                   <span> Reload </span>
@@ -502,37 +389,6 @@ export const WzMenu = withWindowSize(
           </EuiFlexGroup>
         </EuiCallOut>,
         container[0],
-      );
-    }
-
-    removeSelectedAgent() {
-      store.dispatch(updateCurrentAgentData({}));
-      if (window.location.href.includes('/agents?')) {
-        window.location.href = '#/agents-preview';
-        this.router.reload();
-        return;
-      }
-      const { filterManager } = getDataPlugin().query;
-      const currentAppliedFilters = filterManager.getFilters();
-      const agentFilters = currentAppliedFilters.filter(x => {
-        return x.meta.key === 'agent.id';
-      });
-      agentFilters.map(x => {
-        filterManager.removeFilter(x);
-      });
-    }
-
-    thereAreSelectors() {
-      return (
-        (AppState.getAPISelector() &&
-          this.state.currentAPI &&
-          this.state.APIlist &&
-          this.state.APIlist.length > 1) ||
-        !this.state.currentAPI ||
-        (AppState.getPatternSelector() &&
-          this.state.theresPattern &&
-          this.state.patternList &&
-          this.state.patternList.length > 1)
       );
     }
 
@@ -565,6 +421,36 @@ export const WzMenu = withWindowSize(
       );
     }
 
+    onChangePattern = async pattern => {
+      try {
+        this.setState({ currentSelectedPattern: pattern.id });
+        if (this.state.currentMenuTab !== 'wazuh-dev') {
+          /* TODO: this reloads the page to force the components are remounted with the new
+          selection of. To avoid this refresh, we would have to do the components are able to react
+          to these changes redoing the requests, etc... This will need a considerable time to
+          apply the changes. The reload of the pages is the same behavior used for the routing based
+          on AngularJS.
+          */
+          NavigationService.getInstance().reload();
+        }
+        await this.updatePatternAndApi();
+      } catch (error) {
+        const options = {
+          context: `${WzMenu.name}.onChangePattern`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: false,
+          display: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error changing the Index Pattern`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+    };
+
     getIndexPatternSelectorComponent() {
       let style = { maxWidth: 200, maxHeight: 50 };
       if (this.showSelectorsInPopover) {
@@ -576,18 +462,11 @@ export const WzMenu = withWindowSize(
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <p>Index pattern</p>
           </EuiFlexItem>
-
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
-              <EuiSelect
-                id='selectIndexPatternBar'
-                fullWidth={true}
-                options={this.state.patternList.map(item => {
-                  return { value: item.id, text: item.title };
-                })}
-                value={this.state.currentSelectedPattern}
-                onChange={this.changePattern}
-                aria-label='Index pattern selector'
+              <WzDataSourceSelector
+                onChange={this.onChangePattern}
+                name='index pattern'
               />
             </div>
           </EuiFlexItem>

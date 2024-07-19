@@ -13,7 +13,7 @@ export default class GroupsFilesColumns {
 
     this.actionFile = async (item, edit) => {
       let result = await this.groupsHandler.getFileContent(
-        `/groups/${itemDetail.name}/files/${item.filename}/xml`
+        `/groups/${itemDetail.name}/files/${item.filename}?raw=true`,
       );
 
       if (Object.keys(result).length == 0) {
@@ -43,15 +43,15 @@ export default class GroupsFilesColumns {
           name: 'File',
           align: 'left',
           searchable: true,
-          sortable: true
+          sortable: true,
         },
         {
           field: 'hash',
           name: 'Checksum',
           align: 'left',
           searchable: true,
-          sortable: true
-        }
+          sortable: true,
+        },
       ];
       this.columns.push({
         name: 'Actions',
@@ -59,28 +59,36 @@ export default class GroupsFilesColumns {
         render: item => {
           return (
             <div>
-              <EuiToolTip position="top" content={`See file content`}>
+              <EuiToolTip position='top' content={`See file content`}>
                 <EuiButtonIcon
-                  aria-label="See file content"
-                  iconType="eye"
+                  aria-label='See file content'
+                  iconType='eye'
                   onClick={() => this.actionFile(item, false)}
-                  color="primary"
+                  color='primary'
                 />
               </EuiToolTip>
               {item.filename === 'agent.conf' && (
                 <WzButtonPermissions
-                  buttonType="icon"
-                  aria-label="Edit content"
-                  iconType="pencil"
-                  permissions={[{ action: 'group:read', resource: `group:id:${itemDetail.name}` }]}
-                  tooltip={{ position: 'top', content: `Edit ${item.filename}` }}
+                  buttonType='icon'
+                  aria-label='Edit content'
+                  iconType='pencil'
+                  permissions={[
+                    {
+                      action: 'group:read',
+                      resource: `group:id:${itemDetail.name}`,
+                    },
+                  ]}
+                  tooltip={{
+                    position: 'top',
+                    content: `Edit ${item.filename}`,
+                  }}
                   onClick={() => this.actionFile(item, true)}
-                  color="primary"
+                  color='primary'
                 />
               )}
             </div>
           );
-        }
+        },
       });
     };
 
@@ -115,7 +123,7 @@ export default class GroupsFilesColumns {
       'other->single': 0,
       'other->closing': -1,
       'other->opening': 0,
-      'other->other': 0
+      'other->other': 0,
     };
 
     for (var i = 0; i < lines.length; i++) {
@@ -130,10 +138,10 @@ export default class GroupsFilesColumns {
       var type = single
         ? 'single'
         : closing
-          ? 'closing'
-          : opening
-            ? 'opening'
-            : 'other';
+        ? 'closing'
+        : opening
+        ? 'opening'
+        : 'other';
       var fromTo = lastType + '->' + type;
       lastType = type;
       var padding = '';

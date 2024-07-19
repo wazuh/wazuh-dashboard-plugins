@@ -38,6 +38,16 @@ getCore.mockImplementation(() => ({
   },
 }));
 
+jest.mock('../../../react-services/navigation-service', () => ({
+  getInstance() {
+    return {
+      getUrlForApp() {
+        return '';
+      },
+    };
+  },
+}));
+
 describe('Check sample data component', () => {
   it('should render if there is sample data', async () => {
     WzRequest.genericReq.mockResolvedValue({

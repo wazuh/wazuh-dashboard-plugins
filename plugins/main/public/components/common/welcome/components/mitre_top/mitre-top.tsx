@@ -21,10 +21,10 @@ import {
   EuiLoadingChart,
   EuiEmptyPrompt,
 } from '@elastic/eui';
-import { FlyoutTechnique } from '../../../../overview/mitre/components/techniques/components/flyout-technique';
+import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
 import { getMitreCount } from './lib';
-import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 const getTacticsData = async (agentId, timeFilter) => {
   return await getMitreCount(agentId, timeFilter, undefined);
@@ -109,7 +109,7 @@ const MitreTopTacticsTechniques = ({
     };
 
     const openDiscover = (e, techniqueID) => {
-      AppNavigate.navigateToModule(e, 'overview', {
+      NavigationService.getInstance().navigateToModule(e, 'overview', {
         tab: 'mitre',
         tabView: 'discover',
         filters: { 'rule.mitre.id': techniqueID },
@@ -117,7 +117,7 @@ const MitreTopTacticsTechniques = ({
     };
 
     const openDashboard = (e, techniqueID) => {
-      AppNavigate.navigateToModule(e, 'overview', {
+      NavigationService.getInstance().navigateToModule(e, 'overview', {
         tab: 'mitre',
         tabView: 'dashboard',
         filters: { 'rule.mitre.id': techniqueID },

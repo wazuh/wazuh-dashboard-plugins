@@ -14,7 +14,6 @@ import React, { Component, Fragment } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiCallOut,
   EuiTitle,
   EuiButtonEmpty,
 } from '@elastic/eui';
@@ -26,10 +25,18 @@ import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AgentInfo } from '../../common/welcome/agents-info';
-import { getAngularModule, getCore } from '../../../kibana-services';
 import { compose } from 'redux';
 import { withGlobalBreadcrumb } from '../hocs';
 import { endpointSummary } from '../../../utils/applications';
+import {
+  AlertsDataSource,
+  AlertsDataSourceRepository,
+  PatternDataSource,
+  tParsedIndexPattern,
+  useDataSource,
+} from '../data-source';
+import { useAsyncAction } from '../hooks';
+import NavigationService from '../../../react-services/navigation-service';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -56,48 +63,6 @@ export class MainModuleAgent extends Component {
     };
   }
 
-  async componentDidMount() {
-    const $injector = getAngularModule().$injector;
-    this.router = $injector.get('$route');
-  }
-
-  async startReport() {
-    this.setState({ loadingReport: true });
-    const syscollectorFilters: any[] = [];
-    const agent =
-      (
-        this.props.agent ||
-        store.getState().appStateReducers.currentAgentData ||
-        {}
-      ).id || false;
-    if (this.props.section === 'syscollector' && agent) {
-      syscollectorFilters.push(this.filterHandler.managerQuery(agent, true));
-      syscollectorFilters.push(this.filterHandler.agentQuery(agent));
-    }
-    await this.reportingService.startVis2Png(
-      this.props.section,
-      agent,
-      syscollectorFilters.length ? syscollectorFilters : null,
-    );
-    this.setState({ loadingReport: false });
-  }
-
-  renderReportButton() {
-    return (
-      this.props.section === 'syscollector' && (
-        <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
-          <EuiButtonEmpty
-            iconType='document'
-            isLoading={this.state.loadingReport}
-            onClick={async () => this.startReport()}
-          >
-            Generate report
-          </EuiButtonEmpty>
-        </EuiFlexItem>
-      )
-    );
-  }
-
   renderTitle() {
     return (
       <EuiFlexGroup>
@@ -110,8 +75,9 @@ export class MainModuleAgent extends Component {
                     <span
                       style={{ color: euiThemeVars.euiColorPrimaryText }}
                       onClick={() => {
-                        window.location.href = `#/agents?agent=${this.props.agent.id}`;
-                        this.router.reload();
+                        NavigationService.getInstance().navigate(
+                          `/agents?tab=welcome&agent=${this.props.agent.id}`,
+                        );
                       }}
                     >
                       <span>
@@ -123,7 +89,14 @@ export class MainModuleAgent extends Component {
               </span>
             </EuiFlexItem>
             <EuiFlexItem />
-            {this.renderReportButton()}
+            {this.props.section === 'syscollector' && (
+              <EuiFlexItem
+                grow={false}
+                style={{ marginRight: 4, marginTop: 6 }}
+              >
+                <GenerateSyscollectorReportButton agent={this.props.agent} />
+              </EuiFlexItem>
+            )}
           </EuiFlexGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -132,7 +105,6 @@ export class MainModuleAgent extends Component {
 
   render() {
     const { agent, section, selectView } = this.props;
-    const title = this.renderTitle();
     const ModuleTabView = (this.props.tabs || []).find(
       tab => tab.id === selectView,
     );
@@ -144,11 +116,11 @@ export class MainModuleAgent extends Component {
             : 'wz-module'
         }
       >
-        <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent'>{title}</div>
-        </div>
         {agent && agent.os && (
           <Fragment>
+            <div className='wz-module-header-agent-wrapper'>
+              <div className='wz-module-header-agent'>{this.renderTitle()}</div>
+            </div>
             <div>
               <div
                 className={
@@ -212,14 +184,6 @@ export class MainModuleAgent extends Component {
               )}
           </Fragment>
         )}
-        {(!agent || !agent.os) && (
-          <EuiCallOut
-            style={{ margin: '66px 16px 0 16px' }}
-            title='This agent has never connected'
-            color='warning'
-            iconType='alert'
-          ></EuiCallOut>
-        )}
       </div>
     );
   }
@@ -231,9 +195,12 @@ export default compose(
       return [
         {
           text: endpointSummary.breadcrumbLabel,
-          href: getCore().application.getUrlForApp(endpointSummary.id, {
-            path: `#/agents-preview`,
-          }),
+          href: NavigationService.getInstance().getUrlForApp(
+            endpointSummary.id,
+            {
+              path: `#/agents-preview`,
+            },
+          ),
         },
         { text: agent.id },
       ];
@@ -241,9 +208,12 @@ export default compose(
       return [
         {
           text: endpointSummary.breadcrumbLabel,
-          href: getCore().application.getUrlForApp(endpointSummary.id, {
-            path: `#/agents-preview`,
-          }),
+          href: NavigationService.getInstance().getUrlForApp(
+            endpointSummary.id,
+            {
+              path: `#/agents-preview`,
+            },
+          ),
         },
         { agent: agent },
         {
@@ -253,3 +223,41 @@ export default compose(
     }
   }),
 )(MainModuleAgent);
+
+const GenerateSyscollectorReportButton = ({ agent }) => {
+  const {
+    dataSource,
+    fetchFilters,
+    isLoading: isDataSourceLoading,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
+    DataSource: AlertsDataSource,
+  });
+
+  const action = useAsyncAction(async () => {
+    const reportingService = new ReportingService();
+    const agentID =
+      (agent || store.getState().appStateReducers.currentAgentData || {}).id ||
+      false;
+    await reportingService.startVis2Png('syscollector', agentID, {
+      indexPattern: dataSource.indexPattern,
+      query: { query: '', language: 'kuery' },
+      filters: fetchFilters,
+      time: {
+        from: 'now-1d/d',
+        to: 'now',
+      },
+    });
+  }, [dataSource]);
+
+  return (
+    <EuiButtonEmpty
+      iconType='document'
+      isLoading={action.running}
+      isDisabled={isDataSourceLoading}
+      onClick={action.run}
+    >
+      Generate report
+    </EuiButtonEmpty>
+  );
+};

@@ -18,7 +18,9 @@ import WzTabSelector, {
 import WzConfigurationLogCollectionLogs from './log-collection-logs';
 import WzConfigurationLogCollectionCommands from './log-collection-commands';
 import WzConfigurationLogCollectionWindowsEvents from './log-collection-windowsevents';
+import WzConfigurationLogCollectionMacOSEvents from './log-collection-macosevents';
 import WzConfigurationLogCollectionSockets from './log-collection-sockets';
+import WzConfigurationLogCollectionJournald from './log-collection-journald';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString } from '../utils/utils';
 import {
@@ -26,6 +28,8 @@ import {
   LOCALFILE_LOGS_PROP,
   LOCALFILE_WINDOWSEVENT_PROP,
   LOGCOLLECTOR_LOCALFILE_PROP,
+  LOCALFILE_MACOSEVENT_PROP,
+  LOCALFILE_JOURNALDT_PROP,
 } from './types';
 
 class WzConfigurationLogCollection extends Component {
@@ -51,6 +55,12 @@ class WzConfigurationLogCollection extends Component {
                   item.logformat === 'eventchannel' ||
                   item.logformat === 'eventlog',
               ),
+              [LOCALFILE_MACOSEVENT_PROP]: currentConfig[
+                LOGCOLLECTOR_LOCALFILE_PROP
+              ].localfile.filter(item => item.logformat === 'macos'),
+              [LOCALFILE_JOURNALDT_PROP]: currentConfig[
+                LOGCOLLECTOR_LOCALFILE_PROP
+              ].localfile.filter(item => item.logformat === 'journald'),
               [LOCALFILE_COMMANDS_PROP]: currentConfig[
                 LOGCOLLECTOR_LOCALFILE_PROP
               ].localfile.filter(
@@ -86,6 +96,34 @@ class WzConfigurationLogCollection extends Component {
         component: (
           <WzTabSelectorTab label='Windows Events'>
             <WzConfigurationLogCollectionWindowsEvents
+              currentConfig={currentConfig}
+              agent={agent}
+            />
+          </WzTabSelectorTab>
+        ),
+      },
+      {
+        condition:
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_MACOSEVENT_PROP]
+            ?.length > 0,
+        component: (
+          <WzTabSelectorTab label='macOS Events'>
+            <WzConfigurationLogCollectionMacOSEvents
+              currentConfig={currentConfig}
+              agent={agent}
+            />
+          </WzTabSelectorTab>
+        ),
+      },
+      {
+        condition:
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP] &&
+          currentConfig[LOGCOLLECTOR_LOCALFILE_PROP][LOCALFILE_JOURNALDT_PROP]
+            ?.length > 0,
+        component: (
+          <WzTabSelectorTab label='Journald'>
+            <WzConfigurationLogCollectionJournald
               currentConfig={currentConfig}
               agent={agent}
             />

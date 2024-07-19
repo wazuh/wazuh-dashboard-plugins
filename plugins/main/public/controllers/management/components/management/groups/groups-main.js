@@ -10,9 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-// Redux
-import store from '../../../../../redux/store';
-import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
 import WzGroupDetail from './group-detail';
@@ -28,8 +25,13 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { compose } from 'redux';
-import { withGlobalBreadcrumb } from '../../../../../components/common/hocs';
+import {
+  withGlobalBreadcrumb,
+  withRouterSearch,
+} from '../../../../../components/common/hocs';
 import { endpointGroups } from '../../../../../utils/applications';
+import { MultipleAgentSelector } from '../../../../../components/management/groups/multiple-agent-selector';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 class WzGroups extends Component {
   constructor(props) {
@@ -39,12 +41,7 @@ class WzGroups extends Component {
 
   async componentDidMount() {
     // Check if there is a group in the URL
-    const [_, group] =
-      window.location.href.match(new RegExp('group=' + '([^&]*)')) || [];
-    window.location.href = window.location.href.replace(
-      new RegExp('group=' + '[^&]*'),
-      '',
-    );
+    const { group } = this.props.search;
     if (group) {
       try {
         // Try if the group can be accesed
@@ -53,6 +50,9 @@ class WzGroups extends Component {
         });
         const dataGroup = responseGroup?.data?.data?.affected_items?.[0];
         this.props.updateGroupDetail(dataGroup);
+        NavigationService.getInstance().updateAndNavigateSearchParams({
+          group: null,
+        });
       } catch (error) {
         const options = {
           context: `${WzGroups.name}.componentDidMount`,
@@ -71,37 +71,29 @@ class WzGroups extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.groupsProps.closeAddingAgents &&
-      this.props.state.showAddAgents
-    ) {
+    if (this.props.state.showAddAgents) {
       this.props.updateShowAddAgents(false);
-    }
-    if (
-      nextProps.groupsProps.selectedGroup &&
-      nextProps.groupsProps.selectedGroup !==
-        this.props.groupsProps.selectedGroup
-    ) {
-      store.dispatch(updateGroupDetail(nextProps.groupsProps.selectedGroup));
     }
   }
   componentWillUnmount() {
     // When the component is going to be unmounted the groups state is reset
     this.props.resetGroup();
   }
-  componentDidUpdate() {
-    if (this.props.groupsProps.selectedGroup) {
-      this.props.groupsProps.updateProps();
-    }
-  }
+
   render() {
     const { itemDetail, showAddAgents, fileContent } = this.props.state;
     return (
-      <WzReduxProvider>
+      <>
         {!showAddAgents &&
           ((itemDetail && !fileContent && <WzGroupDetail {...this.props} />) ||
             (fileContent && <WzGroupEditor />) || <WzGroupsOverview />)}
-      </WzReduxProvider>
+        {showAddAgents && itemDetail && (
+          <MultipleAgentSelector
+            currentGroup={itemDetail}
+            cancelButton={() => this.props.updateShowAddAgents(false)}
+          />
+        )}
+      </>
     );
   }
 }
@@ -123,4 +115,5 @@ export default compose(
   withGlobalBreadcrumb(props => {
     return [{ text: endpointGroups.breadcrumbLabel }];
   }),
+  withRouterSearch,
 )(WzGroups);

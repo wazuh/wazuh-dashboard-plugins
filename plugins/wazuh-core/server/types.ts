@@ -1,31 +1,35 @@
-import { AxiosResponse } from 'axios';
-import { APIInterceptorRequestOptionsInternalUser } from './services/api-interceptor';
-import { WazuhHostsCtrl } from './controllers';
-import { ISecurityFactory } from './services/security-factory';
+import {
+  ISecurityFactory,
+  ManageHosts,
+  ServerAPIClient,
+  ServerAPIInternalUserClient,
+  ServerAPIScopedUserClient,
+} from './services';
+import { IConfigurationEnhanced } from './services/enhance-configuration';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginSetup {
-  wazuhSecurity: ISecurityFactory;
+  dashboardSecurity: ISecurityFactory;
+  configuration: IConfigurationEnhanced;
+  manageHosts: ManageHosts;
+  serverAPIClient: ServerAPIClient;
+  api: {
+    client: {
+      asInternalUser: ServerAPIInternalUserClient;
+      asScoped: (context: any, request: any) => ServerAPIScopedUserClient;
+    };
+  };
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginStart {
-  controllers: {
-    WazuhHostsCtrl: typeof WazuhHostsCtrl;
-  };
-  services: {
-    log: (location: string, message: string, level?: string) => void;
-    wazuhApiClient: {
-      client: {
-        asInternalUser: {
-          authenticate: (apiHostID: string) => Promise<string>;
-          request: (
-            method: string,
-            path: string,
-            data: any,
-            options: APIInterceptorRequestOptionsInternalUser
-          ) => Promise<AxiosResponse<any, any>>;
-        };
-      };
+  dashboardSecurity: ISecurityFactory;
+  configuration: IConfigurationEnhanced;
+  manageHosts: ManageHosts;
+  serverAPIClient: ServerAPIClient;
+  api: {
+    client: {
+      asInternalUser: ServerAPIInternalUserClient;
+      asScoped: (context: any, request: any) => ServerAPIScopedUserClient;
     };
   };
 }

@@ -10,69 +10,59 @@
  * Find more information about this on the LICENSE file.
  */
 import cron from 'node-cron';
-import { log } from '../../lib/logger';
 import { WAZUH_QUEUE_CRON_FREQ } from '../../../common/constants';
 
 export let queue = [];
 
-export interface IQueueJob{
+export interface IQueueJob {
   /** Date object to start the job */
-  startAt: Date
+  startAt: Date;
   /** Function to execute */
-  run: () => void
-};
+  run: () => void;
+}
 
 /**
  * Add a job to the queue.
  * @param job Job to add to queue
  */
 export function addJobToQueue(job: IQueueJob) {
-  log('queue:addJob', `New job added`, 'debug');
   queue.push(job);
-};
+}
 
-async function executePendingJobs() {
+async function executePendingJobs(context: any) {
   try {
     if (!queue || !queue.length) return;
     const now: Date = new Date();
     const pendingJobs: IQueueJob[] = queue.filter(item => item.startAt <= now);
-    log(
-      'queue:executePendingJobs',
-      `Pending jobs: ${pendingJobs.length}`,
-      'debug'
-    );
-    if (!pendingJobs || !pendingJobs.length){
+    context.wazuh.logger.debug(`Pending jobs: ${pendingJobs.length}`);
+    if (!pendingJobs || !pendingJobs.length) {
       return;
-    };
+    }
     queue = queue.filter((item: IQueueJob) => item.startAt > now);
 
     for (const job of pendingJobs) {
       try {
-        await job.run();
+        await job.run(context);
       } catch (error) {
         continue;
-      };
+      }
     }
   } catch (error) {
     queue = [];
-    log('queue:executePendingJobs', error.message || error);
     return Promise.reject(error);
   }
 }
 
 /**
  * Run the job queue it plugin start.
- * @param context 
+ * @param context
  */
 export function jobQueueRun(context) {
-  cron.schedule(
-    WAZUH_QUEUE_CRON_FREQ,
-    async () => {
-      try {
-        await executePendingJobs();
-      } catch (error) {
-        log('queue:launchCronJob', error.message || error);
-      }
+  cron.schedule(WAZUH_QUEUE_CRON_FREQ, async () => {
+    try {
+      await executePendingJobs(context);
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
     }
-  );
+  });
 }

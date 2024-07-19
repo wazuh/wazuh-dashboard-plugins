@@ -22,8 +22,9 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import NavigationService from '../../react-services/navigation-service';
 
-export function getSavedSearch($location, $window, $route) {
+export function getSavedSearch() {
   try {
     const services = {
       savedObjectsClient: getSavedObjects().client,
@@ -35,22 +36,32 @@ export function getSavedSearch($location, $window, $route) {
     };
 
     const savedSearches = createSavedSearchesLoader(services);
-    const currentParams = $location.search();
-    const targetedAgent = currentParams && (currentParams.agent || currentParams.agent === '000');
-    const targetedRule = currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
-    if (!targetedAgent && !targetedRule && healthCheck($window)) {
-      $location.path('/health-check');
+    const currentParams = new URLSearchParams(
+      NavigationService.getInstance().getSearch(),
+    );
+    const targetedAgent =
+      currentParams &&
+      (currentParams.get('agent') || currentParams.get('agent') === '000');
+    const targetedRule =
+      currentParams &&
+      currentParams.get('tab') === 'ruleset' &&
+      currentParams.get('ruleid');
+    if (!targetedAgent && !targetedRule && healthCheck()) {
+      NavigationService.getInstance().navigate({
+        pathname: '/health-check',
+        state: { prevLocation: NavigationService.getInstance().getLocation() },
+      });
       return Promise.reject();
     } else {
-      const savedSearchId = $route.current.params.id;
+      const savedSearchId = currentParams.get('id'); // = $route.current.params.id; TODO: I am not sure how to port this
       return savedSearches
         .get(savedSearchId)
-        .then((savedSearch) => {
+        .then(savedSearch => {
           if (savedSearchId) {
             getChrome().recentlyAccessed.add(
               savedSearch.getFullPath(),
               savedSearch.title,
-              savedSearchId
+              savedSearchId,
             );
           }
           return savedSearch;
@@ -58,8 +69,11 @@ export function getSavedSearch($location, $window, $route) {
         .catch(() => {
           getToasts().addWarning({
             title: 'Saved object is missing',
-            text: (element) => {
-              ReactDOM.render(<ErrorRenderer>{error.message}</ErrorRenderer>, element);
+            text: element => {
+              ReactDOM.render(
+                <ErrorRenderer>{error.message}</ErrorRenderer>,
+                element,
+              );
               return () => ReactDOM.unmountComponentAtNode(element);
             },
           });

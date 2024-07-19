@@ -1,33 +1,25 @@
 import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { withGuardAsync, withReduxProvider } from '../../../../common/hocs';
-import {
-  getAngularModule,
-  getCore,
-  getSavedObjects,
-} from '../../../../../kibana-services';
+import { withGuardAsync } from '../../../../common/hocs';
+import { getSavedObjects } from '../../../../../kibana-services';
 import { SavedObject } from '../../../../../react-services';
 import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/constants';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
 import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
 async function checkExistenceIndexPattern(indexPatternID: string) {
-  const response = await getSavedObjects().client.get(
-    'index-pattern',
-    indexPatternID,
-  );
-
-  return response?.error?.statusCode !== 404;
+  return await getSavedObjects().client.get('index-pattern', indexPatternID);
 }
 
-async function checkExistenceIndices(indexPatternTitle: string) {
+async function checkExistenceIndices(indexPatternId: string) {
   try {
-    const fields = await SavedObject.getIndicesFields(indexPatternTitle);
+    const fields = await SavedObject.getIndicesFields(indexPatternId);
     return { exist: true, fields };
   } catch (error) {
     return { exist: false };
@@ -59,9 +51,10 @@ export async function validateVulnerabilitiesStateDataSources({
   try {
     // Check the existence of related index pattern
     const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
+    let indexPattern = existIndexPattern;
 
     // If the idnex pattern does not exist, then check the existence of index
-    if (!existIndexPattern) {
+    if (existIndexPattern?.error?.statusCode === 404) {
       // Check the existence of indices
       const { exist, fields } = await checkExistenceIndices(indexPatternID);
 
@@ -100,11 +93,11 @@ export async function validateVulnerabilitiesStateDataSources({
         problem in the Events tabs related there are no implicit filters when accessing if the HOC
         that protect the view is passed.
       */
-      getCore().application.navigateToApp(vulnerabilityDetection.id);
+      NavigationService.getInstance().navigateToApp(vulnerabilityDetection.id);
     }
     return {
       ok: false,
-      data: {},
+      data: { indexPattern },
     };
   } catch (error) {
     return {
@@ -159,7 +152,6 @@ const mapStateToProps = state => ({
 });
 
 export const withVulnerabilitiesStateDataSource = compose(
-  withReduxProvider,
   connect(mapStateToProps),
   withGuardAsync(
     validateVulnerabilitiesStateDataSources,

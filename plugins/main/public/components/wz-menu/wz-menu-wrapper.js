@@ -11,10 +11,8 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import React from 'react';
 import WzMenu from './wz-menu';
 import './wz-menu.scss';
-import { compose } from 'redux';
-import { withErrorBoundary, withReduxProvider } from '../common/hocs';
+import { withErrorBoundary } from '../common/hocs';
 
-export const WzMenuWrapper = compose (withErrorBoundary, withReduxProvider)(WzMenu);
+export const WzMenuWrapper = withErrorBoundary(WzMenu);

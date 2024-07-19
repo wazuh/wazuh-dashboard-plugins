@@ -1567,38 +1567,20 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
 }
 
 @media (min-width: 1600px) {
-  .agents-evolution-visualization {
-    width: 35vw;
-  }
-
   .agents-details-card {
-    width: 55vw;
+    width: 80vw;
   }
 }
 
 @media (max-width: 1599px) {
-  .agents-evolution-visualization {
-    width: 30vw;
-  }
-
   .agents-details-card {
-    width: 45vw;
-  }
-}
-
-@media (max-width: 1439px) {
-  .agents-evolution-visualization {
-    width: 25vw;
+    width: 70vw;
   }
 }
 
 @media only screen and (max-width: 1200px) {
   .agents-evolution-visualization-group {
     flex-wrap: wrap;
-  }
-
-  .agents-evolution-visualization {
-    width: 100vw;
   }
 
   .agents-details-card {
@@ -1758,6 +1740,18 @@ iframe.width-changed {
   }
 }
 
+/* OSD Data grid full screen with dock navigation left sidebar */
+
+.dataGridDockedNav {
+  &.euiDataGrid--fullScreen {
+    left: 320px;
+
+    .euiDataGrid__virtualized {
+      max-width: calc(100vw - 320px);
+    }
+  }
+}
+
 /* Custom Searchbar styles */
 
 .application .filters-search-bar .globalQueryBar,
@@ -1824,19 +1818,12 @@ iframe.width-changed {
   z-index: 9999;
 }
 
-/* OSD Data grid full screen with dock navigation left sidebar */
-
-.dataGridDockedNav {
-  &.euiDataGrid--fullScreen {
-    left: 320px;
-  }
-}
-
 .wz-app {
   .euiPage {
     background-color: transparent;
   }
-  [name='OverviewWelcome'] .euiIcon--app .euiIcon__fillSecondary {
+
+  .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
     fill: #000000bb;
   }
 }

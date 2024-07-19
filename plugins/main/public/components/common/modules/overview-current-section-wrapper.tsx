@@ -11,7 +11,9 @@
  * Find more information about this on the LICENSE file.
  */
 import { compose } from 'redux';
-import { withErrorBoundary, withReduxProvider } from '../hocs';
+import { withErrorBoundary } from '../hocs';
 import WzCurrentOverviewSection from './overview-current-section';
 
-export const WzCurrentOverviewSectionWrapper = compose (withErrorBoundary, withReduxProvider) (WzCurrentOverviewSection);
+export const WzCurrentOverviewSectionWrapper = compose(withErrorBoundary)(
+  WzCurrentOverviewSection,
+);

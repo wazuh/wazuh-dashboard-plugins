@@ -70,6 +70,7 @@ jobs:
       - name: Step 01 - Download the plugin's source code
         uses: actions/checkout@v3
         with:
+          repository: wazuh/wazuh-dashboard-plugins
           ref: ${{ inputs.reference }}
           path: wazuh
 
@@ -107,11 +108,16 @@ jobs:
               cd /home/node/kbn/plugins/${{ matrix.plugins.container_path }} && yarn && ${{ inputs.command }};
             '
 
+      - name: Get the plugin version
+        run: |
+          echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+          echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+
       - name: Step 04 - Upload artifact to GitHub
         if: ${{ inputs.artifact_name && inputs.artifact_path }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ inputs.artifact_name }}
+          name: ${{ inputs.artifact_name }}_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
           path: ${{ matrix.plugins.path }}/${{ inputs.artifact_path }}
           if-no-files-found: 'error'
 

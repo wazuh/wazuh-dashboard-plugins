@@ -1,19 +1,16 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
 import path from 'path';
-import { PLUGIN_SETTINGS } from '../../../common/constants';
 import { createDirectoryIfNotExists } from '../../lib/filesystem';
 import sanitizeUploadedSVG from './sanitize-svg';
 import { sanitizeSVG } from '../../lib/sanitizer';
-import * as configuration from '../../lib/get-configuration';
 import maliciousMockSVG from './__mocks__/malicious.customization.logo.app.svg.ts';
 import sanitizedMockSVG from './__mocks__/sanitized.customization.logo.app.svg.ts';
 
 const customImageDirectory = path.join(
   __dirname,
   '../../..',
-  PLUGIN_SETTINGS['customization.logo.app'].options.file.store
-    .relativePathFileSystem,
+  'public/assets/custom/images',
 );
 
 function mockContextCreator(loggerLevel: string) {
@@ -40,6 +37,15 @@ function mockContextCreator(loggerLevel: string) {
         debug: createLogger('debug'),
       },
     },
+    wazuh_core: {
+      configuration: {
+        _settings: {
+          get: jest.fn(),
+        },
+        get: jest.fn(),
+        set: jest.fn(),
+      },
+    },
     /* Mocked logs getter. It is only for testing purpose.*/
     _getLogs(logLevel: string) {
       return logLevel ? logs.filter(({ level }) => level === logLevel) : logs;
@@ -47,10 +53,6 @@ function mockContextCreator(loggerLevel: string) {
   };
   return ctx;
 }
-
-jest.mock('../../lib/logger', () => ({
-  log: jest.fn(),
-}));
 
 beforeAll(() => {
   // Create custom images directory
@@ -68,11 +70,32 @@ describe('[Sanitize SVG cronjob] Sanitize different custom logos.', () => {
   let mockContext = mockContextCreator('debug');
   jest.fn(sanitizeSVG);
   describe('[Sanitize SVG cronjob] No custom logos setup.', () => {
-    it('With no custom logos does not sanitize any file', () => {
-      jest
-        .spyOn(configuration, 'getConfiguration')
-        .mockImplementationOnce(() => ({}));
-      sanitizeUploadedSVG(mockContext);
+    it('With no custom logos does not sanitize any file', async () => {
+      mockContext.wazuh_core.configuration.get.mockImplementationOnce(
+        () => ({}),
+      );
+      mockContext.wazuh_core.configuration._settings.get.mockImplementation(
+        key =>
+          Object.fromEntries(
+            [
+              'customization.logo.sidebar',
+              'customization.logo.healthcheck',
+              'customization.logo.app',
+            ].map(key => [
+              key,
+              {
+                options: {
+                  file: {
+                    store: {
+                      resolveStaticURL: filename => `custom/images/${filename}`,
+                    },
+                  },
+                },
+              },
+            ]),
+          )[key],
+      );
+      await sanitizeUploadedSVG(mockContext);
       expect(
         mockContext
           ._getLogs()
@@ -113,14 +136,33 @@ describe('[Sanitize SVG cronjob] Sanitize different custom logos.', () => {
     afterAll(() => {
       fs.unlinkSync(path.join(customImageDirectory, filename));
     });
-    it('[Sanitize SVG cronjob] Sanitize script in customization.logo.app.svg file', () => {
-      jest
-        .spyOn(configuration, 'getConfiguration')
-        .mockImplementationOnce(() => ({
-          'customization.logo.app':
-            'custom/images/customization.logo.app.svg?v=123456789',
-        }));
-      sanitizeUploadedSVG(mockContext);
+    it('[Sanitize SVG cronjob] Sanitize script in customization.logo.app.svg file', async () => {
+      mockContext.wazuh_core.configuration.get.mockImplementationOnce(() => ({
+        'customization.logo.app':
+          'custom/images/customization.logo.app.svg?v=123456789',
+      }));
+      mockContext.wazuh_core.configuration._settings.get.mockImplementationOnce(
+        () =>
+          Object.fromEntries(
+            [
+              'customization.logo.sidebar',
+              'customization.logo.healthcheck',
+              'customization.logo.app',
+            ].map(key => [
+              key,
+              {
+                options: {
+                  file: {
+                    store: {
+                      resolveStaticURL: filename => `custom/images/${filename}`,
+                    },
+                  },
+                },
+              },
+            ]),
+          ),
+      );
+      await sanitizeUploadedSVG(mockContext);
       const sanitizedFileBuffer = fs.readFileSync(
         path.join(customImageDirectory, filename),
       );

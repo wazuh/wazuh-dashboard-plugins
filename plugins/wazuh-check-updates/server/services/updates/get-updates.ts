@@ -5,7 +5,10 @@ import {
 } from '../../../common/types';
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { getSavedObject, setSavedObject } from '../saved-object';
-import { getWazuhCore } from '../../plugin-services';
+import {
+  getWazuhCheckUpdatesServices,
+  getWazuhCore,
+} from '../../plugin-services';
 
 export const getUpdates = async (
   queryApi = false,
@@ -20,14 +23,9 @@ export const getUpdates = async (
       return availableUpdates;
     }
 
-    const {
-      controllers: { WazuhHostsCtrl },
-      services: { wazuhApiClient },
-    } = getWazuhCore();
-    const wazuhHostsController = new WazuhHostsCtrl();
+    const { manageHosts, api: wazuhApiClient } = getWazuhCore();
 
-    const hosts: { id: string }[] =
-      await wazuhHostsController.getHostsEntries();
+    const hosts: { id: string }[] = await manageHosts.get();
 
     const apisAvailableUpdates = await Promise.all(
       hosts?.map(async api => {
@@ -114,11 +112,9 @@ export const getUpdates = async (
         ? error
         : 'Error trying to get available updates';
 
-    const {
-      services: { log },
-    } = getWazuhCore();
+    const { logger } = getWazuhCheckUpdatesServices();
 
-    log('wazuh-check-updates:getUpdates', message);
+    logger.error(message);
     return Promise.reject(error);
   }
 };

@@ -1,6 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { getPlugins, getWazuhCorePlugin } from '../../../../../kibana-services';
-import useSearchBarConfiguration from '../../search_bar/use_search_bar_configuration';
 import { IntlProvider } from 'react-intl';
 import {
   EuiDataGrid,
@@ -14,59 +12,68 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiButtonEmpty,
+  EuiPanel,
 } from '@elastic/eui';
-import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../../../src/core/server';
-import { DiscoverNoResults } from '../../common/components/no_results';
-import { LoadingSpinner } from '../../common/components/loading_spinner';
-import { useDataGrid } from '../../data_grid/use_data_grid';
-import { MAX_ENTRIES_PER_QUERY, inventoryTableDefaultColumns } from './config';
-import { useDocViewer } from '../../doc_viewer/use_doc_viewer';
-import './inventory.scss';
-import { search, exportSearchToCSV } from './inventory_service';
+import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
+import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
+import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import {
   ErrorHandler,
   ErrorFactory,
   HttpError,
 } from '../../../../../react-services/error-management';
+import './inventory.scss';
+import { inventoryTableDefaultColumns } from './config';
+import { MAX_ENTRIES_PER_QUERY } from '../../../../common/data-grid/data-grid-service';
+import { DiscoverNoResults } from '../../common/components/no_results';
+import { LoadingSpinner } from '../../common/components/loading_spinner';
+// common components/hooks
+import useSearchBar from '../../../../common/search-bar/use-search-bar';
+import { useDataGrid } from '../../../../common/data-grid/use-data-grid';
+import { useDocViewer } from '../../../../common/doc-viewer/use-doc-viewer';
 import { withErrorBoundary } from '../../../../common/hocs';
-import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
-import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
-import { useAppConfig } from '../../../../common/hooks';
-import {
-  vulnerabilityIndexFiltersAdapter,
-  onUpdateAdapter,
-  restorePrevIndexFiltersAdapter,
-} from '../../common/vulnerability_detector_adapters';
+import { exportSearchToCSV } from '../../../../common/data-grid/data-grid-service';
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
-import { DataSourceFilterManagerVulnerabilitiesStates } from '../../../../../react-services/data-sources';
+import {
+  VulnerabilitiesDataSourceRepository,
+  VulnerabilitiesDataSource,
+  tParsedIndexPattern,
+  PatternDataSource,
+} from '../../../../common/data-source';
+import { useDataSource } from '../../../../common/data-source/hooks';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { DocumentViewTableAndJson } from '../../common/components/document-view-table-and-json';
+import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
+import { WzSearchBar } from '../../../../common/search-bar';
 
 const InventoryVulsComponent = () => {
-  const appConfig = useAppConfig();
-  const VULNERABILITIES_INDEX_PATTERN_ID =
-    appConfig.data['vulnerabilities.pattern'];
-  const { searchBarProps } = useSearchBarConfiguration({
-    defaultIndexPatternID: VULNERABILITIES_INDEX_PATTERN_ID,
-    onMount: vulnerabilityIndexFiltersAdapter,
-    onUpdate: onUpdateAdapter,
-    onUnMount: restorePrevIndexFiltersAdapter,
+  const {
+    dataSource,
+    filters,
+    fetchFilters,
+    fixedFilters,
+    isLoading: isDataSourceLoading,
+    fetchData,
+    setFilters,
+  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+    DataSource: VulnerabilitiesDataSource,
+    repository: new VulnerabilitiesDataSourceRepository(),
   });
+  const { searchBarProps } = useSearchBar({
+    indexPattern: dataSource?.indexPattern as IndexPattern,
+    filters,
+    setFilters,
+  });
+  const { query } = searchBarProps;
 
-  const fetchFilters = DataSourceFilterManagerVulnerabilitiesStates.getFilters(
-    searchBarProps.filters,
-    VULNERABILITIES_INDEX_PATTERN_ID,
-  );
-  const { isLoading, filters, query, indexPatterns } = searchBarProps;
-  const SearchBar = getPlugins().data.ui.SearchBar;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
   );
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
 
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
@@ -97,6 +104,7 @@ const InventoryVulsComponent = () => {
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Vulnerabilities Inventory Table',
     defaultColumns: inventoryTableDefaultColumns,
+    renderColumns: wzDiscoverRenderColumns,
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
@@ -109,39 +117,9 @@ const InventoryVulsComponent = () => {
     indexPattern: indexPattern as IndexPattern,
   });
 
-  useEffect(() => {
-    if (!isLoading) {
-      setIndexPattern(indexPatterns?.[0] as IndexPattern);
-      search({
-        indexPattern: indexPatterns?.[0] as IndexPattern,
-        filters: fetchFilters,
-        query,
-        pagination,
-        sorting,
-      })
-        .then(results => {
-          setResults(results);
-          setIsSearching(false);
-        })
-        .catch(error => {
-          const searchError = ErrorFactory.create(HttpError, {
-            error,
-            message: 'Error fetching vulnerabilities',
-          });
-          ErrorHandler.handleError(searchError);
-          setIsSearching(false);
-        });
-    }
-  }, [
-    JSON.stringify(searchBarProps),
-    JSON.stringify(pagination),
-    JSON.stringify(sorting),
-    JSON.stringify(fetchFilters),
-  ]);
-
   const onClickExportResults = async () => {
     const params = {
-      indexPattern: indexPatterns?.[0] as IndexPattern,
+      indexPattern: indexPattern as IndexPattern,
       filters: fetchFilters,
       query,
       fields: columnVisibility.visibleColumns,
@@ -165,6 +143,29 @@ const InventoryVulsComponent = () => {
     }
   };
 
+  useEffect(() => {
+    if (isDataSourceLoading) {
+      return;
+    }
+    setIndexPattern(dataSource?.indexPattern);
+    fetchData({ query, pagination, sorting })
+      .then(results => {
+        setResults(results);
+      })
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching data',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(pagination),
+    JSON.stringify(sorting),
+  ]);
+
   return (
     <IntlProvider locale='en'>
       <>
@@ -172,66 +173,81 @@ const InventoryVulsComponent = () => {
         <EuiPageTemplate
           className='vulsInventoryContainer'
           restrictWidth='100%'
+          fullHeight={true}
           grow
+          paddingSize='none'
+          pageContentProps={{ color: 'transparent' }}
         >
           <>
-            {isLoading ? (
+            {isDataSourceLoading ? (
               <LoadingSpinner />
             ) : (
-              <div className='wz-search-bar hide-filter-control'>
-                <SearchBar
-                  appName='inventory-vuls'
-                  {...searchBarProps}
-                  showDatePicker={false}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                />
-              </div>
+              <WzSearchBar
+                appName='inventory-vuls'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showDatePicker={false}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
             )}
-            {isSearching ? <LoadingSpinner /> : null}
-            {!isLoading && !isSearching && results?.hits?.total === 0 ? (
+            {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
             ) : null}
-            {!isLoading && !isSearching && results?.hits?.total > 0 ? (
-              <EuiDataGrid
-                {...dataGridProps}
-                className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                toolbarVisibility={{
-                  additionalControls: (
-                    <>
-                      <HitsCounter
-                        hits={results?.hits?.total}
-                        showResetButton={false}
-                        onResetQuery={() => {}}
-                        tooltip={
-                          results?.hits?.total &&
-                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                            ? {
-                                ariaLabel: 'Warning',
-                                content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits.`,
-                                iconType: 'alert',
-                                position: 'top',
-                              }
-                            : undefined
-                        }
-                      />
-                      <EuiButtonEmpty
-                        disabled={results?.hits?.total === 0}
-                        size='xs'
-                        iconType='exportAction'
-                        color='primary'
-                        isLoading={isExporting}
-                        className='euiDataGrid__controlBtn'
-                        onClick={onClickExportResults}
-                      >
-                        Export Formated
-                      </EuiButtonEmpty>
-                    </>
-                  ),
-                }}
-              />
+            {!isDataSourceLoading && results?.hits?.total > 0 ? (
+              <EuiPanel
+                paddingSize='s'
+                hasShadow={false}
+                hasBorder={false}
+                color='transparent'
+              >
+                <div className='vulsInventoryDataGrid'>
+                  <EuiDataGrid
+                    {...dataGridProps}
+                    className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                    toolbarVisibility={{
+                      additionalControls: (
+                        <>
+                          <HitsCounter
+                            hits={results?.hits?.total}
+                            showResetButton={false}
+                            tooltip={
+                              results?.hits?.total &&
+                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                                ? {
+                                    ariaLabel: 'Warning',
+                                    content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                                      MAX_ENTRIES_PER_QUERY,
+                                    )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                      MAX_ENTRIES_PER_QUERY,
+                                    )} hits.`,
+                                    iconType: 'alert',
+                                    position: 'top',
+                                  }
+                                : undefined
+                            }
+                          />
+                          <EuiButtonEmpty
+                            disabled={
+                              results?.hits?.total === 0 ||
+                              !columnVisibility?.visibleColumns?.length
+                            }
+                            size='xs'
+                            iconType='exportAction'
+                            color='primary'
+                            isLoading={isExporting}
+                            className='euiDataGrid__controlBtn'
+                            onClick={onClickExportResults}
+                          >
+                            Export Formated
+                          </EuiButtonEmpty>
+                        </>
+                      ),
+                    }}
+                  />
+                </div>
+              </EuiPanel>
             ) : null}
             {inspectedHit && (
               <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>

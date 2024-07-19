@@ -1,8 +1,8 @@
 import React from 'react';
 import { EuiFlexItem, EuiCodeBlock, EuiTabbedContent } from '@elastic/eui';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
-import DocViewer from '../../doc_viewer/doc_viewer';
-import { useDocViewer } from '../../doc_viewer/use_doc_viewer';
+import DocViewer from '../../../../common/doc-viewer/doc-viewer';
+import { useDocViewer } from '../../../../common/doc-viewer';
 
 export const DocumentViewTableAndJson = ({ document, indexPattern }) => {
   const docViewerProps = useDocViewer({

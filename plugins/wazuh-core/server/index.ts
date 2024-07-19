@@ -8,4 +8,5 @@ export function plugin(initializerContext: PluginInitializerContext) {
   return new WazuhCorePlugin(initializerContext);
 }
 
-export { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
+export type { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
+export type { IConfigurationEnhanced } from './services/enhance-configuration';

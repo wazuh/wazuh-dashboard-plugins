@@ -37,11 +37,11 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
     help={
       Array [
         Object {
-          "href": "https://documentation.wazuh.com/4.8/cloud-security/office365/index.html",
-          "text": "Using Wazuh to monitor Office 365",
+          "href": "https://documentation.wazuh.com/4.9/cloud-security/office365/index.html",
+          "text": "Monitoring Office 365",
         },
         Object {
-          "href": "https://documentation.wazuh.com/4.8/user-manual/reference/ossec-conf/office365-module.html",
+          "href": "https://documentation.wazuh.com/4.9/user-manual/reference/ossec-conf/office365-module.html",
           "text": "Configuration options for the module",
         },
       ]
@@ -106,11 +106,11 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                     links={
                       Array [
                         Object {
-                          "href": "https://documentation.wazuh.com/4.8/cloud-security/office365/index.html",
-                          "text": "Using Wazuh to monitor Office 365",
+                          "href": "https://documentation.wazuh.com/4.9/cloud-security/office365/index.html",
+                          "text": "Monitoring Office 365",
                         },
                         Object {
-                          "href": "https://documentation.wazuh.com/4.8/user-manual/reference/ossec-conf/office365-module.html",
+                          "href": "https://documentation.wazuh.com/4.9/user-manual/reference/ossec-conf/office365-module.html",
                           "text": "Configuration options for the module",
                         },
                       ]
@@ -171,7 +171,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                                     size="m"
                                     type="questionInCircle"
                                   >
-                                    <EuiIconEmpty
+                                    <EuiIconBeaker
                                       aria-hidden={true}
                                       className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                                       focusable="false"
@@ -188,8 +188,12 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                                         viewBox="0 0 16 16"
                                         width={16}
                                         xmlns="http://www.w3.org/2000/svg"
-                                      />
-                                    </EuiIconEmpty>
+                                      >
+                                        <path
+                                          d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                                        />
+                                      </svg>
+                                    </EuiIconBeaker>
                                   </EuiIcon>
                                   <span
                                     className="euiButtonEmpty__text"
@@ -265,7 +269,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
           },
           Object {
             "field": "only_future_events",
-            "label": "Collect events generated since Wazuh manager is initialized",
+            "label": "Collect events generated since manager is initialized",
           },
           Object {
             "field": "interval",
@@ -421,9 +425,9 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                 </EuiSpacer>
               </WzConfigurationSetting>
               <WzConfigurationSetting
-                key="-Collect events generated since Wazuh manager is initialized-undefined-1"
-                keyItem="-Collect events generated since Wazuh manager is initialized-undefined-1"
-                label="Collect events generated since Wazuh manager is initialized"
+                key="-Collect events generated since manager is initialized-undefined-1"
+                keyItem="-Collect events generated since manager is initialized-undefined-1"
+                label="Collect events generated since manager is initialized"
                 value="yes"
               >
                 <div
@@ -450,7 +454,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                       <div
                         className="euiTextAlign euiTextAlign--right"
                       >
-                        Collect events generated since Wazuh manager is initialized
+                        Collect events generated since manager is initialized
                       </div>
                     </EuiTextAlign>
                   </div>
@@ -462,7 +466,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                     }
                   >
                     <EuiFieldText
-                      data-testid="collect-events-generated-since-wazuh-manager-is-initialized"
+                      data-testid="collect-events-generated-since-manager-is-initialized"
                       readOnly={true}
                       value="yes"
                     >
@@ -479,7 +483,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                             <EuiValidatableControl>
                               <input
                                 className="euiFieldText"
-                                data-testid="collect-events-generated-since-wazuh-manager-is-initialized"
+                                data-testid="collect-events-generated-since-manager-is-initialized"
                                 readOnly={true}
                                 type="text"
                                 value="yes"

@@ -61,12 +61,12 @@
       "GET /agents/{agent_id}/key",
       "GET /agents/{agent_id}/daemons/stats",
       "GET /agents/{agent_id}/stats/{component}",
-      "GET /groups/{group_id}/agents",
       "GET /agents/no_group",
       "GET /agents/outdated",
       "GET /agents/stats/distinct",
       "GET /agents/summary/os",
       "GET /agents/summary/status",
+      "GET /groups/{group_id}/agents",
       "GET /overview/agents"
     ]
   },
@@ -181,6 +181,64 @@
       "GET /agents/upgrade_result"
     ]
   },
+  "cluster:read": {
+    "description": "Read Wazuh's cluster nodes configuration",
+    "resources": [
+      "node:id"
+    ],
+    "example": {
+      "actions": [
+        "cluster:read"
+      ],
+      "resources": [
+        "node:id:worker1",
+        "node:id:worker3"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "PUT /agents/node/{node_id}/restart",
+      "GET /cluster/local/info",
+      "GET /cluster/local/config",
+      "GET /cluster/nodes",
+      "GET /cluster/healthcheck",
+      "GET /cluster/ruleset/synchronization",
+      "GET /cluster/{node_id}/status",
+      "GET /cluster/{node_id}/info",
+      "GET /cluster/{node_id}/configuration",
+      "GET /cluster/{node_id}/daemons/stats",
+      "GET /cluster/{node_id}/stats",
+      "GET /cluster/{node_id}/stats/hourly",
+      "GET /cluster/{node_id}/stats/weekly",
+      "GET /cluster/{node_id}/stats/analysisd",
+      "GET /cluster/{node_id}/stats/remoted",
+      "GET /cluster/{node_id}/logs",
+      "GET /cluster/{node_id}/logs/summary",
+      "PUT /cluster/restart",
+      "GET /cluster/configuration/validation",
+      "GET /cluster/{node_id}/configuration/{component}/{configuration}"
+    ]
+  },
+  "agent:reconnect": {
+    "description": "Force reconnect agents",
+    "resources": [
+      "agent:id",
+      "agent:group"
+    ],
+    "example": {
+      "actions": [
+        "agent:reconnect"
+      ],
+      "resources": [
+        "agent:id:050",
+        "agent:id:049"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "PUT /agents/reconnect"
+    ]
+  },
   "group:delete": {
     "description": "Delete agent groups",
     "resources": [
@@ -218,8 +276,7 @@
       "GET /groups/{group_id}/agents",
       "GET /groups/{group_id}/configuration",
       "GET /groups/{group_id}/files",
-      "GET /groups/{group_id}/files/{file_name}/json",
-      "GET /groups/{group_id}/files/{file_name}/xml",
+      "GET /groups/{group_id}/files/{file_name}",
       "GET /overview/agents"
     ]
   },
@@ -257,64 +314,6 @@
     },
     "related_endpoints": [
       "PUT /groups/{group_id}/configuration"
-    ]
-  },
-  "cluster:read": {
-    "description": "Read Wazuh's cluster nodes configuration",
-    "resources": [
-      "node:id"
-    ],
-    "example": {
-      "actions": [
-        "cluster:read"
-      ],
-      "resources": [
-        "node:id:worker1",
-        "node:id:worker3"
-      ],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "PUT /agents/node/{node_id}/restart",
-      "GET /cluster/local/info",
-      "GET /cluster/nodes",
-      "GET /cluster/healthcheck",
-      "GET /cluster/ruleset/synchronization",
-      "GET /cluster/local/config",
-      "GET /cluster/{node_id}/status",
-      "GET /cluster/{node_id}/info",
-      "GET /cluster/{node_id}/configuration",
-      "GET /cluster/{node_id}/daemons/stats",
-      "GET /cluster/{node_id}/stats",
-      "GET /cluster/{node_id}/stats/hourly",
-      "GET /cluster/{node_id}/stats/weekly",
-      "GET /cluster/{node_id}/stats/analysisd",
-      "GET /cluster/{node_id}/stats/remoted",
-      "GET /cluster/{node_id}/logs",
-      "GET /cluster/{node_id}/logs/summary",
-      "PUT /cluster/restart",
-      "GET /cluster/configuration/validation",
-      "GET /cluster/{node_id}/configuration/{component}/{configuration}"
-    ]
-  },
-  "agent:reconnect": {
-    "description": "Force reconnect agents",
-    "resources": [
-      "agent:id",
-      "agent:group"
-    ],
-    "example": {
-      "actions": [
-        "agent:reconnect"
-      ],
-      "resources": [
-        "agent:id:050",
-        "agent:id:049"
-      ],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "PUT /agents/reconnect"
     ]
   },
   "ciscat:read": {
@@ -413,7 +412,7 @@
     ]
   },
   "lists:read": {
-    "description": "Read cdb lists files",
+    "description": "Read CDB lists files",
     "resources": [
       "list:file"
     ],
@@ -433,7 +432,7 @@
     ]
   },
   "lists:update": {
-    "description": "Update or upload cdb lists files",
+    "description": "Update or upload CDB lists files",
     "resources": [
       "*:*"
     ],
@@ -451,7 +450,7 @@
     ]
   },
   "lists:delete": {
-    "description": "Delete cdb lists files",
+    "description": "Delete CDB lists files",
     "resources": [
       "list:file"
     ],

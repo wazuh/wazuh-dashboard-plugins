@@ -26,10 +26,8 @@ import WzSampleData from './sample-data';
 import {
   withUserAuthorizationPrompt,
   withErrorBoundary,
-  withReduxProvider,
 } from '../../components/common/hocs';
 import { compose } from 'redux';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 
 export class WzSampleDataProvider extends Component {
   constructor(props) {
@@ -67,6 +65,5 @@ export class WzSampleDataProvider extends Component {
 
 export const WzSampleDataWrapper = compose(
   withErrorBoundary,
-  withReduxProvider,
-  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME]),
+  withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
 )(WzSampleDataProvider);

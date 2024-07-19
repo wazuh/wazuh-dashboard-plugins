@@ -14,9 +14,8 @@ describe('SettingsAboutAppInfo component', () => {
         appInfo={{
           'app-version': '4.8.0',
           revision: '01',
-          installationDate: 'Sep 25, 2023 @ 14:03:40.816',
         }}
-      />
+      />,
     );
 
     expect(container).toMatchSnapshot();
@@ -25,7 +24,5 @@ describe('SettingsAboutAppInfo component', () => {
     expect(getByText('4.8.0')).toBeInTheDocument();
     expect(getByText('App revision:')).toBeInTheDocument();
     expect(getByText('01')).toBeInTheDocument();
-    expect(getByText('Install date:')).toBeInTheDocument();
-    expect(getByText('Sep 25, 2023 @ 14:03:40.816')).toBeInTheDocument();
   });
 });

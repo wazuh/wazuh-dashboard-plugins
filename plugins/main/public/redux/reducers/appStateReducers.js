@@ -21,11 +21,14 @@ const initialState = {
   ),
   showExploreAgentModalGlobal: false,
   userPermissions: false,
-  userRoles: [],
   toastNotification: false,
   withUserLogged: false,
   allowedAgents: [],
   logtestToken: '',
+  userAccount: {
+    administrator: false,
+    administrator_requirements: '',
+  },
 };
 
 const appStateReducers = (state = initialState, action) => {
@@ -64,6 +67,13 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
+  if (action.type === 'UPDATE_USER_ACCOUNT') {
+    return {
+      ...state,
+      userAccount: action.userAccount,
+    };
+  }
+
   if (action.type === 'UPDATE_SELECTED_AGENT_DATA') {
     window.sessionStorage.setItem(
       'wz-shared-selected-agent',
@@ -79,13 +89,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       showExploreAgentModalGlobal: action.showExploreAgentModalGlobal,
-    };
-  }
-
-  if (action.type === 'UPDATE_USER_ROLES') {
-    return {
-      ...state,
-      userRoles: action.userRoles,
     };
   }
 

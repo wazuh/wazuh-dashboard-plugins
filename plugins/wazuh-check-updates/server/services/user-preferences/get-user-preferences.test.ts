@@ -1,12 +1,17 @@
 import { getSavedObject } from '../saved-object/get-saved-object';
 import { getUserPreferences } from './get-user-preferences';
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
-import { getWazuhCore } from '../../plugin-services';
+import {
+  getWazuhCore,
+  getWazuhCheckUpdatesServices,
+} from '../../plugin-services';
 
 const mockedGetSavedObject = getSavedObject as jest.Mock;
 jest.mock('../saved-object/get-saved-object');
 
 const mockedGetWazuhCore = getWazuhCore as jest.Mock;
+const mockedGetWazuhCheckUpdatesServices =
+  getWazuhCheckUpdatesServices as jest.Mock;
 jest.mock('../../plugin-services');
 
 describe('getUserPreferences function', () => {
@@ -25,10 +30,22 @@ describe('getUserPreferences function', () => {
       hide_update_notifications: false,
     }));
 
+    mockedGetWazuhCheckUpdatesServices.mockImplementation(() => ({
+      logger: {
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      },
+    }));
+
     const response = await getUserPreferences('admin');
 
     expect(getSavedObject).toHaveBeenCalledTimes(1);
-    expect(getSavedObject).toHaveBeenCalledWith(SAVED_OBJECT_USER_PREFERENCES, 'admin');
+    expect(getSavedObject).toHaveBeenCalledWith(
+      SAVED_OBJECT_USER_PREFERENCES,
+      'admin',
+    );
 
     expect(response).toEqual({
       last_dismissed_updates: [
@@ -43,10 +60,6 @@ describe('getUserPreferences function', () => {
 
   test('should return an error', async () => {
     mockedGetSavedObject.mockRejectedValue(new Error('getSavedObject error'));
-
-    mockedGetWazuhCore.mockImplementation(() => ({
-      services: { log: jest.fn().mockImplementation(() => {}) },
-    }));
 
     const promise = getUserPreferences('admin');
 

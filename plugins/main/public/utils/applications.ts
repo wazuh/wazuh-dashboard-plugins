@@ -40,13 +40,18 @@ export const overview = {
   }),
   description: i18n.translate('wz-app-overview-description', {
     defaultMessage:
-      'This application provides you with an overview of Wazuh applications.',
+      'This application provides you with an overview of applications.',
   }),
   euiIconType: 'lensApp',
   order: 1,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/overview/',
+  redirectTo: () =>
+    `/overview/${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `?agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
 };
 
 export const fileIntegrityMonitoring = {
@@ -70,7 +75,7 @@ export const fileIntegrityMonitoring = {
   showInAgentMenu: true,
   order: 202,
   redirectTo: () =>
-    `/overview/?tab=fim&tabView=panels${
+    `/overview/?tab=fim&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -114,7 +119,7 @@ export const malwareDetection = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=pm&tabView=panels${
+    `/overview/?tab=pm&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -142,7 +147,7 @@ export const configurationAssessment = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=sca&tabView=panels${
+    `/overview/?tab=sca&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -167,7 +172,7 @@ export const threatHunting = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=general&tabView=panels${
+    `/overview/?tab=general&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -193,9 +198,9 @@ export const vulnerabilityDetection = {
   euiIconType: 'heartbeatApp',
   order: 301,
   showInOverviewApp: true,
-  showInAgentMenu: true,
+  showInAgentMenu: false,
   redirectTo: () =>
-    `/overview/?tab=vuls&tabView=panels${
+    `/overview/?tab=vuls&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -220,7 +225,7 @@ export const mitreAttack = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=mitre&tabView=panels${
+    `/overview/?tab=mitre&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -245,7 +250,7 @@ export const virustotal = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=virustotal&tabView=panels${
+    `/overview/?tab=virustotal&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -270,7 +275,7 @@ const pciDss = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=pci&tabView=panels${
+    `/overview/?tab=pci&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -295,7 +300,7 @@ const hipaa = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=hipaa&tabView=panels${
+    `/overview/?tab=hipaa&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -320,7 +325,7 @@ const gdpr = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=gdpr&tabView=panels${
+    `/overview/?tab=gdpr&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -345,7 +350,7 @@ const nist80053 = {
   showInAgentMenu: true,
   order: 403,
   redirectTo: () =>
-    `/overview/?tab=nist&tabView=panels${
+    `/overview/?tab=nist&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -370,7 +375,7 @@ const tsc = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=tsc&tabView=panels${
+    `/overview/?tab=tsc&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -398,7 +403,7 @@ export const amazonWebServices = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=aws&tabView=panels${
+    `/overview/?tab=aws&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -423,7 +428,7 @@ export const googleCloud = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=gcp&tabView=panels${
+    `/overview/?tab=gcp&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -448,7 +453,7 @@ export const github = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=github&tabView=panels${
+    `/overview/?tab=github&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -472,7 +477,7 @@ export const office365 = {
   showInOverviewApp: true,
   showInAgentMenu: false,
   redirectTo: () =>
-    `/overview/?tab=office&tabView=panels${
+    `/overview/?tab=office&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -497,7 +502,7 @@ export const docker = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=docker&tabView=panels${
+    `/overview/?tab=docker&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -514,7 +519,7 @@ export const rules = {
     defaultMessage: 'Rules',
   }),
   description: i18n.translate('wz-app-rules-description', {
-    defaultMessage: 'Manage your Wazuh cluster rules.',
+    defaultMessage: 'Manage your cluster rules.',
   }),
   euiIconType: 'indexRollupApp',
   order: 602,
@@ -533,7 +538,7 @@ export const decoders = {
     defaultMessage: 'Decoders',
   }),
   description: i18n.translate('wz-app-decoders-description', {
-    defaultMessage: 'Manage your Wazuh cluster decoders.',
+    defaultMessage: 'Manage your cluster decoders.',
   }),
   euiIconType: 'indexRollupApp',
   order: 603,
@@ -552,7 +557,7 @@ export const cdbLists = {
     defaultMessage: 'CDB Lists',
   }),
   description: i18n.translate('wz-app-cdb-lists-description', {
-    defaultMessage: 'Manage your Wazuh cluster CDB list.',
+    defaultMessage: 'Manage your cluster CDB list.',
   }),
   euiIconType: 'indexRollupApp',
   order: 604,
@@ -590,7 +595,7 @@ export const serverStatus = {
     defaultMessage: 'Status',
   }),
   description: i18n.translate('wz-app-server-status-description', {
-    defaultMessage: 'Manage your Wazuh cluster status.',
+    defaultMessage: 'Manage your cluster status.',
   }),
   euiIconType: 'indexRollupApp',
   order: 605,
@@ -609,7 +614,7 @@ export const cluster = {
     defaultMessage: 'Cluster',
   }),
   description: i18n.translate('wz-app-cluster-description', {
-    defaultMessage: 'Manage your Wazuh cluster.',
+    defaultMessage: 'Manage your cluster.',
   }),
   euiIconType: 'indexRollupApp',
   order: 606,
@@ -628,7 +633,7 @@ export const statistics = {
     defaultMessage: 'Statistics',
   }),
   description: i18n.translate('wz-app-statistics-description', {
-    defaultMessage: 'Information about the Wazuh enviroment.',
+    defaultMessage: 'Information about the enviroment.',
   }),
   euiIconType: 'indexRollupApp',
   order: 607,
@@ -647,7 +652,7 @@ export const logs = {
     defaultMessage: 'Logs',
   }),
   description: i18n.translate('wz-app-logs-description', {
-    defaultMessage: 'Logs from your Wazuh cluster.',
+    defaultMessage: 'Logs from your cluster.',
   }),
   euiIconType: 'indexRollupApp',
   order: 608,
@@ -666,7 +671,7 @@ export const reporting = {
     defaultMessage: 'Reporting',
   }),
   description: i18n.translate('wz-app-reporting-description', {
-    defaultMessage: 'Check your stored Wazuh reports.',
+    defaultMessage: 'Check your stored reports.',
   }),
   euiIconType: 'indexRollupApp',
   order: 10002,
@@ -685,7 +690,7 @@ export const settings = {
     defaultMessage: 'Settings',
   }),
   description: i18n.translate('wz-app-settings-description', {
-    defaultMessage: 'Manage your Wazuh cluster configuration.',
+    defaultMessage: 'Manage your cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
   order: 609,
@@ -704,13 +709,13 @@ export const devTools = {
     defaultMessage: 'Dev Tools',
   }),
   description: i18n.translate('wz-app-dev-tools-description', {
-    defaultMessage: 'Test the Wazuh API endpoints.',
+    defaultMessage: 'Test the API endpoints.',
   }),
   euiIconType: 'devToolsApp',
   order: 610,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/wazuh-dev/?tab=devTools',
+  redirectTo: () => '/wazuh-dev?tab=devTools',
 };
 
 export const rulesetTest = {
@@ -729,7 +734,7 @@ export const rulesetTest = {
   order: 611,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/wazuh-dev/?tab=logtest',
+  redirectTo: () => '/wazuh-dev?tab=logtest',
 };
 
 export const security = {
@@ -800,32 +805,13 @@ export const appSettings = {
     defaultMessage: 'App Settings',
   }),
   description: i18n.translate('wz-app-settings-description', {
-    defaultMessage: 'Manage your Wazuh cluster configuration.',
+    defaultMessage: 'Manage your cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
   order: 10004,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=configuration',
-};
-
-const appLogs = {
-  category: 'wz-category-dashboard-management',
-  id: 'app-logs',
-  title: i18n.translate('wz-app-app-logs-title', {
-    defaultMessage: 'App Logs',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-app-logs-breadcrumbLabel', {
-    defaultMessage: 'App Logs',
-  }),
-  description: i18n.translate('wz-app-app-logs-description', {
-    defaultMessage: 'Explore the logs related to the applications.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 10005,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/settings?tab=logs',
 };
 
 const about = {
@@ -883,7 +869,6 @@ export const Applications = [
   serverApis,
   sampleData,
   appSettings,
-  appLogs,
   about,
 ].sort((a, b) => {
   // Sort applications by order

@@ -12,15 +12,21 @@
 import { WazuhElasticCtrl } from '../controllers';
 import { IRouter } from 'opensearch_dashboards/server';
 import { schema } from '@osd/config-schema';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY, WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING, WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../common/constants';
+import {
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+} from '../../common/constants';
 
 export function WazuhElasticRoutes(router: IRouter) {
   const ctrl = new WazuhElasticCtrl();
-  const schemaSampleAlertsCategories = schema.oneOf([
-    WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
-    WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
-    WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION
-  ].map(category => schema.literal(category)));
+  const schemaSampleAlertsCategories = schema.oneOf(
+    [
+      WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+      WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+      WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+    ].map(category => schema.literal(category)),
+  );
 
   // Endpoints
   router.get(
@@ -28,34 +34,8 @@ export function WazuhElasticRoutes(router: IRouter) {
       path: '/elastic/security/current-platform',
       validate: false,
     },
-    async (context, request, response) => ctrl.getCurrentPlatform(context, request, response)
-  );
-
-  router.get(
-    {
-      path: '/elastic/visualizations/{tab}/{pattern}',
-      validate: {
-        params: schema.object({
-          tab: schema.string(),
-          pattern: schema.string(),
-        }),
-      }
-    },
-    async (context, request, response) => ctrl.createVis(context, request, response)
-  );
-
-  router.post(
-    {
-      path: '/elastic/visualizations/{tab}/{pattern}',
-      validate: {
-        params: schema.object({
-          tab: schema.string(),
-          pattern: schema.string(),
-        }),
-        body: schema.any()
-      }
-    },
-    async (context, request, response) => ctrl.createClusterVis(context, request, response)
+    async (context, request, response) =>
+      ctrl.getCurrentPlatform(context, request, response),
   );
 
   router.get(
@@ -64,12 +44,14 @@ export function WazuhElasticRoutes(router: IRouter) {
       validate: {
         params: schema.object({
           pattern: schema.string(),
-        })
-      }
+        }),
+      },
     },
-    async (context, request, response) => ctrl.getTemplate(context, request, response)
+    async (context, request, response) =>
+      ctrl.getTemplate(context, request, response),
   );
 
+  // TODO: this seems to be deprecated in 4.9 so it could be removed
   router.get(
     {
       path: '/elastic/top/{mode}/{cluster}/{field}/{pattern}',
@@ -82,10 +64,11 @@ export function WazuhElasticRoutes(router: IRouter) {
         }),
         query: schema.object({
           agentsList: schema.string(),
-        })
-      }
+        }),
+      },
     },
-    async (context, request, response) => ctrl.getFieldTop(context, request, response)
+    async (context, request, response) =>
+      ctrl.getFieldTop(context, request, response),
   );
 
   router.get(
@@ -93,7 +76,8 @@ export function WazuhElasticRoutes(router: IRouter) {
       path: '/elastic/samplealerts',
       validate: false,
     },
-    async (context, request, response) => ctrl.haveSampleAlerts(context, request, response)
+    async (context, request, response) =>
+      ctrl.haveSampleAlerts(context, request, response),
   );
 
   router.get(
@@ -102,10 +86,11 @@ export function WazuhElasticRoutes(router: IRouter) {
       validate: {
         params: schema.object({
           category: schemaSampleAlertsCategories,
-        })
+        }),
       },
     },
-    async (context, request, response) => ctrl.haveSampleAlertsOfCategory(context, request, response)
+    async (context, request, response) =>
+      ctrl.haveSampleAlertsOfCategory(context, request, response),
   );
 
   router.post(
@@ -115,10 +100,11 @@ export function WazuhElasticRoutes(router: IRouter) {
         params: schema.object({
           category: schemaSampleAlertsCategories,
         }),
-        body: schema.any()
+        body: schema.any(),
       },
     },
-    async (context, request, response) => ctrl.createSampleAlerts(context, request, response)
+    async (context, request, response) =>
+      ctrl.createSampleAlerts(context, request, response),
   );
 
   router.delete(
@@ -127,10 +113,11 @@ export function WazuhElasticRoutes(router: IRouter) {
       validate: {
         params: schema.object({
           category: schemaSampleAlertsCategories,
-        })
+        }),
       },
     },
-    async (context, request, response) => ctrl.deleteSampleAlerts(context, request, response)
+    async (context, request, response) =>
+      ctrl.deleteSampleAlerts(context, request, response),
   );
 
   router.post(
@@ -138,16 +125,18 @@ export function WazuhElasticRoutes(router: IRouter) {
       path: '/elastic/alerts',
       validate: {
         body: schema.any(),
-      }
+      },
     },
-    async (context, request, response) => ctrl.alerts(context, request, response)
+    async (context, request, response) =>
+      ctrl.alerts(context, request, response),
   );
 
   router.get(
     {
       path: '/elastic/statistics',
-      validate: false
+      validate: false,
     },
-    async (context, request, response) => ctrl.existStatisticsIndices(context, request, response)
+    async (context, request, response) =>
+      ctrl.existStatisticsIndices(context, request, response),
   );
 }

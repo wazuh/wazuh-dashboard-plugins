@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState } from 'react';
-// Redux
-import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzCDBListsOverview from './views/cdblists-overview';
 import WzListEditor from './views/list-editor';
 
@@ -19,20 +17,24 @@ export default function WzCDBList() {
   const [listContent, setListContent] = useState(false);
 
   return (
-    <WzReduxProvider>
-      {
-        (listContent && (
-          <WzListEditor
-            listContent={listContent}
-            clearContent={() => { setListContent(false) }}
-            updateListContent={(listContent) => { setListContent(listContent) }}
-          />
-        )) || (
-          <WzCDBListsOverview
-            updateListContent={(listContent) => { setListContent(listContent) }}
-          />
-        )
-      }
-    </WzReduxProvider>
+    <>
+      {(listContent && (
+        <WzListEditor
+          listContent={listContent}
+          clearContent={() => {
+            setListContent(false);
+          }}
+          updateListContent={listContent => {
+            setListContent(listContent);
+          }}
+        />
+      )) || (
+        <WzCDBListsOverview
+          updateListContent={listContent => {
+            setListContent(listContent);
+          }}
+        />
+      )}
+    </>
   );
 }

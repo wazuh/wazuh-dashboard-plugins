@@ -18,4 +18,10 @@ export class DefaultFactory implements ISecurityFactory {
       hashUsername: md5(ELASTIC_NAME),
     };
   }
+  async isAdministratorUser(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+  ) {
+    // This is replaced after creating the instance
+  }
 }

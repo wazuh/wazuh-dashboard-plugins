@@ -1,9 +1,8 @@
-import migrateReportsDirectoryName from "./reports_directory_name";
+import migrateReportsDirectoryName from './reports_directory_name';
 
 export function jobMigrationTasksRun(context) {
-  const migrationTasks = [
-    migrateReportsDirectoryName
-  ];
+  context.wazuh.logger.debug('Migration tasks started');
+  const migrationTasks = [migrateReportsDirectoryName];
 
   migrationTasks.forEach(task => task(context));
 }

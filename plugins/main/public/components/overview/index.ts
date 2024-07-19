@@ -1,1 +1,16 @@
-export { Mitre } from './mitre';
+export { Mitre, DashboardMITRE } from './mitre';
+export { DashboardAWS } from './amazon-web-services/dashboards';
+export { DashboardDocker } from './docker/dashboards';
+export { DashboardFIM } from './fim/dashboard';
+export { DashboardGDPR } from './gdpr/dashboards';
+export { DashboardGitHub } from './github/dashboards';
+export { DashboardGoogleCloud } from './google-cloud/dashboards';
+export { DashboardHIPAA } from './hipaa/dashboards';
+export { DashboardMalwareDetection } from './malware-detection/dashboard';
+export { DashboardNIST80053 } from './nist/dashboards';
+export { DashboardPCIDSS } from './pci/dashboards';
+export { DashboardOffice365 } from './office/dashboard';
+export { DashboardThreatHunting } from './threat-hunting/dashboard';
+export { DashboardTSC } from './tsc/dashboards';
+export { DashboardVirustotal } from './virustotal/dashboard';
+export { DashboardVuls, InventoryVuls } from './vulnerabilities';

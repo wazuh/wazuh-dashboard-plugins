@@ -85,6 +85,7 @@ import { getCore } from '../../../../../kibana-services';
 import { PromptNoActiveAgentWithoutSelect } from '../../../../../components/agents/prompts';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { endpointGroups } from '../../../../../utils/applications';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -212,7 +213,7 @@ class WzConfigurationSwitch extends Component {
                 {agent.group.map((group, key) => (
                   <EuiButtonEmpty
                     key={`agent-group-${key}`}
-                    href={getCore().application.getUrlForApp(
+                    href={NavigationService.getInstance().getUrlForApp(
                       endpointGroups.id,
                       { path: `#/manager/?tab=groups&group=${group}` },
                     )}
@@ -243,7 +244,6 @@ class WzConfigurationSwitch extends Component {
               <WzConfigurationOverview
                 agent={masterNodeInfo || agent}
                 agentSynchronized={agentSynchronized}
-                exportConfiguration={this.props.exportConfiguration}
                 updateConfigurationSection={this.updateConfigurationSection}
               />
             )) || <WzLoading />)}

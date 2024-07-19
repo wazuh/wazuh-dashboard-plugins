@@ -20,8 +20,8 @@ import {
   EuiBadge,
   EuiPopover,
 } from '@elastic/eui';
-import { getCore } from '../../../../kibana-services';
 import { endpointGroups } from '../../../../utils/applications';
+import NavigationService from '../../../../react-services/navigation-service';
 
 export class GroupTruncate extends React.Component {
   _isMount = false;
@@ -30,9 +30,9 @@ export class GroupTruncate extends React.Component {
     popoverOpen: boolean;
   };
   props!: {
+    groups?: string[];
     label: String;
     length: number;
-    agent: Object;
     action: String;
     filterAction: any;
   };
@@ -52,9 +52,12 @@ export class GroupTruncate extends React.Component {
   action(index, group) {
     switch (this.props.action) {
       case 'redirect':
-        return getCore().application.navigateToApp(endpointGroups.id, {
-          path: `#/manager/?tab=groups&group=${group}`,
-        });
+        return NavigationService.getInstance().navigateToApp(
+          endpointGroups.id,
+          {
+            path: `#/manager/?tab=groups&group=${group}`,
+          },
+        );
       case 'filter':
         return this.filterAction(group);
       default:
@@ -100,10 +103,10 @@ export class GroupTruncate extends React.Component {
     );
   }
 
-  renderGroups(groups = []) {
+  renderGroups(groups: string[] = []) {
     const { length } = this.props;
-    let auxGroups: Array<String> = [];
-    let tooltipGroups: Array<String> = [];
+    let auxGroups: Array<React.ReactNode> = [];
+    let tooltipGroups: Array<React.ReactNode> = [];
     let auxLength = 0;
     let auxIndex = 0;
     if (groups.length >= 2 && groups.toString().length >= length) {

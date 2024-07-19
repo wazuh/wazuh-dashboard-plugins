@@ -1,11 +1,7 @@
 import fs from 'fs';
 import glob from 'glob';
 import path from 'path';
-import { PLUGIN_SETTINGS, TPluginSetting } from '../../../common/constants';
-import { log } from '../../lib/logger';
 import { sanitizeSVG } from '../../lib/sanitizer';
-import { getConfiguration } from '../../lib/get-configuration';
-import { UpdateConfigurationFile } from '../../lib/update-configuration';
 
 /**
  * This task checks for custom SVG files uploaded by the user and sanitizes them.
@@ -13,10 +9,9 @@ import { UpdateConfigurationFile } from '../../lib/update-configuration';
  * @param context
  * @returns
  */
-export default function sanitizeUploadedSVG(context) {
+export default async function sanitizeUploadedSVG(context) {
   // Create a wrapper function that logs to plugin files and platform logging system
   const createLog = (level: string) => message => {
-    log('sanitize:sanitizeUploadedSVG', message, level);
     context.wazuh.logger[level](`sanitize:sanitizeUploadedSVG: ${message}`);
   };
 
@@ -31,9 +26,8 @@ export default function sanitizeUploadedSVG(context) {
   try {
     logger.debug('Task sanitize SVG started');
 
-    logger.debug('Get Wazuh configuration');
-    const updateConfigurationFile = new UpdateConfigurationFile();
-    const configuration = getConfiguration();
+    logger.debug('Get plugins configuration');
+    const configuration = await context.wazuh_core.configuration.get();
     const logosSettingKeys = [
       'customization.logo.sidebar',
       'customization.logo.app',
@@ -43,7 +37,8 @@ export default function sanitizeUploadedSVG(context) {
     logger.debug('Check configuration for custom branding uploaded SVG files');
     // Check each of the possible custom settings uploaded files look for SVG to sanitize
     logosSettingKeys.forEach(async logoKey => {
-      const logoSetting: TPluginSetting | undefined = PLUGIN_SETTINGS[logoKey];
+      const logoSetting =
+        context.wazuh_core.configuration._settings.get(logoKey);
       const customLogoPath = configuration[logoKey];
       if (!logoSetting || !customLogoPath) {
         logger.debug(`Logo [${logoKey}] not customized. Skip.`);
@@ -110,13 +105,13 @@ export default function sanitizeUploadedSVG(context) {
           logoSetting.options.file.store.resolveStaticURL(
             configuredCustomLogo.fileName,
           );
-        await updateConfigurationFile.updateConfiguration({
+        await context.wazuh_core.configuration.set({
           [logoKey]: pluginSettingValue,
         });
       }
     });
 
-    logger.debug(' Task finished');
+    logger.debug('Task finished');
   } catch (error) {
     logger.error(`Error: ${error.message}`);
   }

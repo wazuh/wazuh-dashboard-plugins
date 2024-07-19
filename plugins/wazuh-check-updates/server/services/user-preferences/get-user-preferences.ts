@@ -2,13 +2,15 @@ import _ from 'lodash';
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
 import { UserPreferences } from '../../../common/types';
 import { getSavedObject } from '../saved-object';
-import { getWazuhCore } from '../../plugin-services';
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 
-export const getUserPreferences = async (username: string): Promise<UserPreferences> => {
+export const getUserPreferences = async (
+  username: string,
+): Promise<UserPreferences> => {
   try {
     const userPreferences = (await getSavedObject(
       SAVED_OBJECT_USER_PREFERENCES,
-      username
+      username,
     )) as UserPreferences;
 
     const userPreferencesWithoutUsername = _.omit(userPreferences, 'username');
@@ -22,11 +24,9 @@ export const getUserPreferences = async (username: string): Promise<UserPreferen
         ? error
         : 'Error trying to get user preferences';
 
-    const {
-      services: { log },
-    } = getWazuhCore();
+    const { logger } = getWazuhCheckUpdatesServices();
 
-    log('wazuh-check-updates:getUserPreferences', message);
+    logger.error(message);
     return Promise.reject(error);
   }
 };

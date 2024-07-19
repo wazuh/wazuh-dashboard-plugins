@@ -15,15 +15,12 @@ import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
-import {
-  updateFileContent,
-} from '../../../../../redux/actions/groupsActions';
+import { updateFileContent } from '../../../../../redux/actions/groupsActions';
 
 import GroupsHandler from './utils/groups-handler';
-import { ExportConfiguration } from '../../../../agent/components/export-configuration';
+import { ExportConfiguration } from '../../../../../components/agents/export-configuration';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { ReportingService } from '../../../../../react-services/reporting';
-
 
 class WzGroupsActionButtonsFiles extends Component {
   constructor(props) {
@@ -34,11 +31,14 @@ class WzGroupsActionButtonsFiles extends Component {
     this.refreshTimeoutId = null;
   }
 
-  autoFormat = (xml) => {
+  autoFormat = xml => {
     var reg = /(>)\s*(<)(\/*)/g;
     var wsexp = / *(.*) +\n/g;
     var contexp = /(<.+>)(.+\n)/g;
-    xml = xml.replace(reg, '$1\n$2$3').replace(wsexp, '$1\n').replace(contexp, '$1\n$2');
+    xml = xml
+      .replace(reg, '$1\n$2$3')
+      .replace(wsexp, '$1\n')
+      .replace(contexp, '$1\n$2');
     var formatted = '';
     var lines = xml.split('\n');
     var indent = 0;
@@ -71,7 +71,13 @@ class WzGroupsActionButtonsFiles extends Component {
       var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
       var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
       var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
-      var type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
+      var type = single
+        ? 'single'
+        : closing
+        ? 'closing'
+        : opening
+        ? 'opening'
+        : 'other';
       var fromTo = lastType + '->' + type;
       lastType = type;
       var padding = '';
@@ -91,7 +97,7 @@ class WzGroupsActionButtonsFiles extends Component {
   async showGroupConfiguration() {
     const { itemDetail } = this.props.state;
     let result = await this.groupsHandler.getFileContent(
-      `/groups/${itemDetail.name}/files/agent.conf/xml`
+      `/groups/${itemDetail.name}/files/agent.conf?raw=true`,
     );
 
     if (Object.keys(result).length == 0) {
@@ -113,12 +119,15 @@ class WzGroupsActionButtonsFiles extends Component {
     // Add new group button
     const groupConfigurationButton = (
       <WzButtonPermissions
-        buttonType="empty"
+        buttonType='empty'
         permissions={[
-          { action: 'group:read', resource: `group:id:${this.props.state.itemDetail.name}` },
+          {
+            action: 'group:read',
+            resource: `group:id:${this.props.state.itemDetail.name}`,
+          },
         ]}
-        iconSide="left"
-        iconType="documentEdit"
+        iconSide='left'
+        iconType='documentEdit'
         onClick={() => this.showGroupConfiguration()}
       >
         Edit group configuration
@@ -128,14 +137,14 @@ class WzGroupsActionButtonsFiles extends Component {
     // Export PDF button
     const exportPDFButton = (
       <ExportConfiguration
-        exportConfiguration={(enabledComponents) =>
+        exportConfiguration={enabledComponents =>
           this.reportingService.startConfigReport(
             this.props.state.itemDetail,
             'groupConfig',
-            enabledComponents
+            enabledComponents,
           )
         }
-        type="group"
+        type='group'
       />
     );
 
@@ -148,16 +157,19 @@ class WzGroupsActionButtonsFiles extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateFileContent: (content) => dispatch(updateFileContent(content)),
+    updateFileContent: content => dispatch(updateFileContent(content)),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtonsFiles);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(WzGroupsActionButtonsFiles);

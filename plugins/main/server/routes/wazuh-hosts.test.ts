@@ -1,85 +1,107 @@
 // To launch this file
 // yarn test:jest --testEnvironment node --verbose server/routes/wazuh-hosts
-import axios from 'axios';
-import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
+import supertest from 'supertest';
+import { createMockPlatformServer } from '../mocks/platform-server.mock';
+import { WazuhHostsRoutes } from './wazuh-hosts';
 
-function buildAxiosOptions(
-  method: string,
-  path: string,
-  data: any = {},
-  headers: any = {},
-) {
-  return {
-    method: method,
-    headers: {
-      ...PLUGIN_PLATFORM_REQUEST_HEADERS,
-      'content-type': 'application/json',
-      ...headers,
+function noop() {}
+const logger = {
+  debug: noop,
+  info: noop,
+  warn: noop,
+  error: noop,
+};
+const context = {
+  wazuh: {
+    logger,
+  },
+  wazuh_core: {
+    configuration: {
+      _settings: new Map(),
+      logger,
+      get: jest.fn(),
+      set: jest.fn(),
     },
-    url: `http://localhost:5601${path}`,
-    data: data,
-  };
-}
+    manageHosts: {
+      getEntries: jest.fn(),
+      create: jest.fn(),
+    },
+    dashboardSecurity: {
+      isAdministratorUser: jest.fn(),
+    },
+  },
+};
+const mockPlatformServer = createMockPlatformServer(context);
 
-describe.skip('Wazuh Host', () => {
-  describe('Wazuh API - /hosts/apis', () => {
-    test('[200] Returns the available API hosts', () => {
-      const options = buildAxiosOptions('get', '/hosts/apis');
-      return axios(options)
-        .then(response => {
-          expect(response.status).toBe(200);
-          expect(Array.isArray(response.data)).toBe(true);
-          response.data.forEach(host => {
-            expect(typeof host.url).toBe('string');
-            expect(typeof host.port).toBe('number');
-            expect(typeof host.username).toBe('string');
-            expect(typeof host.run_as).toBe('boolean');
-            expect(typeof host.id).toBe('string');
-            expect(typeof host.cluster_info).toBe('object');
-            expect(typeof host.cluster_info.status).toBe('string');
-            expect(typeof host.cluster_info.manager).toBe('string');
-            expect(typeof host.cluster_info.node).toBe('string');
-            expect(typeof host.cluster_info.cluster).toBe('string');
-            expect(typeof host.allow_run_as).toBe('number');
-          });
-        })
-        .catch(error => {
-          throw error;
-        });
+beforeAll(async () => {
+  // Register settings
+  context.wazuh_core.configuration._settings.set('hosts', {
+    options: {
+      arrayOf: {
+        id: {},
+        url: {},
+        port: {},
+        username: {},
+        password: {},
+        run_as: {},
+      },
+    },
+  });
+  const registerRoutes = router =>
+    WazuhHostsRoutes(router, {
+      configuration: context.wazuh_core.configuration,
     });
+  await mockPlatformServer.start(registerRoutes);
+});
+
+afterAll(async () => {
+  await mockPlatformServer.stop();
+});
+
+describe('[endpoint] GET /hosts/apis', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  describe('Wazuh API - /hosts/update-hostname', () => {
-    test('[200] Update the cluster info for a API host', () => {
-      const options = buildAxiosOptions(
-        'put',
-        '/hosts/update-hostname/default',
-        {
-          cluster_info: {
-            status: 'enabled',
-            manager: 'wazuh-test',
-            node: 'node-test',
-            cluster: 'cluster-test',
-          },
-        },
-      );
-      return axios(options)
-        .then(response => {
-          expect(response.status).toBe(200);
-        })
-        .catch(error => {
-          throw error;
-        });
+  it.each`
+    storedAPIs
+    ${[{
+    id: 'default',
+    url: 'https://localhost',
+    port: 55000,
+    username: 'test',
+    password: 'test',
+    run_as: false,
+  }]}
+    ${[{
+    id: 'default',
+    url: 'https://localhost',
+    port: 55000,
+    username: 'test',
+    password: 'test',
+    run_as: false,
+  }, {
+    id: 'default2',
+    url: 'https://localhost',
+    port: 55000,
+    username: 'test',
+    password: 'test',
+    run_as: false,
+  }]}
+  `('Get API hosts', async ({ storedAPIs }) => {
+    let currentAPIs = storedAPIs;
+    context.wazuh_core.manageHosts.getEntries.mockImplementation(() =>
+      currentAPIs.map(currentAPI => ({ ...currentAPI, cluster_info: {} })),
+    );
+    const response = await supertest(mockPlatformServer.getServerListener())
+      .get(`/hosts/apis`)
+      .expect(200);
+
+    currentAPIs.forEach((currentAPI, index) => {
+      Object.keys(currentAPI).forEach(key => {
+        expect(response.body[index][key]).toBe(currentAPI[key]);
+      });
+      expect(response.body[index].cluster_info).toBeDefined();
     });
   });
 });
-
-//TODO: Do the test to remove-orphan-entries endpoint
-// describe('Wazuh API - /hosts/remove-orphan-entries', () => {
-//   test('[200] Remove orphan entries', () => {
-//     const options = buildAxiosOptions('post', '/hosts/remove-orphan-entries');
-//     return axios(options).then(response => {
-//       expect(response.status).toBe(200);
-//     }).catch(error => {throw error})
-//   });
-// });

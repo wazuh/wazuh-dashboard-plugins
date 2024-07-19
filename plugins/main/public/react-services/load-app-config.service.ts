@@ -27,14 +27,18 @@ import { getErrorOrchestrator } from './common-services';
 export const loadAppConfig = async () => {
   try {
     store.dispatch(setAppConfigIsLoading());
-    const config = await GenericRequest.request('GET', '/utils/configuration', {});
+    const config = await GenericRequest.request(
+      'GET',
+      '/utils/configuration',
+      {},
+    );
 
     if (!config || !config.data || !config.data.data) {
       throw new Error('No config available');
     }
 
-    const ymlContent = config.data.data;
-    store.dispatch(updateAppConfig(ymlContent));
+    const configuration = config.data.data;
+    store.dispatch(updateAppConfig(configuration));
   } catch (error) {
     store.dispatch(setAppConfigHasError());
     const options = {
@@ -45,7 +49,7 @@ export const loadAppConfig = async () => {
       error: {
         error: error,
         message: error.message || error,
-        title: `Error parsing wazuh.yml, using default values.`,
+        title: 'Error getting configuration, using default values.',
       },
     };
     getErrorOrchestrator().handleError(options);

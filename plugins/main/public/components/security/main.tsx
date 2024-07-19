@@ -12,13 +12,12 @@ import { Users } from './users/users';
 import { Roles } from './roles/roles';
 import { Policies } from './policies/policies';
 import { GenericRequest } from '../../react-services/generic-request';
-import { API_USER_STATUS_RUN_AS } from '../../../server/lib/cache-api-user-has-run-as';
 import { AppState } from '../../react-services/app-state';
 import { RolesMapping } from './roles-mapping/roles-mapping';
 import {
-  withReduxProvider,
   withGlobalBreadcrumb,
   withErrorBoundary,
+  withRouteResolvers,
 } from '../common/hocs';
 import { compose } from 'redux';
 import {
@@ -28,8 +27,17 @@ import {
 
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
-import { getPluginDataPath } from '../../../common/plugin';
 import { security } from '../../utils/applications';
+import { getWazuhCorePlugin } from '../../kibana-services';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../services/resolves';
+import { Redirect, Route, Switch } from '../router-search';
+import { useRouterSearch } from '../common/hooks';
+import NavigationService from '../../react-services/navigation-service';
 
 const tabs = [
   {
@@ -56,16 +64,11 @@ const tabs = [
 
 export const WzSecurity = compose(
   withErrorBoundary,
-  withReduxProvider,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([{ text: security.breadcrumbLabel }]),
 )(() => {
-  // Get the initial tab when the component is initiated
-  const securityTabRegExp = new RegExp(
-    `tab=(${tabs.map(tab => tab.id).join('|')})`,
-  );
-  const tab = window.location.href.match(securityTabRegExp);
-
-  const selectedTabId = (tab && tab[1]) || 'users';
+  const navigationService = NavigationService.getInstance();
+  const { tab: selectedTabId } = useRouterSearch();
 
   const checkRunAsUser = async () => {
     const currentApi = AppState.getCurrentAPI();
@@ -104,18 +107,11 @@ export const WzSecurity = compose(
     }
   }, []);
 
-  const onSelectedTabChanged = id => {
-    window.location.href = window.location.href.replace(
-      `tab=${selectedTabId}`,
-      `tab=${id}`,
-    );
-  };
-
   const renderTabs = () => {
     return tabs.map((tab, index) => (
       <EuiTab
         {...(tab.href && { href: tab.href, target: '_blank' })}
-        onClick={() => onSelectedTabChanged(tab.id)}
+        onClick={() => navigationService.navigate(`/security?tab=${tab.id}`)}
         isSelected={tab.id === selectedTabId}
         disabled={tab.disabled}
         key={index}
@@ -128,23 +124,19 @@ export const WzSecurity = compose(
   const isNotRunAs = allowRunAs => {
     let runAsWarningTxt = '';
     switch (allowRunAs) {
-      case API_USER_STATUS_RUN_AS.HOST_DISABLED:
-        runAsWarningTxt = `For the role mapping to take effect, enable run_as in ${getPluginDataPath(
-          'config/wazuh.yml',
-        )} configuration file, restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
+      case getWazuhCorePlugin().API_USER_STATUS_RUN_AS.HOST_DISABLED:
+        runAsWarningTxt = `For the role mapping to take effect, enable run_as in the API host configuration, restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
         break;
-      case API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED:
+      case getWazuhCorePlugin().API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED:
         runAsWarningTxt =
-          'The role mapping has no effect because the current Wazuh API user has allow_run_as disabled.';
+          'The role mapping has no effect because the current API user has allow_run_as disabled.';
         break;
-      case API_USER_STATUS_RUN_AS.ALL_DISABLED:
-        runAsWarningTxt = `For the role mapping to take effect, enable run_as in ${getPluginDataPath(
-          'config/wazuh.yml',
-        )} configuration file and set the current Wazuh API user allow_run_as to true. Restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
+      case getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ALL_DISABLED:
+        runAsWarningTxt = `For the role mapping to take effect, enable run_as in the API host configuration and set the current API user allow_run_as to true. Restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
         break;
       default:
         runAsWarningTxt =
-          'The role mapping has no effect because the current Wazuh API user has run_as disabled.';
+          'The role mapping has no effect because the current API user has run_as disabled.';
         break;
     }
 
@@ -168,17 +160,27 @@ export const WzSecurity = compose(
         <EuiFlexItem>
           <EuiTabs>{renderTabs()}</EuiTabs>
           <EuiSpacer size='m'></EuiSpacer>
-          {selectedTabId === 'users' && <Users></Users>}
-          {selectedTabId === 'roles' && <Roles></Roles>}
-          {selectedTabId === 'policies' && <Policies></Policies>}
-          {selectedTabId === 'roleMapping' && (
-            <>
-              {allowRunAs !== undefined &&
-                allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED &&
-                isNotRunAs(allowRunAs)}
-              <RolesMapping></RolesMapping>
-            </>
-          )}
+          <Switch>
+            <Route path='?tab=users'>
+              <Users></Users>
+            </Route>
+            <Route path='?tab=roles'>
+              <Roles></Roles>
+            </Route>
+            <Route path='?tab=policies'>
+              <Policies></Policies>
+            </Route>
+            <Route path='?tab=roleMapping'>
+              <>
+                {allowRunAs !== undefined &&
+                  allowRunAs !==
+                    getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ENABLED &&
+                  isNotRunAs(allowRunAs)}
+                <RolesMapping></RolesMapping>
+              </>
+            </Route>
+            <Redirect to='?tab=users'></Redirect>
+          </Switch>
         </EuiFlexItem>
       </EuiFlexGroup>
     </EuiPage>

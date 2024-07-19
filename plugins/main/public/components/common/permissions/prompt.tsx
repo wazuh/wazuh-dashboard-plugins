@@ -11,44 +11,38 @@
  */
 
 import React, { Fragment } from 'react';
-import { useUserPermissionsRequirements, useUserRolesRequirements } from '../hooks';
 import { EuiEmptyPrompt, EuiSpacer } from '@elastic/eui';
-import {
-  TUserPermissions,
-  TUserPermissionsFunction,
-  TUserRoles,
-  TUserRolesFunction,
-} from '../permissions/button';
+import { TUserPermissions, TUserIsAdministrator } from '../permissions/element';
 import { WzPermissionsFormatted } from './format';
 import { withErrorBoundary } from '../hocs/error-boundary/with-error-boundary';
 
 interface IEmptyPromptNoPermissions {
   permissions?: TUserPermissions;
-  roles?: TUserRoles;
+  administrator?: TUserIsAdministrator;
   actions?: React.ReactNode;
 }
 export const WzEmptyPromptNoPermissions = withErrorBoundary(
-  ({ permissions, roles, actions }: IEmptyPromptNoPermissions) => {
+  ({ permissions, administrator, actions }: IEmptyPromptNoPermissions) => {
     return (
       <EuiEmptyPrompt
-        iconType="securityApp"
+        iconType='securityApp'
         title={<h2>You have no permissions</h2>}
         body={
           <Fragment>
             {permissions && (
               <div>
-                This section requires the {permissions.length > 1 ? 'permissions' : 'permission'}:
+                This section requires the{' '}
+                {permissions.length > 1 ? 'permissions' : 'permission'}:
                 {WzPermissionsFormatted(permissions)}
               </div>
             )}
-            {permissions && roles && <EuiSpacer />}
-            {roles && (
+            {permissions && administrator && <EuiSpacer />}
+            {administrator && (
               <div>
-                This section requires{' '}
-                {roles
-                  .map((role) => <strong key={`empty-prompt-no-roles-${role}`}>{role}</strong>)
-                  .reduce((accum, cur) => [accum, ', ', cur])}{' '}
-                {roles.length > 1 ? 'roles' : 'role'}
+                This section requires administrator privilegies:{' '}
+                <strong key={`empty-prompt-no-roles-administrator`}>
+                  {administrator}
+                </strong>
               </div>
             )}
           </Fragment>
@@ -56,34 +50,5 @@ export const WzEmptyPromptNoPermissions = withErrorBoundary(
         actions={actions}
       />
     );
-  }
+  },
 );
-interface IPromptNoPermissions {
-  permissions?: TUserPermissions | TUserPermissionsFunction;
-  roles?: TUserRoles | TUserRolesFunction;
-  children?: React.ReactNode;
-  rest?: any;
-}
-
-export const WzPromptPermissions = ({
-  permissions = null,
-  roles = null,
-  children,
-  ...rest
-}: IPromptNoPermissions) => {
-  const [userPermissionRequirements, userPermissions] = useUserPermissionsRequirements(
-    typeof permissions === 'function' ? permissions(rest) : permissions
-  );
-  const [userRolesRequirements, userRoles] = useUserRolesRequirements(
-    typeof roles === 'function' ? roles(rest) : roles
-  );
-
-  return userPermissionRequirements || userRolesRequirements ? (
-    <WzEmptyPromptNoPermissions
-      permissions={userPermissionRequirements}
-      roles={userRolesRequirements}
-    />
-  ) : (
-    children
-  );
-};

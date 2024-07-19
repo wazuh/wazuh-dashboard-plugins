@@ -12,10 +12,11 @@
 
 // Require some libraries
 import { ErrorResponse } from '../../lib/error-response';
-import { read } from 'read-last-lines';
-import { WAZUH_UI_LOGS_RAW_PATH } from '../../../common/constants';
-import { OpenSearchDashboardsRequest, OpenSearchDashboardsResponseFactory } from 'src/core/server';
-import uiLogger from '../../lib/ui-logger';
+import {
+  OpenSearchDashboardsRequest,
+  OpenSearchDashboardsResponseFactory,
+  RequestHandlerContext,
+} from 'src/core/server';
 
 export class UiLogsCtrl {
   /**
@@ -25,45 +26,22 @@ export class UiLogsCtrl {
   constructor() {}
 
   /**
-   * Returns Wazuh ui logs
-   * @param {Object} response
-   * @returns {Array<String>} app logs or ErrorResponse
-   */
-  async getUiLogs(response: OpenSearchDashboardsResponseFactory) {
-    try {
-      return uiLogger.initDirectory().then(async () => {
-        if (!uiLogger.checkFileExist(WAZUH_UI_LOGS_RAW_PATH)) {
-          return response.ok({
-            body: {
-              error: 0,
-              rawLogs: [],
-            },
-          });
-        } else {
-          let arrayLog = await this.getUiFileLogs(WAZUH_UI_LOGS_RAW_PATH);
-          return response.ok({
-            body: {
-              error: 0,
-              rawLogs: arrayLog.filter((item) => typeof item === 'string' && item.length),
-            },
-          });
-        }
-      });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3036, 500, response);
-    }
-  }
-
-  /**
-   * Add new UI Log entry in ui logs file
+   * Add new UI Log entry to the platform logs
+   * @param context
    * @param request
    * @param response
    * @returns success message or ErrorResponse
    */
-  async createUiLogs(request: OpenSearchDashboardsRequest, response: OpenSearchDashboardsResponseFactory) {
+  async createUiLogs(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
     try {
       const { location, message, level } = request.body;
-      await uiLogger.log(location, message, level);
+      const loggerUI = context.wazuh.logger.get('ui');
+      const loggerByLevel = loggerUI?.[level] || loggerUI.error;
+      loggerByLevel(`${location}: ${message}`);
       return response.ok({
         body: {
           statusCode: 200,
@@ -73,20 +51,6 @@ export class UiLogsCtrl {
       });
     } catch (error) {
       return ErrorResponse(error.message || error, 3021, 500, response);
-    }
-  }
-
-  /**
-   * Get UI logs from specific log file
-   * @param filepath
-   * @returns Array
-   */
-  async getUiFileLogs(filepath) {
-    try {
-      const lastLogs = await read(filepath, 50);
-      return lastLogs.split('\n');
-    } catch (err) {
-      throw err;
     }
   }
 }

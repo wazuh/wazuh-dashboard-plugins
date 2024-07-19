@@ -22,5 +22,6 @@ export interface WazuhPluginSetup {}
 export interface WazuhPluginStart {}
 
 export type PluginSetup = {
-    securityDashboards?: {}, // TODO: Add OpenSearch Dashboards Security interface
-}
+  securityDashboards?: {}; // TODO: Add OpenSearch Dashboards Security interface
+  wazuhCore: {};
+};

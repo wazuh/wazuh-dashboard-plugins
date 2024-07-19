@@ -1,1 +1,1 @@
-export { ISecurityFactory, SecurityObj} from './security-factory';
+export * from './security-factory';

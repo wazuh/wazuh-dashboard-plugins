@@ -9,24 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
 
-import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzStatusOverview from './status-overview';
 
-class WzStatus extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <WzReduxProvider>
-        <WzStatusOverview />
-      </WzReduxProvider>
-    );
-  }
-}
-
-export default WzStatus;
+export default WzStatusOverview;

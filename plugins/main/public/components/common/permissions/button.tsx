@@ -10,9 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Fragment } from 'react';
-import { useUserPermissionsRequirements } from '../hooks/useUserPermissions';
-import { useUserRolesRequirements } from '../hooks/useUserRoles';
+import React from 'react';
 
 import {
   EuiSwitch,
@@ -20,49 +18,28 @@ import {
   EuiButtonEmpty,
   EuiButtonIcon,
   EuiLink,
-  EuiToolTip,
-  EuiSpacer,
 } from '@elastic/eui';
 
-import { WzPermissionsFormatted } from './format';
+import { IWzElementPermissionsProps, WzElementPermissions } from './element';
 
-export interface IUserPermissionsObject {
-  action: string;
-  resource: string;
-}
-export type TUserPermissionsFunction = (props: any) => TUserPermissions;
-export type TUserPermissions = (string | IUserPermissionsObject)[] | null;
-export type TUserRoles = string[] | null;
-export type TUserRolesFunction = (props: any) => TUserRoles;
-
-interface IWzButtonPermissionsProps {
-  permissions?: TUserPermissions | TUserPermissionsFunction;
-  roles?: TUserRoles | TUserRolesFunction;
+interface IWzButtonPermissionsProps
+  extends Omit<
+    IWzElementPermissionsProps,
+    'children' | 'additionalPropsFunction'
+  > {
   buttonType?: 'default' | 'empty' | 'icon' | 'link' | 'switch';
-  iconType?: string;
-  tooltip?: any;
-  rest?: any;
+  rest: any;
 }
 
 export const WzButtonPermissions = ({
-  permissions = null,
-  roles = null,
   buttonType = 'default',
+  permissions,
+  administrator,
   tooltip,
   ...rest
 }: IWzButtonPermissionsProps) => {
-  const [userPermissionRequirements, userPermissions] =
-    useUserPermissionsRequirements(
-      typeof permissions === 'function' ? permissions(rest) : permissions,
-    );
-  const [userRolesRequirements, userRoles] = useUserRolesRequirements(
-    typeof roles === 'function' ? roles(rest) : roles,
-  );
-
   const Button =
-    buttonType === 'default'
-      ? EuiButton
-      : buttonType === 'empty'
+    buttonType === 'empty'
       ? EuiButtonEmpty
       : buttonType === 'icon'
       ? EuiButtonIcon
@@ -70,62 +47,31 @@ export const WzButtonPermissions = ({
       ? EuiLink
       : buttonType === 'switch'
       ? EuiSwitch
-      : null;
-  const disabled = Boolean(
-    userRolesRequirements ||
-      userPermissionRequirements ||
-      rest.isDisabled ||
-      rest.disabled,
-  );
-  const disabledProp = !['link', 'switch'].includes(buttonType)
-    ? { isDisabled: disabled }
-    : { disabled };
-  const onClick = disabled || !rest.onClick ? undefined : rest.onClick;
-  const onChange = disabled || !rest.onChange ? undefined : rest.onChange;
-  const customProps = { ...rest, onChange, onClick };
+      : EuiButton;
 
-  if (buttonType == 'switch') delete customProps.onClick;
+  return (
+    <WzElementPermissions
+      permissions={permissions}
+      administrator={administrator}
+      tooltip={tooltip}
+      getAdditionalProps={disabled => {
+        const additionalProps = {
+          ...(!['link', 'switch'].includes(buttonType)
+            ? { isDisabled: disabled }
+            : { disabled }),
+          onClick: disabled || !rest.onClick ? undefined : rest.onClick,
+          onChange:
+            !disabled || rest.onChange || buttonType === 'switch'
+              ? rest.onChange
+              : undefined,
+        };
+        if (buttonType == 'switch') delete additionalProps.onClick;
 
-  const button = <Button {...customProps} {...disabledProp} />;
-
-  const buttonTextRequirements = (userRolesRequirements ||
-    userPermissionRequirements) && (
-    <Fragment>
-      {userPermissionRequirements && (
-        <div>
-          <div>
-            Require the{' '}
-            {userPermissionRequirements.length === 1
-              ? 'permission'
-              : 'permissions'}
-            :
-          </div>
-          {WzPermissionsFormatted(userPermissionRequirements)}
-        </div>
-      )}
-      {userPermissionRequirements && userRolesRequirements && (
-        <EuiSpacer size='s' />
-      )}
-      {userRolesRequirements && (
-        <div>
-          Require{' '}
-          {userRolesRequirements
-            .map(role => (
-              <strong key={`empty-prompt-no-roles-${role}`}>{role}</strong>
-            ))
-            .reduce((prev, cur) => [prev, ', ', cur])}{' '}
-          {userRolesRequirements.length > 1 ? 'roles' : 'role'}
-        </div>
-      )}
-    </Fragment>
-  );
-  return userRolesRequirements || userPermissionRequirements ? (
-    <EuiToolTip {...tooltip} content={buttonTextRequirements}>
-      {button}
-    </EuiToolTip>
-  ) : tooltip && tooltip.content ? (
-    <EuiToolTip {...tooltip}>{button}</EuiToolTip>
-  ) : (
-    button
+        return additionalProps;
+      }}
+      {...rest}
+    >
+      <Button {...rest} />
+    </WzElementPermissions>
   );
 };

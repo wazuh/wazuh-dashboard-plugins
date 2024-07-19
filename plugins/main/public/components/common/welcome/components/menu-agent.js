@@ -20,14 +20,11 @@ import {
 } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
-import {
-  getAngularModule,
-  getCore,
-  getToasts,
-} from '../../../../kibana-services';
-import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
+import { getCore, getToasts } from '../../../../kibana-services';
 import { Applications, Categories } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
+import NavigationService from '../../../../react-services/navigation-service';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -35,6 +32,8 @@ class WzMenuAgent extends Component {
     this.state = {
       hoverAddFilter: '',
     };
+
+    this.pinnedAgentManager = new PinnedAgentManager();
 
     this.appCategories = Applications.reduce((categories, app) => {
       const existingCategory = categories.find(
@@ -65,16 +64,10 @@ class WzMenuAgent extends Component {
     });
   }
 
-  componentDidMount() {
-    const $injector = getAngularModule().$injector;
-    this.router = $injector.get('$route');
-  }
-
   clickMenuItem = appId => {
     this.props.closePopover();
     // do not redirect if we already are in that tab
-    this.props.updateCurrentAgentData(this.props.isAgent);
-    this.router.reload();
+    this.pinnedAgentManager.pinAgent(this.props.isAgent);
   };
 
   addToast({ color, title, text, time = 3000 }) {
@@ -82,10 +75,9 @@ class WzMenuAgent extends Component {
   }
 
   createItems = items => {
+    const currentAgentData = this.pinnedAgentManager.getPinnedAgent();
     return items
-      .filter(item =>
-        hasAgentSupportModule(this.props.currentAgentData, item.id),
-      )
+      .filter(item => hasAgentSupportModule(currentAgentData, item.id))
       .map(item => this.createItem(item));
   };
 
@@ -110,7 +102,7 @@ class WzMenuAgent extends Component {
           >
             <RedirectAppLinks application={getCore().application}>
               <EuiLink
-                href={getCore().application.getUrlForApp(item.id)}
+                href={NavigationService.getInstance().getUrlForApp(item.id)}
                 style={{ cursor: 'pointer' }}
               >
                 {item.title}
@@ -205,14 +197,8 @@ class WzMenuAgent extends Component {
 
 const mapStateToProps = state => {
   return {
-    currentAgentData: state.appStateReducers.currentAgentData,
     currentTab: state.appStateReducers.currentTab,
   };
 };
 
-const mapDispatchToProps = dispatch => ({
-  updateCurrentAgentData: agentData =>
-    dispatch(updateCurrentAgentData(agentData)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(WzMenuAgent);
+export default connect(mapStateToProps, null)(WzMenuAgent);

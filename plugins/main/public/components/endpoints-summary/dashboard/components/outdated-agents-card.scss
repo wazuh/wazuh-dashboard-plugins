@@ -1,0 +1,22 @@
+.wazuh-outdated-agents-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.wazuh-outdated-metric .euiTitle {
+  font-size: 4.5rem;
+  line-height: inherit;
+}
+
+.wazuh-outdated-metric small {
+  font-size: 1.5rem;
+}
+
+.wazuh-outdated-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+}

@@ -1,7 +1,7 @@
 {
   "data": {
     "title": "Wazuh API REST",
-    "api_version": "4.8.0",
+    "api_version": "4.9.0",
     "revision": 1,
     "license_name": "GPL 2.0",
     "license_url": "https://github.com/wazuh/wazuh/blob/4.5/LICENSE",

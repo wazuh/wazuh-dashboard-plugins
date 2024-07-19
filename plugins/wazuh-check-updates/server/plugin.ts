@@ -13,8 +13,16 @@ import {
   AppPluginStartDependencies,
 } from './types';
 import { defineRoutes } from './routes';
-import { availableUpdatesObject, userPreferencesObject } from './services/saved-object/types';
-import { setCore, setWazuhCore, setInternalSavedObjectsClient } from './plugin-services';
+import {
+  availableUpdatesObject,
+  userPreferencesObject,
+} from './services/saved-object/types';
+import {
+  setCore,
+  setWazuhCore,
+  setInternalSavedObjectsClient,
+  setWazuhCheckUpdatesServices,
+} from './plugin-services';
 import { ISecurityFactory } from '../../wazuh-core/server/services/security-factory';
 
 declare module 'opensearch-dashboards/server' {
@@ -27,7 +35,8 @@ declare module 'opensearch-dashboards/server' {
 }
 
 export class WazuhCheckUpdatesPlugin
-  implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {
+  implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart>
+{
   private readonly logger: Logger;
 
   constructor(initializerContext: PluginInitializerContext) {
@@ -37,10 +46,13 @@ export class WazuhCheckUpdatesPlugin
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('wazuh_check_updates: Setup');
 
+    setWazuhCore(plugins.wazuhCore);
+    setWazuhCheckUpdatesServices({ logger: this.logger });
+
     core.http.registerRouteHandlerContext('wazuh_check_updates', () => {
       return {
         logger: this.logger,
-        security: plugins.wazuhCore.wazuhSecurity,
+        security: plugins.wazuhCore.dashboardSecurity,
       };
     });
 
@@ -56,12 +68,16 @@ export class WazuhCheckUpdatesPlugin
     return {};
   }
 
-  public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhCheckUpdatesPluginStart {
+  public start(
+    core: CoreStart,
+    plugins: AppPluginStartDependencies,
+  ): WazuhCheckUpdatesPluginStart {
     this.logger.debug('wazuhCheckUpdates: Started');
 
-    const internalSavedObjectsClient = core.savedObjects.createInternalRepository();
+    const internalSavedObjectsClient =
+      core.savedObjects.createInternalRepository();
     setCore(core);
-    setWazuhCore(plugins.wazuhCore);
+
     setInternalSavedObjectsClient(internalSavedObjectsClient);
 
     return {};

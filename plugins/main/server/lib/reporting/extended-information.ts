@@ -1,4 +1,3 @@
-import { log } from '../logger';
 import SummaryTable from './summary-table';
 import summaryTablesDefinitions from './summary-tables-definitions';
 import * as VulnerabilityRequest from './vulnerability-request';
@@ -14,35 +13,42 @@ import GDPR from '../../integration-files/gdpr-requirements-pdfmake';
 import TSC from '../../integration-files/tsc-requirements-pdfmake';
 import { ReportPrinter } from './printer';
 import moment from 'moment';
-import { getSettingDefaultValue } from '../../../common/services/settings';
-
-
-
 
 /**
-   * This build the agents table
-   * @param {Array<Strings>} ids ids of agents
-   * @param {String} apiId API id
-   */
-export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, groupID: string = '') {
+ * This build the agents table
+ * @param {Array<Strings>} ids ids of agents
+ * @param {String} apiId API id
+ */
+export async function buildAgentsTable(
+  context,
+  printer: ReportPrinter,
+  agentIDs: string[],
+  apiId: string,
+  groupID: string = '',
+) {
   const dateFormat = await context.core.uiSettings.client.get('dateFormat');
   if ((!agentIDs || !agentIDs.length) && !groupID) return;
-  log('reporting:buildAgentsTable', `${agentIDs.length} agents for API ${apiId}`, 'info');
+  printer.logger.debug(`${agentIDs.length} agents for API ${apiId}`);
   try {
     let agentsData = [];
     if (groupID) {
       let totalAgentsInGroup = null;
       do {
-        const { data: { data: { affected_items, total_affected_items } } } = await context.wazuh.api.client.asCurrentUser.request(
+        const {
+          data: {
+            data: { affected_items, total_affected_items },
+          },
+        } = await context.wazuh.api.client.asCurrentUser.request(
           'GET',
           `/groups/${groupID}/agents`,
           {
             params: {
               offset: agentsData.length,
-              select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
-            }
+              select:
+                'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
+            },
           },
-          { apiHostID: apiId }
+          { apiHostID: apiId },
         );
         !totalAgentsInGroup && (totalAgentsInGroup = total_affected_items);
         agentsData = [...agentsData, ...affected_items];
@@ -50,24 +56,27 @@ export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs
     } else {
       for (const agentID of agentIDs) {
         try {
-          const { data: { data: { affected_items: [agent] } } } = await context.wazuh.api.client.asCurrentUser.request(
+          const {
+            data: {
+              data: {
+                affected_items: [agent],
+              },
+            },
+          } = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
             `/agents`,
             {
               params: {
                 q: `id=${agentID}`,
-                select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
-              }
+                select:
+                  'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
+              },
             },
-            { apiHostID: apiId }
+            { apiHostID: apiId },
           );
           agentsData.push(agent);
         } catch (error) {
-          log(
-            'reporting:buildAgentsTable',
-            `Skip agent due to: ${error.message || error}`,
-            'debug'
-          );
+          printer.logger.debug(`Skip agent due to: ${error.message || error}`);
         }
       }
     }
@@ -87,13 +96,16 @@ export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs
         ],
         items: agentsData
           .filter(agent => agent) // Remove undefined agents when Wazuh API no longer finds and agentID
-          .map((agent) => {
+          .map(agent => {
             return {
               ...agent,
-              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
+              os:
+                agent.os && agent.os.name && agent.os.version
+                  ? `${agent.os.name} ${agent.os.version}`
+                  : '',
               lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
-              dateAdd: moment(agent.dateAdd).format(dateFormat)
-            }
+              dateAdd: moment(agent.dateAdd).format(dateFormat),
+            };
           }),
       });
     } else if (!agentsData.length && groupID) {
@@ -103,9 +115,8 @@ export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs
         style: { fontSize: 12, color: '#000' },
       });
     }
-
   } catch (error) {
-    log('reporting:buildAgentsTable', error.message || error);
+    printer.logger.error(error.message || error);
     return Promise.reject(error);
   }
 }
@@ -134,40 +145,38 @@ export async function extendedInformation(
   to,
   filters,
   allowedAgentsFilter,
-  pattern = getSettingDefaultValue('pattern'),
+  pattern,
   agent = null,
 ) {
   try {
-    log(
-      'reporting:extendedInformation',
-      `Section ${section} and tab ${tab}, API is ${apiId}. From ${from} to ${to}. Filters ${JSON.stringify(filters)}. Index pattern ${pattern}`,
-      'info'
+    printer.logger.debug(
+      `Section ${section} and tab ${tab}, API is ${apiId}. From ${from} to ${to}. Filters ${JSON.stringify(
+        filters,
+      )}. Index pattern ${pattern}`,
     );
     if (section === 'agents' && !agent) {
-      throw new Error('Reporting for specific agent needs an agent ID in order to work properly');
+      throw new Error(
+        'Reporting for specific agent needs an agent ID in order to work properly',
+      );
     }
 
     const agents = await context.wazuh.api.client.asCurrentUser.request(
       'GET',
       '/agents',
       { params: { limit: 1 } },
-      { apiHostID: apiId }
+      { apiHostID: apiId },
     );
 
     const totalAgents = agents.data.data.total_affected_items;
 
     //--- OVERVIEW - VULS
     if (section === 'overview' && tab === 'vuls') {
-      log(
-        'reporting:extendedInformation',
-        'Fetching overview vulnerability detector metrics',
-        'debug'
-      );
+      printer.logger.debug('Fetching overview vulnerability detector metrics');
       const vulnerabilitiesLevels = ['Low', 'Medium', 'High', 'Critical'];
 
       const vulnerabilitiesResponsesCount = (
         await Promise.all(
-          vulnerabilitiesLevels.map(async (vulnerabilitiesLevel) => {
+          vulnerabilitiesLevels.map(async vulnerabilitiesLevel => {
             try {
               const count = await VulnerabilityRequest.uniqueSeverityCount(
                 context,
@@ -176,25 +185,23 @@ export async function extendedInformation(
                 vulnerabilitiesLevel,
                 filters,
                 allowedAgentsFilter,
-                pattern
+                pattern,
               );
               return count
                 ? `${count} of ${totalAgents} agents have ${vulnerabilitiesLevel.toLocaleLowerCase()} vulnerabilities.`
                 : undefined;
-            } catch (error) { }
-          })
+            } catch (error) {}
+          }),
         )
-      ).filter((vulnerabilitiesResponse) => vulnerabilitiesResponse);
+      ).filter(vulnerabilitiesResponse => vulnerabilitiesResponse);
 
       printer.addList({
         title: { text: 'Summary', style: 'h2' },
         list: vulnerabilitiesResponsesCount,
       });
 
-      log(
-        'reporting:extendedInformation',
+      printer.logger.debug(
         'Fetching overview vulnerability detector top 3 agents by category',
-        'debug'
       );
       const lowRank = await VulnerabilityRequest.topAgentCount(
         context,
@@ -203,7 +210,7 @@ export async function extendedInformation(
         'Low',
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       const mediumRank = await VulnerabilityRequest.topAgentCount(
         context,
@@ -212,7 +219,7 @@ export async function extendedInformation(
         'Medium',
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       const highRank = await VulnerabilityRequest.topAgentCount(
         context,
@@ -221,7 +228,7 @@ export async function extendedInformation(
         'High',
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       const criticalRank = await VulnerabilityRequest.topAgentCount(
         context,
@@ -230,12 +237,10 @@ export async function extendedInformation(
         'Critical',
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
-      log(
-        'reporting:extendedInformation',
+      printer.logger.debug(
         'Adding overview vulnerability detector top 3 agents by category',
-        'debug'
       );
       if (criticalRank && criticalRank.length) {
         printer.addContentWithNewLine({
@@ -273,17 +278,18 @@ export async function extendedInformation(
         printer.addNewLine();
       }
 
-      log(
-        'reporting:extendedInformation',
+      printer.logger.debug(
         'Fetching overview vulnerability detector top 3 CVEs',
-        'debug'
       );
-      const cveRank = await VulnerabilityRequest.topCVECount(context, from, to, filters, allowedAgentsFilter, pattern);
-      log(
-        'reporting:extendedInformation',
-        'Adding overview vulnerability detector top 3 CVEs',
-        'debug'
+      const cveRank = await VulnerabilityRequest.topCVECount(
+        context,
+        from,
+        to,
+        filters,
+        allowedAgentsFilter,
+        pattern,
       );
+      printer.logger.debug('Adding overview vulnerability detector top 3 CVEs');
       if (cveRank && cveRank.length) {
         printer.addSimpleTable({
           title: { text: 'Top 3 CVE', style: 'h2' },
@@ -291,18 +297,28 @@ export async function extendedInformation(
             { id: 'top', label: 'Top' },
             { id: 'cve', label: 'CVE' },
           ],
-          items: cveRank.map((item) => ({ top: cveRank.indexOf(item) + 1, cve: item })),
+          items: cveRank.map(item => ({
+            top: cveRank.indexOf(item) + 1,
+            cve: item,
+          })),
         });
       }
     }
 
     //--- OVERVIEW - GENERAL
     if (section === 'overview' && tab === 'general') {
-      log('reporting:extendedInformation', 'Fetching top 3 agents with level 15 alerts', 'debug');
+      printer.logger.debug('Fetching top 3 agents with level 15 alerts');
 
-      const level15Rank = await OverviewRequest.topLevel15(context, from, to, filters, allowedAgentsFilter, pattern);
+      const level15Rank = await OverviewRequest.topLevel15(
+        context,
+        from,
+        to,
+        filters,
+        allowedAgentsFilter,
+        pattern,
+      );
 
-      log('reporting:extendedInformation', 'Adding top 3 agents with level 15 alerts', 'debug');
+      printer.logger.debug('Adding top 3 agents with level 15 alerts');
       if (level15Rank.length) {
         printer.addContent({
           text: 'Top 3 agents with level 15 alerts',
@@ -314,16 +330,16 @@ export async function extendedInformation(
 
     //--- OVERVIEW - PM
     if (section === 'overview' && tab === 'pm') {
-      log('reporting:extendedInformation', 'Fetching most common rootkits', 'debug');
+      printer.logger.debug('Fetching most common rootkits');
       const top5RootkitsRank = await RootcheckRequest.top5RootkitsDetected(
         context,
         from,
         to,
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
-      log('reporting:extendedInformation', 'Adding most common rootkits', 'debug');
+      printer.logger.debug('Adding most common rootkits');
       if (top5RootkitsRank && top5RootkitsRank.length) {
         printer
           .addContentWithNewLine({
@@ -331,12 +347,11 @@ export async function extendedInformation(
             style: 'h2',
           })
           .addContentWithNewLine({
-            text:
-              'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',
+            text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',
             style: 'standard',
           })
           .addSimpleTable({
-            items: top5RootkitsRank.map((item) => {
+            items: top5RootkitsRank.map(item => {
               return { top: top5RootkitsRank.indexOf(item) + 1, name: item };
             }),
             columns: [
@@ -345,14 +360,14 @@ export async function extendedInformation(
             ],
           });
       }
-      log('reporting:extendedInformation', 'Fetching hidden pids', 'debug');
+      printer.logger.debug('Fetching hidden pids');
       const hiddenPids = await RootcheckRequest.agentsWithHiddenPids(
         context,
         from,
         to,
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       hiddenPids &&
         printer.addContent({
@@ -371,7 +386,7 @@ export async function extendedInformation(
         to,
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       hiddenPorts &&
         printer.addContent({
@@ -388,14 +403,14 @@ export async function extendedInformation(
 
     //--- OVERVIEW/AGENTS - PCI
     if (['overview', 'agents'].includes(section) && tab === 'pci') {
-      log('reporting:extendedInformation', 'Fetching top PCI DSS requirements', 'debug');
+      printer.logger.debug('Fetching top PCI DSS requirements');
       const topPciRequirements = await PCIRequest.topPCIRequirements(
         context,
         from,
         to,
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       printer.addContentWithNewLine({
         text: 'Most common PCI DSS requirements alerts found',
@@ -409,13 +424,18 @@ export async function extendedInformation(
           filters,
           allowedAgentsFilter,
           item,
-          pattern
+          pattern,
         );
-        printer.addContentWithNewLine({ text: `Requirement ${item}`, style: 'h3' });
+        printer.addContentWithNewLine({
+          text: `Requirement ${item}`,
+          style: 'h3',
+        });
 
         if (PCI[item]) {
           const content =
-            typeof PCI[item] === 'string' ? { text: PCI[item], style: 'standard' } : PCI[item];
+            typeof PCI[item] === 'string'
+              ? { text: PCI[item], style: 'standard' }
+              : PCI[item];
           printer.addContentWithNewLine(content);
         }
 
@@ -434,14 +454,14 @@ export async function extendedInformation(
 
     //--- OVERVIEW/AGENTS - TSC
     if (['overview', 'agents'].includes(section) && tab === 'tsc') {
-      log('reporting:extendedInformation', 'Fetching top TSC requirements', 'debug');
+      printer.logger.debug('Fetching top TSC requirements');
       const topTSCRequirements = await TSCRequest.topTSCRequirements(
         context,
         from,
         to,
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       printer.addContentWithNewLine({
         text: 'Most common TSC requirements alerts found',
@@ -455,13 +475,18 @@ export async function extendedInformation(
           filters,
           allowedAgentsFilter,
           item,
-          pattern
+          pattern,
         );
-        printer.addContentWithNewLine({ text: `Requirement ${item}`, style: 'h3' });
+        printer.addContentWithNewLine({
+          text: `Requirement ${item}`,
+          style: 'h3',
+        });
 
         if (TSC[item]) {
           const content =
-            typeof TSC[item] === 'string' ? { text: TSC[item], style: 'standard' } : TSC[item];
+            typeof TSC[item] === 'string'
+              ? { text: TSC[item], style: 'standard' }
+              : TSC[item];
           printer.addContentWithNewLine(content);
         }
 
@@ -480,14 +505,14 @@ export async function extendedInformation(
 
     //--- OVERVIEW/AGENTS - GDPR
     if (['overview', 'agents'].includes(section) && tab === 'gdpr') {
-      log('reporting:extendedInformation', 'Fetching top GDPR requirements', 'debug');
+      printer.logger.debug('Fetching top GDPR requirements');
       const topGdprRequirements = await GDPRRequest.topGDPRRequirements(
         context,
         from,
         to,
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       printer.addContentWithNewLine({
         text: 'Most common GDPR requirements alerts found',
@@ -501,13 +526,18 @@ export async function extendedInformation(
           filters,
           allowedAgentsFilter,
           item,
-          pattern
+          pattern,
         );
-        printer.addContentWithNewLine({ text: `Requirement ${item}`, style: 'h3' });
+        printer.addContentWithNewLine({
+          text: `Requirement ${item}`,
+          style: 'h3',
+        });
 
         if (GDPR && GDPR[item]) {
           const content =
-            typeof GDPR[item] === 'string' ? { text: GDPR[item], style: 'standard' } : GDPR[item];
+            typeof GDPR[item] === 'string'
+              ? { text: GDPR[item], style: 'standard' }
+              : GDPR[item];
           printer.addContentWithNewLine(content);
         }
 
@@ -527,19 +557,18 @@ export async function extendedInformation(
 
     //--- OVERVIEW - AUDIT
     if (section === 'overview' && tab === 'audit') {
-      log(
-        'reporting:extendedInformation',
+      printer.logger.debug(
         'Fetching agents with high number of failed sudo commands',
-        'debug'
       );
-      const auditAgentsNonSuccess = await AuditRequest.getTop3AgentsSudoNonSuccessful(
-        context,
-        from,
-        to,
-        filters,
-        allowedAgentsFilter,
-        pattern
-      );
+      const auditAgentsNonSuccess =
+        await AuditRequest.getTop3AgentsSudoNonSuccessful(
+          context,
+          from,
+          to,
+          filters,
+          allowedAgentsFilter,
+          pattern,
+        );
       if (auditAgentsNonSuccess && auditAgentsNonSuccess.length) {
         printer.addContent({
           text: 'Agents with high number of failed sudo commands',
@@ -547,14 +576,15 @@ export async function extendedInformation(
         });
         await buildAgentsTable(context, printer, auditAgentsNonSuccess, apiId);
       }
-      const auditAgentsFailedSyscall = await AuditRequest.getTop3AgentsFailedSyscalls(
-        context,
-        from,
-        to,
-        filters,
-        allowedAgentsFilter,
-        pattern
-      );
+      const auditAgentsFailedSyscall =
+        await AuditRequest.getTop3AgentsFailedSyscalls(
+          context,
+          from,
+          to,
+          filters,
+          allowedAgentsFilter,
+          pattern,
+        );
       if (auditAgentsFailedSyscall && auditAgentsFailedSyscall.length) {
         printer.addSimpleTable({
           columns: [
@@ -562,7 +592,7 @@ export async function extendedInformation(
             { id: 'syscall_id', label: 'Syscall ID' },
             { id: 'syscall_syscall', label: 'Syscall' },
           ],
-          items: auditAgentsFailedSyscall.map((item) => ({
+          items: auditAgentsFailedSyscall.map(item => ({
             agent: item.agent,
             syscall_id: item.syscall.id,
             syscall_syscall: item.syscall.syscall,
@@ -577,25 +607,41 @@ export async function extendedInformation(
 
     //--- OVERVIEW - FIM
     if (section === 'overview' && tab === 'fim') {
-      log('reporting:extendedInformation', 'Fetching top 3 rules for FIM', 'debug');
-      const rules = await SyscheckRequest.top3Rules(context, from, to, filters, allowedAgentsFilter, pattern);
+      printer.logger.debug('Fetching top 3 rules for FIM');
+      const rules = await SyscheckRequest.top3Rules(
+        context,
+        from,
+        to,
+        filters,
+        allowedAgentsFilter,
+        pattern,
+      );
 
       if (rules && rules.length) {
-        printer.addContentWithNewLine({ text: 'Top 3 FIM rules', style: 'h2' }).addSimpleTable({
-          columns: [
-            { id: 'ruleID', label: 'Rule ID' },
-            { id: 'ruleDescription', label: 'Description' },
-          ],
-          items: rules,
-          title: {
-            text: 'Top 3 rules that are generating most alerts.',
-            style: 'standard',
-          },
-        });
+        printer
+          .addContentWithNewLine({ text: 'Top 3 FIM rules', style: 'h2' })
+          .addSimpleTable({
+            columns: [
+              { id: 'ruleID', label: 'Rule ID' },
+              { id: 'ruleDescription', label: 'Description' },
+            ],
+            items: rules,
+            title: {
+              text: 'Top 3 rules that are generating most alerts.',
+              style: 'standard',
+            },
+          });
       }
 
-      log('reporting:extendedInformation', 'Fetching top 3 agents for FIM', 'debug');
-      const agents = await SyscheckRequest.top3agents(context, from, to, filters, allowedAgentsFilter, pattern);
+      printer.logger.debug('Fetching top 3 agents for FIM');
+      const agents = await SyscheckRequest.top3agents(
+        context,
+        from,
+        to,
+        filters,
+        allowedAgentsFilter,
+        pattern,
+      );
 
       if (agents && agents.length) {
         printer.addContentWithNewLine({
@@ -603,8 +649,7 @@ export async function extendedInformation(
           style: 'h2',
         });
         printer.addContentWithNewLine({
-          text:
-            'Top 3 agents that have most FIM alerts from level 7 to level 15. Take care about them.',
+          text: 'Top 3 agents that have most FIM alerts from level 7 to level 15. Take care about them.',
           style: 'standard',
         });
         await buildAgentsTable(context, printer, agents, apiId);
@@ -613,14 +658,14 @@ export async function extendedInformation(
 
     //--- AGENTS - AUDIT
     if (section === 'agents' && tab === 'audit') {
-      log('reporting:extendedInformation', `Fetching most common failed syscalls`, 'debug');
+      printer.logger.debug('Fetching most common failed syscalls');
       const auditFailedSyscall = await AuditRequest.getTopFailedSyscalls(
         context,
         from,
         to,
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       auditFailedSyscall &&
         auditFailedSyscall.length &&
@@ -636,18 +681,15 @@ export async function extendedInformation(
 
     //--- AGENTS - FIM
     if (section === 'agents' && tab === 'fim') {
-      log(
-        'reporting:extendedInformation',
-        `Fetching syscheck database for agent ${agent}`,
-        'debug'
-      );
+      printer.logger.debug(`Fetching syscheck database for agent ${agent}`);
 
-      const lastScanResponse = await context.wazuh.api.client.asCurrentUser.request(
-        'GET',
-        `/syscheck/${agent}/last_scan`,
-        {},
-        { apiHostID: apiId }
-      );
+      const lastScanResponse =
+        await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          `/syscheck/${agent}/last_scan`,
+          {},
+          { apiHostID: apiId },
+        );
 
       if (lastScanResponse && lastScanResponse.data) {
         const lastScanData = lastScanResponse.data.data.affected_items[0];
@@ -667,14 +709,14 @@ export async function extendedInformation(
         printer.addNewLine();
       }
 
-      log('reporting:extendedInformation', `Fetching last 10 deleted files for FIM`, 'debug');
+      printer.logger.debug('Fetching last 10 deleted files for FIM');
       const lastTenDeleted = await SyscheckRequest.lastTenDeletedFiles(
         context,
         from,
         to,
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
 
       lastTenDeleted &&
@@ -688,14 +730,14 @@ export async function extendedInformation(
           title: 'Last 10 deleted files',
         });
 
-      log('reporting:extendedInformation', `Fetching last 10 modified files`, 'debug');
+      printer.logger.debug('Fetching last 10 modified files');
       const lastTenModified = await SyscheckRequest.lastTenModifiedFiles(
         context,
         from,
         to,
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
 
       lastTenModified &&
@@ -712,11 +754,7 @@ export async function extendedInformation(
 
     //--- AGENTS - SYSCOLLECTOR
     if (section === 'agents' && tab === 'syscollector') {
-      log(
-        'reporting:extendedInformation',
-        `Fetching hardware information for agent ${agent}`,
-        'debug'
-      );
+      printer.logger.debug(`Fetching hardware information for agent ${agent}`);
       const requestsSyscollectorLists = [
         {
           endpoint: `/syscollector/${agent}/hardware`,
@@ -724,12 +762,12 @@ export async function extendedInformation(
           list: {
             title: { text: 'Hardware information', style: 'h2' },
           },
-          mapResponse: (hardware) => [
+          mapResponse: hardware => [
             hardware.cpu && hardware.cpu.cores && `${hardware.cpu.cores} cores`,
             hardware.cpu && hardware.cpu.name,
             hardware.ram &&
-            hardware.ram.total &&
-            `${Number(hardware.ram.total / 1024 / 1024).toFixed(2)}GB RAM`,
+              hardware.ram.total &&
+              `${Number(hardware.ram.total / 1024 / 1024).toFixed(2)}GB RAM`,
           ],
         },
         {
@@ -738,29 +776,30 @@ export async function extendedInformation(
           list: {
             title: { text: 'Operating system information', style: 'h2' },
           },
-          mapResponse: (osData) => [
+          mapResponse: osData => [
             osData.sysname,
             osData.version,
             osData.architecture,
             osData.release,
             osData.os &&
-            osData.os.name &&
-            osData.os.version &&
-            `${osData.os.name} ${osData.os.version}`,
+              osData.os.name &&
+              osData.os.version &&
+              `${osData.os.name} ${osData.os.version}`,
           ],
         },
       ];
 
       const syscollectorLists = await Promise.all(
-        requestsSyscollectorLists.map(async (requestSyscollector) => {
+        requestsSyscollectorLists.map(async requestSyscollector => {
           try {
-            log('reporting:extendedInformation', requestSyscollector.loggerMessage, 'debug');
-            const responseSyscollector = await context.wazuh.api.client.asCurrentUser.request(
-              'GET',
-              requestSyscollector.endpoint,
-              {},
-              { apiHostID: apiId }
-            );
+            printer.logger.debug(requestSyscollector.loggerMessage);
+            const responseSyscollector =
+              await context.wazuh.api.client.asCurrentUser.request(
+                'GET',
+                requestSyscollector.endpoint,
+                {},
+                { apiHostID: apiId },
+              );
             const [data] =
               (responseSyscollector &&
                 responseSyscollector.data &&
@@ -774,27 +813,25 @@ export async function extendedInformation(
               };
             }
           } catch (error) {
-            log('reporting:extendedInformation', error.message || error);
+            printer.logger.error(error.message || error);
           }
-        })
+        }),
       );
 
       if (syscollectorLists) {
         syscollectorLists
-          .filter((syscollectorList) => syscollectorList)
-          .forEach((syscollectorList) => printer.addList(syscollectorList));
+          .filter(syscollectorList => syscollectorList)
+          .forEach(syscollectorList => printer.addList(syscollectorList));
       }
 
       const vulnerabilitiesRequests = ['Critical', 'High'];
 
       const vulnerabilitiesResponsesItems = (
         await Promise.all(
-          vulnerabilitiesRequests.map(async (vulnerabilitiesLevel) => {
+          vulnerabilitiesRequests.map(async vulnerabilitiesLevel => {
             try {
-              log(
-                'reporting:extendedInformation',
+              printer.logger.debug(
                 `Fetching top ${vulnerabilitiesLevel} packages`,
-                'debug'
               );
 
               return await VulnerabilityRequest.topPackages(
@@ -804,20 +841,26 @@ export async function extendedInformation(
                 vulnerabilitiesLevel,
                 filters,
                 allowedAgentsFilter,
-                pattern
+                pattern,
               );
             } catch (error) {
-              log('reporting:extendedInformation', error.message || error);
+              printer.logger.error(error.message || error);
             }
-          })
+          }),
         )
       )
-        .filter((vulnerabilitiesResponse) => vulnerabilitiesResponse)
+        .filter(vulnerabilitiesResponse => vulnerabilitiesResponse)
         .flat();
 
-      if (vulnerabilitiesResponsesItems && vulnerabilitiesResponsesItems.length) {
+      if (
+        vulnerabilitiesResponsesItems &&
+        vulnerabilitiesResponsesItems.length
+      ) {
         printer.addSimpleTable({
-          title: { text: 'Vulnerable packages found (last 24 hours)', style: 'h2' },
+          title: {
+            text: 'Vulnerable packages found (last 24 hours)',
+            style: 'h2',
+          },
           columns: [
             { id: 'package', label: 'Package' },
             { id: 'severity', label: 'Severity' },
@@ -836,20 +879,22 @@ export async function extendedInformation(
         'Critical',
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       if (topCriticalPackages && topCriticalPackages.length) {
-        printer.addContentWithNewLine({ text: 'Critical severity', style: 'h2' });
         printer.addContentWithNewLine({
-          text:
-            'These vulnerabilties are critical, please review your agent. Click on each link to read more about each found vulnerability.',
+          text: 'Critical severity',
+          style: 'h2',
+        });
+        printer.addContentWithNewLine({
+          text: 'These vulnerabilties are critical, please review your agent. Click on each link to read more about each found vulnerability.',
           style: 'standard',
         });
         const customul = [];
         for (const critical of topCriticalPackages) {
           customul.push({ text: critical.package, style: 'standard' });
           customul.push({
-            ul: critical.references.map((item) => ({
+            ul: critical.references.map(item => ({
               text: item.substring(0, 80) + '...',
               link: item,
               color: '#1EA5C8',
@@ -866,7 +911,7 @@ export async function extendedInformation(
         'High',
         filters,
         allowedAgentsFilter,
-        pattern
+        pattern,
       );
       if (topHighPackages && topHighPackages.length) {
         printer.addContentWithNewLine({ text: 'High severity', style: 'h2' });
@@ -878,7 +923,7 @@ export async function extendedInformation(
         for (const critical of topHighPackages) {
           customul.push({ text: critical.package, style: 'standard' });
           customul.push({
-            ul: critical.references.map((item) => ({
+            ul: critical.references.map(item => ({
               text: item,
               color: '#1EA5C8',
             })),
@@ -892,25 +937,27 @@ export async function extendedInformation(
     //--- SUMMARY TABLES
     let extraSummaryTables = [];
     if (Array.isArray(summaryTablesDefinitions[section][tab])) {
-      const tablesPromises = summaryTablesDefinitions[section][tab].map((summaryTable) => {
-        log('reporting:AlertsTable', `Fetching ${summaryTable.title} Table`, 'debug');
-        const alertsSummaryTable = new SummaryTable(
-          context,
-          from,
-          to,
-          filters,
-          allowedAgentsFilter,
-          summaryTable,
-          pattern
-        );
-        return alertsSummaryTable.fetch();
-      });
+      const tablesPromises = summaryTablesDefinitions[section][tab].map(
+        summaryTable => {
+          printer.logger.debug(`Fetching ${summaryTable.title} Table`);
+          const alertsSummaryTable = new SummaryTable(
+            context,
+            from,
+            to,
+            filters,
+            allowedAgentsFilter,
+            summaryTable,
+            pattern,
+          );
+          return alertsSummaryTable.fetch();
+        },
+      );
       extraSummaryTables = await Promise.all(tablesPromises);
     }
 
     return extraSummaryTables;
   } catch (error) {
-    log('reporting:extendedInformation', error.message || error);
+    printer.logger.error(error.message || error);
     return Promise.reject(error);
   }
 }

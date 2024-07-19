@@ -15,11 +15,11 @@ import { WzUserPermissions } from '../../../react-services/wz-user-permissions';
 
 // It retuns user permissions
 export const useUserPermissions = () => {
-  return useSelector((state) => state.appStateReducers.userPermissions);
+  return useSelector(state => state.appStateReducers.userPermissions);
 };
 
 // It returns user permissions validation and user permissions
-export const useUserPermissionsRequirements = (requiredPermissions) => {
+export const useUserPermissionsRequirements = requiredPermissions => {
   const userPermissions = useUserPermissions();
   if (requiredPermissions === null) {
     return [false, userPermissions];
@@ -30,20 +30,14 @@ export const useUserPermissionsRequirements = (requiredPermissions) => {
   }
 
   const requiredPermissionsArray =
-    typeof requiredPermissions === 'function' ? requiredPermissions() : requiredPermissions;
+    typeof requiredPermissions === 'function'
+      ? requiredPermissions()
+      : requiredPermissions;
   return [
-    WzUserPermissions.checkMissingUserPermissions(requiredPermissionsArray, userPermissions),
+    WzUserPermissions.checkMissingUserPermissions(
+      requiredPermissionsArray,
+      userPermissions,
+    ),
     userPermissions,
   ];
-};
-
-// It redirects to other URL if user permissions are not valid
-export const useUserPermissionsPrivate = (requiredPermissions, redirectURL) => {
-  const [userPermissionsValidation, userPermissions] = useUserPermissionsRequirements(
-    requiredPermissions
-  );
-  if (userPermissionsValidation) {
-    window.location.href = redirectURL;
-  }
-  return [userPermissionsValidation, userPermissions];
 };

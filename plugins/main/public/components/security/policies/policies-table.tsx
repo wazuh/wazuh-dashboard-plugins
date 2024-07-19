@@ -72,7 +72,7 @@ export const PoliciesTable = ({
     {
       field: 'id',
       name: 'ID',
-      width: 75,
+      width: '75',
       sortable: true,
       truncateText: true,
     },
@@ -113,7 +113,7 @@ export const PoliciesTable = ({
           )
         );
       },
-      width: 150,
+      width: '150',
       sortable: false,
     },
     {

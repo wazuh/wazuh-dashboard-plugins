@@ -11,15 +11,13 @@
  */
 
 import React, { Component } from 'react';
-import { Mitre } from '../../../components/overview/mitre/mitre';
+import { Mitre } from '../../../components/overview';
 import { withUserAuthorizationPrompt, withAgentSupportModule } from '../hocs';
 import { compose } from 'redux';
 
 export const MainMitre = compose(
   withAgentSupportModule,
-  withUserAuthorizationPrompt([
-    { action: 'mitre:read', resource: '*:*:*' },
-  ])
+  withUserAuthorizationPrompt([{ action: 'mitre:read', resource: '*:*:*' }]),
 )(
   class MainMitre extends Component {
     constructor(props) {
@@ -29,5 +27,5 @@ export const MainMitre = compose(
     render() {
       return <Mitre {...this.props} />;
     }
-  }
+  },
 );

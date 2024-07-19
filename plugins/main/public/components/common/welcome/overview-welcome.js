@@ -22,14 +22,9 @@ import {
   EuiFlexGrid,
   EuiCallOut,
   EuiPage,
-  EuiButtonEmpty,
 } from '@elastic/eui';
 import './welcome.scss';
-import {
-  withErrorBoundary,
-  withGlobalBreadcrumb,
-  withReduxProvider,
-} from '../hocs';
+import { withErrorBoundary, withGlobalBreadcrumb } from '../hocs';
 import { compose } from 'redux';
 import {
   Applications,
@@ -39,6 +34,8 @@ import {
 } from '../../../utils/applications';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { WzButtonPermissions } from '../../common/permissions/button';
+import NavigationService from '../../../react-services/navigation-service';
 
 const appCategories = Applications.reduce((categories, app) => {
   const existingCategory = categories.find(
@@ -63,7 +60,6 @@ const appCategories = Applications.reduce((categories, app) => {
 });
 
 export const OverviewWelcome = compose(
-  withReduxProvider,
   withErrorBoundary,
   withGlobalBreadcrumb(props => {
     return [{ text: overview.breadcrumbLabel }];
@@ -85,14 +81,21 @@ export const OverviewWelcome = compose(
                   title={
                     <>
                       No agents were added to this manager.{' '}
-                      <EuiButtonEmpty
-                        href={getCore().application.getUrlForApp(
+                      <WzButtonPermissions
+                        buttonType='empty'
+                        permissions={[
+                          { action: 'agent:create', resource: '*:*:*' },
+                        ]}
+                        iconType='plusInCircle'
+                        href={NavigationService.getInstance().getUrlForApp(
                           endpointSummary.id,
-                          { path: '#/agents-preview' },
+                          {
+                            path: `#${endpointSummary.redirectTo()}deploy`,
+                          },
                         )}
                       >
-                        Add agent
-                      </EuiButtonEmpty>
+                        Deploy new agent
+                      </WzButtonPermissions>
                     </>
                   }
                   color='warning'
@@ -144,7 +147,7 @@ export const OverviewWelcome = compose(
                                     }
                                     className='homSynopsis__card'
                                     title={app.title}
-                                    href={getCore().application.getUrlForApp(
+                                    href={NavigationService.getInstance().getUrlForApp(
                                       app.id,
                                     )}
                                     data-test-subj={`overviewWelcome${this.strtools.capitalize(
