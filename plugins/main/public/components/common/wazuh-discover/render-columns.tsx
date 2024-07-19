@@ -13,16 +13,15 @@ import NavigationService from '../../../react-services/navigation-service';
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
 const renderMitreTechnique = technique => (
-  <EuiLink
-    onClick={e => {
-      e.preventDefault();
-      NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+  <RedirectAppLinks application={getCore().application}>
+    <EuiLink
+      href={NavigationService.getInstance().getUrlForApp(mitreAttack.id, {
         path: `#/overview?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${technique}`,
-      });
-    }}
-  >
-    {technique}
-  </EuiLink>
+      })}
+    >
+      {technique}
+    </EuiLink>
+  </RedirectAppLinks>
 );
 
 export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
