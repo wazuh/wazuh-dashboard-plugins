@@ -1,0 +1,12 @@
+{
+  "entry": [
+    "{public,server,common}/index.{js,ts}",
+    "{public,server,common}/**/*.test.{js,ts,tsx}"
+  ],
+  "project": [
+    "**/*.{js,ts,jsx,tsx}",
+    "!test/**/*",
+    "!target/**/*",
+    "!scripts/**/*"
+  ]
+}

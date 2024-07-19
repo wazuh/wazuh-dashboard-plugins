@@ -37,6 +37,7 @@ const DashboardOffice365Component: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -82,7 +83,7 @@ const DashboardOffice365Component: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -103,6 +104,7 @@ const DashboardOffice365Component: React.FC = () => {
             <WzSearchBar
               appName='google-cloud-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}

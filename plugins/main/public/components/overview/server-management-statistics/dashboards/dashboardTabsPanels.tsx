@@ -97,7 +97,7 @@ export const DashboardTabsPanels = ({
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching statistics',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });

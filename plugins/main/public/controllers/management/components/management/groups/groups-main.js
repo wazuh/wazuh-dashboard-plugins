@@ -43,16 +43,6 @@ class WzGroups extends Component {
     // Check if there is a group in the URL
     const { group } = this.props.search;
     if (group) {
-      // This removes the group from the search URL parameters.
-      // TODO: the view to display the specific group should be managed through the routing based on
-      // the URL instead of a component state. This lets refreshing the page and display the same view
-      const search = new URLSearchParams(
-        NavigationService.getInstance().getSearch(),
-      );
-      search.delete('group');
-      NavigationService.getInstance().replace(
-        `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
-      );
       try {
         // Try if the group can be accesed
         const responseGroup = await WzRequest.apiReq('GET', '/groups', {
@@ -60,6 +50,9 @@ class WzGroups extends Component {
         });
         const dataGroup = responseGroup?.data?.data?.affected_items?.[0];
         this.props.updateGroupDetail(dataGroup);
+        NavigationService.getInstance().updateAndNavigateSearchParams({
+          group: null,
+        });
       } catch (error) {
         const options = {
           context: `${WzGroups.name}.componentDidMount`,

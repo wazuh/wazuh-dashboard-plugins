@@ -34,6 +34,7 @@ export const DashboardMITRE: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -77,7 +78,7 @@ export const DashboardMITRE: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -98,6 +99,7 @@ export const DashboardMITRE: React.FC = () => {
             <WzSearchBar
               appName='mitre-detector-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showQueryInput={true}
               showQueryBar={true}
               showSaveQuery={true}

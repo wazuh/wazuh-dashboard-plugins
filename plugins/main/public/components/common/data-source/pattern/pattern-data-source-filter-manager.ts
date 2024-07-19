@@ -124,10 +124,10 @@ export class PatternDataSourceFilterManager
    * Get the filters necessary to fetch the data from the data source
    * @returns
    */
-  fetch(params: Omit<tSearchParams, 'filters'> = {}): Promise<any> {
+  fetch(params: tSearchParams = {}): Promise<any> {
     return this.dataSource.fetch({
       ...params,
-      filters: this.getFetchFilters(),
+      filters: params?.filters || this.getFetchFilters(),
     });
   }
 
@@ -147,10 +147,7 @@ export class PatternDataSourceFilterManager
    */
   private getDefaultFilters(filters: tFilter[]) {
     const defaultFilters = filters.length ? filters : this.getFilters();
-    return [
-      ...this.getFixedFilters(),
-      ...(this.filterUserFilters(defaultFilters) || []),
-    ];
+    return [...(this.filterUserFilters(defaultFilters) || [])];
   }
 
   /**
@@ -224,9 +221,10 @@ export class PatternDataSourceFilterManager
    */
   getFetchFilters(): tFilter[] {
     return [
+      ...this.getFixedFilters(),
+      ...this.getFilters(),
       ...this.defaultFetchFilters,
       ...this.dataSource.getFetchFilters(),
-      ...this.getFilters(),
     ];
   }
 
@@ -338,29 +336,13 @@ export class PatternDataSourceFilterManager
     }
     const currentPinnedAgent = pinnedAgentManager.getPinnedAgent();
     return [
-      {
-        meta: {
-          alias: null,
-          disabled: false,
-          key: PinnedAgentManager.AGENT_ID_KEY,
-          negate: false,
-          params: { query: currentPinnedAgent.id },
-          type: 'phrase',
-          index: indexPatternId,
-          controlledBy: PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
-        },
-        query: {
-          match: {
-            [PinnedAgentManager.AGENT_ID_KEY]: {
-              query: currentPinnedAgent.id,
-              type: 'phrase',
-            },
-          },
-        },
-        $state: {
-          store: 'appState', // this makes that the filter is pinned and can be remove the close icon by css
-        },
-      } as tFilter,
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        PinnedAgentManager.AGENT_ID_KEY,
+        currentPinnedAgent.id,
+        indexPatternId,
+        PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
+      ),
     ];
   }
 

@@ -13,7 +13,7 @@ import React, { useState, useEffect } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 //@ts-ignore
 import { ComplianceRequirements } from './components/requirements';
-import { ComplianceSubrequirements } from './components/subrequirements';
+import { ComplianceSubrequirements } from './components';
 import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
@@ -147,6 +147,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -161,6 +162,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     setFilters,
   });
 
+  const { dateRangeFrom, dateRangeTo } = searchBarProps;
   const [complianceData, setComplianceData] = useState({
     descriptions: {},
     complianceObject: {},
@@ -204,7 +206,12 @@ export const ComplianceTable = withAgentSupportModule(props => {
     ];
   };
 
-  const getRequirementsCount = async ({ section, query, fetchData }) => {
+  const getRequirementsCount = async ({
+    section,
+    query,
+    fetchData,
+    dateRange,
+  }) => {
     try {
       const mapFieldAgg = {
         pci: 'rule.pci_dss',
@@ -222,7 +229,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
         },
       };
 
-      const data = await fetchData({ aggs, query });
+      const data = await fetchData({ aggs, query, dateRange });
 
       return data?.aggregations?.tactics?.buckets || [];
     } catch (error) {
@@ -246,6 +253,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     props.section,
     dataSource,
     searchBarProps.query,
+    { from: dateRangeFrom, to: dateRangeTo },
   ]);
 
   useEffect(() => {
@@ -260,24 +268,33 @@ export const ComplianceTable = withAgentSupportModule(props => {
         section: props.section,
         fetchData,
         query: searchBarProps.query,
+        dateRange: { from: dateRangeFrom, to: dateRangeTo },
       });
     }
   }, [
     dataSource,
     JSON.stringify(searchBarProps.query),
     JSON.stringify(fetchFilters),
+    JSON.stringify(dateRangeFrom),
+    JSON.stringify(dateRangeTo),
   ]);
 
   return (
     <I18nProvider>
       <>
-        <EuiPanel paddingSize='none' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='none'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
             <WzSearchBar
               appName='compliance-controls'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
@@ -285,7 +302,12 @@ export const ComplianceTable = withAgentSupportModule(props => {
             />
           )}
         </EuiPanel>
-        <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='s'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           <EuiPanel paddingSize='none'>
             <EuiFlexGroup paddingSize='none'>
               <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>

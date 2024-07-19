@@ -318,13 +318,9 @@ export default withRouterSearch(
       // TODO: the view of the rule flyout should be managed through the routing instead component
       // states
       if (this.props.search.redirectRule) {
-        const search = new URLSearchParams(
-          NavigationService.getInstance().getSearch(),
-        );
-        search.delete('redirectRule');
-        NavigationService.getInstance().navigate(
-          `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
-        );
+        NavigationService.getInstance().updateAndNavigateSearchParams({
+          redirectRule: null,
+        });
       }
       this.props.cleanFilters();
       this.props.onFiltersChange(filters);
@@ -717,15 +713,9 @@ export default withRouterSearch(
       if (this.state.currentRuleId == ruleId) {
         return;
       }
-
-      const search = new URLSearchParams(
-        NavigationService.getInstance().getSearch(),
-      );
-      search.delete('redirectRule');
-      search.append('redirectRule', ruleId);
-      NavigationService.getInstance().navigate(
-        `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
-      );
+      NavigationService.getInstance().updateAndNavigateSearchParams({
+        redirectRule: ruleId,
+      });
       this.setState({ currentRuleId: ruleId, isLoading: true });
     }
 

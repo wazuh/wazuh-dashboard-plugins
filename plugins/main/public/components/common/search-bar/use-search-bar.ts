@@ -47,8 +47,6 @@ const useSearchBarConfiguration = (
     setTimeFilter: setGlobalTimeFilter,
   } = useTimeFilter();
   const filters = defaultFilters ?? [];
-  const fixedFilters = filters.filter(filter => filter.meta.controlledBy);
-  const userFilters = filters.filter(filter => !filter.meta.controlledBy);
   const [timeFilter, setTimeFilter] = useState(globalTimeFilter);
   const [query, setQuery] = props?.setQuery
     ? useState(props?.query || { query: '', language: 'kuery' })
@@ -103,18 +101,15 @@ const useSearchBarConfiguration = (
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
     filters,
-    fixedFilters,
-    userFilters,
     query,
     timeHistory,
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (userFilters: Filter[]) => {
-      const allFilters = [...fixedFilters, ...userFilters];
       setFilters
-        ? setFilters(allFilters)
+        ? setFilters(userFilters)
         : console.warn('setFilters function is not defined');
-      props?.onFiltersUpdated && props?.onFiltersUpdated(allFilters);
+      props?.onFiltersUpdated && props?.onFiltersUpdated(userFilters);
     },
     onQuerySubmit: (
       payload: { dateRange: TimeRange; query?: Query },

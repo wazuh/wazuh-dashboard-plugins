@@ -37,6 +37,7 @@ const DashboardDockerComponent: React.FC = ({}) => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -103,6 +104,7 @@ const DashboardDockerComponent: React.FC = ({}) => {
             <WzSearchBar
               appName='docker-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
