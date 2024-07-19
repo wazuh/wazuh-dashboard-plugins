@@ -150,7 +150,7 @@ describe('PatternDataSourceFilterManager', () => {
       ).not.toHaveBeenCalled();
     });
 
-    it('should filter the filters received in the constructor then no keep the filters with different index and merge with the fixed filters', () => {
+    it('should filter the filters received in the constructor then no keep the filters with different index', () => {
       const dataSource = new DataSourceMocked('my-index', 'my-title');
       const filterDifIndex = createFilter('agent.id', '1', 'different filter');
       const fixedFilter = createFilter('agent.id', '1', 'my-index');
@@ -161,9 +161,7 @@ describe('PatternDataSourceFilterManager', () => {
         mockedFilterManager,
       );
       expect(mockedFilterManager.setFilters).toHaveBeenCalledTimes(1);
-      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([
-        fixedFilter,
-      ]);
+      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([]);
     });
 
     it('should filter the filters received in the constructor then no keep the filters with meta.controlledBy property (with same index)', () => {
@@ -185,9 +183,7 @@ describe('PatternDataSourceFilterManager', () => {
       expect(mockedFilterManager.setFilters).not.toHaveBeenCalledWith([
         filterSameIndexControlled,
       ]);
-      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([
-        fixedFilter,
-      ]);
+      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([]);
     });
 
     it('should filter the filters received in the constructor then no keep the filters with $state.isImplicit property (with same index)', () => {
@@ -213,9 +209,7 @@ describe('PatternDataSourceFilterManager', () => {
       expect(mockedFilterManager.setFilters).not.toHaveBeenCalledWith([
         filterSameIndexControlled,
       ]);
-      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([
-        fixedFilter,
-      ]);
+      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([]);
     });
 
     it('should filter the filters received in the constructor and keep the filters with the same index and merge with the fixed ', () => {
@@ -230,7 +224,6 @@ describe('PatternDataSourceFilterManager', () => {
       );
       expect(mockedFilterManager.setFilters).toHaveBeenCalledTimes(1);
       expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([
-        fixedFilter,
         sameIndexFilter,
       ]);
     });
@@ -245,9 +238,7 @@ describe('PatternDataSourceFilterManager', () => {
       jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
       new PatternDataSourceFilterManager(dataSource, [], mockedFilterManager);
       expect(mockedFilterManager.setFilters).toHaveBeenCalledTimes(1);
-      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([
-        fixedFilter,
-      ]);
+      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([]);
     });
 
     it('should return the filters merged the fixed filters included defined in data source', () => {
@@ -264,7 +255,6 @@ describe('PatternDataSourceFilterManager', () => {
       );
       expect(mockedFilterManager.setFilters).toHaveBeenCalledTimes(1);
       expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([
-        fixedFilter,
         sameIndexFilter,
       ]);
     });
@@ -280,9 +270,7 @@ describe('PatternDataSourceFilterManager', () => {
         mockedFilterManager,
       );
       expect(mockedFilterManager.setFilters).toHaveBeenCalledTimes(1);
-      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([
-        fixedFilter,
-      ]);
+      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([]);
     });
   });
 
@@ -296,16 +284,16 @@ describe('PatternDataSourceFilterManager', () => {
       jest.spyOn(dataSource, 'getFixedFilters').mockReturnValue([fixedFilter]);
       new PatternDataSourceFilterManager(dataSource, [], mockedFilterManager);
       expect(mockedFilterManager.setFilters).toHaveBeenCalledTimes(1);
-      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([
-        fixedFilter,
-      ]);
+      expect(mockedFilterManager.setFilters).toHaveBeenCalledWith([]);
+      expect(dataSource.getFixedFilters()).toEqual([fixedFilter]);
     });
   });
 
   describe('getFetchFilters', () => {
     it('should return the filters to fetch the data from the data source', () => {
       const dataSource = new DataSourceMocked('my-index', 'my-title');
-      const storedFilter = createFilter('agent.id', '1', 'my-index');
+      const storedFilter = createFilter('fetch.filter', '1', 'my-index');
+      const defaultFilters = createFilter('rule.level', '3', 'my-index');
       storedFilter.meta.controlledBy =
         DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT;
       jest.spyOn(dataSource, 'getFetchFilters').mockReturnValue([storedFilter]);
@@ -314,9 +302,10 @@ describe('PatternDataSourceFilterManager', () => {
         [],
         mockedFilterManager,
       );
-      jest.spyOn(filterManager, 'getFilters').mockReturnValue([]);
+      jest.spyOn(filterManager, 'getFilters').mockReturnValue([defaultFilters]);
+      jest.spyOn(filterManager, 'getFixedFilters').mockReturnValue([]);
       const filters = filterManager.getFetchFilters();
-      expect(filters).toEqual([storedFilter]);
+      expect(filters).toEqual([defaultFilters, storedFilter]);
     });
   });
 

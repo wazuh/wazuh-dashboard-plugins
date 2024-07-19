@@ -59,6 +59,7 @@ const MitreComponent = props => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -152,20 +153,31 @@ const MitreComponent = props => {
   return (
     <I18nProvider>
       <>
-        <EuiPanel paddingSize='none' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='none'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
             <WzSearchBar
               appName='mitre-attack-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showQueryInput={true}
               showQueryBar={true}
               showSaveQuery={true}
             />
           )}
         </EuiPanel>
-        <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='s'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           <EuiPanel paddingSize='none'>
             <EuiFlexGroup>
               <EuiFlexItem

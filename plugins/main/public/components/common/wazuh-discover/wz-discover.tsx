@@ -72,6 +72,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     dataSource,
     filters,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -141,7 +142,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -200,6 +201,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           <WzSearchBar
             appName='wazuh-discover-search-bar'
             {...searchBarProps}
+            fixedFilters={fixedFilters}
             showQueryInput={true}
             showQueryBar={true}
             showSaveQuery={true}

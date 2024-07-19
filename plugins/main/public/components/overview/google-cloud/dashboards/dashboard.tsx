@@ -36,6 +36,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -81,7 +82,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching alerts',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -102,6 +103,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
             <WzSearchBar
               appName='google-cloud-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}

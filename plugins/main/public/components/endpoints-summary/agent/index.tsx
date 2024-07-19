@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { EuiPage, EuiPageBody, EuiProgress } from '@elastic/eui';
+import { EuiPage, EuiPageBody, EuiProgress, EuiLink } from '@elastic/eui';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
 import { Agent } from '../types';
 import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
-import { withErrorBoundary, withRouteResolvers } from '../../common/hocs';
+import {
+  withErrorBoundary,
+  withGuard,
+  withRouteResolvers,
+} from '../../common/hocs';
 import { compose } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 import { MainModuleAgent } from '../../common/modules/main-agent';
@@ -18,11 +22,46 @@ import {
 import { useRouterSearch } from '../../common/hooks/use-router-search';
 import { Redirect, Route, Switch } from '../../router-search';
 import NavigationService from '../../../react-services/navigation-service';
+import { connect } from 'react-redux';
+import { PromptNoSelectedAgent } from '../../agents/prompts';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { getCore } from '../../../kibana-services';
+import { endpointSummary } from '../../../utils/applications';
+
+const mapStateToProps = state => ({
+  agent: state.appStateReducers?.currentAgentData,
+});
 
 export const AgentView = compose(
   withErrorBoundary,
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
-)(() => {
+  connect(mapStateToProps),
+  withGuard(
+    props => !(props.agent && props.agent.id),
+    () => (
+      <>
+        <PromptNoSelectedAgent
+          body={
+            <>
+              You need to select an agent or return to
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink
+                  aria-label='go to Endpoint summary'
+                  href={`${endpointSummary.id}#/agents-preview`}
+                  onClick={() =>
+                    NavigationService.getInstance().navigate(`/agents-preview`)
+                  }
+                >
+                  Endpoint summary
+                </EuiLink>
+              </RedirectAppLinks>
+            </>
+          }
+        />
+      </>
+    ),
+  ),
+)(({ agent: agentData }) => {
   const { tab = 'welcome' } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
 
@@ -35,23 +74,20 @@ export const AgentView = compose(
 
   const pinnedAgentManager = new PinnedAgentManager();
 
-  const [agent, setAgent] = useState<Agent>();
   const [isLoadingAgent, setIsLoadingAgent] = useState(true);
 
-  const getAgent = async () => {
+  const syncAgent = async () => {
     setIsLoadingAgent(true);
     await pinnedAgentManager.syncPinnedAgentSources();
-    const isPinnedAgent = pinnedAgentManager.isPinnedAgent();
-    setAgent(isPinnedAgent ? pinnedAgentManager.getPinnedAgent() : null);
     setIsLoadingAgent(false);
   };
 
   useEffect(() => {
-    getAgent();
+    syncAgent();
   }, [tab]);
 
   const switchTab = (tab: string) => {
-    navigationService.navigate(`/agents?tab=${tab}&agent=${agent?.id}`);
+    navigationService.navigate(`/agents?tab=${tab}&agent=${agentData?.id}`);
   };
 
   if (isLoadingAgent) {
@@ -67,21 +103,21 @@ export const AgentView = compose(
   return (
     <Switch>
       <Route path='?tab=syscollector'>
-        <MainModuleAgent agent={agent} section={tab} />
-        <MainSyscollector agent={agent} />
+        <MainModuleAgent agent={agentData} section={tab} />
+        <MainSyscollector agent={agentData} />
       </Route>
       <Route path='?tab=stats'>
-        <MainModuleAgent agent={agent} section={tab} />
-        <MainAgentStats agent={agent} />
+        <MainModuleAgent agent={agentData} section={tab} />
+        <MainAgentStats agent={agentData} />
       </Route>
       <Route path='?tab=configuration'>
-        <MainModuleAgent agent={agent} section={tab} />
-        <WzManagementConfiguration agent={agent} />
+        <MainModuleAgent agent={agentData} section={tab} />
+        <WzManagementConfiguration agent={agentData} />
       </Route>
       <Route path='?tab=welcome'>
         <AgentsWelcome
           switchTab={switchTab}
-          agent={agent}
+          agent={agentData}
           pinAgent={pinnedAgentManager.pinAgent}
           unPinAgent={pinnedAgentManager.unPinAgent}
         />

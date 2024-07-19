@@ -26,6 +26,7 @@ type CustomSearchBarProps = {
   filterDrillDownValue: { field: string; value: string };
   searchBarProps: tUseSearchBarProps;
   indexPattern: IndexPattern;
+  fixedFilters: Filter[];
   setFilters: (filters: tFilter[]) => void;
 };
 
@@ -35,8 +36,9 @@ export const CustomSearchBar = ({
   searchBarProps,
   indexPattern,
   setFilters,
+  fixedFilters,
 }: CustomSearchBarProps) => {
-  const { filters, fixedFilters } = searchBarProps;
+  const { filters } = searchBarProps;
 
   const defaultSelectedOptions = () => {
     const array = [];
@@ -60,7 +62,7 @@ export const CustomSearchBar = ({
 
   useEffect(() => {
     refreshCustomSelectedFilter();
-  }, [filters]);
+  }, [filters, fixedFilters]);
 
   const checkSelectDrillDownValue = key => {
     return filterDrillDownValue.field === key &&
@@ -70,7 +72,7 @@ export const CustomSearchBar = ({
   };
 
   const onFiltersUpdated = (filters?: Filter[]) => {
-    setFilters([...fixedFilters, filters]);
+    setFilters([filters]);
   };
 
   const changeSwitch = () => {
@@ -124,8 +126,9 @@ export const CustomSearchBar = ({
 
   const refreshCustomSelectedFilter = () => {
     setSelectedOptions(defaultSelectedOptions());
+    // The dropdown filters could be added like fixed filters and user filters
     const currentFilters =
-      filters
+      [...filters, ...fixedFilters]
         .filter(
           item =>
             item.meta.type === 'phrases' &&
@@ -204,6 +207,7 @@ export const CustomSearchBar = ({
       <div style={{ margin: '20px 20px 0px 20px' }}>
         <WzSearchBar
           {...searchBarProps}
+          fixedFilters={fixedFilters}
           showQueryInput={avancedFiltersState}
           onFiltersUpdated={onFiltersUpdated}
           preQueryBar={

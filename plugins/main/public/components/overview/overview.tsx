@@ -33,7 +33,7 @@ export const Overview: React.FC = withRouteResolvers({
   savedSearch,
 })(() => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
-  const { tab = 'welcome', tabView = 'dashboard' } = useRouterSearch();
+  const { tab = 'welcome', tabView = 'dashboard', agentId } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
   const pinnedAgentManager = new PinnedAgentManager();
 
@@ -100,7 +100,7 @@ export const Overview: React.FC = withRouteResolvers({
       stopSyncingGlobalStateWithUrl();
       stopSyncingQueryAppStateWithStateContainer();
     };
-  }, []);
+  }, [agentId]);
 
   /**
    * This fetch de agents summary
@@ -118,20 +118,12 @@ export const Overview: React.FC = withRouteResolvers({
     }
   };
 
-  function switchTab(newTab: any, force: any) {
-    const urlSearchParams = new URLSearchParams(navigationService.getSearch());
-    urlSearchParams.set('tab', newTab);
-    navigationService.navigate(
-      `${navigationService.getPathname()}?${urlSearchParams.toString()}`,
-    );
+  function switchTab(newTab: string) {
+    navigationService.switchTab(newTab);
   }
 
   const switchSubTab = (subTab: string) => {
-    const urlSearchParams = new URLSearchParams(navigationService.getSearch());
-    urlSearchParams.set('tabView', subTab);
-    navigationService.navigate(
-      `${navigationService.getPathname()}?${urlSearchParams.toString()}`,
-    );
+    navigationService.switchSubTab(subTab);
   };
 
   return (

@@ -37,6 +37,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -102,9 +103,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
             <WzSearchBar
               appName='aws-searchbar'
               {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
+              fixedFilters={fixedFilters}
             />
           )}
           {dataSource && results?.hits?.total === 0 ? (

@@ -37,6 +37,7 @@ const DashboardVT: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -83,7 +84,7 @@ const DashboardVT: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching alerts',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -104,6 +105,7 @@ const DashboardVT: React.FC = () => {
           <WzSearchBar
             appName='virustotal-searchbar'
             {...searchBarProps}
+            fixedFilters={fixedFilters}
             showDatePicker={true}
             showQueryInput={true}
             showQueryBar={true}

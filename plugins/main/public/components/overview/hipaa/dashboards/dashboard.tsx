@@ -37,6 +37,7 @@ const DashboardHIPAAComponent: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -83,7 +84,7 @@ const DashboardHIPAAComponent: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching alerts',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -104,6 +105,7 @@ const DashboardHIPAAComponent: React.FC = () => {
             <WzSearchBar
               appName='hipaa-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}

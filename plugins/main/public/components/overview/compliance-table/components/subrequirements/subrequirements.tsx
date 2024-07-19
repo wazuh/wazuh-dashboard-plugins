@@ -27,7 +27,7 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { AppState } from '../../../../../react-services/app-state';
-import { RequirementFlyout } from '../requirement-flyout/requirement-flyout';
+import { RequirementFlyout } from '../requirement-flyout';
 import {
   getDataPlugin,
   getWazuhCorePlugin,

@@ -37,6 +37,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -103,6 +104,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
             <WzSearchBar
               appName='fim-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}

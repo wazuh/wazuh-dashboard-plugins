@@ -3,10 +3,6 @@ import path from 'path';
 import PdfPrinter from 'pdfmake/src/printer';
 import clockIconRaw from './clock-icon-raw';
 import filterIconRaw from './filter-icon-raw';
-import {
-  AgentsVisualizations,
-  OverviewVisualizations,
-} from '../../integration-files/visualizations';
 import * as TimSort from 'timsort';
 import { REPORTS_PRIMARY_COLOR } from '../../../common/constants';
 import { Logger } from 'opensearch-dashboards/server';
@@ -477,18 +473,6 @@ export class ReportPrinter {
     }:${seconds < 10 ? '0' + seconds : seconds}`;
     this.logger.debug(`str: ${str}`);
     return str;
-  }
-  checkTitle(item, isAgents, tab) {
-    this.logger.debug(
-      `Item ID ${item.id}, from ${
-        isAgents ? 'agents' : 'overview'
-      } and tab ${tab}`,
-    );
-
-    const title = isAgents
-      ? AgentsVisualizations[tab].filter(v => v._id === item.id)
-      : OverviewVisualizations[tab].filter(v => v._id === item.id);
-    return title;
   }
 
   addSimpleTable({

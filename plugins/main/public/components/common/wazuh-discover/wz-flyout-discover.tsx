@@ -34,8 +34,7 @@ import {
 } from '../data-source';
 import DocDetails from './components/doc-details';
 import { WzSearchBar } from '../search-bar/search-bar';
-
-export const MAX_ENTRIES_PER_QUERY = 10000;
+import { MAX_ENTRIES_PER_QUERY } from '../data-grid/data-grid-service';
 export const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 export const DEFAULT_PAGE_SIZE = 20;
 const INDEX_FIELD_NAME = '_id';
@@ -102,6 +101,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     dataSource,
     filters,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -152,7 +152,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       .catch((error: HttpError) => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching discover data',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
@@ -300,7 +300,9 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                     results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
                           ariaLabel: 'Warning',
-                          content: `The query results has exceeded the limit of 10,000 hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                          content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY,
+                          )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
                             MAX_ENTRIES_PER_QUERY,
                           )} hits.`,
                           iconType: 'alert',

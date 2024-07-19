@@ -36,7 +36,6 @@ export class PatternDataSource implements tDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    // return all filters
     return [...this.getPinnedAgentFilter()];
   }
 
