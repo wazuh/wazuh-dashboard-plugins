@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 02
+## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 03
 
 ### Added
 
@@ -42,7 +42,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Upgraded versions of `follow-redirects` and `es5-ext` [#6626](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6626)
 - Changed agent log collector socket API response controller component [#6660](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6660)
 - Improve margins and paddings in the Events, Inventory and Control tabs [#6708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6708)
-- Refactored the search bar to correctly handle fixed and user-added filters [#6716](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6716) [#6755](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6755)
+- Refactored the search bar to correctly handle fixed and user-added filters [#6716](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6716) [#6755](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6755) [#6833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6833)
 - Generate URL with predefined filters [#6745](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6745)
 - Migrated AngularJS routing to ReactJS [#6689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6689) [#6775](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6775) [#6790](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6790
 - Improvement of the filter management system by implementing new standard modules [#6534](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6534) [#6772](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6772)
@@ -68,7 +68,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed custom EuiSuggestItem component in favor of OUI's native component [#6714](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6714)
 - Removed API endpoint unused endpoints from creation of old visualisations: GET /elastic/visualizations/{tab}/{pattern} and GET /elastic/visualizations/{tab}/{pattern} [#6782](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6782)
 
-## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 02
+## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 04
 
 ### Added
 
@@ -79,6 +79,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the unexpected `delay` parameter on the server API requests [#6778](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6778)
 - Fixed home KPI links with custom or index pattern whose title is different to the id [#6777](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6777)
 - Fixed colors related to vulnerability severity levels on Vulnerability Detection dashboard [#6793](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6793)
+- Fixed pinned agent error in vulnerabilities events tab [#6827](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6827)
 
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 12
 
