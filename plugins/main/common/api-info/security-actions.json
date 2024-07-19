@@ -316,6 +316,45 @@
       "PUT /groups/{group_id}/configuration"
     ]
   },
+  "cluster:read": {
+    "description": "Read Wazuh's cluster nodes configuration",
+    "resources": [
+      "node:id"
+    ],
+    "example": {
+      "actions": [
+        "cluster:read"
+      ],
+      "resources": [
+        "node:id:worker1",
+        "node:id:worker3"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "PUT /groups/{group_id}/configuration"
+    ]
+  },
+  "agent:reconnect": {
+    "description": "Force reconnect agents",
+    "resources": [
+      "agent:id",
+      "agent:group"
+    ],
+    "example": {
+      "actions": [
+        "agent:reconnect"
+      ],
+      "resources": [
+        "agent:id:050",
+        "agent:id:049"
+      ],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "PUT /agents/reconnect"
+    ]
+  },
   "ciscat:read": {
     "description": "Access CIS-CAT results for agents",
     "resources": [
