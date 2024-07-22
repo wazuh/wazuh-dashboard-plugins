@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 02
+## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 03
 
 ### Added
 
@@ -27,7 +27,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Change how the configuration is managed in the backend side [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337) [#6519](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6519) [#6573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6573)
 - Change the view of API is down and check connection to Server APIs application [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Changed the usage of the endpoint GET /groups/{group_id}/files/{file_name} [#6385](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6385)
-- Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
+- Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268) [#6832](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6832)
 - Move AngularJS settings controller to ReactJS [#6580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6580)
 - Move AngularJS controller and view for manage groups to ReactJS [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
 - Move AngularJS controllers and views of Tools and Dev Tools to ReactJS [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
@@ -46,6 +46,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Generate URL with predefined filters [#6745](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6745)
 - Migrated AngularJS routing to ReactJS [#6689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6689) [#6775](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6775) [#6790](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6790)
 - Improvement of the filter management system by implementing new standard modules [#6534](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6534) [#6772](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6772)
+- Changed permalink field in the Events tab table in Virustotal to show an external link [#6839](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6839)
 
 ### Fixed
 
