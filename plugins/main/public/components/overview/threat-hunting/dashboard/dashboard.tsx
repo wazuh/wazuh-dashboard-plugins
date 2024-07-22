@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   getPlugins,
   getWazuhCorePlugin,
-  getCore,
 } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { SearchResponse } from '../../../../../../../src/core/server';
@@ -23,7 +22,6 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiButtonEmpty,
-  EuiLink,
 } from '@elastic/eui';
 import {
   ErrorFactory,
@@ -235,11 +233,10 @@ const DashboardTH: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         <div
-          className={`th-container ${
-            !isDataSourceLoading && dataSource && results?.hits?.total > 0
-              ? ''
-              : 'wz-no-display'
-          }`}
+          className={`th-container ${!isDataSourceLoading && dataSource && results?.hits?.total > 0
+            ? ''
+            : 'wz-no-display'
+            }`}
         >
           <SampleDataWarning />
           <div className='th-dashboard-responsive'>
@@ -300,20 +297,20 @@ const DashboardTH: React.FC = () => {
                       <HitsCounter
                         hits={results?.hits?.total}
                         showResetButton={false}
-                        onResetQuery={() => {}}
+                        onResetQuery={() => { }}
                         tooltip={
                           results?.hits?.total &&
-                          results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
                             ? {
-                                ariaLabel: 'Warning',
-                                content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                  MAX_ENTRIES_PER_QUERY,
-                                )} hits.`,
-                                iconType: 'alert',
-                                position: 'top',
-                              }
+                              ariaLabel: 'Warning',
+                              content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                                MAX_ENTRIES_PER_QUERY,
+                              )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                MAX_ENTRIES_PER_QUERY,
+                              )} hits.`,
+                              iconType: 'alert',
+                              position: 'top',
+                            }
                             : undefined
                         }
                       />

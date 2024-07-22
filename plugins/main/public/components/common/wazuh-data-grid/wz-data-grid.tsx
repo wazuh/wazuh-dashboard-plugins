@@ -11,7 +11,6 @@ import {
   EuiTitle,
   EuiFlyoutBody,
   EuiFlexGroup,
-  EuiLink,
 } from '@elastic/eui';
 import { useDataGrid, exportSearchToCSV, tDataGridColumn } from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';

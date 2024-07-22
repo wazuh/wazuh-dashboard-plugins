@@ -12,7 +12,6 @@ import {
   EuiFlyoutHeader,
   EuiTitle,
   EuiPanel,
-  EuiLink,
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
