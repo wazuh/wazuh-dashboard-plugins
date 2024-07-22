@@ -11,8 +11,10 @@ const DOT_PREFIX_RE = /(.).+?\./g;
 export type tDocViewerProps = {
   flattened: any;
   formatted: any;
+  renderFields: () => {};
   mapping: any;
   indexPattern: any;
+  docJSON: any;
 };
 
 /**
@@ -80,7 +82,7 @@ const DocViewer = (props: tDocViewerProps) => {
   const [fieldRowOpen, setFieldRowOpen] = useState(
     {} as Record<string, boolean>,
   );
-  const { flattened, formatted, mapping, indexPattern, renderFields } = props;
+  const { flattened, formatted, mapping, indexPattern, renderFields, docJSON } = props;
 
   return (
     <>
@@ -145,12 +147,12 @@ const DocViewer = (props: tDocViewerProps) => {
                     </td>
                     <td>
                       {renderFields &&
-                      renderFields?.find(
-                        (field: string) => field?.id === displayName,
-                      ) ? (
+                        renderFields?.find(
+                          (field: string) => field?.id === displayName,
+                        ) ? (
                         renderFields
                           ?.find((field: string) => field.id === displayName)
-                          .render(flattened[displayName], flattened)
+                          .render(flattened[displayName], docJSON)
                       ) : (
                         <div
                           className={valueClassName}
