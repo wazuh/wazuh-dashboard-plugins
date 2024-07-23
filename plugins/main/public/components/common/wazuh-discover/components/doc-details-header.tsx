@@ -2,6 +2,7 @@ import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiTitle, EuiLink } from '@elastic/eui';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../../kibana-services';
+import NavigationService from '../../../../react-services/navigation-service';
 
 const DocDetailsHeader = ({ doc, indexPattern }) => {
   return (
@@ -16,7 +17,7 @@ const DocDetailsHeader = ({ doc, indexPattern }) => {
           <EuiFlexItem>
             <RedirectAppLinks application={getCore().application}>
               <EuiLink
-                href={getCore().application.getUrlForApp('discover', {
+                href={NavigationService.getInstance().getUrlForApp('discover', {
                   path: `#/context/${indexPattern?.id}/${doc?._id}`,
                 })}
                 target='_blank'
@@ -30,7 +31,7 @@ const DocDetailsHeader = ({ doc, indexPattern }) => {
           <EuiFlexItem>
             <RedirectAppLinks application={getCore().application}>
               <EuiLink
-                href={getCore().application.getUrlForApp('discover', {
+                href={NavigationService.getInstance().getUrlForApp('discover', {
                   path: `#/doc/${indexPattern?.id}/${doc?._index}?id=${doc?._id}`,
                 })}
                 target='_blank'
