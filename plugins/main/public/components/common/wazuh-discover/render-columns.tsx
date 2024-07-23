@@ -3,29 +3,25 @@ import { EuiLink } from '@elastic/eui';
 import { tDataGridRenderColumn } from '../data-grid';
 import { getCore } from '../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { endpointSummary, rules } from '../../../utils/applications';
-import { formatUIDate } from '../../../react-services';
+import {
+  endpointSummary,
+  rules,
+  mitreAttack,
+} from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
-const navigateTo = (ev, section, params) => {
-  NavigationService.getInstance().navigateToModule(ev, section, params);
-};
-
-const renderMitreTechnique = (technique: string) => (
-  <EuiLink
-    onClick={e =>
-      navigateTo(e, 'overview', {
-        tab: 'mitre',
-        tabView: 'intelligence',
-        tabRedirect: 'techniques',
-        idToRedirect: technique,
-      })
-    }
-  >
-    {technique}
-  </EuiLink>
+const renderMitreTechnique = technique => (
+  <RedirectAppLinks application={getCore().application}>
+    <EuiLink
+      href={NavigationService.getInstance().getUrlForApp(mitreAttack.id, {
+        path: `#/overview?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${technique}`,
+      })}
+    >
+      {technique}
+    </EuiLink>
+  </RedirectAppLinks>
 );
 
 export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [

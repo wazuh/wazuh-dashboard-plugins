@@ -11,10 +11,10 @@ export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
     id: 'timestamp',
   },
   {
-    id: 'agent.id'
+    id: 'agent.id',
   },
   {
-    id: 'agent.name'
+    id: 'agent.name',
   },
   {
     id: 'rule.mitre.id',
@@ -29,7 +29,7 @@ export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
     id: 'rule.level',
   },
   {
-    id: 'rule.id'
+    id: 'rule.id',
   },
 ];
 
