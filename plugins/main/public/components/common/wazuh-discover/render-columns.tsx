@@ -8,7 +8,7 @@ import {
   rules,
   mitreAttack,
 } from '../../../utils/applications';
-import NavigationService from '../../../react-services/navigation-service';
+import { WzLink } from '../../wz-link/wz-link';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -21,15 +21,12 @@ const renderRequirementsSecurityOperations = (value: []) => {
 };
 
 const renderMitreTechnique = technique => (
-  <RedirectAppLinks application={getCore().application}>
-    <EuiLink
-      href={NavigationService.getInstance().getUrlForApp(mitreAttack.id, {
-        path: `#/overview?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${technique}`,
-      })}
-    >
-      {technique}
-    </EuiLink>
-  </RedirectAppLinks>
+  <WzLink
+    appId={mitreAttack.id}
+    path={`/overview?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${technique}`}
+  >
+    {technique}
+  </WzLink>
 );
 
 export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
