@@ -82,7 +82,8 @@ const DocViewer = (props: tDocViewerProps) => {
   const [fieldRowOpen, setFieldRowOpen] = useState(
     {} as Record<string, boolean>,
   );
-  const { flattened, formatted, mapping, indexPattern, renderFields, docJSON } = props;
+  const { flattened, formatted, mapping, indexPattern, renderFields, docJSON } =
+    props;
 
   return (
     <>
@@ -147,9 +148,9 @@ const DocViewer = (props: tDocViewerProps) => {
                     </td>
                     <td>
                       {renderFields &&
-                        renderFields?.find(
-                          (field: string) => field?.id === displayName,
-                        ) ? (
+                      renderFields?.find(
+                        (field: string) => field?.id === displayName,
+                      ) ? (
                         renderFields
                           ?.find((field: string) => field.id === displayName)
                           .render(flattened[displayName], docJSON)
