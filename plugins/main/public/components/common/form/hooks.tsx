@@ -134,6 +134,21 @@ export function enhanceFormFields(
                     return cloneDeep(newstate);
                   });
                 },
+                removeItem: index => {
+                  setState(state => {
+                    const _state = get(state, [...pathField, 'fields']);
+
+                    _state.splice(index, 1);
+
+                    const newState = set(
+                      state,
+                      [...pathField, 'fields'],
+                      _state,
+                    );
+
+                    return cloneDeep(newState);
+                  });
+                },
               }
             : {
                 ...field,
