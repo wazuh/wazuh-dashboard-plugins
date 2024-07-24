@@ -38,13 +38,12 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
       }
 
       return (
-        <RedirectAppLinks application={getCore().application}>
-          <EuiLink
-            href={`${endpointSummary.id}#/agents?tab=welcome&agent=${value}`}
-          >
-            {value}
-          </EuiLink>
-        </RedirectAppLinks>
+        <WzLink
+          appId={endpointSummary.id}
+          path={`/agents?tab=welcome&agent=${value}`}
+        >
+          {value}
+        </WzLink>
       );
     },
   },
@@ -56,24 +55,24 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
       }
 
       return (
-        <RedirectAppLinks application={getCore().application}>
-          <EuiLink
-            href={`${endpointSummary.id}#/agents?tab=welcome&agent=${row.agent.id}`}
-          >
-            {value}
-          </EuiLink>
-        </RedirectAppLinks>
+        <WzLink
+          appId={endpointSummary.id}
+          path={`/agents?tab=welcome&agent=${row.agent.id}`}
+        >
+          {value}
+        </WzLink>
       );
     },
   },
   {
     id: 'rule.id',
     render: value => (
-      <RedirectAppLinks application={getCore().application}>
-        <EuiLink href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}>
-          {value}
-        </EuiLink>
-      </RedirectAppLinks>
+      <WzLink
+        appId={rules.id}
+        path={`/manager/?tab=rules&redirectRule=${value}`}
+      >
+        {value}
+      </WzLink>
     ),
   },
   {
@@ -91,21 +90,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
         <div>{renderMitreTechnique(value)}</div>
       ),
   },
-  {
-    id: 'rule.mitre_techniques',
-    render: value =>
-      Array.isArray(value) ? (
-        <div style={{ display: 'flex', gap: 10 }}>
-          {value?.map((technique, index) => (
-            <div key={`${technique}-${index}`}>
-              {renderMitreTechnique(technique)}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div>{renderMitreTechnique(value)}</div>
-      ),
-  },
+
   {
     id: 'rule.pci_dss',
     render: renderRequirementsSecurityOperations,
