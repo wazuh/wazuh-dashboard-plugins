@@ -1,8 +1,6 @@
 import React from 'react';
-import { EuiLink, EuiText } from '@elastic/eui';
+import { EuiText } from '@elastic/eui';
 import { tDataGridRenderColumn } from '../data-grid';
-import { getCore } from '../../../kibana-services';
-import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import {
   endpointSummary,
   rules,
