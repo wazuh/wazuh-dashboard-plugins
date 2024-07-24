@@ -12,41 +12,38 @@ type tWzLinkProps = {
 };
 
 export const WzLink = (props: tWzLinkProps) => {
-  const { appId, path } = props;
+  const { appId, path, children, ...otherProps } = props;
 
   const [isCurrentApp, setIsCurrentApp] = useState(false);
+  const currentAppId$ = useObservable(
+    getCore().application.currentAppId$,
+    undefined,
+  );
 
   useEffect(() => {
-    const currentAppId$ = getCore().application.currentAppId$.subscribe(
-      currentApp => {
-        setIsCurrentApp(currentApp === appId);
-      },
-    );
-    return () => {
-      currentAppId$.unsubscribe();
-    };
-  }, []);
+    setIsCurrentApp(currentAppId$ === appId);
+  }, [currentAppId$, appId]);
 
   const linkDiferentApps = (
     <RedirectAppLinks application={getCore().application}>
       <EuiLink
-        {...props}
+        {...otherProps}
         href={NavigationService.getInstance().getUrlForApp(appId, {
           path: `#${path}`,
         })}
       >
-        {props.children}
+        {children}
       </EuiLink>
     </RedirectAppLinks>
   );
   const linkSameApp = (
     <EuiLink
-      {...props}
+      {...otherProps}
       onClick={() => {
         NavigationService.getInstance().navigate(path);
       }}
     >
-      {props.children}
+      {children}
     </EuiLink>
   );
   return isCurrentApp ? linkSameApp : linkDiferentApps;
