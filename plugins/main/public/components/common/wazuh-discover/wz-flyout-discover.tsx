@@ -15,6 +15,7 @@ import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { tDataGridColumn } from '../data-grid';
+import './discover.scss';
 import {
   ErrorHandler,
   ErrorFactory,
@@ -51,6 +52,7 @@ export type WazuhDiscoverProps = {
   isExpanded?: boolean;
   initialFilters?: tFilter[];
   initialFetchFilters?: tFilter[];
+  fileDetails?: boolean;
 };
 
 const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
@@ -62,6 +64,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     isExpanded = true,
     initialFilters,
     initialFetchFilters,
+    fileDetails = false,
   } = props;
 
   if (!DataSource) {
@@ -265,6 +268,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   return (
     <IntlProvider locale='en'>
       <EuiPageTemplate
+        className={fileDetails && 'file-integrity-monitoring-style'}
         restrictWidth='100%'
         fullHeight={true}
         grow
