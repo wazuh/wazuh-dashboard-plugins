@@ -210,32 +210,15 @@ export class FileDetails extends Component {
     ];
   }
 
-  viewInEvents = ev => {
+  viewInEvents = async ev => {
     const { file } = this.props.currentFile;
-    if (this.props.view === 'extern') {
-      NavigationService.getInstance().navigateToModule(ev, 'overview', {
-        agentId: this.props?.agent?.id,
-        tab: 'fim',
-        tabView: 'events',
-        filters: { 'syscheck.path': file },
-      });
-    } else {
-      NavigationService.getInstance().navigateToModule(
-        ev,
-        'overview',
-        {
-          agentId: this.props?.agent?.id,
-          tab: 'fim',
-          tabView: 'events',
-          filters: { 'syscheck.path': file },
-        },
-        () => this.openEventCurrentWindow(),
-      );
-    }
-  };
+    const { agent } = this.props;
+    const agentId = agent?.id;
 
-  openEventCurrentWindow() {
-    const { file } = this.props.currentFile;
+    if (!this.indexPattern) {
+      this.indexPattern = await getIndexPattern();
+    }
+
     const filters = [
       {
         ...buildPhraseFilter(
@@ -247,9 +230,42 @@ export class FileDetails extends Component {
       },
     ];
 
+    if (this.props.view === 'extern') {
+      this.applyFiltersAndNavigate(ev, filters, 'overview', {
+        agentId,
+        tab: 'fim',
+        tabView: 'events',
+        filters: { 'syscheck.path': file },
+      });
+    } else {
+      this.applyFiltersAndNavigate(
+        ev,
+        filters,
+        'overview',
+        { agentId, tab: 'fim', tabView: 'events' },
+        this.openEventCurrentWindow,
+      );
+    }
+  };
+
+  applyFiltersAndNavigate = async (ev, filters, module, params, callback) => {
+    try {
+      const { filterManager } = getDataPlugin().query;
+      filterManager.addFilters(filters);
+      await NavigationService.getInstance().navigateToModule(
+        ev,
+        module,
+        params,
+        callback,
+      );
+    } catch (error) {
+      ErrorHandler.handleError(error);
+    }
+  };
+
+  openEventCurrentWindow = () => {
     this.props.onSelectedTabChanged('events');
-    this.checkFilterManager(filters);
-  }
+  };
 
   async checkFilterManager(filters) {
     try {
