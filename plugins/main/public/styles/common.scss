@@ -1818,6 +1818,12 @@ iframe.width-changed {
   z-index: 9999;
 }
 
+.euiFlyout {
+  .euiPage {
+    background-color: transparent;
+  }
+}
+
 .wz-app {
   .euiPage {
     background-color: transparent;
