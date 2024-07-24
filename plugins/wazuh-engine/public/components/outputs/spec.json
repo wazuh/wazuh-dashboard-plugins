@@ -146,13 +146,18 @@
     "allow": {
       "$ref": "#/definitions/_check"
     },
-    "check": {
+    "check2": {
       "type": "array",
       "description": "Modify the event. All operations are performed in declaration order and on best effort, this stage is a list composed of blocks, where each block can be a map [map] or a conditional map [check, map].",
       "minItems": 1,
       "items": {
         "$ref": "#/definitions/_normalizeBlock"
       }
+    },
+    "check": {
+      "type": "array",
+      "description": "Variable definitions, used to define variables that can be reused in other parts of the asset",
+      "minProperties": 1
     },
     "outputs": {
       "type": "array",

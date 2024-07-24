@@ -96,9 +96,16 @@
     }
   },
   "check": {
-    "type": "textarea",
+    "type": "arrayOf",
+    "initialValue": [{ "value": "" }],
+    "fields": {
+      "value": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
     "_meta": {
-      "label": "Checks",
+      "label": "Check",
       "groupForm": "steps"
     }
   },

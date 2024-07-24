@@ -95,6 +95,52 @@
       "groupForm": "metadata"
     }
   },
+  "definitions": {
+    "type": "arrayOf",
+    "initialValue": [{ "key": "", "value": "" }],
+    "fields": {
+      "key": {
+        "type": "text",
+        "initialValue": ""
+      },
+      "value": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Definitions",
+      "groupForm": "metadata"
+    }
+  },
+  "check": {
+    "type": "arrayOf",
+    "initialValue": [{ "value": "" }],
+    "fields": {
+      "value": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Check",
+      "groupForm": "steps"
+    }
+  },
+  "map": {
+    "type": "arrayOf",
+    "initialValue": [{ "value": "" }],
+    "fields": {
+      "value": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Map",
+      "groupForm": "steps"
+    }
+  },
   "normalize": {
     "type": "textarea",
     "_meta": {

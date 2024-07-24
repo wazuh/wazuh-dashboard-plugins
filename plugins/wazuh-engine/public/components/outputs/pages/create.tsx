@@ -4,9 +4,7 @@ import { RuleForm } from '../components/form';
 import { EuiButton, EuiButtonEmpty, EuiLink } from '@elastic/eui';
 import { RuleFileEditor } from '../components/file-editor';
 
-export const Create = props => {
-  const [view, setView] = useState('visual-editor');
-
+export const CreateVisual = props => {
   const actions = [
     <EuiLink
       href={'#'} // TODO: change link to documentation
@@ -25,37 +23,39 @@ export const Create = props => {
     >
       Import file
     </EuiButton>,
-    ...(view === 'visual-editor'
-      ? [
-          <EuiButtonEmpty
-            fill
-            onClick={() => {
-              setView('file-editor');
-            }}
-            iconType='apmTrace'
-          >
-            Switch to file editor
-          </EuiButtonEmpty>,
-        ]
-      : [
-          <EuiButtonEmpty
-            fill
-            onClick={() => {
-              setView('visual-editor');
-            }}
-            iconType='apmTrace'
-          >
-            Switch to visual editor
-          </EuiButtonEmpty>,
-        ]),
   ];
 
   return (
-    <Layout title='Create rule' actions={actions}>
-      {view === 'visual-editor' && <RuleForm {...props} />}
-      {view === 'file-editor' && (
-        <RuleFileEditor {...props} isEditable={true} />
-      )}
+    <Layout title='Create output' actions={actions}>
+      <RuleForm {...props} />
+    </Layout>
+  );
+};
+
+export const CreateFile = props => {
+  const actions = [
+    <EuiLink
+      href={'#'} // TODO: change link to documentation
+      target='_blank'
+      external
+      style={{ textAlign: 'center' }}
+      rel='noopener noreferrer'
+    >
+      Documentation
+    </EuiLink>,
+    <EuiButton
+      onClick={() => {
+        // TODO: Implement
+      }}
+      iconType='importAction'
+    >
+      Import file
+    </EuiButton>,
+  ];
+
+  return (
+    <Layout title='Create output' actions={actions}>
+      <RuleFileEditor {...props} isEditable={true} />
     </Layout>
   );
 };

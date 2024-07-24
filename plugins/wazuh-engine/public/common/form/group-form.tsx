@@ -7,6 +7,7 @@ import {
   EuiTitle,
   EuiSpacer,
   EuiButton,
+  EuiButtonIcon,
   EuiIcon,
   EuiToolTip,
 } from '@elastic/eui';
@@ -66,13 +67,27 @@ export const FormGroup = ({
             </EuiTitle>
           </EuiFlexItem>
         </EuiFlexGroup>
-        {rest.fields.map(item => (
-          <>
-            {Object.entries(item).map(([name, field]) =>
-              renderInput({ ...field, name }),
-            )}
-          </>
+        {rest.fields.map((item, index) => (
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              {Object.entries(item).map(([name, field]) =>
+                renderInput({
+                  ...field,
+                  name,
+                }),
+              )}
+            </EuiFlexItem>
+            <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
+              <EuiButtonIcon
+                display='base'
+                color='danger'
+                iconType='cross'
+                onClick={() => rest.removeItem(index)}
+              ></EuiButtonIcon>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         ))}
+        <EuiSpacer />
         <EuiButton onClick={rest.addNewItem}>Add</EuiButton>
       </EuiPanel>
     );

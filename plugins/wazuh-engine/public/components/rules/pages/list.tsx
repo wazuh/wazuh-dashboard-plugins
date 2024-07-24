@@ -9,6 +9,26 @@ import { Layout } from '../components';
 import specification from '../spec.json';
 import { transformAssetSpecToListTableColumn } from '../utils/transform-asset-spec';
 import { Detail } from '../components/detail';
+import { CreateAssetSelectorButton } from '../../../common/create-asset-selector';
+
+const modalOptions = isEdit => [
+  {
+    id: 'create-asset-visual',
+    label: 'Visual',
+    help: `Use the visual editor to ${isEdit ? 'update' : 'create'} your asset${
+      isEdit ? '' : ' using pre-defined options.'
+    }`,
+    routePath: 'visual',
+  },
+  {
+    id: 'create-asset-file-editor',
+    label: 'File editor',
+    help: `Use the file editor to ${isEdit ? 'update' : 'create'} your asset${
+      isEdit ? '' : ' using pre-defined options.'
+    }`,
+    routePath: 'file',
+  },
+];
 
 export const RulesList = props => {
   const { TableIndexer, RulesDataSource, RulesDataSourceRepository, title } =
@@ -23,14 +43,19 @@ export const RulesList = props => {
     >
       Import file
     </EuiButton>,
-    <EuiButton
-      fill
-      onClick={() => {
-        props.navigationService.getInstance().navigate('/engine/rules/create');
+    <CreateAssetSelectorButton
+      buttonLabel='Create Rule'
+      options={modalOptions(false)}
+      onClickContinue={editor => {
+        props.navigationService
+          .getInstance()
+          .navigate(
+            `/engine/rules/create/${
+              modalOptions(false).find(({ id }) => id === editor)?.routePath
+            }`,
+          );
       }}
-    >
-      Create Rule
-    </EuiButton>,
+    ></CreateAssetSelectorButton>,
   ];
 
   const [indexPattern, setIndexPattern] = React.useState(null);

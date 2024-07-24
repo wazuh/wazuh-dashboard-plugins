@@ -143,11 +143,21 @@
         "type": "string"
       }
     },
-    "check": {
+    "check2": {
       "$ref": "#/definitions/_check"
     },
     "allow": {
       "$ref": "#/definitions/_check"
+    },
+    "check": {
+      "type": "array",
+      "description": "Variable definitions, used to define variables that can be reused in other parts of the asset",
+      "minProperties": 1
+    },
+    "map": {
+      "type": "array",
+      "description": "Variable definitions, used to define variables that can be reused in other parts of the asset",
+      "minProperties": 1
     },
     "normalize": {
       "type": "array",
@@ -163,7 +173,7 @@
       "minItems": 1
     },
     "definitions": {
-      "type": "object",
+      "type": "array",
       "description": "Variable definitions, used to define variables that can be reused in other parts of the asset",
       "minProperties": 1
     }
