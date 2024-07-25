@@ -231,16 +231,15 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   };
 
   const addRenderColumn = columns => {
-    columns.map(column => {
+    return columns.map(column => {
       const renderColumn = wzDiscoverRenderColumns.find(
         columnRender => columnRender.id === column.id,
       );
       if (renderColumn) {
-        column.render = renderColumn.render;
+        return { ...column, render: renderColumn.render };
       }
       return column;
     });
-    return columns;
   };
 
   const getDiscoverColumns = () => {
