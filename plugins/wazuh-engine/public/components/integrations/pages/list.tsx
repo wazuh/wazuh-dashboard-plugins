@@ -33,8 +33,8 @@ const modalOptions = isEdit => [
 export const List = props => {
   const {
     TableIndexer,
-    OutputsDataSource,
-    OutputsDataSourceRepository,
+    IntegrationsDataSource,
+    IntegrationsDataSourceRepository,
     title,
   } = props;
 
@@ -47,19 +47,17 @@ export const List = props => {
     >
       Import file
     </EuiButton>,
-    <CreateAssetSelectorButton
-      buttonLabel='Create Output'
-      options={modalOptions(false)}
-      onClickContinue={editor => {
+    <EuiButton
+      fill
+      onClick={() => {
         props.navigationService
           .getInstance()
-          .navigate(
-            `/engine/outputs/create/${
-              modalOptions(false).find(({ id }) => id === editor)?.routePath
-            }`,
-          );
+          .navigate('/engine/integrations/create');
       }}
-    ></CreateAssetSelectorButton>,
+      iconType='importAction'
+    >
+      Create Integration
+    </EuiButton>,
   ];
 
   const [indexPattern, setIndexPattern] = React.useState(null);
@@ -69,35 +67,12 @@ export const List = props => {
   const defaultColumns = React.useMemo(
     () => [
       ...transformAssetSpecToListTableColumn(specification, {
-        name: {
+        title: {
           render: (prop, item) => (
             <EuiButtonEmpty onClick={() => setInspectedHit(item._document)}>
               {prop}
             </EuiButtonEmpty>
           ),
-          show: true,
-        },
-        parents: {
-          render: (prop, item) =>
-            prop.map(parent => (
-              <EuiButtonEmpty
-                key={`parent-${parent}`}
-                onClick={() => {
-                  // TODO: implement
-                  // setInspectedHit(parent);
-                }}
-              >
-                {prop}
-              </EuiButtonEmpty>
-            )),
-        },
-        'metadata.title': {
-          show: true,
-        },
-        'metadata.description': {
-          show: true,
-        },
-        'metadata.integration': {
           show: true,
         },
       }),
@@ -161,11 +136,11 @@ export const List = props => {
   return (
     <Layout title={title} actions={actions}>
       <TableIndexer
-        DataSource={OutputsDataSource}
-        DataSourceRepository={OutputsDataSourceRepository}
+        DataSource={IntegrationsDataSource}
+        DataSourceRepository={IntegrationsDataSourceRepository}
         tableProps={{
           title: 'Catalog',
-          description: 'Manage the engine outputs',
+          description: 'Manage the engine integrations',
           tableColumns: defaultColumns,
           actionButtons: props => TableActions({ ...props, selectedItems }),
           tableSortingInitialField: defaultColumns[0].field,
@@ -181,10 +156,10 @@ export const List = props => {
           },
           saveStateStorage: {
             system: 'localStorage',
-            key: 'wz-engine:outputs-main',
+            key: 'wz-engine:integrations-main',
           },
         }}
-        exportCSVPrefixFilename='outputs'
+        exportCSVPrefixFilename='integrations'
         onSetIndexPattern={setIndexPattern}
       />
       {inspectedHit && (

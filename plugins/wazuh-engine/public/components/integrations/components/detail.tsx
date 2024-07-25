@@ -10,8 +10,7 @@ import {
   EuiFlexGroup,
   EuiTitle,
 } from '@elastic/eui';
-import { withDataSourceFetch } from '../hocs/with-data-source-fetch';
-import { FileViewerFetchContent } from '../../../common/assets/file-viewer';
+import { withDataSourceFetch } from '../../../hocs/with-data-source-fetch';
 
 export const Detail = withDataSourceFetch(
   ({
@@ -29,7 +28,6 @@ export const Detail = withDataSourceFetch(
   }) => {
     // To be able to display a non-loaded rule, the component should fetch it before
     // to display it
-
     return (
       <EuiFlyout onClose={onClose} size='m'>
         <EuiFlyoutHeader>
@@ -44,11 +42,6 @@ export const Detail = withDataSourceFetch(
               indexPattern={indexPattern}
               extraTabs={{
                 post: params => [
-                  {
-                    id: 'file',
-                    name: 'File',
-                    content: () => <FileViewerFetchContent fetch={() => ''} />,
-                  },
                   {
                     id: 'relationship',
                     name: 'Relationship',

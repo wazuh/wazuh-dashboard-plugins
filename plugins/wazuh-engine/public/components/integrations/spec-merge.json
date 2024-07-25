@@ -1,0 +1,85 @@
+{
+  "title": {
+    "_meta": {
+      "label": "Name",
+      "groupForm": "documentation"
+    }
+  },
+  "labels": {
+    "type": "arrayOf",
+    "initialValue": [{ "label": "" }],
+    "fields": {
+      "label": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Labels",
+      "groupForm": "documentation"
+    }
+  },
+  "overview": {
+    "type": "textarea",
+    "_meta": {
+      "label": "Overview",
+      "groupForm": "documentation"
+    }
+  },
+  "compatibility": {
+    "type": "textarea",
+    "_meta": {
+      "label": "Compatibility",
+      "groupForm": "documentation"
+    }
+  },
+  "configuration": {
+    "type": "textarea",
+    "_meta": {
+      "label": "Configuration",
+      "groupForm": "documentation"
+    }
+  },
+  "decoders": {
+    "type": "text",
+    "_meta": {
+      "label": "Decoders",
+      "groupForm": "policy"
+    }
+  },
+  "rules": {
+    "type": "text",
+    "_meta": {
+      "label": "Rules",
+      "groupForm": "policy"
+    }
+  },
+  "filters": {
+    "type": "text",
+    "_meta": {
+      "label": "Filters",
+      "groupForm": "policy"
+    }
+  },
+  "outputs": {
+    "type": "text",
+    "_meta": {
+      "label": "Outputs",
+      "groupForm": "policy"
+    }
+  },
+  "kvdbs": {
+    "type": "text",
+    "_meta": {
+      "label": "KVDBs",
+      "groupForm": "policy"
+    }
+  },
+  "changelog": {
+    "type": "textarea",
+    "_meta": {
+      "label": "Changelog",
+      "groupForm": "changelog"
+    }
+  }
+}

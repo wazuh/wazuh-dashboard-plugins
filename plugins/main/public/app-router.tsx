@@ -61,6 +61,10 @@ import { DocumentViewTableAndJson } from './components/common/wazuh-discover/com
 import { OutputsDataSource } from './components/common/data-source/pattern/outputs/data-source';
 import { OutputsDataSourceRepository } from './components/common/data-source/pattern/outputs/data-source-repository';
 import WzDecoderInfo from './controllers/management/components/management/decoders/views/decoder-info.tsx';
+import {
+  IntegrationsDataSource,
+  IntegrationsDataSourceRepository,
+} from './components/common/data-source/pattern/integrations';
 export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
@@ -158,6 +162,10 @@ export function Application(props) {
                 RulesDataSourceRepository={RulesDataSourceRepository}
                 OutputsDataSource={OutputsDataSource}
                 OutputsDataSourceRepository={OutputsDataSourceRepository}
+                IntegrationsDataSource={IntegrationsDataSource}
+                IntegrationsDataSourceRepository={
+                  IntegrationsDataSourceRepository
+                }
                 useDocViewer={useDocViewer}
                 DocViewer={DocViewer}
                 DocumentViewTableAndJson={DocumentViewTableAndJson}

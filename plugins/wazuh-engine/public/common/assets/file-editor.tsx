@@ -7,7 +7,7 @@ import {
   EuiButton,
 } from '@elastic/eui';
 
-export const RuleFileEditor = ({
+export const FileEditor = ({
   initialContent = '',
   isEditable = false,
   ...props
@@ -36,13 +36,12 @@ export const RuleFileEditor = ({
       <EuiCodeEditor
         theme='textmate'
         width='100%'
-        height={`calc(100vh - 270px)`}
+        height={'calc(100vh - 270px)'}
         {...fields.content}
         mode='yml'
         isReadOnly={!isEditable}
         wrapEnabled
-        // setOptions={this.codeEditorOptions}
-        aria-label='Code Editor'
+        aria-label='Asset editor'
       />
     </>
   );

@@ -11,6 +11,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { withDataSourceFetch } from '../../../hocs/with-data-source-fetch';
+import { FileViewerFetchContent } from '../../../common/assets/file-viewer';
 
 export const Detail = withDataSourceFetch(
   ({
@@ -42,6 +43,11 @@ export const Detail = withDataSourceFetch(
               indexPattern={indexPattern}
               extraTabs={{
                 post: params => [
+                  {
+                    id: 'file',
+                    name: 'File',
+                    content: () => <FileViewerFetchContent fetch={() => ''} />,
+                  },
                   {
                     id: 'relationship',
                     name: 'Relationship',

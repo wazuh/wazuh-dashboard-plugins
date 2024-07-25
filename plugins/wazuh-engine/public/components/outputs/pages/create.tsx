@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Layout } from '../components';
 import { RuleForm } from '../components/form';
-import { EuiButton, EuiButtonEmpty, EuiLink } from '@elastic/eui';
-import { RuleFileEditor } from '../components/file-editor';
+import { EuiButton, EuiLink } from '@elastic/eui';
+import { FileEditor } from '../../../common/assets';
 
 export const CreateVisual = props => {
   const actions = [
@@ -55,7 +55,7 @@ export const CreateFile = props => {
 
   return (
     <Layout title='Create output' actions={actions}>
-      <RuleFileEditor {...props} isEditable={true} />
+      <FileEditor {...props} isEditable={true} />
     </Layout>
   );
 };

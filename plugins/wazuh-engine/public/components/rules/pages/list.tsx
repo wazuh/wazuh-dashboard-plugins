@@ -9,7 +9,7 @@ import { Layout } from '../components';
 import specification from '../spec.json';
 import { transformAssetSpecToListTableColumn } from '../utils/transform-asset-spec';
 import { Detail } from '../components/detail';
-import { CreateAssetSelectorButton } from '../../../common/create-asset-selector';
+import { CreateAssetSelectorButton } from '../../../common/assets';
 
 const modalOptions = isEdit => [
   {
@@ -93,8 +93,14 @@ export const RulesList = props => {
         'metadata.description': {
           show: true,
         },
+        'metadata.integration': {
+          show: true,
+        },
       }),
       {
+        // The field property does not exist on the data, but it used to display the column with
+        // show
+        field: 'actions',
         name: 'Actions',
         show: true,
         actions: [

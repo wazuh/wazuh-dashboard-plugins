@@ -1,1 +1,1 @@
-export { Integrations } from './integrations';
+export { Integrations } from './router';
