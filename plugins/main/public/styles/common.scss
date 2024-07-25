@@ -1813,9 +1813,15 @@ iframe.width-changed {
 
 /* Workaround to fix maximize embeddable dashboard */
 .wz-app .dshLayout-isMaximizedPanel {
-  top: 0;
-  left: 0;
+  height: calc(100vh - 49px) !important;
+  bottom: 0;
+  right: 0;
+  position: fixed !important;
   z-index: 9999;
+}
+
+.euiBody--hasFlyout .wz-app .dshLayout-isMaximizedPanel {
+  width: calc(100% - 320px) !important;
 }
 
 .wz-app {
