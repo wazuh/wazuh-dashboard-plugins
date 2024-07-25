@@ -264,75 +264,67 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   return (
     <IntlProvider locale='en'>
-      <EuiFlexGroup direction='column'>
-        <EuiFlexItem>
-          {isDataSourceLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <WzSearchBar
-              appName='wazuh-discover-search-bar'
-              {...searchBarProps}
-              useDefaultBehaviors={false}
-              hideFixedFilters
-            />
-          )}
-        </EuiFlexItem>
+      <EuiFlexItem>
+        {isDataSourceLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <WzSearchBar
+            appName='wazuh-discover-search-bar'
+            {...searchBarProps}
+            useDefaultBehaviors={false}
+            hideFixedFilters
+          />
+        )}
         {!isDataSourceLoading && results?.hits?.total === 0 && (
-          <EuiFlexItem>
-            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-          </EuiFlexItem>
+          <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
         )}
         {!isDataSourceLoading && dataSource && results?.hits?.total > 0 && (
           <>
-            <EuiFlexItem>
-              <EuiPanel
-                color='subdued'
-                borderRadius='none'
-                hasShadow={false}
-                paddingSize='s'
-              >
-                <HitsCounter
-                  hits={results?.hits?.total}
-                  showResetButton={false}
-                  tooltip={
-                    results?.hits?.total &&
-                    results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                      ? {
-                          ariaLabel: 'Warning',
-                          content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits.`,
-                          iconType: 'alert',
-                          position: 'top',
-                        }
-                      : undefined
-                  }
-                />
-              </EuiPanel>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiBasicTable
-                items={parsedItems}
-                itemId={INDEX_FIELD_NAME}
-                itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-                isExpandable={isExpanded}
-                columns={getColumns()}
-                pagination={{
-                  ...pagination,
-                  totalItemCount:
-                    (results?.hits?.total ?? 0) > MAX_ENTRIES_PER_QUERY
-                      ? MAX_ENTRIES_PER_QUERY
-                      : results?.hits?.total ?? 0,
-                }}
-                sorting={sorting}
-                onChange={onTableChange}
+            <EuiPanel
+              color='subdued'
+              borderRadius='none'
+              hasShadow={false}
+              paddingSize='s'
+            >
+              <HitsCounter
+                hits={results?.hits?.total}
+                showResetButton={false}
+                tooltip={
+                  results?.hits?.total &&
+                  results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                    ? {
+                        ariaLabel: 'Warning',
+                        content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                          MAX_ENTRIES_PER_QUERY,
+                        )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                          MAX_ENTRIES_PER_QUERY,
+                        )} hits.`,
+                        iconType: 'alert',
+                        position: 'top',
+                      }
+                    : undefined
+                }
               />
-            </EuiFlexItem>
+            </EuiPanel>
+            <EuiBasicTable
+              items={parsedItems}
+              itemId={INDEX_FIELD_NAME}
+              itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+              isExpandable={isExpanded}
+              columns={getColumns()}
+              pagination={{
+                ...pagination,
+                totalItemCount:
+                  (results?.hits?.total ?? 0) > MAX_ENTRIES_PER_QUERY
+                    ? MAX_ENTRIES_PER_QUERY
+                    : results?.hits?.total ?? 0,
+              }}
+              sorting={sorting}
+              onChange={onTableChange}
+            />
           </>
         )}
-      </EuiFlexGroup>
+      </EuiFlexItem>
     </IntlProvider>
   );
 };
