@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layout } from '../components';
-import { RuleForm } from '../components/form';
+import { Form } from '../components/form';
 import { EuiButton, EuiButtonEmpty, EuiLink } from '@elastic/eui';
 import { FileEditor } from '../../../common/assets';
 
@@ -52,7 +52,7 @@ export const EditRule = props => {
 
   return (
     <Layout title='Edit rule' actions={actions}>
-      {view === 'visual-editor' && <RuleForm {...props} />}
+      {view === 'visual-editor' && <Form {...props} />}
       {view === 'file-editor' && <FileEditor {...props} isEditable={true} />}
     </Layout>
   );

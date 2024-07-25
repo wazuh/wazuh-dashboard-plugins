@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout } from '../components';
-import { RuleForm } from '../components/form';
+import { Form } from '../components/form';
 import { EuiButton, EuiLink } from '@elastic/eui';
 import { FileEditor } from '../../../common/assets';
 
@@ -27,7 +27,7 @@ export const CreateVisual = props => {
 
   return (
     <Layout title='Create output' actions={actions}>
-      <RuleForm {...props} />
+      <Form {...props} />
     </Layout>
   );
 };

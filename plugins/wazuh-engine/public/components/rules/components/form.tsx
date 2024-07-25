@@ -4,7 +4,7 @@ import specMerge from '../spec-merge.json';
 import { transfromAssetSpecToForm } from '../utils/transform-asset-spec';
 import { FormGroup } from '../../../common/form';
 
-export const RuleForm = props => {
+export const Form = props => {
   const { useForm, InputForm } = props;
   const specForm = useMemo(() => transfromAssetSpecToForm(spec, specMerge), []);
 

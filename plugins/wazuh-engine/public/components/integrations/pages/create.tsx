@@ -1,7 +1,7 @@
 import React from 'react';
 import { Layout } from '../components';
-import { RuleForm } from '../components/form';
-import { EuiButton, EuiLink } from '@elastic/eui';
+import { Form } from '../components/form';
+import { EuiLink } from '@elastic/eui';
 
 export const Create = props => {
   const actions = [
@@ -14,19 +14,11 @@ export const Create = props => {
     >
       Documentation
     </EuiLink>,
-    <EuiButton
-      onClick={() => {
-        // TODO: Implement
-      }}
-      iconType='importAction'
-    >
-      Import file
-    </EuiButton>,
   ];
 
   return (
     <Layout title='Create integration' actions={actions}>
-      <RuleForm {...props} />
+      <Form {...props} />
     </Layout>
   );
 };
