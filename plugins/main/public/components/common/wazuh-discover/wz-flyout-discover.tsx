@@ -16,7 +16,6 @@ import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { tDataGridColumn } from '../data-grid';
-import './discover.scss';
 import {
   ErrorHandler,
   ErrorFactory,
