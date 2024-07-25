@@ -16,12 +16,5 @@
 
   .discoverChartContainer {
     min-height: 234px;
-    .dshLayout-isMaximizedPanel {
-      top: 0;
-      left: 0;
-      min-height: calc(100vh - 49px);
-      position: fixed;
-      z-index: 9999;
-    }
   }
 }
