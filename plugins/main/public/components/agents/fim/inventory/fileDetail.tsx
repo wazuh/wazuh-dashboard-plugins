@@ -669,7 +669,6 @@ export class FileDetails extends Component {
         >
           <div className='details-row'>
             <WazuhFlyoutDiscover
-              fileDetails={true}
               DataSource={PatternDataSource}
               tableColumns={this.getDiscoverColumns()}
               filterManager={this.discoverFilterManager}
