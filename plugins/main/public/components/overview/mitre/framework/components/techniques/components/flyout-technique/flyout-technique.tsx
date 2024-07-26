@@ -46,6 +46,7 @@ import TechniqueRowDetails from './technique-row-details';
 import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/data/common';
 import store from '../../../../../../../../redux/store';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
+import { wzDiscoverRenderColumns } from '../../../../../../../common/wazuh-discover/render-columns';
 
 type tFlyoutTechniqueProps = {
   currentTechnique: string;
@@ -229,10 +230,24 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     return <TechniqueRowDetails {...props} onRuleItemClick={onItemClick} />;
   };
 
+  const addRenderColumn = columns => {
+    return columns.map(column => {
+      const renderColumn = wzDiscoverRenderColumns.find(
+        columnRender => columnRender.id === column.id,
+      );
+      if (renderColumn) {
+        return { ...column, render: renderColumn.render };
+      }
+      return column;
+    });
+  };
+
   const getDiscoverColumns = () => {
     // when the agent is pinned
     const agentId = store.getState().appStateReducers?.currentAgentData?.id;
-    return agentId ? agentTechniquesColumns : techniquesColumns;
+    return agentId
+      ? addRenderColumn(agentTechniquesColumns)
+      : addRenderColumn(techniquesColumns);
   };
 
   const renderBody = () => {
@@ -378,7 +393,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           paddingSize='none'
           initialIsOpen={true}
         >
-          <div className='details-row'>
+          <div>
             <WazuhFlyoutDiscover
               DataSource={PatternDataSource}
               tableColumns={getDiscoverColumns()}

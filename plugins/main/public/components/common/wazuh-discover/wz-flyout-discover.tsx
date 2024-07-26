@@ -264,7 +264,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   return (
     <IntlProvider locale='en'>
-      <EuiFlexGroup>
+      <EuiFlexGroup className='flyout-row'>
         <EuiFlexItem>
           {isDataSourceLoading ? (
             <LoadingSpinner />

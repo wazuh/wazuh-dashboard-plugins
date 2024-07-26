@@ -667,7 +667,7 @@ export class FileDetails extends Component {
           paddingSize='none'
           initialIsOpen={true}
         >
-          <div className='details-row'>
+          <div>
             <WazuhFlyoutDiscover
               DataSource={PatternDataSource}
               tableColumns={this.getDiscoverColumns()}
