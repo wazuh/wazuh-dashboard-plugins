@@ -125,7 +125,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the help menu, to be consistent and avoid duplication [#6374](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6374)
 - Fixed the axis label visual bug from dashboards [#6378](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6378)
 - Fixed a error pop-up spawn in MITRE ATT&CK [#6431](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6431)
-- Fixed minor style issues [#6484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6484) [#6489](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6489) [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6587)
+- Fixed minor style issues [#6484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6484) [#6489](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6489) [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6587) [#6868](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6868)
 - Fixed "View alerts of this Rule" link [#6553](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6553)
 - Fixed disconnected agent configuration error [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6617)
 
