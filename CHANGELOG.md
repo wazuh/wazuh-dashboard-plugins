@@ -72,7 +72,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed custom EuiSuggestItem component in favor of OUI's native component [#6714](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6714)
 - Removed API endpoint unused endpoints from creation of old visualisations: GET /elastic/visualizations/{tab}/{pattern} and GET /elastic/visualizations/{tab}/{pattern} [#6782](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6782)
 - Removed `logs.level` setting [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
-- Removed the usage of `wazuhapp-plain.log`, `wazuhapp.log`, `wazuh-ui-plain.log` and `wazuh-ui.log` [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
+- Removed the usage of `wazuhapp-plain.log`, `wazuhapp.log`, `wazuh-ui-plain.log` and `wazuh-ui.log` files [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
 - Removed the `App logs` application [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
 - Removed API endpoint GET /utils/logs/ui [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
 - Removed API endpoint GET /utils/logs [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
