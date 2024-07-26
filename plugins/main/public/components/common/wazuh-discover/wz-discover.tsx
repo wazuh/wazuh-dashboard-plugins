@@ -18,7 +18,12 @@ import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
-import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../data-grid';
+import {
+  useDataGrid,
+  tDataGridColumn,
+  exportSearchToCSV,
+  getAllCustomRenders,
+} from '../data-grid';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import {
   ErrorHandler,
@@ -279,6 +284,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     <DocumentViewTableAndJson
                       document={inspectedHit}
                       indexPattern={indexPattern}
+                      renderFields={getAllCustomRenders(
+                        defaultTableColumns,
+                        wzDiscoverRenderColumns,
+                      )}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
