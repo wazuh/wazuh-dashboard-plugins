@@ -43,6 +43,7 @@ import {
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
 import { WzSearchBar } from '../search-bar';
+import DocDetailsHeader from './components/doc-details-header';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -267,9 +268,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           {inspectedHit && (
             <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
               <EuiFlyoutHeader>
-                <EuiTitle>
-                  <h2>Document Details</h2>
-                </EuiTitle>
+                <DocDetailsHeader
+                  doc={inspectedHit}
+                  indexPattern={dataSource?.indexPattern}
+                />
               </EuiFlyoutHeader>
               <EuiFlyoutBody>
                 <EuiFlexGroup direction='column'>

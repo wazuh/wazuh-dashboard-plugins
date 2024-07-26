@@ -55,6 +55,8 @@ import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-
 import { wzDiscoverRenderColumns } from '../../../common/wazuh-discover/render-columns';
 import { WzSearchBar } from '../../../common/search-bar';
 
+import DocDetailsHeader from '../../../common/wazuh-discover/components/doc-details-header';
+
 const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -332,9 +334,10 @@ const DashboardTH: React.FC = () => {
             {inspectedHit && (
               <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
                 <EuiFlyoutHeader>
-                  <EuiTitle>
-                    <h2>Document details</h2>
-                  </EuiTitle>
+                  <DocDetailsHeader
+                    doc={inspectedHit}
+                    indexPattern={dataSource?.indexPattern}
+                  />
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
                   <EuiFlexGroup direction='column'>
