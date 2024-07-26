@@ -300,17 +300,15 @@ export const RequirementFlyout = connect(mapStateToProps)(
             paddingSize='none'
             initialIsOpen={true}
           >
-            <div className='details-row'>
-              <WazuhFlyoutDiscover
-                DataSource={PatternDataSource}
-                tableColumns={this.getDiscoverColumns()}
-                filterManager={this.filterManager}
-                initialFetchFilters={this.props.fetchFilters}
-                expandedRowComponent={(...args) =>
-                  this.renderDiscoverExpandedRow(...args)
-                }
-              />
-            </div>
+            <WazuhFlyoutDiscover
+              DataSource={PatternDataSource}
+              tableColumns={this.getDiscoverColumns()}
+              filterManager={this.filterManager}
+              initialFetchFilters={this.props.fetchFilters}
+              expandedRowComponent={(...args) =>
+                this.renderDiscoverExpandedRow(...args)
+              }
+            />
           </EuiAccordion>
         </EuiFlyoutBody>
       );

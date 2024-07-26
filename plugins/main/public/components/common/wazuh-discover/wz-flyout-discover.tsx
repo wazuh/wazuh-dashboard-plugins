@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  EuiPageTemplate,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiBasicTable,
   EuiBasicTableProps,
   EuiButtonIcon,
@@ -101,7 +102,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     dataSource,
     filters,
     fetchFilters,
-    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -264,13 +264,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   return (
     <IntlProvider locale='en'>
-      <EuiPageTemplate
-        restrictWidth='100%'
-        fullHeight={true}
-        grow
-        paddingSize='m'
-      >
-        <>
+      <EuiFlexGroup className='flyout-row'>
+        <EuiFlexItem>
           {isDataSourceLoading ? (
             <LoadingSpinner />
           ) : (
@@ -281,10 +276,10 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
               hideFixedFilters
             />
           )}
-          {!isDataSourceLoading && results?.hits?.total === 0 ? (
+          {!isDataSourceLoading && results?.hits?.total === 0 && (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-          ) : null}
-          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+          )}
+          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 && (
             <>
               <EuiPanel
                 color='subdued'
@@ -329,9 +324,9 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                 onChange={onTableChange}
               />
             </>
-          ) : null}
-        </>
-      </EuiPageTemplate>
+          )}
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </IntlProvider>
   );
 };
