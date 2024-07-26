@@ -393,15 +393,13 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           paddingSize='none'
           initialIsOpen={true}
         >
-          <div>
-            <WazuhFlyoutDiscover
-              DataSource={PatternDataSource}
-              tableColumns={getDiscoverColumns()}
-              filterManager={filterManager}
-              initialFetchFilters={filterParams.filters}
-              expandedRowComponent={expandedRow}
-            />
-          </div>
+          <WazuhFlyoutDiscover
+            DataSource={PatternDataSource}
+            tableColumns={getDiscoverColumns()}
+            filterManager={filterManager}
+            initialFetchFilters={filterParams.filters}
+            expandedRowComponent={expandedRow}
+          />
         </EuiAccordion>
       </EuiFlyoutBody>
     );

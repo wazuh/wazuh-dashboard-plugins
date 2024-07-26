@@ -667,17 +667,15 @@ export class FileDetails extends Component {
           paddingSize='none'
           initialIsOpen={true}
         >
-          <div>
-            <WazuhFlyoutDiscover
-              DataSource={PatternDataSource}
-              tableColumns={this.getDiscoverColumns()}
-              filterManager={this.discoverFilterManager}
-              initialFetchFilters={this.getImplicitFilters()}
-              expandedRowComponent={(...args) =>
-                this.renderDiscoverExpandedRow(...args)
-              }
-            />
-          </div>
+          <WazuhFlyoutDiscover
+            DataSource={PatternDataSource}
+            tableColumns={this.getDiscoverColumns()}
+            filterManager={this.discoverFilterManager}
+            initialFetchFilters={this.getImplicitFilters()}
+            expandedRowComponent={(...args) =>
+              this.renderDiscoverExpandedRow(...args)
+            }
+          />
         </EuiAccordion>
       </Fragment>
     );
