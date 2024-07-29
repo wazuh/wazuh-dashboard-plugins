@@ -22,6 +22,8 @@ import {
 } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { mitreAttack } from '../../../../utils/applications';
+import { WzLink } from '../../../wz-link/wz-link';
 
 const getMitreAttackIntelligenceSuggestions = async (
   endpoint: string,
@@ -103,8 +105,13 @@ function buildResource(label: string) {
         field: 'external_id',
         name: 'ID',
         width: '12%',
-        render: (value, item) => (
-          <EuiLink onClick={() => openResourceDetails(item)}>{value}</EuiLink>
+        render: value => (
+          <WzLink
+            appId={mitreAttack.id}
+            path={`/overview?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${value}`}
+          >
+            {value}
+          </WzLink>
         ),
       },
       {
