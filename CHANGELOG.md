@@ -58,6 +58,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed styles in small height viewports [#6747](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6747)
 - Fixed behavior in Configuration Assessment when changing API [#6770](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6770)
 - Fixed the fixed maximum width of the clear session button in the ruleset test view [#6871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6871)
+- Fixed redirection to FIM > Inventory > Files from FIM > Inventory > Windows Registry when switching to non-Windows agent. [#6880](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6880)
 
 ### Removed
 
