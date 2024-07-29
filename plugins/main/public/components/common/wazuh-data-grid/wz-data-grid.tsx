@@ -12,7 +12,12 @@ import {
   EuiFlyoutBody,
   EuiFlexGroup,
 } from '@elastic/eui';
-import { useDataGrid, exportSearchToCSV, tDataGridColumn } from '../data-grid';
+import {
+  useDataGrid,
+  exportSearchToCSV,
+  tDataGridColumn,
+  getAllCustomRenders,
+} from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import {
   IndexPattern,
@@ -30,6 +35,7 @@ import { DocumentViewTableAndJson } from '../wazuh-discover/components/document-
 import DiscoverDataGridAdditionalControls from '../wazuh-discover/components/data-grid-additional-controls';
 import './wazuh-data-grid.scss';
 import { wzDiscoverRenderColumns } from '../wazuh-discover/render-columns';
+import DocDetailsHeader from '../wazuh-discover/components/doc-details-header';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -180,7 +186,10 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
         <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
           <EuiFlyoutHeader>
             <EuiTitle>
-              <h2>Document Details</h2>
+              <DocDetailsHeader
+                doc={inspectedHit}
+                indexPattern={indexPattern}
+              />
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
@@ -189,6 +198,10 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
                 <DocumentViewTableAndJson
                   document={inspectedHit}
                   indexPattern={indexPattern as IndexPattern}
+                  renderFields={getAllCustomRenders(
+                    defaultTableColumns,
+                    wzDiscoverRenderColumns,
+                  )}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>

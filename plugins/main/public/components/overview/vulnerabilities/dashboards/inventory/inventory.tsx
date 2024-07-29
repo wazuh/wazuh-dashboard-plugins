@@ -25,7 +25,10 @@ import {
 } from '../../../../../react-services/error-management';
 import './inventory.scss';
 import { inventoryTableDefaultColumns } from './config';
-import { MAX_ENTRIES_PER_QUERY } from '../../../../common/data-grid/data-grid-service';
+import {
+  MAX_ENTRIES_PER_QUERY,
+  getAllCustomRenders,
+} from '../../../../common/data-grid/data-grid-service';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSpinner } from '../../common/components/loading_spinner';
 // common components/hooks
@@ -45,8 +48,8 @@ import {
 } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
-import { DocumentViewTableAndJson } from '../../common/components/document-view-table-and-json';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
+import { DocumentViewTableAndJson } from '../../../../common/wazuh-discover/components/document-view-table-and-json';
 import { WzSearchBar } from '../../../../common/search-bar';
 
 const InventoryVulsComponent = () => {
@@ -261,6 +264,10 @@ const InventoryVulsComponent = () => {
                     <DocumentViewTableAndJson
                       document={inspectedHit}
                       indexPattern={indexPattern}
+                      renderFields={getAllCustomRenders(
+                        inventoryTableDefaultColumns,
+                        wzDiscoverRenderColumns,
+                      )}
                     />
                   </EuiFlexGroup>
                 </EuiFlyoutBody>
