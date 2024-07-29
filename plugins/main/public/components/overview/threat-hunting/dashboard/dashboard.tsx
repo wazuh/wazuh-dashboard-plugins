@@ -28,6 +28,7 @@ import {
 import {
   MAX_ENTRIES_PER_QUERY,
   exportSearchToCSV,
+  getAllCustomRenders,
 } from '../../../common/data-grid/data-grid-service';
 import { useDocViewer } from '../../../common/doc-viewer/use-doc-viewer';
 import { useDataGrid } from '../../../common/data-grid/use-data-grid';
@@ -54,6 +55,8 @@ import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner'
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { wzDiscoverRenderColumns } from '../../../common/wazuh-discover/render-columns';
 import { WzSearchBar } from '../../../common/search-bar';
+
+import DocDetailsHeader from '../../../common/wazuh-discover/components/doc-details-header';
 
 const plugins = getPlugins();
 
@@ -332,14 +335,21 @@ const DashboardTH: React.FC = () => {
             {inspectedHit && (
               <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
                 <EuiFlyoutHeader>
-                  <EuiTitle>
-                    <h2>Document details</h2>
-                  </EuiTitle>
+                  <DocDetailsHeader
+                    doc={inspectedHit}
+                    indexPattern={dataSource?.indexPattern}
+                  />
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
                   <EuiFlexGroup direction='column'>
                     <EuiFlexItem>
-                      <DocViewer {...docViewerProps} />
+                      <DocViewer
+                        {...docViewerProps}
+                        renderFields={getAllCustomRenders(
+                          threatHuntingTableDefaultColumns,
+                          wzDiscoverRenderColumns,
+                        )}
+                      />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiFlyoutBody>
