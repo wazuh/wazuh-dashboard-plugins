@@ -48,6 +48,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Migrated AngularJS routing to ReactJS [#6689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6689) [#6775](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6775) [#6790](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6790)
 - Improvement of the filter management system by implementing new standard modules [#6534](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6534) [#6772](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6772) [#6873](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6873)
 - Changed permalink field in the Events tab table in Virustotal to show an external link [#6839](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6839)
+- Changed the display of rule details flyout to be based on URL [#6886](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6886)
 
 ### Fixed
 
