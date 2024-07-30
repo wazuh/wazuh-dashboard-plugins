@@ -71,6 +71,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed legacy discover references and methods [#6646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6646)
 - Removed custom EuiSuggestItem component in favor of OUI's native component [#6714](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6714)
 - Removed API endpoint unused endpoints from creation of old visualisations: GET /elastic/visualizations/{tab}/{pattern} and GET /elastic/visualizations/{tab}/{pattern} [#6782](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6782)
+- Removed `rule.mitre.id` and `rule.mitre.tactics` values from Security alerts table in Malware Detection [#6883](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6883)
 
 ## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 04
 
