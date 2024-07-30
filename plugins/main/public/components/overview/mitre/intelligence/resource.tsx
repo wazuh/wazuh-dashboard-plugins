@@ -74,7 +74,6 @@ export const ModuleMitreAttackIntelligenceResource = ({
   const closeFlyout = useCallback(() => {
     setDetails(null);
     NavigationService.getInstance().updateAndNavigateSearchParams({
-      tabRedirect: null,
       idToRedirect: null,
     });
   }, []);

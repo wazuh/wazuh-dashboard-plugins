@@ -15,7 +15,6 @@ import { WzRequest } from '../../../../react-services';
 import { Markdown } from '../../../common/util';
 import { formatUIDate } from '../../../../react-services';
 import React from 'react';
-import { EuiLink } from '@elastic/eui';
 import {
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
   UI_LOGGER_LEVELS,
@@ -100,7 +99,7 @@ function buildResource(label: string) {
     apiEndpoint: endpoint,
     fieldName: 'name',
     initialSortingField: 'name',
-    tableColumnsCreator: openResourceDetails => [
+    tableColumnsCreator: () => [
       {
         field: 'external_id',
         name: 'ID',
@@ -108,7 +107,7 @@ function buildResource(label: string) {
         render: value => (
           <WzLink
             appId={mitreAttack.id}
-            path={`/overview?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${value}`}
+            path={`/overview?tab=mitre&tabView=intelligence&tabRedirect=${id}&idToRedirect=${value}`}
           >
             {value}
           </WzLink>
@@ -120,7 +119,12 @@ function buildResource(label: string) {
         sortable: true,
         width: '30%',
         render: (value, item) => (
-          <EuiLink onClick={() => openResourceDetails(item)}>{value}</EuiLink>
+          <WzLink
+            appId={mitreAttack.id}
+            path={`/overview?tab=mitre&tabView=intelligence&tabRedirect=${id}&idToRedirect=${item.external_id}`}
+          >
+            {value}
+          </WzLink>
         ),
       },
       {
