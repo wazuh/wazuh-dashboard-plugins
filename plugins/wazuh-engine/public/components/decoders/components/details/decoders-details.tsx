@@ -17,7 +17,7 @@ import { getServices } from '../../../../services';
 import { columns } from './decoders-details-columns';
 import { colors } from '../decoders-columns';
 
-export const DecodersDetails = ({ item }) => {
+export const DecodersDetails = ({ item, setIsFlyoutVisible }) => {
   const TableWzAPI = getServices().TableWzAPI;
   /**
    * Render the basic information in a list
@@ -36,11 +36,7 @@ export const DecodersDetails = ({ item }) => {
           <b style={{ paddingBottom: 6 }}>File</b>
           <span>
             <EuiToolTip position='top' content={`Filter by this file: ${file}`}>
-              <EuiLink
-                onClick={async () =>
-                  this.setNewFiltersAndBack({ q: `filename=${file}` })
-                }
-              >
+              <EuiLink onClick={() => setIsFlyoutVisible(false)}>
                 &nbsp;{file}
               </EuiLink>
             </EuiToolTip>
@@ -50,11 +46,7 @@ export const DecodersDetails = ({ item }) => {
           <b style={{ paddingBottom: 6 }}>Path</b>
           <span>
             <EuiToolTip position='top' content={`Filter by this path: ${path}`}>
-              <EuiLink
-                onClick={async () =>
-                  this.setNewFiltersAndBack({ q: `relative_dirname=${path}` })
-                }
-              >
+              <EuiLink onClick={() => setIsFlyoutVisible(false)}>
                 &nbsp;{path}
               </EuiLink>
             </EuiToolTip>

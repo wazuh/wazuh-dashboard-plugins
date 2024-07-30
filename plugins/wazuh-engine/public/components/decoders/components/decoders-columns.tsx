@@ -1,23 +1,18 @@
 import React from 'react';
-import { EuiButtonIcon } from '@elastic/eui';
+import { EuiButtonIcon, EuiLink } from '@elastic/eui';
 
 export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
   return [
     {
-      field: 'filename',
+      field: 'name',
       name: 'Name',
       align: 'left',
       sortable: true,
     },
+
     {
       field: 'status',
       name: 'Status',
-      align: 'left',
-      sortable: true,
-    },
-    {
-      field: 'relative_dirname',
-      name: 'Path',
       align: 'left',
       sortable: true,
     },
@@ -34,6 +29,20 @@ export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
       sortable: true,
     },
     {
+      field: 'relative_dirname',
+      name: 'Path',
+      align: 'left',
+      sortable: true,
+    },
+    {
+      name: 'File',
+      align: 'left',
+      sortable: true,
+      render: item => {
+        return <EuiLink>&nbsp;{item.filename}</EuiLink>;
+      },
+    },
+    {
       name: 'Actions',
       align: 'left',
       render: item => {
@@ -47,6 +56,7 @@ export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
                   name: item.filename,
                   path: item.relative_dirname,
                   details: item.details,
+                  position: item.position,
                 };
                 setDetailsRequest(file);
                 setIsFlyoutVisible(true);

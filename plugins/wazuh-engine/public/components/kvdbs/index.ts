@@ -1,1 +1,1 @@
-export { KVDBs } from './kvdbs';
+export { KVDBs } from './router';

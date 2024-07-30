@@ -86,7 +86,10 @@ export const DecodersTable = () => {
           onClose={closeFlyout}
           className='wz-inventory wzApp wz-decoders-flyout'
         >
-          <DecodersDetails item={getDecodersRequest}></DecodersDetails>
+          <DecodersDetails
+            item={getDecodersRequest}
+            setIsFlyoutVisible={setIsFlyoutVisible}
+          ></DecodersDetails>
         </EuiFlyout>
       )}
     </div>
