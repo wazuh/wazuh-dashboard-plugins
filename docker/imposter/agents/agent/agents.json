@@ -27,7 +27,7 @@
         "id": "000",
         "registerIP": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "dateAdd": "2022-08-25T16:17:46Z",
-        "name": "wazuh-manager-master-0",
+        "name": "Debian",
         "status": "active",
         "manager": "wazuh-manager-master-0",
         "node_name": "master",
@@ -39,11 +39,11 @@
       {
         "os": {
           "arch": "x86_64",
-          "major": "2",
-          "name": "Amazon Linux",
-          "platform": "amzn",
-          "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
-          "version": "2"
+          "major": "9",
+          "name": "Debian GNU/Linux",
+          "platform": "debian",
+          "uname": "Linux |ip-10-0-1-106 |4.9.0-9-amd64 |#1 SMP Debian 4.9.168-1+deb9u2 (2019-05-13) |x86_64",
+          "version": "9"
         },
         "group": [
           "default",
@@ -51,18 +51,21 @@
           "test2",
           "test3",
           "test4",
-          "test5"
+          "test5",
+          "test6",
+          "test7",
+          "test8"
         ],
         "ip": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",
         "id": "001",
         "registerIP": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",
         "dateAdd": "2022-08-25T16:17:46Z",
-        "name": "wazuh-manager-master-0",
+        "name": "Debian agent",
         "status": "active",
         "manager": "wazuh-manager-master-0",
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
-        "version": "Wazuh v4.4.0",
+        "version": "Wazuh v4.5.0",
         "group_config_status": "not synced",
         "status_code": 0
       },
@@ -75,11 +78,7 @@
           "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
           "version": "2"
         },
-        "group": [
-          "default",
-          "test",
-          "test2"
-        ],
+        "group": ["default", "test", "test2"],
         "ip": "127.0.0.1",
         "id": "002",
         "registerIP": "127.0.0.1",
@@ -105,13 +104,10 @@
         },
         "disconnection_time": "2023-03-14T04:37:42Z",
         "manager": "test.com",
-        "status": "disconnected",
-        "name": "disconnected-agent",
+        "status": "active",
+        "name": "Windows-agent",
         "dateAdd": "1970-01-01T00:00:00Z",
-        "group": [
-          "default",
-          "test"
-        ],
+        "group": ["default", "test"],
         "lastKeepAlive": "2023-03-14T04:20:51Z",
         "node_name": "node01",
         "registerIP": "any",
@@ -124,15 +120,27 @@
         "status_code": 1
       },
       {
-        "status": "never_connected",
-        "name": "never_connected_agent",
-        "dateAdd": "2023-03-14T09:44:11Z",
-        "node_name": "unknown",
-        "registerIP": "any",
+        "os": {
+          "arch": "x86_64",
+          "major": "2",
+          "name": "macOS High Sierra",
+          "platform": "darwin",
+          "uname": "macOS High Sierra |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
+          "version": "2"
+        },
+        "ip": "127.0.0.1",
         "id": "004",
-        "ip": "any",
-        "group_config_status": "not synced",
-        "status_code": 4
+        "group": ["default"],
+        "registerIP": "127.0.0.1",
+        "dateAdd": "2022-08-25T16:17:46Z",
+        "name": "macOS High Sierra agent",
+        "status": "active",
+        "manager": "wazuh-manager-master-0",
+        "node_name": "master",
+        "lastKeepAlive": "9999-12-31T23:59:59Z",
+        "version": "Wazuh v4.5.0",
+        "group_config_status": "synced",
+        "status_code": 3
       },
       {
         "os": {
@@ -145,13 +153,11 @@
         },
         "ip": "127.0.0.1",
         "id": "005",
-        "group": [
-          "default"
-        ],
+        "group": ["default"],
         "registerIP": "127.0.0.1",
         "dateAdd": "2022-08-25T16:17:46Z",
-        "name": "macOS High Sierra agent",
-        "status": "disconnected",
+        "status": "pending",
+        "name": "Pending agent",
         "manager": "wazuh-manager-master-0",
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
@@ -160,25 +166,15 @@
         "status_code": 2
       },
       {
-        "os": {
-          "name": "Ubuntu",
-          "platform": "ubuntu",
-          "uname": "Linux |f288f4c59dbc |5.19.0-35-generic |#36~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Feb 17 15:17:25 UTC 2 |x86_64",
-          "version": "18.04.6 LTS"
-        },
-        "group_config_status": "not synced",
-        "status_code": 0,
-        "ip": "172.19.0.27",
-        "status": "pending",
-        "name": "Pending agent",
-        "group": [
-          "default"
-        ],
-        "node_name": "master-node",
-        "version": "Wazuh v4.4.0",
-        "lastKeepAlive": "2023-03-16T15:15:05+00:00",
+        "status": "never_connected",
+        "name": "never_connected_agent-2",
+        "dateAdd": "2023-03-14T09:44:11Z",
+        "node_name": "unknown",
+        "registerIP": "any",
         "id": "006",
-        "dateAdd": "2023-03-16T15:14:47+00:00"
+        "ip": "any",
+        "group_config_status": "not synced",
+        "status_code": 5
       },
       {
         "status": "never_connected",
@@ -192,25 +188,26 @@
         "status_code": 5
       },
       {
-        "status": "never_connected",
-        "name": "never_connected_agent-3",
-        "dateAdd": "2023-03-14T09:44:11Z",
-        "node_name": "unknown",
-        "registerIP": "any",
-        "id": "008",
-        "ip": "any",
-        "group_config_status": "not synced",
-        "status_code": 1
-      },
-      {
-        "status": "never_connected",
-        "name": "never_connected_agent-4",
-        "dateAdd": "2023-03-14T09:44:11Z",
-        "node_name": "unknown",
-        "registerIP": "any",
+        "os": {
+          "arch": "x86_64",
+          "major": "2",
+          "name": "macOS High Sierra",
+          "platform": "darwin",
+          "uname": "macOS High Sierra |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
+          "version": "2"
+        },
+        "ip": "127.0.0.1",
         "id": "009",
-        "ip": "any",
-        "group_config_status": "not synced",
+        "group": ["default"],
+        "registerIP": "127.0.0.1",
+        "dateAdd": "2022-08-25T16:17:46Z",
+        "status": "disconnected",
+        "name": "disconnected-agent-1",
+        "manager": "wazuh-manager-master-0",
+        "node_name": "master",
+        "lastKeepAlive": "9999-12-31T23:59:59Z",
+        "version": "Wazuh v4.5.0",
+        "group_config_status": "synced",
         "status_code": 2
       },
       {
@@ -228,10 +225,7 @@
         "status": "disconnected",
         "name": "disconnected-agent-2",
         "dateAdd": "1970-01-01T00:00:00Z",
-        "group": [
-          "default",
-          "test"
-        ],
+        "group": ["default", "test"],
         "lastKeepAlive": "2023-03-14T04:20:51Z",
         "node_name": "node01",
         "registerIP": "any",
