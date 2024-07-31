@@ -21,7 +21,7 @@ export const getOutdatedAgentsService = async ({
     params: {
       ...(agentIds?.length || q
         ? {
-            q: finalQ,
+            q: finalQ ? `(${finalQ})` : '',
           }
         : {}),
       limit,
