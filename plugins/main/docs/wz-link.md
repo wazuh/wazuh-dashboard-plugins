@@ -37,12 +37,17 @@ When navigating between applications you can use Opensearch Dashboard navigation
 </RedirectAppLinks>
 ```
 
+#### With tooltip
+
+If the component receives the `toolTipProps` object as a prop, then it wraps the link with a tooltip component.
+
 ### Implementation
 
 ```tsx
   <WzLink
     appId={<Application-to-go-to>}
     path={<Path-to-navigate-to>}
+    toolTipProps={{content: 'This is a tooltip'}} //Optional prop
     otherPropsForTheEuiLink
   >
     whatever you want to render in the link

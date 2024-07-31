@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
-import { EuiLink } from '@elastic/eui';
+import { EuiLink, EuiToolTip, EuiToolTipProps } from '@elastic/eui';
 import { getCore } from '../../kibana-services';
 import NavigationService from '../../react-services/navigation-service';
 import useObservable from 'react-use/lib/useObservable';
@@ -9,10 +9,11 @@ type tWzLinkProps = {
   appId: string;
   path: string;
   children: React.ReactNode;
+  toolTipProps?: EuiToolTipProps;
 };
 
 export const WzLink = (props: tWzLinkProps) => {
-  const { appId, path, children, ...otherProps } = props;
+  const { appId, path, children, toolTipProps, ...otherProps } = props;
 
   const [isCurrentApp, setIsCurrentApp] = useState(false);
   const currentAppId$ = useObservable(
@@ -36,6 +37,7 @@ export const WzLink = (props: tWzLinkProps) => {
       </EuiLink>
     </RedirectAppLinks>
   );
+
   const linkSameApp = (
     <EuiLink
       {...otherProps}
@@ -46,5 +48,12 @@ export const WzLink = (props: tWzLinkProps) => {
       {children}
     </EuiLink>
   );
-  return isCurrentApp ? linkSameApp : linkDiferentApps;
+
+  const finalLink = isCurrentApp ? linkSameApp : linkDiferentApps;
+
+  return toolTipProps ? (
+    <EuiToolTip {...toolTipProps}>{finalLink}</EuiToolTip>
+  ) : (
+    finalLink
+  );
 };
