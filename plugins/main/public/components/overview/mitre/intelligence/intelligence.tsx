@@ -100,9 +100,6 @@ export const ModuleMitreAttackIntelligence = compose(
         tabRedirect: selectedResource,
       });
     }
-  }, []);
-
-  useEffect(() => {
     setSelectedResource(paramTabRedirect);
   }, [paramTabRedirect]);
 
