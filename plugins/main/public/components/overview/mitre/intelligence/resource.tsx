@@ -69,7 +69,7 @@ export const ModuleMitreAttackIntelligenceResource = ({
     }
   };
 
-  const tableColumns = useMemo(() => tableColumnsCreator(setDetails), []);
+  const tableColumns = useMemo(() => tableColumnsCreator(), []);
 
   const closeFlyout = useCallback(() => {
     setDetails(null);
