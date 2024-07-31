@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getPlugins } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { getDashboardPanels } from './dashboard_panels';
+import { getDashboardPanels } from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import { SampleDataWarning } from '../../../visualize/components';
