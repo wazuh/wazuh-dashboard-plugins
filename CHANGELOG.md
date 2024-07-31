@@ -50,6 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed permalink field in the Events tab table in Virustotal to show an external link [#6839](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6839)
 - Changed the logging system to use the provided by the platform [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
 - Change the internal control from Endpoint Groups to a control via url. [#6890](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6890)
+- Change the internal control from Mitre > intelligence > Table to a control via url. [#6882](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6882)
 - Changed the display of rule details flyout to be based on URL [#6886](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6886)
 
 ### Fixed

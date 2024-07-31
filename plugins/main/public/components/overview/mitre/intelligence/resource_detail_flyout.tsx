@@ -95,7 +95,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
                 <ReferencesTable
                   referencesName={item.id}
                   referencesArray={details[item.id]}
-                  columns={item.tableColumnsCreator(onSelectResource)}
+                  columns={item.tableColumnsCreator()}
                   backToTop={() => {
                     startReference.current?.scrollIntoView();
                   }}
