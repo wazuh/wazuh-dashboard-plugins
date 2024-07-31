@@ -7,6 +7,7 @@ import {
   mitreAttack,
 } from '../../../utils/applications';
 import { WzLink } from '../../wz-link/wz-link';
+import { i18n } from '@osd/i18n';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -22,6 +23,12 @@ const renderMitreTechnique = technique => (
   <WzLink
     appId={mitreAttack.id}
     path={`/overview?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${technique}`}
+    toolTipProps={{
+      content: i18n.translate('discover.fieldLinkTooltip.mitreTechnique', {
+        defaultMessage:
+          'Navigate to MITRE ATT&CK - Intelligence and see the technique details',
+      }),
+    }}
   >
     {technique}
   </WzLink>
@@ -39,6 +46,11 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
         <WzLink
           appId={endpointSummary.id}
           path={`/agents?tab=welcome&agent=${value}`}
+          toolTipProps={{
+            content: i18n.translate('discover.fieldLinkTooltip.agent', {
+              defaultMessage: 'Navigate to the agent details',
+            }),
+          }}
         >
           {value}
         </WzLink>
@@ -56,6 +68,11 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
         <WzLink
           appId={endpointSummary.id}
           path={`/agents?tab=welcome&agent=${row.agent.id}`}
+          toolTipProps={{
+            content: i18n.translate('discover.fieldLinkTooltip.agent', {
+              defaultMessage: 'Navigate to the agent details',
+            }),
+          }}
         >
           {value}
         </WzLink>
@@ -68,6 +85,11 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
       <WzLink
         appId={rules.id}
         path={`/manager/?tab=rules&redirectRule=${value}`}
+        toolTipProps={{
+          content: i18n.translate('discover.fieldLinkTooltip.rule', {
+            defaultMessage: 'Navigate to the rule details',
+          }),
+        }}
       >
         {value}
       </WzLink>
