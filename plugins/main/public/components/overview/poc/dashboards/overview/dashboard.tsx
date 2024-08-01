@@ -6,7 +6,6 @@ import { getDashboardPanels } from './dashboard_panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { getDashboardFilters } from './dashboard_panels_filters';
-import './vulnerability_detector_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
@@ -113,7 +112,7 @@ const getAllDashboards = async () => {
   return data.saved_objects;
 };
 
-const DashboardVulsComponent = () => {
+const DashboardComponent = () => {
   const [dashboardId, setDashboardId] = useState();
 
   useEffect(() => {
@@ -143,7 +142,7 @@ const DashboardVulsComponent = () => {
   );
 };
 
-export const DashboardVuls = compose(
+export const Dashboard = compose(
   withErrorBoundary,
   withVulnerabilitiesStateDataSource,
-)(DashboardVulsComponent);
+)(DashboardComponent);
