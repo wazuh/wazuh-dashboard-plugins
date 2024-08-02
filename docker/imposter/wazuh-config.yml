@@ -291,7 +291,7 @@ resources:
       raw: true
     response:
       statusCode: 200
-      staticFile: rules/get_rule_raw.txt
+      staticFile: decoders/get_decoders_raw.txt
 
   # Update decoders file
   - method: PUT
