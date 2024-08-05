@@ -47,7 +47,7 @@ async function createIndexPattern(indexPattern, fields) {
 
 export async function createDashboard() {
   const dashboardId = '6e71e2a1-89ca-49c9-b9e6-1f2aa404903b';
-  const visualizationId = 'd39f5530-4e8b-11ef-bc17-d10a7d31ade1';
+  const visualizationId = '5db1d75d-f680-4869-a0e8-0f2b8b05b99c';
 
   const dashboardData = {
     title: 'Agents and Vuls',
@@ -96,7 +96,8 @@ export async function createDashboard() {
 async function addVisualizationToDashboard(dashboardId, visualizationId) {
   try {
     // Fetch the existing dashboard
-    const { data } = await SavedObject.getSavedObject('dashboard', dashboardId);
+    const data = await getSavedObjects().client.get('dashboard', dashboardId);
+    console.log(data, 'data');
     const existingDashboard = data.attributes;
 
     // Modify the dashboard to include the new visualization
@@ -128,7 +129,7 @@ createDashboard().then(dashboardId => {
   if (dashboardId) {
     addVisualizationToDashboard(
       dashboardId,
-      'd39f5530-4e8b-11ef-bc17-d10a7d31ade1',
+      '5db1d75d-f680-4869-a0e8-0f2b8b05b99c',
     );
   }
 });

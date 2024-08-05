@@ -80,6 +80,7 @@ export const DashboardSavedObject = ({ savedObjectId }) => {
         );
         // Transform to the expected by the render component
         const dashboardSpecRenderer = transform(data);
+        console.log(dashboardSpecRenderer, 'dashboardSpecRenderer');
         setDashboardSpecForComponent(dashboardSpecRenderer);
       } catch (error) {
         console.error('Error fetching dashboard:', error);
