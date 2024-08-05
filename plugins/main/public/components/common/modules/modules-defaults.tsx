@@ -20,7 +20,7 @@ import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
 import { InventoryVuls } from '../../overview/vulnerabilities';
 // import { DashboardVuls } from '../../overview/poc-dashboards-by-reference/dashboards/dashboard';
-import { Dashboard } from '../../overview/poc/dashboards/overview/dashboard';
+import { DashboardVuls } from '../../overview/poc/dashboards/overview/dashboard';
 
 import { DashboardMITRE } from '../../overview/mitre/dashboard';
 import { withModuleNotForAgent } from '../hocs';
@@ -267,7 +267,7 @@ export const ModulesDefaults = {
       {
         id: 'dashboard',
         name: 'Dashboard',
-        component: Dashboard,
+        component: DashboardVuls,
         /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
         buttons: [
           ({ ...props }) => (

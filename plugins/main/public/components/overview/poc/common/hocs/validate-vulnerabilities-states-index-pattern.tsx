@@ -13,11 +13,11 @@ import NavigationService from '../../../../../react-services/navigation-service'
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
-async function checkExistenceIndexPattern(indexPatternID: string) {
+async function checkExistenceIndexPattern(indexPatternID) {
   return await getSavedObjects().client.get('index-pattern', indexPatternID);
 }
 
-async function checkExistenceIndices(indexPatternId: string) {
+async function checkExistenceIndices(indexPatternId) {
   try {
     const fields = await SavedObject.getIndicesFields(indexPatternId);
     return { exist: true, fields };
@@ -26,7 +26,7 @@ async function checkExistenceIndices(indexPatternId: string) {
   }
 }
 
-async function createIndexPattern(indexPattern, fields: any) {
+async function createIndexPattern(indexPattern, fields) {
   try {
     await SavedObject.createSavedObject(
       'index-pattern',
@@ -45,8 +45,9 @@ async function createIndexPattern(indexPattern, fields: any) {
   }
 }
 
-async function createDashboard() {
+export async function createDashboard() {
   const dashboardId = '6e71e2a1-89ca-49c9-b9e6-1f2aa404903b';
+  const visualizationId = 'd39f5530-4e8b-11ef-bc17-d10a7d31ade1';
 
   const dashboardData = {
     title: 'Agents and Vuls',
@@ -61,7 +62,7 @@ async function createDashboard() {
     },
     references: [
       {
-        id: '37cc8650-b882-11e8-a6d9-e546fe2bba5f',
+        id: visualizationId,
         name: 'panel_0',
         type: 'visualization',
       },
@@ -69,19 +70,68 @@ async function createDashboard() {
   };
 
   try {
-    // Create dashboard
+    // Create the dashboard
     const result = await SavedObject.createSavedObject(
       'dashboard',
       dashboardId,
       dashboardData,
     );
     console.log('Dashboard created:', result);
+
+    // If the dashboard is created successfully, ensure the visualization is correctly referenced
+    if (result) {
+      console.log(`Dashboard ${dashboardId} created successfully.`);
+      return dashboardId;
+    } else {
+      console.error('Failed to create dashboard.');
+      return null;
+    }
   } catch (error) {
     console.error('Error creating dashboard:', error);
+    return null;
   }
 }
 
-createDashboard();
+// Function to add a visualization to an existing dashboard
+async function addVisualizationToDashboard(dashboardId, visualizationId) {
+  try {
+    // Fetch the existing dashboard
+    const { data } = await SavedObject.getSavedObject('dashboard', dashboardId);
+    const existingDashboard = data.attributes;
+
+    // Modify the dashboard to include the new visualization
+    const updatedPanelsJSON = JSON.parse(existingDashboard.panelsJSON);
+    updatedPanelsJSON.push({
+      version: '2.13.0',
+      gridData: { x: 0, y: 0, w: 24, h: 15, i: visualizationId },
+      panelIndex: visualizationId,
+      embeddableConfig: {},
+      panelRefName: 'panel_1',
+    });
+
+    // Update the dashboard with the new visualization
+    const updateResult = await SavedObject.createSavedObject(
+      'dashboard',
+      dashboardId,
+      {
+        ...existingDashboard,
+        panelsJSON: JSON.stringify(updatedPanelsJSON),
+      },
+    );
+    console.log('Dashboard updated with visualization:', updateResult);
+  } catch (error) {
+    console.error('Error updating dashboard with visualization:', error);
+  }
+}
+
+createDashboard().then(dashboardId => {
+  if (dashboardId) {
+    addVisualizationToDashboard(
+      dashboardId,
+      'd39f5530-4e8b-11ef-bc17-d10a7d31ade1',
+    );
+  }
+});
 
 export async function validateVulnerabilitiesStateDataSources({
   vulnerabilitiesStatesindexPatternID: indexPatternID,
@@ -91,7 +141,7 @@ export async function validateVulnerabilitiesStateDataSources({
     const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
     let indexPattern = existIndexPattern;
 
-    // If the idnex pattern does not exist, then check the existence of index
+    // If the index pattern does not exist, then check the existence of index
     if (existIndexPattern?.error?.statusCode === 404) {
       // Check the existence of indices
       const { exist, fields } = await checkExistenceIndices(indexPatternID);
@@ -108,7 +158,7 @@ export async function validateVulnerabilitiesStateDataSources({
           },
         };
       }
-      // If the some index match the index pattern, then create the index pattern
+      // If some index matches the index pattern, then create the index pattern
       const resultCreateIndexPattern = await createIndexPattern(
         indexPatternID,
         fields,

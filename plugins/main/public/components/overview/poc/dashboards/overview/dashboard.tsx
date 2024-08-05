@@ -16,7 +16,10 @@ import {
   HttpError,
 } from '../../../../../react-services/error-management';
 import { compose } from 'redux';
-import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
+import {
+  withVulnerabilitiesStateDataSource,
+  createDashboard,
+} from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 
 import {
@@ -29,10 +32,10 @@ import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { WzSearchBar } from '../../../../common/search-bar';
 import { GenericRequest } from '../../../../../react-services/generic-request';
+import { SavedObject } from '../../../../../react-services';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
-
 const transformPanelsJSON = ({ panelsJSON, references }) =>
   Object.fromEntries(
     JSON.parse(panelsJSON).map(({ gridData, panelIndex, panelRefName }) => [
@@ -65,27 +68,24 @@ const transform = spec => {
 };
 
 export const DashboardSavedObject = ({ savedObjectId }) => {
-  const [dashboardSpecForComponent, setDashboardSpecForComponent] = useState<
-    null | string
-  >(null);
+  const [dashboardSpecForComponent, setDashboardSpecForComponent] =
+    useState(null);
+
   useEffect(() => {
-    // Get dashboard saved object specification
     (async () => {
-      const { data } = await GenericRequest.request(
-        'GET',
-        `/api/saved_objects/dashboard/${savedObjectId}`,
-      );
-
-      // Transform to the expected by the render component
-      const dashboardSpecRenderer = transform(data);
-      console.log(dashboardSpecRenderer, 'dashboardSpecRenderer');
-      console.log(data, 'data');
-
-      setDashboardSpecForComponent(dashboardSpecRenderer);
+      try {
+        const { data } = await GenericRequest.request(
+          'GET',
+          `/api/saved_objects/dashboard/${savedObjectId}`,
+        );
+        // Transform to the expected by the render component
+        const dashboardSpecRenderer = transform(data);
+        setDashboardSpecForComponent(dashboardSpecRenderer);
+      } catch (error) {
+        console.error('Error fetching dashboard:', error);
+      }
     })();
   }, [savedObjectId]);
-
-  console.log(dashboardSpecForComponent, 'dashboardSpecForComponent');
 
   return dashboardSpecForComponent ? (
     <DashboardByRenderer
@@ -101,48 +101,69 @@ export const DashboardSavedObject = ({ savedObjectId }) => {
         },
       }}
     />
-  ) : null;
-};
-
-const getAllDashboards = async () => {
-  const { data } = await GenericRequest.request(
-    'GET',
-    '/api/saved_objects/_find?type=dashboard',
+  ) : (
+    <p>Loading dashboard...</p>
   );
-  return data.saved_objects;
+};
+const getAllDashboards = async () => {
+  try {
+    const { data } = await GenericRequest.request(
+      'GET',
+      '/api/saved_objects/_find?type=dashboard',
+    );
+    return data.saved_objects;
+  } catch (error) {
+    console.error('Error fetching dashboards:', error);
+    return [];
+  }
 };
 
 const DashboardComponent = () => {
-  const [dashboardId, setDashboardId] = useState();
+  const [idDashboard, setIdDashboard] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const dashboards = await getAllDashboards();
-      console.log(dashboards, 'dashboards');
-      const targetDashboard = dashboards.find(
-        dashboard =>
-          dashboard.attributes.title === 'Agents and Vuls' &&
-          dashboard.id === '6e71e2a1-89ca-49c9-b9e6-1f2aa404903b',
-      );
+      try {
+        const dashboards = await getAllDashboards();
+        let targetDashboard = dashboards.find(
+          dashboard =>
+            dashboard.attributes.title === 'Agents and Vuls' &&
+            dashboard.id === '6e71e2a1-89ca-49c9-b9e6-1f2aa404903b',
+        );
 
-      if (targetDashboard) {
-        setDashboardId(targetDashboard.id);
+        if (!targetDashboard) {
+          const newDashboardId = await createDashboard();
+          if (newDashboardId) {
+            targetDashboard = { id: newDashboardId };
+          }
+        }
+
+        if (targetDashboard) {
+          setIdDashboard(targetDashboard.id);
+        }
+      } catch (error) {
+        console.error('Error processing dashboards:', error);
+      } finally {
+        setIsLoading(false);
       }
     })();
   }, []);
-  console.log(dashboardId, 'dashboardId');
+
   return (
     <>
-      {dashboardId ? (
-        <DashboardSavedObject key={dashboardId} savedObjectId={dashboardId} />
+      {idDashboard ? (
+        <DashboardSavedObject key={idDashboard} savedObjectId={idDashboard} />
+      ) : isLoading ? (
+        <p>Loading dashboard...</p>
       ) : (
-        <p>No matching dashboard found, hola</p>
+        <p>No matching dashboard found.</p>
       )}
     </>
   );
 };
 
-export const Dashboard = compose(
+export const DashboardVuls = compose(
   withErrorBoundary,
   withVulnerabilitiesStateDataSource,
 )(DashboardComponent);
