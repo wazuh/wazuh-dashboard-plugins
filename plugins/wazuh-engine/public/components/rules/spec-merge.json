@@ -31,7 +31,7 @@
   },
   "metadata.references": {
     "type": "arrayOf",
-    "initialValue": [{ "reference": "" }],
+    "initialValue": [],
     "fields": {
       "reference": {
         "type": "text",
@@ -56,20 +56,22 @@
     }
   },
   "metadata.description": {
+    "type": "textarea",
     "_meta": {
       "label": "Description",
       "groupForm": "metadata"
     }
   },
   "metadata.compatibility": {
+    "type": "textarea",
     "_meta": {
-      "label": "Comptability",
+      "label": "Compatibility",
       "groupForm": "metadata"
     }
   },
   "metadata.versions": {
     "type": "arrayOf",
-    "initialValue": [{ "version": "" }],
+    "initialValue": [],
     "fields": {
       "version": {
         "type": "text",
@@ -83,7 +85,7 @@
   },
   "parents": {
     "type": "arrayOf",
-    "initialValue": [{ "parent": "" }],
+    "initialValue": [],
     "fields": {
       "parent": {
         "type": "text",
@@ -97,7 +99,7 @@
   },
   "definitions": {
     "type": "arrayOf",
-    "initialValue": [{ "key": "", "value": "" }],
+    "initialValue": [],
     "fields": {
       "key": {
         "type": "text",
@@ -114,23 +116,27 @@
     }
   },
   "check": {
-    "type": "arrayOf",
-    "initialValue": [{ "value": "" }],
+    "type": "custom",
+    "initialValue": [],
     "fields": {
-      "value": {
+      "check": {
         "type": "text",
         "initialValue": ""
       }
     },
     "_meta": {
       "label": "Check",
-      "groupForm": "steps"
+      "groupForm": "check"
     }
   },
   "map": {
     "type": "arrayOf",
-    "initialValue": [{ "value": "" }],
+    "initialValue": [],
     "fields": {
+      "field": {
+        "type": "text",
+        "initialValue": ""
+      },
       "value": {
         "type": "text",
         "initialValue": ""
@@ -138,14 +144,61 @@
     },
     "_meta": {
       "label": "Map",
-      "groupForm": "steps"
+      "groupForm": "map"
     }
   },
   "normalize": {
-    "type": "textarea",
+    "type": "arrayOf",
+    "initialValue": [],
+    "fields": {
+      "check": {
+        "type": "custom",
+        "initialValue": [],
+        "_meta": {
+          "label": "Check",
+          "groupForm": "check"
+        }
+      },
+      "map": {
+        "type": "arrayOf",
+        "initialValue": [],
+        "fields": {
+          "field": {
+            "type": "text",
+            "initialValue": ""
+          },
+          "value": {
+            "type": "text",
+            "initialValue": ""
+          }
+        },
+        "_meta": {
+          "label": "Map",
+          "groupForm": "map"
+        }
+      },
+      "parse": {
+        "type": "arrayOf",
+        "initialValue": [],
+        "fields": {
+          "field": {
+            "type": "text",
+            "initialValue": ""
+          },
+          "value": {
+            "type": "text",
+            "initialValue": ""
+          }
+        },
+        "_meta": {
+          "label": "Map",
+          "groupForm": "map"
+        }
+      }
+    },
     "_meta": {
       "label": "Normalize",
-      "groupForm": "steps"
+      "groupForm": "normalize"
     }
   }
 }

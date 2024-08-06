@@ -9,10 +9,11 @@ import {
   EuiButton,
   EuiButtonIcon,
   EuiIcon,
+  EuiText,
   EuiToolTip,
 } from '@elastic/eui';
 
-const addSpaceBetween = (accum, item) => (
+export const addSpaceBetween = (accum, item) => (
   <>
     {accum}
     <EuiSpacer />
@@ -20,7 +21,7 @@ const addSpaceBetween = (accum, item) => (
   </>
 );
 
-const groupFieldsFormByGroup = (fields, groupKey) =>
+export const groupFieldsFormByGroup = (fields, groupKey) =>
   Object.entries(fields)
     .map(([name, item]) => ({ ...item, name }))
     .reduce((accum, item) => {
@@ -59,20 +60,14 @@ export const FormGroup = ({
     }
 
     return (
-      <EuiPanel>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiTitle>
-              <h4>{name}</h4>
-            </EuiTitle>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+      <FormInputGroupPanel title={name}>
         {rest.fields.map((item, index) => (
           <EuiFlexGroup>
             <EuiFlexItem>
               {Object.entries(item).map(([name, field]) =>
                 renderInput({
                   ...field,
+                  _label: name,
                   name,
                 }),
               )}
@@ -89,7 +84,7 @@ export const FormGroup = ({
         ))}
         <EuiSpacer />
         <EuiButton onClick={rest.addNewItem}>Add</EuiButton>
-      </EuiPanel>
+      </FormInputGroupPanel>
     );
   };
 
@@ -97,7 +92,7 @@ export const FormGroup = ({
     <>
       {renderGroups
         .map(({ title, groupKey }) => (
-          <InputGroup
+          <FormInputGroup
             title={title}
             fields={fieldsSplitted[groupKey]}
             renderInput={renderInput}
@@ -120,32 +115,36 @@ export const FormGroup = ({
   );
 };
 
-const InputGroup = ({ title, fields, renderInput }) => (
-  <EuiPanel>
-    <EuiFlexGroup>
-      <EuiFlexItem>
-        <EuiTitle>
-          <h4>{title}</h4>
-        </EuiTitle>
-      </EuiFlexItem>
-    </EuiFlexGroup>
+export const FormInputGroup = ({
+  description,
+  title,
+  fields,
+  renderInput,
+}: {
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  fields: any[];
+  renderInput: () => React.ReactNode;
+}) => (
+  <FormInputGroupPanel title={title} description={description}>
     {fields
       .map(formField =>
         renderInput({
           ...formField,
+          _label: formField?._meta?.label || formField?.name,
           name: (
-            <InputLabel
+            <FormInputLabel
               label={formField?._meta?.label || formField?.name}
               description={formField?._spec?.description}
             />
           ),
         }),
       )
-      .reduce(addSpaceBetween)}
-  </EuiPanel>
+      .reduce(addSpaceBetween, <></>)}
+  </FormInputGroupPanel>
 );
 
-const InputLabel = ({
+export const FormInputLabel = ({
   label,
   description,
 }: {
@@ -162,4 +161,30 @@ const InputLabel = ({
       </span>
     )}
   </>
+);
+
+export const FormInputGroupPanel = ({
+  title,
+  description,
+  actions,
+  children,
+}) => (
+  <EuiPanel>
+    <EuiFlexGroup justifyContent='spaceBetween'>
+      <EuiFlexItem>
+        <EuiTitle>
+          <h4>{title}</h4>
+        </EuiTitle>
+      </EuiFlexItem>
+      {actions && <EuiFlexItem grow={false}>{actions}</EuiFlexItem>}
+    </EuiFlexGroup>
+    {description && (
+      <EuiFlexGroup>
+        <EuiFlexItem>
+          <EuiText>{description}</EuiText>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    )}
+    {children}
+  </EuiPanel>
 );
