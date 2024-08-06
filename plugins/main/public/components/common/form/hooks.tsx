@@ -121,26 +121,18 @@ export function enhanceFormFields(
                       [...pathFormField, 'fields', _state.length],
                       Object.fromEntries(
                         Object.entries(field.fields).map(
-                          ([key, { defaultValue, initialValue, ...rest }]) => {
-                            console.log({
-                              key,
-                              defaultValue,
-                              initialValue,
-                              rest,
-                            });
-                            return [
-                              key,
-                              rest.type === 'arrayOf'
-                                ? {
-                                    fields: [],
-                                  }
-                                : {
-                                    currentValue: cloneDeep(initialValue),
-                                    initialValue: cloneDeep(initialValue),
-                                    defaultValue: cloneDeep(defaultValue),
-                                  },
-                            ];
-                          },
+                          ([key, { defaultValue, initialValue, ...rest }]) => [
+                            key,
+                            rest.type === 'arrayOf'
+                              ? {
+                                  fields: [],
+                                }
+                              : {
+                                  currentValue: cloneDeep(initialValue),
+                                  initialValue: cloneDeep(initialValue),
+                                  defaultValue: cloneDeep(defaultValue),
+                                },
+                          ],
                         ),
                       ),
                     );
