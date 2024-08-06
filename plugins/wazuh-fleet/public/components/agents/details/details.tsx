@@ -10,9 +10,14 @@ import {
   EuiHorizontalRule,
   EuiTabbedContent,
   EuiLoadingContent,
+  EuiContextMenu,
+  EuiIcon,
 } from '@elastic/eui';
 import { Agent } from '../../../../common/types';
 import { AgentResume } from './resume';
+import { AgentDashboard } from './dashboard';
+import { AgentInventory } from './inventory';
+import { AgentConfiguration } from './configuration';
 
 export interface AgentDetailsProps {
   useDataSource: any;
@@ -21,9 +26,9 @@ export interface AgentDetailsProps {
 }
 
 export const AgentDetails = ({
-  useDataSource,
   FleetDataSource,
   FleetDataSourceRepository,
+  ...restProps
 }: AgentDetailsProps) => {
   const { id } = useParams();
 
@@ -32,7 +37,8 @@ export const AgentDetails = ({
     isLoading: isDataSourceLoading,
     fetchData,
     filterManager,
-  } = useDataSource({
+    fetchFilters,
+  } = restProps.useDataSource({
     DataSource: FleetDataSource,
     repository: new FleetDataSourceRepository(),
   });
@@ -40,6 +46,7 @@ export const AgentDetails = ({
   const [isAgentLoading, setIsAgentLoading] = useState(true);
   const [agentData, setAgentData] = useState<Agent>();
   const [isActionsOpen, setIsActionsOpen] = useState(false);
+  const [isNavigateToOpen, setIsNavigateToOpen] = useState(false);
 
   useEffect(() => {
     if (!filterManager || isDataSourceLoading) return;
@@ -52,7 +59,7 @@ export const AgentDetails = ({
     );
 
     fetchData({
-      query: filterByAgentId.query,
+      filters: [filterByAgentId, ...fetchFilters],
     })
       .then((results: any) => {
         setAgentData(results.hits.hits?.[0]?._source);
@@ -71,25 +78,110 @@ export const AgentDetails = ({
     );
   }
 
+  const closeNativagateTo = () => {
+    setIsNavigateToOpen(false);
+  };
+
   const closeActions = () => {
     setIsActionsOpen(false);
   };
+
+  const navigateToPanels = [
+    {
+      id: 0,
+      items: [
+        {
+          name: 'Endpoint security',
+          icon: 'monitoringApp',
+          panel: 1,
+        },
+        {
+          name: 'Threat intelligencey',
+          icon: 'lensApp',
+          panel: 2,
+        },
+      ],
+    },
+    {
+      id: 1,
+      initialFocusedItemIndex: 1,
+      title: 'Endpoint security',
+      items: [
+        {
+          name: 'Configuration Assessment',
+          onClick: () => {
+            closeNativagateTo();
+          },
+        },
+        {
+          name: 'Malware Detection',
+          onClick: () => {
+            closeNativagateTo();
+          },
+        },
+        {
+          name: 'File Integrity Monitoring',
+          onClick: () => {
+            closeNativagateTo();
+          },
+        },
+      ],
+    },
+    {
+      id: 2,
+      initialFocusedItemIndex: 1,
+      title: 'Threat intelligencey',
+      items: [
+        {
+          name: 'Threat Hunting',
+          onClick: () => {
+            closeNativagateTo();
+          },
+        },
+        {
+          name: 'Vulnerability Detection',
+          onClick: () => {
+            closeNativagateTo();
+          },
+        },
+        {
+          name: 'MITRE ATT&CT',
+          onClick: () => {
+            closeNativagateTo();
+          },
+        },
+        {
+          name: 'VirusTotal',
+          onClick: () => {
+            closeNativagateTo();
+          },
+        },
+      ],
+    },
+  ];
+
+  const tabContent = (content: React.ReactNode) => (
+    <>
+      <EuiSpacer />
+      {content}
+    </>
+  );
 
   const tabs = [
     {
       id: 'dashboard',
       name: 'Dashboard',
-      content: <div>Dashboard</div>,
+      content: tabContent(<AgentDashboard agentId={id} {...restProps} />),
     },
     {
       id: 'inventory',
       name: 'Inventory',
-      content: <div>Inventory</div>,
+      content: tabContent(<AgentInventory agentId={id} />),
     },
     {
       id: 'configuration',
       name: 'Configuration',
-      content: <div>Configuration</div>,
+      content: tabContent(<AgentConfiguration agentId={id} />),
     },
   ];
 
@@ -149,6 +241,25 @@ export const AgentDetails = ({
               ]}
             />
           </EuiPopover>,
+          <EuiPopover
+            id='navigate-to'
+            button={
+              <EuiButton
+                iconType='arrowDown'
+                iconSide='right'
+                onClick={() => setIsNavigateToOpen(!isNavigateToOpen)}
+              >
+                Navigate to
+              </EuiButton>
+            }
+            isOpen={isNavigateToOpen}
+            closePopover={closeNativagateTo}
+            panelPaddingSize='none'
+            anchorPosition='downLeft'
+            panelStyle={{ overflowY: 'unset' }}
+          >
+            <EuiContextMenu initialPanelId={0} panels={navigateToPanels} />
+          </EuiPopover>,
         ]}
       />
       <EuiSpacer size='l' />
@@ -158,7 +269,6 @@ export const AgentDetails = ({
         tabs={tabs}
         initialSelectedTab={tabs[0]}
         autoFocus='selected'
-        onTabClick={tab => {}}
       />
     </>
   );

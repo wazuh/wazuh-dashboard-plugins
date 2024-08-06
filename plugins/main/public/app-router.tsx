@@ -32,12 +32,16 @@ import {
   FleetGroupsDataSource,
   FleetGroupsDataSourceRepository,
   FleetCommandsDataSource,
-  FleetCommandsDataSourceRepository
+  FleetCommandsDataSourceRepository,
+  AlertsDataSource,
+  AlertsDataSourceRepository,
 } from './components/common/data-source';
 import useSearchBar from './components/common/search-bar/use-search-bar';
 import { WzSearchBar } from './components/common/search-bar';
 import { TableIndexer } from './components/common/tables';
-import { DocDetails } from './components/common/wazuh-discover/components/doc-details';
+import DocDetails from './components/common/wazuh-discover/components/doc-details';
+import { useTimeFilter } from './components/common/hooks';
+import { LoadingSpinner } from './components/common/loading-spinner/loading-spinner';
 
 export function Application(props) {
   const dispatch = useDispatch();
@@ -53,7 +57,7 @@ export function Application(props) {
       .then(item => {
         dispatch(updateCurrentPlatform(item));
       })
-      .catch(() => { });
+      .catch(() => {});
 
     // Init the process of refreshing the user's token when app starts.
     checkPluginVersion().finally(() => {
@@ -108,12 +112,17 @@ export function Application(props) {
               FleetGroupsDataSource={FleetGroupsDataSource}
               FleetGroupsDataSourceRepository={FleetGroupsDataSourceRepository}
               FleetCommandsDataSource={FleetCommandsDataSource}
-              FleetCommandsDataSourceRepository={FleetCommandsDataSourceRepository}
+              FleetCommandsDataSourceRepository={
+                FleetCommandsDataSourceRepository
+              }
               useSearchBar={useSearchBar}
               WzSearchBar={WzSearchBar}
               TableIndexer={TableIndexer}
               DocDetails={DocDetails}
-
+              useTimeFilter={useTimeFilter}
+              LoadingSpinner={LoadingSpinner}
+              AlertsDataSource={AlertsDataSource}
+              AlertsDataSourceRepository={AlertsDataSourceRepository}
             />
           )}
         ></Route>

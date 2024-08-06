@@ -1,15 +1,11 @@
 import React from 'react';
 import { agentsTableActions } from './actions/actions';
-// import { AgentSynced } from '../../agents/agent-synced';
-// import { AgentStatus } from '../../agents/agent-status';
-// import { GroupTruncate } from '../../common/util';
 import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiHealth,
   EuiToolTip,
   EuiText,
-  EuiBadge,
   EuiLink,
 } from '@elastic/eui';
 import { getCore, getWazuhCore } from '../../../plugin-services';

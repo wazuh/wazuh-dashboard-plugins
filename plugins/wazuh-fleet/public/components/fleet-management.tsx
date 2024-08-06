@@ -44,6 +44,10 @@ export interface FleetManagementProps {
   FleetDataSource: any;
   FleetDataSourceRepository: any;
   TableIndexer: any;
+  useTimeFilter: any;
+  LoadingSpinner: any;
+  AlertsDataSource: any;
+  AlertsDataSourceRepository: any;
 }
 
 export const FleetManagement = ({
@@ -104,9 +108,8 @@ export const FleetManagement = ({
                       }
 
                       if (item.id === 'groups') {
-                        return <div>Group</div>
+                        return <div>Group</div>;
                       }
-
                     }}
                   />
                 ) : null,
