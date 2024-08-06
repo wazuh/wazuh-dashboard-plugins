@@ -115,20 +115,33 @@ export function enhanceFormFields(
                 })(),
                 addNewItem: () => {
                   setState(state => {
-                    const _state = get(state, [...pathField, 'fields']);
+                    const _state = get(state, [...pathFormField, 'fields']);
                     const newstate = set(
                       state,
-                      [...pathField, 'fields', _state.length],
-                      Object.entries(field.fields).reduce(
-                        (accum, [key, { defaultValue, initialValue }]) => ({
-                          ...accum,
-                          [key]: {
-                            currentValue: cloneDeep(initialValue),
-                            initialValue: cloneDeep(initialValue),
-                            defaultValue: cloneDeep(defaultValue),
+                      [...pathFormField, 'fields', _state.length],
+                      Object.fromEntries(
+                        Object.entries(field.fields).map(
+                          ([key, { defaultValue, initialValue, ...rest }]) => {
+                            console.log({
+                              key,
+                              defaultValue,
+                              initialValue,
+                              rest,
+                            });
+                            return [
+                              key,
+                              rest.type === 'arrayOf'
+                                ? {
+                                    fields: [],
+                                  }
+                                : {
+                                    currentValue: cloneDeep(initialValue),
+                                    initialValue: cloneDeep(initialValue),
+                                    defaultValue: cloneDeep(defaultValue),
+                                  },
+                            ];
                           },
-                        }),
-                        {},
+                        ),
                       ),
                     );
                     return cloneDeep(newstate);
@@ -136,13 +149,13 @@ export function enhanceFormFields(
                 },
                 removeItem: index => {
                   setState(state => {
-                    const _state = get(state, [...pathField, 'fields']);
+                    const _state = get(state, [...pathFormField, 'fields']);
 
                     _state.splice(index, 1);
 
                     const newState = set(
                       state,
-                      [...pathField, 'fields'],
+                      [...pathFormField, 'fields'],
                       _state,
                     );
 
