@@ -1,0 +1,94 @@
+{
+  "index_patterns": [
+    "commands-default"
+  ],
+  "priority": 1,
+  "template": {
+    "settings": {
+      "index": {
+        "codec": "zstd",
+        "number_of_replicas": "0",
+        "number_of_shards": "1",
+        "query.default_field": [
+          "args",
+          "agent.id",
+          "status",
+          "info"
+        ],
+        "refresh_interval": "5s"
+      }
+    },
+    "mappings": {
+      "date_detection": false,
+      "dynamic": "strict",
+      "properties": {
+        "message": {
+          "type": "text"
+        },
+        "process": {
+          "properties": {
+            "command_line": {
+              "fields": {
+                "text": {
+                  "type": "text"
+                }
+              },
+              "type": "text"
+            },
+            "end": {
+              "type": "date"
+            },
+            "entity_id": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "name": {
+              "fields": {
+                "text": {
+                  "type": "text"
+                }
+              },
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "start": {
+              "type": "date"
+            }
+          }
+        },
+        "tags": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "wazuh": {
+          "properties": {
+            "cluster": {
+              "properties": {
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "manager": {
+              "properties": {
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "node": {
+              "properties": {
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

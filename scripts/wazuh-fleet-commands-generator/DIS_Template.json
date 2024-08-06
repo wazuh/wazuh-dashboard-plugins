@@ -1,0 +1,99 @@
+{
+    "mappings": {
+        "date_detection": false,
+        "dynamic_templates": [
+            {
+                "strings_as_keyword": {
+                    "mapping": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                    },
+                    "match_mapping_type": "string"
+                }
+            }
+        ],
+        "properties": {
+            "args": {
+                "ignore_above": 1024,
+                "type": "keyword"
+            },
+            "message": {
+                "type": "text"
+            },
+            "process": {
+                "properties": {
+                    "command_line": {
+                        "fields": {
+                            "text": {
+                                "type": "text"
+                            }
+                        },
+                        "type": "text"
+                    },
+                    "end": {
+                        "type": "date"
+                    },
+                    "entity_id": {
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                    },
+                    "name": {
+                        "fields": {
+                            "text": {
+                                "type": "text"
+                            }
+                        },
+                        "ignore_above": 1024,
+                        "type": "keyword"
+                    },
+                    "start": {
+                        "type": "date"
+                    }
+                }
+            },
+            "tags": {
+                "ignore_above": 1024,
+                "type": "keyword"
+            },
+            "wazuh": {
+                "properties": {
+                    "cluster": {
+                        "properties": {
+                            "name": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                            }
+                        }
+                    },
+                    "manager": {
+                        "properties": {
+                            "name": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                            }
+                        }
+                    },
+                    "node": {
+                        "properties": {
+                            "name": {
+                                "ignore_above": 1024,
+                                "type": "keyword"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings": {
+        "index": {
+            "codec": "best_compression",
+            "mapping": {
+                "total_fields": {
+                    "limit": 1000
+                }
+            },
+            "refresh_interval": "2s"
+        }
+    }
+}
