@@ -11,6 +11,8 @@ import { GroupList } from './groups/list/list';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { getCore } from '../plugin-services';
 import { AgentDetails } from './agents/details';
+import { CommandsList } from './commands';
+
 
 const views = [
   {
@@ -28,7 +30,7 @@ const views = [
   {
     name: 'Agents commands',
     id: 'agents-commands',
-    render: () => <div>Agents commands</div>,
+    render: (props: any) => <CommandsList {...props} />,
   },
   {
     name: 'Comms configurations',
