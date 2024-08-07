@@ -8,6 +8,7 @@ import {
   FormInputLabel,
   InputAssetCheck,
   InputAssetMap,
+  InputAssetParse,
   addSpaceBetween,
 } from '../../../common/form';
 import {
@@ -19,13 +20,13 @@ import {
 } from '@elastic/eui';
 
 export const Form = props => {
-  const { useForm, InputForm } = props;
+  const { useForm, InputForm, onSave } = props;
   const specForm = useMemo(() => {
     const result = transfromAssetSpecToForm(spec, specMerge);
     return result;
   }, []);
 
-  const { fields } = useForm(specForm);
+  const { fields, errors, changed } = useForm(specForm);
 
   return (
     <>
@@ -37,18 +38,24 @@ export const Form = props => {
             return (
               <InputForm
                 {...fields[keyProp]}
-                label={fields[keyProp]._meta.label}
                 label={
                   <FormInputLabel
                     label={fields[keyProp]._meta.label}
-                    description={fields[keyProp].description}
+                    description={fields[keyProp]._spec.description}
                   />
                 }
               />
             );
           })}
           <EuiSpacer />
-          <FormInputGroupPanel title='Versions'>
+          <FormInputGroupPanel
+            title={
+              <FormInputLabel
+                label='Versions'
+                description={fields['metadata.versions']._spec.description}
+              />
+            }
+          >
             <>
               {fields['metadata.versions'].fields.map(
                 ({ version: field }, indexField) => (
@@ -77,7 +84,14 @@ export const Form = props => {
             </>
           </FormInputGroupPanel>
           <EuiSpacer />
-          <FormInputGroupPanel title='References'>
+          <FormInputGroupPanel
+            title={
+              <FormInputLabel
+                label='References'
+                description={fields['metadata.references']._spec.description}
+              />
+            }
+          >
             <>
               {fields['metadata.references'].fields.map(
                 ({ reference: field }, indexField) => (
@@ -115,14 +129,26 @@ export const Form = props => {
             return (
               <InputForm
                 {...fields[keyProp]}
-                label={fields[keyProp]._meta.label}
+                label={
+                  <FormInputLabel
+                    label={fields[keyProp]._meta.label}
+                    description={fields[keyProp]._spec.description}
+                  />
+                }
               />
             );
           })}
         </>
       </FormInputGroupPanel>
       <EuiSpacer />
-      <FormInputGroupPanel title='Definitions'>
+      <FormInputGroupPanel
+        title={
+          <FormInputLabel
+            label={fields['definitions']._meta.label}
+            description={fields['definitions']._spec.description}
+          />
+        }
+      >
         <>
           {fields['definitions'].fields.map((field, indexField) => (
             <EuiFlexGroup>
@@ -146,7 +172,14 @@ export const Form = props => {
         </>
       </FormInputGroupPanel>
       <EuiSpacer />
-      <FormInputGroupPanel title='Check'>
+      <FormInputGroupPanel
+        title={
+          <FormInputLabel
+            label={fields.check._meta.label}
+            description={fields.check._spec.description}
+          />
+        }
+      >
         <InputAssetCheck
           useForm={useForm}
           InputForm={InputForm}
@@ -154,15 +187,25 @@ export const Form = props => {
         />
       </FormInputGroupPanel>
       <EuiSpacer />
-      <FormInputGroupPanel title='Map'>
-        <InputAssetMap
-          useForm={useForm}
-          InputForm={InputForm}
-          {...fields.map}
-        />
+      <FormInputGroupPanel
+        title={
+          <FormInputLabel
+            label={fields.map._meta.label}
+            description={fields.map._spec.description}
+          />
+        }
+      >
+        <InputAssetMap field={fields.map} InputForm={InputForm} />
       </FormInputGroupPanel>
       <EuiSpacer />
-      <FormInputGroupPanel title='Normalize'>
+      <FormInputGroupPanel
+        title={
+          <FormInputLabel
+            label={fields.normalize._meta.label}
+            description={fields.normalize._spec.description}
+          />
+        }
+      >
         <>
           {fields.normalize.fields
             .map((field, indexNormalize) => (
@@ -180,7 +223,14 @@ export const Form = props => {
                     ></EuiButtonIcon>
                   }
                 >
-                  <FormInputGroupPanel title='Check'>
+                  <FormInputGroupPanel
+                    title={
+                      <FormInputLabel
+                        label={fields.check._meta.label}
+                        description={fields.check._spec.description}
+                      />
+                    }
+                  >
                     <InputAssetCheck
                       useForm={useForm}
                       InputForm={InputForm}
@@ -188,19 +238,28 @@ export const Form = props => {
                     />
                   </FormInputGroupPanel>
                   <EuiSpacer />
-                  <FormInputGroupPanel title='Map'>
-                    <InputAssetMap
-                      useForm={useForm}
-                      InputForm={InputForm}
-                      {...field.map}
-                    />
+                  <FormInputGroupPanel
+                    title={
+                      <FormInputLabel
+                        label={fields.map._meta.label}
+                        description={fields.map._spec.description}
+                      />
+                    }
+                  >
+                    <InputAssetMap field={field.map} InputForm={InputForm} />
                   </FormInputGroupPanel>
                   <EuiSpacer />
-                  <FormInputGroupPanel title='Parse'>
-                    <InputAssetMap
-                      useForm={useForm}
+                  <FormInputGroupPanel
+                    title={
+                      <FormInputLabel
+                        label='Parse'
+                        description='Further decomposes and extracts fields from the event data if required'
+                      />
+                    }
+                  >
+                    <InputAssetParse
+                      field={field.parse}
                       InputForm={InputForm}
-                      {...field.map}
                     />
                   </FormInputGroupPanel>
                 </FormInputGroupPanel>
@@ -211,6 +270,18 @@ export const Form = props => {
           <EuiButton onClick={fields.normalize.addNewItem}>Add</EuiButton>
         </>
       </FormInputGroupPanel>
+      <EuiSpacer />
+      <EuiFlexGroup justfyContent='flexEnds'>
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            fill
+            isDisabled={Boolean(Object.keys(errors).length)}
+            onClick={() => onSave({ fields, errors, changed })}
+          >
+            Save
+          </EuiButton>
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </>
   );
 };

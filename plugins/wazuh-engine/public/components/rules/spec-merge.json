@@ -186,7 +186,7 @@
             "initialValue": ""
           },
           "value": {
-            "type": "text",
+            "type": "textarea",
             "initialValue": ""
           }
         },

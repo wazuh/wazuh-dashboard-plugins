@@ -64,12 +64,14 @@ export const InputAssetCheck = props => {
           {fields.mode_list_content.fields.map((field, index) => (
             <>
               <EuiFlexGroup>
-                <EuiFlexItem>
-                  <InputForm {...field.field} label={`Field ${index}`} />
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <InputForm {...field.value} label={`Value ${index}`} />
-                </EuiFlexItem>
+                {[
+                  { key: 'field', label: 'Field' },
+                  { key: 'field', label: 'Value' },
+                ].map(({ key, label }) => (
+                  <EuiFlexItem>
+                    <InputForm {...field[key]} label={label} />
+                  </EuiFlexItem>
+                ))}
                 <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
                   <EuiButtonIcon
                     display='base'
