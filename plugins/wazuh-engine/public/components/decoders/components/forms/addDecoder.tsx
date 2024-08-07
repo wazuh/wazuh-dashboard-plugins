@@ -15,7 +15,7 @@ import {
   EuiConfirmModal,
 } from '@elastic/eui';
 
-export const AddDatabase = () => {
+export const AddDecoder = () => {
   const [isGoBackModalVisible, setIsGoBackModalVisible] = useState(false);
   const InputForm = getServices().InputForm;
   const useForm = getServices().useForm;
@@ -28,13 +28,13 @@ export const AddDatabase = () => {
   if (isGoBackModalVisible) {
     modal = (
       <EuiConfirmModal
-        title='Do this thing'
+        title='Get out'
         onCancel={() => {
           setIsGoBackModalVisible(false);
         }}
         onConfirm={async () => {
           setIsGoBackModalVisible(false);
-          navigationService.getInstance().navigate('/engine/kvdbs');
+          navigationService.getInstance().navigate('/engine/decoders');
         }}
         cancelButtonText="No, don't do it"
         confirmButtonText='Yes, do it'
@@ -59,7 +59,7 @@ export const AddDatabase = () => {
         </EuiFlexItem>
         <EuiFlexItem>
           <EuiTitle>
-            <h1>Create new database</h1>
+            <h1>Create new decoder</h1>
           </EuiTitle>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>

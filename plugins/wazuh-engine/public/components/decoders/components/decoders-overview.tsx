@@ -32,6 +32,13 @@ export const DecodersTable = () => {
     >
       Add new decoders file
     </EuiButtonEmpty>,
+    <EuiButtonEmpty
+      aria-label='Add new decoders file'
+      iconType='importAction'
+      onClick={() => {}}
+    >
+      Exports files
+    </EuiButtonEmpty>,
   ];
 
   return (
@@ -78,6 +85,7 @@ export const DecodersTable = () => {
         endpoint={'/decoders'}
         isExpandable={true}
         downloadCsv
+        showFieldSelector
         showReload
         tablePageSizeOptions={[10, 25, 50, 100]}
       />
@@ -86,10 +94,7 @@ export const DecodersTable = () => {
           onClose={closeFlyout}
           className='wz-inventory wzApp wz-decoders-flyout'
         >
-          <DecodersDetails
-            item={getDecodersRequest}
-            setIsFlyoutVisible={setIsFlyoutVisible}
-          ></DecodersDetails>
+          <DecodersDetails item={getDecodersRequest}></DecodersDetails>
         </EuiFlyout>
       )}
     </div>

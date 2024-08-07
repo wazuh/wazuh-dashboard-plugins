@@ -1,68 +1,178 @@
-import React from 'react';
-import { EuiButtonIcon, EuiLink } from '@elastic/eui';
+import React, { useState } from 'react';
+import {
+  EuiButtonEmpty,
+  EuiButtonIcon,
+  EuiLink,
+  EuiPopover,
+  EuiFlexItem,
+  EuiFlexGroup,
+} from '@elastic/eui';
+import { getServices } from '../../../services';
 
 export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
+  const navigationService = getServices().navigationService;
+  const [openPopoverId, setOpenPopoverId] = useState(null);
+
+  const togglePopover = id => {
+    setOpenPopoverId(currentOpenId => (currentOpenId === id ? null : id));
+  };
+
+  const closePopover = () => {
+    setOpenPopoverId(null);
+  };
   return [
     {
-      field: 'name',
       name: 'Name',
+      field: 'name',
       align: 'left',
-      sortable: true,
-    },
-
-    {
-      field: 'status',
-      name: 'Status',
-      align: 'left',
-      sortable: true,
-    },
-    {
-      field: 'position',
-      name: 'Position',
-      align: 'left',
-      sortable: true,
-    },
-    {
-      field: 'details.order',
-      name: 'Order',
-      align: 'left',
-      sortable: true,
-    },
-    {
-      field: 'relative_dirname',
-      name: 'Path',
-      align: 'left',
-      sortable: true,
-    },
-    {
-      name: 'File',
-      align: 'left',
-      sortable: true,
-      render: item => {
-        return <EuiLink>&nbsp;{item.filename}</EuiLink>;
+      show: true,
+      render: name => {
+        return (
+          <>
+            <EuiLink
+              onClick={() => {
+                navigationService
+                  .getInstance()
+                  .navigate(`/engine/decoders/file/${name}`);
+              }}
+            >
+              &nbsp;{name}
+            </EuiLink>
+          </>
+        );
       },
+    },
+    {
+      field: 'title',
+      name: 'Title',
+      align: 'left',
+      sortable: true,
+      show: true,
+    },
+    {
+      field: 'description',
+      name: 'Description',
+      align: 'left',
+      sortable: true,
+      show: true,
+    },
+    {
+      field: 'compatibility',
+      name: 'Compatibility',
+      align: 'left',
+      sortable: true,
+    },
+    {
+      field: 'parents',
+      name: 'Parents',
+      align: 'left',
+      sortable: true,
+      show: true,
+    },
+    {
+      field: 'module',
+      name: 'Module',
+      align: 'left',
+      sortable: true,
+      show: true,
+    },
+    {
+      field: 'versions',
+      name: 'Versions',
+      align: 'left',
+      sortable: true,
+      show: true,
+    },
+    {
+      field: 'author',
+      name: 'Author',
+      align: 'left',
+      sortable: true,
+      render: author => {
+        return (
+          <>
+            {author?.name} {author?.date} {author?.email}
+          </>
+        );
+      },
+      show: true,
     },
     {
       name: 'Actions',
       align: 'left',
+      show: true,
       render: item => {
+        const isOpen = openPopoverId === item.name;
         return (
-          <>
-            <EuiButtonIcon
-              aria-label='Edit Button'
-              iconType='eye'
-              onClick={async () => {
-                const file = {
-                  name: item.filename,
-                  path: item.relative_dirname,
-                  details: item.details,
-                  position: item.position,
-                };
-                setDetailsRequest(file);
-                setIsFlyoutVisible(true);
-              }}
-            />
-          </>
+          <EuiPopover
+            panelPaddingSize='none'
+            button={
+              <EuiButtonIcon
+                iconType='boxesVertical'
+                onClick={() => togglePopover(item.name)}
+              />
+            }
+            isOpen={isOpen}
+            closePopover={closePopover}
+          >
+            <EuiFlexGroup direction='column' gutterSize='s'>
+              <EuiFlexItem>
+                <EuiButtonEmpty
+                  aria-label='Details Button'
+                  iconType='eye'
+                  onClick={async () => {
+                    const file = {
+                      name: item.name,
+                      module: item.module,
+                      details: {
+                        parents: item.parents,
+                        author: item.author,
+                        references: item.references,
+                      },
+                    };
+                    setDetailsRequest(file);
+                    setIsFlyoutVisible(true);
+                    closePopover();
+                  }}
+                >
+                  View
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiButtonEmpty
+                  aria-label='Edit Button'
+                  iconType='pencil'
+                  onClick={async ev => {
+                    closePopover();
+                  }}
+                >
+                  Edit
+                </EuiButtonEmpty>
+                <EuiButtonEmpty
+                  aria-label='Delete Button'
+                  iconType='trash'
+                  onClick={async ev => {
+                    closePopover();
+                  }}
+                  color='danger'
+                >
+                  Delete
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiButtonEmpty
+                  aria-label='Export Button'
+                  iconType='exportAction'
+                  onClick={async ev => {
+                    ev.stopPropagation();
+                    closePopover();
+                  }}
+                >
+                  Export
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPopover>
         );
       },
     },
