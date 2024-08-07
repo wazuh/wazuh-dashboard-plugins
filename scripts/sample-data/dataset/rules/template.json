@@ -1,0 +1,97 @@
+{
+  "mappings": {
+    "date_detection": false,
+    "dynamic_templates": [
+      {
+        "strings_as_keyword": {
+          "mapping": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "match_mapping_type": "string"
+        }
+      }
+    ],
+    "properties": {
+      "name": {
+        "type": "keyword"
+      },
+      "metadata": {
+        "properties": {
+          "title": {
+            "type": "keyword"
+          },
+          "description": {
+            "type": "keyword"
+          },
+          "author": {
+            "properties": {
+              "name": {
+                "type": "keyword"
+              },
+              "date": {
+                "type": "keyword"
+              },
+              "email": {
+                "type": "keyword"
+              },
+              "url": {
+                "type": "keyword"
+              }
+            }
+          },
+          "compatibility": {
+            "type": "keyword"
+          },
+          "integration": {
+            "type": "keyword"
+          },
+          "versions": {
+            "type": "keyword"
+          },
+          "references": {
+            "type": "keyword"
+          }
+        }
+      },
+      "parents": {
+        "type": "keyword"
+      },
+      "allow": {
+        "type": "keyword"
+      },
+      "normalize": {
+        "type": "keyword"
+      },
+      "outputs": {
+        "type": "keyword"
+      },
+      "definitions": {
+        "type": "keyword"
+      },
+      "wazuh": {
+        "properties": {
+          "cluster": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "codec": "best_compression",
+      "mapping": {
+        "total_fields": {
+          "limit": 1000
+        }
+      },
+      "refresh_interval": "2s"
+    }
+  }
+}

@@ -1,0 +1,204 @@
+{
+  "name": {
+    "_meta": {
+      "label": "Name",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.author.name": {
+    "_meta": {
+      "label": "Name",
+      "groupForm": "author"
+    }
+  },
+  "metadata.author.date": {
+    "_meta": {
+      "label": "Date",
+      "groupForm": "author"
+    }
+  },
+  "metadata.author.url": {
+    "_meta": {
+      "label": "URL",
+      "groupForm": "author"
+    }
+  },
+  "metadata.author.email": {
+    "_meta": {
+      "label": "Email",
+      "groupForm": "author"
+    }
+  },
+  "metadata.references": {
+    "type": "arrayOf",
+    "initialValue": [],
+    "fields": {
+      "reference": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "References",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.integration": {
+    "_meta": {
+      "label": "Integration",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.title": {
+    "_meta": {
+      "label": "Title",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.description": {
+    "type": "textarea",
+    "_meta": {
+      "label": "Description",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.compatibility": {
+    "type": "textarea",
+    "_meta": {
+      "label": "Compatibility",
+      "groupForm": "metadata"
+    }
+  },
+  "metadata.versions": {
+    "type": "arrayOf",
+    "initialValue": [],
+    "fields": {
+      "version": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Versions",
+      "groupForm": "metadata"
+    }
+  },
+  "parents": {
+    "type": "arrayOf",
+    "initialValue": [],
+    "fields": {
+      "parent": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Parents",
+      "groupForm": "metadata"
+    }
+  },
+  "definitions": {
+    "type": "arrayOf",
+    "initialValue": [],
+    "fields": {
+      "key": {
+        "type": "text",
+        "initialValue": ""
+      },
+      "value": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Definitions",
+      "groupForm": "metadata"
+    }
+  },
+  "check": {
+    "type": "custom",
+    "initialValue": [],
+    "fields": {
+      "check": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Check",
+      "groupForm": "check"
+    }
+  },
+  "map": {
+    "type": "arrayOf",
+    "initialValue": [],
+    "fields": {
+      "field": {
+        "type": "text",
+        "initialValue": ""
+      },
+      "value": {
+        "type": "text",
+        "initialValue": ""
+      }
+    },
+    "_meta": {
+      "label": "Map",
+      "groupForm": "map"
+    }
+  },
+  "normalize": {
+    "type": "arrayOf",
+    "initialValue": [],
+    "fields": {
+      "check": {
+        "type": "custom",
+        "initialValue": [],
+        "_meta": {
+          "label": "Check",
+          "groupForm": "check"
+        }
+      },
+      "map": {
+        "type": "arrayOf",
+        "initialValue": [],
+        "fields": {
+          "field": {
+            "type": "text",
+            "initialValue": ""
+          },
+          "value": {
+            "type": "text",
+            "initialValue": ""
+          }
+        },
+        "_meta": {
+          "label": "Map",
+          "groupForm": "map"
+        }
+      },
+      "parse": {
+        "type": "arrayOf",
+        "initialValue": [],
+        "fields": {
+          "field": {
+            "type": "text",
+            "initialValue": ""
+          },
+          "value": {
+            "type": "textarea",
+            "initialValue": ""
+          }
+        },
+        "_meta": {
+          "label": "Map",
+          "groupForm": "map"
+        }
+      }
+    },
+    "_meta": {
+      "label": "Normalize",
+      "groupForm": "normalize"
+    }
+  }
+}

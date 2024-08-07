@@ -1,0 +1,25 @@
+{
+  "name": "wazuh-engine",
+  "version": "5.0.0",
+  "revision": "00",
+  "pluginPlatform": {
+    "version": "2.13.0"
+  },
+  "description": "Wazuh Engine",
+  "private": true,
+  "scripts": {
+    "build": "yarn plugin-helpers build --opensearch-dashboards-version=$OPENSEARCH_DASHBOARDS_VERSION",
+    "plugin-helpers": "node ../../scripts/plugin_helpers",
+    "osd": "node ../../scripts/osd",
+    "test:ui:runner": "node ../../scripts/functional_test_runner.js",
+    "test:server": "plugin-helpers test:server",
+    "test:browser": "plugin-helpers test:browser",
+    "test:jest": "node scripts/jest --runInBand",
+    "test:jest:runner": "node scripts/runner test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@testing-library/user-event": "^14.5.0",
+    "@types/": "testing-library/user-event"
+  }
+}

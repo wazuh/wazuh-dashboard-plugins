@@ -1,0 +1,17 @@
+{
+  "filename": {
+    "_meta": {
+      "label": "Name"
+    }
+  },
+  "description": {
+    "_meta": {
+      "label": "Description"
+    }
+  },
+  "relative_dirname": {
+    "_meta": {
+      "label": "Path"
+    }
+  }
+}

@@ -16,6 +16,7 @@ export interface InputFormProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
   label?: string | React.ReactNode;
+  labelAppend?: string | React.ReactNode;
   header?:
     | React.ReactNode
     | ((props: { value: any; error?: string }) => React.ReactNode);
@@ -40,6 +41,7 @@ export const InputForm = ({
   onChange,
   error,
   label,
+  labelAppend,
   header,
   footer,
   preInput,
@@ -66,7 +68,13 @@ export const InputForm = ({
   );
 
   return label ? (
-    <EuiFormRow label={label} fullWidth isInvalid={isInvalid} error={error}>
+    <EuiFormRow
+      label={label}
+      labelAppend={labelAppend}
+      fullWidth
+      isInvalid={isInvalid}
+      error={error}
+    >
       <>
         {typeof header === 'function' ? header({ value, error }) : header}
         <EuiFlexGroup responsive={false}>

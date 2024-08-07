@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "wazuh-asset.json",
+  "name": "schema/wazuh-asset/0",
+  "title": "Schema for Wazuh assets",
+  "type": "object",
+  "description": "Schema for Wazuh assets",
+  "additionalProperties": false,
+  "required": ["name", "metadata"],
+  "anyOf": [
+    {
+      "anyOf": [
+        {
+          "required": ["check"]
+        },
+        {
+          "required": ["parse"]
+        },
+        {
+          "required": ["normalize"]
+        }
+      ],
+      "not": {
+        "anyOf": [
+          {
+            "required": ["allow"]
+          },
+          {
+            "required": ["outputs"]
+          }
+        ]
+      }
+    },
+    {
+      "required": ["outputs"],
+      "not": {
+        "anyOf": [
+          {
+            "required": ["normalize"]
+          },
+          {
+            "required": ["parse"]
+          }
+        ]
+      }
+    },
+    {
+      "required": ["allow", "parents"],
+      "not": {
+        "anyOf": [
+          {
+            "required": ["check"]
+          },
+          {
+            "required": ["normalize"]
+          }
+        ]
+      }
+    }
+  ],
+  "patternProperties": {
+    "parse\\|\\S+": {
+      "$ref": "#/definitions/_parse"
+    }
+  },
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Name of the integration"
+    },
+    "labels": {
+      "type": "string",
+      "description": "Fields to identify the integration"
+    },
+    "overview": {
+      "type": "string",
+      "description": "Overview of the integration purpose"
+    },
+    "compatibility": {
+      "type": "string",
+      "description": "Description of the general compatibility of the integration, including supported devices or services, and their versions and formats"
+    },
+    "configuration": {
+      "type": "string",
+      "description": "Description of how to configure Wazuh for the integration to work, including any necessary steps or settings and the expected configuration of the service or device"
+    },
+    "decoders": {
+      "type": "string",
+      "description": "Description of how to configure Wazuh for the integration to work, including any necessary steps or settings and the expected configuration of the service or device"
+    },
+    "rules": {
+      "type": "string",
+      "description": "Description of how to configure Wazuh for the integration to work, including any necessary steps or settings and the expected configuration of the service or device"
+    },
+    "filters": {
+      "type": "string",
+      "description": "Description of how to configure Wazuh for the integration to work, including any necessary steps or settings and the expected configuration of the service or device"
+    },
+    "outputs": {
+      "type": "string",
+      "description": "Description of how to configure Wazuh for the integration to work, including any necessary steps or settings and the expected configuration of the service or device"
+    },
+    "kvdbs": {
+      "type": "string",
+      "description": "Contains input JSON files to create kvdbs with the same name."
+    },
+    "changelog": {
+      "type": "string",
+      "description": "For each version, the changelog should include the following information: version tag, short description and link to the full changelog"
+    }
+  }
+}
