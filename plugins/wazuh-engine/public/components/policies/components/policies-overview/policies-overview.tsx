@@ -83,7 +83,7 @@ export const PoliciesTable = () => {
           },
         }}
         searchTable
-        endpoint={'/policies'}
+        endpoint={'/security/policies'}
         isExpandable={true}
         downloadCsv
         showFieldSelector

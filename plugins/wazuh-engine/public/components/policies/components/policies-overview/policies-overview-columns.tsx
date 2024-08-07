@@ -7,80 +7,37 @@ export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
 
   return [
     {
-      name: 'Name',
-      field: 'name',
+      name: 'Policy',
+      field: 'policy',
       align: 'left',
       show: true,
       render: name => {
         return (
           <>
-            <EuiLink
-              onClick={() => {
-                navigationService
-                  .getInstance()
-                  .navigate(`/engine/decoders/file/${name}`);
-              }}
-            >
-              &nbsp;{name}
-            </EuiLink>
+            <EuiLink onClick={() => {}}>&nbsp;{name}</EuiLink>
           </>
         );
       },
     },
     {
-      field: 'title',
-      name: 'Title',
+      field: 'hash',
+      name: 'Hash',
       align: 'left',
       sortable: true,
       show: true,
     },
     {
-      field: 'description',
-      name: 'Description',
+      field: 'assets',
+      name: 'Assets',
       align: 'left',
       sortable: true,
       show: true,
     },
     {
-      field: 'compatibility',
-      name: 'Compatibility',
+      field: 'default_parents',
+      name: 'Default parents',
       align: 'left',
       sortable: true,
-    },
-    {
-      field: 'parents',
-      name: 'Parents',
-      align: 'left',
-      sortable: true,
-      show: true,
-    },
-    {
-      field: 'module',
-      name: 'Module',
-      align: 'left',
-      sortable: true,
-      show: true,
-    },
-    {
-      field: 'versions',
-      name: 'Versions',
-      align: 'left',
-      sortable: true,
-      show: true,
-    },
-    {
-      field: 'author',
-      name: 'Author',
-      align: 'left',
-      sortable: true,
-      render: author => {
-        return (
-          <>
-            {author?.name} {author?.date} {author?.email}
-          </>
-        );
-      },
-      show: true,
     },
     {
       name: 'Actions',
@@ -93,25 +50,13 @@ export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
           description: 'View details',
           icon: 'eye',
           type: 'icon',
-          onClick: async item => {
-            const file = {
-              name: item.name,
-              module: item.module,
-              details: {
-                parents: item.parents,
-                author: item.author,
-                references: item.references,
-              },
-            };
-            setDetailsRequest(file);
-            setIsFlyoutVisible(true);
-          },
+          onClick: async item => {},
           'data-test-subj': 'action-view',
         },
         {
           name: 'Edit',
           isPrimary: true,
-          description: 'Edit decoder',
+          description: 'Edit policy',
           icon: 'pencil',
           type: 'icon',
           onClick: async item => {},
@@ -120,7 +65,7 @@ export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
         {
           name: 'Delete',
           isPrimary: true,
-          description: 'Delete decoder',
+          description: 'Delete policy',
           icon: 'trash',
           type: 'icon',
           onClick: async item => {
@@ -131,8 +76,8 @@ export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
         {
           name: 'Import',
           isPrimary: true,
-          description: 'Import decoder',
-          icon: 'eye',
+          description: 'Import policy',
+          icon: 'importAction',
           type: 'icon',
           onClick: async item => {},
           'data-test-subj': 'action-import',

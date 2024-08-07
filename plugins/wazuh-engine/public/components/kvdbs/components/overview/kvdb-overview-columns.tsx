@@ -113,7 +113,7 @@ export const columns = (setIsFlyoutVisible, setKeysRequest) => {
           name: 'Import',
           isPrimary: true,
           description: 'Import database',
-          icon: 'eye',
+          icon: 'importAction',
           type: 'icon',
           onClick: async item => {},
           'data-test-subj': 'action-import',

@@ -132,7 +132,7 @@ export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
           name: 'Import',
           isPrimary: true,
           description: 'Import decoder',
-          icon: 'eye',
+          icon: 'importAction',
           type: 'icon',
           onClick: async item => {},
           'data-test-subj': 'action-import',
