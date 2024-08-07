@@ -28,8 +28,7 @@ export const GroupList = ({
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [group, setGroup] = useState<Group>();
 
-  const handleOnOpenDetails = (agentId: string) => { };
-
+  const handleOnOpenDetails = (agentId: string) => {};
 
   return (
     <>
@@ -40,9 +39,9 @@ export const GroupList = ({
             Add new group
           </EuiButton>,
         ]}
-      // rightSideGroupProps={{ gutterSize: 's' }}
+        // rightSideGroupProps={{ gutterSize: 's' }}
       />
-      <EuiSpacer size='l' />
+      <EuiSpacer />
       <TableIndexer
         DataSource={FleetGroupsDataSource}
         DataSourceRepository={FleetGroupsDataSourceRepository}
@@ -53,7 +52,7 @@ export const GroupList = ({
           setGroup,
         })}
         tableProps={{
-          hasActions: true
+          hasActions: true,
         }}
       />
       {isFlyoutVisible ? (
@@ -77,9 +76,7 @@ export const GroupList = ({
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
-            <EuiText>
-
-            </EuiText>
+            <EuiText></EuiText>
           </EuiFlyoutBody>
         </EuiFlyout>
       ) : null}

@@ -103,7 +103,7 @@ export const AgentList = ({
         ]}
         // rightSideGroupProps={{ gutterSize: 's' }}
       />
-      <EuiSpacer size='l' />
+      <EuiSpacer />
       <TableIndexer
         DataSource={FleetDataSource}
         DataSourceRepository={FleetDataSourceRepository}

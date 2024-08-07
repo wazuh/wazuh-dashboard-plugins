@@ -262,9 +262,9 @@ export const AgentDetails = ({
           </EuiPopover>,
         ]}
       />
-      <EuiSpacer size='l' />
+      <EuiSpacer />
       <AgentResume agent={agentData} />
-      <EuiSpacer size='l' />
+      <EuiSpacer />
       <EuiTabbedContent
         tabs={tabs}
         initialSelectedTab={tabs[0]}

@@ -13,7 +13,6 @@ import { getCore } from '../plugin-services';
 import { AgentDetails } from './agents/details';
 import { CommandsList } from './commands';
 
-
 const views = [
   {
     name: 'Agents',
@@ -29,7 +28,7 @@ const views = [
   },
   {
     name: 'Agents commands',
-    id: 'agents-commands',
+    id: 'commands',
     render: (props: any) => <CommandsList {...props} />,
   },
   {
@@ -58,7 +57,7 @@ export const FleetManagement = ({
     {
       name: 'Fleet Management',
       id: 'fleet-management',
-      items: views.map(({ render, ...item }) => ({
+      items: views.map(item => ({
         ...item,
         onClick: () => {
           navigationService
