@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { columns } from './decoders-columns';
-import { EuiFlyout, EuiButtonEmpty } from '@elastic/eui';
-import { getServices } from '../../../services';
-import { DecodersDetails } from './details/decoders-details';
+import { columns } from './policies-overview-columns';
+import { EuiButtonEmpty } from '@elastic/eui';
+import { getServices } from '../../../../services';
+import { EngineFlyout } from '../../../../common/flyout';
 
-export const DecodersTable = () => {
+export const PoliciesTable = () => {
   const TableWzAPI = getServices().TableWzAPI;
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-  const [getDecodersRequest, setDecodersRequest] = useState(false);
+  const [policiesRequest, setPoliciesRequest] = useState(false);
   const WzRequest = getServices().WzRequest;
   const navigationService = getServices().navigationService;
   const closeFlyout = () => setIsFlyoutVisible(false);
+
   const searchBarWQLOptions = {
     searchTermFields: ['filename', 'relative_dirname'],
     filterButtons: [
@@ -24,23 +25,30 @@ export const DecodersTable = () => {
 
   const actionButtons = [
     <EuiButtonEmpty
-      aria-label='Add new decoders file'
+      aria-label='Add new policy'
       iconType='plusInCircle'
       onClick={() => {
-        navigationService.getInstance().navigate('/engine/decoders/new');
+        navigationService.getInstance().navigate('/engine/policies/new');
       }}
     >
-      Add new decoders file
+      Add new policy
+    </EuiButtonEmpty>,
+    <EuiButtonEmpty
+      aria-label='Add new policy'
+      iconType='importAction'
+      onClick={() => {}}
+    >
+      Exports files
     </EuiButtonEmpty>,
   ];
 
   return (
     <div className='wz-inventory'>
       <TableWzAPI
-        title='Decoders'
-        description='From here you can manage your keys databases.'
+        title='Policies'
+        description='From here you can manage your policies.'
         actionButtons={actionButtons}
-        tableColumns={columns(setIsFlyoutVisible, setDecodersRequest)}
+        tableColumns={columns(setIsFlyoutVisible, setPoliciesRequest)}
         tableInitialSortingField='filename'
         searchBarWQL={{
           options: searchBarWQLOptions,
@@ -75,22 +83,18 @@ export const DecodersTable = () => {
           },
         }}
         searchTable
-        endpoint={'/decoders'}
+        endpoint={'/policies'}
         isExpandable={true}
         downloadCsv
+        showFieldSelector
         showReload
         tablePageSizeOptions={[10, 25, 50, 100]}
       />
       {isFlyoutVisible && (
-        <EuiFlyout
+        <EngineFlyout
           onClose={closeFlyout}
-          className='wz-inventory wzApp wz-decoders-flyout'
-        >
-          <DecodersDetails
-            item={getDecodersRequest}
-            setIsFlyoutVisible={setIsFlyoutVisible}
-          ></DecodersDetails>
-        </EuiFlyout>
+          children={<DecodersDetails item={policiesRequest}></DecodersDetails>}
+        ></EngineFlyout>
       )}
     </div>
   );

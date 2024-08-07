@@ -75,6 +75,27 @@ export class ResourcesHandler {
   }
 
   /**
+   * Get the content of any type of file KVDB lists...
+   * @param {String} fileName
+   */
+  async getDecodersContent(name) {
+    try {
+      const result: any = await this.WzRequest.apiReq(
+        'GET',
+        this.getResourceFilesPath(name),
+        {
+          params: {
+            raw: true,
+          },
+        },
+      );
+      return (result || {}).data || '';
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
    * Update the content of any type of file KVDB lists...
    * @param {String} fileName
    * @param {String} content

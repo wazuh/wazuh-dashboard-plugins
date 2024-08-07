@@ -50,12 +50,6 @@ import { useForm } from './components/common/form/hooks';
 import { InputForm } from './components/common/form';
 
 import { TableWzAPI } from './components/common/tables';
-import {
-  AddNewCdbListButton,
-  AddNewFileButton,
-  ManageFiles,
-  UploadFilesButton,
-} from './controllers/management/components/management/common/actions-buttons';
 import WzListEditor from './controllers/management/components/management/cdblists/views/list-editor.tsx';
 import { DocumentViewTableAndJson } from './components/common/wazuh-discover/components/document-view-table-and-json';
 import { OutputsDataSource } from './components/common/data-source/pattern/outputs/data-source';

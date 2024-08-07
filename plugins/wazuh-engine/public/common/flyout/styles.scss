@@ -1,5 +1,5 @@
-.subdued-color {
-  color: #808184;
+.wzApp {
+  padding: 0 !important;
 }
 
 .wz-inventory {
@@ -106,6 +106,19 @@
   }
 }
 
-.euiFlyoutBody .euiFlyoutBody__overflowContent {
-  padding: 0 !important;
+.wz-decoders-flyout {
+  .flyout-header {
+    padding-right: 42px;
+  }
+
+  .euiAccordion__button {
+    margin-top: 8px;
+  }
+
+  .euiFlyoutBody__overflow {
+    padding-top: 3px;
+  }
+  .euiAccordion__children-isLoading {
+    line-height: inherit;
+  }
 }

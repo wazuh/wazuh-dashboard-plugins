@@ -15,39 +15,27 @@ import {
 } from '@elastic/eui';
 import { getServices } from '../../../../services';
 import { columns } from './decoders-details-columns';
-import { colors } from '../decoders-columns';
+import { colors } from '../overview/decoders-overview-columns';
 
-export const DecodersDetails = ({ item, setIsFlyoutVisible }) => {
+export const DecodersDetails = ({ item }) => {
+  const navigationService = getServices().navigationService;
   const TableWzAPI = getServices().TableWzAPI;
-  /**
-   * Render the basic information in a list
-   * @param {Number} position
-   * @param {String} file
-   * @param {String} path
-   */
-  const renderInfo = (position, file, path) => {
+
+  const renderInfo = (path, params, type) => {
     return (
       <EuiFlexGrid columns={4}>
-        <EuiFlexItem key='position'>
-          <b style={{ paddingBottom: 6 }}>Position</b>
-          {position}
-        </EuiFlexItem>
-        <EuiFlexItem key='file'>
-          <b style={{ paddingBottom: 6 }}>File</b>
+        <EuiFlexItem key='name'>
+          <b style={{ paddingBottom: 6 }}>{type}</b>
           <span>
-            <EuiToolTip position='top' content={`Filter by this file: ${file}`}>
-              <EuiLink onClick={() => setIsFlyoutVisible(false)}>
-                &nbsp;{file}
-              </EuiLink>
-            </EuiToolTip>
-          </span>
-        </EuiFlexItem>
-        <EuiFlexItem key='path'>
-          <b style={{ paddingBottom: 6 }}>Path</b>
-          <span>
-            <EuiToolTip position='top' content={`Filter by this path: ${path}`}>
-              <EuiLink onClick={() => setIsFlyoutVisible(false)}>
-                &nbsp;{path}
+            <EuiToolTip position='top' content={`Filter by: ${params}`}>
+              <EuiLink
+                onClick={() => {
+                  navigationService
+                    .getInstance()
+                    .navigate(`/engine/${path}/${params}`);
+                }}
+              >
+                &nbsp;{params}
               </EuiLink>
             </EuiToolTip>
           </span>
@@ -78,8 +66,11 @@ export const DecodersDetails = ({ item, setIsFlyoutVisible }) => {
                 style={{ marginBottom: '4px', wordBreak: 'break-word' }}
                 className='subdued-color'
               >
-                {k}:&nbsp;
-                {details[key][k]}
+                {key == 'references' ? (
+                  <EuiLink href={details[key][k]}>{details[key][k]}</EuiLink>
+                ) : (
+                  details[key][k]
+                )}
                 <br />
               </li>
             ))}
@@ -154,7 +145,14 @@ export const DecodersDetails = ({ item, setIsFlyoutVisible }) => {
               paddingSize='l'
               initialIsOpen={true}
             >
-              {renderInfo(item.position, item.name, item.path)}
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  {renderInfo('decoders/file', item.name, 'File')}
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  {renderInfo('integrations', item.module, 'Integration')}
+                </EuiFlexItem>
+              </EuiFlexGroup>
             </EuiAccordion>
           </EuiFlexItem>
         </EuiFlexGroup>
