@@ -15,7 +15,7 @@ import {
 } from '@elastic/eui';
 import { getServices } from '../../../../services';
 import { columns } from './decoders-details-columns';
-import { colors } from '../decoders-columns';
+import { colors } from '../overview/decoders-overview-columns';
 
 export const DecodersDetails = ({ item }) => {
   const navigationService = getServices().navigationService;

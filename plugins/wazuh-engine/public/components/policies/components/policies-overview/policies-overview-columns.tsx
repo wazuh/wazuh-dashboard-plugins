@@ -1,25 +1,10 @@
 import React, { useState } from 'react';
-import {
-  EuiButtonEmpty,
-  EuiButtonIcon,
-  EuiLink,
-  EuiPopover,
-  EuiFlexItem,
-  EuiFlexGroup,
-} from '@elastic/eui';
-import { getServices } from '../../../services';
+import { EuiLink } from '@elastic/eui';
+import { getServices } from '../../../../services';
 
 export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
   const navigationService = getServices().navigationService;
-  const [openPopoverId, setOpenPopoverId] = useState(null);
 
-  const togglePopover = id => {
-    setOpenPopoverId(currentOpenId => (currentOpenId === id ? null : id));
-  };
-
-  const closePopover = () => {
-    setOpenPopoverId(null);
-  };
   return [
     {
       name: 'Name',
@@ -120,7 +105,6 @@ export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
             };
             setDetailsRequest(file);
             setIsFlyoutVisible(true);
-            closePopover();
           },
           'data-test-subj': 'action-view',
         },

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { DecodersTable } from './components/decoders-overview';
+import { DecodersTable } from './components/overview/decoders-overview';
 import { AddDecoder } from './components/forms/addDecoder';
 import { DecodersFile } from './components/decoders-files/files-info';
 

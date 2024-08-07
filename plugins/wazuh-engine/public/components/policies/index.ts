@@ -1,1 +1,1 @@
-export { Policies } from './policies';
+export { Policies } from './router';

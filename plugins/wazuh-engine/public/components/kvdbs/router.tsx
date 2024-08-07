@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { KVDBTable } from './components/kvdb-overview';
+import { KVDBTable } from './components/overview/kvdb-overview';
 import { getServices } from '../../services';
 import { AddDatabase } from './components/forms/addDatabase';
 
