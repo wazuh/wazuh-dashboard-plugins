@@ -279,7 +279,7 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'POST',
-        `/api/saved_objects/${type}/${id}`,
+        `/api/saved_objects/visualization/${id}`,
         {
           attributes: {
             title: 'my-vega-visualization',
@@ -411,16 +411,7 @@ export class SavedObject {
           ],
         },
       );
-
-      if (type === 'visualization') {
-        await this.refreshFieldsOfIndexPattern(
-          id,
-          params.attributes.title,
-          fields,
-          params.attributes.timeFieldName,
-        );
-        console.log('visualizacion creada');
-      }
+      console.log('visualizacion creada');
 
       return result;
     } catch (error) {
