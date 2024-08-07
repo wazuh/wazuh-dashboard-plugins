@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { columns } from './kvdb-columns';
-import { EuiFlyout, EuiButtonEmpty } from '@elastic/eui';
+import { EuiButtonEmpty } from '@elastic/eui';
 import { KeyInfo } from './keys/key-info';
 import { getServices } from '../../../services';
+import { EngineFlyout } from '../../../common/flyout';
 
 export const KVDBTable = ({ TableWzAPI }) => {
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
@@ -81,12 +82,15 @@ export const KVDBTable = ({ TableWzAPI }) => {
         tablePageSizeOptions={[10, 25, 50, 100]}
       />
       {isFlyoutVisible && (
-        <EuiFlyout onClose={closeFlyout}>
-          <KeyInfo
-            keys={getKeysRequest}
-            setKeysRequest={setKeysRequest}
-          ></KeyInfo>
-        </EuiFlyout>
+        <EngineFlyout
+          onClose={closeFlyout}
+          children={
+            <KeyInfo
+              keys={getKeysRequest}
+              setKeysRequest={setKeysRequest}
+            ></KeyInfo>
+          }
+        ></EngineFlyout>
       )}
     </>
   );

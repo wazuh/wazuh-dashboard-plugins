@@ -101,80 +101,59 @@ export const columns = (setIsFlyoutVisible, setDetailsRequest) => {
       name: 'Actions',
       align: 'left',
       show: true,
-      render: item => {
-        const isOpen = openPopoverId === item.name;
-        return (
-          <EuiPopover
-            panelPaddingSize='none'
-            button={
-              <EuiButtonIcon
-                iconType='boxesVertical'
-                onClick={() => togglePopover(item.name)}
-              />
-            }
-            isOpen={isOpen}
-            closePopover={closePopover}
-          >
-            <EuiFlexGroup direction='column' gutterSize='s'>
-              <EuiFlexItem>
-                <EuiButtonEmpty
-                  aria-label='Details Button'
-                  iconType='eye'
-                  onClick={async () => {
-                    const file = {
-                      name: item.name,
-                      module: item.module,
-                      details: {
-                        parents: item.parents,
-                        author: item.author,
-                        references: item.references,
-                      },
-                    };
-                    setDetailsRequest(file);
-                    setIsFlyoutVisible(true);
-                    closePopover();
-                  }}
-                >
-                  View
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiButtonEmpty
-                  aria-label='Edit Button'
-                  iconType='pencil'
-                  onClick={async ev => {
-                    closePopover();
-                  }}
-                >
-                  Edit
-                </EuiButtonEmpty>
-                <EuiButtonEmpty
-                  aria-label='Delete Button'
-                  iconType='trash'
-                  onClick={async ev => {
-                    closePopover();
-                  }}
-                  color='danger'
-                >
-                  Delete
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiButtonEmpty
-                  aria-label='Export Button'
-                  iconType='exportAction'
-                  onClick={async ev => {
-                    ev.stopPropagation();
-                    closePopover();
-                  }}
-                >
-                  Export
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiPopover>
-        );
-      },
+      actions: [
+        {
+          name: 'View',
+          isPrimary: true,
+          description: 'View details',
+          icon: 'eye',
+          type: 'icon',
+          onClick: async item => {
+            const file = {
+              name: item.name,
+              module: item.module,
+              details: {
+                parents: item.parents,
+                author: item.author,
+                references: item.references,
+              },
+            };
+            setDetailsRequest(file);
+            setIsFlyoutVisible(true);
+            closePopover();
+          },
+          'data-test-subj': 'action-view',
+        },
+        {
+          name: 'Edit',
+          isPrimary: true,
+          description: 'Edit decoder',
+          icon: 'pencil',
+          type: 'icon',
+          onClick: async item => {},
+          'data-test-subj': 'action-edit',
+        },
+        {
+          name: 'Delete',
+          isPrimary: true,
+          description: 'Delete decoder',
+          icon: 'trash',
+          type: 'icon',
+          onClick: async item => {
+            const file = {};
+          },
+          'data-test-subj': 'action-delete',
+        },
+        {
+          name: 'Import',
+          isPrimary: true,
+          description: 'Import decoder',
+          icon: 'eye',
+          type: 'icon',
+          onClick: async item => {},
+          'data-test-subj': 'action-import',
+        },
+      ],
     },
   ];
 };

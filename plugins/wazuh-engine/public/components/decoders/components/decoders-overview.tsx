@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { columns } from './decoders-columns';
-import { EuiFlyout, EuiButtonEmpty } from '@elastic/eui';
+import { EuiButtonEmpty } from '@elastic/eui';
 import { getServices } from '../../../services';
 import { DecodersDetails } from './details/decoders-details';
+import { EngineFlyout } from '../../../common/flyout';
 
 export const DecodersTable = () => {
   const TableWzAPI = getServices().TableWzAPI;
@@ -90,12 +91,12 @@ export const DecodersTable = () => {
         tablePageSizeOptions={[10, 25, 50, 100]}
       />
       {isFlyoutVisible && (
-        <EuiFlyout
+        <EngineFlyout
           onClose={closeFlyout}
-          className='wz-inventory wzApp wz-decoders-flyout'
-        >
-          <DecodersDetails item={getDecodersRequest}></DecodersDetails>
-        </EuiFlyout>
+          children={
+            <DecodersDetails item={getDecodersRequest}></DecodersDetails>
+          }
+        ></EngineFlyout>
       )}
     </div>
   );
