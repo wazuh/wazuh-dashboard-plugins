@@ -279,7 +279,7 @@ export class SavedObject {
     try {
       const result = await GenericRequest.request(
         'POST',
-        `/api/saved_objects/visualization/${id}`,
+        `/api/saved_objects/${type}/${id}`,
         {
           attributes: {
             title: 'my-vega-visualization',
