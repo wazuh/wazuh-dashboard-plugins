@@ -7,7 +7,7 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 
-export const InputAssetMap = ({ field, InputForm }) => {
+export const InputAssetParse = ({ field, InputForm }) => {
   return (
     <>
       {field.fields.map((fieldNested, indexField) => (
