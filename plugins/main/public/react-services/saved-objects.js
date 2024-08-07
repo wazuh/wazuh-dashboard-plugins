@@ -97,7 +97,7 @@ export class SavedObject {
         patternID,
         WAZUH_INDEX_TYPE_ALERTS,
       );
-      await this.createSavedObject(
+      await this.createSavedObjectIndexPattern(
         'index-pattern',
         patternID,
         {

@@ -38,7 +38,7 @@ export const checkPatternSupportService =
   id: ${pattern}
   timeFieldName: ${timeFieldName}
   ${fields ? `fields: ${fields.length}` : ''}`);
-        await SavedObject.createSavedObject(
+        await SavedObject.createSavedObjectIndexPattern(
           'index-pattern',
           pattern,
           {
