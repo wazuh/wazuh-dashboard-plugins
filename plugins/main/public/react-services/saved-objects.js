@@ -205,18 +205,46 @@ export class SavedObject {
   }
 
   /**
-   * Creates a saved object (dashboard, index-pattern, etc.)
-   */
-  static async createSavedObject(type, id, params, fields = '') {
+   * Create index-pattern */
+  static async createSavedObjectIndexPattern(type, id, params, fields = '') {
     try {
-      // Check if the dashboard already exists
-      const dashboardExists = await this.existsDashboard(id);
-      if (dashboardExists) {
-        console.log(`Dashboard with ID ${id} already exists.`);
-        return dashboardExists;
+      const result = await GenericRequest.request(
+        'POST',
+        `/api/saved_objects/${type}/${id}`,
+        {
+          ...params,
+          attributes: {
+            ...params?.attributes,
+            timeFieldName:
+              params?.attributes?.timeFieldName !==
+              NOT_TIME_FIELD_NAME_INDEX_PATTERN
+                ? params?.attributes?.timeFieldName
+                : undefined,
+          },
+        },
+      );
+
+      if (type === 'index-pattern') {
+        await this.refreshFieldsOfIndexPattern(
+          id,
+          params.attributes.title,
+          fields,
+          params?.attributes?.timeFieldName,
+        );
       }
 
-      // If it does not exist, proceed to create it
+      return result;
+    } catch (error) {
+      throw ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : error;
+    }
+  }
+
+  /**
+   * Create dashboard */
+  static async createSavedObjectDashboard(type, id, params, fields = '') {
+    try {
       const result = await GenericRequest.request(
         'POST',
         `/api/saved_objects/${type}/${id}`,
@@ -233,18 +261,165 @@ export class SavedObject {
           references: params.references || [],
         },
       );
+      const dashboardExists = await this.existsDashboard(id);
+      if (dashboardExists) {
+        console.log(`Dashboard with ID ${id} already exists.`);
+        return dashboardExists;
+      } else return result;
+    } catch (error) {
+      throw ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : error;
+    }
+  }
 
-      if (type === 'index-pattern') {
+  /**
+   * Create visualization */
+  static async createSavedObjectVisualization(type, id, params, fields = '') {
+    try {
+      const result = await GenericRequest.request(
+        'POST',
+        `/api/saved_objects/${type}/${id}`,
+        {
+          attributes: {
+            title: 'my-vega-visualization',
+            visState: JSON.stringify({
+              title: 'vuls',
+              type: 'area',
+              aggs: [
+                {
+                  id: '1',
+                  enabled: true,
+                  type: 'count',
+                  params: {},
+                  schema: 'metric',
+                },
+                {
+                  id: '2',
+                  enabled: true,
+                  type: 'terms',
+                  params: {
+                    field: 'vulnerability.score.temporal',
+                    orderBy: '1',
+                    order: 'desc',
+                    size: 5,
+                    otherBucket: false,
+                    otherBucketLabel: 'Other',
+                    missingBucket: false,
+                    missingBucketLabel: 'Missing',
+                  },
+                  schema: 'segment',
+                },
+              ],
+              params: {
+                type: 'area',
+                grid: {
+                  categoryLines: false,
+                },
+                categoryAxes: [
+                  {
+                    id: 'CategoryAxis-1',
+                    type: 'category',
+                    position: 'bottom',
+                    show: true,
+                    style: {},
+                    scale: {
+                      type: 'linear',
+                    },
+                    labels: {
+                      show: true,
+                      filter: true,
+                      truncate: 100,
+                    },
+                    title: {},
+                  },
+                ],
+                valueAxes: [
+                  {
+                    id: 'ValueAxis-1',
+                    name: 'LeftAxis-1',
+                    type: 'value',
+                    position: 'left',
+                    show: true,
+                    style: {},
+                    scale: {
+                      type: 'linear',
+                      mode: 'normal',
+                    },
+                    labels: {
+                      show: true,
+                      rotate: 0,
+                      filter: false,
+                      truncate: 100,
+                    },
+                    title: {
+                      text: 'Count',
+                    },
+                  },
+                ],
+                seriesParams: [
+                  {
+                    show: true,
+                    type: 'area',
+                    mode: 'stacked',
+                    data: {
+                      label: 'Count',
+                      id: '1',
+                    },
+                    drawLinesBetweenPoints: true,
+                    lineWidth: 2,
+                    showCircles: true,
+                    interpolate: 'linear',
+                    valueAxis: 'ValueAxis-1',
+                  },
+                ],
+                addTooltip: true,
+                addLegend: true,
+                legendPosition: 'right',
+                times: [],
+                addTimeMarker: false,
+                thresholdLine: {
+                  show: false,
+                  value: 10,
+                  width: 1,
+                  style: 'full',
+                  color: '#E7664C',
+                },
+                labels: {},
+              },
+            }),
+            uiStateJSON: '{}',
+            description: '',
+            version: 1,
+            kibanaSavedObjectMeta: {
+              searchSourceJSON: JSON.stringify({
+                query: {
+                  query: '',
+                  language: 'kuery',
+                },
+                filter: [],
+                indexRefName: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+              }),
+            },
+          },
+          references: [
+            {
+              name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+              type: 'index-pattern',
+              id: 'wazuh-states-vulnerabilities-*',
+            },
+          ],
+        },
+      );
+
+      if (type === 'visualization') {
         await this.refreshFieldsOfIndexPattern(
           id,
           params.attributes.title,
           fields,
           params.attributes.timeFieldName,
         );
-      }
-
-      if (type === 'dashboard') {
-        console.log(`Dashboard created successfully with ID: ${id}`);
+        console.log('visualizacion creada');
       }
 
       return result;
@@ -254,7 +429,6 @@ export class SavedObject {
         : error;
     }
   }
-
   static async refreshFieldsOfIndexPattern(
     id,
     title,
