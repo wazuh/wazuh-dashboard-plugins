@@ -1,0 +1,98 @@
+{
+  "mappings": {
+    "date_detection": false,
+    "dynamic_templates": [
+      {
+        "resource_attributes_map": {
+          "mapping": {
+            "type": "keyword"
+          },
+          "path_match": "resource.attributes.*"
+        }
+      },
+      {
+        "span_attributes_map": {
+          "mapping": {
+            "type": "keyword"
+          },
+          "path_match": "span.attributes.*"
+        }
+      }
+    ],
+    "_source": {
+      "enabled": true
+    },
+    "properties": {
+      "traceId": {
+        "ignore_above": 256,
+        "type": "keyword"
+      },
+      "spanId": {
+        "ignore_above": 256,
+        "type": "keyword"
+      },
+      "parentSpanId": {
+        "ignore_above": 256,
+        "type": "keyword"
+      },
+      "name": {
+        "ignore_above": 1024,
+        "type": "keyword"
+      },
+      "traceGroup": {
+        "ignore_above": 1024,
+        "type": "keyword"
+      },
+      "traceGroupFields": {
+        "properties": {
+          "endTime": {
+            "type": "date_nanos"
+          },
+          "durationInNanos": {
+            "type": "long"
+          },
+          "statusCode": {
+            "type": "integer"
+          }
+        }
+      },
+      "kind": {
+        "ignore_above": 128,
+        "type": "keyword"
+      },
+      "startTime": {
+        "type": "date_nanos"
+      },
+      "endTime": {
+        "type": "date_nanos"
+      },
+      "status": {
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "keyword"
+          }
+        }
+      },
+      "serviceName": {
+        "type": "keyword"
+      },
+      "durationInNanos": {
+        "type": "long"
+      },
+      "events": {
+        "type": "nested",
+        "properties": {
+          "time": {
+            "type": "date_nanos"
+          }
+        }
+      },
+      "links": {
+        "type": "nested"
+      }
+    }
+  }
+}

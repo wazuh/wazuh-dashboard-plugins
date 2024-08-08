@@ -1,0 +1,61 @@
+{
+  "mappings": {
+    "date_detection": false,
+    "dynamic_templates": [
+      {
+        "strings_as_keyword": {
+          "mapping": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "match_mapping_type": "string"
+        }
+      }
+    ],
+    "_source": {
+      "enabled": true
+    },
+    "properties": {
+      "hashId": {
+        "ignore_above": 1024,
+        "type": "keyword"
+      },
+      "serviceName": {
+        "ignore_above": 1024,
+        "type": "keyword"
+      },
+      "kind": {
+        "ignore_above": 1024,
+        "type": "keyword"
+      },
+      "destination": {
+        "properties": {
+          "domain": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "resource": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "target": {
+        "properties": {
+          "domain": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "resource": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "traceGroupName": {
+        "ignore_above": 1024,
+        "type": "keyword"
+      }
+    }
+  }
+}
