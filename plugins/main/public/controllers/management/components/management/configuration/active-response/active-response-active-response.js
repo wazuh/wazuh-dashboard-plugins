@@ -26,11 +26,6 @@ import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
-  {
-    field: 'disabled',
-    label: 'Status of this active response',
-    render: renderValueNoThenEnabled,
-  },
   { field: 'command', label: 'Command to execute' },
   { field: 'location', label: 'Execute the command on this location' },
   { field: 'agent_id', label: 'Agent ID on which execute the command' },
@@ -93,7 +88,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component {
         currentConfig['analysis-active_response']['active-response'].length ? (
           <WzConfigurationSettingsHeader
             title='Active response definitions'
-            description='Find here all the currently defined Active responses'
+            description="Find here all the currently defined Active responses. Disabled Active responses don't show up."
             help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
