@@ -125,8 +125,8 @@ export class ReportingService {
           See https://github.com/wazuh/wazuh-dashboard-plugins/issues/6900#issuecomment-2275495245
           */
           element: await domtoimage.toPng(node, {
-            width: node.clientWidth * scale,
-            height: node.clientHeight * scale,
+            width: node.clientWidth,
+            height: node.clientHeight,
           }),
           width: node.clientWidth,
           height: node.clientHeight,
