@@ -19,7 +19,7 @@ import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 import store from '../redux/store';
-import domtoimage from 'dom-to-image-more';
+import domtoimage from '../utils/dom-to-image-more';
 import dateMath from '@elastic/datemath';
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiButton, EuiLink } from '@elastic/eui';

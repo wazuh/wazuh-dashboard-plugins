@@ -1447,11 +1447,6 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-dom-to-image-more@^3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/dom-to-image-more/-/dom-to-image-more-3.3.1.tgz#c01ca8592740abe44fa712cb3226af1cc96bd72f"
-  integrity sha512-+NH+KEuFLJKVVS2NvStB+W2jOs3prDTzzEhvB/6xTh8SU/g4kqlRjbqyAIwZsOHmljR/pkgSBLHteeKIH40nBA==
-
 domexception@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/domexception/-/domexception-2.0.1.tgz#fb44aefba793e1574b0af6aed2801d057529f304"
