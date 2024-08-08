@@ -88,7 +88,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component {
         currentConfig['analysis-active_response']['active-response'].length ? (
           <WzConfigurationSettingsHeader
             title='Active response definitions'
-            description="Find here all the currently defined Active responses. Disabled Active responses don't show up."
+            description="Find here all the currently defined active responses. Disabled active responses don't show up."
             help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
