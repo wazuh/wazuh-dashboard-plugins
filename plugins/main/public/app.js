@@ -15,5 +15,3 @@ import './styles';
 import './utils/fontawesome/scss/font-awesome.scss';
 // Dev tools
 import './utils/codemirror';
-// Require lib to dashboards PDFs
-require('./utils/dom-to-image.js');

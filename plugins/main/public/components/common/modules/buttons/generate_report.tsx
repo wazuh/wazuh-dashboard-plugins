@@ -38,7 +38,9 @@ export const ButtonModuleGenerateReport = connect(mapStateToProps)(
         const defaultTextColor = '#DFE5EF';
 
         //Patch to fix dark backgrounds in visualizations dark-mode pdf reports
-        const $labels = $('.euiButtonEmpty__text, .echLegendItem');
+        const $labels = $(
+          '.euiButtonEmpty__text, .echLegendItem, div.mtrVis__value ~ div',
+        );
         const $vizBackground = $('.echChartBackground');
         const defaultVizBackground = $vizBackground.css('background-color');
 
