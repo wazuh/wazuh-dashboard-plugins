@@ -111,7 +111,7 @@ export const getWindowsInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, name } = props;
-  return `Invoke-WebRequest -Uri ${urlPackage} -OutFile \${env.tmp}\\wazuh-agent; msiexec.exe /i \${env.tmp}\\wazuh-agent /q ${
+  return `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\wazuh-agent; msiexec.exe /i \$env:tmp\\wazuh-agent /q ${
     optionals && getAllOptionals(optionals, name)
   }`;
 };
