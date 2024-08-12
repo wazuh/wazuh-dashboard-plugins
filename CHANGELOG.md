@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.9.1
 
+### Fixed
+
+- Fixed windows-agent-deployment-command from deploy new agent [#6905](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6905)
+
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 03
 
 ### Added
