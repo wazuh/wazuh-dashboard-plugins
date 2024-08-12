@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.9.1
 
+### Fixed
+
+- Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
+
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 03
 
 ### Added
