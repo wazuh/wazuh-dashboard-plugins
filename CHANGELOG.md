@@ -10,10 +10,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-
 - Fixed windows-agent-deployment-command from deploy new agent [#6905](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6905)
 - Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
-
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 03
 
