@@ -6,6 +6,7 @@ export type Agent = {
   };
   host: {
     os: {
+      full: string;
       name: string;
       platform: string;
     };

@@ -19,7 +19,7 @@ export const AgentResume = ({ agent }: AgentResumeProps) => {
 
   return (
     <EuiFlexGroup>
-      <EuiFlexItem grow={2}>
+      <EuiFlexItem>
         <EuiCard title='Agent' layout='horizontal'>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -49,18 +49,34 @@ export const AgentResume = ({ agent }: AgentResumeProps) => {
           </EuiFlexGroup>
         </EuiCard>
       </EuiFlexItem>
-      <EuiFlexItem grow={1}>
+      <EuiFlexItem>
         <EuiCard title='Host' layout='horizontal'>
-          <EuiDescriptionList compressed>
-            <EuiDescriptionListTitle>Host OS</EuiDescriptionListTitle>
-            <EuiDescriptionListDescription>
-              <HostOS os={agent.host.os} />
-            </EuiDescriptionListDescription>
-            <EuiDescriptionListTitle>Host IP</EuiDescriptionListTitle>
-            <EuiDescriptionListDescription>
-              {agent.host.ip}
-            </EuiDescriptionListDescription>
-          </EuiDescriptionList>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiDescriptionList compressed>
+                <EuiDescriptionListTitle>Name</EuiDescriptionListTitle>
+                <EuiDescriptionListDescription>
+                  {agent.host.hostname}
+                </EuiDescriptionListDescription>
+                <EuiDescriptionListTitle>IP</EuiDescriptionListTitle>
+                <EuiDescriptionListDescription>
+                  {agent.host.ip}
+                </EuiDescriptionListDescription>
+              </EuiDescriptionList>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiDescriptionList compressed>
+                <EuiDescriptionListTitle>OS</EuiDescriptionListTitle>
+                <EuiDescriptionListDescription>
+                  <HostOS os={agent.host.os} />
+                </EuiDescriptionListDescription>
+                <EuiDescriptionListTitle>Architecture</EuiDescriptionListTitle>
+                <EuiDescriptionListDescription>
+                  {agent.host.architecture}
+                </EuiDescriptionListDescription>
+              </EuiDescriptionList>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiCard>
       </EuiFlexItem>
     </EuiFlexGroup>

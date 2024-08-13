@@ -1,1 +1,0 @@
-export { AgentInventory } from './inventory';

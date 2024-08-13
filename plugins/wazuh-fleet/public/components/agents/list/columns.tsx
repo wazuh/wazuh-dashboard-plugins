@@ -120,38 +120,12 @@ export const agentsTableColumns = ({
     width: '140px',
   },
   // {
-  //   field: 'lastKeepAlive',
-  //   name: (
-  //     <span>
-  //       Last keep alive{' '}
-  //       <EuiIconTip
-  //         content='This is not searchable through a search term.'
-  //         size='s'
-  //         color='subdued'
-  //         type='alert'
-  //       />
-  //     </span>
-  //   ),
-  //   render: lastKeepAlive => formatUIDate(lastKeepAlive),
-  //   sortable: true,
-  //   show: false,
-  //   searchable: false,
-  // },
-  // {
   //   field: 'status',
   //   name: 'Status',
   //   truncateText: true,
   //   sortable: true,
   //   show: true,
   //   render: (status, agent) => <AgentStatus status={status} agent={agent} />,
-  // },
-  // {
-  //   field: 'group_config_status',
-  //   name: 'Synced',
-  //   sortable: true,
-  //   show: false,
-  //   render: synced => <AgentSynced synced={synced} />,
-  //   searchable: true,
   // },
   {
     field: 'agent.last_login',

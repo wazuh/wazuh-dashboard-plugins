@@ -16,8 +16,7 @@ import {
 import { Agent } from '../../../../common/types';
 import { AgentResume } from './resume';
 import { AgentDashboard } from './dashboard';
-import { AgentInventory } from './inventory';
-import { AgentConfiguration } from './configuration';
+import { AgentNetworks } from './networks';
 
 export interface AgentDetailsProps {
   useDataSource: any;
@@ -174,14 +173,24 @@ export const AgentDetails = ({
       content: tabContent(<AgentDashboard agentId={id} {...restProps} />),
     },
     {
-      id: 'inventory',
-      name: 'Inventory',
-      content: tabContent(<AgentInventory agentId={id} />),
+      id: 'networks',
+      name: 'Networks',
+      content: tabContent(<AgentNetworks agentId={id} />),
+    },
+    {
+      id: 'processes',
+      name: 'Processes',
+      content: tabContent(<div>Processes</div>),
+    },
+    {
+      id: 'packages',
+      name: 'Packages',
+      content: tabContent(<div>Packages</div>),
     },
     {
       id: 'configuration',
       name: 'Configuration',
-      content: tabContent(<AgentConfiguration agentId={id} />),
+      content: tabContent(<div>Configuration</div>),
     },
   ];
 

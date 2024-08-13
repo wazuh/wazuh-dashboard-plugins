@@ -5,6 +5,7 @@ export interface HostOSProps {
   os: {
     name: string;
     platform: string;
+    full: string;
   };
 }
 
@@ -26,7 +27,7 @@ export const HostOS = ({ os }: HostOSProps) => {
           aria-hidden='true'
         ></i>
       </EuiFlexItem>{' '}
-      <EuiFlexItem>{os?.name || '-'}</EuiFlexItem>
+      <EuiFlexItem>{os?.full || '-'}</EuiFlexItem>
     </EuiFlexGroup>
   );
 };

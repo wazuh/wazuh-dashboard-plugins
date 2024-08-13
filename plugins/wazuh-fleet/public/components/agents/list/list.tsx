@@ -101,7 +101,6 @@ export const AgentList = ({
             />
           </EuiPopover>,
         ]}
-        // rightSideGroupProps={{ gutterSize: 's' }}
       />
       <EuiSpacer />
       <TableIndexer

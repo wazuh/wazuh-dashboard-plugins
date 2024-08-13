@@ -36,9 +36,7 @@ def generateRandomAgent(i):
 
 def generateRandomHost():
     host = {}
-    # family=random.choice(['debian','ubuntu','macos','ios','android','RHEL'])
-    # version='{}.{}'.format(random.randint(0, 99),random.randint(0, 99))
-    
+   
     os_versions = [
         "Microsoft Windows 10 Home",
         "Microsoft Windows 10 Pro",
@@ -81,40 +79,77 @@ def generateRandomHost():
     platform_key = next(key for key in platform_map if os.startswith(key))
     platform = platform_map[platform_key]
 
+    host['architecture'] = random.choice(["x86_64", "arm64", "i386"])
+    host['checksum'] = str(uuid.uuid4()).replace('-', '')[:32]
+    host['hostname'] = f"host-{random.randint(1000, 9999)}"
     host['os'] = {
-        # 'family': family,
-        # 'full': family + ' ' + version,
-        # 'kernel': version+'kernel{}'.format(random.randint(0, 99)),
-        'name': os,
+        'name': os.split(' ')[0],
         'platform': platform,
-        # 'type': random.choice(['windows','linux','macos','ios','android','unix']),
-        # 'version': version
+        'version': os.split(' ')[-1],
+        'kernel': f"kernel-{random.randint(1, 10)}.{random.randint(0, 9)}.{random.randint(0, 99)}",
+        'full': os,
+        'type': platform_key.lower()
     }
+    host['scan_time'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    host['sysname'] = platform_key.lower()
     host['ip'] = f"192.168.{random.randint(0, 255)}.{random.randint(0, 255)}"
     return(host)
+
+def generateRandomNetwork():
+    network_names = ["docker0", "enp3s0", "virbr0", "wlp2s0", "eth0", "eth1", "lo", "br-3a2df5e3b74a"]
+    states = ["up", "down"]
+    types = ["ethernet", "wifi", "bridge", "loopback"]
+    
+    network = {}
+    network['name'] =  random.choice(network_names)
+    network['mac'] =  ':'.join(['{:02x}'.format(random.randint(0, 255)) for _ in range(6)])
+    network['state'] =  random.choice(states)
+    network['mtu'] =  str(random.choice([1500, 9000, 1450, 1400]))
+    network['type'] = random.choice(types)
+    return (network)
 
 def generateRandomWazuh():
     wazuh = {}
     wazuh['cluster'] = {'name':random.choice(['wazuh.manager', 'wazuh']), 'node':random.choice(['master','worker-01','worker-02','worker-03'])}
     return(wazuh)
 
-def generateRandomData(number):
+def generateFleetData(number):
     for i in range(0, int(number)):
         yield{
             'agent':generateRandomAgent(i),
-            'host':generateRandomHost(),
+            'host': generateRandomHost(),
             'wazuh':generateRandomWazuh()
         }
 
-def verifyIndex(index,instance):
+# def generateSystemData(fleetData):
+#     for agent in fleetData:
+#         yield{
+#             'agent':{
+#                     'id':agent['agent']['id']
+#                 },
+#             'host':generateRandomHost(),
+#             'wazuh':agent['wazuh']
+#         }
+
+def generateNetworksData(fleetData, number):
+    for agent in fleetData:
+        for i in range(0, int(number)):
+            yield{
+                'agent':{
+                        'id':agent['agent']['id']
+                    },
+                'network':generateRandomNetwork(),
+                'wazuh':agent['wazuh']
+            }
+
+def verifyIndex(index,instance,entity):
     if not instance.indices.exists(index):
-        if os.path.exists('DIS_Template.json'):
-            print('\nIndex {} does not exist. Trying to create it with the template in DIS_Template.json'.format(index))
-            with open('DIS_Template.json') as templateFile:
+        if os.path.exists(f'DIS_Template{entity}.json'):
+            print(f'\nIndex {index} does not exist. Trying to create it with the template in DIS_Template{entity}.json'.format(index))
+            with open(f'DIS_Template{entity}.json') as templateFile:
                 template = json.load(templateFile)
             try:
                 instance.indices.create(index=index, body=template)
-                indexExist = True
                 print('Done!')
             except Exception as e:
                 print('Error: {}'.format(e))
@@ -137,7 +172,7 @@ def verifySettings():
     if os.path.exists('DIS_Settings.json'):
         with open('DIS_Settings.json') as configFile:
             config = json.load(configFile)
-            if 'ip' not in config or 'port' not in config or 'index' not in config or 'username' not in config or 'password' not in config:
+            if 'ip' not in config or 'port' not in config or 'indexFleet' not in config or 'indexInventorySystem' not in config or 'indexInventoryNetworks' not in config or 'indexInventoryProcesses' not in config or 'indexInventoryPackages' not in config or 'username' not in config or 'password' not in config:
                 print('\nDIS_Settings.json is not properly configured. Continuing without it.')
             else:
                 verified = True
@@ -153,11 +188,25 @@ def verifySettings():
         if port == '':
             port = '9200'
 
-        index = input("\nEnter the index name [default=wazuh-fleet-agents-default]: \n")
-        if index == '':
-            index = 'wazuh-fleet-agents-default'
+        indexFleet = input("\nEnter the index name for the fleet [default=fleet-agents-default]: \n")
+        if indexFleet == '':
+            indexFleet = 'fleet-agents-default'
 
-        url = 'https://{}:{}/{}/_doc'.format(ip, port, index)
+        indexInventorySystem = input("\nEnter the index name for the inventory system [default=inventory-system-default]: \n")
+        if indexInventorySystem == '':
+            indexInventorySystem = 'inventory-system-default'
+
+        indexInventoryNetworks = input("\nEnter the index name for the inventory networks [default=inventory-networks-default]: \n")
+        if indexInventoryNetworks == '':
+            indexInventoryNetworks = 'inventory-networks-default'
+
+        indexInventoryProcesses = input("\nEnter the index name for the inventory processes [default=inventory-processes-default]: \n")
+        if indexInventoryProcesses == '':
+            indexInventoryProcesses = 'inventory-processes-default'
+
+        indexInventoryPackages = input("\nEnter the index name for the inventory packages [default=inventory-packages-default]: \n")
+        if indexInventoryPackages == '':
+            indexInventoryPackages = 'inventory-packages-default'
 
         username = input("\nUsername [default=admin]: \n")
         if username == '':
@@ -167,7 +216,7 @@ def verifySettings():
         if password == '':
             password = 'admin'
 
-        config = {'ip':ip,'port':port,'index':index,'username':username,'password':password}
+        config = {'ip':ip,'port':port,'indexFleet':indexFleet, 'indexInventorySystem':indexInventorySystem, 'indexInventoryNetworks':indexInventoryNetworks, 'indexInventoryProcesses':indexInventoryProcesses, 'indexInventoryPackages':indexInventoryPackages, 'username':username,'password':password}
 
         store = input("\nDo you want to store these settings for future use? (y/n) [default=n] \n")
         if store == '':
@@ -180,7 +229,8 @@ def verifySettings():
                 json.dump(config, configFile)
     return config
 
-def injectEvents(generator):
+# def injectEvents(fleetData, systemData, networksData, processesData, packagesData):
+def injectEvents(fleetData, networksData):
     config = verifySettings()
     instance = OpenSearch([{'host':config['ip'],'port':config['port']}], http_auth=(config['username'], config['password']), use_ssl=True, verify_certs=False)
 
@@ -188,39 +238,55 @@ def injectEvents(generator):
         print('\nError: Could not connect to the indexer')
         return
 
-    if (verifyIndex(config['index'],instance)):
-        print('\nTrying to inject the generated data...\n')
+    if (verifyIndex(config['indexFleet'],instance, 'FleetAgents')):
+        print('\nTrying to inject the fleet generated data...\n')
         try:
-            helpers.bulk(instance, generator, index=config['index'])
+            helpers.bulk(instance, fleetData, index=config['indexFleet'])
             print('\nDone!')
         except Exception as e:
             print('\nError: {}'.format(e))
+    
+        # if (verifyIndex(config['indexInventorySystem'],instance, 'InventorySystem')):
+        #     print('\nTrying to inject the system generated data...\n')
+        # try:
+        #     helpers.bulk(instance, systemData, index=config['indexInventorySystem'])
+        #     print('\nDone!')
+        # except Exception as e:
+        #     print('\nError: {}'.format(e))
+
+        if (verifyIndex(config['indexInventoryNetworks'],instance, 'InventoryNetworks')):
+            print('\nTrying to inject the networks generated data...\n')
+        try:
+            helpers.bulk(instance, networksData, index=config['indexInventoryNetworks'])
+            print('\nDone!')
+        except Exception as e:
+            print('\nError: {}'.format(e))
+
     return
 
 
 def main():
-    action = input("Do you want to inject data or save it to a file? (i/s) [default=i]\n")
-    if action == '':
-        action = 'i'
+    numberAgents = input("\nHow many agents do you want to generate? [default=20]\n")
+    if numberAgents == '':
+        numberAgents = '20'
+    while(not numberAgents.isdigit()):
+        numberAgents = input("Invalid option.\n How many agents do you want to generate? \n")
 
-    while(action != 'i' and action != 's'):
-        action = input("\nInvalid option.\n Do you want to inject data or save it to a file? (i/s) \n")
-    number = input("\nHow many agents do you want to generate? [default=20]\n")
-    if number == '':
-        number = '20'
-    while(not number.isdigit()):
-        number = input("Invalid option.\n How many events do you want to generate? \n")
-    data = generateRandomData(number)
-    if action == 's':
-        print('\nGenerating {} events...\n'.format(number))
-        outfile = open('generatedData.json','a')
-        for i in data:
-            json.dump(i, outfile)
-            outfile.write('\n')
-        outfile.close()
-        print('\nDone!\n')
-    else:
-        injectEvents(data)
+    numberNetworksAgent = input("\nHow many networks by agent do you want to generate? [default=5]\n")
+    if numberNetworksAgent == '':
+        numberNetworksAgent = '5'
+    while(not numberNetworksAgent.isdigit()):
+        numberNetworksAgent = input("Invalid option.\n How many networks by agent do you want to generate? \n")
+
+    fleetData = generateFleetData(numberAgents)
+    fleetList = list(fleetData)
+    # systemData = generateSystemData(fleetList)
+    networksData = generateNetworksData(fleetList, numberNetworksAgent)
+    # processesData = generateProcessesData(fleetData)
+    # packagesData = generatePackagesData(fleetData)
+
+    # injectEvents(fleetData, systemData, networksData, processesData, packagesData)
+    injectEvents(fleetList, networksData)
     return
 
 if __name__=="__main__":

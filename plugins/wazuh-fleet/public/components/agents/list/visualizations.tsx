@@ -3,7 +3,7 @@ import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../plugin-services';
 
 const getVisTopOS = (indexPatternId: string) => {
-  return getPieVis(indexPatternId, 'host.os.platform', 'Top 5 OS', 'top_5_os');
+  return getPieVis(indexPatternId, 'host.os.name', 'Top 5 OS', 'top_5_os');
 };
 
 const getVisTopGroups = (indexPatternId: string) => {
@@ -168,7 +168,7 @@ export const AgentsVisualizations = () => {
           // but if it is undefined use the index pattern of the hoc
           // because the first executions of the dataSource are undefined
           // and embeddables need index pattern.
-          panels: getKPIsPanel('wazuh-fleet-agents-*'),
+          panels: getKPIsPanel('fleet-agents-*'),
           isFullScreenMode: false,
           filters: [],
           useMargins: true,
