@@ -149,7 +149,7 @@ export const getMacOsInstallCommand = (
     // We need to remove the " added by JSON.stringify
     optionalsForCommand.wazuhPassword = `${JSON.stringify(
       optionalsForCommand?.wazuhPassword,
-    ).substring(1, scapedPasswordLength - 1)}\\n`;
+    ).substring(1, scapedPasswordLength - 1)}`;
   }
 
   // Set macOS installation script with environment variables
