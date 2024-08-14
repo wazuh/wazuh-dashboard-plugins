@@ -205,7 +205,7 @@ describe('transformOptionalsParamatersMacOSCommand', () => {
 
 describe('getMacOsInstallCommand', () => {
   it('should return the correct macOS installation script', () => {
-    let expected = `curl -so wazuh-agent.pkg ${test.urlPackage} && echo "${test.optionals.serverAddress} && ${test.optionals.agentGroups} && ${test.optionals.agentName} && ${test.optionals.wazuhPassword}\\n\" > /tmp/wazuh_envs && sudo installer -pkg ./wazuh-agent.pkg -target /`;
+    let expected = `curl -so wazuh-agent.pkg ${test.urlPackage} && echo "${test.optionals.serverAddress} && ${test.optionals.agentGroups} && ${test.optionals.agentName} && ${test.optionals.wazuhPassword}\" > /tmp/wazuh_envs && sudo installer -pkg ./wazuh-agent.pkg -target /`;
 
     const withAllOptionals = getMacOsInstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
