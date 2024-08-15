@@ -103,6 +103,8 @@ export async function createDashboard() {
       visualizationId,
     );
     console.log('Visualization created:', resultVis);
+    // const pepe = await SavedObject.createSavedObjectbulk();
+    // console.log(pepe, 'pepe');
 
     // If the dashboard is created successfully, ensure the visualization is correctly referenced
     if (result) {

@@ -29,6 +29,8 @@ import {
   version as pluginVersion,
   revision as pluginRevision,
 } from '../../package.json';
+import fs from 'fs';
+import path from 'path';
 
 export class WazuhApiCtrl {
   constructor() {}
@@ -1145,6 +1147,39 @@ export class WazuhApiCtrl {
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
       );
+    }
+  }
+  async getAppDashboards(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      // context.wazuh.logger.debug(
+      //   `Getting ${context.wazuhEndpointParams.pathFilename} report`,
+      // );
+      // const reportFileBuffer = fs.readFileSync(
+      //   context.wazuhEndpointParams.pathFilename,
+      // );
+      const dashboardName = request.params.name;
+      const dashboardFilePath = path.join(
+        __dirname,
+        '../integration-files/dashboards',
+        dashboardName,
+      );
+      const dashboardFile = fs.readFileSync(dashboardFilePath);
+      console.log(dashboardFile, 'dashboardFile');
+      console.log(request.params, 'hola');
+      // return response.ok({
+      //   body: 'hola',
+      // });
+      return response.ok({
+        headers: { 'Content-Type': 'application/x-ndjson' },
+        body: dashboardFile,
+      });
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(error.message || error, 5030, 500, response);
     }
   }
 }

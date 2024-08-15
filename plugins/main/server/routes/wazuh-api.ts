@@ -138,4 +138,19 @@ export function WazuhApiRoutes(router: IRouter) {
     async (context, request, response) =>
       ctrl.getAppLogos(context, request, response),
   );
+
+  // Return binary dashboard
+  router.get(
+    {
+      path: '/api/dashboards/{name}',
+      validate: {
+        params: schema.object({
+          name: schema.string(),
+        }),
+      },
+      // options: { authRequired: false },
+    },
+    async (context, request, response) =>
+      ctrl.getAppDashboards(context, request, response),
+  );
 }
