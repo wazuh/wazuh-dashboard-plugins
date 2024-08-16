@@ -26,15 +26,12 @@ import DrillDownDataGrid from '../../../github/panel/config/drilldown-data-grid'
 import { rules } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
-const DashboardByRenderer =
-  getPlugins().dashboard.DashboardContainerByValueRenderer;
+const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const getDashboardPanels = (
-  indexPatternId: string,
+  indexPatternId: string
 ): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
+  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
 } => {
   return {
     d0: {
@@ -82,7 +79,7 @@ const getDashboardPanels = (
   };
 };
 
-export const drilldownOperationsConfig = props => {
+export const drilldownOperationsConfig = (props) => {
   const { fetchData, fetchFilters, searchBarProps, indexPattern } = props;
 
   return {
@@ -91,7 +88,7 @@ export const drilldownOperationsConfig = props => {
         columns: [
           {
             width: 100,
-            component: props => {
+            component: (props) => {
               const defaultTableColumns = [
                 {
                   id: 'timestamp',
@@ -107,11 +104,9 @@ export const drilldownOperationsConfig = props => {
                 { id: 'rule.level', displayAsText: 'Level' },
                 {
                   id: 'rule.id',
-                  render: value => (
+                  render: (value) => (
                     <RedirectAppLinks application={getCore().application}>
-                      <EuiLink
-                        href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-                      >
+                      <EuiLink href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}>
                         {value}
                       </EuiLink>
                     </RedirectAppLinks>
@@ -133,8 +128,7 @@ export const drilldownOperationsConfig = props => {
                         to: searchBarProps.dateRangeTo,
                       },
                       title: 'Office drilldown operations config dashboard',
-                      description:
-                        'Dashboard of the Office drilldown operations config',
+                      description: 'Dashboard of the Office drilldown operations config',
                       query: searchBarProps.query,
                       refreshConfig: {
                         pause: false,
@@ -142,7 +136,7 @@ export const drilldownOperationsConfig = props => {
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                   <EuiFlexItem>
                     <DrillDownDataGrid

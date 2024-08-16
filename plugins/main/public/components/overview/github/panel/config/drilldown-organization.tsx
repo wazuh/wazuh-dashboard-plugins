@@ -11,7 +11,15 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiPanel,
+  EuiToolTip,
+  EuiButtonIcon,
+  EuiDataGridCellValueElementProps,
+  EuiDataGrid,
+  EuiLink,
+} from '@elastic/eui';
 import { SecurityAlerts } from '../../../../visualize/components';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins, getCore } from '../../../../../kibana-services';
@@ -25,20 +33,21 @@ import {
   getVisStateTopActions,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
+import {
+  ErrorFactory,
+  HttpError,
+  ErrorHandler,
+} from '../../../../../react-services/error-management';
 import DrillDownDataGrid from './drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
-const DashboardByRenderer =
-  getPlugins().dashboard.DashboardContainerByValueRenderer;
+const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const getDashboardPanels = (
-  indexPatternId: string,
+  indexPatternId: string
 ): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
+  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
 } => {
   return {
     d0: {
@@ -114,16 +123,8 @@ const getDashboardPanels = (
   };
 };
 
-export const DrilldownConfigOrganization = (
-  drilldownProps: ModuleConfigProps,
-) => {
-
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern
-  } = drilldownProps;
+export const DrilldownConfigOrganization = (drilldownProps: ModuleConfigProps) => {
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } = drilldownProps;
 
   return {
     rows: [
@@ -131,7 +132,7 @@ export const DrilldownConfigOrganization = (
         columns: [
           {
             width: 100,
-            component: props => {
+            component: (props) => {
               return (
                 <div style={{ width: '100%' }}>
                   <DashboardByRenderer
@@ -155,7 +156,7 @@ export const DrilldownConfigOrganization = (
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );
@@ -180,7 +181,7 @@ export const DrilldownConfigOrganization = (
                 { id: 'data.github.action', displayAsText: 'Action' },
                 { id: 'rule.level' },
                 { id: 'rule.id' },
-              ]
+              ];
 
               return (
                 <DrillDownDataGrid
@@ -190,7 +191,7 @@ export const DrilldownConfigOrganization = (
                   searchBarProps={searchBarProps}
                   indexPattern={indexPattern}
                 />
-              )
+              );
             },
           },
         ],

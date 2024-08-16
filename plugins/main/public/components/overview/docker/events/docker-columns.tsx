@@ -4,7 +4,7 @@ export const dockerColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
     isSortable: true,
-    defaultSortDirection: 'desc'
+    defaultSortDirection: 'desc',
   },
   {
     id: 'agent.name',

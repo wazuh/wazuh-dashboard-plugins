@@ -4,7 +4,7 @@ export const configurationAssessmentColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
     isSortable: true,
-    defaultSortDirection: 'desc'
+    defaultSortDirection: 'desc',
   },
   {
     id: 'data.sca.check.title',

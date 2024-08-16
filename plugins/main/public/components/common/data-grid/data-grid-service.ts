@@ -175,6 +175,10 @@ export const parseColumns = (
 ): EuiDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
   // merge the properties of the field with the default columns
+  if (!fields?.length) {
+    return defaultColumns;
+  }
+
   const columns =
     fields
       .filter(field => field.name !== '_source')
