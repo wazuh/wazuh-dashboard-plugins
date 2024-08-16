@@ -174,24 +174,25 @@ export const parseColumns = (
   defaultColumns: tDataGridColumn[] = [],
 ): EuiDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
-  fields = fields.filter(field => field.name !== '_source');
   // merge the properties of the field with the default columns
   const columns =
-    fields.map(field => {
-      const defaultColumn = defaultColumns.find(
-        column => column.id === field.name,
-      );
-      return {
-        ...field,
-        id: field.name,
-        name: field.name,
-        schema: field.type,
-        actions: {
-          showHide: true,
-        },
-        ...defaultColumn,
-      };
-    }) || [];
+    fields
+      .filter(field => field.name !== '_source')
+      .map(field => {
+        const defaultColumn = defaultColumns.find(
+          column => column.id === field.name,
+        );
+        return {
+          ...field,
+          id: field.name,
+          name: field.name,
+          schema: field.type,
+          actions: {
+            showHide: true,
+          },
+          ...defaultColumn,
+        };
+      }) || [];
   return columns;
 };
 

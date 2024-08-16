@@ -251,7 +251,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                 </EuiPanel>
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiDataGrid
+                {!isDataSourceLoading && dataSource?.indexPattern && dataGridProps?.columns.length ? <EuiDataGrid
                   {...dataGridProps}
                   className={sideNavDocked ? 'dataGridDockedNav' : ''}
                   toolbarVisibility={{
@@ -267,6 +267,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     ),
                   }}
                 />
+                  : null}
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiPanel>
