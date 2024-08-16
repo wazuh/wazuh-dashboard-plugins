@@ -25,12 +25,15 @@ import {
 import { ModuleConfigProps } from './module-config';
 import DrillDownDataGrid from './drilldown-data-grid';
 
-const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
+const DashboardByRenderer =
+  getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const getDashboardPanels = (
-  indexPatternId: string
+  indexPatternId: string,
 ): {
-  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
 } => {
   return {
     d0: {
@@ -107,7 +110,8 @@ const getDashboardPanels = (
 };
 
 export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
-  const { fetchData, fetchFilters, searchBarProps, indexPattern } = drilldownProps;
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [
@@ -115,7 +119,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
         columns: [
           {
             width: 100,
-            component: (props) => {
+            component: props => {
               return (
                 <div style={{ width: '100%' }}>
                   <DashboardByRenderer

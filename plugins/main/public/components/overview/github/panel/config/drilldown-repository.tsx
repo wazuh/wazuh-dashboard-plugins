@@ -32,12 +32,15 @@ import {
 import DrillDownDataGrid from './drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
 
-const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
+const DashboardByRenderer =
+  getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const getDashboardPanels = (
-  indexPatternId: string
+  indexPatternId: string,
 ): {
-  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
 } => {
   return {
     d0: {
@@ -113,8 +116,11 @@ const getDashboardPanels = (
   };
 };
 
-export const DrilldownConfigRepository = (drilldownProps: ModuleConfigProps) => {
-  const { fetchData, fetchFilters, searchBarProps, indexPattern } = drilldownProps;
+export const DrilldownConfigRepository = (
+  drilldownProps: ModuleConfigProps,
+) => {
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [
@@ -122,7 +128,7 @@ export const DrilldownConfigRepository = (drilldownProps: ModuleConfigProps) => 
         columns: [
           {
             width: 100,
-            component: (props) => {
+            component: props => {
               return (
                 <div style={{ width: '100%' }}>
                   <DashboardByRenderer
@@ -172,8 +178,10 @@ export const DrilldownConfigRepository = (drilldownProps: ModuleConfigProps) => 
                 { id: 'rule.level' },
                 {
                   id: 'rule.id',
-                  render: (value) => (
-                    <EuiLink href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}>
+                  render: value => (
+                    <EuiLink
+                      href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
+                    >
                       {value}
                     </EuiLink>
                   ),

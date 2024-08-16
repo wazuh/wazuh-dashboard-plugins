@@ -42,12 +42,15 @@ import DrillDownDataGrid from './drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
-const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
+const DashboardByRenderer =
+  getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const getDashboardPanels = (
-  indexPatternId: string
+  indexPatternId: string,
 ): {
-  [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
 } => {
   return {
     d0: {
@@ -123,8 +126,11 @@ const getDashboardPanels = (
   };
 };
 
-export const DrilldownConfigOrganization = (drilldownProps: ModuleConfigProps) => {
-  const { fetchData, fetchFilters, searchBarProps, indexPattern } = drilldownProps;
+export const DrilldownConfigOrganization = (
+  drilldownProps: ModuleConfigProps,
+) => {
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [
@@ -132,7 +138,7 @@ export const DrilldownConfigOrganization = (drilldownProps: ModuleConfigProps) =
         columns: [
           {
             width: 100,
-            component: (props) => {
+            component: props => {
               return (
                 <div style={{ width: '100%' }}>
                   <DashboardByRenderer
