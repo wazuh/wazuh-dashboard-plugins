@@ -10,8 +10,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed windows-agent-deployment-command from deploy new agent [#6905](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6905)
-- Fixed mac-agent-deployment-command from deploy new agent [#6906](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6906)
+- Fixed the temporal directory variable on the the command to deploy a new Windows agent [#6905](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6905)
+- Fixed an error on the command to deploy a new macOS agent that could cause the registration password had a wrong value because a `\n` could be included [#6906](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6906)
 - Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
 - Fixed an error on Dev Tools when using payload properties as arrays [#6908](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6908)
 
