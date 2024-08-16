@@ -143,7 +143,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
       {!isLoading && !results?.hits?.total === 0 ? (
         <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
       ) : null}
-      {!isLoading && results?.hits?.total > 0 && dataGridProps.columns.length ? (
+      {!isLoading && results?.hits?.total > 0 ? (
         <div className="wazuhDataGridContainer">
           <EuiDataGrid
             {...dataGridProps}
