@@ -108,7 +108,11 @@ export const drilldownRulesConfig = props => {
             width: 100,
             component: props => {
               const defaultTableColumns = [
-                { id: 'timestamp' },
+                {
+                  id: 'timestamp',
+                  isSortable: true,
+                  defaultSortDirection: 'desc',
+                },
                 { id: 'rule.description', displayAsText: 'Description' },
                 { id: 'data.office365.UserId', displayAsText: 'User ID' },
                 {
@@ -158,7 +162,7 @@ export const drilldownRulesConfig = props => {
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => {}}
+                    onInputUpdated={() => { }}
                   />
                   <EuiFlexItem>
                     <DrillDownDataGrid

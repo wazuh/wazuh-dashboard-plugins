@@ -78,6 +78,8 @@ export const RequirementFlyout = connect(mapStateToProps)(
       const columnsAgent = [
         {
           id: 'timestamp',
+          isSortable: true,
+          defaultSortDirection: 'desc',
           displayAsText: 'Time',
           render: value => formatUIDate(value),
         },
@@ -96,6 +98,8 @@ export const RequirementFlyout = connect(mapStateToProps)(
       const columnsWithoutAgent = [
         {
           id: 'timestamp',
+          isSortable: true,
+          defaultSortDirection: 'desc',
           displayAsText: 'Time',
           render: value => formatUIDate(value),
         },
@@ -133,10 +137,10 @@ export const RequirementFlyout = connect(mapStateToProps)(
               <EuiLoadingContent lines={1} />
             </div>
           )) || (
-            <EuiTitle size='m'>
-              <h2 id='flyoutSmallTitle'>Requirement {currentRequirement}</h2>
-            </EuiTitle>
-          )}
+              <EuiTitle size='m'>
+                <h2 id='flyoutSmallTitle'>Requirement {currentRequirement}</h2>
+              </EuiTitle>
+            )}
         </EuiFlyoutHeader>
       );
     }

@@ -3,6 +3,8 @@ import { tDataGridColumn } from '../../../common/data-grid';
 export const gdprColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc'
   },
   {
     id: 'agent.name',

@@ -3,6 +3,8 @@ import { tDataGridColumn } from '../../../common/data-grid';
 export const configurationAssessmentColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc'
   },
   {
     id: 'data.sca.check.title',
