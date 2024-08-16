@@ -12,11 +12,23 @@ import {
   EuiFlyoutBody,
   EuiFlexGroup,
 } from '@elastic/eui';
-import { useDataGrid, exportSearchToCSV, tDataGridColumn, getAllCustomRenders } from '../data-grid';
+import {
+  useDataGrid,
+  exportSearchToCSV,
+  tDataGridColumn,
+  getAllCustomRenders,
+} from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
-import { IndexPattern, SearchResponse } from '../../../../../../src/plugins/data/public';
+import {
+  IndexPattern,
+  SearchResponse,
+} from '../../../../../../src/plugins/data/public';
 import { useDocViewer } from '../doc-viewer';
-import { ErrorHandler, ErrorFactory, HttpError } from '../../../react-services/error-management';
+import {
+  ErrorHandler,
+  ErrorFactory,
+  HttpError,
+} from '../../../react-services/error-management';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { DocumentViewTableAndJson } from '../wazuh-discover/components/document-view-table-and-json';
@@ -39,7 +51,10 @@ export type tWazuhDataGridProps = {
   };
   query: any;
   exportFilters: tFilter[];
-  onChangePagination: (pagination: { pageIndex: number; pageSize: number }) => void;
+  onChangePagination: (pagination: {
+    pageIndex: number;
+    pageSize: number;
+  }) => void;
   onChangeSorting: (sorting: { columns: any[]; onSort: any }) => void;
 };
 
@@ -64,16 +79,18 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
       const rowClicked = results.hits.hits[index];
       setInspectedHit(rowClicked);
     },
-    [results]
+    [results],
   );
 
-  const DocViewInspectButton = ({ rowIndex }: EuiDataGridCellValueElementProps) => {
+  const DocViewInspectButton = ({
+    rowIndex,
+  }: EuiDataGridCellValueElementProps) => {
     const inspectHintMsg = 'Inspect document details';
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
           onClick={() => onClickInspectDoc(rowIndex)}
-          iconType="inspect"
+          iconType='inspect'
           aria-label={inspectHintMsg}
         />
       </EuiToolTip>
@@ -109,7 +126,9 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     indexPattern: indexPattern as IndexPattern,
   });
 
-  const timeField = indexPattern?.timeFieldName ? indexPattern.timeFieldName : undefined;
+  const timeField = indexPattern?.timeFieldName
+    ? indexPattern.timeFieldName
+    : undefined;
 
   const onClickExportResults = async () => {
     const params = {
@@ -144,7 +163,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
         <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
       ) : null}
       {!isLoading && results?.hits?.total > 0 ? (
-        <div className="wazuhDataGridContainer">
+        <div className='wazuhDataGridContainer'>
           <EuiDataGrid
             {...dataGridProps}
             className={sideNavDocked ? 'dataGridDockedNav' : ''}
@@ -164,19 +183,25 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
         </div>
       ) : null}
       {inspectedHit && (
-        <EuiFlyout onClose={() => setInspectedHit(undefined)} size="m">
+        <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
           <EuiFlyoutHeader>
             <EuiTitle>
-              <DocDetailsHeader doc={inspectedHit} indexPattern={indexPattern} />
+              <DocDetailsHeader
+                doc={inspectedHit}
+                indexPattern={indexPattern}
+              />
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
-            <EuiFlexGroup direction="column">
+            <EuiFlexGroup direction='column'>
               <EuiFlexItem>
                 <DocumentViewTableAndJson
                   document={inspectedHit}
                   indexPattern={indexPattern as IndexPattern}
-                  renderFields={getAllCustomRenders(defaultTableColumns, wzDiscoverRenderColumns)}
+                  renderFields={getAllCustomRenders(
+                    defaultTableColumns,
+                    wzDiscoverRenderColumns,
+                  )}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>
