@@ -15,6 +15,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
 - Fixed an error on Dev Tools when using payload properties as arrays [#6908](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6908)
 
+### Changed
+
+- Upgraded the `axios` dependency to `1.7.4` [#6919](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6919)
+
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 03
 
 ### Added
