@@ -130,7 +130,6 @@ export function useDataSource<
     }
     const paramsWithSignal = { ...params, signal: getAbortController().signal };
     setFetchDateRange(transformDateRange(params.dateRange));
-    console.log('dateRange on fetch', fetchDateRange);
     return await dataSourceFilterManager?.fetch(paramsWithSignal);
   };
 
@@ -140,7 +139,6 @@ export function useDataSource<
     if (!dataSourceFilterManager) {
       return;
     }
-    console.log('dateRange on page', fetchDateRange);
     const paramsWithSignal = {
       ...params,
       dateRange: fetchDateRange,
