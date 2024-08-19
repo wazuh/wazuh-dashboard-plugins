@@ -2,6 +2,7 @@ import { getPlugins } from '../../../kibana-services';
 import {
   IndexPattern,
   OpenSearchQuerySortValue,
+  TimeRange,
 } from '../../../../../../src/plugins/data/public';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { tFilter, tSearchParams } from '../data-source/index';
@@ -47,6 +48,15 @@ export function getForceNow() {
     );
   }
   return new Date(ticks);
+}
+
+export function transformDateRange(dateRange: TimeRange) {
+  return {
+    from: dateMath.parse(dateRange.from).toISOString(),
+    to: dateMath
+      .parse(dateRange.to, { roundUp: true, forceNow: getForceNow() })
+      .toISOString(),
+  };
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
