@@ -310,7 +310,7 @@ export class FileDetails extends Component {
     const { view } = this.props;
     const columns =
       this.props.type === 'registry_key' ||
-      this.props.currentFile.type === 'registry_key'
+        this.props.currentFile.type === 'registry_key'
         ? this.registryDetails()
         : this.details();
     const generalDetails = columns.map((item, idx) => {
@@ -379,7 +379,7 @@ export class FileDetails extends Component {
                     this.userSvg
                   )}
                   {item.name === 'Permissions' &&
-                  agentPlatform === 'windows' ? (
+                    agentPlatform === 'windows' ? (
                     ''
                   ) : (
                     <span className='detail-title'>{item.name}</span>
@@ -459,84 +459,84 @@ export class FileDetails extends Component {
     const agentId = this.props.agent?.id;
     return agentId
       ? [
-          {
-            id: 'timestamp',
-            isSortable: true,
-            defaultSortDirection: 'desc',
-            displayAsText: 'Time',
-            render: value => formatUIDate(value),
-          },
-          {
-            id: 'syscheck.event',
-            displayAsText: 'Action',
-          },
-          { id: 'rule.description', displayAsText: 'Description' },
-          { id: 'rule.level', displayAsText: 'Level' },
-          {
-            id: 'rule.id',
-            displayAsText: 'Rule ID',
-            render: value => (
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink
-                  href={getCore().application.getUrlForApp(rules.id, {
-                    path: `#/manager/?tab=rules&redirectRule=${value}`,
-                  })}
-                >
-                  {value}
-                </EuiLink>
-              </RedirectAppLinks>
-            ),
-          },
-        ]
+        {
+          id: 'timestamp',
+          isSortable: true,
+          defaultSortDirection: 'desc',
+          displayAsText: 'Time',
+          render: value => formatUIDate(value),
+        },
+        {
+          id: 'syscheck.event',
+          displayAsText: 'Action',
+        },
+        { id: 'rule.description', displayAsText: 'Description' },
+        { id: 'rule.level', displayAsText: 'Level' },
+        {
+          id: 'rule.id',
+          displayAsText: 'Rule ID',
+          render: value => (
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                href={getCore().application.getUrlForApp(rules.id, {
+                  path: `#/manager/?tab=rules&redirectRule=${value}`,
+                })}
+              >
+                {value}
+              </EuiLink>
+            </RedirectAppLinks>
+          ),
+        },
+      ]
       : [
-          {
-            id: 'timestamp',
-            isSortable: true,
-            defaultSortDirection: 'desc',
-            displayAsText: 'Time',
-            render: value => formatUIDate(value),
-          },
-          {
-            id: 'agent.id',
-            displayAsText: 'Agent',
-            render: value => (
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink
-                  href={getCore().application.getUrlForApp(endpointSummary.id, {
-                    path: `#/agents/?tab=welcome&agent=${value}`,
-                  })}
-                >
-                  {value}
-                </EuiLink>
-              </RedirectAppLinks>
-            ),
-          },
-          {
-            id: 'agent.name',
-            displayAsText: 'Agent name',
-          },
-          {
-            id: 'syscheck.event',
-            displayAsText: 'Action',
-          },
-          { id: 'rule.description', displayAsText: 'Description' },
-          { id: 'rule.level', displayAsText: 'Level' },
-          {
-            id: 'rule.id',
-            displayAsText: 'Rule ID',
-            render: value => (
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink
-                  href={getCore().application.getUrlForApp(rules.id, {
-                    path: `#/manager/?tab=rules&redirectRule=${value}`,
-                  })}
-                >
-                  {value}
-                </EuiLink>
-              </RedirectAppLinks>
-            ),
-          },
-        ];
+        {
+          id: 'timestamp',
+          isSortable: true,
+          defaultSortDirection: 'desc',
+          displayAsText: 'Time',
+          render: value => formatUIDate(value),
+        },
+        {
+          id: 'agent.id',
+          displayAsText: 'Agent',
+          render: value => (
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                href={getCore().application.getUrlForApp(endpointSummary.id, {
+                  path: `#/agents/?tab=welcome&agent=${value}`,
+                })}
+              >
+                {value}
+              </EuiLink>
+            </RedirectAppLinks>
+          ),
+        },
+        {
+          id: 'agent.name',
+          displayAsText: 'Agent name',
+        },
+        {
+          id: 'syscheck.event',
+          displayAsText: 'Action',
+        },
+        { id: 'rule.description', displayAsText: 'Description' },
+        { id: 'rule.level', displayAsText: 'Level' },
+        {
+          id: 'rule.id',
+          displayAsText: 'Rule ID',
+          render: value => (
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                href={getCore().application.getUrlForApp(rules.id, {
+                  path: `#/manager/?tab=rules&redirectRule=${value}`,
+                })}
+              >
+                {value}
+              </EuiLink>
+            </RedirectAppLinks>
+          ),
+        },
+      ];
   }
 
   getImplicitFilters() {
