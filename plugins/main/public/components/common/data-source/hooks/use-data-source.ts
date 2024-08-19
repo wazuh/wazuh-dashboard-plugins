@@ -11,8 +11,10 @@ import {
   PatternDataSourceFilterManager,
   tFilterManager,
 } from '../index';
+import { TimeRange } from '../../../../../../../src/plugins/data/public';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 import { useIsMounted } from '../../hooks/use-is-mounted';
+import { transformDateRange } from '../../search-bar/search-bar-service';
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   DataSource: IDataSourceFactoryConstructor<K>;
@@ -49,8 +51,12 @@ type tUseDataSourceLoadedReturns<K> = {
   */
   fixedFilters: tFilter[];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
+  fetchPageData: (
+    params: Omit<tSearchParams, 'filters' | 'dateRange'>,
+  ) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: PatternDataSourceFilterManager;
+  fetchDateRange: TimeRange;
 };
 
 type tUseDataSourceNotLoadedReturns = {
@@ -69,6 +75,9 @@ type tUseDataSourceNotLoadedReturns = {
   */
   fixedFilters: [];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
+  fetchPageData: (
+    params: Omit<tSearchParams, 'filters' | 'dateRange'>,
+  ) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: null;
 };
@@ -102,6 +111,7 @@ export function useDataSource<
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
+  const [fetchDateRange, setFetchDateRange] = useState<TimeRange>();
   const { isComponentMounted, getAbortController } = useIsMounted();
 
   const setFilters = (filters: tFilter[]) => {
@@ -119,6 +129,23 @@ export function useDataSource<
       return;
     }
     const paramsWithSignal = { ...params, signal: getAbortController().signal };
+    setFetchDateRange(transformDateRange(params.dateRange));
+    console.log('dateRange on fetch', fetchDateRange);
+    return await dataSourceFilterManager?.fetch(paramsWithSignal);
+  };
+
+  const fetchPageData = async (
+    params: Omit<tSearchParams, 'filters' | 'dateRange'>,
+  ) => {
+    if (!dataSourceFilterManager) {
+      return;
+    }
+    console.log('dateRange on page', fetchDateRange);
+    const paramsWithSignal = {
+      ...params,
+      dateRange: fetchDateRange,
+      signal: getAbortController().signal,
+    };
     return await dataSourceFilterManager?.fetch(paramsWithSignal);
   };
 
@@ -188,6 +215,7 @@ export function useDataSource<
       fetchFilters: [],
       fixedFilters: [],
       fetchData,
+      fetchPageData,
       setFilters,
       filterManager: null,
     };
@@ -199,8 +227,10 @@ export function useDataSource<
       fetchFilters,
       fixedFilters,
       fetchData,
+      fetchPageData,
       setFilters,
       filterManager: dataSourceFilterManager as PatternDataSourceFilterManager,
+      fetchDateRange,
     };
   }
 }
