@@ -19,7 +19,7 @@ import { compose } from 'redux';
 import {
   withVulnerabilitiesStateDataSource,
   createDashboard,
-} from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
+} from '../../../../common/hocs/validate-vulnerabilities-states-index-pattern';
 import { ModuleEnabledCheck } from '../../common/components/check-module-enabled';
 import { getHttp, getDataPlugin } from '../../../../../kibana-services';
 import { WzRequest } from '../../../../../../public/react-services/wz-request';
@@ -39,10 +39,6 @@ import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../../../../../common/consta
 
 //Contenido NDJSON
 // Contenido de la cadena NDJSON
-const ndjsonData = `{"attributes":{"fields":"[{\\"count\\":0,\\"name\\":\\"_index\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"_index\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":false},{\\"count\\":0,\\"name\\":\\"_source\\",\\"type\\":\\"_source\\",\\"esTypes\\":[\\"_source\\"],\\"scripted\\":false,\\"searchable\\":false,\\"aggregatable\\":false,\\"readFromDocValues\\":false},{\\"count\\":0,\\"name\\":\\"agent.build.original\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"agent.ephemeral_id\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"agent.id\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"agent.name\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"agent.type\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"agent.version\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"ecs.version\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"host.os.family\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"host.os.full\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"host.os.full.text\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"text\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":false,\\"readFromDocValues\\":false,\\"subType\\":{\\"multi\\":{\\"parent\\":\\"host.os.full\\"}}},{\\"count\\":0,\\"name\\":\\"host.os.kernel\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"host.os.name\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"host.os.name.text\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"text\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":false,\\"readFromDocValues\\":false,\\"subType\\":{\\"multi\\":{\\"parent\\":\\"host.os.name\\"}}},{\\"count\\":0,\\"name\\":\\"host.os.platform\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"host.os.type\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"host.os.version\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"message\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"text\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":false,\\"readFromDocValues\\":false},{\\"count\\":0,\\"name\\":\\"package.architecture\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.build_version\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.checksum\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.description\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.install_scope\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.installed\\",\\"type\\":\\"date\\",\\"esTypes\\":[\\"date\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.license\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.name\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.path\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.reference\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.size\\",\\"type\\":\\"number\\",\\"esTypes\\":[\\"long\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.type\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"package.version\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"tags\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.category\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.classification\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.description\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.description.text\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"text\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":false,\\"readFromDocValues\\":false,\\"subType\\":{\\"multi\\":{\\"parent\\":\\"vulnerability.description\\"}}},{\\"count\\":0,\\"name\\":\\"vulnerability.detected_at\\",\\"type\\":\\"date\\",\\"esTypes\\":[\\"date\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.enumeration\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.id\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.published_at\\",\\"type\\":\\"date\\",\\"esTypes\\":[\\"date\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.reference\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.report_id\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.scanner.vendor\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.score.base\\",\\"type\\":\\"number\\",\\"esTypes\\":[\\"float\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.score.environmental\\",\\"type\\":\\"number\\",\\"esTypes\\":[\\"float\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.score.temporal\\",\\"type\\":\\"number\\",\\"esTypes\\":[\\"float\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.score.version\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"vulnerability.severity\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"wazuh.cluster.name\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"wazuh.cluster.node\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"wazuh.manager.name\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true},{\\"count\\":0,\\"name\\":\\"wazuh.node.name\\",\\"type\\":\\"string\\",\\"esTypes\\":[\\"keyword\\"],\\"scripted\\":false,\\"searchable\\":true,\\"aggregatable\\":true,\\"readFromDocValues\\":true}]","title":"wazuh-states-vulnerabilities-*"},"id":"wazuh-states-vulnerabilities-*","migrationVersion":{"index-pattern":"7.6.0"},"references":[],"type":"index-pattern","updated_at":"2024-08-08T16:23:10.532Z","version":"WzI4MCwxXQ=="}
-{"attributes":{"description":"","kibanaSavedObjectMeta":{"searchSourceJSON":"{\\"query\\":{\\"query\\":\\"\\",\\"language\\":\\"kuery\\"},\\"filter\\":[],\\"indexRefName\\":\\"kibanaSavedObjectMeta.searchSourceJSON.index\\"}"},"title":"vis","uiStateJSON":"{}","version":1,"visState":"{\\"title\\":\\"vis\\",\\"type\\":\\"area\\",\\"aggs\\":[{\\"id\\":\\"1\\",\\"enabled\\":true,\\"type\\":\\"count\\",\\"params\\":{},\\"schema\\":\\"metric\\"},{\\"id\\":\\"2\\",\\"enabled\\":true,\\"type\\":\\"terms\\",\\"params\\":{\\"field\\":\\"agent.name\\",\\"orderBy\\":\\"1\\",\\"order\\":\\"desc\\",\\"size\\":5,\\"otherBucket\\":false,\\"otherBucketLabel\\":\\"Other\\",\\"missingBucket\\":false,\\"missingBucketLabel\\":\\"Missing\\"},\\"schema\\":\\"segment\\"}],\\"params\\":{\\"type\\":\\"area\\",\\"grid\\":{\\"categoryLines\\":false},\\"categoryAxes\\":[{\\"id\\":\\"CategoryAxis-1\\",\\"type\\":\\"category\\",\\"position\\":\\"bottom\\",\\"show\\":true,\\"style\\":{},\\"scale\\":{\\"type\\":\\"linear\\"},\\"labels\\":{\\"show\\":true,\\"filter\\":true,\\"truncate\\":100},\\"title\\":{}}],\\"valueAxes\\":[{\\"id\\":\\"ValueAxis-1\\",\\"name\\":\\"LeftAxis-1\\",\\"type\\":\\"value\\",\\"position\\":\\"left\\",\\"show\\":true,\\"style\\":{},\\"scale\\":{\\"type\\":\\"linear\\",\\"mode\\":\\"normal\\"},\\"labels\\":{\\"show\\":true,\\"rotate\\":0,\\"filter\\":false,\\"truncate\\":100},\\"title\\":{\\"text\\":\\"Count\\"}}],\\"seriesParams\\":[{\\"show\\":true,\\"type\\":\\"area\\",\\"mode\\":\\"stacked\\",\\"data\\":{\\"label\\":\\"Count\\",\\"id\\":\\"1\\"},\\"drawLinesBetweenPoints\\":true,\\"lineWidth\\":2,\\"showCircles\\":true,\\"interpolate\\":\\"linear\\",\\"valueAxis\\":\\"ValueAxis-1\\"}],\\"addTooltip\\":true,\\"addLegend\\":true,\\"legendPosition\\":\\"right\\",\\"times\\":[],\\"addTimeMarker\\":false,\\"thresholdLine\\":{\\"show\\":false,\\"value\\":10,\\"width\\":1,\\"style\\":\\"full\\",\\"color\\":\\"#E7664C\\"},\\"labels\\":{}}}"},"id":"9caace70-55a1-11ef-a580-5b5ba88681be","migrationVersion":{"visualization":"7.10.0"},"references":[{"id":"wazuh-states-vulnerabilities-*","name":"kibanaSavedObjectMeta.searchSourceJSON.index","type":"index-pattern"}],"type":"visualization","updated_at":"2024-08-08T16:23:10.532Z","version":"WzI4MSwxXQ=="}
-{"attributes":{"description":"","hits":0,"kibanaSavedObjectMeta":{"searchSourceJSON":"{\\"query\\":{\\"query\\":\\"\\",\\"language\\":\\"kuery\\"},\\"filter\\":[]}"},"optionsJSON":"{\\"useMargins\\":true,\\"hidePanelTitles\\":false}","panelsJSON":"[{\\"version\\":\\"2.13.0\\",\\"gridData\\":{\\"x\\":0,\\"y\\":0,\\"w\\":24,\\"h\\":15,\\"i\\":\\"dde69adc-98bc-4c6d-bd0b-3756c9d0228e\\"},\\"panelIndex\\":\\"dde69adc-98bc-4c6d-bd0b-3756c9d0228e\\",\\"embeddableConfig\\":{},\\"panelRefName\\":\\"panel_0\\"}]","timeRestore":false,"title":"dash","version":1},"id":"94febc80-55a2-11ef-a580-5b5ba88681be","migrationVersion":{"dashboard":"7.9.3"},"references":[{"id":"9caace70-55a1-11ef-a580-5b5ba88681be","name":"panel_0","type":"visualization"}],"type":"dashboard","updated_at":"2024-08-08T16:23:44.456Z","version":"WzI4MiwxXQ=="}
-{"exportedCount":3,"missingRefCount":0,"missingReferences":[]}`;
 
 // Crear un Blob a partir del contenido NDJSON
 // const ndjsonBlob = new Blob([ndjsonData], { type: 'application/x-ndjson' });
@@ -213,66 +209,29 @@ const DashboardComponent = () => {
     }
   };
   useEffect(() => {
-    (async () => {
-      try {
-        const dashboardVuls = await WzRequest.genericReq(
-          'GET',
-          '/api/dashboards/vulnerabilityDashboard.ndjson',
-        );
-
-        // const dash = await fetch('./dashvis.ndjson');
-        // const blobDash = await dash.blob();
-        const ndjsonBlob = new Blob([dashboardVuls.data], {
-          type: 'application/x-ndjson',
-        });
-
-        const formdata = new FormData();
-        formdata.append('file', ndjsonBlob, 'ndjsonBlob.ndjson');
-
-        WzRequest.genericReq(
-          'POST',
-          '/api/saved_objects/_import?overwrite=true',
-          formdata,
-          { overwriteHeaders: { 'content-type': 'multipart/form-data' } },
-        );
-
-        const requestOptions = {
-          method: 'POST',
-          headers: {
-            ...PLUGIN_PLATFORM_REQUEST_HEADERS,
-            // 'content-type': 'multipart/form-data',
-          },
-          body: formdata,
-          // redirect: 'follow',
-        };
-        const tmpUrl = getHttp().basePath.prepend(
-          '/api/saved_objects/_import?overwrite=true',
-        );
-
-        // fetch(
-        //   'https://localhost:5601/api/saved_objects/_import?overwrite=true',
-        //   requestOptions,
-        // )
-      } catch (error) {
-        console.log(error);
-      }
-    })();
+    // (async () => {
+    //   try {
+    //     createDashboard();
+    //   } catch (error) {
+    //     console.error('Error create dashboard:', error);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // })();
     (async () => {
       try {
         const dashboards = await getAllDashboards();
         let targetDashboard = dashboards.find(
           dashboard =>
-            dashboard.attributes.title === 'Agents and Vuls' &&
-            dashboard.id === '6e71e2a1-89ca-49c9-b9e6-1f2aa404903b',
+            dashboard.attributes.title === 'dash' &&
+            dashboard.id === '94febc80-55a2-11ef-a580-5b5ba88681be',
         );
-
         if (!targetDashboard) {
           const newDashboardId = await createDashboard();
           if (newDashboardId) {
             targetDashboard = { id: newDashboardId };
           }
         }
-
         if (targetDashboard) {
           setIdDashboard(targetDashboard.id);
         }

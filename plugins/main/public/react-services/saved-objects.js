@@ -26,6 +26,7 @@ import { getDataPlugin, getSavedObjects } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { ErrorFactory } from './error-management';
 import { WarningError } from './error-management/error-factory/errors/WarningError';
+import { WzRequest } from '../react-services/wz-request';
 
 export class SavedObject {
   /**
@@ -243,288 +244,28 @@ export class SavedObject {
 
   /**
    * Create dashboard */
-  static async createSavedObjectDashboard(type, id, params, fields = '') {
+  static async createSavedObjectDashboard() {
     try {
-      const result = await GenericRequest.request(
-        'POST',
-        `/api/saved_objects/${type}/${id}`,
-        {
-          attributes: {
-            title: params.title,
-            description: params.description,
-            panelsJSON: params.panelsJSON,
-            optionsJSON: params.optionsJSON,
-            version: params.version,
-            timeRestore: params.timeRestore,
-            kibanaSavedObjectMeta: params.kibanaSavedObjectMeta,
-          },
-          references: params.references || [],
-        },
+      const dashboardVuls = await WzRequest.genericReq(
+        'GET',
+        '/api/dashboards/vulnerabilityDashboard.ndjson',
       );
-      const dashboardExists = await this.existsDashboard(id);
-      if (dashboardExists) {
-        console.log(`Dashboard with ID ${id} already exists.`);
-        return dashboardExists;
-      } else return result;
-    } catch (error) {
-      throw ((error || {}).data || {}).message || false
-        ? new Error(error.data.message)
-        : error;
-    }
-  }
 
-  /**
-   * Create dashboard */
-  static async createSavedObjectDashboard(type, id, params, fields = '') {
-    try {
-      const result = await GenericRequest.request(
-        'POST',
-        '/api/saved_objects/_bulk_create',
-        [
-          {
-            type: 'dashboard',
-            id: '6db1d75d-f680-4869-a0e8-0f2b8b05b99c',
-            attributes: {
-              title: 'My Dashboard',
-              description: 'Description of my dashboard',
-              panelsJSON:
-                '[{"panelIndex":1,"gridData":{"x":0,"y":0,"w":24,"h":15},"type":"visualization","id":"my-vega-visualization","version":"7.10.0"}]',
-              optionsJSON: '{"useMargins":true}',
-              version: 1,
-            },
-          },
-          {
-            type: 'visualization',
-            attributes: {
-              title: 'my-vega-visualization',
-              visState:
-                '{"title":"vuls","type":"area","aggs":[{"id":"1","enabled":true,"type":"count","params":{},"schema":"metric"},{"id":"2","enabled":true,"type":"terms","params":{"field":"vulnerability.score.temporal","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"},"schema":"segment"}],"params":{"type":"area","grid":{"categoryLines":false},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"filter":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":true,"type":"area","mode":"stacked","data":{"label":"Count","id":"1"},"drawLinesBetweenPoints":true,"lineWidth":2,"showCircles":true,"interpolate":"linear","valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false,"thresholdLine":{"show":false,"value":10,"width":1,"style":"full","color":"#E7664C"},"labels":{}}}',
-              uiStateJSON: '{}',
-              description: '',
-              version: 1,
-              kibanaSavedObjectMeta: {
-                searchSourceJSON:
-                  '{"query":{"query":"","language":"kuery"},"filter":[],"indexRefName":"kibanaSavedObjectMeta.searchSourceJSON.index"}',
-              },
-            },
-            references: [
-              {
-                name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-                type: 'index-pattern',
-                id: 'wazuh-states-vulnerabilities-*',
-              },
-            ],
-          },
-        ],
-      );
-      const dashboardExists = await this.existsDashboard(id);
-      if (dashboardExists) {
-        console.log(`Dashboard with ID ${id} already exists.`);
-        return dashboardExists;
-      } else return result;
-    } catch (error) {
-      throw ((error || {}).data || {}).message || false
-        ? new Error(error.data.message)
-        : error;
-    }
-  }
+      const ndjsonBlob = new Blob([dashboardVuls.data], {
+        type: 'application/x-ndjson',
+      });
 
-  /**
-   * Create dashboard */
-  static async createSavedObjectDashboard(type, id, params, fields = '') {
-    try {
-      const result = await GenericRequest.request(
-        'POST',
-        '/api/saved_objects/_bulk_create',
-        [
-          {
-            type: 'dashboard',
-            id: '6db1d75d-f680-4869-a0e8-0f2b8b05b99c',
-            attributes: {
-              title: 'My Dashboard',
-              description: 'Description of my dashboard',
-              panelsJSON:
-                '[{"panelIndex":1,"gridData":{"x":0,"y":0,"w":24,"h":15},"type":"visualization","id":"my-vega-visualization","version":"7.10.0"}]',
-              optionsJSON: '{"useMargins":true}',
-              version: 1,
-            },
-          },
-          {
-            type: 'visualization',
-            attributes: {
-              title: 'my-vega-visualization',
-              visState:
-                '{"title":"vuls","type":"area","aggs":[{"id":"1","enabled":true,"type":"count","params":{},"schema":"metric"},{"id":"2","enabled":true,"type":"terms","params":{"field":"vulnerability.score.temporal","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"},"schema":"segment"}],"params":{"type":"area","grid":{"categoryLines":false},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"filter":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":true,"type":"area","mode":"stacked","data":{"label":"Count","id":"1"},"drawLinesBetweenPoints":true,"lineWidth":2,"showCircles":true,"interpolate":"linear","valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false,"thresholdLine":{"show":false,"value":10,"width":1,"style":"full","color":"#E7664C"},"labels":{}}}',
-              uiStateJSON: '{}',
-              description: '',
-              version: 1,
-              kibanaSavedObjectMeta: {
-                searchSourceJSON:
-                  '{"query":{"query":"","language":"kuery"},"filter":[],"indexRefName":"kibanaSavedObjectMeta.searchSourceJSON.index"}',
-              },
-            },
-            references: [
-              {
-                name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-                type: 'index-pattern',
-                id: 'wazuh-states-vulnerabilities-*',
-              },
-            ],
-          },
-        ],
-      );
-      const dashboardExists = await this.existsDashboard(id);
-      if (dashboardExists) {
-        console.log(`Dashboard with ID ${id} already exists.`);
-        return dashboardExists;
-      } else return result;
-    } catch (error) {
-      throw ((error || {}).data || {}).message || false
-        ? new Error(error.data.message)
-        : error;
-    }
-  }
-  /**
-   * Create visualization */
-  static async createSavedObjectVisualization(type, id, params, fields = '') {
-    try {
-      const result = await GenericRequest.request(
-        'POST',
-        `/api/saved_objects/${type}/${id}`,
-        {
-          attributes: {
-            title: 'my-vega-visualization',
-            visState: JSON.stringify({
-              title: 'vuls',
-              type: 'area',
-              aggs: [
-                {
-                  id: '1',
-                  enabled: true,
-                  type: 'count',
-                  params: {},
-                  schema: 'metric',
-                },
-                {
-                  id: '2',
-                  enabled: true,
-                  type: 'terms',
-                  params: {
-                    field: 'vulnerability.score.temporal',
-                    orderBy: '1',
-                    order: 'desc',
-                    size: 5,
-                    otherBucket: false,
-                    otherBucketLabel: 'Other',
-                    missingBucket: false,
-                    missingBucketLabel: 'Missing',
-                  },
-                  schema: 'segment',
-                },
-              ],
-              params: {
-                type: 'area',
-                grid: {
-                  categoryLines: false,
-                },
-                categoryAxes: [
-                  {
-                    id: 'CategoryAxis-1',
-                    type: 'category',
-                    position: 'bottom',
-                    show: true,
-                    style: {},
-                    scale: {
-                      type: 'linear',
-                    },
-                    labels: {
-                      show: true,
-                      filter: true,
-                      truncate: 100,
-                    },
-                    title: {},
-                  },
-                ],
-                valueAxes: [
-                  {
-                    id: 'ValueAxis-1',
-                    name: 'LeftAxis-1',
-                    type: 'value',
-                    position: 'left',
-                    show: true,
-                    style: {},
-                    scale: {
-                      type: 'linear',
-                      mode: 'normal',
-                    },
-                    labels: {
-                      show: true,
-                      rotate: 0,
-                      filter: false,
-                      truncate: 100,
-                    },
-                    title: {
-                      text: 'Count',
-                    },
-                  },
-                ],
-                seriesParams: [
-                  {
-                    show: true,
-                    type: 'area',
-                    mode: 'stacked',
-                    data: {
-                      label: 'Count',
-                      id: '1',
-                    },
-                    drawLinesBetweenPoints: true,
-                    lineWidth: 2,
-                    showCircles: true,
-                    interpolate: 'linear',
-                    valueAxis: 'ValueAxis-1',
-                  },
-                ],
-                addTooltip: true,
-                addLegend: true,
-                legendPosition: 'right',
-                times: [],
-                addTimeMarker: false,
-                thresholdLine: {
-                  show: false,
-                  value: 10,
-                  width: 1,
-                  style: 'full',
-                  color: '#E7664C',
-                },
-                labels: {},
-              },
-            }),
-            uiStateJSON: '{}',
-            description: '',
-            version: 1,
-            kibanaSavedObjectMeta: {
-              searchSourceJSON: JSON.stringify({
-                query: {
-                  query: '',
-                  language: 'kuery',
-                },
-                filter: [],
-                indexRefName: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-              }),
-            },
-          },
-          references: [
-            {
-              name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-              type: 'index-pattern',
-              id: 'wazuh-states-vulnerabilities-*',
-            },
-          ],
-        },
-      );
-      console.log('visualizacion creada');
+      const formdata = new FormData();
+      formdata.append('file', ndjsonBlob, 'ndjsonBlob.ndjson');
 
-      return result;
+      const postDashboard = await WzRequest.genericReq(
+        'POST',
+        '/api/saved_objects/_import?overwrite=true',
+        formdata,
+        { overwriteHeaders: { 'content-type': 'multipart/form-data' } },
+      );
+      console.log(postDashboard, 'postDashboard');
+      return postDashboard;
     } catch (error) {
       throw ((error || {}).data || {}).message || false
         ? new Error(error.data.message)
