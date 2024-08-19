@@ -166,7 +166,11 @@ export const DrilldownConfigRepository = (
             width: 100,
             component: () => {
               const defaultTableColumns = [
-                { id: 'timestamp' },
+                {
+                  id: 'timestamp',
+                  isSortable: true,
+                  defaultSortDirection: 'desc',
+                },
                 { id: 'rule.description' },
                 { id: 'data.github.org', displayAsText: 'Organization' },
                 { id: 'data.github.actor', displayAsText: 'Actor' },

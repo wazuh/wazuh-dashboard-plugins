@@ -11,7 +11,15 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiPanel,
+  EuiToolTip,
+  EuiButtonIcon,
+  EuiDataGridCellValueElementProps,
+  EuiDataGrid,
+  EuiLink,
+} from '@elastic/eui';
 import { SecurityAlerts } from '../../../../visualize/components';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins, getCore } from '../../../../../kibana-services';
@@ -25,7 +33,11 @@ import {
   getVisStateTopActions,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
+import {
+  ErrorFactory,
+  HttpError,
+  ErrorHandler,
+} from '../../../../../react-services/error-management';
 import DrillDownDataGrid from './drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -117,13 +129,8 @@ const getDashboardPanels = (
 export const DrilldownConfigOrganization = (
   drilldownProps: ModuleConfigProps,
 ) => {
-
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern
-  } = drilldownProps;
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [
@@ -155,7 +162,7 @@ export const DrilldownConfigOrganization = (
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );
@@ -169,14 +176,18 @@ export const DrilldownConfigOrganization = (
             width: 100,
             component: () => {
               const defaultTableColumns = [
-                { id: 'timestamp' },
+                {
+                  id: 'timestamp',
+                  isSortable: true,
+                  defaultSortDirection: 'desc',
+                },
                 { id: 'rule.description' },
                 { id: 'data.github.repo', displayAsText: 'Repository' },
                 { id: 'data.github.actor', displayAsText: 'Actor' },
                 { id: 'data.github.action', displayAsText: 'Action' },
                 { id: 'rule.level' },
                 { id: 'rule.id' },
-              ]
+              ];
 
               return (
                 <DrillDownDataGrid
@@ -186,7 +197,7 @@ export const DrilldownConfigOrganization = (
                   searchBarProps={searchBarProps}
                   indexPattern={indexPattern}
                 />
-              )
+              );
             },
           },
         ],

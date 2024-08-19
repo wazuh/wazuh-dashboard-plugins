@@ -463,6 +463,8 @@ export class FileDetails extends Component {
       ? [
           {
             id: 'timestamp',
+            isSortable: true,
+            defaultSortDirection: 'desc',
             displayAsText: 'Time',
             render: value => formatUIDate(value),
           },
@@ -491,6 +493,8 @@ export class FileDetails extends Component {
       : [
           {
             id: 'timestamp',
+            isSortable: true,
+            defaultSortDirection: 'desc',
             displayAsText: 'Time',
             render: value => formatUIDate(value),
           },

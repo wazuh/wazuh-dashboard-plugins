@@ -11,7 +11,15 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiPanel,
+  EuiToolTip,
+  EuiButtonIcon,
+  EuiDataGridCellValueElementProps,
+  EuiDataGrid,
+  EuiLink,
+} from '@elastic/eui';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
@@ -24,7 +32,11 @@ import {
   getVisStateTopRepositories,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
+import {
+  ErrorFactory,
+  HttpError,
+  ErrorHandler,
+} from '../../../../../react-services/error-management';
 import DrillDownDataGrid from './drilldown-data-grid';
 import { rules } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -114,13 +126,8 @@ const getDashboardPanels = (
 };
 
 export const DrilldownConfigActor = (drilldownProps: ModuleConfigProps) => {
-
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern
-  } = drilldownProps;
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [
@@ -141,7 +148,7 @@ export const DrilldownConfigActor = (drilldownProps: ModuleConfigProps) => {
                       id: 'github-drilldown-action-dashboard-tab',
                       timeRange: {
                         from: searchBarProps.dateRangeFrom,
-                        to: searchBarProps.dateRangeTo
+                        to: searchBarProps.dateRangeTo,
                       },
                       title: 'GitHub drilldown action dashboard',
                       description: 'Dashboard of the GitHub drilldown action',
@@ -152,7 +159,7 @@ export const DrilldownConfigActor = (drilldownProps: ModuleConfigProps) => {
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );
@@ -166,14 +173,18 @@ export const DrilldownConfigActor = (drilldownProps: ModuleConfigProps) => {
             width: 100,
             component: () => {
               const defaultTableColumns = [
-                { id: 'timestamp' },
+                {
+                  id: 'timestamp',
+                  isSortable: true,
+                  defaultSortDirection: 'desc',
+                },
                 { id: 'rule.description' },
                 { id: 'data.github.org', displayAsText: 'Organization' },
                 { id: 'data.github.repo', displayAsText: 'Repository' },
                 { id: 'data.github.action', displayAsText: 'Action' },
                 { id: 'rule.level' },
-                { id: 'rule.id' }
-              ]
+                { id: 'rule.id' },
+              ];
 
               return (
                 <DrillDownDataGrid
@@ -183,9 +194,9 @@ export const DrilldownConfigActor = (drilldownProps: ModuleConfigProps) => {
                   searchBarProps={searchBarProps}
                   indexPattern={indexPattern}
                 />
-              )
+              );
             },
-          }
+          },
         ],
       },
     ],

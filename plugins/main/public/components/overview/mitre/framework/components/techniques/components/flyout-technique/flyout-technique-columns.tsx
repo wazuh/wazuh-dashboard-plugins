@@ -5,6 +5,8 @@ import { tDataGridColumn } from '../../../../../../../common/data-grid';
 export const techniquesColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
     displayAsText: 'Time',
     render: value => formatUIDate(value),
   },
@@ -29,6 +31,8 @@ export const techniquesColumns: tDataGridColumn[] = [
 export const agentTechniquesColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
     displayAsText: 'Time',
     render: value => formatUIDate(value),
   },
