@@ -172,31 +172,30 @@ export const exportSearchToCSV = async (
 export const parseColumns = (
   fields: IFieldType[],
   defaultColumns: tDataGridColumn[] = [],
-): EuiDataGridColumn[] => {
+): tDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
   // merge the properties of the field with the default columns
   if (!fields?.length) {
     return defaultColumns;
   }
 
-  const columns =
-    fields
-      .filter(field => field.name !== '_source')
-      .map(field => {
-        const defaultColumn = defaultColumns.find(
-          column => column.id === field.name,
-        );
-        return {
-          ...field,
-          id: field.name,
-          name: field.name,
-          schema: field.type,
-          actions: {
-            showHide: true,
-          },
-          ...defaultColumn,
-        };
-      }) || [];
+  const columns = fields
+    .filter(field => field.name !== '_source')
+    .map(field => {
+      const defaultColumn = defaultColumns.find(
+        column => column.id === field.name,
+      );
+      return {
+        ...field,
+        id: field.name,
+        name: field.name,
+        schema: field.type,
+        actions: {
+          showHide: true,
+        },
+        ...defaultColumn,
+      };
+    }) as tDataGridColumn[];
   return columns;
 };
 
