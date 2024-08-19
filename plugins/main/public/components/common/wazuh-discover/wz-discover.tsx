@@ -81,7 +81,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
+    fetchPageData,
     setFilters,
+    fetchDateRange
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     repository: AlertsRepository, // this makes only works with alerts index pattern
     DataSource,
@@ -155,11 +157,29 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(pagination),
     JSON.stringify(sorting),
     dateRangeFrom,
     dateRangeTo,
   ]);
+
+
+  useEffect(() => {
+    fetchPageData({
+      query,
+      pagination,
+      sorting
+    })
+      .then(results => setResults(results))
+      .catch(error => {
+        const searchError = ErrorFactory.create(HttpError, {
+          error,
+          message: 'Error fetching data',
+        });
+        ErrorHandler.handleError(searchError);
+      });
+  }, [
+    JSON.stringify(pagination),
+  ])
 
   const timeField = indexPattern?.timeFieldName
     ? indexPattern.timeFieldName
@@ -262,6 +282,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           isExporting={isExporting}
                           onClickExportResults={onClickExportResults}
                           maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                          dateRange={fetchDateRange}
                         />
                       </>
                     ),
