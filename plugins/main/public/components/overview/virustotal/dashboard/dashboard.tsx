@@ -70,7 +70,7 @@ const DashboardVT: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -112,10 +112,11 @@ const DashboardVT: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         <div
-          className={`virustotal-dashboard-responsive ${!isDataSourceLoading && dataSource && results?.hits?.total > 0
+          className={`virustotal-dashboard-responsive ${
+            !isDataSourceLoading && dataSource && results?.hits?.total > 0
               ? ''
               : 'wz-no-display'
-            }`}
+          }`}
         >
           <DashboardByRenderer
             input={{
