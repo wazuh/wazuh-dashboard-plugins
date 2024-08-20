@@ -11,21 +11,21 @@ CLUSTER_DISABLED="${CLUSTER_DISABLED:-no}"
 
 if [ ! -f $WITNESS_FILE_PATH ]; then
     # Set right permissions for test_config data
-    chown root:ossec /var/ossec/etc/ossec.conf
-    chown root:ossec /var/ossec/etc/client.keys
-    chown -R ossec:ossec /var/ossec/queue/agent-groups
-    chown -R ossec:ossec /var/ossec/etc/shared
-    chown root:ossec /var/ossec/etc/shared/ar.conf
-    chown -R ossecr:ossec /var/ossec/queue/agent-info
+    chown root:wazuh_server /var/wazuh_server/etc/wazuh_server.conf
+    chown root:wazuh_server /var/wazuh_server/etc/client.keys
+    chown -R wazuh_server:wazuh_server /var/wazuh_server/queue/agent-groups
+    chown -R wazuh_server:wazuh_server /var/wazuh_server/etc/shared
+    chown root:wazuh_server /var/wazuh_server/etc/shared/ar.conf
+    chown -R wazuh_server:wazuh_server /var/wazuh_server/queue/agent-info
 
-    # Modify ossec.conf
-    sed -i "s:<key></key>:<key>$NODE_KEY</key>:g" /var/ossec/etc/ossec.conf
-    sed -i "s:<node>NODE_IP</node>:<node>$NODE_IP</node>:g" /var/ossec/etc/ossec.conf
-    sed -i "s:<name>wazuh</name>:<name>$CLUSTER_NAME</name>:g" /var/ossec/etc/ossec.conf
-    sed -i -e "/<cluster>/,/<\/cluster>/ s|<disabled>[a-z]\+</disabled>|<disabled>$CLUSTER_DISABLED</disabled>|g" /var/ossec/etc/ossec.conf
-    sed -i "s:<node_name>node01</node_name>:<node_name>$NODE_NAME</node_name>:g" /var/ossec/etc/ossec.conf
-    sed -i "s:<node_type>master</node_type>:<node_type>$NODE_TYPE</node_type>:g" /var/ossec/etc/ossec.conf
-    
+    # Modify wazuh_server.conf
+    sed -i "s:<key></key>:<key>$NODE_KEY</key>:g" /var/wazuh_server/etc/wazuh_server.conf
+    sed -i "s:<node>NODE_IP</node>:<node>$NODE_IP</node>:g" /var/wazuh_server/etc/wazuh_server.conf
+    sed -i "s:<name>wazuh</name>:<name>$CLUSTER_NAME</name>:g" /var/wazuh_server/etc/wazuh_server.conf
+    sed -i -e "/<cluster>/,/<\/cluster>/ s|<disabled>[a-z]\+</disabled>|<disabled>$CLUSTER_DISABLED</disabled>|g" /var/wazuh_server/etc/wazuh_server.conf
+    sed -i "s:<node_name>node01</node_name>:<node_name>$NODE_NAME</node_name>:g" /var/wazuh_server/etc/wazuh_server.conf
+    sed -i "s:<node_type>master</node_type>:<node_type>$NODE_TYPE</node_type>:g" /var/wazuh_server/etc/wazuh_server.conf
+
     # Create a witness file
     touch $WITNESS_FILE_PATH
 fi
@@ -38,6 +38,6 @@ service filebeat start
 sleep 1
 
 service wazuh-manager restart
-/var/ossec/bin/wazuh-apid restart
+/var/wazuh_server/bin/wazuh-apid restart
 
 /usr/bin/supervisord

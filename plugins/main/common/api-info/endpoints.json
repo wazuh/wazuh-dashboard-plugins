@@ -2055,7 +2055,7 @@
       {
         "name": "/decoders",
         "documentation": "https://documentation.wazuh.com/4.9/user-manual/api/reference.html#operation/api.controllers.decoder_controller.get_decoders",
-        "description": "Return information about all decoders included in ossec.conf. This information include decoder's route, decoder's name, decoder's file among others",
+        "description": "Return information about all decoders included in wazuh_server.conf. This information include decoder's route, decoder's name, decoder's file among others",
         "summary": "List decoders",
         "tags": ["Decoders"],
         "query": [
@@ -9469,7 +9469,7 @@
           },
           {
             "name": "file_path",
-            "description": "Full path to the WPK file. The file must be on a folder on the Server's installation directory (by default, <code>/var/ossec</code>)",
+            "description": "Full path to the WPK file. The file must be on a folder on the Server's installation directory (by default, <code>/var/wazuh_server</code>)",
             "required": true,
             "schema": {
               "type": "string",
