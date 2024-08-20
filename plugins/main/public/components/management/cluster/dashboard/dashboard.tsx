@@ -80,7 +80,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -95,7 +95,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(absoluteDateRange)
+    JSON.stringify(absoluteDateRange),
   ]);
 
   const setBooleans = (component: string | null) => {
