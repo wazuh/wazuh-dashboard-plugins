@@ -116,13 +116,15 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     to: timeFilter.to,
   });
 
-  const { searchBarProps, absoluteDateRange } = useSearchBar({
+  const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
     setQuery,
     setTimeFilter: setDateRange,
   } as tUseSearchBarProps);
+
+  const { absoluteDateRange } = searchBarProps;
 
   const parseSorting = useMemo(() => {
     if (!sorting) {
