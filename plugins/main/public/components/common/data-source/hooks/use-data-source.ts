@@ -14,7 +14,6 @@ import {
 import { TimeRange } from '../../../../../../../src/plugins/data/public';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 import { useIsMounted } from '../../hooks/use-is-mounted';
-import { transformDateRange } from '../../search-bar/search-bar-service';
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   DataSource: IDataSourceFactoryConstructor<K>;
