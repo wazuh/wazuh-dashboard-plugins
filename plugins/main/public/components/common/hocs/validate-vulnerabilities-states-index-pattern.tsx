@@ -49,14 +49,12 @@ export async function createDashboard() {
   try {
     // Create the dashboard
     const result = await SavedObject.createSavedObjectDashboard();
-    console.log('Dashboard import:', result);
 
     let targetDashboard = result?.data?.successResults?.find(
       dashboard => dashboard.id === '94febc80-55a2-11ef-a580-5b5ba88681be',
     );
 
     if (result) {
-      console.log(`Dashboard created successfully.`);
       return targetDashboard;
     } else {
       console.error('Failed to create dashboard.');

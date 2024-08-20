@@ -264,7 +264,6 @@ export class SavedObject {
         formdata,
         { overwriteHeaders: { 'content-type': 'multipart/form-data' } },
       );
-      console.log(postDashboard, 'postDashboard');
       return postDashboard;
     } catch (error) {
       throw ((error || {}).data || {}).message || false
@@ -281,7 +280,6 @@ export class SavedObject {
         'GET',
         '/api/saved_objects/_find?type=dashboard',
       );
-      console.log(allDashboards, 'allDashboards');
       return allDashboards;
     } catch (error) {
       throw ((error || {}).data || {}).message || false
@@ -298,7 +296,6 @@ export class SavedObject {
         'GET',
         `/api/saved_objects/dashboard/${savedObjectId}`,
       );
-      console.log(dashboardForId, 'dashboardForId');
       return dashboardForId;
     } catch (error) {
       throw ((error || {}).data || {}).message || false
