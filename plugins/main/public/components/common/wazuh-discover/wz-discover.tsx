@@ -81,9 +81,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
-    fetchPageData,
-    setFilters,
-    fetchDateRange
+    setFilters
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     repository: AlertsRepository, // this makes only works with alerts index pattern
     DataSource,
@@ -117,7 +115,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     filters,
     setFilters,
   });
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
@@ -144,7 +142,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       query,
       pagination,
       sorting,
-      dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -158,28 +156,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
     JSON.stringify(sorting),
-    dateRangeFrom,
-    dateRangeTo,
-  ]);
-
-
-  useEffect(() => {
-    fetchPageData({
-      query,
-      pagination,
-      sorting
-    })
-      .then(results => setResults(results))
-      .catch(error => {
-        const searchError = ErrorFactory.create(HttpError, {
-          error,
-          message: 'Error fetching data',
-        });
-        ErrorHandler.handleError(searchError);
-      });
-  }, [
     JSON.stringify(pagination),
-  ])
+
+    JSON.stringify(absoluteDateRange),
+  ]);
 
   const timeField = indexPattern?.timeFieldName
     ? indexPattern.timeFieldName
@@ -282,7 +262,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           isExporting={isExporting}
                           onClickExportResults={onClickExportResults}
                           maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                          dateRange={fetchDateRange}
+                          dateRange={absoluteDateRange}
                         />
                       </>
                     ),

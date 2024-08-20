@@ -51,9 +51,6 @@ type tUseDataSourceLoadedReturns<K> = {
   */
   fixedFilters: tFilter[];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
-  fetchPageData: (
-    params: Omit<tSearchParams, 'filters' | 'dateRange'>,
-  ) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: PatternDataSourceFilterManager;
   fetchDateRange: TimeRange;
@@ -75,9 +72,6 @@ type tUseDataSourceNotLoadedReturns = {
   */
   fixedFilters: [];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
-  fetchPageData: (
-    params: Omit<tSearchParams, 'filters' | 'dateRange'>,
-  ) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: null;
 };
@@ -129,21 +123,6 @@ export function useDataSource<
       return;
     }
     const paramsWithSignal = { ...params, signal: getAbortController().signal };
-    setFetchDateRange(transformDateRange(params.dateRange));
-    return await dataSourceFilterManager?.fetch(paramsWithSignal);
-  };
-
-  const fetchPageData = async (
-    params: Omit<tSearchParams, 'filters' | 'dateRange'>,
-  ) => {
-    if (!dataSourceFilterManager) {
-      return;
-    }
-    const paramsWithSignal = {
-      ...params,
-      dateRange: fetchDateRange,
-      signal: getAbortController().signal,
-    };
     return await dataSourceFilterManager?.fetch(paramsWithSignal);
   };
 
@@ -213,7 +192,6 @@ export function useDataSource<
       fetchFilters: [],
       fixedFilters: [],
       fetchData,
-      fetchPageData,
       setFilters,
       filterManager: null,
     };
@@ -225,7 +203,6 @@ export function useDataSource<
       fetchFilters,
       fixedFilters,
       fetchData,
-      fetchPageData,
       setFilters,
       filterManager: dataSourceFilterManager as PatternDataSourceFilterManager,
       fetchDateRange,
