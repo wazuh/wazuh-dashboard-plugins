@@ -3,7 +3,11 @@ import { SearchResponse } from '../../../../../../../src/core/server';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { ErrorFactory, ErrorHandler, HttpError } from '../../../../react-services/error-management';
+import {
+  ErrorFactory,
+  ErrorHandler,
+  HttpError,
+} from '../../../../react-services/error-management';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import { EuiSpacer, EuiFlexItem } from '@elastic/eui';
@@ -78,17 +82,21 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
       query,
       dateRange: absoluteDateRange,
     })
-      .then((results) => {
+      .then(results => {
         setResults(results);
       })
-      .catch((error) => {
+      .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query), JSON.stringify(absoluteDateRange)]);
+  }, [
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+    JSON.stringify(absoluteDateRange),
+  ]);
 
   const setBooleans = (component: string | null) => {
     setState({
@@ -148,10 +156,17 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
         {isDataSourceLoading && !dataSource ? (
           <LoadingSpinner />
         ) : !state.showNodes ? (
-          <WzSearchBar appName="ct-searchbar" {...searchBarProps} fixedFilters={fixedFilters} />
+          <WzSearchBar
+            appName='ct-searchbar'
+            {...searchBarProps}
+            fixedFilters={fixedFilters}
+          />
         ) : null}
-        <EuiSpacer size="m" />
-        {!isDataSourceLoading && dataSource && !state.showConfig && !state.showNodes ? (
+        <EuiSpacer size='m' />
+        {!isDataSourceLoading &&
+        dataSource &&
+        !state.showConfig &&
+        !state.showNodes ? (
           <OverviewCards
             goNodes={goNodes}
             goAgents={goAgents}
