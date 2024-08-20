@@ -74,7 +74,10 @@ export const search = async (
   const fromField = (pagination?.pageIndex || 0) * paginationPageSize;
   // If the paginationPageSize + the offset exceeds the 10000 result limit of OpenSearch, truncates the page size
   // to avoid an exception
-  const pageSize = paginationPageSize + fromField < MAX_ENTRIES_PER_QUERY ? paginationPageSize: MAX_ENTRIES_PER_QUERY - fromField;
+  const pageSize =
+    paginationPageSize + fromField < MAX_ENTRIES_PER_QUERY
+      ? paginationPageSize
+      : MAX_ENTRIES_PER_QUERY - fromField;
   const sortOrder: OpenSearchQuerySortValue[] =
     sorting?.columns?.map(column => {
       const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
