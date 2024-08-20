@@ -1155,12 +1155,6 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      // context.wazuh.logger.debug(
-      //   `Getting ${context.wazuhEndpointParams.pathFilename} report`,
-      // );
-      // const reportFileBuffer = fs.readFileSync(
-      //   context.wazuhEndpointParams.pathFilename,
-      // );
       const dashboardName = request.params.name;
       const dashboardFilePath = path.join(
         __dirname,
@@ -1168,11 +1162,7 @@ export class WazuhApiCtrl {
         dashboardName,
       );
       const dashboardFile = fs.readFileSync(dashboardFilePath);
-      console.log(dashboardFile, 'dashboardFile');
-      console.log(request.params, 'hola');
-      // return response.ok({
-      //   body: 'hola',
-      // });
+
       return response.ok({
         headers: { 'Content-Type': 'application/x-ndjson' },
         body: dashboardFile,
