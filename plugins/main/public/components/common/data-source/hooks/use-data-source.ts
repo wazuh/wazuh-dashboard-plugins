@@ -90,7 +90,9 @@ export function useDataSource<
     useHash: config.get(OSD_URL_STATE_STORAGE_ID),
     history: history,
   });
-  const defaultFilters = osdUrlStateStorage.get('_a')?.filters ?? [];
+  const appDefaultFilters = osdUrlStateStorage.get('_a')?.filters ?? [];
+  const globalDefaultFilters = osdUrlStateStorage.get('_g')?.filters ?? [];
+  const defaultFilters = [...appDefaultFilters, ...globalDefaultFilters];
   const {
     filters: initialFilters = [...defaultFilters],
     fetchFilters: initialFetchFilters = [],
