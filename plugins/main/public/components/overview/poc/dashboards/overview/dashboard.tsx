@@ -6,7 +6,7 @@ import { compose } from 'redux';
 import {
   withVulnerabilitiesStateDataSource,
   createDashboard,
-} from '../../../../common/hocs/validate-vulnerabilities-states-index-pattern';
+} from '../../../../common/hocs/validate-states-index-pattern-and-dashboards';
 import { SavedObject } from '../../../../../react-services';
 import { EuiButton } from '@elastic/eui';
 

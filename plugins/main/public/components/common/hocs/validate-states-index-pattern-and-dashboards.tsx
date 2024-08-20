@@ -1,14 +1,14 @@
 import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { withGuardAsync } from '../../common/hocs';
+import { withGuardAsync } from '.';
 import { getSavedObjects } from '../../../kibana-services';
 import { SavedObject } from '../../../react-services';
 import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../common/constants';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { vulnerabilityDetection } from '../../../utils/applications';
-import { LoadingSpinnerDataSource } from '../../common/loading/loading-spinner-data-source';
+import { LoadingSpinnerDataSource } from '../loading/loading-spinner-data-source';
 import NavigationService from '../../../react-services/navigation-service';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
