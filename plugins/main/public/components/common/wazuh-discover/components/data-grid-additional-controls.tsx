@@ -55,7 +55,7 @@ const DiscoverDataGridAdditionalControls = (props: tDiscoverDataGridAdditionalCo
       >
         <EuiFlexItem grow={false}>
           <EuiText size="s">
-            {formatUIDate(dateRange?.to)} - {formatUIDate(dateRange?.from)}
+            {formatUIDate(dateRange?.from)} - {formatUIDate(dateRange?.to)}
           </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
