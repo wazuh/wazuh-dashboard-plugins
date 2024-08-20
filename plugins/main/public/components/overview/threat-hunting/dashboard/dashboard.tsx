@@ -55,6 +55,7 @@ import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner'
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { wzDiscoverRenderColumns } from '../../../common/wazuh-discover/render-columns';
 import { WzSearchBar } from '../../../common/search-bar';
+import DiscoverDataGridAdditionalControls from '../../../common/wazuh-discover/components/data-grid-additional-controls'
 
 import DocDetailsHeader from '../../../common/wazuh-discover/components/doc-details-header';
 
@@ -84,7 +85,7 @@ const DashboardTH: React.FC = () => {
     filters,
     setFilters,
   });
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -147,10 +148,7 @@ const DashboardTH: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange
   });
 
   useEffect(() => {
@@ -161,10 +159,7 @@ const DashboardTH: React.FC = () => {
       query,
       pagination,
       sorting,
-      dateRange: {
-        from: dateRangeFrom,
-        to: dateRangeTo,
-      },
+      dateRange: absoluteDateRange
     })
       .then(results => {
         setResults(results);
@@ -181,8 +176,7 @@ const DashboardTH: React.FC = () => {
     JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
-    dateRangeFrom,
-    dateRangeTo,
+    JSON.stringify(absoluteDateRange)
   ]);
 
   const onClickExportResults = async () => {
@@ -231,11 +225,10 @@ const DashboardTH: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         <div
-          className={`th-container ${
-            !isDataSourceLoading && dataSource && results?.hits?.total > 0
-              ? ''
-              : 'wz-no-display'
-          }`}
+          className={`th-container ${!isDataSourceLoading && dataSource && results?.hits?.total > 0
+            ? ''
+            : 'wz-no-display'
+            }`}
         >
           <SampleDataWarning />
           <div className='th-dashboard-responsive'>
@@ -247,10 +240,7 @@ const DashboardTH: React.FC = () => {
                 filters: fetchFilters ?? [],
                 useMargins: true,
                 id: 'kpis-th-dashboard-tab',
-                timeRange: {
-                  from: dateRangeFrom,
-                  to: dateRangeTo,
-                },
+                timeRange: absoluteDateRange,
                 title: 'KPIs Threat Hunting dashboard',
                 description: 'KPIs Dashboard of the Threat Hunting',
                 query: query,
@@ -272,10 +262,7 @@ const DashboardTH: React.FC = () => {
                 filters: fetchFilters ?? [],
                 useMargins: true,
                 id: 'th-dashboard-tab',
-                timeRange: {
-                  from: dateRangeFrom,
-                  to: dateRangeTo,
-                },
+                timeRange: absoluteDateRange,
                 title: 'Threat Hunting dashboard',
                 description: 'Dashboard of the Threat Hunting',
                 query: query,
@@ -294,40 +281,13 @@ const DashboardTH: React.FC = () => {
                   toolbarVisibility={{
                     additionalControls: (
                       <>
-                        <HitsCounter
-                          hits={results?.hits?.total}
-                          showResetButton={false}
-                          onResetQuery={() => {}}
-                          tooltip={
-                            results?.hits?.total &&
-                            results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                              ? {
-                                  ariaLabel: 'Warning',
-                                  content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                                    MAX_ENTRIES_PER_QUERY,
-                                  )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                    MAX_ENTRIES_PER_QUERY,
-                                  )} hits.`,
-                                  iconType: 'alert',
-                                  position: 'top',
-                                }
-                              : undefined
-                          }
+                        <DiscoverDataGridAdditionalControls
+                          totalHits={results?.hits?.total || 0}
+                          isExporting={isExporting}
+                          onClickExportResults={onClickExportResults}
+                          maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                          dateRange={absoluteDateRange}
                         />
-                        <EuiButtonEmpty
-                          disabled={
-                            results?.hits?.total === 0 ||
-                            !columnVisibility?.visibleColumns?.length
-                          }
-                          size='xs'
-                          iconType='exportAction'
-                          color='primary'
-                          isLoading={isExporting}
-                          className='euiDataGrid__controlBtn'
-                          onClick={onClickExportResults}
-                        >
-                          Export Formated
-                        </EuiButtonEmpty>
                       </>
                     ),
                   }}
@@ -360,7 +320,7 @@ const DashboardTH: React.FC = () => {
           </div>
         </div>
       </>
-    </I18nProvider>
+    </I18nProvider >
   );
 };
 

@@ -47,7 +47,7 @@ const DiscoverDataGridAdditionalControls = (props: tDiscoverDataGridAdditionalCo
             : undefined
         }
       />
-      <EuiFlexGroup
+      {dateRange ? (<EuiFlexGroup
         gutterSize="s"
         responsive={false}
         justifyContent="center"
@@ -58,7 +58,8 @@ const DiscoverDataGridAdditionalControls = (props: tDiscoverDataGridAdditionalCo
             {formatUIDate(dateRange?.from)} - {formatUIDate(dateRange?.to)}
           </EuiText>
         </EuiFlexItem>
-      </EuiFlexGroup>
+      </EuiFlexGroup>) : null
+      }
       <EuiButtonEmpty
         disabled={totalHits === 0 || isExporting}
         size="xs"

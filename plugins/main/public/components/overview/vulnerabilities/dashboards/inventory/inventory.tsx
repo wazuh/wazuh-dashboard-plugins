@@ -217,17 +217,17 @@ const InventoryVulsComponent = () => {
                             showResetButton={false}
                             tooltip={
                               results?.hits?.total &&
-                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                                results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
-                                    ariaLabel: 'Warning',
-                                    content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                                      MAX_ENTRIES_PER_QUERY,
-                                    )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                      MAX_ENTRIES_PER_QUERY,
-                                    )} hits.`,
-                                    iconType: 'alert',
-                                    position: 'top',
-                                  }
+                                  ariaLabel: 'Warning',
+                                  content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                                    MAX_ENTRIES_PER_QUERY,
+                                  )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                    MAX_ENTRIES_PER_QUERY,
+                                  )} hits.`,
+                                  iconType: 'alert',
+                                  position: 'top',
+                                }
                                 : undefined
                             }
                           />

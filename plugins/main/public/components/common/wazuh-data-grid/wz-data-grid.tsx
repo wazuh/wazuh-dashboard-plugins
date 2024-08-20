@@ -51,6 +51,7 @@ export type tWazuhDataGridProps = {
   };
   query: any;
   exportFilters: tFilter[];
+  dateRange: TimeRange;
   onChangePagination: (pagination: {
     pageIndex: number;
     pageSize: number;
@@ -69,6 +70,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     exportFilters = [],
     onChangeSorting,
     query,
+    dateRange
   } = props;
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -175,6 +177,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
                     isExporting={isExporting}
                     onClickExportResults={onClickExportResults}
                     maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                    dateRange={dateRange}
                   />
                 </>
               ),

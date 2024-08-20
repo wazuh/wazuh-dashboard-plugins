@@ -157,7 +157,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     JSON.stringify(query),
     JSON.stringify(sorting),
     JSON.stringify(pagination),
-
     JSON.stringify(absoluteDateRange),
   ]);
 
@@ -243,8 +242,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                         AlertsRepository.getStoreIndexPatternId(),
                         fetchFilters,
                         query,
-                        dateRangeFrom,
-                        dateRangeTo,
+                        absoluteDateRange.from,
+                        absoluteDateRange.to,
                       )}
                     />
                   </EuiPanel>

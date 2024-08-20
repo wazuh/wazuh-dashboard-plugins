@@ -102,7 +102,10 @@ const useSearchBarConfiguration = (
    * Search bar properties necessary to render and initialize the osd search bar component
    */
   const searchBarProps: Partial<
-    SearchBarProps & { useDefaultBehaviors: boolean }
+    SearchBarProps & {
+      useDefaultBehaviors: boolean;
+      absoluteDateRange: TimeRange;
+    }
   > = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []

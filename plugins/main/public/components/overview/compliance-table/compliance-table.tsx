@@ -162,7 +162,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     setFilters,
   });
 
-  const { dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { absoluteDateRange } = searchBarProps;
   const [complianceData, setComplianceData] = useState({
     descriptions: {},
     complianceObject: {},
@@ -224,7 +224,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
         },
       };
 
-      const data = await fetchData({ aggs, query, dateRange });
+      const data = await fetchData({ aggs, query, dateRange: absoluteDateRange });
 
       return data?.aggregations?.tactics?.buckets || [];
     } catch (error) {
@@ -248,7 +248,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     props.section,
     dataSource,
     searchBarProps.query,
-    { from: dateRangeFrom, to: dateRangeTo },
+    absoluteDateRange,
   ]);
 
 
@@ -265,15 +265,14 @@ export const ComplianceTable = withAgentSupportModule(props => {
         section: props.section,
         fetchData,
         query: searchBarProps.query,
-        dateRange: { from: dateRangeFrom, to: dateRangeTo },
+        dateRange: absoluteDateRange
       });
     }
   }, [
     dataSource,
     JSON.stringify(searchBarProps.query),
     JSON.stringify(fetchFilters),
-    JSON.stringify(dateRangeFrom),
-    JSON.stringify(dateRangeTo),
+    JSON.stringify(absoluteDateRange),
   ]);
 
   return (
@@ -288,16 +287,16 @@ export const ComplianceTable = withAgentSupportModule(props => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='compliance-controls'
-                {...searchBarProps}
-                fixedFilters={fixedFilters}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-            )}
+            <WzSearchBar
+              appName='compliance-controls'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+              showSaveQuery={true}
+            />
+          )}
         </EuiPanel>
         <EuiPanel
           paddingSize='s'
