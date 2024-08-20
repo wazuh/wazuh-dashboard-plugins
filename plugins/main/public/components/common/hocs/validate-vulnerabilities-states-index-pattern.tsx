@@ -51,14 +51,10 @@ export async function createDashboard() {
     const result = await SavedObject.createSavedObjectDashboard();
     console.log('Dashboard import:', result);
 
-    let targetDashboard = result.find(
+    let targetDashboard = result?.data?.successResults?.find(
       dashboard => dashboard.id === '94febc80-55a2-11ef-a580-5b5ba88681be',
     );
-    //Create the visualization
-    // const pepe = await SavedObject.createSavedObjectbulk();
-    // console.log(pepe, 'pepe');
 
-    // If the dashboard is created successfully, ensure the visualization is correctly referenced
     if (result) {
       console.log(`Dashboard created successfully.`);
       return targetDashboard;
@@ -71,48 +67,6 @@ export async function createDashboard() {
     return null;
   }
 }
-
-// Function to add a visualization to an existing dashboard
-// async function addVisualizationToDashboard(dashboardId, visualizationId) {
-//   try {
-//     // Fetch the existing dashboard
-//     const data = await getSavedObjects().client.get('dashboard', dashboardId);
-//     console.log(data, 'data');
-//     const existingDashboard = data.attributes;
-
-//     // Modify the dashboard to include the new visualization
-//     const updatedPanelsJSON = JSON.parse(existingDashboard.panelsJSON);
-//     updatedPanelsJSON.push({
-//       version: '2.13.0',
-//       gridData: { x: 0, y: 0, w: 24, h: 15, i: visualizationId },
-//       panelIndex: visualizationId,
-//       embeddableConfig: {},
-//       panelRefName: 'panel_1',
-//     });
-
-//     // Update the dashboard with the new visualization
-//     const updateResult = await SavedObject.createSavedObjectDashboard(
-//       'dashboard',
-//       dashboardId,
-//       {
-//         ...existingDashboard,
-//         panelsJSON: JSON.stringify(updatedPanelsJSON),
-//       },
-//     );
-//     console.log('Dashboard updated with visualization:', updateResult);
-//   } catch (error) {
-//     console.error('Error updating dashboard with visualization:', error);
-//   }
-// }
-
-// createDashboard().then(dashboardId => {
-//   if (dashboardId) {
-//     addVisualizationToDashboard(
-//       dashboardId,
-//       '5db1d75d-f680-4869-a0e8-0f2b8b05b99c',
-//     );
-//   }
-// });
 
 export async function validateVulnerabilitiesStateDataSources({
   vulnerabilitiesStatesindexPatternID: indexPatternID,

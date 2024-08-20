@@ -273,37 +273,33 @@ export class SavedObject {
     }
   }
 
-  static async createSavedObjectbulk(type, id, params, fields = '') {
+  /**
+   * Get all dashboards */
+  static async getAllDashboards() {
     try {
-      const result = await GenericRequest.request(
-        'POST',
-        '/api/saved_objects/_bulk_create',
-        [
-          {
-            id: '67a9021c-c97e-4499-8150-9722ab44edd4',
-            type: 'visualization',
-            attributes: {
-              title: 'vega-visualization',
-              fieldFormatMap: '{"hour_of_day":{}}',
-              fields:
-                '[{"name":"@timestamp","type":"date","esTypes":["date"],"count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true}]',
-            },
-            version: '1',
-            migrationVersion: {},
-            references: [
-              {
-                id: 'ef71d6c1-8e6b-418d-9f7c-e5d9bbde9cf7',
-                type: 'data-source',
-                name: 'dataSource',
-              },
-            ],
-            initialNamespaces: ['default'],
-          },
-        ],
+      const allDashboards = await WzRequest.genericReq(
+        'GET',
+        '/api/saved_objects/_find?type=dashboard',
       );
-      console.log('bulk creado');
+      console.log(allDashboards, 'allDashboards');
+      return allDashboards;
+    } catch (error) {
+      throw ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : error;
+    }
+  }
 
-      return result;
+  /**
+   * Get dashboard for ID */
+  static async getDashboardForId(savedObjectId) {
+    try {
+      const dashboardForId = await WzRequest.genericReq(
+        'GET',
+        `/api/saved_objects/dashboard/${savedObjectId}`,
+      );
+      console.log(dashboardForId, 'dashboardForId');
+      return dashboardForId;
     } catch (error) {
       throw ((error || {}).data || {}).message || false
         ? new Error(error.data.message)
