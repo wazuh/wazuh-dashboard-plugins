@@ -12,6 +12,8 @@ export type SearchParams = {
 } & tSearchParams;
 
 import { parse } from 'query-string';
+import { MAX_ENTRIES_PER_QUERY } from '../data-grid/data-grid-service';
+const DEFAULT_PAGE_SIZE = 100;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // This methods are used to use correcty the forceNow setting in the date range picker
@@ -68,8 +70,14 @@ export const search = async (
   }
   const data = getPlugins().data;
   const searchSource = await data.search.searchSource.create();
-  const fromField =
-    (pagination?.pageIndex || 0) * (pagination?.pageSize || 100);
+  const paginationPageSize = pagination?.pageSize || DEFAULT_PAGE_SIZE;
+  const fromField = (pagination?.pageIndex || 0) * paginationPageSize;
+  // If the paginationPageSize + the offset exceeds the 10000 result limit of OpenSearch, truncates the page size
+  // to avoid an exception
+  const pageSize =
+    paginationPageSize + fromField < MAX_ENTRIES_PER_QUERY
+      ? paginationPageSize
+      : MAX_ENTRIES_PER_QUERY - fromField;
   const sortOrder: OpenSearchQuerySortValue[] =
     sorting?.columns?.map(column => {
       const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
@@ -111,7 +119,7 @@ export const search = async (
     .setField('filter', filters)
     .setField('query', query)
     .setField('sort', sortOrder)
-    .setField('size', pagination?.pageSize)
+    .setField('size', pageSize)
     .setField('from', fromField)
     .setField('index', indexPattern);
 
