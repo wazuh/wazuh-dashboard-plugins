@@ -31,7 +31,7 @@ const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-const DashboardFIMComponent: React.FC = ({ }) => {
+const DashboardFIMComponent: React.FC = ({}) => {
   const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
@@ -62,7 +62,7 @@ const DashboardFIMComponent: React.FC = ({ }) => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const DashboardFIMComponent: React.FC = ({ }) => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {

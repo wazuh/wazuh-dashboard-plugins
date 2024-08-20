@@ -31,7 +31,7 @@ const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-const DashboardDockerComponent: React.FC = ({ }) => {
+const DashboardDockerComponent: React.FC = ({}) => {
   const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
@@ -74,7 +74,7 @@ const DashboardDockerComponent: React.FC = ({ }) => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {

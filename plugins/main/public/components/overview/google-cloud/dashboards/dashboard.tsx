@@ -61,7 +61,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -70,7 +70,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {

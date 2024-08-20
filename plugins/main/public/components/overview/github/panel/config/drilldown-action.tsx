@@ -140,7 +140,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );

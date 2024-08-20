@@ -60,7 +60,7 @@ const DashboardOffice365Component: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const DashboardOffice365Component: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -109,8 +109,9 @@ const DashboardOffice365Component: React.FC = () => {
           ) : null}
 
           <div
-            className={`office-365-dashboard-responsive ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-              }`}
+            className={`office-365-dashboard-responsive ${
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }`}
           >
             <SampleDataWarning />
             <DashboardByRenderer

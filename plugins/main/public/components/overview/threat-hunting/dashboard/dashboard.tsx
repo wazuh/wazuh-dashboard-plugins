@@ -55,7 +55,7 @@ import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner'
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { wzDiscoverRenderColumns } from '../../../common/wazuh-discover/render-columns';
 import { WzSearchBar } from '../../../common/search-bar';
-import DiscoverDataGridAdditionalControls from '../../../common/wazuh-discover/components/data-grid-additional-controls'
+import DiscoverDataGridAdditionalControls from '../../../common/wazuh-discover/components/data-grid-additional-controls';
 
 import DocDetailsHeader from '../../../common/wazuh-discover/components/doc-details-header';
 
@@ -148,7 +148,7 @@ const DashboardTH: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -159,7 +159,7 @@ const DashboardTH: React.FC = () => {
       query,
       pagination,
       sorting,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -176,7 +176,7 @@ const DashboardTH: React.FC = () => {
     JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
-    JSON.stringify(absoluteDateRange)
+    JSON.stringify(absoluteDateRange),
   ]);
 
   const onClickExportResults = async () => {
@@ -225,10 +225,11 @@ const DashboardTH: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         <div
-          className={`th-container ${!isDataSourceLoading && dataSource && results?.hits?.total > 0
-            ? ''
-            : 'wz-no-display'
-            }`}
+          className={`th-container ${
+            !isDataSourceLoading && dataSource && results?.hits?.total > 0
+              ? ''
+              : 'wz-no-display'
+          }`}
         >
           <SampleDataWarning />
           <div className='th-dashboard-responsive'>
@@ -320,7 +321,7 @@ const DashboardTH: React.FC = () => {
           </div>
         </div>
       </>
-    </I18nProvider >
+    </I18nProvider>
   );
 };
 

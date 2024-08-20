@@ -206,7 +206,12 @@ export const ComplianceTable = withAgentSupportModule(props => {
     ];
   };
 
-  const getRequirementsCount = async ({ section, query, fetchData, dateRange }) => {
+  const getRequirementsCount = async ({
+    section,
+    query,
+    fetchData,
+    dateRange,
+  }) => {
     try {
       const mapFieldAgg = {
         pci: 'rule.pci_dss',
@@ -224,7 +229,11 @@ export const ComplianceTable = withAgentSupportModule(props => {
         },
       };
 
-      const data = await fetchData({ aggs, query, dateRange: absoluteDateRange });
+      const data = await fetchData({
+        aggs,
+        query,
+        dateRange: absoluteDateRange,
+      });
 
       return data?.aggregations?.tactics?.buckets || [];
     } catch (error) {
@@ -251,8 +260,6 @@ export const ComplianceTable = withAgentSupportModule(props => {
     absoluteDateRange,
   ]);
 
-
-
   useEffect(() => {
     const { descriptions, complianceObject, selectedRequirements } =
       buildComplianceObject({ section: props.section });
@@ -265,7 +272,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
         section: props.section,
         fetchData,
         query: searchBarProps.query,
-        dateRange: absoluteDateRange
+        dateRange: absoluteDateRange,
       });
     }
   }, [

@@ -83,7 +83,7 @@ const MitreComponent = props => {
   const [filterParams, setFilterParams] = useState<tFilterParams>({
     filters: fetchFilters,
     query: searchBarProps?.query,
-    time: absoluteDateRange
+    time: absoluteDateRange,
   });
   const [indexPattern, setIndexPattern] = useState<any>(); //Todo: Add correct type
   const [isLoading, setIsLoading] = useState(true);
@@ -93,7 +93,7 @@ const MitreComponent = props => {
     let filterParams = {
       filters: fetchFilters, // pass the fetchFilters to use it as initial filters in the technique flyout
       query: searchBarProps?.query,
-      time: absoluteDateRange
+      time: absoluteDateRange,
     };
     setFilterParams(filterParams);
     setIsLoading(true);
@@ -148,7 +148,12 @@ const MitreComponent = props => {
   return (
     <I18nProvider>
       <>
-        <EuiPanel paddingSize='none' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='none'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
@@ -162,7 +167,12 @@ const MitreComponent = props => {
             />
           )}
         </EuiPanel>
-        <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='s'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           <EuiPanel paddingSize='none'>
             <EuiFlexGroup>
               <EuiFlexItem

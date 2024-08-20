@@ -62,7 +62,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);

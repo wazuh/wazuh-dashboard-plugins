@@ -115,10 +115,11 @@ const DashboardVT: React.FC = () => {
           <DiscoverNoResults />
         ) : null}
         <div
-          className={`virustotal-dashboard-responsive ${!isDataSourceLoading && dataSource && results?.hits?.total > 0
-            ? ''
-            : 'wz-no-display'
-            }`}
+          className={`virustotal-dashboard-responsive ${
+            !isDataSourceLoading && dataSource && results?.hits?.total > 0
+              ? ''
+              : 'wz-no-display'
+          }`}
         >
           <DashboardByRenderer
             input={{

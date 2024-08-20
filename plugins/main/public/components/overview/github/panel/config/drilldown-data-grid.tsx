@@ -40,7 +40,6 @@ export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
       pagination,
       sorting,
       dateRange: searchBarProps.absoluteDateRange,
-
     })
       .then(results => {
         setResults(results);

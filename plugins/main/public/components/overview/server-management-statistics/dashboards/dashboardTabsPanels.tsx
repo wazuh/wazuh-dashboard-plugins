@@ -86,7 +86,7 @@ export const DashboardTabsPanels = ({
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);

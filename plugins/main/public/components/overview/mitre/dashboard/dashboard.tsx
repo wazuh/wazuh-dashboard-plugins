@@ -58,7 +58,7 @@ export const DashboardMITRE: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export const DashboardMITRE: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -105,8 +105,9 @@ export const DashboardMITRE: React.FC = () => {
             <DiscoverNoResults />
           ) : null}
           <div
-            className={`mitre-dashboard-responsive ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-              }`}
+            className={`mitre-dashboard-responsive ${
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }`}
           >
             <SampleDataWarning />
             <div className='mitre-dashboard-filters-wrapper'>

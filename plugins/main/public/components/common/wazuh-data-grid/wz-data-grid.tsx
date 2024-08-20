@@ -70,7 +70,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     exportFilters = [],
     onChangeSorting,
     query,
-    dateRange
+    dateRange,
   } = props;
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [isExporting, setIsExporting] = useState<boolean>(false);

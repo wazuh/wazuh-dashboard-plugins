@@ -149,7 +149,7 @@ export const DrilldownConfigRepository = (
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );

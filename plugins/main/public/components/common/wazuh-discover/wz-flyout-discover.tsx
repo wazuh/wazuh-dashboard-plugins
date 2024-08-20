@@ -7,7 +7,7 @@ import {
   EuiButtonIcon,
   Direction,
   EuiPanel,
-  EuiText
+  EuiText,
 } from '@elastic/eui';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
@@ -167,7 +167,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     JSON.stringify(query),
     JSON.stringify(sorting),
     JSON.stringify(pagination),
-    JSON.stringify(absoluteDateRange)
+    JSON.stringify(absoluteDateRange),
   ]);
 
   const toggleDetails = item => {
@@ -296,33 +296,35 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                   showResetButton={false}
                   tooltip={
                     results?.hits?.total &&
-                      results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                    results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
-                        ariaLabel: 'Warning',
-                        content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                          MAX_ENTRIES_PER_QUERY,
-                        )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                          MAX_ENTRIES_PER_QUERY,
-                        )} hits.`,
-                        iconType: 'alert',
-                        position: 'top',
-                      }
+                          ariaLabel: 'Warning',
+                          content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY,
+                          )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY,
+                          )} hits.`,
+                          iconType: 'alert',
+                          position: 'top',
+                        }
                       : undefined
                   }
                 />
-                {absoluteDateRange ? (<EuiFlexGroup
-                  gutterSize="s"
-                  responsive={false}
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiText size="s">
-                      {formatUIDate(absoluteDateRange?.from)} - {formatUIDate(absoluteDateRange?.to)}
-                    </EuiText>
-                  </EuiFlexItem>
-                </EuiFlexGroup>) : null
-                }
+                {absoluteDateRange ? (
+                  <EuiFlexGroup
+                    gutterSize='s'
+                    responsive={false}
+                    justifyContent='center'
+                    alignItems='center'
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiText size='s'>
+                        {formatUIDate(absoluteDateRange?.from)} -{' '}
+                        {formatUIDate(absoluteDateRange?.to)}
+                      </EuiText>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                ) : null}
               </EuiPanel>
               <EuiBasicTable
                 items={parsedItems}
@@ -335,7 +337,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                   totalItemCount:
                     (results?.hits?.total ?? 0) > MAX_ENTRIES_PER_QUERY
                       ? MAX_ENTRIES_PER_QUERY
-                      : results?.hits?.total ?? 0,
+                      : (results?.hits?.total ?? 0),
                 }}
                 sorting={sorting}
                 onChange={onTableChange}

@@ -1,9 +1,14 @@
 import React from 'react';
-import { EuiButtonEmpty, EuiFlexItem, EuiFlexGroup, EuiText } from '@elastic/eui';
+import {
+  EuiButtonEmpty,
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiText,
+} from '@elastic/eui';
 import { HitsCounter } from '../../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../../kibana-integrations/discover/application/helpers';
 import { MAX_ENTRIES_PER_QUERY } from '../../data-grid/data-grid-service';
-import { formatUIDate } from '../../../../react-services/time-service'
+import { formatUIDate } from '../../../../react-services/time-service';
 
 type tDiscoverDataGridAdditionalControlsProps = {
   totalHits: number;
@@ -13,14 +18,15 @@ type tDiscoverDataGridAdditionalControlsProps = {
   dateRange: TimeRange;
 };
 
-
-const DiscoverDataGridAdditionalControls = (props: tDiscoverDataGridAdditionalControlsProps) => {
+const DiscoverDataGridAdditionalControls = (
+  props: tDiscoverDataGridAdditionalControlsProps,
+) => {
   const {
     totalHits,
     isExporting,
     maxEntriesPerQuery = MAX_ENTRIES_PER_QUERY,
     onClickExportResults,
-    dateRange
+    dateRange,
   } = props;
 
   const onHandleExportResults = () => {
@@ -35,43 +41,43 @@ const DiscoverDataGridAdditionalControls = (props: tDiscoverDataGridAdditionalCo
         tooltip={
           totalHits && totalHits > maxEntriesPerQuery
             ? {
-              ariaLabel: 'Warning',
-              content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                maxEntriesPerQuery
-              )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                maxEntriesPerQuery
-              )} hits.`,
-              iconType: 'alert',
-              position: 'top',
-            }
+                ariaLabel: 'Warning',
+                content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                  maxEntriesPerQuery,
+                )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                  maxEntriesPerQuery,
+                )} hits.`,
+                iconType: 'alert',
+                position: 'top',
+              }
             : undefined
         }
       />
-      {dateRange ? (<EuiFlexGroup
-        gutterSize="s"
-        responsive={false}
-        justifyContent="center"
-        alignItems="center"
-      >
-        <EuiFlexItem grow={false}>
-          <EuiText size="s">
-            {formatUIDate(dateRange?.from)} - {formatUIDate(dateRange?.to)}
-          </EuiText>
-        </EuiFlexItem>
-      </EuiFlexGroup>) : null
-      }
+      {dateRange ? (
+        <EuiFlexGroup
+          gutterSize='s'
+          responsive={false}
+          justifyContent='center'
+          alignItems='center'
+        >
+          <EuiFlexItem grow={false}>
+            <EuiText size='s'>
+              {formatUIDate(dateRange?.from)} - {formatUIDate(dateRange?.to)}
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      ) : null}
       <EuiButtonEmpty
         disabled={totalHits === 0 || isExporting}
-        size="xs"
-        iconType="exportAction"
-        color="primary"
+        size='xs'
+        iconType='exportAction'
+        color='primary'
         isLoading={isExporting}
-        className="euiDataGrid__controlBtn"
+        className='euiDataGrid__controlBtn'
         onClick={onHandleExportResults}
       >
         Export Formated
       </EuiButtonEmpty>
-
     </>
   );
 };

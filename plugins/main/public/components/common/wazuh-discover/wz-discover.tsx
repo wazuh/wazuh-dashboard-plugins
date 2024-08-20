@@ -81,7 +81,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
-    setFilters
+    setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     repository: AlertsRepository, // this makes only works with alerts index pattern
     DataSource,

@@ -159,7 +159,7 @@ export const DrilldownConfigOrganization = (
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );
