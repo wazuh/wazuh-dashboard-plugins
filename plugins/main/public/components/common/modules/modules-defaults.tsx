@@ -18,7 +18,7 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
-import { InventoryVuls, DashboardVuls } from '../../overview/vulnerabilities';
+import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { DashboardPOCByReference } from '../../overview/poc/dashboards/overview/dashboard';
 
 import { DashboardMITRE } from '../../overview/mitre/dashboard';
@@ -244,7 +244,7 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   vuls: {
-    init: 'dashboardByReference',
+    init: 'dashboard',
     tabs: [
       {
         id: 'dashboardByReference',
