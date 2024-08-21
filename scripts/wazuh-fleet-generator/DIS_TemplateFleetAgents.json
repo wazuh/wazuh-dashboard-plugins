@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "inventory-system-default"
-  ],
+  "index_patterns": ["inventory-system-default"],
   "template": {
     "mappings": {
       "date_detection": false,
