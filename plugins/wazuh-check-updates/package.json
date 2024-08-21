@@ -1,7 +1,7 @@
 {
   "name": "wazuh-check-updates",
   "version": "4.9.0",
-  "revision": "05",
+  "revision": "06",
   "pluginPlatform": {
     "version": "2.13.0"
   },
