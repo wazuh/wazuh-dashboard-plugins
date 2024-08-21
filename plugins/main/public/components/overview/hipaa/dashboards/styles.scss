@@ -4,7 +4,7 @@
       height: auto !important;
     }
     .dshLayout-isMaximizedPanel {
-      height: 100% !important;
+      height: calc(100vh - 44px) !important;
     }
   }
 }

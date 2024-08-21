@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { getToasts } from '../../../../../../kibana-services';
 import {
   resourceDictionary,
@@ -38,7 +38,9 @@ import {
 } from '../../common/actions-buttons';
 
 import apiSuggestsItems from './ruleset-suggestions';
-import { useRouterSearch } from '../../../../../../components/common/hooks';
+import { Route, Switch } from '../../../../../../components/router-search';
+import { withRouterSearch } from '../../../../../../components/common/hocs';
+import NavigationService from '../../../../../../react-services/navigation-service';
 
 const searchBarWQLOptions = {
   searchTermFields: [
@@ -107,52 +109,60 @@ const FilesTable = ({
   />
 );
 
-const RulesFlyoutTable = ({
-  actionButtons,
-  columns,
-  searchBarSuggestions,
-  filters,
-  updateFilters,
-  getRowProps,
-  isFlyoutVisible,
-  currentItem,
-  closeFlyout,
-  cleanFilters,
-  ...props
-}) => (
-  <>
-    <TableWzAPI
-      actionButtons={actionButtons}
-      title='Rules'
-      description='From here you can manage your rules.'
-      tableColumns={columns}
-      tableInitialSortingField='id'
-      searchTable={true}
-      searchBarWQL={{
-        options: searchBarWQLOptions,
-        suggestions: searchBarSuggestions,
-      }}
-      endpoint='/rules'
-      isExpandable={true}
-      rowProps={getRowProps}
-      downloadCsv={true}
-      showReload={true}
-      filters={filters}
-      tablePageSizeOptions={[10, 25, 50, 100]}
-    />
-    {isFlyoutVisible && (
-      <FlyoutDetail
-        item={currentItem}
-        closeFlyout={closeFlyout}
-        showViewInEvents={true}
-        outsideClickCloses={true}
+const RulesFlyoutTable = withRouterSearch(
+  ({
+    actionButtons,
+    columns,
+    searchBarSuggestions,
+    filters,
+    updateFilters,
+    getRowProps,
+    cleanFilters,
+    ...props
+  }) => (
+    <>
+      <TableWzAPI
+        actionButtons={actionButtons}
+        title='Rules'
+        description='From here you can manage your rules.'
+        tableColumns={columns}
+        tableInitialSortingField='id'
+        searchTable={true}
+        searchBarWQL={{
+          options: searchBarWQLOptions,
+          suggestions: searchBarSuggestions,
+        }}
+        endpoint='/rules'
+        isExpandable={true}
+        rowProps={getRowProps}
+        downloadCsv={true}
+        showReload={true}
         filters={filters}
-        onFiltersChange={updateFilters}
-        cleanFilters={cleanFilters}
-        {...props}
+        tablePageSizeOptions={[10, 25, 50, 100]}
       />
-    )}
-  </>
+      <Switch>
+        <Route
+          path='?redirectRule=:redirectRule'
+          render={({ search: { redirectRule } }) => (
+            <FlyoutDetail
+              item={redirectRule}
+              closeFlyout={() => {
+                NavigationService.getInstance().updateAndNavigateSearchParams({
+                  redirectRule: null,
+                });
+              }}
+              showViewInEvents={true}
+              outsideClickCloses={true}
+              filters={filters}
+              onFiltersChange={updateFilters}
+              cleanFilters={cleanFilters}
+              {...props}
+            />
+          )}
+        ></Route>
+      </Switch>
+    </>
+  ),
 );
 
 /***************************************
@@ -160,22 +170,9 @@ const RulesFlyoutTable = ({
  */
 function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
   const [filters, setFilters] = useState([]);
-  const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
-  const search = useRouterSearch();
-
   const [tableFootprint, setTableFootprint] = useState(0);
 
   const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
-
-  useEffect(() => {
-    if (search.redirectRule) {
-      // TODO: the view to display the specific group should be managed through the routing based on
-      // the URL instead of a component state. This lets refreshing the page and display the same view
-      setCurrentItem(parseInt(search.redirectRule));
-      setIsFlyoutVisible(true);
-    }
-  }, []);
 
   const updateFilters = filters => {
     setFilters(filters);
@@ -188,10 +185,6 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
   const toggleShowFiles = () => {
     setFilters([]);
     setShowingFiles(!showingFiles);
-  };
-
-  const closeFlyout = () => {
-    setIsFlyoutVisible(false);
   };
 
   /**
@@ -266,8 +259,9 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
         props.userPermissions,
       )
         ? item => {
-            setCurrentItem(id);
-            setIsFlyoutVisible(true);
+            NavigationService.getInstance().updateAndNavigateSearchParams({
+              redirectRule: id,
+            });
           }
         : undefined,
     };
@@ -326,9 +320,6 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
           filters={filters}
           updateFilters={updateFilters}
           getRowProps={getRowProps}
-          isFlyoutVisible={isFlyoutVisible}
-          currentItem={currentItem}
-          closeFlyout={closeFlyout}
           cleanFilters={cleanFilters}
           updateFileContent={updateFileContent}
         />

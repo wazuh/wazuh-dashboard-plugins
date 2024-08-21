@@ -41,7 +41,10 @@ const DonutCard = ({
       betaBadgeLabel={betaBadgeLabel}
     >
       <EuiFlexGroup>
-        <EuiFlexItem className='align-items-center'>
+        <EuiFlexItem
+          className='align-items-center'
+          style={{ margin: '12px 0px' }}
+        >
           <VisualizationBasic
             isLoading={isLoading}
             type='donut'

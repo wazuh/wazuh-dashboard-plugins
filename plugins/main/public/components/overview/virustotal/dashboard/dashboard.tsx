@@ -53,7 +53,7 @@ const DashboardVT: React.FC = () => {
     filters,
     setFilters,
   });
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -61,10 +61,7 @@ const DashboardVT: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -73,10 +70,7 @@ const DashboardVT: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: {
-        from: dateRangeFrom,
-        to: dateRangeTo,
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -92,8 +86,7 @@ const DashboardVT: React.FC = () => {
     isDataSourceLoading,
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    dateRangeFrom,
-    dateRangeTo,
+    JSON.stringify(absoluteDateRange),
   ]);
 
   return (
@@ -133,10 +126,7 @@ const DashboardVT: React.FC = () => {
               filters: fetchFilters ?? [],
               useMargins: true,
               id: 'kpis-virustotal-dashboard-tab',
-              timeRange: {
-                from: dateRangeFrom,
-                to: dateRangeTo,
-              },
+              timeRange: absoluteDateRange,
               title: 'KPIs Virustotal dashboard',
               description: 'KPIs Dashboard of the Virustotal',
               query: query,
@@ -158,10 +148,7 @@ const DashboardVT: React.FC = () => {
               filters: fetchFilters ?? [],
               useMargins: true,
               id: 'virustotal-dashboard-tab',
-              timeRange: {
-                from: dateRangeFrom,
-                to: dateRangeTo,
-              },
+              timeRange: absoluteDateRange,
               title: 'Virustotal dashboard',
               description: 'Dashboard of the Virustotal',
               query: query,

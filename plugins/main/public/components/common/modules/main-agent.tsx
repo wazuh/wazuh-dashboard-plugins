@@ -32,6 +32,7 @@ import {
   AlertsDataSource,
   AlertsDataSourceRepository,
   PatternDataSource,
+  tFilter,
   tParsedIndexPattern,
   useDataSource,
 } from '../data-source';
@@ -224,6 +225,19 @@ export default compose(
   }),
 )(MainModuleAgent);
 
+export class AgentInventoryDataSource extends AlertsDataSource {
+  constructor(id: string, title: string) {
+    super(id, title);
+  }
+
+  getFixedFilters(): tFilter[] {
+    return [
+      ...super.getFixedFiltersClusterManager(),
+      ...super.getFixedFilters(),
+    ];
+  }
+}
+
 const GenerateSyscollectorReportButton = ({ agent }) => {
   const {
     dataSource,
@@ -231,7 +245,7 @@ const GenerateSyscollectorReportButton = ({ agent }) => {
     isLoading: isDataSourceLoading,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
-    DataSource: AlertsDataSource,
+    DataSource: AgentInventoryDataSource,
   });
 
   const action = useAsyncAction(async () => {

@@ -1,14 +1,21 @@
 import React from 'react';
-import { EuiButtonEmpty } from '@elastic/eui';
+import {
+  EuiButtonEmpty,
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiText,
+} from '@elastic/eui';
 import { HitsCounter } from '../../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../../kibana-integrations/discover/application/helpers';
 import { MAX_ENTRIES_PER_QUERY } from '../../data-grid/data-grid-service';
+import { formatUIDate } from '../../../../react-services/time-service';
 
 type tDiscoverDataGridAdditionalControlsProps = {
   totalHits: number;
   isExporting: boolean;
   onClickExportResults: () => void;
   maxEntriesPerQuery?: number;
+  dateRange: TimeRange;
 };
 
 const DiscoverDataGridAdditionalControls = (
@@ -19,6 +26,7 @@ const DiscoverDataGridAdditionalControls = (
     isExporting,
     maxEntriesPerQuery = MAX_ENTRIES_PER_QUERY,
     onClickExportResults,
+    dateRange,
   } = props;
 
   const onHandleExportResults = () => {
@@ -45,6 +53,20 @@ const DiscoverDataGridAdditionalControls = (
             : undefined
         }
       />
+      {dateRange ? (
+        <EuiFlexGroup
+          gutterSize='s'
+          responsive={false}
+          justifyContent='center'
+          alignItems='center'
+        >
+          <EuiFlexItem grow={false}>
+            <EuiText size='s'>
+              {formatUIDate(dateRange?.from)} - {formatUIDate(dateRange?.to)}
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      ) : null}
       <EuiButtonEmpty
         disabled={totalHits === 0 || isExporting}
         size='xs'
