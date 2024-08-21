@@ -5,6 +5,8 @@ import { EuiLink } from '@elastic/eui';
 export const virustotalColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
   },
   {
     id: 'agent.name',

@@ -31,7 +31,7 @@ const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-const DashboardDockerComponent: React.FC = ({ }) => {
+const DashboardDockerComponent: React.FC = ({}) => {
   const AlertsRepository = new AlertsDataSourceRepository();
   const {
     filters,
@@ -54,7 +54,7 @@ const DashboardDockerComponent: React.FC = ({ }) => {
     setFilters,
   });
 
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -62,10 +62,7 @@ const DashboardDockerComponent: React.FC = ({ }) => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -74,10 +71,7 @@ const DashboardDockerComponent: React.FC = ({ }) => {
     }
     fetchData({
       query,
-      dateRange: {
-        to: dateRangeTo,
-        from: dateRangeFrom,
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -90,8 +84,7 @@ const DashboardDockerComponent: React.FC = ({ }) => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(dateRangeFrom),
-    JSON.stringify(dateRangeTo),
+    JSON.stringify(absoluteDateRange),
   ]);
 
   return (
@@ -101,15 +94,15 @@ const DashboardDockerComponent: React.FC = ({ }) => {
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
-              <WzSearchBar
-                appName='docker-searchbar'
-                {...searchBarProps}
-                fixedFilters={fixedFilters}
-                showDatePicker={true}
-                showQueryInput={true}
-                showQueryBar={true}
-              />
-            )}
+            <WzSearchBar
+              appName='docker-searchbar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showDatePicker={true}
+              showQueryInput={true}
+              showQueryBar={true}
+            />
+          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -131,10 +124,7 @@ const DashboardDockerComponent: React.FC = ({ }) => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'docker-dashboard-tab',
-                  timeRange: {
-                    from: dateRangeFrom,
-                    to: dateRangeTo,
-                  },
+                  timeRange: absoluteDateRange,
                   title: 'Docker dashboard',
                   description: 'Dashboard of Docker',
                   query: query,

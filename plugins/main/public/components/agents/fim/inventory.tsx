@@ -23,7 +23,6 @@ import {
   EuiSpacer,
   EuiTab,
   EuiTabs,
-  EuiTitle,
 } from '@elastic/eui';
 import { InventoryTable, RegistryTable } from './inventory/';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -65,8 +64,8 @@ export class Inventory extends Component {
       totalItemsRegistry: 0,
       isLoading: true,
       customBadges: [],
-      isConfigured: false
-    }
+      isConfigured: false,
+    };
     this.onFiltersChange.bind(this);
   }
 
@@ -76,8 +75,15 @@ export class Inventory extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)){
-      this.setState({isLoading: true}, this.loadAgent)
+    if (JSON.stringify(this.props.agent) !== JSON.stringify(prevProps.agent)) {
+      if (this.props?.agent?.os?.platform !== 'windows') {
+        this.setState(
+          { isLoading: true, selectedTabId: 'files' },
+          this.loadAgent,
+        );
+        return;
+      }
+      this.setState({ isLoading: true }, this.loadAgent);
     }
   }
 
@@ -86,73 +92,90 @@ export class Inventory extends Component {
   }
 
   async loadAgent() {
-    const agentPlatform  = ((this.props.agent || {}).os || {}).platform;
-    const {totalItemsFile, syscheck} = await this.getItemNumber('file');
-    const totalItemsRegistry = agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
+    const agentPlatform = this.props.agent?.os?.platform;
+    const { totalItemsFile, syscheck } = await this.getItemNumber('file');
+    const totalItemsRegistry =
+      agentPlatform === 'windows' ? await this.getItemNumber('registry') : 0;
     const isConfigured = await this.isConfigured();
-    if (this._isMount){
-      this.setState({ totalItemsFile, totalItemsRegistry, syscheck, isLoading: false, isConfigured });
+    if (this._isMount) {
+      this.setState({
+        totalItemsFile,
+        totalItemsRegistry,
+        syscheck,
+        isLoading: false,
+        isConfigured,
+      });
     }
   }
 
-  // Do not load the localStorage filters when changing tabs
-  // componentDidUpdate(prevProps, prevState) {
-  //   const { selectedTabId } = this.state;
-  //   if (selectedTabId !== prevState.selectedTabId) {
-  //     const filters = this.getStoreFilters(this.props);
-  //     this.setState({ filters });
-  //   }
-  // }
-
   tabs() {
-    let auxTabs = [
+    const auxTabs = [
       {
         id: 'files',
-        name: `Files ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsFile + ')'}`,
+        name: `Files ${
+          this.state.isLoading === true
+            ? ''
+            : '(' + this.state.totalItemsFile + ')'
+        }`,
         disabled: false,
       },
-    ]
-    const platform = (this.props.agent.os || {}).platform || "other";
-     platform  === 'windows' ? auxTabs.push(
-      {
-        id: 'registry',
-        name: `Windows Registry ${this.state.isLoading === true ? '' : '(' + this.state.totalItemsRegistry + ')'}`,
-        disabled: false,
-      },
-    ) : null;
-    return (auxTabs);
+    ];
+    const registryTab = {
+      id: 'registry',
+      name: `Windows Registry ${
+        this.state.isLoading === true
+          ? ''
+          : '(' + this.state.totalItemsRegistry + ')'
+      }`,
+      disabled: false,
+    };
+
+    const platform = this.props.agent.os?.platform || 'other';
+    platform === 'windows' ? auxTabs.push(registryTab) : null;
+    return auxTabs;
   }
 
   getStoreFilters(props) {
     const { section, selectView, agent } = props;
-    const filters = JSON.parse(window.localStorage.getItem(`wazuh-${section}-${selectView}-${((this.state || {}).selectedTabId || 'files')}-${agent['id']}`) || '{}');
+    const filters = JSON.parse(
+      window.localStorage.getItem(
+        `wazuh-${section}-${selectView}-${
+          this.state?.selectedTabId || 'files'
+        }-${agent['id']}`,
+      ) || '{}',
+    );
     return filters;
   }
 
   setStoreFilters(filters) {
     const { section, selectView, agent } = this.props;
-    window.localStorage.setItem(`wazuh-${section}-${selectView}-${(this.state || {}).selectedTabId || 'files'}-${agent['id']}`, JSON.stringify(filters))
+    window.localStorage.setItem(
+      `wazuh-${section}-${selectView}-${this.state?.selectedTabId || 'files'}-${
+        agent['id']
+      }`,
+      JSON.stringify(filters),
+    );
   }
 
-  onFiltersChange = (filters) => {
+  onFiltersChange = filters => {
     this.setState({ filters });
-  }
+  };
 
   onTotalItemsChange = (totalItems: number) => {
     this.setState({ totalItemsFile: totalItems });
-  }
+  };
 
   onSelectedTabChanged = id => {
     this.setState({ selectedTabId: id });
-  }
+  };
 
   buildFilter(type) {
     const filters = filtersToObject(this.state.filters);
     const filter = {
       ...filters,
       limit: type === 'file' ? '15' : '1',
-      ...(type === 'registry' ? {q: 'type=registry_key'} : {type}),
-      ...(type === 'file' && {sort: '+file'})
+      ...(type === 'registry' ? { q: 'type=registry_key' } : { type }),
+      ...(type === 'file' && { sort: '+file' }),
     };
     return filter;
   }
@@ -165,11 +188,11 @@ export class Inventory extends Component {
       });
       if (type === 'file') {
         return {
-          totalItemsFile: ((response.data || {}).data || {}).total_affected_items || 0,
-          syscheck: ((response.data || {}).data || {}).affected_items || [],
+          totalItemsFile: response.data?.data?.total_affected_items || 0,
+          syscheck: response.data?.data?.affected_items || [],
         };
       }
-      return ((response.data || {}).data || {}).total_affected_items || 0;
+      return response.data?.data?.total_affected_items || 0;
     } catch (error) {
       this.setState({ isLoading: false });
 
@@ -198,13 +221,15 @@ export class Inventory extends Component {
               onClick={() => this.onSelectedTabChanged(tab.id)}
               isSelected={tab.id === this.state.selectedTabId}
               disabled={tab.disabled}
-              key={index}>
-              {tab.name}&nbsp;{isLoading === true && <EuiLoadingSpinner size="s" />}
+              key={index}
+            >
+              {tab.name}&nbsp;
+              {isLoading === true && <EuiLoadingSpinner size='s' />}
             </EuiTab>
           ))}
         </EuiTabs>
       );
-    };
+    }
     return null;
   }
 
@@ -217,25 +242,33 @@ export class Inventory extends Component {
   };
 
   renderTable() {
-    const { filters, syscheck, selectedTabId, customBadges, totalItemsRegistry, totalItemsFile } = this.state;
+    const {
+      filters,
+      syscheck,
+      selectedTabId,
+      totalItemsRegistry,
+      totalItemsFile,
+    } = this.state;
     return (
       <>
-        {selectedTabId === 'files' &&
+        {selectedTabId === 'files' && (
           <InventoryTable
             {...this.props}
             filters={filters}
             items={syscheck}
             totalItems={totalItemsFile}
             onFiltersChange={this.onFiltersChange}
-            onTotalItemsChange={this.onTotalItemsChange}/>
-        }
-        {selectedTabId === 'registry' &&
+            onTotalItemsChange={this.onTotalItemsChange}
+          />
+        )}
+        {selectedTabId === 'registry' && (
           <RegistryTable
             {...this.props}
             filters={filters}
             totalItems={totalItemsRegistry}
-            onFiltersChange={this.onFiltersChange} />
-        }
+            onFiltersChange={this.onFiltersChange}
+          />
+        )}
       </>
     );
   }
@@ -243,30 +276,35 @@ export class Inventory extends Component {
   noConfiguredMonitoring() {
     return (
       <EuiEmptyPrompt
-        iconType="filebeatApp"
+        iconType='filebeatApp'
         title={<h2>Integrity monitoring is not configured for this agent</h2>}
         body={
           <EuiLink
-            href={webDocumentationLink('user-manual/capabilities/file-integrity/index.html')}
-            target="_blank"
+            href={webDocumentationLink(
+              'user-manual/capabilities/file-integrity/index.html',
+            )}
+            target='_blank'
             external
-            style={{ textAlign: "center" }}
-            rel="noopener noreferrer"
+            style={{ textAlign: 'center' }}
+            rel='noopener noreferrer'
           >
             How to configure the module
           </EuiLink>
         }
-      />);
+      />
+    );
   }
 
   loadingInventory() {
-    return <EuiPage>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiProgress size="xs" color="primary" />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </EuiPage>;
+    return (
+      <EuiPage>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiProgress size='xs' color='primary' />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiPage>
+    );
   }
 
   async isConfigured() {
@@ -274,10 +312,10 @@ export class Inventory extends Component {
       const response = await WzRequest.apiReq(
         'GET',
         `/agents/${this.props.agent.id}/config/syscheck/syscheck`,
-        {}
+        {},
       );
 
-      return (((response.data || {}).data).syscheck || {}).disabled === 'no';
+      return response.data?.data?.syscheck?.disabled === 'no';
     } catch (error) {
       const options: UIErrorLog = {
         context: `${Inventory.name}.isConfigured`,
@@ -297,19 +335,27 @@ export class Inventory extends Component {
   render() {
     const { isLoading, isConfigured } = this.state;
     if (isLoading) {
-      return this.loadingInventory()
+      return this.loadingInventory();
     }
     const table = this.renderTable();
     const tabs = this.renderTabs();
 
-    return isConfigured
-      ? (<EuiPage>
+    return isConfigured ? (
+      <EuiPage>
         <EuiPanel>
           {tabs}
-          <EuiSpacer size={(((this.props.agent || {}).os || {}).platform || false) === 'windows' ? 's' : 'm'} />
+          <EuiSpacer
+            size={
+              (this.props.agent?.os?.platform || false) === 'windows'
+                ? 's'
+                : 'm'
+            }
+          />
           {table}
         </EuiPanel>
-      </EuiPage>)
-      : this.noConfiguredMonitoring()
+      </EuiPage>
+    ) : (
+      this.noConfiguredMonitoring()
+    );
   }
 }

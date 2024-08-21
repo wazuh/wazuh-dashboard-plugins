@@ -110,13 +110,8 @@ const getDashboardPanels = (
 };
 
 export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
-
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern
-  } = drilldownProps;
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [
@@ -135,10 +130,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                       filters: fetchFilters ?? [],
                       useMargins: true,
                       id: 'github-drilldown-action-dashboard-tab',
-                      timeRange: {
-                        from: searchBarProps.dateRangeFrom,
-                        to: searchBarProps.dateRangeTo,
-                      },
+                      timeRange: searchBarProps?.absoluteDateRange,
                       title: 'GitHub drilldown action dashboard',
                       description: 'Dashboard of the GitHub drilldown action',
                       query: searchBarProps.query,
@@ -148,7 +140,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );
@@ -161,16 +153,19 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
           {
             width: 100,
             component: () => {
-
               const defaultTableColumns = [
-                { id: 'timestamp' },
+                {
+                  id: 'timestamp',
+                  isSortable: true,
+                  defaultSortDirection: 'desc',
+                },
                 { id: 'rule.description' },
                 { id: 'data.github.org', displayAsText: 'Organization' },
                 { id: 'data.github.repo', displayAsText: 'Repository' },
                 { id: 'data.github.actor', displayAsText: 'Actor' },
                 { id: 'rule.level' },
                 { id: 'rule.id' },
-              ]
+              ];
 
               return (
                 <DrillDownDataGrid
@@ -180,9 +175,9 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                   searchBarProps={searchBarProps}
                   indexPattern={indexPattern}
                 />
-              )
+              );
             },
-          }
+          },
         ],
       },
     ],
