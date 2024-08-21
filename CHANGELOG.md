@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 5.0.0
 
+### Removed
+
+- Removed `ossec` references in repository [#6926](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6926)
+
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.13.0 - Revision 00
 
 ### Added
