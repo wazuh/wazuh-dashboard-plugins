@@ -149,10 +149,7 @@ export const DrilldownConfigOrganization = (
                       filters: fetchFilters ?? [],
                       useMargins: true,
                       id: 'github-drilldown-action-dashboard-tab',
-                      timeRange: {
-                        from: searchBarProps.dateRangeFrom,
-                        to: searchBarProps.dateRangeTo,
-                      },
+                      timeRange: searchBarProps?.absoluteDateRange,
                       title: 'GitHub drilldown action dashboard',
                       description: 'Dashboard of the GitHub drilldown action',
                       query: searchBarProps.query,

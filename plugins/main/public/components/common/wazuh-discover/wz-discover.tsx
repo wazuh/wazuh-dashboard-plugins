@@ -115,7 +115,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     filters,
     setFilters,
   });
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
@@ -142,7 +142,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       query,
       pagination,
       sorting,
-      dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -155,10 +155,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(pagination),
     JSON.stringify(sorting),
-    dateRangeFrom,
-    dateRangeTo,
+    JSON.stringify(pagination),
+    JSON.stringify(absoluteDateRange),
   ]);
 
   const timeField = indexPattern?.timeFieldName
@@ -243,8 +242,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                         AlertsRepository.getStoreIndexPatternId(),
                         fetchFilters,
                         query,
-                        dateRangeFrom,
-                        dateRangeTo,
+                        absoluteDateRange.from,
+                        absoluteDateRange.to,
                       )}
                     />
                   </EuiPanel>
@@ -262,6 +261,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           isExporting={isExporting}
                           onClickExportResults={onClickExportResults}
                           maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                          dateRange={absoluteDateRange}
                         />
                       </>
                     ),

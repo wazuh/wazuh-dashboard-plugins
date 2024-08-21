@@ -7,6 +7,7 @@ import {
   EuiButtonIcon,
   Direction,
   EuiPanel,
+  EuiText,
 } from '@elastic/eui';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
@@ -39,6 +40,7 @@ import { MAX_ENTRIES_PER_QUERY } from '../data-grid/data-grid-service';
 export const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 export const DEFAULT_PAGE_SIZE = 20;
 const INDEX_FIELD_NAME = '_id';
+import { formatUIDate } from '../../../react-services/time-service';
 
 export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
@@ -93,10 +95,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   // use the global time filter to get the default date range
   const [query, setQuery] = useState<Query>({ query: '', language: 'kuery' });
   const { timeFilter } = useTimeFilter();
-  const [dateRange, setDateRange] = useState<TimeRange>({
-    from: timeFilter.from,
-    to: timeFilter.to,
-  });
 
   const {
     dataSource,
@@ -113,6 +111,11 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     fetchFilters: initialFetchFilters,
   });
 
+  const [dateRange, setDateRange] = useState<TimeRange>({
+    from: timeFilter.from,
+    to: timeFilter.to,
+  });
+
   const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
@@ -120,6 +123,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     setQuery,
     setTimeFilter: setDateRange,
   } as tUseSearchBarProps);
+
+  const { absoluteDateRange } = searchBarProps;
 
   const parseSorting = useMemo(() => {
     if (!sorting) {
@@ -139,7 +144,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     setIndexPattern(dataSource?.indexPattern);
     fetchData({
       query,
-      dateRange: { from: dateRange.from || '', to: dateRange.to || '' },
+      dateRange: absoluteDateRange,
       pagination,
       sorting: parseSorting,
     })
@@ -162,8 +167,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     JSON.stringify(query),
     JSON.stringify(sorting),
     JSON.stringify(pagination),
-    dateRange.from,
-    dateRange.to,
+    JSON.stringify(absoluteDateRange),
   ]);
 
   const toggleDetails = item => {
@@ -306,6 +310,21 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                       : undefined
                   }
                 />
+                {absoluteDateRange ? (
+                  <EuiFlexGroup
+                    gutterSize='s'
+                    responsive={false}
+                    justifyContent='center'
+                    alignItems='center'
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiText size='s'>
+                        {formatUIDate(absoluteDateRange?.from)} -{' '}
+                        {formatUIDate(absoluteDateRange?.to)}
+                      </EuiText>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                ) : null}
               </EuiPanel>
               <EuiBasicTable
                 items={parsedItems}
