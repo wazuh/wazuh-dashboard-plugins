@@ -160,7 +160,7 @@ const getVisStateTopOrganizationsByAlertCount = (indexPatternId: string) => {
       addTooltip: true,
       addLegend: true,
       legendPosition: 'right',
-      isDonut: false,
+      isDonut: true,
       labels: {
         show: false,
         values: true,
@@ -600,7 +600,7 @@ const getVisStateAgentTopOrganizationsByAlertCount = (
       addTooltip: true,
       addLegend: true,
       legendPosition: 'right',
-      isDonut: false,
+      isDonut: true,
       labels: {
         show: false,
         values: true,
@@ -889,10 +889,16 @@ const getVisStateMetricOrganizationsCount = (indexPatternId: string) => {
       metric: {
         percentageMode: false,
         useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
+        colorSchema: 'Greens',
+        metricColorMode: 'Labels',
         colorsRange: [
           {
+            type: 'range',
+            from: 0,
+            to: 0,
+          },
+          {
+            type: 'range',
             from: 0,
             to: 0,
           },
@@ -904,7 +910,6 @@ const getVisStateMetricOrganizationsCount = (indexPatternId: string) => {
         style: {
           bgFill: '#000',
           bgColor: false,
-          labelColor: false,
           subText: '',
           fontSize: 40,
         },
@@ -954,10 +959,16 @@ const getVisStateMetricRepositoriesCount = (indexPatternId: string) => {
       metric: {
         percentageMode: false,
         useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
+        colorSchema: 'Blues',
+        metricColorMode: 'Labels',
         colorsRange: [
           {
+            type: 'range',
+            from: 0,
+            to: 0,
+          },
+          {
+            type: 'range',
             from: 0,
             to: 0,
           },
@@ -1019,10 +1030,16 @@ const getVisStateMetricActorsCount = (indexPatternId: string) => {
       metric: {
         percentageMode: false,
         useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
+        colorSchema: 'Reds',
+        metricColorMode: 'Labels',
         colorsRange: [
           {
+            type: 'range',
+            from: 0,
+            to: 0,
+          },
+          {
+            type: 'range',
             from: 0,
             to: 0,
           },

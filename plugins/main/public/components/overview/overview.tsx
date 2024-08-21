@@ -4,6 +4,7 @@ import { Stats } from '../../controllers/overview/components/stats';
 import { AppState, WzRequest } from '../../react-services';
 import { OverviewWelcome } from '../common/welcome/overview-welcome';
 import { MainModule } from '../common/modules/main';
+import { OSD_URL_STATE_STORAGE_ID } from '../../../common/constants';
 import { WzCurrentOverviewSectionWrapper } from '../common/modules/overview-current-section-wrapper';
 import {
   connectToQueryState,
@@ -49,7 +50,7 @@ export const Overview: React.FC = withRouteResolvers({
     const config = getUiSettings();
     const history = navigationService.getHistory();
     const osdUrlStateStorage = createOsdUrlStateStorage({
-      useHash: config.get('state:storeInSessionStorage'),
+      useHash: config.get(OSD_URL_STATE_STORAGE_ID),
       history: history,
     });
 

@@ -291,7 +291,7 @@ resources:
       raw: true
     response:
       statusCode: 200
-      staticFile: rules/get_rule_raw.txt
+      staticFile: decoders/get_decoders_raw.txt
 
   # Update decoders file
   - method: PUT
@@ -827,6 +827,9 @@ resources:
   # Get results
   - method: GET
     path: /syscheck/{agent_id}
+    response:
+      statusCode: 200
+      scriptFile: syscheck/get-agent.js
 
   # Clearresults
   - method: DELETE

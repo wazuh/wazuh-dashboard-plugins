@@ -109,7 +109,11 @@ export const drilldownUserConfig = props => {
             width: 100,
             component: props => {
               const defaultTableColumns = [
-                { id: 'timestamp' },
+                {
+                  id: 'timestamp',
+                  isSortable: true,
+                  defaultSortDirection: 'desc',
+                },
                 { id: 'rule.description', displayAsText: 'Description' },
                 {
                   id: 'data.office365.ClientIP',

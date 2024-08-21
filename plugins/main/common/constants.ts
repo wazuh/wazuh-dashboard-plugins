@@ -525,3 +525,6 @@ export const SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT = 10;
 /* Time in milliseconds to debounce the analysis of search bar. This mitigates some problems related
 to changes running in parallel */
 export const SEARCH_BAR_DEBOUNCE_UPDATE_TIME = 400;
+
+// ID used to refer the createOsdUrlStateStorage state
+export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
