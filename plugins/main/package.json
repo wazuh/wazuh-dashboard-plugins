@@ -8,8 +8,7 @@
   "description": "Wazuh dashboard",
   "keywords": [
     "opensearch_dashboards",
-    "wazuh",
-    "ossec"
+    "wazuh"
   ],
   "node_build": "10.23.1",
   "author": "Wazuh, Inc",
