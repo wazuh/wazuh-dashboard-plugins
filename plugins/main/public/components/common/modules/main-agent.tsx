@@ -14,7 +14,6 @@ import React, { Component, Fragment } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiCallOut,
   EuiTitle,
   EuiButtonEmpty,
 } from '@elastic/eui';
@@ -33,6 +32,7 @@ import {
   AlertsDataSource,
   AlertsDataSourceRepository,
   PatternDataSource,
+  tFilter,
   tParsedIndexPattern,
   useDataSource,
 } from '../data-source';
@@ -106,7 +106,6 @@ export class MainModuleAgent extends Component {
 
   render() {
     const { agent, section, selectView } = this.props;
-    const title = this.renderTitle();
     const ModuleTabView = (this.props.tabs || []).find(
       tab => tab.id === selectView,
     );
@@ -118,11 +117,11 @@ export class MainModuleAgent extends Component {
             : 'wz-module'
         }
       >
-        <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent'>{title}</div>
-        </div>
         {agent && agent.os && (
           <Fragment>
+            <div className='wz-module-header-agent-wrapper'>
+              <div className='wz-module-header-agent'>{this.renderTitle()}</div>
+            </div>
             <div>
               <div
                 className={
@@ -186,14 +185,6 @@ export class MainModuleAgent extends Component {
               )}
           </Fragment>
         )}
-        {(!agent || !agent.os) && (
-          <EuiCallOut
-            style={{ margin: '66px 16px 0 16px' }}
-            title='This agent has never connected'
-            color='warning'
-            iconType='alert'
-          ></EuiCallOut>
-        )}
       </div>
     );
   }
@@ -234,6 +225,19 @@ export default compose(
   }),
 )(MainModuleAgent);
 
+export class AgentInventoryDataSource extends AlertsDataSource {
+  constructor(id: string, title: string) {
+    super(id, title);
+  }
+
+  getFixedFilters(): tFilter[] {
+    return [
+      ...super.getFixedFiltersClusterManager(),
+      ...super.getFixedFilters(),
+    ];
+  }
+}
+
 const GenerateSyscollectorReportButton = ({ agent }) => {
   const {
     dataSource,
@@ -241,7 +245,7 @@ const GenerateSyscollectorReportButton = ({ agent }) => {
     isLoading: isDataSourceLoading,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
-    DataSource: AlertsDataSource,
+    DataSource: AgentInventoryDataSource,
   });
 
   const action = useAsyncAction(async () => {

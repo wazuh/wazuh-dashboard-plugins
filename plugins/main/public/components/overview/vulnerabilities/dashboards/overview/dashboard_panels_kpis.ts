@@ -98,7 +98,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
       metric: {
         percentageMode: false,
         useRanges: false,
-        colorSchema: 'Blues',
+        colorSchema: 'Yellow to Red',
         metricColorMode: 'Labels',
         colorsRange: [
           {
@@ -113,20 +113,13 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
         labels: {
           show: true,
         },
-        invertColors: false,
+        invertColors: true,
         style: {
           bgFill: '#000',
           bgColor: false,
           labelColor: false,
           subText: '',
           fontSize: 50,
-        },
-      },
-    },
-    uiState: {
-      vis: {
-        colors: {
-          'High Severity - Count': '#38D1BA',
         },
       },
     },
@@ -190,7 +183,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
       metric: {
         percentageMode: false,
         useRanges: false,
-        colorSchema: 'Yellow to Red',
+        colorSchema: 'Blues',
         metricColorMode: 'Labels',
         colorsRange: [
           {
@@ -205,7 +198,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
         labels: {
           show: true,
         },
-        invertColors: true,
+        invertColors: false,
         style: {
           bgFill: '#000',
           bgColor: false,

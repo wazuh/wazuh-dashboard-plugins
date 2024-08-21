@@ -1,0 +1,41 @@
+name: Prettier
+
+on:
+  pull_request:
+
+jobs:
+  prettier:
+    name: Ensure the code format on the changed files
+    runs-on: ubuntu-latest
+    steps:
+      # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # - https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#node-version-file
+      - name: Install NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Verify the changed files
+        run: |
+          REMOTE_NAME=origin
+          echo "Base ref: $GITHUB_BASE_REF"
+          echo "Head ref: $GITHUB_HEAD_REF"
+          echo "Fetching branch: $GITHUB_BASE_REF"
+          git fetch origin $GITHUB_BASE_REF
+          echo "Fetching branch: $GITHUB_HEAD_REF"
+          git fetch origin $GITHUB_HEAD_REF
+          echo "Listing branches"
+          git branch -a
+          echo "Getting diff files ignoring deleted and getting the changed or renamed files"
+          CHANGED_FILES=$(git diff --name-status --diff-filter d ${REMOTE_NAME}/${GITHUB_BASE_REF}..${REMOTE_NAME}/${GITHUB_HEAD_REF} | awk '{print $NF}')
+          echo "Changed files:"
+          echo "${CHANGED_FILES}"
+          git checkout $GITHUB_HEAD_REF
+          plugin_package_json=$(ls -d plugins/* | head -n1)
+          echo "Installing dependencies from plugin: ${plugin_package_json}"
+          yarn --cwd "${plugin_package_json}" --modules-folder ../../node_modules
+          echo "Running prettier on the changed files"
+          npx prettier ${CHANGED_FILES} --check --ignore-unknown

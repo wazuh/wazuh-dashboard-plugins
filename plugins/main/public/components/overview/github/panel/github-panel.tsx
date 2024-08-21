@@ -21,6 +21,7 @@ import { ModuleConfiguration } from './views';
 import { ModuleConfig, filtersValues } from './config';
 import {
   AlertsDataSourceRepository,
+  FILTER_OPERATOR,
   PatternDataSource,
   tParsedIndexPattern,
   useDataSource,
@@ -34,6 +35,7 @@ export const GitHubPanel = withErrorBoundary(() => {
     value: '',
   });
   const [currentSelectedFilter, setCurrentSelectedFilter] = useState();
+  const [selectedPanelFilter, setSelectedPanelFilter] = useState([]);
   const filterDrillDownValue = value => {
     setDrillDownValue(value);
   };
@@ -41,13 +43,15 @@ export const GitHubPanel = withErrorBoundary(() => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
-    filterManager
+    filterManager,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: GitHubDataSource,
     repository: new AlertsDataSourceRepository(),
+    fetchFilters: [...selectedPanelFilter],
   });
 
   const { searchBarProps } = useSearchBar({
@@ -63,14 +67,18 @@ export const GitHubPanel = withErrorBoundary(() => {
     const { field, value } = selectedFilter;
     const controlledByFilter = 'github-panel-row-filter';
     if (value) {
-      const filter = filterManager?.createFilter('is one of', field, [value], controlledByFilter);
-      // this hide the remove filter button in the filter bar
-      setFilters([...filters, filter]);
+      const filter = filterManager?.createFilter(
+        FILTER_OPERATOR.IS_ONE_OF,
+        field,
+        [value],
+        controlledByFilter,
+      );
+      setSelectedPanelFilter([filter]);
     } else {
-      filterManager?.removeFilterByControlledBy(controlledByFilter);
+      setSelectedPanelFilter([]);
     }
     setCurrentSelectedFilter(selectedFilter);
-  }
+  };
 
   return (
     <>
@@ -81,9 +89,10 @@ export const GitHubPanel = withErrorBoundary(() => {
           <CustomSearchBar
             filterInputs={filtersValues}
             filterDrillDownValue={drillDownValue}
-            searchBarProps={searchBarProps}
+            fixedFilters={[...fixedFilters, ...selectedPanelFilter]}
+            searchBarProps={{ ...searchBarProps }}
             setFilters={setFilters}
-            indexPattern={dataSource.indexPattern}
+            indexPattern={dataSource?.indexPattern}
           />
           <MainPanel
             moduleConfig={ModuleConfig}
@@ -91,8 +100,8 @@ export const GitHubPanel = withErrorBoundary(() => {
             sidePanelChildren={<ModuleConfiguration />}
             onChangeView={handleChangeView}
             dataSourceProps={{
-              fetchData,
-              fetchFilters,
+              fetchData: fetchData,
+              fetchFilters: [...fetchFilters, ...selectedPanelFilter],
               searchBarProps,
               indexPattern: dataSource?.indexPattern,
             }}

@@ -37,6 +37,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -53,7 +54,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
     setFilters,
   });
 
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -61,10 +62,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -73,10 +71,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: {
-        from: dateRangeFrom,
-        to: dateRangeTo,
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -84,15 +79,14 @@ const DashboardPCIDSSComponent: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching alerts',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(dateRangeFrom),
-    JSON.stringify(dateRangeTo),
+    JSON.stringify(absoluteDateRange),
   ]);
 
   return (
@@ -105,6 +99,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
             <WzSearchBar
               appName='pci-dss-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
@@ -131,10 +126,7 @@ const DashboardPCIDSSComponent: React.FC = () => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'pci-dss-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
+                  timeRange: absoluteDateRange,
                   title: 'PCI DSS dashboard',
                   description: 'Dashboard of the PCI DSS',
                   query: searchBarProps.query,

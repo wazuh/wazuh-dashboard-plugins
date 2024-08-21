@@ -46,6 +46,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -71,7 +72,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     filters,
     setFilters,
   });
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -79,10 +80,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     }
     fetchData({
       query,
-      dateRange: {
-        from: dateRangeFrom,
-        to: dateRangeTo,
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -90,15 +88,14 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching vulnerabilities',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    dateRangeFrom,
-    dateRangeTo,
+    JSON.stringify(absoluteDateRange),
   ]);
 
   const setBooleans = (component: string | null) => {
@@ -162,9 +159,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
           <WzSearchBar
             appName='ct-searchbar'
             {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={true}
-            showQueryBar={true}
+            fixedFilters={fixedFilters}
           />
         ) : null}
         <EuiSpacer size='m' />

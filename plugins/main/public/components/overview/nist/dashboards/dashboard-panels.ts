@@ -554,10 +554,21 @@ const getVisStateMetrics = (indexPatternId: string) => {
       metric: {
         percentageMode: false,
         useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [{ type: 'range', from: 0, to: 10000 }],
-        labels: { show: true },
+        colorSchema: 'Greens',
+        metricColorMode: 'Labels',
+        colorsRange: [
+          {
+            from: 0,
+            to: 0,
+          },
+          {
+            from: 0,
+            to: 0,
+          },
+        ],
+        labels: {
+          show: true,
+        },
         invertColors: false,
         style: {
           bgFill: '#000',
@@ -722,10 +733,21 @@ const getVisStateAgentStats = (indexPatternId: string) => {
       metric: {
         percentageMode: false,
         useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [{ type: 'range', from: 0, to: 10000 }],
-        labels: { show: true },
+        colorSchema: 'Greens',
+        metricColorMode: 'Labels',
+        colorsRange: [
+          {
+            from: 0,
+            to: 0,
+          },
+          {
+            from: 0,
+            to: 0,
+          },
+        ],
+        labels: {
+          show: true,
+        },
         invertColors: false,
         style: {
           bgFill: '#000',

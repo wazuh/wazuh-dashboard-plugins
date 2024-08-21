@@ -1,7 +1,11 @@
 import { tDataGridColumn } from '../../../common/data-grid';
 
 export const mitreAttackColumns: tDataGridColumn[] = [
-  { id: 'timestamp' },
+  {
+    id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
+  },
   { id: 'agent.name' },
   { id: 'rule.mitre.id' },
   { id: 'rule.mitre.tactic' },

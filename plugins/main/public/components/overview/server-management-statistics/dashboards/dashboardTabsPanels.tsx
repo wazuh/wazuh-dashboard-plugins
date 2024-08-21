@@ -78,7 +78,7 @@ export const DashboardTabsPanels = ({
     setFilters,
   });
 
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -86,10 +86,7 @@ export const DashboardTabsPanels = ({
     }
     fetchData({
       query,
-      dateRange: {
-        from: dateRangeFrom,
-        to: dateRangeTo,
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -97,15 +94,14 @@ export const DashboardTabsPanels = ({
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching statistics',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    dateRangeFrom,
-    dateRangeTo,
+    JSON.stringify(absoluteDateRange),
   ]);
 
   const selectedNodeFilter: tFilter = {
