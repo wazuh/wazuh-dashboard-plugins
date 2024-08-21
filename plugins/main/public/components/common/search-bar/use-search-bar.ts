@@ -9,6 +9,7 @@ import {
 } from '../../../../../../src/plugins/data/public';
 import { getDataPlugin } from '../../../kibana-services';
 import { useQueryManager, useTimeFilter } from '../hooks';
+import { transformDateRange } from './search-bar-service';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
@@ -52,6 +53,11 @@ const useSearchBarConfiguration = (
     ? useState(props?.query || { query: '', language: 'kuery' })
     : useQueryManager();
 
+  // This absoluteDateRange is used to ensure that the date range is the same when we make the
+  // pagination request with relative dates like "Last 24 hours"
+  const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
+    transformDateRange(globalTimeFilter),
+  );
   // states
   const [isLoading, setIsLoading] = useState(true);
   const [indexPatternSelected, setIndexPatternSelected] =
@@ -96,13 +102,17 @@ const useSearchBarConfiguration = (
    * Search bar properties necessary to render and initialize the osd search bar component
    */
   const searchBarProps: Partial<
-    SearchBarProps & { useDefaultBehaviors: boolean }
+    SearchBarProps & {
+      useDefaultBehaviors: boolean;
+      absoluteDateRange: TimeRange;
+    }
   > = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
     filters,
     query,
     timeHistory,
+    absoluteDateRange,
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (userFilters: Filter[]) => {
@@ -124,9 +134,9 @@ const useSearchBarConfiguration = (
       props?.setQuery ? props?.setQuery(query) : setQuery(query);
       props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
       setTimeFilter(dateRange);
+      setAbsoluteDateRange(transformDateRange(dateRange));
       setQuery(query);
     },
-
     // its necessary to use saved queries. if not, the load saved query not work
     useDefaultBehaviors: true,
   };

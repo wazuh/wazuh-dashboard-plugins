@@ -3,6 +3,8 @@ import { tDataGridColumn } from '../../../common/data-grid';
 export const vulnerabilitiesColumns: tDataGridColumn[] = [
   {
     id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
   },
   {
     id: 'agent.name',
@@ -18,5 +20,8 @@ export const vulnerabilitiesColumns: tDataGridColumn[] = [
   },
   {
     id: 'data.vulnerability.status',
+  },
+  {
+    id: 'data.vulnerability.package.version',
   },
 ];

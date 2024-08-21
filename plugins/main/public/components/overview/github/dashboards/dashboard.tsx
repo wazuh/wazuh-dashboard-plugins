@@ -53,7 +53,7 @@ const DashboardGitHubComponent: React.FC = () => {
     setFilters,
   });
 
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -61,10 +61,7 @@ const DashboardGitHubComponent: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -73,10 +70,7 @@ const DashboardGitHubComponent: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: {
-        to: dateRangeTo,
-        from: dateRangeFrom,
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -91,8 +85,7 @@ const DashboardGitHubComponent: React.FC = () => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(dateRangeFrom),
-    JSON.stringify(dateRangeTo),
+    JSON.stringify(absoluteDateRange),
   ]);
 
   return (
@@ -132,10 +125,7 @@ const DashboardGitHubComponent: React.FC = () => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'github-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
+                  timeRange: absoluteDateRange,
                   title: 'GitHub dashboard',
                   description: 'Dashboard of the GitHub',
                   query: searchBarProps.query,

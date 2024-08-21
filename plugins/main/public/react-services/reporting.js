@@ -19,7 +19,7 @@ import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 import store from '../redux/store';
-import domtoimage from '../utils/dom-to-image';
+import domtoimage from '../utils/dom-to-image-more';
 import dateMath from '@elastic/datemath';
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiButton, EuiLink } from '@elastic/eui';
@@ -116,7 +116,18 @@ export class ReportingService {
     return await Promise.all(
       Array.from(domVisualizations).map(async node => {
         return {
-          element: await domtoimage.toPng(node),
+          /* WORKAROUND: Defining the width and height resolves a bug
+          related to cropped screenshot on Firefox.
+
+          This solution is based on
+          https://github.com/1904labs/dom-to-image-more/issues/160#issuecomment-1922491067
+
+          See https://github.com/wazuh/wazuh-dashboard-plugins/issues/6900#issuecomment-2275495245
+          */
+          element: await domtoimage.toPng(node, {
+            width: node.clientWidth,
+            height: node.clientHeight,
+          }),
           width: node.clientWidth,
           height: node.clientHeight,
           title: node?.parentNode?.parentNode?.parentNode?.querySelector(
@@ -140,13 +151,13 @@ export class ReportingService {
       const timeFilter =
         dataSourceContext.time && dataSourceContext.indexPattern.timeFieldName
           ? buildRangeFilter(
-            {
-              name: dataSourceContext.indexPattern.timeFieldName,
-              type: 'date',
-            },
-            dataSourceContext.time,
-            dataSourceContext.indexPattern,
-          )
+              {
+                name: dataSourceContext.indexPattern.timeFieldName,
+                type: 'date',
+              },
+              dataSourceContext.time,
+              dataSourceContext.indexPattern,
+            )
           : null;
       // Build the filters to use in the server side
       // Based on https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.13.0/src/plugins/data/public/query/query_service.ts#L103-L113
@@ -166,12 +177,12 @@ export class ReportingService {
         tab === 'syscollector'
           ? { to: dataSourceContext.time.to, from: dataSourceContext.time.from }
           : {
-            to: dateMath.parse(dataSourceContext.time.to, {
-              roundUp: true,
-              forceNow: getForceNow(),
-            }),
-            from: dateMath.parse(dataSourceContext.time.from),
-          };
+              to: dateMath.parse(dataSourceContext.time.to, {
+                roundUp: true,
+                forceNow: getForceNow(),
+              }),
+              from: dateMath.parse(dataSourceContext.time.from),
+            };
 
       const data = {
         array: visualizations,
