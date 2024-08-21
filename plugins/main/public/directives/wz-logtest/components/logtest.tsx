@@ -267,7 +267,6 @@ export const Logtest = compose(
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <WzButtonPermissionsModalConfirm
-              style={{ maxWidth: '150px' }}
               tooltip={{ position: 'top', content: 'Clear current session' }}
               fill
               isDisabled={sessionToken === '' ? true : false}

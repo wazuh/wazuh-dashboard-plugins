@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getPlugins } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { getDashboardPanels } from './dashboard_panels';
+import { getDashboardPanels } from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import { SampleDataWarning } from '../../../visualize/components';
@@ -50,7 +50,7 @@ export const DashboardMITRE: React.FC = () => {
     filters,
     setFilters,
   });
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -58,10 +58,7 @@ export const DashboardMITRE: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -70,7 +67,7 @@ export const DashboardMITRE: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -85,8 +82,7 @@ export const DashboardMITRE: React.FC = () => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    dateRangeFrom,
-    dateRangeTo,
+    JSON.stringify(absoluteDateRange),
   ]);
 
   return (
@@ -126,10 +122,7 @@ export const DashboardMITRE: React.FC = () => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'mitre-dashboard-tab-filters',
-                  timeRange: {
-                    from: dateRangeFrom,
-                    to: dateRangeTo,
-                  },
+                  timeRange: absoluteDateRange,
                   title: 'MITRE dashboard filters',
                   description: 'Dashboard of the MITRE filters',
                   query: query,

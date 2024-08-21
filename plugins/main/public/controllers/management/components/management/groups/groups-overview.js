@@ -39,6 +39,7 @@ import { WzRequest, WzUserPermissions } from '../../../../../react-services';
 import { getToasts } from '../../../../../kibana-services';
 import GroupsHandler from './utils/groups-handler';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../../common/constants';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 export class WzGroupsOverview extends Component {
   _isMounted = false;
@@ -256,7 +257,12 @@ export class WzGroupsOverview extends Component {
           [{ action: 'group:read', resource: `group:id:${item.name}` }],
           this.props.userPermissions,
         )
-          ? () => this.props.updateGroupDetail(item)
+          ? () => {
+              NavigationService.getInstance().updateAndNavigateSearchParams({
+                group: item.name,
+              });
+              return this.props.updateGroupDetail(item);
+            }
           : undefined,
       };
     };

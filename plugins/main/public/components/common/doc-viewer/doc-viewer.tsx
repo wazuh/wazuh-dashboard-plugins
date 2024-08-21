@@ -11,8 +11,10 @@ const DOT_PREFIX_RE = /(.).+?\./g;
 export type tDocViewerProps = {
   flattened: any;
   formatted: any;
+  renderFields: () => {};
   mapping: any;
   indexPattern: any;
+  docJSON: any;
 };
 
 /**
@@ -80,7 +82,8 @@ const DocViewer = (props: tDocViewerProps) => {
   const [fieldRowOpen, setFieldRowOpen] = useState(
     {} as Record<string, boolean>,
   );
-  const { flattened, formatted, mapping, indexPattern } = props;
+  const { flattened, formatted, mapping, indexPattern, renderFields, docJSON } =
+    props;
 
   return (
     <>
@@ -144,17 +147,26 @@ const DocViewer = (props: tDocViewerProps) => {
                       </EuiFlexGroup>
                     </td>
                     <td>
-                      <div
-                        className={valueClassName}
-                        data-test-subj={`tableDocViewRow-${field}-value`}
-                        /*
-                         * Justification for dangerouslySetInnerHTML:
-                         * We just use values encoded by our field formatters
-                         */
-                        // eslint-disable-next-line react/no-danger
-                        dangerouslySetInnerHTML={{ __html: value as string }}
-                        style={{ overflowY: 'auto', wordBreak: 'break-all' }}
-                      />
+                      {renderFields &&
+                      renderFields?.find(
+                        (field: string) => field?.id === displayName,
+                      ) ? (
+                        renderFields
+                          ?.find((field: string) => field.id === displayName)
+                          .render(flattened[displayName], docJSON)
+                      ) : (
+                        <div
+                          className={valueClassName}
+                          data-test-subj={`tableDocViewRow-${field}-value`}
+                          /*
+                           * Justification for dangerouslySetInnerHTML:
+                           * We just use values encoded by our field formatters
+                           */
+                          // eslint-disable-next-line react/no-danger
+                          dangerouslySetInnerHTML={{ __html: value as string }}
+                          style={{ overflowY: 'auto', wordBreak: 'break-all' }}
+                        />
+                      )}
                     </td>
                   </tr>
                 );

@@ -9,6 +9,8 @@ export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
   },
   {
     id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
   },
   {
     id: 'agent.id',
@@ -21,9 +23,6 @@ export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
   },
   {
     id: 'rule.mitre.tactic',
-  },
-  {
-    id: 'rule.mitre_technique',
   },
   {
     id: 'rule.description',
@@ -42,15 +41,14 @@ export const threatHuntingTableAgentColumns: EuiDataGridColumn[] = [
   },
   {
     id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
   },
   {
     id: 'rule.mitre.id',
   },
   {
     id: 'rule.mitre.tactic',
-  },
-  {
-    id: 'rule.mitre_technique',
   },
   {
     id: 'rule.description',

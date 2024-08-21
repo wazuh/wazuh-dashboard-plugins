@@ -17,17 +17,19 @@ import { EuiPanel } from '@elastic/eui';
 import { MitreAttackResources } from './resources';
 import { ModuleMitreAttackIntelligenceLeftPanel } from './intelligence_left_panel';
 import { ModuleMitreAttackIntelligenceRightPanel } from './intelligence_right_panel';
-import { useAsyncAction } from '../../../common/hooks';
+import { useAsyncAction, useRouterSearch } from '../../../common/hooks';
 import { WzRequest } from '../../../../react-services';
 import { PanelSplit } from '../../../common/panels';
 import { withUserAuthorizationPrompt } from '../../../common/hocs';
 import { compose } from 'redux';
+import NavigationService from '../../../../react-services/navigation-service';
 
 export const ModuleMitreAttackIntelligence = compose(
   withUserAuthorizationPrompt([{ action: 'mitre:read', resource: '*:*:*' }]),
 )(() => {
+  const paramTabRedirect = useRouterSearch().tabRedirect;
   const [selectedResource, setSelectedResource] = useState(
-    MitreAttackResources[0].id,
+    paramTabRedirect || MitreAttackResources[0].id,
   );
   const [searchTermAllResources, setSearchTermAllResources] = useState('');
   const searchTermAllResourcesLastSearch = useRef('');
@@ -50,8 +52,8 @@ export const ModuleMitreAttackIntelligence = compose(
                 params: {
                   ...(searchTerm
                     ? {
-                      q: fields.map(key => `${key}~${searchTerm}`).join(','),
-                    }
+                        q: fields.map(key => `${key}~${searchTerm}`).join(','),
+                      }
                     : {}),
                   limit: limitResults,
                 },
@@ -70,13 +72,13 @@ export const ModuleMitreAttackIntelligence = compose(
                   setResourceFilters({
                     ...(searchTermAllResourcesLastSearch.current
                       ? {
-                        q: fields
-                          .map(
-                            key =>
-                              `${key}~${searchTermAllResourcesLastSearch.current}`,
-                          )
-                          .join(','),
-                      }
+                          q: fields
+                            .map(
+                              key =>
+                                `${key}~${searchTermAllResourcesLastSearch.current}`,
+                            )
+                            .join(','),
+                        }
                       : {}),
                   });
                   setSelectedResource(resource.id);
@@ -93,19 +95,23 @@ export const ModuleMitreAttackIntelligence = compose(
   );
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.href);
-    const redirectTab = urlParams.get('tabRedirect');
-    if (redirectTab) {
-      setSelectedResource(redirectTab);
+    if (!paramTabRedirect) {
+      NavigationService.getInstance().updateAndNavigateSearchParams({
+        tabRedirect: selectedResource,
+      });
     }
-  }, []);
+    setSelectedResource(paramTabRedirect);
+  }, [paramTabRedirect]);
 
   const onSelectResource = useCallback(
     resourceID => {
+      NavigationService.getInstance().updateAndNavigateSearchParams({
+        tabRedirect: resourceID,
+      });
       setResourceFilters({});
       setSelectedResource(prevSelectedResource =>
         prevSelectedResource === resourceID &&
-          searchTermAllResourcesUsed.current
+        searchTermAllResourcesUsed.current
           ? null
           : resourceID,
       );
@@ -118,7 +124,12 @@ export const ModuleMitreAttackIntelligence = compose(
   }, []);
 
   return (
-    <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+    <EuiPanel
+      paddingSize='s'
+      hasShadow={false}
+      hasBorder={false}
+      color='transparent'
+    >
       <PanelSplit
         side={
           <ModuleMitreAttackIntelligenceLeftPanel

@@ -18,7 +18,12 @@ import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
-import { useDataGrid, tDataGridColumn, exportSearchToCSV } from '../data-grid';
+import {
+  useDataGrid,
+  tDataGridColumn,
+  exportSearchToCSV,
+  getAllCustomRenders,
+} from '../data-grid';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import {
   ErrorHandler,
@@ -43,6 +48,7 @@ import {
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
 import { WzSearchBar } from '../search-bar';
+import DocDetailsHeader from './components/doc-details-header';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -109,7 +115,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     filters,
     setFilters,
   });
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
@@ -136,7 +142,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       query,
       pagination,
       sorting,
-      dateRange: { from: dateRangeFrom || '', to: dateRangeTo || '' },
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -149,10 +155,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(pagination),
     JSON.stringify(sorting),
-    dateRangeFrom,
-    dateRangeTo,
+    JSON.stringify(pagination),
+    JSON.stringify(absoluteDateRange),
   ]);
 
   const timeField = indexPattern?.timeFieldName
@@ -237,8 +242,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                         AlertsRepository.getStoreIndexPatternId(),
                         fetchFilters,
                         query,
-                        dateRangeFrom,
-                        dateRangeTo,
+                        absoluteDateRange.from,
+                        absoluteDateRange.to,
                       )}
                     />
                   </EuiPanel>
@@ -256,6 +261,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           isExporting={isExporting}
                           onClickExportResults={onClickExportResults}
                           maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                          dateRange={absoluteDateRange}
                         />
                       </>
                     ),
@@ -267,9 +273,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           {inspectedHit && (
             <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
               <EuiFlyoutHeader>
-                <EuiTitle>
-                  <h2>Document Details</h2>
-                </EuiTitle>
+                <DocDetailsHeader
+                  doc={inspectedHit}
+                  indexPattern={dataSource?.indexPattern}
+                />
               </EuiFlyoutHeader>
               <EuiFlyoutBody>
                 <EuiFlexGroup direction='column'>
@@ -277,6 +284,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     <DocumentViewTableAndJson
                       document={inspectedHit}
                       indexPattern={indexPattern}
+                      renderFields={getAllCustomRenders(
+                        defaultTableColumns,
+                        wzDiscoverRenderColumns,
+                      )}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
