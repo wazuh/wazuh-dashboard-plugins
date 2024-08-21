@@ -171,9 +171,6 @@ export class SavedObject {
     }
   }
 
-  /**
-   * Create index-pattern
-   */
   static async createSavedObject(type, id, params, fields = '') {
     try {
       const result = await GenericRequest.request(
