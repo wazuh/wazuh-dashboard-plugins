@@ -20,7 +20,6 @@ import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
 import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
 import { DashboardPOCByReference } from '../../overview/poc/dashboards/overview/dashboard';
-
 import { DashboardMITRE } from '../../overview/mitre/dashboard';
 import { withModuleNotForAgent } from '../hocs';
 import {
