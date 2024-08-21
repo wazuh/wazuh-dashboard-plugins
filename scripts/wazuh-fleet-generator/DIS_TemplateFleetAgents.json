@@ -1,151 +1,94 @@
 {
-  "mappings": {
-    "date_detection": false,
-    "dynamic_templates": [
-      {
-        "strings_as_keyword": {
-          "mapping": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "match_mapping_type": "string"
-        }
-      }
-    ],
-    "properties": {
-      "agent": {
-        "properties": {
-          "build": {
-            "properties": {
-              "original": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              }
-            }
-          },
-          "ephemeral_id": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "id": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "name": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "last_login": {
-            "type": "date"
-          },
-          "version": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "groups": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "node_name": {
-            "ignore_above": 1024,
-            "type": "keyword"
+  "index_patterns": [
+    "inventory-system-default"
+  ],
+  "template": {
+    "mappings": {
+      "date_detection": false,
+      "dynamic_templates": [
+        {
+          "strings_as_keyword": {
+            "mapping": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "match_mapping_type": "string"
           }
         }
-      },
-      "host": {
-        "properties": {
-          "architecture": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "checksum": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "hostname": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "ip": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "scan_time": {
-            "type": "date"
-          },
-          "sysname": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "os": {
-            "properties": {
-              "full": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              },
-              "kernel": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              },
-              "name": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              },
-              "platform": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              },
-              "type": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              },
-              "version": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              }
+      ],
+      "properties": {
+        "agent": {
+          "properties": {
+            "id": {
+              "ignore_above": 1024,
+              "type": "keyword"
             }
           }
-        }
-      },
-      "wazuh": {
-        "properties": {
-          "cluster": {
-            "properties": {
-              "name": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              }
+        },
+        "network": {
+          "properties": {
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "MAC": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "state": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "mtu": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "type": {
+              "ignore_above": 1024,
+              "type": "keyword"
             }
-          },
-          "manager": {
-            "properties": {
-              "name": {
-                "ignore_above": 1024,
-                "type": "keyword"
+          }
+        },
+        "wazuh": {
+          "properties": {
+            "cluster": {
+              "properties": {
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
               }
-            }
-          },
-          "node": {
-            "properties": {
-              "name": {
-                "ignore_above": 1024,
-                "type": "keyword"
+            },
+            "manager": {
+              "properties": {
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "node": {
+              "properties": {
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
               }
             }
           }
         }
       }
-    }
-  },
-  "settings": {
-    "index": {
-      "codec": "best_compression",
-      "mapping": {
-        "total_fields": {
-          "limit": 1000
-        }
-      },
-      "refresh_interval": "2s"
+    },
+    "settings": {
+      "index": {
+        "codec": "best_compression",
+        "mapping": {
+          "total_fields": {
+            "limit": 1000
+          }
+        },
+        "refresh_interval": "2s"
+      }
     }
   }
 }

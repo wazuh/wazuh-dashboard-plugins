@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "commands-default"
-  ],
+  "index_patterns": ["commands-default"],
   "priority": 1,
   "template": {
     "settings": {
@@ -9,12 +7,7 @@
         "codec": "zstd",
         "number_of_replicas": "0",
         "number_of_shards": "1",
-        "query.default_field": [
-          "args",
-          "agent.id",
-          "status",
-          "info"
-        ],
+        "query.default_field": ["args", "agent.id", "status", "info"],
         "refresh_interval": "5s"
       }
     },
@@ -87,6 +80,23 @@
               }
             }
           }
+        },
+        "agent": {
+          "properties": {
+            "id": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
+        "status": {
+          "type": "keyword"
+        },
+        "info": {
+          "type": "text"
+        },
+        "args": {
+          "type": "text"
         }
       }
     }

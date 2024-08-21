@@ -161,7 +161,9 @@ def generateRandomData(number):
         yield {
             'process': generateRandomProcess(),
             'args': random.sample(getProcessArgs(), random.randint(1, len(getProcessArgs()))),
-            'agent.id': generateRandomUUID(),
+            'agent': {
+                'id': generateRandomUUID(),
+            }, 
             'status': random.choice(getCommandStatus()),
             'info': random.choice(getCommandInfo()),
             'wazuh': generateRandomWazuh()
