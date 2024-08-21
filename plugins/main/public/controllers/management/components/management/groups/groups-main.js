@@ -39,7 +39,7 @@ class WzGroups extends Component {
     this.state = {};
   }
 
-  async componentDidMount() {
+  getGroupDetail = async () => {
     // Check if there is a group in the URL
     const { group } = this.props.search;
     if (group) {
@@ -50,9 +50,6 @@ class WzGroups extends Component {
         });
         const dataGroup = responseGroup?.data?.data?.affected_items?.[0];
         this.props.updateGroupDetail(dataGroup);
-        NavigationService.getInstance().updateAndNavigateSearchParams({
-          group: null,
-        });
       } catch (error) {
         const options = {
           context: `${WzGroups.name}.componentDidMount`,
@@ -67,6 +64,17 @@ class WzGroups extends Component {
         };
         getErrorOrchestrator().handleError(options);
       }
+    }
+  };
+  async componentDidMount() {
+    await this.getGroupDetail();
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (this.props.search?.group !== prevProps.search?.group) {
+      this.props.search?.group === undefined
+        ? this.props.updateGroupDetail(false)
+        : await this.getGroupDetail();
     }
   }
 
@@ -113,7 +121,20 @@ const mapDispatchToProps = dispatch => {
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withGlobalBreadcrumb(props => {
-    return [{ text: endpointGroups.breadcrumbLabel }];
+    return props.state?.itemDetail
+      ? [
+          {
+            text: endpointGroups.breadcrumbLabel,
+            onClick: ev => {
+              ev.preventDefault();
+              NavigationService.getInstance().updateAndNavigateSearchParams({
+                group: null,
+              });
+            },
+          },
+          { text: props.state?.itemDetail.name },
+        ]
+      : [{ text: endpointGroups.breadcrumbLabel }];
   }),
   withRouterSearch,
 )(WzGroups);

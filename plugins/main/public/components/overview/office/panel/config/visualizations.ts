@@ -90,7 +90,7 @@ export const getVisStateOfficeTopsEventsPie = (indexPatternId: string) => {
       addTooltip: true,
       addLegend: true,
       legendPosition: 'right',
-      isDonut: false,
+      isDonut: true,
       labels: {
         show: false,
         values: true,

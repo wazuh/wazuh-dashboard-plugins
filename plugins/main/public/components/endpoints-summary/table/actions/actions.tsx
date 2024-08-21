@@ -35,9 +35,9 @@ export const agentsTableActions = (
     color: 'primary',
     enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     onClick: agent =>
-      NavigationService.getInstance().navigateToApp(endpointSummary.id, {
-        path: `#/agents?tab=welcome&agent=${agent.id}`,
-      }),
+      NavigationService.getInstance().navigate(
+        `/agents?tab=welcome&agent=${agent.id}`,
+      ),
   },
   {
     name: agent => {
@@ -57,9 +57,9 @@ export const agentsTableActions = (
     icon: 'wrench',
     type: 'icon',
     onClick: agent =>
-      NavigationService.getInstance().navigateToApp(endpointSummary.id, {
-        path: `#/agents?tab=configuration&agent=${agent.id}`,
-      }),
+      NavigationService.getInstance().navigate(
+        `/agents?tab=configuration&agent=${agent.id}`,
+      ),
     enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     'data-test-subj': 'action-configuration',
   },

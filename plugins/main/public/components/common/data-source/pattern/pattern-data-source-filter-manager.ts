@@ -537,7 +537,7 @@ export class PatternDataSourceFilterManager
         value: Array.isArray(value) ? value.join(', ') : value,
         params: value,
         negate,
-        type: 'phrases',
+        type: Array.isArray(value) ? 'phrases' : 'phrase',
         index: indexPatternId,
         controlledBy,
       },
