@@ -11,6 +11,10 @@ import {
   PatternDataSourceFilterManager,
   tFilterManager,
 } from '../index';
+import { createOsdUrlStateStorage } from '../../../../../../../src/plugins/opensearch_dashboards_utils/public';
+import NavigationService from '../../../../react-services/navigation-service';
+import { OSD_URL_STATE_STORAGE_ID } from '../../../../../common/constants';
+import { getUiSettings } from '../../../../kibana-services';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 import { useIsMounted } from '../../hooks/use-is-mounted';
 
@@ -79,8 +83,18 @@ export function useDataSource<
 >(
   props: tUseDataSourceProps<T, K>,
 ): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
+  const navigationService = NavigationService.getInstance();
+  const config = getUiSettings();
+  const history = navigationService.getHistory();
+  const osdUrlStateStorage = createOsdUrlStateStorage({
+    useHash: config.get(OSD_URL_STATE_STORAGE_ID),
+    history: history,
+  });
+  const appDefaultFilters = osdUrlStateStorage.get('_a')?.filters ?? [];
+  const globalDefaultFilters = osdUrlStateStorage.get('_g')?.filters ?? [];
+  const defaultFilters = [...appDefaultFilters, ...globalDefaultFilters];
   const {
-    filters: initialFilters = [],
+    filters: initialFilters = [...defaultFilters],
     fetchFilters: initialFetchFilters = [],
     fixedFilters: initialFixedFilters = [],
     DataSource: DataSourceConstructor,
