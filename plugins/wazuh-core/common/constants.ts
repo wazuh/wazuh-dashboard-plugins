@@ -2189,3 +2189,6 @@ export const WAZUH_CORE_CONFIGURATION_CACHE_SECONDS = 10;
 
 // API connection permissions
 export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
+
+// ID used to refer the createOsdUrlStateStorage state
+export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';

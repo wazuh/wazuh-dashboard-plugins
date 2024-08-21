@@ -9,12 +9,27 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { getDataPlugin } from '../../../kibana-services';
 import { useState, useEffect } from 'react';
+import NavigationService from '../../../react-services/navigation-service';
+import { getUiSettings, getDataPlugin } from '../../../kibana-services';
+import { OSD_URL_STATE_STORAGE_ID } from '../../../../common/constants';
+import { createOsdUrlStateStorage } from '../../../../../../src/plugins/opensearch_dashboards_utils/public';
 
 export function useTimeFilter() {
+  const navigationService = NavigationService.getInstance();
+  const config = getUiSettings();
+  const history = navigationService.getHistory();
+  const osdUrlStateStorage = createOsdUrlStateStorage({
+    useHash: config.get(OSD_URL_STATE_STORAGE_ID),
+    history: history,
+  });
+
+  const globalStateFromUrl = osdUrlStateStorage.get('_g');
+
   const { timefilter } = getDataPlugin().query.timefilter;
-  const [timeFilter, setTimeFilter] = useState(timefilter.getTime());
+  const [timeFilter, setTimeFilter] = useState(
+    globalStateFromUrl?.time ?? timefilter.getTime(),
+  );
   const [timeHistory, setTimeHistory] = useState(timefilter._history);
   useEffect(() => {
     const subscription = timefilter.getTimeUpdate$().subscribe(() => {
