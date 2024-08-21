@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 // Eui components
 import {
   EuiFlexGroup,
@@ -6,11 +6,10 @@ import {
   EuiPanel,
   EuiPage,
   EuiTitle,
-  EuiText,
   EuiTab,
   EuiTabs,
   EuiToolTip,
-  EuiButtonIcon
+  EuiButtonIcon,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -19,7 +18,7 @@ import GroupsHandler from './utils/groups-handler';
 
 import {
   cleanTabs,
-  updateSelectedTab
+  updateSelectedTab,
 } from '../../../../../redux/actions/groupsActions';
 import WzGroupsActionButtonsAgents from './actions-buttons-agents';
 import WzGroupsActionButtonsFiles from './actions-buttons-files';
@@ -27,6 +26,7 @@ import WzGroupAgentsTable from './group-agents-table';
 import WzGroupFilesTable from './group-files-table';
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 class WzGroupDetail extends Component {
   constructor(props) {
@@ -36,17 +36,17 @@ class WzGroupDetail extends Component {
       {
         id: 'agents',
         name: 'Agents',
-        disabled: false
+        disabled: false,
       },
       {
         id: 'files',
         name: 'Files',
-        disabled: false
-      }
+        disabled: false,
+      },
     ];
 
     this.state = {
-      selectedTabId: this.props.state.selectedTabId
+      selectedTabId: this.props.state.selectedTabId,
     };
 
     this.groupsHandler = GroupsHandler;
@@ -58,13 +58,16 @@ class WzGroupDetail extends Component {
 
   onSelectedTabChanged = id => {
     this.setState({
-      selectedTabId: id
+      selectedTabId: id,
     });
     this.props.updateSelectedTab(id);
   };
 
   goBack() {
     this.props.cleanTabs();
+    NavigationService.getInstance().updateAndNavigateSearchParams({
+      group: null,
+    });
   }
 
   renderTabs() {
@@ -82,15 +85,11 @@ class WzGroupDetail extends Component {
   }
 
   renderAgents() {
-    return (
-      <WzGroupAgentsTable {...this.props} />
-    );
+    return <WzGroupAgentsTable {...this.props} />;
   }
 
   renderFiles() {
-    return (
-      <WzGroupFilesTable />
-    );
+    return <WzGroupFilesTable />;
   }
 
   render() {
@@ -103,19 +102,19 @@ class WzGroupDetail extends Component {
             <EuiFlexItem>
               <EuiFlexGroup>
                 <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-                  <EuiToolTip position="right" content={`Back to groups`}>
+                  <EuiToolTip position='right' content={`Back to groups`}>
                     <EuiButtonIcon
-                      aria-label="Back"
+                      aria-label='Back'
                       style={{ paddingTop: 8 }}
-                      color="primary"
-                      iconSize="l"
-                      iconType="arrowLeft"
+                      color='primary'
+                      iconSize='l'
+                      iconType='arrowLeft'
                       onClick={() => this.goBack()}
                     />
                   </EuiToolTip>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                  <EuiTitle size="s">
+                  <EuiTitle size='s'>
                     <h1>{itemDetail.name}</h1>
                   </EuiTitle>
                 </EuiFlexItem>
@@ -147,7 +146,7 @@ class WzGroupDetail extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
   };
 };
 
@@ -155,14 +154,16 @@ const mapDispatchToProps = dispatch => {
   return {
     cleanTabs: () => dispatch(cleanTabs()),
     updateSelectedTab: selectedTabId =>
-      dispatch(updateSelectedTab(selectedTabId))
+      dispatch(updateSelectedTab(selectedTabId)),
   };
 };
 
 export default compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
-  withUserAuthorizationPrompt((props) => [{action: 'group:read', resource: `group:id:${props.state.itemDetail.name}`}]),
+  connect(mapStateToProps, mapDispatchToProps),
+  withUserAuthorizationPrompt(props => [
+    {
+      action: 'group:read',
+      resource: `group:id:${props.state.itemDetail.name}`,
+    },
+  ]),
 )(WzGroupDetail);

@@ -4,7 +4,7 @@ import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/
 const getVisStateAlertsEvolution = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Alerts-Evolution',
-    title: 'Mitre alerts evolution',
+    title: 'Alerts evolution over time',
     type: 'line',
     params: {
       type: 'line',
@@ -552,7 +552,7 @@ const getVisStateTopTacticsByAgent = (indexPatternId: string) => {
 const getVisStateTechniqueByAgent = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Attacks-By-Agent',
-    title: 'Attack by agent',
+    title: 'Mitre techniques by agent',
     type: 'pie',
     params: {
       type: 'pie',
@@ -636,6 +636,398 @@ const getVisStateTechniqueByAgent = (indexPatternId: string) => {
   };
 };
 
+const getVisStateAlertsLevelByAttack = indexPatternId => {
+  return {
+    id: 'Wazuh-App-Agents-MITRE-Level-By-Attack',
+    title: 'Rule level by attack',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: {
+        show: false,
+        values: true,
+        last_level: true,
+        truncate: 100,
+      },
+      dimensions: {
+        metric: {
+          accessor: 1,
+          format: { id: 'number' },
+          params: {},
+          aggType: 'count',
+        },
+        buckets: [
+          {
+            accessor: 0,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+          {
+            accessor: 2,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+          {
+            accessor: 4,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'number',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'lucene',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.mitre.technique',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Attack ID',
+          },
+        },
+        {
+          id: '4',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.level',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Rule level',
+          },
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateMitreAttacksByTactic = indexPatternId => {
+  return {
+    id: 'Wazuh-App-Agents-MITRE-Attacks-By-Tactic',
+    title: 'MITRE attacks by tactic',
+    type: 'histogram',
+    params: {
+      type: 'histogram',
+      grid: { categoryLines: false },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'histogram',
+          mode: 'stacked',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      labels: { show: false },
+      thresholdLine: {
+        show: false,
+        value: 10,
+        width: 1,
+        style: 'full',
+        color: '#34130C',
+      },
+      dimensions: {
+        x: null,
+        y: [
+          {
+            accessor: 1,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+        series: [
+          {
+            accessor: 0,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'lucene',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.mitre.technique',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.mitre.tactic',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateAlertsLevelByTactic = indexPatternId => {
+  return {
+    id: 'Wazuh-App-Agents-MITRE-Level-By-Tactic',
+    title: 'Rule level by tactic',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: {
+        show: false,
+        values: true,
+        last_level: true,
+        truncate: 100,
+      },
+      dimensions: {
+        metric: {
+          accessor: 1,
+          format: { id: 'number' },
+          params: {},
+          aggType: 'count',
+        },
+        buckets: [
+          {
+            accessor: 0,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+          {
+            accessor: 2,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'number',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'lucene',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.mitre.tactic',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Attack ID',
+          },
+        },
+        {
+          id: '4',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.level',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Rule level',
+          },
+        },
+      ],
+    },
+  };
+};
+
 export const getDashboardPanels = (
   indexPatternId: string,
   pinnedAgent?: boolean,
@@ -644,7 +1036,6 @@ export const getDashboardPanels = (
     EmbeddableInput & { [k: string]: unknown }
   >;
 } => {
-  //There is currently no difference between the panels that are rendered with or without an agent, but in light of future changes, it has been decided to keep this structure.
   const pinnedAgentPanels = {
     '1': {
       gridData: {
@@ -685,7 +1076,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '3',
-        savedVis: getVisStateAttacksByTechnique(indexPatternId),
+        savedVis: getVisStateAlertsLevelByAttack(indexPatternId),
       },
     },
     '4': {
@@ -699,7 +1090,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '4',
-        savedVis: getVisStateTopTacticsByAgent(indexPatternId),
+        savedVis: getVisStateMitreAttacksByTactic(indexPatternId),
       },
     },
     '5': {
@@ -713,78 +1104,78 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '5',
-        savedVis: getVisStateTechniqueByAgent(indexPatternId),
+        savedVis: getVisStateAlertsLevelByTactic(indexPatternId),
       },
     },
   };
   const panels = {
-    '1': {
+    '6': {
       gridData: {
         w: 36,
         h: 12,
         x: 0,
         y: 0,
-        i: '1',
+        i: '6',
       },
       type: 'visualization',
       explicitInput: {
-        id: '1',
+        id: '6',
         savedVis: getVisStateAlertsEvolution(indexPatternId),
       },
     },
-    '2': {
+    '7': {
       gridData: {
         w: 12,
         h: 12,
         x: 36,
         y: 0,
-        i: '2',
+        i: '7',
       },
       type: 'visualization',
       explicitInput: {
-        id: '2',
+        id: '7',
         savedVis: getVisStateTopTactics(indexPatternId),
       },
     },
-    '3': {
+    '8': {
       gridData: {
         w: 16,
         h: 12,
         x: 0,
         y: 12,
-        i: '3',
+        i: '8',
       },
       type: 'visualization',
       explicitInput: {
-        id: '3',
+        id: '8',
         savedVis: getVisStateAttacksByTechnique(indexPatternId),
       },
     },
-    '4': {
+    '9': {
       gridData: {
         w: 16,
         h: 12,
         x: 16,
         y: 12,
-        i: '4',
+        i: '9',
       },
       type: 'visualization',
       explicitInput: {
-        id: '4',
+        id: '9',
         savedVis: getVisStateTopTacticsByAgent(indexPatternId),
       },
     },
-    '5': {
+    '10': {
       gridData: {
         w: 16,
         h: 12,
         x: 32,
         y: 12,
-        i: '5',
+        i: '10',
       },
       type: 'visualization',
       explicitInput: {
-        id: '5',
+        id: '10',
         savedVis: getVisStateTechniqueByAgent(indexPatternId),
       },
     },
