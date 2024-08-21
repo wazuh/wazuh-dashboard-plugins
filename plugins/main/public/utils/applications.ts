@@ -946,3 +946,68 @@ export const Categories = [
     euiIconType: 'managementApp',
   },
 ];
+
+export const CategoriesNavGroup = [
+  {
+    id: 'wz-category-home',
+    title: i18n.translate('wz-app-category-home', {
+      defaultMessage: 'Home',
+    }),
+    order: 1000,
+    euiIconType: 'appSearchApp',
+  },
+  {
+    id: 'wz-category-endpoint-security',
+    title: i18n.translate('wz-app-category-endpoint-security', {
+      defaultMessage: 'Endpoint security',
+    }),
+    order: 1200,
+    euiIconType: 'monitoringApp',
+  },
+  {
+    id: 'wz-category-threat-intelligence',
+    title: i18n.translate('wz-app-category-threat-intelligence', {
+      defaultMessage: 'Threat intelligence',
+    }),
+    order: 1300,
+    euiIconType: 'lensApp',
+  },
+  {
+    id: 'wz-category-security-operations',
+    title: i18n.translate('wz-app-category-security-operations', {
+      defaultMessage: 'Security operations',
+    }),
+    order: 1400,
+    euiIconType: 'securityApp',
+  },
+  {
+    id: 'wz-category-cloud-security',
+    title: i18n.translate('wz-app-category-cloud-security', {
+      defaultMessage: 'Cloud security',
+    }),
+    order: 1500,
+    euiIconType: 'watchesApp',
+  },
+  {
+    id: 'wz-category-server-management',
+    title: i18n.translate('wz-app-category-server-management', {
+      defaultMessage: 'Server management',
+    }),
+    order: 1600,
+    euiIconType: 'indexRollupApp',
+  },
+  {
+    id: 'wz-category-dashboard-management',
+    title: i18n.translate('wz-app-category-dashboard-management', {
+      defaultMessage: 'Dashboard management',
+    }),
+    order: 6e3,
+    euiIconType: 'dashboardApp',
+  },
+  {
+    id: 'management',
+    title: 'Indexer management',
+    order: 5e3,
+    euiIconType: 'managementApp',
+  },
+];

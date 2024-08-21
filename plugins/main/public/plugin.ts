@@ -47,6 +47,7 @@ import { Applications, Categories } from './utils/applications';
 import { euiPaletteColorBlind } from '@elastic/eui';
 import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
+import { PluginNav } from './plugin-nav';
 
 export class WazuhPlugin
   implements
@@ -181,6 +182,10 @@ export class WazuhPlugin
         ),
       });
     });
+
+    if (core.chrome.navGroup.getNavGroupEnabled()) {
+      PluginNav(core);
+    }
     return {};
   }
   public start(
