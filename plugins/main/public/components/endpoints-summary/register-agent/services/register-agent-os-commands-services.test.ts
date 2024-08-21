@@ -222,6 +222,8 @@ describe('getMacOsInstallCommand', () => {
 describe('getMacosStartCommand', () => {
   it('returns the correct start command for macOS', () => {
     const startCommand = getMacosStartCommand({});
-    expect(startCommand).toEqual('sudo /Library/Ossec/bin/wazuh-control start');
+    expect(startCommand).toEqual(
+      'sudo /Library/wazuh_agent/bin/wazuh-control start',
+    );
   });
 });
