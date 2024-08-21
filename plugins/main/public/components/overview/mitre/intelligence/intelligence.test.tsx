@@ -46,7 +46,18 @@ jest.mock('react', () => ({
 }));
 
 jest.mock('../../../../react-services/navigation-service', () => ({
-  getInstance() {},
+  getInstance() {
+    return {
+      getLocation: () => {
+        return { search: '?tabRedirect=groups' };
+      },
+      getParams: () => {
+        return {
+          has: () => 'groups',
+        };
+      },
+    };
+  },
 }));
 
 const mockStore = configureMockStore();

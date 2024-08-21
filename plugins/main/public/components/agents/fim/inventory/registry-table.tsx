@@ -88,7 +88,8 @@ export const RegistryTable = withRouterSearch(
             </span>
           ),
           sortable: true,
-          width: '200px',
+          width: '250px',
+          className: 'wz-white-space-nowrap',
           render: formatUIDate,
           searchable: false,
         },

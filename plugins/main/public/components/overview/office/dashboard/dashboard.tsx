@@ -52,7 +52,7 @@ const DashboardOffice365Component: React.FC = () => {
     filters,
     setFilters,
   });
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -60,10 +60,7 @@ const DashboardOffice365Component: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -72,10 +69,7 @@ const DashboardOffice365Component: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: {
-        from: searchBarProps.dateRangeFrom || '',
-        to: searchBarProps.dateRangeTo || '',
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -90,8 +84,7 @@ const DashboardOffice365Component: React.FC = () => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    searchBarProps.dateRangeFrom,
-    searchBarProps.dateRangeTo,
+    JSON.stringify(absoluteDateRange),
   ]);
 
   return (
@@ -129,10 +122,7 @@ const DashboardOffice365Component: React.FC = () => {
                 filters: fetchFilters ?? [],
                 useMargins: true,
                 id: 'kpis-th-dashboard-tab',
-                timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
-                },
+                timeRange: absoluteDateRange,
                 title: 'KPIs Office 365 dashboard',
                 description: 'KPIs Dashboard of the Office 365',
                 query: searchBarProps.query,
@@ -153,10 +143,7 @@ const DashboardOffice365Component: React.FC = () => {
                 filters: fetchFilters ?? [],
                 useMargins: true,
                 id: 'office-365-detector-dashboard-tab',
-                timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
-                },
+                timeRange: absoluteDateRange,
                 title: 'Office 365 detector dashboard',
                 description: 'Dashboard of the Office 365',
                 query: searchBarProps.query,
