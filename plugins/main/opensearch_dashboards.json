@@ -1,8 +1,10 @@
 {
   "id": "wazuh",
-  "version": "4.9.0-05",
+  "version": "4.9.0-06",
   "opensearchDashboardsVersion": "opensearchDashboards",
-  "configPath": ["wazuh"],
+  "configPath": [
+    "wazuh"
+  ],
   "requiredPlugins": [
     "navigation",
     "data",
