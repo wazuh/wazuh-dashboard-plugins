@@ -40,35 +40,6 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/visualizations/{tab}/{pattern}',
-      validate: {
-        params: schema.object({
-          tab: schema.string(),
-          pattern: schema.string(),
-        }),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.createVis(context, request, response),
-  );
-
-  router.post(
-    {
-      path: '/elastic/visualizations/{tab}/{pattern}',
-      validate: {
-        params: schema.object({
-          tab: schema.string(),
-          pattern: schema.string(),
-        }),
-        body: schema.any(),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.createClusterVis(context, request, response),
-  );
-
-  router.get(
-    {
       path: '/elastic/template/{pattern}',
       validate: {
         params: schema.object({

@@ -2,6 +2,11 @@ import { tDataGridColumn } from '../../../common/data-grid';
 
 export const fileIntegrityMonitoringColumns: tDataGridColumn[] = [
   {
+    id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
+  },
+  {
     id: 'agent.name',
   },
   {

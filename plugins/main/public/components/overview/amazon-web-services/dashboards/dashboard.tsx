@@ -37,6 +37,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -53,7 +54,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
     setFilters,
   });
 
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -61,10 +62,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -73,10 +71,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
     }
     fetchData({
       query,
-      dateRange: {
-        from: dateRangeFrom,
-        to: dateRangeTo,
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -89,8 +84,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(dateRangeFrom),
-    JSON.stringify(dateRangeTo),
+    JSON.stringify(absoluteDateRange),
   ]);
   return (
     <>
@@ -102,9 +96,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
             <WzSearchBar
               appName='aws-searchbar'
               {...searchBarProps}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
+              fixedFilters={fixedFilters}
             />
           )}
           {dataSource && results?.hits?.total === 0 ? (
@@ -130,10 +122,7 @@ const DashboardAWSComponents: React.FC = ({}) => {
                   filters: fetchFilters || [],
                   useMargins: true,
                   id: 'aws-dashboard-tab',
-                  timeRange: {
-                    from: dateRangeFrom,
-                    to: dateRangeTo,
-                  },
+                  timeRange: absoluteDateRange,
                   title: 'AWS dashboard',
                   description: 'Dashboard of the AWS',
                   query: query,

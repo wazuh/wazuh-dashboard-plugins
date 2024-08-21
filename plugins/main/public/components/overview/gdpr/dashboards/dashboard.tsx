@@ -37,6 +37,7 @@ const DashboardGDPRComponent: React.FC = () => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -52,7 +53,7 @@ const DashboardGDPRComponent: React.FC = () => {
     setFilters,
   });
 
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -60,10 +61,7 @@ const DashboardGDPRComponent: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -72,10 +70,7 @@ const DashboardGDPRComponent: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: {
-        from: dateRangeFrom,
-        to: dateRangeTo,
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => {
         setResults(results);
@@ -83,15 +78,14 @@ const DashboardGDPRComponent: React.FC = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching alerts',
+          message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(dateRangeFrom),
-    JSON.stringify(dateRangeTo),
+    JSON.stringify(absoluteDateRange),
   ]);
 
   return (
@@ -104,6 +98,7 @@ const DashboardGDPRComponent: React.FC = () => {
             <WzSearchBar
               appName='gdpr-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
@@ -130,10 +125,7 @@ const DashboardGDPRComponent: React.FC = () => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'gdpr-dashboard-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
+                  timeRange: absoluteDateRange,
                   title: 'GDPR dashboard',
                   description: 'Dashboard of the GDPR',
                   query: searchBarProps.query,

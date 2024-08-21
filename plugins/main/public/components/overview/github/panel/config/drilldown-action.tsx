@@ -10,9 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { EuiFlexItem, EuiPanel, EuiToolTip, EuiButtonIcon, EuiDataGridCellValueElementProps, EuiDataGrid, EuiLink } from '@elastic/eui';
-import { SecurityAlerts } from '../../../../visualize/components';
+import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins, getCore } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
@@ -25,10 +23,7 @@ import {
   getVisStateTopRepositories,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import { ErrorFactory, HttpError, ErrorHandler } from '../../../../../react-services/error-management';
 import DrillDownDataGrid from './drilldown-data-grid';
-import { rules } from '../../../../../utils/applications';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -115,13 +110,8 @@ const getDashboardPanels = (
 };
 
 export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
-
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern
-  } = drilldownProps;
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [
@@ -140,10 +130,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                       filters: fetchFilters ?? [],
                       useMargins: true,
                       id: 'github-drilldown-action-dashboard-tab',
-                      timeRange: {
-                        from: searchBarProps.dateRangeFrom,
-                        to: searchBarProps.dateRangeTo,
-                      },
+                      timeRange: searchBarProps?.absoluteDateRange,
                       title: 'GitHub drilldown action dashboard',
                       description: 'Dashboard of the GitHub drilldown action',
                       query: searchBarProps.query,
@@ -153,7 +140,7 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                       },
                       hidePanelTitles: false,
                     }}
-                    onInputUpdated={() => { }}
+                    onInputUpdated={() => {}}
                   />
                 </div>
               );
@@ -166,16 +153,19 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
           {
             width: 100,
             component: () => {
-
               const defaultTableColumns = [
-                { id: 'timestamp' },
+                {
+                  id: 'timestamp',
+                  isSortable: true,
+                  defaultSortDirection: 'desc',
+                },
                 { id: 'rule.description' },
                 { id: 'data.github.org', displayAsText: 'Organization' },
                 { id: 'data.github.repo', displayAsText: 'Repository' },
                 { id: 'data.github.actor', displayAsText: 'Actor' },
                 { id: 'rule.level' },
                 { id: 'rule.id' },
-              ]
+              ];
 
               return (
                 <DrillDownDataGrid
@@ -185,9 +175,9 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                   searchBarProps={searchBarProps}
                   indexPattern={indexPattern}
                 />
-              )
+              );
             },
-          }
+          },
         ],
       },
     ],

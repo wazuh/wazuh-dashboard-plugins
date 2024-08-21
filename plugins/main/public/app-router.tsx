@@ -16,7 +16,7 @@ import { ToastNotificationsModal } from './components/notifications/modal';
 import { WzUpdatesNotification } from './components/wz-updates-notification';
 import { HealthCheck } from './components/health-check';
 import { WzBlankScreen } from './components/wz-blank-screen/wz-blank-screen';
-import { RegisterAgent } from './components/endpoints-summary/register-agent/containers/register-agent/register-agent';
+import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
 import { AgentView } from './components/endpoints-summary/agent';
 import WzManagement from './controllers/management/components/management/management-provider';

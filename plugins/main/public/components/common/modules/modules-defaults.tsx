@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { MainSca } from '../../agents/sca';
-import { DashboardAWS } from '../../overview/amazon-web-services/dashboards';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { MainFim } from '../../agents/fim';
@@ -18,8 +17,6 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
-import { DashboardVuls, InventoryVuls } from '../../overview/vulnerabilities';
-import { DashboardMITRE } from '../../overview/mitre/dashboard';
 import { withModuleNotForAgent } from '../hocs';
 import {
   WazuhDiscover,
@@ -27,10 +24,6 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
-import { DashboardOffice365 } from '../../overview/office/dashboard';
-import { DashboardThreatHunting } from '../../overview/threat-hunting/dashboard/dashboard';
-import { DashboardVirustotal } from '../../overview/virustotal/dashboard/dashboard';
-import { DashboardGoogleCloud } from '../../overview/google-cloud/dashboards';
 import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -48,15 +41,25 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
-import { DashboardGitHub } from '../../overview/github/dashboards/dashboard';
-import { DashboardGDPR } from '../../overview/gdpr/dashboards/dashboard';
-import { DashboardPCIDSS } from '../../overview/pci/dashboards/dashboard';
-import { DashboardDocker } from '../../overview/docker/dashboards';
-import { DashboardMalwareDetection } from '../../overview/malware-detection/dashboard';
-import { DashboardFIM } from '../../overview/fim/dashboard/dashboard';
-import { DashboardNIST80053 } from '../../overview/nist/dashboards/dashboard';
-import { DashboardHIPAA } from '../../overview/hipaa/dashboards/dashboard';
-import { DashboardTSC } from '../../overview/tsc/dashboards/dashboard';
+import {
+  DashboardGitHub,
+  DashboardGDPR,
+  DashboardPCIDSS,
+  DashboardDocker,
+  DashboardMalwareDetection,
+  DashboardFIM,
+  DashboardNIST80053,
+  DashboardHIPAA,
+  DashboardTSC,
+  DashboardMITRE,
+  DashboardAWS,
+  DashboardOffice365,
+  DashboardThreatHunting,
+  DashboardVirustotal,
+  DashboardGoogleCloud,
+  DashboardVuls,
+  InventoryVuls,
+} from '../../overview';
 import {
   DockerDataSource,
   AlertsVulnerabilitiesDataSource,

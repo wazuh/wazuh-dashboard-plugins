@@ -8,7 +8,26 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 5.0.0
 
-## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 00
+## Wazuh v4.10.0 - OpenSearch Dashboards 2.13.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.10.0
+
+## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.9.1
+
+### Fixed
+
+- Fixed the temporal directory variable on the the command to deploy a new Windows agent [#6905](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6905)
+- Fixed an error on the command to deploy a new macOS agent that could cause the registration password had a wrong value because a `\n` could be included [#6906](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6906)
+- Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
+- Fixed an error on Dev Tools when using payload properties as arrays [#6908](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6908)
+
+## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 05
 
 ### Added
 
@@ -24,15 +43,18 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added HAProxy helper settings to cluster configuration [#6653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6653)
 - Added ability to open the report file or Reporting application from the toast message [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
 - Added support for agents to Office 365 [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558)
+- Added pinned agent data validation when rendering the Inventory data, Stats and Configuration tabs in Agent preview of Endpoints Summary [#6800](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6800)
+- Added wz-link component to make redirections [#6848](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6848)
+- Add embedded and customized `dom-to-image-more` dependency [#6902](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6902)
 
 ### Changed
 
-- Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6288](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6288) [#6290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6290) [#6289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6289) [#6286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6286) [#6275](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6275) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6297](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6297) [#6291](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6459) [#6434](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6434) [#6504](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6504) [#6649](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6649) [#6506](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6506) [#6537](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6537) [#6528](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6528) [#6675](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6675) [#6674](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6674) [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558) [#6685](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6685) [#6691](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6691) [#6712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6712) [#6734](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6734) [#6746](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6746) [#6752](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6752) [#6753](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6753) [#6756](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6756)
+- Removed embedded discover [#6120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6120) [#6235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6235) [#6254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6254) [#6285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6285) [#6288](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6288) [#6290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6290) [#6289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6289) [#6286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6286) [#6275](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6275) [#6287](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6297](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6297) [#6291](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6287) [#6459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6459) [#6434](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6434) [#6504](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6504) [#6649](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6649) [#6506](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6506) [#6537](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6537) [#6528](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6528) [#6675](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6675) [#6674](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6674) [#6558](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6558) [#6685](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6685) [#6691](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6691) [#6712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6712) [#6734](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6734) [#6746](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6746) [#6752](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6752) [#6753](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6753) [#6756](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6756) [#6771](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6771) [#6792](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6792) [#6845](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6845) [#6857](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6857) [#6847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6847) [#6865](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6865) [#6848](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6848) [#6843](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6843) [#6878](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6878) [#6883](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6883) [#6889](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6889) [#6902](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6902) [#6912](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6912) [#6917](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6917) [#6927](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6927)
 - Allow editing groups for an agent from Endpoints Summary [#6250](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6250)
 - Change how the configuration is managed in the backend side [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337) [#6519](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6519) [#6573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6573)
 - Change the view of API is down and check connection to Server APIs application [#6337](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6337)
 - Changed the usage of the endpoint GET /groups/{group_id}/files/{file_name} [#6385](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6385)
-- Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268)
+- Refactoring and redesign endpoints summary visualizations [#6268](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6268) [#6832](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6832)
 - Move AngularJS settings controller to ReactJS [#6580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6580)
 - Move AngularJS controller and view for manage groups to ReactJS [#6543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6543)
 - Move AngularJS controllers and views of Tools and Dev Tools to ReactJS [#6544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6544)
@@ -46,10 +68,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Implement new data source feature on MITRE ATT&CK module [#6482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6482)
 - Upgraded versions of `follow-redirects` and `es5-ext` [#6626](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6626)
 - Changed agent log collector socket API response controller component [#6660](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6660)
-- Improve margins and paddins in the Events, Inventory and Control tabs [#6708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6708)
-- Refactored the search bar to correctly handle fixed and user-added filters [#6716](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6716) [#6755](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6755)
+- Improve margins and paddings in the Events, Inventory and Control tabs [#6708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6708)
+- Refactored the search bar to correctly handle fixed and user-added filters [#6716](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6716) [#6755](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6755) [#6833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6833)
 - Generate URL with predefined filters [#6745](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6745)
-- Migrated AngularJS routing to ReactJS [#6689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6689)
+- Migrated AngularJS routing to ReactJS [#6689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6689) [#6775](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6775) [#6790](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6790) [#6893](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6893)
+- Improvement of the filter management system by implementing new standard modules [#6534](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6534) [#6772](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6772) [#6873](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6873)
+- Changed permalink field in the Events tab table in Virustotal to show an external link [#6839](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6839)
+- Changed the logging system to use the provided by the platform [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
+- Change the internal control from Endpoint Groups to a control via url. [#6890](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6890)
+- Change the internal control from Mitre > intelligence > Table to a control via url. [#6882](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6882)
+- Changed the display of rule details flyout to be based on URL [#6886](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6886)
 
 ### Fixed
 
@@ -58,6 +86,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the sample alerts scripts to generate valid IP ranges and file hashes [#6667](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6667)
 - Fixed cronjob max seconds interval validation [#6730](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6730)
 - Fixed styles in small height viewports [#6747](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6747)
+- Fixed behavior in Configuration Assessment when changing API [#6770](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6770)
+- Fixed the fixed maximum width of the clear session button in the ruleset test view [#6871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6871)
+- Fixed the width of the last modification column of the table in Windows Registry [#6876](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6876)
+- Fixed redirection to FIM > Inventory > Files from FIM > Inventory > Windows Registry when switching to non-Windows agent. [#6880](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6880)
 
 ### Removed
 
@@ -69,12 +101,32 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed AngularJS service `config-handler` [#6631](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6631)
 - Removed legacy discover references and methods [#6646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6646)
 - Removed custom EuiSuggestItem component in favor of OUI's native component [#6714](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6714)
+- Removed API endpoint unused endpoints from creation of old visualisations: GET /elastic/visualizations/{tab}/{pattern} and GET /elastic/visualizations/{tab}/{pattern} [#6782](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6782)
+- Removed `logs.level` setting [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
+- Removed the usage of `wazuhapp-plain.log`, `wazuhapp.log`, `wazuh-ui-plain.log` and `wazuh-ui.log` files [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
+- Removed the `App logs` application [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
+- Removed API endpoint GET /utils/logs/ui [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
+- Removed API endpoint GET /utils/logs [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
+- Removed embedded `dom-to-image` dependency [#6902](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6902)
 
-## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 00
+## Wazuh v4.8.2 - OpenSearch Dashboards 2.10.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.8.2
+
+## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 04
 
 ### Added
 
 - Support for Wazuh 4.8.1
+
+### Fixed
+
+- Removed the unexpected `delay` parameter on the server API requests [#6778](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6778)
+- Fixed home KPI links with custom or index pattern whose title is different to the id [#6777](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6777)
+- Fixed colors related to vulnerability severity levels on Vulnerability Detection dashboard [#6793](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6793)
+- Fixed pinned agent error in vulnerabilities events tab [#6827](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6827)
 
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 12
 
@@ -117,7 +169,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the help menu, to be consistent and avoid duplication [#6374](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6374)
 - Fixed the axis label visual bug from dashboards [#6378](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6378)
 - Fixed a error pop-up spawn in MITRE ATT&CK [#6431](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6431)
-- Fixed minor style issues [#6484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6484) [#6489](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6489) [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6587)
+- Fixed minor style issues [#6484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6484) [#6489](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6489) [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6587) [#6868](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6868)
 - Fixed "View alerts of this Rule" link [#6553](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6553)
 - Fixed disconnected agent configuration error [#6587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6617)
 

@@ -32,7 +32,7 @@ jest.mock('./last-alerts-stat/last-alerts-service', () => ({
       field: 'cluster.name',
       name: 'master',
     },
-    indexPatternName: 'wazuh-alerts-*',
+    indexPatternId: 'wazuh-alerts-*',
   }),
 }));
 

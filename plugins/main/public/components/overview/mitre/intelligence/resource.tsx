@@ -19,6 +19,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import NavigationService from '../../../../react-services/navigation-service';
+import { Route, Switch } from '../../../router-search';
 
 export const ModuleMitreAttackIntelligenceResource = ({
   label,
@@ -40,13 +41,11 @@ export const ModuleMitreAttackIntelligenceResource = ({
       const idToRedirect = urlParams.get('idToRedirect');
       const endpoint = `/mitre/${redirectTab}?q=external_id=${idToRedirect}`;
       getMitreItemToRedirect(endpoint);
-      urlParams.delete('tabRedirect');
-      urlParams.delete('idToRedirect');
-      navigationService.replace(
-        `${navigationService.getPathname()}?${urlParams.toString()}`,
-      );
     }
-  }, []);
+  }, [
+    navigationService.getParams().has('tabRedirect'),
+    navigationService.getParams().has('idToRedirect'),
+  ]);
 
   const getMitreItemToRedirect = async endpoint => {
     try {
@@ -70,10 +69,13 @@ export const ModuleMitreAttackIntelligenceResource = ({
     }
   };
 
-  const tableColumns = useMemo(() => tableColumnsCreator(setDetails), []);
+  const tableColumns = useMemo(() => tableColumnsCreator(), []);
 
   const closeFlyout = useCallback(() => {
     setDetails(null);
+    NavigationService.getInstance().updateAndNavigateSearchParams({
+      idToRedirect: null,
+    });
   }, []);
 
   return (
@@ -92,11 +94,18 @@ export const ModuleMitreAttackIntelligenceResource = ({
         }}
       />
       {details && (
-        <ModuleMitreAttackIntelligenceFlyout
-          details={details}
-          closeFlyout={() => closeFlyout()}
-          onSelectResource={setDetails}
-        />
+        <Switch>
+          <Route
+            path='?tabRedirect=:tabRedirect&idToRedirect=:idToRedirect'
+            render={() => (
+              <ModuleMitreAttackIntelligenceFlyout
+                details={details}
+                closeFlyout={() => closeFlyout()}
+                onSelectResource={setDetails}
+              />
+            )}
+          />
+        </Switch>
       )}
     </>
   );

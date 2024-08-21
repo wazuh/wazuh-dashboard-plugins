@@ -2,6 +2,11 @@ import { tDataGridColumn } from '../../../common/data-grid';
 
 export const pciColumns: tDataGridColumn[] = [
   {
+    id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
+  },
+  {
     id: 'agent.name',
   },
   {

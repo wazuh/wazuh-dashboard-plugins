@@ -39,20 +39,10 @@ class WzGroups extends Component {
     this.state = {};
   }
 
-  async componentDidMount() {
+  getGroupDetail = async () => {
     // Check if there is a group in the URL
     const { group } = this.props.search;
     if (group) {
-      // This removes the group from the search URL parameters.
-      // TODO: the view to display the specific group should be managed through the routing based on
-      // the URL instead of a component state. This lets refreshing the page and display the same view
-      const search = new URLSearchParams(
-        NavigationService.getInstance().getSearch(),
-      );
-      search.delete('group');
-      NavigationService.getInstance().replace(
-        `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
-      );
       try {
         // Try if the group can be accesed
         const responseGroup = await WzRequest.apiReq('GET', '/groups', {
@@ -74,6 +64,17 @@ class WzGroups extends Component {
         };
         getErrorOrchestrator().handleError(options);
       }
+    }
+  };
+  async componentDidMount() {
+    await this.getGroupDetail();
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (this.props.search?.group !== prevProps.search?.group) {
+      this.props.search?.group === undefined
+        ? this.props.updateGroupDetail(false)
+        : await this.getGroupDetail();
     }
   }
 
@@ -120,7 +121,20 @@ const mapDispatchToProps = dispatch => {
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withGlobalBreadcrumb(props => {
-    return [{ text: endpointGroups.breadcrumbLabel }];
+    return props.state?.itemDetail
+      ? [
+          {
+            text: endpointGroups.breadcrumbLabel,
+            onClick: ev => {
+              ev.preventDefault();
+              NavigationService.getInstance().updateAndNavigateSearchParams({
+                group: null,
+              });
+            },
+          },
+          { text: props.state?.itemDetail.name },
+        ]
+      : [{ text: endpointGroups.breadcrumbLabel }];
   }),
   withRouterSearch,
 )(WzGroups);

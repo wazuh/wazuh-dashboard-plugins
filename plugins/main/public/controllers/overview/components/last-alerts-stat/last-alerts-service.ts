@@ -9,7 +9,7 @@ interface Last24HoursAlerts {
     field: string;
     name: string;
   };
-  indexPatternName: string;
+  indexPatternId: string;
 }
 
 /**
@@ -44,7 +44,7 @@ export const getLast24HoursAlerts = async (
         field: isCluster ? 'cluster.name' : 'manager.name',
         name: clusterValue,
       },
-      indexPatternName: currentIndexPattern.id,
+      indexPatternId: currentIndexPattern.id,
     };
   } catch (error) {
     return Promise.reject(error);
