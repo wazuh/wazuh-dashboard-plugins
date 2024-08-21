@@ -18,9 +18,8 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
-import { InventoryVuls } from '../../overview/vulnerabilities';
-// import { DashboardVuls } from '../../overview/poc-dashboards-by-reference/dashboards/dashboard';
-import { DashboardVuls } from '../../overview/poc/dashboards/overview/dashboard';
+import { InventoryVuls, DashboardVuls } from '../../overview/vulnerabilities';
+import { DashboardPOCByReference } from '../../overview/poc/dashboards/overview/dashboard';
 
 import { DashboardMITRE } from '../../overview/mitre/dashboard';
 import { withModuleNotForAgent } from '../hocs';
@@ -245,25 +244,15 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   vuls: {
-    init: 'dashboard',
+    init: 'dashboardByReference',
     tabs: [
-      // {
-      //   id: 'dashboard',
-      //   name: 'Dashboard',
-      //   component: DashboardSavedObject,
-      //   /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
-      //   buttons: [
-      //     (...props) => {
-      //       console.log('ButtonExploreAgent Props in vuls:', props);
-      //       return (
-      //         <ButtonExploreAgent
-      //           {...props}
-      //           moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
-      //         />
-      //       );
-      //     },
-      //   ],
-      // },
+      {
+        id: 'dashboardByReference',
+        name: 'Dashboard by reference',
+        component: DashboardPOCByReference,
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-alerts-* */
+        buttons: [],
+      },
       {
         id: 'dashboard',
         name: 'Dashboard',

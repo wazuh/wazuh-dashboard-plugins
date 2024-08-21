@@ -51,7 +51,7 @@ export const DashboardSavedObject = ({ savedObjectId }) => {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await SavedObject.getDashboardForId(savedObjectId);
+        const { data } = await SavedObject.getDashboardById(savedObjectId);
         const dashboardSpecRenderer = transform(data);
         setDashboardSpecForComponent(dashboardSpecRenderer);
       } catch (error) {
@@ -113,7 +113,7 @@ const DashboardComponent = () => {
   const handleRestart = async () => {
     try {
       const savedObjectId = '94febc80-55a2-11ef-a580-5b5ba88681be';
-      const dashboardChanged = await SavedObject.getDashboardForId(
+      const dashboardChanged = await SavedObject.getDashboardById(
         savedObjectId,
       );
 
@@ -155,7 +155,7 @@ const DashboardComponent = () => {
   );
 };
 
-export const DashboardVuls = compose(
+export const DashboardPOCByReference = compose(
   withErrorBoundary,
   withVulnerabilitiesStateDataSource,
 )(DashboardComponent);
