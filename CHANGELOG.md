@@ -84,6 +84,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed API endpoint GET /utils/logs [#6161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6161)
 - Removed embedded `dom-to-image` dependency [#6902](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6902)
 
+## Wazuh v4.8.2 - OpenSearch Dashboards 2.10.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.8.2
+
 ## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 04
 
 ### Added
