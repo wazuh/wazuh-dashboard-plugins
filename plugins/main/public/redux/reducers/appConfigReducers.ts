@@ -20,6 +20,7 @@ const initialState: AppConfigState = {
   data: {
     // TODO: this should use the configuration service
     'vulnerabilities.pattern': 'wazuh-states-vulnerabilities',
+    'fleet.pattern': 'wazuh-fleet-agents',
   },
 };
 
