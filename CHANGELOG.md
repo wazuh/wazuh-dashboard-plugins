@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.0
 
+### Changed
+
+- Changed the registration id of the Settings application for compatibility with Opensearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
+
 ## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 00
 
 ### Added
