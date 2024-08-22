@@ -18,7 +18,7 @@
     "test:jest:runner": "node scripts/runner test"
   },
   "dependencies": {
-    "axios": "^1.6.1",
+    "axios": "^1.7.4",
     "md5": "^2.3.0"
   },
   "devDependencies": {
