@@ -1,0 +1,11 @@
+{
+  "ip": "127.0.0.1",
+  "port": "9200",
+  "username": "admin",
+  "password": "admin",
+  "indexFleet": "fleet-agents-default",
+  "indexInventorySystem": "inventory-system-default",
+  "indexInventoryNetworks": "inventory-networks-default",
+  "indexInventoryProcesses": "inventory-processes-default",
+  "indexInventoryPackages": "inventory-packages-default"
+}

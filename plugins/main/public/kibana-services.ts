@@ -15,6 +15,7 @@ import { VisualizationsStart } from '../../../src/plugins/visualizations/public'
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AppPluginStartDependencies } from './types';
 import { WazuhCheckUpdatesPluginStart } from '../../wazuh-check-updates/public';
+import { WazuhFleetPluginStart } from '../../wazuh-fleet/public';
 
 let angularModule: any = null;
 let discoverModule: any = null;
@@ -51,6 +52,8 @@ export const [getHeaderActionMenuMounter, setHeaderActionMenuMounter] =
   createGetterSetter<AppMountParameters['setHeaderActionMenu']>(
     'headerActionMenuMounter',
   );
+export const [getWazuhFleetPlugin, setWazuhFleetPlugin] =
+  createGetterSetter<WazuhFleetPluginStart>('WazuhFleetPlugin');
 
 /**
  * set bootstrapped inner angular module
