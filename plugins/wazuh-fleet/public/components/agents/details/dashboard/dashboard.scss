@@ -1,0 +1,7 @@
+.wz-search-bar-no-padding .globalQueryBar:not(:empty) {
+  padding: 0px !important;
+}
+
+.wz-search-bar-no-padding .osdQueryBar {
+  justify-content: flex-start;
+}

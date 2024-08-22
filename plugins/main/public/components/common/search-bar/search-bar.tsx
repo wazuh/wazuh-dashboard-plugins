@@ -33,7 +33,7 @@ export const WzSearchBar = ({
   return (
     <EuiPanel
       className='wz-search-bar wz-search-bar-no-padding'
-      paddingSize='s'
+      paddingSize='none'
       hasShadow={false}
       hasBorder={false}
       color='transparent'

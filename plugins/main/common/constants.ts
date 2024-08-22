@@ -51,6 +51,11 @@ export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities-*';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 
+// Wazuh Fleet
+export const WAZUH_FLEET_PATTERN = 'wazuh-fleet-*';
+export const WAZUH_INDEX_TYPE_FLEET = 'fleet';
+export const FLEET_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
+
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 

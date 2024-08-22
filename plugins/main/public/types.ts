@@ -20,6 +20,7 @@ import {
 import { WazuhCheckUpdatesPluginStart } from '../../wazuh-check-updates/public';
 import { WazuhCorePluginStart } from '../../wazuh-core/public';
 import { DashboardStart } from '../../../src/plugins/dashboard/public';
+import { WazuhFleetPluginStart } from '../../wazuh-fleet/public';
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
@@ -33,6 +34,7 @@ export interface AppPluginStartDependencies {
   wazuhCheckUpdates: WazuhCheckUpdatesPluginStart;
   wazuhCore: WazuhCorePluginStart;
   dashboard: DashboardStart;
+  wazuhFleet: WazuhFleetPluginStart;
 }
 export interface AppDependencies {
   core: CoreStart;

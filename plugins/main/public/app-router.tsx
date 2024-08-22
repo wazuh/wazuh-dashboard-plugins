@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
-import { getWazuhCorePlugin, getWzMainParams } from './kibana-services';
+import {
+  getWazuhCorePlugin,
+  getWazuhFleetPlugin,
+  getWzMainParams,
+} from './kibana-services';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { useDispatch } from 'react-redux';
 import { checkPluginVersion } from './utils';
@@ -21,11 +25,30 @@ import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
+import {
+  FleetDataSource,
+  FleetDataSourceRepository,
+  useDataSource,
+  FleetGroupsDataSource,
+  FleetGroupsDataSourceRepository,
+  FleetCommandsDataSource,
+  FleetCommandsDataSourceRepository,
+  AlertsDataSource,
+  AlertsDataSourceRepository,
+} from './components/common/data-source';
+import useSearchBar from './components/common/search-bar/use-search-bar';
+import { WzSearchBar } from './components/common/search-bar';
+import { TableIndexer } from './components/common/tables';
+import DocDetails from './components/common/wazuh-discover/components/doc-details';
+import { useTimeFilter } from './components/common/hooks';
+import { LoadingSpinner } from './components/common/loading-spinner/loading-spinner';
 
 export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
   const history = navigationService.getHistory();
+
+  const { FleetManagement } = getWazuhFleetPlugin();
 
   useEffect(() => {
     // Get the dashboard security
@@ -77,6 +100,31 @@ export function Application(props) {
           path={'/agents-preview/'}
           exact
           render={MainEndpointsSummary}
+        ></Route>
+        <Route
+          path={'/fleet-management'}
+          render={() => (
+            <FleetManagement
+              navigationService={NavigationService}
+              useDataSource={useDataSource}
+              FleetDataSource={FleetDataSource}
+              FleetDataSourceRepository={FleetDataSourceRepository}
+              FleetGroupsDataSource={FleetGroupsDataSource}
+              FleetGroupsDataSourceRepository={FleetGroupsDataSourceRepository}
+              FleetCommandsDataSource={FleetCommandsDataSource}
+              FleetCommandsDataSourceRepository={
+                FleetCommandsDataSourceRepository
+              }
+              useSearchBar={useSearchBar}
+              WzSearchBar={WzSearchBar}
+              TableIndexer={TableIndexer}
+              DocDetails={DocDetails}
+              useTimeFilter={useTimeFilter}
+              LoadingSpinner={LoadingSpinner}
+              AlertsDataSource={AlertsDataSource}
+              AlertsDataSourceRepository={AlertsDataSourceRepository}
+            />
+          )}
         ></Route>
         <Route path={'/manager'} exact render={WzManagement}></Route>
         <Route
