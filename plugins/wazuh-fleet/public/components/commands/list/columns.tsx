@@ -55,9 +55,9 @@ export const tableColumns = ({
     render: (field: string, commandData) => (
       <EuiFlexGroup direction='column' gutterSize='none'>
         <EuiFlexItem>
-          <EuiToolTip content={commandData['agent.id']}>
+          <EuiToolTip content={commandData?.agent?.id ?? '-'}>
             <EuiText color='subdued' size='s'>
-              {`${commandData['agent.id'].substring(0, 14)}...`}
+              {`${commandData?.agent?.id?.substring(0, 14) ?? '-'}...`}
             </EuiText>
           </EuiToolTip>
         </EuiFlexItem>
