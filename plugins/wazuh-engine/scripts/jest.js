@@ -11,7 +11,10 @@
 // See all cli options in https://facebook.github.io/jest/docs/cli.html
 
 const path = require('path');
-process.argv.push('--config', path.resolve(__dirname, '../test/jest/config.js'));
+process.argv.push(
+  '--config',
+  path.resolve(__dirname, '../test/jest/config.js'),
+);
 
 require('../../../src/setup_node_env');
 const jest = require('../../../node_modules/jest');
