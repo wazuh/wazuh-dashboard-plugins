@@ -279,7 +279,9 @@ resources:
   # List decoders
   - method: GET
     path: /decoders
-
+    response:
+      statusCode: 200
+      staticFile: decoders/get_decoders.json
   # Get files
   - method: GET
     path: /decoders/files
@@ -291,7 +293,7 @@ resources:
       raw: true
     response:
       statusCode: 200
-      staticFile: decoders/get_decoders_raw.txt
+      staticFile: decoders/get_decoder_raw.txt
 
   # Update decoders file
   - method: PUT
@@ -406,6 +408,9 @@ resources:
   # Get CDB lists info
   - method: GET
     path: /lists
+    response:
+      statusCode: 200
+      staticFile: lists/get_lists.json
 
   # Get CDB list file content
   - method: GET

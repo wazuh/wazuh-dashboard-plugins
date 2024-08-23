@@ -2,14 +2,22 @@ import React, { useEffect } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
 import {
+  getPlugins,
   getWazuhCorePlugin,
+  getWazuhEnginePlugin,
   getWazuhFleetPlugin,
   getWzMainParams,
 } from './kibana-services';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { useDispatch } from 'react-redux';
 import { checkPluginVersion } from './utils';
-import { WzAuthentication, loadAppConfig } from './react-services';
+import {
+  WzAuthentication,
+  AppState,
+  GenericRequest,
+  WzRequest,
+  loadAppConfig,
+} from './react-services';
 import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 import { ToastNotificationsModal } from './components/notifications/modal';
@@ -26,6 +34,16 @@ import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
 import {
+  RulesDataSource,
+  RulesDataSourceRepository,
+} from './components/common/data-source/pattern/rules';
+import { useDocViewer } from './components/common/doc-viewer';
+import DocViewer from './components/common/doc-viewer/doc-viewer';
+import { WazuhFlyoutDiscover } from './components/common/wazuh-discover/wz-flyout-discover';
+import {
+  FILTER_OPERATOR,
+  PatternDataSource,
+  PatternDataSourceFilterManager,
   FleetDataSource,
   FleetDataSourceRepository,
   useDataSource,
@@ -36,13 +54,26 @@ import {
   AlertsDataSource,
   AlertsDataSourceRepository,
 } from './components/common/data-source';
+import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../common/constants';
+import { useForm } from './components/common/form/hooks';
+import { InputForm } from './components/common/form';
 import useSearchBar from './components/common/search-bar/use-search-bar';
 import { WzSearchBar } from './components/common/search-bar';
-import { TableIndexer } from './components/common/tables';
+import { TableIndexer, TableIndexerEngine } from './components/common/tables';
 import DocDetails from './components/common/wazuh-discover/components/doc-details';
 import { useTimeFilter } from './components/common/hooks';
 import { LoadingSpinner } from './components/common/loading-spinner/loading-spinner';
 
+import { TableWzAPI } from './components/common/tables';
+import WzListEditor from './controllers/management/components/management/cdblists/views/list-editor.tsx';
+import { DocumentViewTableAndJson } from './components/common/wazuh-discover/components/document-view-table-and-json';
+import { OutputsDataSource } from './components/common/data-source/pattern/outputs/data-source';
+import { OutputsDataSourceRepository } from './components/common/data-source/pattern/outputs/data-source-repository';
+import WzDecoderInfo from './controllers/management/components/management/decoders/views/decoder-info.tsx';
+import {
+  IntegrationsDataSource,
+  IntegrationsDataSourceRepository,
+} from './components/common/data-source/pattern/integrations';
 export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
@@ -143,6 +174,48 @@ export function Application(props) {
           path={'/blank-screen'}
           exact
           render={props => <WzBlankScreen {...props} />}
+        ></Route>
+        <Route
+          path={'/engine'}
+          render={props => {
+            const { Engine } = getWazuhEnginePlugin();
+            return (
+              <Engine
+                navigationService={NavigationService}
+                DashboardContainerByValueRenderer={
+                  getPlugins().dashboard.DashboardContainerByValueRenderer
+                }
+                TableIndexer={TableIndexerEngine}
+                WazuhFlyoutDiscover={WazuhFlyoutDiscover}
+                PatternDataSource={PatternDataSource}
+                PatternDataSourceFilterManager={PatternDataSourceFilterManager}
+                AppState={AppState}
+                DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER={
+                  DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER
+                }
+                FILTER_OPERATOR={FILTER_OPERATOR}
+                RulesDataSource={RulesDataSource}
+                RulesDataSourceRepository={RulesDataSourceRepository}
+                OutputsDataSource={OutputsDataSource}
+                OutputsDataSourceRepository={OutputsDataSourceRepository}
+                IntegrationsDataSource={IntegrationsDataSource}
+                IntegrationsDataSourceRepository={
+                  IntegrationsDataSourceRepository
+                }
+                useDocViewer={useDocViewer}
+                DocViewer={DocViewer}
+                DocumentViewTableAndJson={DocumentViewTableAndJson}
+                useForm={useForm}
+                InputForm={InputForm}
+                GenericRequest={GenericRequest}
+                TableWzAPI={TableWzAPI}
+                WzRequest={WzRequest}
+                WzListEditor={WzListEditor}
+                WzDecoderInfo={WzDecoderInfo}
+                {...props}
+              />
+            );
+          }}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>

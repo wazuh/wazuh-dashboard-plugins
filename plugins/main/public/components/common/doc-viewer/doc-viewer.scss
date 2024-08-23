@@ -1,0 +1,25 @@
+.osdDocViewerTable tr:hover {
+  .osdDocViewer__actionButton {
+    opacity: 1;
+  }
+}
+
+.osdDocViewer__buttons {
+  // width: 60px;
+
+  // Show all icons if one is focused,
+  // IE doesn't support, but the fallback is just the focused button becomes visible
+  &:focus-within {
+    .osdDocViewer__actionButton {
+      opacity: 1;
+    }
+  }
+}
+
+.osdDocViewer__actionButton {
+  opacity: 0;
+
+  &:focus {
+    opacity: 1;
+  }
+}

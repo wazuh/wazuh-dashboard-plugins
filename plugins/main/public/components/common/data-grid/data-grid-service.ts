@@ -84,6 +84,7 @@ export const exportSearchToCSV = async (
     sorting,
     fields,
     pagination,
+    filePrefix = 'events',
   } = params;
   // when the pageSize is greater than the default max size per call (10000)
   // then we need to paginate the search
@@ -165,7 +166,10 @@ export const exportSearchToCSV = async (
 
   if (blobData) {
     // @ts-ignore
-    FileSaver?.saveAs(blobData, `events-${new Date().toISOString()}.csv`);
+    FileSaver?.saveAs(
+      blobData,
+      `${filePrefix}-${new Date().toISOString()}.csv`,
+    );
   }
 };
 
