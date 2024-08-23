@@ -10,6 +10,7 @@ import dateMath from '@elastic/datemath';
 
 export type SearchParams = {
   indexPattern: IndexPattern;
+  filePrefix: string;
 } & tSearchParams;
 
 import { parse } from 'query-string';
