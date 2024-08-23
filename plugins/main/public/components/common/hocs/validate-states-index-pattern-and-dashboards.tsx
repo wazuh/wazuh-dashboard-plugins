@@ -1,23 +1,23 @@
 import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { withGuardAsync } from '../../../../common/hocs';
-import { getSavedObjects } from '../../../../../kibana-services';
-import { SavedObject } from '../../../../../react-services';
-import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/constants';
+import { withGuardAsync } from '.';
+import { getSavedObjects } from '../../../kibana-services';
+import { SavedObject } from '../../../react-services';
+import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../common/constants';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import { vulnerabilityDetection } from '../../../../../utils/applications';
-import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
-import NavigationService from '../../../../../react-services/navigation-service';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { vulnerabilityDetection } from '../../../utils/applications';
+import { LoadingSpinnerDataSource } from '../loading/loading-spinner-data-source';
+import NavigationService from '../../../react-services/navigation-service';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
-async function checkExistenceIndexPattern(indexPatternID: string) {
+async function checkExistenceIndexPattern(indexPatternID) {
   return await getSavedObjects().client.get('index-pattern', indexPatternID);
 }
 
-async function checkExistenceIndices(indexPatternId: string) {
+async function checkExistenceIndices(indexPatternId) {
   try {
     const fields = await SavedObject.getIndicesFields(indexPatternId);
     return { exist: true, fields };
@@ -26,9 +26,9 @@ async function checkExistenceIndices(indexPatternId: string) {
   }
 }
 
-async function createIndexPattern(indexPattern, fields: any) {
+async function createIndexPattern(indexPattern, fields) {
   try {
-    await SavedObject.createSavedObjectIndexPattern(
+    await SavedObject.createSavedObject(
       'index-pattern',
       indexPattern,
       {
@@ -45,6 +45,27 @@ async function createIndexPattern(indexPattern, fields: any) {
   }
 }
 
+export async function createDashboard() {
+  try {
+    // Create the dashboard
+    const result = await SavedObject.createSavedObjectDashboard();
+
+    let targetDashboard = result?.data?.successResults?.find(
+      dashboard => dashboard.id === '94febc80-55a2-11ef-a580-5b5ba88681be',
+    );
+
+    if (result) {
+      return targetDashboard;
+    } else {
+      console.error('Failed to create dashboard.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error creating dashboard:', error);
+    return null;
+  }
+}
+
 export async function validateVulnerabilitiesStateDataSources({
   vulnerabilitiesStatesindexPatternID: indexPatternID,
 }) {
@@ -53,7 +74,7 @@ export async function validateVulnerabilitiesStateDataSources({
     const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
     let indexPattern = existIndexPattern;
 
-    // If the idnex pattern does not exist, then check the existence of index
+    // If the index pattern does not exist, then check the existence of index
     if (existIndexPattern?.error?.statusCode === 404) {
       // Check the existence of indices
       const { exist, fields } = await checkExistenceIndices(indexPatternID);
@@ -70,7 +91,7 @@ export async function validateVulnerabilitiesStateDataSources({
           },
         };
       }
-      // If the some index match the index pattern, then create the index pattern
+      // If some index matches the index pattern, then create the index pattern
       const resultCreateIndexPattern = await createIndexPattern(
         indexPatternID,
         fields,

@@ -26,6 +26,7 @@ import { getDataPlugin, getSavedObjects } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { ErrorFactory } from './error-management';
 import { WarningError } from './error-management/error-factory/errors/WarningError';
+import { WzRequest } from '../react-services/wz-request';
 
 export class SavedObject {
   /**
@@ -340,6 +341,102 @@ export class SavedObject {
 Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More information in troubleshooting guide: ${webDocumentationLink(
         'user-manual/wazuh-dashboard/troubleshooting.html#saved-object-for-index-pattern-not-found',
       )}.`);
+    }
+  }
+
+  /**
+   * Given a dashboard ID, checks if it exists
+   */
+  static async existsDashboard(dashboardID) {
+    try {
+      const dashboardData = await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/dashboard/${dashboardID}`,
+        null,
+        true,
+      );
+
+      const title = dashboardData?.data?.attributes?.title;
+      const id = dashboardData?.data?.id;
+
+      if (title) {
+        return {
+          data: 'Dashboard found',
+          status: true,
+          statusCode: 200,
+          title,
+          id,
+        };
+      }
+    } catch (error) {
+      if (error && error.response && error.response.status == 404) return false;
+      return ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : new Error(
+            error.message || `Error getting the '${dashboardID}' dashboard`,
+          );
+    }
+  }
+
+  /**
+   * Create dashboard */
+  static async createSavedObjectDashboard() {
+    try {
+      const dashboardVuls = await WzRequest.genericReq(
+        'GET',
+        '/api/dashboards/vulnerabilityDashboard.ndjson',
+      );
+
+      const ndjsonBlob = new Blob([dashboardVuls.data], {
+        type: 'application/x-ndjson',
+      });
+
+      const formdata = new FormData();
+      formdata.append('file', ndjsonBlob, 'ndjsonBlob.ndjson');
+
+      const postDashboard = await WzRequest.genericReq(
+        'POST',
+        '/api/saved_objects/_import?overwrite=true',
+        formdata,
+        { overwriteHeaders: { 'content-type': 'multipart/form-data' } },
+      );
+      return postDashboard;
+    } catch (error) {
+      throw ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : error;
+    }
+  }
+
+  /**
+   * Get all dashboards */
+  static async getAllDashboards() {
+    try {
+      const allDashboards = await WzRequest.genericReq(
+        'GET',
+        '/api/saved_objects/_find?type=dashboard',
+      );
+      return allDashboards;
+    } catch (error) {
+      throw ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : error;
+    }
+  }
+
+  /**
+   * Get dashboard for ID */
+  static async getDashboardById(savedObjectId) {
+    try {
+      const dashboardForId = await WzRequest.genericReq(
+        'GET',
+        `/api/saved_objects/dashboard/${savedObjectId}`,
+      );
+      return dashboardForId;
+    } catch (error) {
+      throw ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : error;
     }
   }
 }

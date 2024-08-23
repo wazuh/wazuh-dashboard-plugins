@@ -17,6 +17,7 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
+import { DashboardPOCByReference } from '../../overview/poc/dashboards/overview/dashboard';
 import { withModuleNotForAgent } from '../hocs';
 import {
   WazuhDiscover,
@@ -89,7 +90,6 @@ const renderDiscoverTab = (props: WazuhDiscoverProps) => {
     component: () => <WazuhDiscover {...props} />,
   };
 };
-
 export const ModulesDefaults = {
   general: {
     init: 'events',
@@ -248,6 +248,13 @@ export const ModulesDefaults = {
   vuls: {
     init: 'dashboard',
     tabs: [
+      {
+        id: 'dashboardByReference',
+        name: 'Dashboard by reference',
+        component: DashboardPOCByReference,
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-alerts-* */
+        buttons: [],
+      },
       {
         id: 'dashboard',
         name: 'Dashboard',
