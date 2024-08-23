@@ -852,6 +852,25 @@ const about = {
   redirectTo: () => '/settings?tab=about',
 };
 
+export const engine = {
+  category: 'wz-category-server-management',
+  id: 'wz-engine',
+  title: i18n.translate('wz-app-engine-title', {
+    defaultMessage: 'Security Policies',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-engine-breadcrumbLabel', {
+    defaultMessage: 'Security Policies',
+  }),
+  description: i18n.translate('wz-app-engine-description', {
+    defaultMessage: 'Change',
+  }),
+  euiIconType: 'lensApp',
+  order: 602,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => `/engine`,
+};
+
 export const Applications = [
   fileIntegrityMonitoring,
   overview,
@@ -877,6 +896,7 @@ export const Applications = [
   // endpointSummary,
   fleetManagement,
   rules,
+  engine,
   decoders,
   cdbLists,
   // endpointGroups,

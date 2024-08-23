@@ -28,7 +28,7 @@ async function checkExistenceIndices(indexPatternId: string) {
 
 async function createIndexPattern(indexPattern, fields: any) {
   try {
-    await SavedObject.createSavedObject(
+    await SavedObject.createSavedObjectIndexPattern(
       'index-pattern',
       indexPattern,
       {

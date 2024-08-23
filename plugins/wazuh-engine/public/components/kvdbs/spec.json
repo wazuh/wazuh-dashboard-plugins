@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "wazuh-asset.json",
+  "name": "schema/wazuh-asset/0",
+  "title": "Schema for Wazuh assets",
+  "type": "object",
+  "description": "Schema for Wazuh assets",
+  "additionalProperties": false,
+  "required": ["filename"],
+  "properties": {
+    "filename": {
+      "type": "string",
+      "description": "Name of the asset, short and concise name to identify this asset",
+      "pattern": "^[^/]+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the asset",
+      "pattern": "^.*$"
+    },
+    "relative_dirname": {
+      "type": "string",
+      "description": "Relative directory name where the asset is located",
+      "pattern": "^[^/]+(/[^/]+)*$"
+    }
+  }
+}

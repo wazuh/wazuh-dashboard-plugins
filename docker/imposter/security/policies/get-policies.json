@@ -2,429 +2,647 @@
   "data": {
     "affected_items": [
       {
-        "id": 1,
-        "name": "agents_all_resourceless",
-        "policy": {
-          "actions": ["agent:create", "group:create"],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 5]
+        "policy": "policy/wazuh/0",
+        "hash": "13009429687400424171",
+        "assets": [
+          "integration/wazuh-core/0",
+          "integration/syslog/0",
+          "integration/system/0",
+          "integration/windows/0",
+          "integration/apache-http/0",
+          "integration/suricata/0"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/0",
+          "wazuh": ["rule/enrichment/0", "decoder/integrations/0"]
+        }
       },
       {
-        "id": 2,
-        "name": "agents_all_agents",
-        "policy": {
-          "actions": [
-            "agent:read",
-            "agent:delete",
-            "agent:modify_group",
-            "agent:reconnect",
-            "agent:restart",
-            "agent:upgrade"
-          ],
-          "resources": ["agent:id:*", "agent:group:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 5]
+        "policy": "policy/siem/1",
+        "hash": "42893465918273619834",
+        "assets": [
+          "integration/elk/1",
+          "integration/sysmon/1",
+          "integration/zeek/1",
+          "integration/linux/1",
+          "integration/nginx/1",
+          "integration/cisco/1"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/1",
+          "wazuh": ["rule/enrichment/1", "decoder/integrations/1"]
+        }
       },
       {
-        "id": 3,
-        "name": "agents_all_groups",
-        "policy": {
-          "actions": [
-            "group:read",
-            "group:delete",
-            "group:update_config",
-            "group:modify_assignments"
-          ],
-          "resources": ["group:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 5]
+        "policy": "policy/security/2",
+        "hash": "12938402938402984012",
+        "assets": [
+          "integration/firewall/2",
+          "integration/idp/2",
+          "integration/ossec/2",
+          "integration/windows/2",
+          "integration/apache-http/2",
+          "integration/suricata/2"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/2",
+          "wazuh": ["rule/enrichment/2", "decoder/integrations/2"]
+        }
       },
       {
-        "id": 4,
-        "name": "agents_read_agents",
-        "policy": {
-          "actions": ["agent:read"],
-          "resources": ["agent:id:*", "agent:group:*"],
-          "effect": "allow"
-        },
-        "roles": [2, 4, 100]
+        "policy": "policy/incident-response/3",
+        "hash": "98723498723987239847",
+        "assets": [
+          "integration/splunk/3",
+          "integration/syslog/3",
+          "integration/linux/3",
+          "integration/windows/3",
+          "integration/palo-alto/3",
+          "integration/fortigate/3"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/3",
+          "wazuh": ["rule/enrichment/3", "decoder/integrations/3"]
+        }
       },
       {
-        "id": 5,
-        "name": "agents_read_groups",
-        "policy": {
-          "actions": ["group:read"],
-          "resources": ["group:id:*"],
-          "effect": "allow"
-        },
-        "roles": [2, 4, 100]
+        "policy": "policy/network-monitoring/4",
+        "hash": "43509283409823984092",
+        "assets": [
+          "integration/nmap/4",
+          "integration/sysmon/4",
+          "integration/zeek/4",
+          "integration/linux/4",
+          "integration/nginx/4",
+          "integration/cisco/4"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/4",
+          "wazuh": ["rule/enrichment/4", "decoder/integrations/4"]
+        }
       },
       {
-        "id": 6,
-        "name": "agents_commands_agents",
-        "policy": {
-          "actions": ["active-response:command"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/log-management/5",
+        "hash": "12094823409283402984",
+        "assets": [
+          "integration/elk/5",
+          "integration/syslog/5",
+          "integration/linux/5",
+          "integration/windows/5",
+          "integration/apache-http/5",
+          "integration/suricata/5"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/5",
+          "wazuh": ["rule/enrichment/5", "decoder/integrations/5"]
+        }
       },
       {
-        "id": 7,
-        "name": "security_all_resourceless",
-        "policy": {
-          "actions": [
-            "security:create",
-            "security:create_user",
-            "security:read_config",
-            "security:update_config",
-            "security:revoke",
-            "security:edit_run_as"
-          ],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/threat-hunting/6",
+        "hash": "23908409238409283490",
+        "assets": [
+          "integration/wazuh-core/6",
+          "integration/sysmon/6",
+          "integration/zeek/6",
+          "integration/linux/6",
+          "integration/nginx/6",
+          "integration/cisco/6"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/6",
+          "wazuh": ["rule/enrichment/6", "decoder/integrations/6"]
+        }
       },
       {
-        "id": 8,
-        "name": "security_all_security",
-        "policy": {
-          "actions": ["security:read", "security:update", "security:delete"],
-          "resources": ["role:id:*", "policy:id:*", "user:id:*", "rule:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/vulnerability-management/7",
+        "hash": "32094823094823094823",
+        "assets": [
+          "integration/openvas/7",
+          "integration/syslog/7",
+          "integration/linux/7",
+          "integration/windows/7",
+          "integration/apache-http/7",
+          "integration/suricata/7"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/7",
+          "wazuh": ["rule/enrichment/7", "decoder/integrations/7"]
+        }
       },
       {
-        "id": 9,
-        "name": "users_all_resourceless",
-        "policy": {
-          "actions": [
-            "security:create_user",
-            "security:revoke",
-            "security:edit_run_as"
-          ],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [3]
+        "policy": "policy/compliance/8",
+        "hash": "94023840238402384238",
+        "assets": [
+          "integration/nist/8",
+          "integration/sysmon/8",
+          "integration/zeek/8",
+          "integration/linux/8",
+          "integration/nginx/8",
+          "integration/cisco/8"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/8",
+          "wazuh": ["rule/enrichment/8", "decoder/integrations/8"]
+        }
       },
       {
-        "id": 10,
-        "name": "users_all_users",
-        "policy": {
-          "actions": ["security:read", "security:update", "security:delete"],
-          "resources": ["user:id:*"],
-          "effect": "allow"
-        },
-        "roles": [3]
+        "policy": "policy/encryption/9",
+        "hash": "94823094823094823094",
+        "assets": [
+          "integration/ssl/9",
+          "integration/syslog/9",
+          "integration/linux/9",
+          "integration/windows/9",
+          "integration/apache-http/9",
+          "integration/suricata/9"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/9",
+          "wazuh": ["rule/enrichment/9", "decoder/integrations/9"]
+        }
       },
       {
-        "id": 11,
-        "name": "users_modify_run_as_flag",
-        "policy": {
-          "actions": ["security:edit_run_as"],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": []
+        "policy": "policy/malware-detection/10",
+        "hash": "94823094823402938409",
+        "assets": [
+          "integration/clamav/10",
+          "integration/sysmon/10",
+          "integration/zeek/10",
+          "integration/linux/10",
+          "integration/nginx/10",
+          "integration/cisco/10"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/10",
+          "wazuh": ["rule/enrichment/10", "decoder/integrations/10"]
+        }
       },
       {
-        "id": 12,
-        "name": "ciscat_read_ciscat",
-        "policy": {
-          "actions": ["ciscat:read"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 2, 100]
+        "policy": "policy/cloud-security/11",
+        "hash": "23840923840239408234",
+        "assets": [
+          "integration/aws/11",
+          "integration/syslog/11",
+          "integration/linux/11",
+          "integration/windows/11",
+          "integration/apache-http/11",
+          "integration/suricata/11"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/11",
+          "wazuh": ["rule/enrichment/11", "decoder/integrations/11"]
+        }
       },
       {
-        "id": 13,
-        "name": "decoders_read_decoders",
-        "policy": {
-          "actions": ["decoders:read"],
-          "resources": ["decoder:file:*"],
-          "effect": "allow"
-        },
-        "roles": [2, 100]
+        "policy": "policy/container-security/12",
+        "hash": "32094832094823094823",
+        "assets": [
+          "integration/docker/12",
+          "integration/sysmon/12",
+          "integration/zeek/12",
+          "integration/linux/12",
+          "integration/nginx/12",
+          "integration/cisco/12"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/12",
+          "wazuh": ["rule/enrichment/12", "decoder/integrations/12"]
+        }
       },
       {
-        "id": 14,
-        "name": "decoders_all_files",
-        "policy": {
-          "actions": ["decoders:read", "decoders:delete"],
-          "resources": ["decoder:file:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/endpoint-security/13",
+        "hash": "94823094823402938402",
+        "assets": [
+          "integration/bitdefender/13",
+          "integration/syslog/13",
+          "integration/linux/13",
+          "integration/windows/13",
+          "integration/apache-http/13",
+          "integration/suricata/13"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/13",
+          "wazuh": ["rule/enrichment/13", "decoder/integrations/13"]
+        }
       },
       {
-        "id": 15,
-        "name": "decoders_all_resourceless",
-        "policy": {
-          "actions": ["decoders:update"],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/data-protection/14",
+        "hash": "23409823409823409823",
+        "assets": [
+          "integration/gdpr/14",
+          "integration/sysmon/14",
+          "integration/zeek/14",
+          "integration/linux/14",
+          "integration/nginx/14",
+          "integration/cisco/14"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/14",
+          "wazuh": ["rule/enrichment/14", "decoder/integrations/14"]
+        }
       },
       {
-        "id": 16,
-        "name": "mitre_read_mitre",
-        "policy": {
-          "actions": ["mitre:read"],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 2, 100]
+        "policy": "policy/risk-management/15",
+        "hash": "93482934829348239482",
+        "assets": [
+          "integration/iso27001/15",
+          "integration/syslog/15",
+          "integration/linux/15",
+          "integration/windows/15",
+          "integration/apache-http/15",
+          "integration/suricata/15"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/15",
+          "wazuh": ["rule/enrichment/15", "decoder/integrations/15"]
+        }
       },
       {
-        "id": 17,
-        "name": "lists_read_rules",
-        "policy": {
-          "actions": ["lists:read"],
-          "resources": ["list:file:*"],
-          "effect": "allow"
-        },
-        "roles": [2, 100]
+        "policy": "policy/zero-trust/16",
+        "hash": "49823094820394820384",
+        "assets": [
+          "integration/okta/16",
+          "integration/sysmon/16",
+          "integration/zeek/16",
+          "integration/linux/16",
+          "integration/nginx/16",
+          "integration/cisco/16"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/16",
+          "wazuh": ["rule/enrichment/16", "decoder/integrations/16"]
+        }
       },
       {
-        "id": 18,
-        "name": "lists_all_rules",
-        "policy": {
-          "actions": ["lists:read", "lists:delete"],
-          "resources": ["list:file:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/business-continuity/17",
+        "hash": "23908402398402398409",
+        "assets": [
+          "integration/backup/17",
+          "integration/syslog/17",
+          "integration/linux/17",
+          "integration/windows/17",
+          "integration/apache-http/17",
+          "integration/suricata/17"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/17",
+          "wazuh": ["rule/enrichment/17", "decoder/integrations/17"]
+        }
       },
       {
-        "id": 19,
-        "name": "lists_all_resourceless",
-        "policy": {
-          "actions": ["lists:update"],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/identity-management/18",
+        "hash": "23094823094823094823",
+        "assets": [
+          "integration/ad/18",
+          "integration/sysmon/18",
+          "integration/zeek/18",
+          "integration/linux/18",
+          "integration/nginx/18",
+          "integration/cisco/18"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/18",
+          "wazuh": ["rule/enrichment/18", "decoder/integrations/18"]
+        }
       },
       {
-        "id": 20,
-        "name": "rootcheck_read_rootcheck",
-        "policy": {
-          "actions": ["rootcheck:read"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [2, 100]
+        "policy": "policy/supply-chain-security/19",
+        "hash": "43820394820394820394",
+        "assets": [
+          "integration/scm/19",
+          "integration/syslog/19",
+          "integration/linux/19",
+          "integration/windows/19",
+          "integration/apache-http/19",
+          "integration/suricata/19"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/19",
+          "wazuh": ["rule/enrichment/19", "decoder/integrations/19"]
+        }
       },
       {
-        "id": 21,
-        "name": "rootcheck_all_rootcheck",
-        "policy": {
-          "actions": ["rootcheck:clear", "rootcheck:read", "rootcheck:run"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/privacy/20",
+        "hash": "93482039482039482039",
+        "assets": [
+          "integration/ccpa/20",
+          "integration/sysmon/20",
+          "integration/zeek/20",
+          "integration/linux/20",
+          "integration/nginx/20",
+          "integration/cisco/20"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/20",
+          "wazuh": ["rule/enrichment/20", "decoder/integrations/20"]
+        }
       },
       {
-        "id": 22,
-        "name": "rules_read_rules",
-        "policy": {
-          "actions": ["rules:read"],
-          "resources": ["rule:file:*"],
-          "effect": "allow"
-        },
-        "roles": [2, 100]
+        "policy": "policy/mobile-security/21",
+        "hash": "23498239482394823984",
+        "assets": [
+          "integration/mdm/21",
+          "integration/syslog/21",
+          "integration/linux/21",
+          "integration/windows/21",
+          "integration/apache-http/21",
+          "integration/suricata/21"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/21",
+          "wazuh": ["rule/enrichment/21", "decoder/integrations/21"]
+        }
       },
       {
-        "id": 23,
-        "name": "rules_all_files",
-        "policy": {
-          "actions": ["rules:read", "rules:delete"],
-          "resources": ["rule:file:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/data-leak-prevention/22",
+        "hash": "92834928349823498234",
+        "assets": [
+          "integration/dlp/22",
+          "integration/sysmon/22",
+          "integration/zeek/22",
+          "integration/linux/22",
+          "integration/nginx/22",
+          "integration/cisco/22"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/22",
+          "wazuh": ["rule/enrichment/22", "decoder/integrations/22"]
+        }
       },
       {
-        "id": 24,
-        "name": "rules_all_resourceless",
-        "policy": {
-          "actions": ["rules:update"],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/incident-response/23",
+        "hash": "09823098230982309823",
+        "assets": [
+          "integration/splunk/23",
+          "integration/syslog/23",
+          "integration/linux/23",
+          "integration/windows/23",
+          "integration/palo-alto/23",
+          "integration/fortigate/23"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/23",
+          "wazuh": ["rule/enrichment/23", "decoder/integrations/23"]
+        }
       },
       {
-        "id": 25,
-        "name": "sca_read_sca",
-        "policy": {
-          "actions": ["sca:read"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 2, 100]
+        "policy": "policy/remote-access/24",
+        "hash": "94820394820394820384",
+        "assets": [
+          "integration/vpn/24",
+          "integration/syslog/24",
+          "integration/linux/24",
+          "integration/windows/24",
+          "integration/apache-http/24",
+          "integration/suricata/24"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/24",
+          "wazuh": ["rule/enrichment/24", "decoder/integrations/24"]
+        }
       },
       {
-        "id": 26,
-        "name": "syscheck_read_syscheck",
-        "policy": {
-          "actions": ["syscheck:read"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [2, 100]
+        "policy": "policy/social-engineering/25",
+        "hash": "29308429304820394823",
+        "assets": [
+          "integration/phishing/25",
+          "integration/sysmon/25",
+          "integration/zeek/25",
+          "integration/linux/25",
+          "integration/nginx/25",
+          "integration/cisco/25"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/25",
+          "wazuh": ["rule/enrichment/25", "decoder/integrations/25"]
+        }
       },
       {
-        "id": 27,
-        "name": "syscheck_all_syscheck",
-        "policy": {
-          "actions": ["syscheck:clear", "syscheck:read", "syscheck:run"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/data-recovery/26",
+        "hash": "92834092834098234098",
+        "assets": [
+          "integration/backup/26",
+          "integration/syslog/26",
+          "integration/linux/26",
+          "integration/windows/26",
+          "integration/apache-http/26",
+          "integration/suricata/26"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/26",
+          "wazuh": ["rule/enrichment/26", "decoder/integrations/26"]
+        }
       },
       {
-        "id": 28,
-        "name": "syscollector_read_syscollector",
-        "policy": {
-          "actions": ["syscollector:read"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 2, 100]
+        "policy": "policy/encryption/27",
+        "hash": "23908402384092384029",
+        "assets": [
+          "integration/ssl/27",
+          "integration/sysmon/27",
+          "integration/zeek/27",
+          "integration/linux/27",
+          "integration/nginx/27",
+          "integration/cisco/27"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/27",
+          "wazuh": ["rule/enrichment/27", "decoder/integrations/27"]
+        }
       },
       {
-        "id": 29,
-        "name": "cluster_all_resourceless",
-        "policy": {
-          "actions": [
-            "cluster:status",
-            "manager:read",
-            "manager:read_api_config",
-            "manager:update_config",
-            "manager:restart"
-          ],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 7]
+        "policy": "policy/patch-management/28",
+        "hash": "23908402384923840923",
+        "assets": [
+          "integration/wsus/28",
+          "integration/syslog/28",
+          "integration/linux/28",
+          "integration/windows/28",
+          "integration/apache-http/28",
+          "integration/suricata/28"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/28",
+          "wazuh": ["rule/enrichment/28", "decoder/integrations/28"]
+        }
       },
       {
-        "id": 30,
-        "name": "cluster_all_nodes",
-        "policy": {
-          "actions": [
-            "cluster:read_api_config",
-            "cluster:read",
-            "cluster:restart",
-            "cluster:update_config"
-          ],
-          "resources": ["node:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 7]
+        "policy": "policy/intrusion-detection/29",
+        "hash": "93840293840923840923",
+        "assets": [
+          "integration/ossec/29",
+          "integration/sysmon/29",
+          "integration/zeek/29",
+          "integration/linux/29",
+          "integration/nginx/29",
+          "integration/cisco/29"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/29",
+          "wazuh": ["rule/enrichment/29", "decoder/integrations/29"]
+        }
       },
       {
-        "id": 31,
-        "name": "cluster_read_resourceless",
-        "policy": {
-          "actions": [
-            "cluster:status",
-            "manager:read",
-            "manager:read_api_config"
-          ],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [2, 6, 100]
+        "policy": "policy/fraud-detection/30",
+        "hash": "29308402384023840239",
+        "assets": [
+          "integration/aml/30",
+          "integration/syslog/30",
+          "integration/linux/30",
+          "integration/windows/30",
+          "integration/apache-http/30",
+          "integration/suricata/30"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/30",
+          "wazuh": ["rule/enrichment/30", "decoder/integrations/30"]
+        }
       },
       {
-        "id": 32,
-        "name": "cluster_read_nodes",
-        "policy": {
-          "actions": [
-            "cluster:read_api_config",
-            "cluster:read",
-            "cluster:read_api_config"
-          ],
-          "resources": ["node:id:*"],
-          "effect": "allow"
-        },
-        "roles": [2, 6, 100]
+        "policy": "policy/privacy/31",
+        "hash": "23984023984023984029",
+        "assets": [
+          "integration/gdpr/31",
+          "integration/sysmon/31",
+          "integration/zeek/31",
+          "integration/linux/31",
+          "integration/nginx/31",
+          "integration/cisco/31"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/31",
+          "wazuh": ["rule/enrichment/31", "decoder/integrations/31"]
+        }
       },
       {
-        "id": 33,
-        "name": "logtest_all_logtest",
-        "policy": {
-          "actions": ["logtest:run"],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 100]
+        "policy": "policy/digital-rights/32",
+        "hash": "23908402394823984092",
+        "assets": [
+          "integration/drm/32",
+          "integration/syslog/32",
+          "integration/linux/32",
+          "integration/windows/32",
+          "integration/apache-http/32",
+          "integration/suricata/32"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/32",
+          "wazuh": ["rule/enrichment/32", "decoder/integrations/32"]
+        }
       },
       {
-        "id": 34,
-        "name": "task_status_task",
-        "policy": {
-          "actions": ["task:status"],
-          "resources": ["*:*:*"],
-          "effect": "allow"
-        },
-        "roles": [1]
+        "policy": "policy/audit/33",
+        "hash": "28309823098423908420",
+        "assets": [
+          "integration/siem/33",
+          "integration/sysmon/33",
+          "integration/zeek/33",
+          "integration/linux/33",
+          "integration/nginx/33",
+          "integration/cisco/33"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/33",
+          "wazuh": ["rule/enrichment/33", "decoder/integrations/33"]
+        }
       },
       {
-        "id": 35,
-        "name": "vulnerability_read_vulnerability",
-        "policy": {
-          "actions": ["vulnerability:read"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 2, 100]
+        "policy": "policy/access-control/34",
+        "hash": "39482039482039482398",
+        "assets": [
+          "integration/rbac/34",
+          "integration/syslog/34",
+          "integration/linux/34",
+          "integration/windows/34",
+          "integration/apache-http/34",
+          "integration/suricata/34"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/34",
+          "wazuh": ["rule/enrichment/34", "decoder/integrations/34"]
+        }
       },
       {
-        "id": 100,
-        "name": "manager_deny_read",
-        "policy": {
-          "actions": ["manager:read", "cluster:read"],
-          "resources": ["*:*:*", "node:id:*"],
-          "effect": "deny"
-        },
-        "roles": [100]
+        "policy": "policy/cloud-compliance/35",
+        "hash": "23984023984023984023",
+        "assets": [
+          "integration/azure/35",
+          "integration/sysmon/35",
+          "integration/zeek/35",
+          "integration/linux/35",
+          "integration/nginx/35",
+          "integration/cisco/35"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/35",
+          "wazuh": ["rule/enrichment/35", "decoder/integrations/35"]
+        }
       },
       {
-        "id": 101,
-        "name": "custom_manager_deny_read",
-        "policy": {
-          "actions": ["manager:read", "cluster:read"],
-          "resources": ["*:*:*", "node:id:*"],
-          "effect": "deny"
-        },
-        "roles": [100]
+        "policy": "policy/endpoint-management/36",
+        "hash": "23094823094823094823",
+        "assets": [
+          "integration/mem/36",
+          "integration/syslog/36",
+          "integration/linux/36",
+          "integration/windows/36",
+          "integration/apache-http/36",
+          "integration/suricata/36"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/36",
+          "wazuh": ["rule/enrichment/36", "decoder/integrations/36"]
+        }
       },
       {
-        "id": 102,
-        "name": "custom_manager_deny_read2",
-        "policy": {
-          "actions": ["manager:read", "cluster:read"],
-          "resources": ["*:*:*", "node:id:*"],
-          "effect": "deny"
-        },
-        "roles": [100]
+        "policy": "policy/network-defense/37",
+        "hash": "23984023984023984029",
+        "assets": [
+          "integration/firewall/37",
+          "integration/sysmon/37",
+          "integration/zeek/37",
+          "integration/linux/37",
+          "integration/nginx/37",
+          "integration/cisco/37"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/37",
+          "wazuh": ["rule/enrichment/37", "decoder/integrations/37"]
+        }
+      },
+      {
+        "policy": "policy/network-monitoring/38",
+        "hash": "23908409238409283409",
+        "assets": [
+          "integration/snmp/38",
+          "integration/syslog/38",
+          "integration/linux/38",
+          "integration/windows/38",
+          "integration/apache-http/38",
+          "integration/suricata/38"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/38",
+          "wazuh": ["rule/enrichment/38", "decoder/integrations/38"]
+        }
+      },
+      {
+        "policy": "policy/data-loss-prevention/39",
+        "hash": "94823094823094823094",
+        "assets": [
+          "integration/dlp/39",
+          "integration/sysmon/39",
+          "integration/zeek/39",
+          "integration/linux/39",
+          "integration/nginx/39",
+          "integration/cisco/39"
+        ],
+        "default_parents": {
+          "user": "decoder/integrations/39",
+          "wazuh": ["rule/enrichment/39", "decoder/integrations/39"]
+        }
       }
     ],
-    "total_affected_items": 36,
+    "total_affected_items": 39,
     "total_failed_items": 0,
     "failed_items": []
   },

@@ -100,6 +100,7 @@ export function enhanceFormFields(
         [fieldKey]: {
           ...(field.type === 'arrayOf'
             ? {
+                ...field,
                 type: field.type,
                 fields: (() => {
                   return restFieldState.fields.map((fieldState, index) =>
@@ -114,23 +115,43 @@ export function enhanceFormFields(
                 })(),
                 addNewItem: () => {
                   setState(state => {
-                    const _state = get(state, [...pathField, 'fields']);
+                    const _state = get(state, [...pathFormField, 'fields']);
                     const newstate = set(
                       state,
-                      [...pathField, 'fields', _state.length],
-                      Object.entries(field.fields).reduce(
-                        (accum, [key, { defaultValue }]) => ({
-                          ...accum,
-                          [key]: {
-                            currentValue: cloneDeep(defaultValue),
-                            initialValue: cloneDeep(defaultValue),
-                            defaultValue: cloneDeep(defaultValue),
-                          },
-                        }),
-                        {},
+                      [...pathFormField, 'fields', _state.length],
+                      Object.fromEntries(
+                        Object.entries(field.fields).map(
+                          ([key, { defaultValue, initialValue, ...rest }]) => [
+                            key,
+                            rest.type === 'arrayOf'
+                              ? {
+                                  fields: [],
+                                }
+                              : {
+                                  currentValue: cloneDeep(initialValue),
+                                  initialValue: cloneDeep(initialValue),
+                                  defaultValue: cloneDeep(defaultValue),
+                                },
+                          ],
+                        ),
                       ),
                     );
                     return cloneDeep(newstate);
+                  });
+                },
+                removeItem: index => {
+                  setState(state => {
+                    const _state = get(state, [...pathFormField, 'fields']);
+
+                    _state.splice(index, 1);
+
+                    const newState = set(
+                      state,
+                      [...pathFormField, 'fields'],
+                      _state,
+                    );
+
+                    return cloneDeep(newState);
                   });
                 },
               }
