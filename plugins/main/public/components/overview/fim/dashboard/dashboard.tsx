@@ -37,6 +37,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -53,7 +54,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
     setFilters,
   });
 
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const { query, absoluteDateRange } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -61,10 +62,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: {
-      from: dateRangeFrom,
-      to: dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
 
   useEffect(() => {
@@ -73,10 +71,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
     }
     fetchData({
       query,
-      dateRange: {
-        to: dateRangeTo,
-        from: dateRangeFrom,
-      },
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -89,8 +84,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(dateRangeFrom),
-    JSON.stringify(dateRangeTo),
+    JSON.stringify(absoluteDateRange),
   ]);
 
   return (
@@ -103,6 +97,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
             <WzSearchBar
               appName='fim-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
@@ -131,10 +126,7 @@ const DashboardFIMComponent: React.FC = ({}) => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'fim-dashboard-tab',
-                  timeRange: {
-                    from: dateRangeFrom,
-                    to: dateRangeTo,
-                  },
+                  timeRange: absoluteDateRange,
                   title: 'File Integrity Monitoring dashboard',
                   description: 'Dashboard of the File Integrity Monitoring',
                   query: query,

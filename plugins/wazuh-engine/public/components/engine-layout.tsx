@@ -7,7 +7,7 @@ export const EngineLayout = ({ children, title }) => {
     getCore().chrome.setBreadcrumbs([
       {
         className: 'osdBreadcrumbs',
-        text: 'Engine',
+        text: 'Security policies',
       },
       {
         className: 'osdBreadcrumbs',

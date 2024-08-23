@@ -24,7 +24,7 @@ import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getAssetURL } from '../../utils/assets';
 import { getHttp, getWzCurrentAppID } from '../../kibana-services';
 import { ApiTable } from '../settings/api/api-table';
-import { WzConfigurationSettings } from '../settings/configuration/configuration';
+import { WzConfigurationSettings } from '../settings/configuration';
 import { SettingsMiscellaneous } from '../settings/miscellaneous/miscellaneous';
 import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
 import { SettingsAbout } from '../settings/about/index';

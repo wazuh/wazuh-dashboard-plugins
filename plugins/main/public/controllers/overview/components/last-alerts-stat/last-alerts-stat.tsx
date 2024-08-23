@@ -60,7 +60,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
   useEffect(() => {
     const getCountLastAlerts = async () => {
       try {
-        const { indexPatternName, cluster, count } = await getLast24HoursAlerts(
+        const { indexPatternId, cluster, count } = await getLast24HoursAlerts(
           severityLabel[severity].ruleLevelRange,
         );
         setCountLastAlerts(count);
@@ -76,7 +76,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           FILTER_OPERATOR.IS,
           cluster.field,
           cluster.name,
-          indexPatternName,
+          indexPatternId,
         );
         const ruleLevelRangeFilter =
           PatternDataSourceFilterManager.createFilter(
@@ -86,7 +86,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
               severityLabel[severity].ruleLevelRange.minRuleLevel,
               severityLabel[severity].ruleLevelRange.maxRuleLevel,
             ],
-            indexPatternName,
+            indexPatternId,
           );
         const predefinedFilters =
           PatternDataSourceFilterManager.filtersToURLFormat([
@@ -95,7 +95,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           ]);
 
         const destURL = core.application.getUrlForApp(discoverLocation.app, {
-          path: `${discoverLocation.basePath}#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternName}',view:discover))&_g=${predefinedFilters}&_q=(filters:!(),query:(language:kuery,query:''))`,
+          path: `${discoverLocation.basePath}#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternId}',view:discover))&_g=${predefinedFilters}&_q=(filters:!(),query:(language:kuery,query:''))`,
         });
         setDiscoverLocation(destURL);
       } catch (error) {

@@ -53,10 +53,10 @@ class NavigationService {
   public renewURL(params?: URLSearchParams): void {
     const newPath = this.getPathname();
     const queryParams = params
-      ? params.toString()
-      : this.getParams().toString();
+      ? this.buildSearch(params)
+      : this.buildSearch(this.getParams());
     const locationHash = this.getHash();
-    this.replace(
+    this.navigate(
       `${newPath}${queryParams ? `?${queryParams}` : ''}${locationHash}`,
     );
   }
@@ -123,6 +123,38 @@ class NavigationService {
   ): string {
     return getCore().application.getUrlForApp(appId, options);
   }
+
+  public buildSearch(search: URLSearchParams) {
+    return Array.from(search.entries())
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
+  }
+
+  public updateAndNavigateSearchParams(params: {
+    [key: string]: string | null;
+  }): void {
+    const urlParams = this.getParams();
+
+    // Update or delete parameters according to their value
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === null) {
+        urlParams.delete(key);
+      } else {
+        urlParams.set(key, value);
+      }
+    });
+
+    const queryString = this.buildSearch(urlParams);
+    this.navigate(`${this.getPathname()}?${queryString}`);
+  }
+
+  public switchTab(newTab: string): void {
+    this.updateAndNavigateSearchParams({ tab: newTab });
+  }
+
+  public switchSubTab = (subTab: string): void => {
+    this.updateAndNavigateSearchParams({ tabView: subTab });
+  };
 
   /*
   TODO: Analyze and improve this function taking into account whether buildFilter_w is still used and whether the implementation with respect to the middle button is correct in navigateToModule

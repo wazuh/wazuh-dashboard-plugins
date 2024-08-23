@@ -11,32 +11,69 @@ import {
   PatternDataSourceFilterManager,
   tFilterManager,
 } from '../index';
+import { TimeRange } from '../../../../../../../src/plugins/data/public';
+import { createOsdUrlStateStorage } from '../../../../../../../src/plugins/opensearch_dashboards_utils/public';
+import NavigationService from '../../../../react-services/navigation-service';
+import { OSD_URL_STATE_STORAGE_ID } from '../../../../../common/constants';
+import { getUiSettings } from '../../../../kibana-services';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
+import { useIsMounted } from '../../hooks/use-is-mounted';
 
 type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   DataSource: IDataSourceFactoryConstructor<K>;
   repository: tDataSourceRepository<T>;
   factory?: PatternDataSourceFactory;
   filterManager?: tFilterManager;
+  /*
+    Filters applied by the user that will be shown in the search bar
+  */
   filters?: tFilter[];
+  /*
+    Filters that will be used to make the fetch request, is a merge of the user filters, fixed filters and fetch (hidden) filters
+  */
   fetchFilters?: tFilter[];
+  /*
+    Filters applied by the data source and cannot be removed by the user
+  */
+  fixedFilters?: tFilter[];
 };
 
 type tUseDataSourceLoadedReturns<K> = {
   isLoading: boolean;
   dataSource: K;
+  /*
+    Filters applied by the user that will be shown in the search bar
+  */
   filters: tFilter[];
+  /*
+    Filters that will be used to make the fetch request, is a merge of the user filters, fixed filters and fetch (hidden) filters
+  */
   fetchFilters: tFilter[];
+  /*
+    Filters applied by the data source and cannot be removed by the user
+  */
+  fixedFilters: tFilter[];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: PatternDataSourceFilterManager;
+  fetchDateRange: TimeRange;
 };
 
 type tUseDataSourceNotLoadedReturns = {
   isLoading: boolean;
   dataSource: undefined;
+  /*
+    Filters applied by the user that will be shown in the search bar
+  */
   filters: [];
+  /*
+    Filters that will be used to make the fetch request, is a merge of the user filters, fixed filters and fetch (hidden) filters
+  */
   fetchFilters: [];
+  /*
+    Filters applied by the data source and cannot be removed by the user
+  */
+  fixedFilters: [];
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: null;
@@ -48,9 +85,20 @@ export function useDataSource<
 >(
   props: tUseDataSourceProps<T, K>,
 ): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
+  const navigationService = NavigationService.getInstance();
+  const config = getUiSettings();
+  const history = navigationService.getHistory();
+  const osdUrlStateStorage = createOsdUrlStateStorage({
+    useHash: config.get(OSD_URL_STATE_STORAGE_ID),
+    history: history,
+  });
+  const appDefaultFilters = osdUrlStateStorage.get('_a')?.filters ?? [];
+  const globalDefaultFilters = osdUrlStateStorage.get('_g')?.filters ?? [];
+  const defaultFilters = [...appDefaultFilters, ...globalDefaultFilters];
   const {
-    filters: initialFilters = [],
+    filters: initialFilters = [...defaultFilters],
     fetchFilters: initialFetchFilters = [],
+    fixedFilters: initialFixedFilters = [],
     DataSource: DataSourceConstructor,
     repository,
     factory: injectedFactory,
@@ -66,9 +114,12 @@ export function useDataSource<
     useState<PatternDataSourceFilterManager | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
+  const [fixedFilters, setFixedFilters] = useState<tFilter[]>([]);
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
+  const [fetchDateRange, setFetchDateRange] = useState<TimeRange>();
+  const { isComponentMounted, getAbortController } = useIsMounted();
 
   const setFilters = (filters: tFilter[]) => {
     if (!dataSourceFilterManager) {
@@ -77,17 +128,20 @@ export function useDataSource<
     dataSourceFilterManager?.setFilters(filters);
     setAllFilters(dataSourceFilterManager?.getFilters() || []);
     setFetchFilters(dataSourceFilterManager?.getFetchFilters() || []);
+    setFixedFilters(dataSourceFilterManager?.getFixedFilters() || []);
   };
 
   const fetchData = async (params: Omit<tSearchParams, 'filters'>) => {
     if (!dataSourceFilterManager) {
       return;
     }
-    return await dataSourceFilterManager?.fetch(params);
+    const paramsWithSignal = { ...params, signal: getAbortController().signal };
+    return await dataSourceFilterManager?.fetch(paramsWithSignal);
   };
 
   useEffect(() => {
-    let subscription;
+    let subscription: any;
+
     (async () => {
       setIsLoading(true);
       const factory = injectedFactory || new PatternDataSourceFactory();
@@ -101,6 +155,7 @@ export function useDataSource<
       if (!dataSource) {
         throw new Error('No valid data source found');
       }
+      if (!isComponentMounted()) return;
       setDataSource(dataSource);
       const dataSourceFilterManager = new PatternDataSourceFilterManager(
         dataSource,
@@ -111,45 +166,34 @@ export function useDataSource<
       // what the filters update
       subscription = dataSourceFilterManager.getUpdates$().subscribe({
         next: () => {
+          if (!isComponentMounted()) return;
           // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
           dataSourceFilterManager.setFilters(
             dataSourceFilterManager.getFilters(),
           );
           setAllFilters(dataSourceFilterManager.getFilters());
           setFetchFilters(dataSourceFilterManager.getFetchFilters());
+          setFixedFilters(dataSourceFilterManager.getFixedFilters());
         },
       });
       setAllFilters(dataSourceFilterManager.getFilters());
       setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      setFixedFilters(dataSourceFilterManager.getFixedFilters());
       setDataSourceFilterManager(dataSourceFilterManager);
       setIsLoading(false);
     })();
 
-    return () => subscription && subscription.unsubscribe();
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, []);
 
   useEffect(() => {
     if (dataSourceFilterManager && dataSource) {
-      const pinnedAgentFilter = dataSourceFilterManager
-        .getFilters()
-        .filter(
-          (filter: tFilter) =>
-            filter.meta.controlledBy ===
-            PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
-        );
-
-      if (pinnedAgentFilter.length) {
-        dataSourceFilterManager.removeFilterByControlledBy(
-          PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
-        );
-      }
-      if (pinnedAgentManager.isPinnedAgent()) {
-        const pinnedAgent = PatternDataSourceFilterManager.getPinnedAgentFilter(
-          dataSource.id,
-        );
-
-        dataSourceFilterManager.addFilters([...pinnedAgent]);
-      }
+      setFixedFilters(dataSourceFilterManager.getFixedFilters());
+      setFetchFilters(dataSourceFilterManager.getFetchFilters());
     }
   }, [JSON.stringify(pinnedAgent)]);
 
@@ -159,6 +203,7 @@ export function useDataSource<
       dataSource: undefined,
       filters: [],
       fetchFilters: [],
+      fixedFilters: [],
       fetchData,
       setFilters,
       filterManager: null,
@@ -169,9 +214,11 @@ export function useDataSource<
       dataSource: dataSource as K,
       filters: allFilters,
       fetchFilters,
+      fixedFilters,
       fetchData,
       setFilters,
       filterManager: dataSourceFilterManager as PatternDataSourceFilterManager,
+      fetchDateRange,
     };
   }
 }

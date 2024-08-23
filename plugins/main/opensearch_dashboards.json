@@ -19,7 +19,8 @@
     "opensearchDashboardsLegacy",
     "wazuhCheckUpdates",
     "wazuhCore",
-    "wazuhEngine"
+    "wazuhEngine",
+    "wazuhFleet"
   ],
   "optionalPlugins": [
     "security",

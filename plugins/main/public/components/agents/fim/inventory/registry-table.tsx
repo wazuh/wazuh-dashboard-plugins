@@ -60,16 +60,11 @@ export const RegistryTable = withRouterSearch(
         syscheckItem: {},
       };
     }
-
-    closeFlyout() {
-      const search = new URLSearchParams(
-        NavigationService.getInstance().getSearch(),
-      );
-      search.delete('file');
-      NavigationService.getInstance().navigate(
-        `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
-      );
-    }
+    closeFlyout = () => {
+      NavigationService.getInstance().updateAndNavigateSearchParams({
+        file: null,
+      });
+    };
 
     columns() {
       return [
@@ -93,7 +88,8 @@ export const RegistryTable = withRouterSearch(
             </span>
           ),
           sortable: true,
-          width: '200px',
+          width: '250px',
+          className: 'wz-white-space-nowrap',
           render: formatUIDate,
           searchable: false,
         },
@@ -106,13 +102,9 @@ export const RegistryTable = withRouterSearch(
         return {
           'data-test-subj': `row-${file}`,
           onClick: () => {
-            const search = new URLSearchParams(
-              NavigationService.getInstance().getSearch(),
-            );
-            search.append('file', file);
-            NavigationService.getInstance().navigate(
-              `${NavigationService.getInstance().getPathname()}?${search.toString()}`,
-            );
+            NavigationService.getInstance().updateAndNavigateSearchParams({
+              file,
+            });
           },
         };
       };

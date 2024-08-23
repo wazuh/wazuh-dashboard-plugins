@@ -7,6 +7,7 @@ import { useDocViewer } from '../../doc-viewer';
 export const DocumentViewTableAndJson = ({
   document,
   indexPattern,
+  renderFields,
   extraTabs = [],
   tableProps = {},
 }) => {
@@ -45,7 +46,13 @@ export const DocumentViewTableAndJson = ({
           {
             id: 'table',
             name: 'Table',
-            content: <DocViewer {...docViewerProps} {...tableProps} />,
+            content: (
+              <DocViewer
+                {...docViewerProps}
+                renderFields={renderFields}
+                {...tableProps}
+              />
+            ),
           },
           {
             id: 'json',

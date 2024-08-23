@@ -176,12 +176,16 @@ export const exportSearchToCSV = async (
 export const parseColumns = (
   fields: IFieldType[],
   defaultColumns: tDataGridColumn[] = [],
-): EuiDataGridColumn[] => {
+): tDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
-  fields = fields.filter(field => field.name !== '_source');
   // merge the properties of the field with the default columns
-  const columns =
-    fields.map(field => {
+  if (!fields?.length) {
+    return defaultColumns;
+  }
+
+  const columns = fields
+    .filter(field => field.name !== '_source')
+    .map(field => {
       const defaultColumn = defaultColumns.find(
         column => column.id === field.name,
       );
@@ -195,6 +199,27 @@ export const parseColumns = (
         },
         ...defaultColumn,
       };
-    }) || [];
+    }) as tDataGridColumn[];
   return columns;
+};
+
+/**
+ * Merge the defaults columns and the wzDiscoverRenderColumns
+ * The custom columns renders will override the defaults columns.
+ * Only consider the fields that have the render method
+ * @param customColumns
+ * @param defaultColumns
+ */
+export const getAllCustomRenders = (
+  customColumns: tDataGridColumn[],
+  discoverColumns: tDataGridColumn[],
+): tDataGridColumn[] => {
+  const customColumnsWithRender = customColumns.filter(column => column.render);
+  const allColumns = discoverColumns.map(column => {
+    const customColumn = customColumnsWithRender.find(
+      customColumn => customColumn.id === column.id,
+    );
+    return customColumn || column;
+  });
+  return allColumns;
 };

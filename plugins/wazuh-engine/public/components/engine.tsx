@@ -69,7 +69,7 @@ export const Engine = props => {
 
   const sideNav = [
     {
-      name: 'Engine',
+      name: 'Security policies',
       id: 'engine',
       items: views.map(({ render, ...item }) => ({
         ...item,

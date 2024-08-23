@@ -59,6 +59,7 @@ const MitreComponent = props => {
     filters,
     dataSource,
     fetchFilters,
+    fixedFilters,
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
@@ -72,6 +73,8 @@ const MitreComponent = props => {
     filters,
     setFilters: setFilters,
   });
+
+  const { absoluteDateRange } = searchBarProps;
   const [mitreState, setMitreState] = useState<tMitreState>({
     tacticsObject: {},
     selectedTactics: {},
@@ -80,10 +83,7 @@ const MitreComponent = props => {
   const [filterParams, setFilterParams] = useState<tFilterParams>({
     filters: fetchFilters,
     query: searchBarProps?.query,
-    time: {
-      from: searchBarProps?.dateRangeFrom,
-      to: searchBarProps?.dateRangeTo,
-    },
+    time: absoluteDateRange,
   });
   const [indexPattern, setIndexPattern] = useState<any>(); //Todo: Add correct type
   const [isLoading, setIsLoading] = useState(true);
@@ -93,10 +93,7 @@ const MitreComponent = props => {
     let filterParams = {
       filters: fetchFilters, // pass the fetchFilters to use it as initial filters in the technique flyout
       query: searchBarProps?.query,
-      time: {
-        from: searchBarProps?.dateRangeFrom,
-        to: searchBarProps?.dateRangeTo,
-      },
+      time: absoluteDateRange,
     };
     setFilterParams(filterParams);
     setIsLoading(true);
@@ -110,9 +107,8 @@ const MitreComponent = props => {
     isDataSourceLoading,
     dataSource,
     searchBarProps.query,
-    searchBarProps.dateRangeFrom,
-    searchBarProps.dateRangeTo,
     JSON.stringify(filters),
+    JSON.stringify(absoluteDateRange),
   ]);
 
   const buildTacticsObject = async () => {
@@ -152,20 +148,31 @@ const MitreComponent = props => {
   return (
     <I18nProvider>
       <>
-        <EuiPanel paddingSize='none' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='none'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           {isDataSourceLoading && !dataSource ? (
             <LoadingSpinner />
           ) : (
             <WzSearchBar
               appName='mitre-attack-searchbar'
               {...searchBarProps}
+              fixedFilters={fixedFilters}
               showQueryInput={true}
               showQueryBar={true}
               showSaveQuery={true}
             />
           )}
         </EuiPanel>
-        <EuiPanel paddingSize='s' hasShadow={false} hasBorder={false} color="transparent">
+        <EuiPanel
+          paddingSize='s'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
           <EuiPanel paddingSize='none'>
             <EuiFlexGroup>
               <EuiFlexItem

@@ -9,4 +9,4 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { ComplianceRequirements } from './requirement-flyout';
+export { RequirementFlyout } from './requirement-flyout';

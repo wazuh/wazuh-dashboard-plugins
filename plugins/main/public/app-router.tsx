@@ -5,6 +5,7 @@ import {
   getPlugins,
   getWazuhCorePlugin,
   getWazuhEnginePlugin,
+  getWazuhFleetPlugin,
   getWzMainParams,
 } from './kibana-services';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
@@ -23,7 +24,7 @@ import { ToastNotificationsModal } from './components/notifications/modal';
 import { WzUpdatesNotification } from './components/wz-updates-notification';
 import { HealthCheck } from './components/health-check';
 import { WzBlankScreen } from './components/wz-blank-screen/wz-blank-screen';
-import { RegisterAgent } from './components/endpoints-summary/register-agent/containers/register-agent/register-agent';
+import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
 import { AgentView } from './components/endpoints-summary/agent';
 import WzManagement from './controllers/management/components/management/management-provider';
@@ -32,7 +33,6 @@ import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
-import { TableIndexer } from './components/common/tables/table-indexer';
 import {
   RulesDataSource,
   RulesDataSourceRepository,
@@ -44,10 +44,25 @@ import {
   FILTER_OPERATOR,
   PatternDataSource,
   PatternDataSourceFilterManager,
+  FleetDataSource,
+  FleetDataSourceRepository,
+  useDataSource,
+  FleetGroupsDataSource,
+  FleetGroupsDataSourceRepository,
+  FleetCommandsDataSource,
+  FleetCommandsDataSourceRepository,
+  AlertsDataSource,
+  AlertsDataSourceRepository,
 } from './components/common/data-source';
 import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../common/constants';
 import { useForm } from './components/common/form/hooks';
 import { InputForm } from './components/common/form';
+import useSearchBar from './components/common/search-bar/use-search-bar';
+import { WzSearchBar } from './components/common/search-bar';
+import { TableIndexer, TableIndexerEngine } from './components/common/tables';
+import DocDetails from './components/common/wazuh-discover/components/doc-details';
+import { useTimeFilter } from './components/common/hooks';
+import { LoadingSpinner } from './components/common/loading-spinner/loading-spinner';
 
 import { TableWzAPI } from './components/common/tables';
 import WzListEditor from './controllers/management/components/management/cdblists/views/list-editor.tsx';
@@ -63,6 +78,8 @@ export function Application(props) {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
   const history = navigationService.getHistory();
+
+  const { FleetManagement } = getWazuhFleetPlugin();
 
   useEffect(() => {
     // Get the dashboard security
@@ -115,6 +132,31 @@ export function Application(props) {
           exact
           render={MainEndpointsSummary}
         ></Route>
+        <Route
+          path={'/fleet-management'}
+          render={() => (
+            <FleetManagement
+              navigationService={NavigationService}
+              useDataSource={useDataSource}
+              FleetDataSource={FleetDataSource}
+              FleetDataSourceRepository={FleetDataSourceRepository}
+              FleetGroupsDataSource={FleetGroupsDataSource}
+              FleetGroupsDataSourceRepository={FleetGroupsDataSourceRepository}
+              FleetCommandsDataSource={FleetCommandsDataSource}
+              FleetCommandsDataSourceRepository={
+                FleetCommandsDataSourceRepository
+              }
+              useSearchBar={useSearchBar}
+              WzSearchBar={WzSearchBar}
+              TableIndexer={TableIndexer}
+              DocDetails={DocDetails}
+              useTimeFilter={useTimeFilter}
+              LoadingSpinner={LoadingSpinner}
+              AlertsDataSource={AlertsDataSource}
+              AlertsDataSourceRepository={AlertsDataSourceRepository}
+            />
+          )}
+        ></Route>
         <Route path={'/manager'} exact render={WzManagement}></Route>
         <Route
           path={'/overview'}
@@ -143,7 +185,7 @@ export function Application(props) {
                 DashboardContainerByValueRenderer={
                   getPlugins().dashboard.DashboardContainerByValueRenderer
                 }
-                TableIndexer={TableIndexer}
+                TableIndexer={TableIndexerEngine}
                 WazuhFlyoutDiscover={WazuhFlyoutDiscover}
                 PatternDataSource={PatternDataSource}
                 PatternDataSourceFilterManager={PatternDataSourceFilterManager}

@@ -51,6 +51,11 @@ export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities-*';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 
+// Wazuh Fleet
+export const WAZUH_FLEET_PATTERN = 'wazuh-fleet-*';
+export const WAZUH_INDEX_TYPE_FLEET = 'fleet';
+export const FLEET_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
+
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
@@ -525,3 +530,6 @@ export const SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT = 10;
 /* Time in milliseconds to debounce the analysis of search bar. This mitigates some problems related
 to changes running in parallel */
 export const SEARCH_BAR_DEBOUNCE_UPDATE_TIME = 400;
+
+// ID used to refer the createOsdUrlStateStorage state
+export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';

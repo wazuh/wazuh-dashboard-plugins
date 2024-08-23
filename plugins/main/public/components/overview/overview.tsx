@@ -4,6 +4,7 @@ import { Stats } from '../../controllers/overview/components/stats';
 import { AppState, WzRequest } from '../../react-services';
 import { OverviewWelcome } from '../common/welcome/overview-welcome';
 import { MainModule } from '../common/modules/main';
+import { OSD_URL_STATE_STORAGE_ID } from '../../../common/constants';
 import { WzCurrentOverviewSectionWrapper } from '../common/modules/overview-current-section-wrapper';
 import {
   connectToQueryState,
@@ -33,7 +34,7 @@ export const Overview: React.FC = withRouteResolvers({
   savedSearch,
 })(() => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
-  const { tab = 'welcome', tabView = 'dashboard' } = useRouterSearch();
+  const { tab = 'welcome', tabView = 'dashboard', agentId } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
   const pinnedAgentManager = new PinnedAgentManager();
 
@@ -49,7 +50,7 @@ export const Overview: React.FC = withRouteResolvers({
     const config = getUiSettings();
     const history = navigationService.getHistory();
     const osdUrlStateStorage = createOsdUrlStateStorage({
-      useHash: config.get('state:storeInSessionStorage'),
+      useHash: config.get(OSD_URL_STATE_STORAGE_ID),
       history: history,
     });
 
@@ -100,7 +101,7 @@ export const Overview: React.FC = withRouteResolvers({
       stopSyncingGlobalStateWithUrl();
       stopSyncingQueryAppStateWithStateContainer();
     };
-  }, []);
+  }, [agentId]);
 
   /**
    * This fetch de agents summary
@@ -118,20 +119,12 @@ export const Overview: React.FC = withRouteResolvers({
     }
   };
 
-  function switchTab(newTab: any, force: any) {
-    const urlSearchParams = new URLSearchParams(navigationService.getSearch());
-    urlSearchParams.set('tab', newTab);
-    navigationService.navigate(
-      `${navigationService.getPathname()}?${urlSearchParams.toString()}`,
-    );
+  function switchTab(newTab: string) {
+    navigationService.switchTab(newTab);
   }
 
   const switchSubTab = (subTab: string) => {
-    const urlSearchParams = new URLSearchParams(navigationService.getSearch());
-    urlSearchParams.set('tabView', subTab);
-    navigationService.navigate(
-      `${navigationService.getPathname()}?${urlSearchParams.toString()}`,
-    );
+    navigationService.switchSubTab(subTab);
   };
 
   return (

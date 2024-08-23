@@ -832,6 +832,9 @@ resources:
   # Get results
   - method: GET
     path: /syscheck/{agent_id}
+    response:
+      statusCode: 200
+      scriptFile: syscheck/get-agent.js
 
   # Clearresults
   - method: DELETE
