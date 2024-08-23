@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.0
 
+### Fixed
+
+- Fix the app state filters are not kept when refreshing the page in some modules [#6944](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6944)
+
 ### Changed
 
 - Changed the registration id of the Settings application for compatibility with Opensearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
