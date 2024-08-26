@@ -359,23 +359,6 @@ export class PatternDataSourceFilterManager
     return [];
   }
 
-  /**
-     * Return the allowed agents related to the user permissions to read data from agents in the
-      API server
-     */
-  static getAllowAgentsFilter(indexPatternId: string): tFilter[] {
-    const allowedAgents =
-      store.getState().appStateReducers?.allowedAgents || [];
-    if (allowedAgents.length > 0) {
-      const allowAgentsFilter = getFilterAllowedAgents(
-        allowedAgents,
-        indexPatternId,
-      ) as tFilter;
-      return [allowAgentsFilter];
-    }
-    return [];
-  }
-
   /******************************************************************/
   /********************** FILTERS FACTORY ***************************/
   /******************************************************************/

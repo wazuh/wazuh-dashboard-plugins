@@ -38,7 +38,6 @@ class DataSourceMocked implements PatternDataSource {
     getClusterManagerFilters = mockedGetFilters
     getPinnedAgentFilter = mockedGetFilters
     getExcludeManagerFilter = mockedGetFilters
-    getAllowAgentsFilter = mockedGetFilters
 }
 
 class ExampleRepository implements tDataSourceRepository<tParsedIndexPattern> {
