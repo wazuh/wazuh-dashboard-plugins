@@ -23,7 +23,6 @@ const initialState = {
   userPermissions: false,
   toastNotification: false,
   withUserLogged: false,
-  allowedAgents: [],
   logtestToken: '',
   userAccount: {
     administrator: false,
@@ -110,13 +109,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       withUserLogged: action.withUserLogged,
-    };
-  }
-
-  if (action.type === 'GET_ALLOWED_AGENTS') {
-    return {
-      ...state,
-      allowedAgents: action.allowedAgents,
     };
   }
 
