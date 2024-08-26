@@ -17,7 +17,6 @@ import store from '../redux/store';
 import {
   updateUserPermissions,
   updateWithUserLogged,
-  updateAllowedAgents,
   updateUserAccount,
 } from '../redux/actions/appStateActions';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
