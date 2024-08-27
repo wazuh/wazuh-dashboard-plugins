@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Upgraded the `axios` dependency to `1.7.4` [#6919](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6919)
+- Changed the order of columns on Vulnerabilities Detection > Events table [#6948](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6948)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 05
 
