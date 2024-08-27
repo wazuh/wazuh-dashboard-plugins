@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Register agent if client.keys is empty
-if [ ! -s /var/ossec/etc/client.keys ]; then
+if [ ! -s /var/wazuh_server/etc/client.keys ]; then
   groups=${JOIN_GROUPS:-default}
   password=""
   if [ ! -z ${JOIN_PASSWORD} ]; then
     password="-P ${JOIN_PASSWORD}"
   fi
   manager=${JOIN_MANAGER}
-  sed -i "s:MANAGER_IP:$JOIN_MANAGER:g" /var/ossec/etc/ossec.conf
-  /var/ossec/bin/agent-auth -m $manager -G $groups $password
+  sed -i "s:MANAGER_IP:$JOIN_MANAGER:g" /var/wazuh_server/etc/wazuh_server.conf
+  /var/wazuh_server/bin/agent-auth -m $manager -G $groups $password
 fi
 
 # Start the agent

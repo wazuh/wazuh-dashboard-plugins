@@ -408,7 +408,7 @@ export default compose(
           })),
           `wazuh-${
             this.state.selectedNode ? `${this.state.selectedNode}-` : ''
-          }ossec-log`,
+          }server-log`,
         );
       } catch (error) {
         const options = {

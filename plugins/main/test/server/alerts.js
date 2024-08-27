@@ -5,7 +5,10 @@ const elasticServer = process.env.WAZUH_ELASTIC_IP || 'localhost';
 chai.should();
 
 const headers = {
-  headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' }
+  headers: {
+    ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+    'content-type': 'application/json',
+  },
 };
 
 const date = new Date();
@@ -39,12 +42,12 @@ const syscheck = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'syscheck' } }
-          ]
-        }
-      }
+            { match: { 'rule.groups': 'syscheck' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -59,7 +62,7 @@ const syscheck = async agentID => {
   sample.rule.groups.should.be.a('array').that.includes('syscheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh_server/logs/alerts/alerts.json');
   sample.location.should.be.eql('syscheck');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
@@ -75,12 +78,12 @@ const rootcheck = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'rootcheck' } }
-          ]
-        }
-      }
+            { match: { 'rule.groups': 'rootcheck' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -94,7 +97,7 @@ const rootcheck = async agentID => {
   sample.rule.groups.should.be.a('array').that.includes('rootcheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh_server/logs/alerts/alerts.json');
   sample.location.should.be.eql('rootcheck');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
@@ -110,12 +113,12 @@ const vulnerability = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'vulnerability-detector' } }
-          ]
-        }
-      }
+            { match: { 'rule.groups': 'vulnerability-detector' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -140,7 +143,7 @@ const vulnerability = async agentID => {
     .that.includes('vulnerability-detector');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh_server/logs/alerts/alerts.json');
   sample.location.should.be.eql('vulnerability-detector');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
@@ -156,12 +159,12 @@ const pciDss = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { exists: { field: 'rule.pci_dss' } }
-          ]
-        }
-      }
+            { exists: { field: 'rule.pci_dss' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -175,7 +178,7 @@ const pciDss = async agentID => {
   sample.rule.pci_dss.should.be.a('array');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh_server/logs/alerts/alerts.json');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
   sample.cluster.node.should.be.eql('node01');
@@ -190,12 +193,12 @@ const gdpr = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { exists: { field: 'rule.gdpr' } }
-          ]
-        }
-      }
+            { exists: { field: 'rule.gdpr' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -209,7 +212,7 @@ const gdpr = async agentID => {
   sample.rule.gdpr.should.be.a('array');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh_server/logs/alerts/alerts.json');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
   sample.cluster.node.should.be.eql('node01');
@@ -224,12 +227,12 @@ const audit = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'audit' } }
-          ]
-        }
-      }
+            { match: { 'rule.groups': 'audit' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -244,7 +247,7 @@ const audit = async agentID => {
   sample.rule.groups.should.be.a('array').that.includes('audit');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh_server/logs/alerts/alerts.json');
   sample.location.should.be.eql('/var/log/audit/audit.log');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
@@ -257,7 +260,7 @@ describe('Elasticsearch', () => {
       'get',
       `${elasticServer}:9200/_cat/indices`,
       {},
-      headers
+      headers,
     );
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');
@@ -268,7 +271,7 @@ describe('Elasticsearch', () => {
       'get',
       `${elasticServer}:9200/_cat/indices/${index}`,
       {},
-      headers
+      headers,
     );
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');
