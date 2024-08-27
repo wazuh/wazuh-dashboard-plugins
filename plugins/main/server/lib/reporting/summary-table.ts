@@ -22,7 +22,6 @@ export default class SummaryTable {
     gte,
     lte,
     filters,
-    allowedAgentsFilter,
     summarySetup: SummarySetup,
     pattern,
   ) {
@@ -36,7 +35,7 @@ export default class SummaryTable {
 
     Object.assign(
       this._base,
-      Base(pattern, filters, gte, lte, allowedAgentsFilter),
+      Base(pattern, filters, gte, lte),
     );
 
     this._parseSummarySetup(summarySetup);

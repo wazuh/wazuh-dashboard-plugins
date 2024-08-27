@@ -12,7 +12,7 @@
 
 import { cloneDeep } from 'lodash';
 
-export function Base(pattern: string, filters: any, gte: number, lte: number, allowedAgentsFilter: any = null) {
+export function Base(pattern: string, filters: any, gte: number, lte: number) {
   const clonedFilter = cloneDeep(filters);
   clonedFilter?.bool?.must?.push?.({
     range: {

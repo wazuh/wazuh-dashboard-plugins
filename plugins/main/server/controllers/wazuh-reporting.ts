@@ -1301,17 +1301,11 @@ export class WazuhReportingCtrl {
               from,
               to,
               serverSideQuery,
-              agentsFilter,
               indexPatternTitle ||
                 context.wazuh_core.configuration.getSettingValue('pattern'),
               agentID,
             );
           }
-
-          // Add inventory tables
-          (await Promise.all(agentRequestsInventory.map(requestInventory)))
-            .filter(table => table)
-            .forEach(table => printer.addSimpleTable(table));
 
           // Print the document
           await printer.print(context.wazuhEndpointParams.pathFilename);

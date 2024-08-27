@@ -24,13 +24,12 @@ export const topLevel15 = async (
   gte,
   lte,
   filters,
-  allowedAgentsFilter,
   pattern,
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {
