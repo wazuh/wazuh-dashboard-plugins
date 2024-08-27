@@ -369,7 +369,6 @@ export class WazuhReportingCtrl {
             new Date(from).getTime(),
             new Date(to).getTime(),
             serverSideQuery,
-            agentsFilter,
             indexPatternTitle ||
               context.wazuh_core.configuration.getSettingValue('pattern'),
             agents,
@@ -380,11 +379,6 @@ export class WazuhReportingCtrl {
 
         if (tables) {
           printer.addTables([...tables, ...(additionalTables || [])]);
-        }
-
-        //add authorized agents
-        if (agentsFilter?.agentsText) {
-          printer.addAgentsFilters(agentsFilter.agentsText);
         }
 
         await printer.print(context.wazuhEndpointParams.pathFilename);
@@ -1306,6 +1300,11 @@ export class WazuhReportingCtrl {
               agentID,
             );
           }
+
+          // Add inventory tables
+          (await Promise.all(agentRequestsInventory.map(requestInventory)))
+            .filter(table => table)
+            .forEach(table => printer.addSimpleTable(table));
 
           // Print the document
           await printer.print(context.wazuhEndpointParams.pathFilename);
