@@ -17,14 +17,7 @@ interface SummarySetup {
 }
 
 export default class SummaryTable {
-  constructor(
-    context,
-    gte,
-    lte,
-    filters,
-    summarySetup: SummarySetup,
-    pattern,
-  ) {
+  constructor(context, gte, lte, filters, summarySetup: SummarySetup, pattern) {
     this._context = context;
     this._pattern = pattern;
     this._summarySetup = summarySetup;
@@ -33,10 +26,7 @@ export default class SummaryTable {
     this._rows = [];
     this._title = summarySetup.title;
 
-    Object.assign(
-      this._base,
-      Base(pattern, filters, gte, lte),
-    );
+    Object.assign(this._base, Base(pattern, filters, gte, lte));
 
     this._parseSummarySetup(summarySetup);
   }

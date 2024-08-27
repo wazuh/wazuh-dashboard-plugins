@@ -19,13 +19,7 @@ import { Base } from './base-query';
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>}
  */
-export const top3agents = async (
-  context,
-  gte,
-  lte,
-  filters,
-  pattern,
-) => {
+export const top3agents = async (context, gte, lte, filters, pattern) => {
   try {
     const base = {};
 
@@ -71,13 +65,7 @@ export const top3agents = async (
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>}
  */
-export const top3Rules = async (
-  context,
-  gte,
-  lte,
-  filters,
-  pattern,
-) => {
+export const top3Rules = async (context, gte, lte, filters, pattern) => {
   try {
     const base = {};
 

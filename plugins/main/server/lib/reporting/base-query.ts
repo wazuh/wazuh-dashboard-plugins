@@ -19,9 +19,9 @@ export function Base(pattern: string, filters: any, gte: number, lte: number) {
       timestamp: {
         gte: gte,
         lte: lte,
-        format: 'epoch_millis'
-      }
-    }
+        format: 'epoch_millis',
+      },
+    },
   });
   const base = {
     from: 0,
@@ -29,7 +29,7 @@ export function Base(pattern: string, filters: any, gte: number, lte: number) {
     aggs: {},
     sort: [],
     script_fields: {},
-    query: clonedFilter
+    query: clonedFilter,
   };
 
   return base;

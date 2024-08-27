@@ -19,13 +19,7 @@ import { Base } from './base-query';
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>} E.g:['000','130','300']
  */
-export const topLevel15 = async (
-  context,
-  gte,
-  lte,
-  filters,
-  pattern,
-) => {
+export const topLevel15 = async (context, gte, lte, filters, pattern) => {
   try {
     const base = {};
 
