@@ -36,7 +36,7 @@ export const CustomSearchBar = ({
   searchBarProps,
   indexPattern,
   setFilters,
-  fixedFilters
+  fixedFilters,
 }: CustomSearchBarProps) => {
   const { filters } = searchBarProps;
 

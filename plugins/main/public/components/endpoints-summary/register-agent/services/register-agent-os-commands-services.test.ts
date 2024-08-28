@@ -145,7 +145,7 @@ describe('getLinuxStartCommand', () => {
 
 describe('getWindowsInstallCommand', () => {
   it('should return the correct install command', () => {
-    let expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \${env.tmp}\\wazuh-agent; msiexec.exe /i \${env.tmp}\\wazuh-agent /q ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} `;
+    let expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\wazuh-agent; msiexec.exe /i \$env:tmp\\wazuh-agent /q ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} `;
 
     const withAllOptionals = getWindowsInstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
@@ -153,7 +153,7 @@ describe('getWindowsInstallCommand', () => {
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
 
-    expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \${env.tmp}\\wazuh-agent; msiexec.exe /i \${env.tmp}\\wazuh-agent /q ${test.optionals.serverAddress} ${test.optionals.agentGroups} `;
+    expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\wazuh-agent; msiexec.exe /i \$env:tmp\\wazuh-agent /q ${test.optionals.serverAddress} ${test.optionals.agentGroups} `;
     const withServerAddresAndAgentGroupsOptions =
       getWindowsInstallCommand(test);
 
@@ -205,7 +205,7 @@ describe('transformOptionalsParamatersMacOSCommand', () => {
 
 describe('getMacOsInstallCommand', () => {
   it('should return the correct macOS installation script', () => {
-    let expected = `curl -so wazuh-agent.pkg ${test.urlPackage} && echo "${test.optionals.serverAddress} && ${test.optionals.agentGroups} && ${test.optionals.agentName} && ${test.optionals.wazuhPassword}\\n\" > /tmp/wazuh_envs && sudo installer -pkg ./wazuh-agent.pkg -target /`;
+    let expected = `curl -so wazuh-agent.pkg ${test.urlPackage} && echo "${test.optionals.serverAddress} && ${test.optionals.agentGroups} && ${test.optionals.agentName} && ${test.optionals.wazuhPassword}\" > /tmp/wazuh_envs && sudo installer -pkg ./wazuh-agent.pkg -target /`;
 
     const withAllOptionals = getMacOsInstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
