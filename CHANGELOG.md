@@ -51,6 +51,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the internal control from Endpoint Groups to a control via url. [#6890](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6890)
 - Changed the internal control from MITRE ATT&CK > intelligence > Table to a control via url. [#6882](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6882)
 - Changed the display of rule details flyout to be based on URL [#6886](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6886)
+- Changed the order of columns on Vulnerabilities Detection > Events table [#6948](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6948)
 
 ### Fixed
 
