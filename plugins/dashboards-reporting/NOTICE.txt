@@ -1,0 +1,5 @@
+OpenSearch (https://opensearch.org/)
+Copyright OpenSearch Contributors
+
+This product includes software developed by
+naptha (https://github.com/naptha/tesseract.js/)

@@ -1,0 +1,15 @@
+npm-debug.log*
+node_modules
+/build/
+/public/app.css
+.idea/
+yarn-error.log
+/coverage/
+.DS_Store
+.history/
+.eslintcache
+package-lock.json
+/target/
+.cypress/screenshots
+.cypress/videos
+.cypress/downloads
