@@ -22,7 +22,7 @@ import {
 } from '../../../common/data-source';
 import { GoogleCloudDataSource } from '../../../common/data-source/pattern/alerts/google-cloud/google-cloud-data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../../../common/search-bar';
 
@@ -91,7 +91,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
       <I18nProvider>
         <>
           {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
+            <LoadingSearchbarProgress />
           ) : (
             <WzSearchBar
               appName='google-cloud-searchbar'

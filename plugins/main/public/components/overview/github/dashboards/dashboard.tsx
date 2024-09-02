@@ -8,7 +8,7 @@ import useSearchBar from '../../../common/search-bar/use-search-bar';
 import './styles.scss';
 import { withErrorBoundary } from '../../../common/hocs';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import {
   ErrorFactory,
@@ -93,7 +93,7 @@ const DashboardGitHubComponent: React.FC = () => {
       <I18nProvider>
         <>
           {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
+            <LoadingSearchbarProgress />
           ) : (
             <WzSearchBar
               appName='github-searchbar'

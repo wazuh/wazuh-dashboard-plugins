@@ -23,7 +23,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import {
   useDataSource,
@@ -155,7 +155,7 @@ const MitreComponent = props => {
           color='transparent'
         >
           {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
+            <LoadingSearchbarProgress />
           ) : (
             <WzSearchBar
               appName='mitre-attack-searchbar'

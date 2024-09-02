@@ -12,7 +12,7 @@ import {
   HttpError,
 } from '../../../../react-services/error-management';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { SearchResponse } from '../../../../../../../src/core/server';
 import './mitre_dashboard_filters.scss';
 import {
@@ -90,7 +90,7 @@ export const DashboardMITRE: React.FC = () => {
       <I18nProvider>
         <>
           {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
+            <LoadingSearchbarProgress />
           ) : (
             <WzSearchBar
               appName='mitre-detector-searchbar'

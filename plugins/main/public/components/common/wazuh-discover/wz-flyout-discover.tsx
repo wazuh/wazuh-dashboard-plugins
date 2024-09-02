@@ -15,7 +15,7 @@ import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/public';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
-import { LoadingSpinner } from '../loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { tDataGridColumn } from '../data-grid';
 import {
   ErrorHandler,
@@ -271,7 +271,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       <EuiFlexGroup className='flyout-row'>
         <EuiFlexItem>
           {isDataSourceLoading ? (
-            <LoadingSpinner />
+            <LoadingSearchbarProgress />
           ) : (
             <WzSearchBar
               appName='wazuh-discover-search-bar'

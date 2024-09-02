@@ -20,7 +20,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { VirusTotalDataSource } from '../../../common/data-source/pattern/alerts/virustotal/virustotal-data-source';
 import './virustotal_dashboard.scss';
@@ -93,7 +93,7 @@ const DashboardVT: React.FC = () => {
     <I18nProvider>
       <>
         {isDataSourceLoading && !dataSource ? (
-          <LoadingSpinner />
+          <LoadingSearchbarProgress />
         ) : (
           <WzSearchBar
             appName='virustotal-searchbar'
