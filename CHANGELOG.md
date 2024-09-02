@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Upgraded the `axios` dependency to `1.7.4` [#6919](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6919)
+- Upgraded MITRE ATT&CK intelligence flyout details readability [#6954](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6954)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 05
 
