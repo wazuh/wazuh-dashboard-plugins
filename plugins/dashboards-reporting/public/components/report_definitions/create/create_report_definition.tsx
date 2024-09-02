@@ -23,6 +23,7 @@ import {
   permissionsMissingActions,
 } from '../../utils/utils';
 import { definitionInputValidation } from '../utils/utils';
+import { ReportDelivery } from '../delivery';
 
 interface reportParamsType {
   report_name: string;
@@ -89,7 +90,11 @@ export interface timeRangeParams {
   timeTo: Date;
 }
 
-export function CreateReport(props: { [x: string]: any; setBreadcrumbs?: any; httpClient?: any; }) {
+export function CreateReport(props: {
+  [x: string]: any;
+  setBreadcrumbs?: any;
+  httpClient?: any;
+}) {
   let createReportDefinitionRequest: reportDefinitionParams = {
     report_params: {
       report_name: '',
@@ -105,7 +110,7 @@ export function CreateReport(props: { [x: string]: any; setBreadcrumbs?: any; ht
       configIds: [],
       title: '',
       textDescription: '',
-      htmlDescription: ''
+      htmlDescription: '',
     },
     trigger: {
       trigger_type: '',
@@ -116,26 +121,18 @@ export function CreateReport(props: { [x: string]: any; setBreadcrumbs?: any; ht
   const [comingFromError, setComingFromError] = useState(false);
   const [preErrorData, setPreErrorData] = useState({});
 
-  const [
-    showSettingsReportNameError,
-    setShowSettingsReportNameError,
-  ] = useState(false);
-  const [
-    settingsReportNameErrorMessage,
-    setSettingsReportNameErrorMessage,
-  ] = useState('');
-  const [
-    showSettingsReportSourceError,
-    setShowSettingsReportSourceError,
-  ] = useState(false);
+  const [showSettingsReportNameError, setShowSettingsReportNameError] =
+    useState(false);
+  const [settingsReportNameErrorMessage, setSettingsReportNameErrorMessage] =
+    useState('');
+  const [showSettingsReportSourceError, setShowSettingsReportSourceError] =
+    useState(false);
   const [
     settingsReportSourceErrorMessage,
     setSettingsReportSourceErrorMessage,
   ] = useState('');
-  const [
-    showTriggerIntervalNaNError,
-    setShowTriggerIntervalNaNError,
-  ] = useState(false);
+  const [showTriggerIntervalNaNError, setShowTriggerIntervalNaNError] =
+    useState(false);
   const [showCronError, setShowCronError] = useState(false);
   const [showTimeRangeError, setShowTimeRangeError] = useState(false);
 
@@ -208,7 +205,7 @@ export function CreateReport(props: { [x: string]: any; setBreadcrumbs?: any; ht
     addInvalidTimeRangeToastHandler();
   };
 
-  const removeToast = (removedToast: { id: string; }) => {
+  const removeToast = (removedToast: { id: string }) => {
     setToasts(toasts.filter((toast: any) => toast.id !== removedToast.id));
   };
 
@@ -241,7 +238,7 @@ export function CreateReport(props: { [x: string]: any; setBreadcrumbs?: any; ht
       setShowTriggerIntervalNaNError,
       timeRange,
       setShowTimeRangeError,
-      setShowCronError,
+      setShowCronError
     ).then((response) => {
       error = response;
     });
@@ -257,16 +254,20 @@ export function CreateReport(props: { [x: string]: any; setBreadcrumbs?: any; ht
             'Content-Type': 'application/json',
           },
         })
-        .then(async (resp: { scheduler_response: { reportDefinitionId: string; }; }) => {
-          //TODO: consider handle the on demand report generation from server side instead
-          if (metadata.trigger.trigger_type === 'On demand') {
-            const reportDefinitionId =
-              resp.scheduler_response.reportDefinitionId;
-            generateReportFromDefinitionId(reportDefinitionId, httpClient);
+        .then(
+          async (resp: {
+            scheduler_response: { reportDefinitionId: string };
+          }) => {
+            //TODO: consider handle the on demand report generation from server side instead
+            if (metadata.trigger.trigger_type === 'On demand') {
+              const reportDefinitionId =
+                resp.scheduler_response.reportDefinitionId;
+              generateReportFromDefinitionId(reportDefinitionId, httpClient);
+            }
+            window.location.assign(`reports-dashboards#/create=success`);
           }
-          window.location.assign(`reports-dashboards#/create=success`);
-        })
-        .catch((error: {body: { statusCode: number; }; }) => {
+        )
+        .catch((error: { body: { statusCode: number } }) => {
           console.log('error in creating report definition: ' + error);
           if (error.body.statusCode === 403) {
             handleErrorOnCreateToast('permissions');
@@ -321,6 +322,12 @@ export function CreateReport(props: { [x: string]: any; setBreadcrumbs?: any; ht
           showTimeRangeError={showTimeRangeError}
           showTriggerIntervalNaNError={showTriggerIntervalNaNError}
           showCronError={showCronError}
+        />
+        <EuiSpacer />
+        <ReportDelivery
+          edit={false}
+          reportDefinitionRequest={createReportDefinitionRequest}
+          httpClientProps={props['httpClient']}
         />
         <EuiSpacer />
         <EuiFlexGroup justifyContent="flexEnd">

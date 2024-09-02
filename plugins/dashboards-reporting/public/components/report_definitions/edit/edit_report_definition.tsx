@@ -25,32 +25,29 @@ import {
   permissionsMissingActions,
 } from '../../utils/utils';
 import { definitionInputValidation } from '../utils/utils';
+import { ReportDelivery } from '../delivery';
 
-export function EditReportDefinition(props: { [x: string]: any; setBreadcrumbs?: any; httpClient?: any; }) {
+export function EditReportDefinition(props: {
+  [x: string]: any;
+  setBreadcrumbs?: any;
+  httpClient?: any;
+}) {
   const [toasts, setToasts] = useState([]);
   const [comingFromError, setComingFromError] = useState(false);
   const [preErrorData, setPreErrorData] = useState({});
 
-  const [
-    showSettingsReportNameError,
-    setShowSettingsReportNameError,
-  ] = useState(false);
-  const [
-    settingsReportNameErrorMessage,
-    setSettingsReportNameErrorMessage,
-  ] = useState('');
-  const [
-    showSettingsReportSourceError,
-    setShowSettingsReportSourceError,
-  ] = useState(false);
+  const [showSettingsReportNameError, setShowSettingsReportNameError] =
+    useState(false);
+  const [settingsReportNameErrorMessage, setSettingsReportNameErrorMessage] =
+    useState('');
+  const [showSettingsReportSourceError, setShowSettingsReportSourceError] =
+    useState(false);
   const [
     settingsReportSourceErrorMessage,
     setSettingsReportSourceErrorMessage,
   ] = useState('');
-  const [
-    showTriggerIntervalNaNError,
-    setShowTriggerIntervalNaNError,
-  ] = useState(false);
+  const [showTriggerIntervalNaNError, setShowTriggerIntervalNaNError] =
+    useState(false);
   const [showCronError, setShowCronError] = useState(false);
   const [showTimeRangeError, setShowTimeRangeError] = useState(false);
 
@@ -143,7 +140,7 @@ export function EditReportDefinition(props: { [x: string]: any; setBreadcrumbs?:
     addErrorDeletingReportDefinitionToastHandler();
   };
 
-  const removeToast = (removedToast: { id: any; }) => {
+  const removeToast = (removedToast: { id: any }) => {
     setToasts(toasts.filter((toast: any) => toast.id !== removedToast.id));
   };
 
@@ -164,7 +161,7 @@ export function EditReportDefinition(props: { [x: string]: any; setBreadcrumbs?:
       configIds: [],
       title: '',
       textDescription: '',
-      htmlDescription: ''
+      htmlDescription: '',
     },
     trigger: {
       trigger_type: '',
@@ -194,7 +191,7 @@ export function EditReportDefinition(props: { [x: string]: any; setBreadcrumbs?:
       .then(async () => {
         window.location.assign(`reports-dashboards#/edit=success`);
       })
-      .catch((error: { body: { statusCode: number; }; }) => {
+      .catch((error: { body: { statusCode: number } }) => {
         console.log('error in updating report definition:', error);
         if (error.body.statusCode === 400) {
           handleInputValidationErrorToast();
@@ -208,7 +205,9 @@ export function EditReportDefinition(props: { [x: string]: any; setBreadcrumbs?:
       });
   };
 
-  const editReportDefinition = async (metadata: { report_params: {core_params: {header: string, footer: string}}}) => {
+  const editReportDefinition = async (metadata: {
+    report_params: { core_params: { header: string; footer: string } };
+  }) => {
     if ('header' in metadata.report_params.core_params) {
       metadata.report_params.core_params.header = converter.makeHtml(
         metadata.report_params.core_params.header
@@ -232,7 +231,7 @@ export function EditReportDefinition(props: { [x: string]: any; setBreadcrumbs?:
       setShowTriggerIntervalNaNError,
       timeRange,
       setShowTimeRangeError,
-      setShowCronError,
+      setShowCronError
     ).then((response) => {
       error = response;
     });
@@ -257,6 +256,7 @@ export function EditReportDefinition(props: { [x: string]: any; setBreadcrumbs?:
           status,
           last_updated: lastUpdated,
           report_params: { report_name: reportName },
+          delivery,
         } = reportDefinition;
         // configure non-editable fields
         editReportDefinitionRequest.time_created = timeCreated;
@@ -277,7 +277,7 @@ export function EditReportDefinition(props: { [x: string]: any; setBreadcrumbs?:
           },
         ]);
       })
-      .catch((error: { body: { statusCode: number; }; }) => {
+      .catch((error: { body: { statusCode: number } }) => {
         console.error(
           'error when loading edit report definition page: ',
           error
@@ -314,6 +314,13 @@ export function EditReportDefinition(props: { [x: string]: any; setBreadcrumbs?:
           showTimeRangeError={showTimeRangeError}
           showTriggerIntervalNaNError={showTriggerIntervalNaNError}
           showCronError={showCronError}
+        />
+        <EuiSpacer />
+        <ReportDelivery
+          edit={true}
+          editDefinitionId={reportDefinitionId}
+          reportDefinitionRequest={editReportDefinitionRequest}
+          httpClientProps={props['httpClient']}
         />
         <EuiSpacer />
         <EuiFlexGroup justifyContent="flexEnd">
