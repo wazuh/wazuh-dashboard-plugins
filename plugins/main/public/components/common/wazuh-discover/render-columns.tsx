@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiText } from '@elastic/eui';
+import { EuiText, EuiLink, EuiToolTip } from '@elastic/eui';
 import { tDataGridRenderColumn } from '../data-grid';
 import {
   endpointSummary,
@@ -76,6 +76,21 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
         >
           {value}
         </WzLink>
+      );
+    },
+  },
+  {
+    id: 'vulnerability.reference',
+    render: value => {
+      return (
+        <EuiToolTip
+          position='top'
+          content='Navigate to the vulnerability reference'
+        >
+          <EuiLink href={value} target='_blank'>
+            {value}
+          </EuiLink>
+        </EuiToolTip>
       );
     },
   },
