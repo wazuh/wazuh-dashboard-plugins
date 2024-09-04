@@ -325,7 +325,7 @@ export class PatternDataSourceFilterManager
   static createFilter(
     type: FILTER_OPERATOR,
     key: string,
-    value: string | [],
+    value: string | string[],
     indexPatternId: string,
     controlledBy?: string,
   ) {
