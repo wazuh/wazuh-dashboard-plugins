@@ -82,16 +82,24 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'vulnerability.reference',
     render: value => {
-      return (
-        <EuiToolTip
-          position='top'
-          content='Navigate to the vulnerability reference'
-        >
-          <EuiLink href={value} target='_blank'>
-            {value}
-          </EuiLink>
-        </EuiToolTip>
+      const links = (
+        <>
+          {value?.split(',').map((link, index) => (
+            <span key={index}>
+              {!!index && ', '}
+              <EuiToolTip
+                position='top'
+                content='Navigate to the vulnerability reference'
+              >
+                <EuiLink href={link} target='_blank'>
+                  {link}
+                </EuiLink>
+              </EuiToolTip>
+            </span>
+          ))}
+        </>
       );
+      return links;
     },
   },
   {
