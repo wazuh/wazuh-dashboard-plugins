@@ -11,7 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed some fields were not rendering correctly or not using the field format in some tables [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6968)
+- Fixed some fields were not correctly rendering or not using the field format in some tables [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6968)
 
 ### Changed
 
