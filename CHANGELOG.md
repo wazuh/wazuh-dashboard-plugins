@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Update malware detection group values in data sources [#6963](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6963)
 - Changed the registration id of the Settings application for compatibility with Opensearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
 
 ### Removed
@@ -644,7 +645,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3367](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3367)
   [#3373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3373)
   [#3374](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3374)
-  [#3390](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3390)  
+  [#3390](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3390)
   [#3410](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3410)
   [#3408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3408)
   [#3429](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3429)
