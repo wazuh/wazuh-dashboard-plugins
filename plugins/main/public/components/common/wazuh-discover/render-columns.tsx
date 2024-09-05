@@ -91,7 +91,12 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
                 position='top'
                 content='Navigate to the vulnerability reference'
               >
-                <EuiLink href={link} target='_blank'>
+                <EuiLink
+                  href={link}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  external
+                >
                   {link}
                 </EuiLink>
               </EuiToolTip>
