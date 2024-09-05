@@ -341,6 +341,94 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
   };
 };
 
+const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
+  return {
+    id: 'vulnerabilities_evaluation_count',
+    title: 'Evalution',
+    type: 'metric',
+    params: {
+      addLegend: false,
+      addTooltip: true,
+      metric: {
+        colorSchema: 'Green to Red',
+        colorsRange: [
+          {
+            from: 0,
+            to: 10000,
+          },
+        ],
+        invertColors: false,
+        labels: {
+          show: true,
+        },
+        metricColorMode: 'None',
+        percentageMode: false,
+        style: {
+          bgColor: false,
+          bgFill: '#000',
+          fontSize: 50,
+          labelColor: false,
+          subText: '',
+        },
+        useRanges: false,
+      },
+      type: 'metric',
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'Evaluation',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  language: 'kuery',
+                  query: 'wazuh.vulnerability.under_evaluation:false',
+                },
+                label: 'Evaluated',
+              },
+              {
+                input: {
+                  language: 'kuery',
+                  query: 'wazuh.vulnerability.under_evaluation:true',
+                },
+                label: 'Pending',
+              },
+            ],
+          },
+          schema: 'group',
+        },
+      ],
+    },
+  };
+};
+
 export const getKPIsPanel = (
   indexPatternId: string,
 ): {
@@ -351,7 +439,7 @@ export const getKPIsPanel = (
   return {
     '1': {
       gridData: {
-        w: 12,
+        w: 8,
         h: 6,
         x: 0,
         y: 0,
@@ -365,9 +453,9 @@ export const getKPIsPanel = (
     },
     '2': {
       gridData: {
-        w: 12,
+        w: 8,
         h: 6,
-        x: 12,
+        x: 8,
         y: 0,
         i: '2',
       },
@@ -379,9 +467,9 @@ export const getKPIsPanel = (
     },
     '3': {
       gridData: {
-        w: 12,
+        w: 8,
         h: 6,
-        x: 24,
+        x: 16,
         y: 0,
         i: '3',
       },
@@ -393,9 +481,9 @@ export const getKPIsPanel = (
     },
     '4': {
       gridData: {
-        w: 12,
+        w: 8,
         h: 6,
-        x: 36,
+        x: 24,
         y: 0,
         i: '4',
       },
@@ -403,6 +491,20 @@ export const getKPIsPanel = (
       explicitInput: {
         id: '4',
         savedVis: getVisStateSeverityLow(indexPatternId),
+      },
+    },
+    '5': {
+      gridData: {
+        w: 16,
+        h: 6,
+        x: 32,
+        y: 0,
+        i: '5',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '5',
+        savedVis: getVisStateEvaluatedEvaluationPending(indexPatternId),
       },
     },
   };
