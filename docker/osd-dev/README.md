@@ -1,12 +1,28 @@
 # Wazuh development with Wazuh Stack
 
+## Requirements
+
+- vm.max_map_count=262144
+
+  To modify the vm.max_map_count, you can run this command:
+  `sudo sysctl -w vm.max_map_count=262144`
+
+- jq
+
+  To install jq, you can run this command:
+
+  - In Debian/Ubuntu os:
+    `sudo apt-get install jq`
+  - In RedHat/CentOS:
+    `sudo yum install jq`
+
 ## Usage
 
 Use always the provided script to bring up or down the development
 environment. For example:
 
 ```bash
-./dev.sh 1.2.4 1.2.0 $WZ_HOME up [saml]
+./dev.sh [-o 1.2.4] [-d 1.2.0] $WZ_HOME up [saml]
 ```
 
 The script will ask you all the required parameters to bring up the
@@ -27,7 +43,7 @@ the server using the `--no-base-path`**.
 wazuh-dashboard-plugins to use, so be sure to check out the appropriate version
 before bringing up the environment!**
 
-###  UI Credentials
+### UI Credentials
 
 The default user and password to access the UI at https://0.0.0.0:5601/ are:
 
@@ -43,25 +59,48 @@ the versions of OpenSearch which will be included into a Wazuh
 version.
 
 `OpenSearch` supported versions:
+
 - 1.2.4
+- 2.1.0
+- 2.2.1
 - 2.3.0
 - 2.4.0
 - 2.4.1
+- 2.6.0
+- 2.8.0
+- 2.9.0
+- 2.10.0
+- 2.11.0
+- 2.11.1
+- 2.12.0
+- 2.13.0
 
 `OpenSearch Dashboards` supported versions:
+
 - 1.2.0
+- 2.1.0
+- 2.2.1
 - 2.3.0
 - 2.4.0
 - 2.4.1
+- 2.6.0
+- 2.8.0
+- 2.9.0
+- 2.10.0
+- 2.11.0
+- 2.11.1
+- 2.12.0
+- 2.13.0
 
 We must use official `Wazuh Indexer` and `Wazuh Dashboard` images for
 testing!
 
 This environment will start a working deployment with:
-  - Imposter - a mock server.
-  - Elasticsearch-exporter - Elasticsearch metrics to Prometheus adapter.
-  - OpenSearch single-node cluster.
-  - OpenSearch Dashboards development environment.
+
+- Imposter - a mock server.
+- Elasticsearch-exporter - Elasticsearch metrics to Prometheus adapter.
+- OpenSearch single-node cluster.
+- OpenSearch Dashboards development environment.
 
 The OpenSearch Dashboards development environment includes an already
 bootstrapped Kibana, with all the node modules precompiled and ready to
