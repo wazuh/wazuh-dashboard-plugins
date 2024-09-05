@@ -7,6 +7,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.10.0
+- Added a visulization to Vulnerabilities Detection dashboard related to evalution status count [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6968)
+
+### Fixed
+
+- Fixed some fields were not rendering correctly or not using the field format in some tables [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6968)
 
 ### Changed
 
