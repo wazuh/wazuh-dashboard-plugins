@@ -83,7 +83,7 @@ export function ReportSettings(props: ReportSettingProps) {
     settingsReportSourceErrorMessage,
     showTimeRangeError,
     showTriggerIntervalNaNError,
-    showCronError
+    showCronError,
   } = props;
 
   const [reportName, setReportName] = useState('');
@@ -128,14 +128,16 @@ export function ReportSettings(props: ReportSettingProps) {
     target: { value: React.SetStateAction<string> };
   }) => {
     setReportName(e.target.value);
-    reportDefinitionRequest.report_params.report_name = e.target.value.toString();
+    reportDefinitionRequest.report_params.report_name =
+      e.target.value.toString();
   };
 
   const handleReportDescription = (e: {
     target: { value: React.SetStateAction<string> };
   }) => {
     setReportDescription(e.target.value);
-    reportDefinitionRequest.report_params.description = e.target.value.toString();
+    reportDefinitionRequest.report_params.description =
+      e.target.value.toString();
   };
 
   const handleReportSource = (e: React.SetStateAction<string>) => {
@@ -252,7 +254,8 @@ export function ReportSettings(props: ReportSettingProps) {
 
   const handleFileFormat = (e: React.SetStateAction<string>) => {
     setFileFormat(e);
-    reportDefinitionRequest.report_params.core_params.report_format = e.toString();
+    reportDefinitionRequest.report_params.core_params.report_format =
+      e.toString();
   };
 
   const PDFandPNGFileFormats = () => {
@@ -298,10 +301,8 @@ export function ReportSettings(props: ReportSettingProps) {
   };
 
   const SettingsMarkdown = () => {
-    const [
-      checkboxIdSelectHeaderFooter,
-      setCheckboxIdSelectHeaderFooter,
-    ] = useState({ ['header']: false, ['footer']: false });
+    const [checkboxIdSelectHeaderFooter, setCheckboxIdSelectHeaderFooter] =
+      useState({ ['header']: false, ['footer']: false });
 
     const [footer, setFooter] = useState('');
     const [selectedTabFooter, setSelectedTabFooter] = React.useState<
@@ -625,7 +626,8 @@ export function ReportSettings(props: ReportSettingProps) {
       savedSearch: [],
       notebooks: [],
     };
-    reportDefinitionRequest.report_params.core_params.report_format = fileFormat;
+    reportDefinitionRequest.report_params.core_params.report_format =
+      fileFormat;
     await httpClientProps
       .get('../api/reporting/getReportSource/dashboard')
       .then(async (response) => {
@@ -667,10 +669,13 @@ export function ReportSettings(props: ReportSettingProps) {
       });
 
     await httpClientProps
-      .get('../api/observability/notebooks/')
+      .get('../api/observability/notebooks/savedNotebook')
       .catch((error: any) => {
-        console.error('error fetching notebooks, retrying with legacy api', error)
-        return httpClientProps.get('../api/notebooks/')
+        console.error(
+          'error fetching notebooks, retrying with legacy api',
+          error
+        );
+        return httpClientProps.get('../api/notebooks/');
       })
       .then(async (response: any) => {
         let notebooksOptions = getNotebooksOptions(response.data);
@@ -707,7 +712,7 @@ export function ReportSettings(props: ReportSettingProps) {
     reportSourceId === 'dashboardReportSource' ? (
       <div>
         <EuiFormRow
-        id="reportSourceDashboardSelect"
+          id="reportSourceDashboardSelect"
           label={i18n.translate(
             'opensearch.reports.reportSettingProps.selectDashboard',
             { defaultMessage: 'Select dashboard' }
