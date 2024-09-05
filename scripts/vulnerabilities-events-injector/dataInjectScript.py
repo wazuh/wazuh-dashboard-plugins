@@ -122,6 +122,7 @@ def generateRandomVulnerability():
 def generateRandomWazuh():
     wazuh = {}
     wazuh['cluster'] = {'name':random.choice(['wazuh.manager', 'wazuh']), 'node':random.choice(['master','worker-01','worker-02','worker-03'])}
+    wazuh['vulnerability'] = {'under_evaluation': random.choice([True, False])}
     return(wazuh)
 
 def generateRandomData(number):
