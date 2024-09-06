@@ -84,7 +84,9 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: value => {
       const links = (
         <>
-          {value?.split(',').map((link, index) => (
+          {/* We separated the reference value since it is a string separated by
+            commas, causing an issue when returning 2 links. */}
+          {value?.split(', ').map((link, index) => (
             <span key={index}>
               {!!index && ', '}
               <EuiToolTip
