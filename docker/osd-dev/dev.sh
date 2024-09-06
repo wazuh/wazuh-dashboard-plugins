@@ -15,8 +15,8 @@ usage() {
   echo "  -d osd_version Specify the OSD version (optional)"
   echo "  wazuh_app_src is the path to the wazuh application source code"
   echo "  action is one of up | down | stop"
-  echo "  saml to deploy a saml enabled environment"
-  echo "  server to deploy a real server enabled environment"
+  echo "  saml to deploy a saml enabled environment (optional)"
+  echo "  server to deploy a real server enabled environment (optional)"
   exit -1
 }
 
@@ -26,7 +26,7 @@ exit_with_message() {
 }
 
 if ! command -v jq &> /dev/null; then
-  echo "jq is not installed. Please install jq to continue."
+  echo "[ERROR] jq is not installed. Please install jq to continue."
   echo "sudo apt-get install jq in Debian/Ubuntu OS"
   echo "sudo yum install jq in RedHat/CentOS OS"
   exit 1
@@ -58,37 +58,37 @@ shift $((OPTIND - 1))
 
 if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
   if [ ! -f $PACKAGE_PATH ]; then
-    echo "The file package.json was not found."
+    echo "[ERROR] The file package.json was not found."
     exit 1
   fi
 
   if [ -z "$os_version" ]; then
-    echo "OS Version not received via flag, getting the version from $PACKAGE_PATH"
+    echo "[INFO] OS Version not received via flag, getting the version from $PACKAGE_PATH"
     os_version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
     if [ -z "$os_version" ]; then
-      echo "Could not retrieve the OS version from package.json."
+      echo "[ERROR] Could not retrieve the OS version from package.json."
       exit 1
     fi
   fi
 
   if [ -z "$osd_version" ]; then
-    echo "OSD Version not received via flag, getting the version from $PACKAGE_PATH"
+    echo "[INFO] OSD Version not received via flag, getting the version from $PACKAGE_PATH"
     osd_version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
     if [ -z "$osd_version" ]; then
-      echo "Could not retrieve the OSD version from package.json."
+      echo "[ERROR] Could not retrieve the OSD version from package.json."
       exit 1
     fi
   fi
 fi
 
 if [ $# -lt 2 ]; then
-  echo "Incorrect number of arguments " $# ", got " $@
+  echo "[ERROR] Incorrect number of arguments " $# ", got " $@
   echo
   usage
 fi
 
 if [[ $1 != /* ]]; then
-  echo "Source path must be absolute, and start with /"
+  echo "[ERROR] Source path must be absolute, and start with /"
   echo
   usage
   exit
@@ -98,7 +98,7 @@ export PASSWORD=${PASSWORD:-admin}
 export OS_VERSION=$os_version
 export OSD_VERSION=$osd_version
 export OSD_PORT=${PORT:-5601}
-export IMPOSTER_PORT=8081
+export IMPOSTER_VERSION=3.44.1
 export SRC=$1
 export OSD_MAJOR_NUMBER=$(echo $OSD_VERSION | cut -d. -f1)
 export COMPOSE_PROJECT_NAME=os-dev-${OSD_VERSION//./}
@@ -123,7 +123,7 @@ fi
 if [[ "$3" =~ "server" ]]; then
   profile="server"
   if [[ ! " ${wzs_version[*]} " =~ " ${4} " ]]; then
-    echo "Wazuh server version ${4} not found in ${wzs_version[*]}"
+    echo "[ERROR] Wazuh server version ${4} not found in ${wzs_version[*]}"
     echo
     exit -1
   fi
@@ -168,7 +168,7 @@ up)
    docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
    ;;
  *)
-   echo "Action must be up | down | stop: "
+   echo "[ERROR] Action must be up | down | stop: "
    echo
    usage
    ;;
