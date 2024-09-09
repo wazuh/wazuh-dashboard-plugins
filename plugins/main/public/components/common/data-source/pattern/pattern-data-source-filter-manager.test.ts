@@ -80,7 +80,6 @@ class DataSourceMocked implements PatternDataSource {
   getClusterManagerFilters = mockedGetFilters;
   getPinnedAgentFilter = mockedGetFilters;
   getExcludeManagerFilter = mockedGetFilters;
-  getAllowAgentsFilter = mockedGetFilters;
 }
 
 const createFilter = (id: string, value: string, index: string): tFilter => {
@@ -371,27 +370,6 @@ describe('PatternDataSourceFilterManager', () => {
       });
       const filter =
         PatternDataSourceFilterManager.getExcludeManagerFilter('index-title');
-      expect(filter.length).toBe(0);
-    });
-
-    it('should return the filters to fetch the data merging the filters stored and the allowed agents filter', () => {
-      (store.getState as jest.Mock).mockReturnValue({
-        appStateReducers: {
-          allowedAgents: ['001'],
-        },
-      });
-      const filter =
-        PatternDataSourceFilterManager.getAllowAgentsFilter('index-title');
-      expect(filter.length).toBe(1);
-      expect(filter[0].meta.controlledBy).toBe(AUTHORIZED_AGENTS);
-    });
-
-    it('should return the filters to fetch the data merging the filters stored without the allowed agents filter when is not defined', () => {
-      (store.getState as jest.Mock).mockReturnValue({
-        appStateReducers: {},
-      });
-      const filter =
-        PatternDataSourceFilterManager.getAllowAgentsFilter('index-title');
       expect(filter.length).toBe(0);
     });
 

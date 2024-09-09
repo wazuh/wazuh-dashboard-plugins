@@ -10,18 +10,18 @@ export const vulnerabilitiesColumns: tDataGridColumn[] = [
     id: 'agent.name',
   },
   {
-    id: 'data.vulnerability.package.name',
-  },
-  {
     id: 'data.vulnerability.cve',
   },
   {
     id: 'data.vulnerability.severity',
   },
   {
-    id: 'data.vulnerability.status',
+    id: 'data.vulnerability.package.name',
   },
   {
     id: 'data.vulnerability.package.version',
+  },
+  {
+    id: 'data.vulnerability.status',
   },
 ];

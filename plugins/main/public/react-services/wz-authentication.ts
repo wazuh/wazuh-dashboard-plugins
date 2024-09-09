@@ -17,12 +17,10 @@ import store from '../redux/store';
 import {
   updateUserPermissions,
   updateWithUserLogged,
-  updateAllowedAgents,
   updateUserAccount,
 } from '../redux/actions/appStateActions';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { getWazuhCorePlugin } from '../kibana-services';
-import { getAuthorizedAgents } from '../react-services/wz-agents';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -82,15 +80,6 @@ export class WzAuthentication {
 
       // Get user Policies
       const userPolicies = await WzAuthentication.getUserPolicies();
-
-      //Get allowed agents for the current user
-      let allowedAgents: any = [];
-      if (WzAuthentication.userHasAgentsPermissions(userPolicies)) {
-        allowedAgents = await getAuthorizedAgents();
-        // users without read:agent police should not view info about any agent
-        allowedAgents = allowedAgents.length ? allowedAgents : ['-1'];
-      }
-      store.dispatch(updateAllowedAgents(allowedAgents));
 
       // Dispatch actions to set permissions and administrator consideration
       store.dispatch(updateUserPermissions(userPolicies));

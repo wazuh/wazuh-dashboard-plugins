@@ -26,6 +26,8 @@ import {
 } from '../../services/resolves';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
+import { cloneDeep } from 'lodash';
+import { migrateLegacyQuery } from '../../utils/migrate_legacy_query';
 
 export const Overview: React.FC = withRouteResolvers({
   enableMenu,
@@ -56,7 +58,7 @@ export const Overview: React.FC = withRouteResolvers({
 
     const appStateFromUrl = osdUrlStateStorage.get('_a') as AppState;
     let initialAppState = {
-      ...data.query.queryString.getDefaultQuery(),
+      query: migrateLegacyQuery(data.query.queryString.getDefaultQuery()),
       ...appStateFromUrl,
     };
     const appStateContainer = createStateContainer<AppState>(initialAppState);
@@ -79,6 +81,15 @@ export const Overview: React.FC = withRouteResolvers({
       stateContainer: appStateContainerModified,
       stateStorage: osdUrlStateStorage,
     });
+
+    // sync initial app filters from state to filterManager
+    // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.13.0/src/plugins/dashboard/public/application/utils/use/use_dashboard_app_state.tsx#L84-L86
+    data.query.filterManager.setAppFilters(
+      cloneDeep(appStateContainer.getState().filters),
+    );
+    data.query.queryString.setQuery(
+      migrateLegacyQuery(appStateContainer.getState().query),
+    );
 
     const stopSyncingQueryAppStateWithStateContainer = connectToQueryState(
       data.query,

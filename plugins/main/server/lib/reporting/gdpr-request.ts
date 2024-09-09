@@ -24,13 +24,12 @@ export const topGDPRRequirements = async (
   gte,
   lte,
   filters,
-  allowedAgentsFilter,
   pattern,
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {
@@ -70,14 +69,13 @@ export const getRulesByRequirement = async (
   gte,
   lte,
   filters,
-  allowedAgentsFilter,
   requirement,
   pattern,
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {

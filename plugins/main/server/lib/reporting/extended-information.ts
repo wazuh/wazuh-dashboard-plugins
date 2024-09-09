@@ -144,7 +144,6 @@ export async function extendedInformation(
   from,
   to,
   filters,
-  allowedAgentsFilter,
   pattern,
   agent = null,
 ) {
@@ -184,7 +183,6 @@ export async function extendedInformation(
                 to,
                 vulnerabilitiesLevel,
                 filters,
-                allowedAgentsFilter,
                 pattern,
               );
               return count
@@ -209,7 +207,6 @@ export async function extendedInformation(
         to,
         'Low',
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       const mediumRank = await VulnerabilityRequest.topAgentCount(
@@ -218,7 +215,6 @@ export async function extendedInformation(
         to,
         'Medium',
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       const highRank = await VulnerabilityRequest.topAgentCount(
@@ -227,7 +223,6 @@ export async function extendedInformation(
         to,
         'High',
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       const criticalRank = await VulnerabilityRequest.topAgentCount(
@@ -236,7 +231,6 @@ export async function extendedInformation(
         to,
         'Critical',
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       printer.logger.debug(
@@ -286,7 +280,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       printer.logger.debug('Adding overview vulnerability detector top 3 CVEs');
@@ -314,7 +307,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
 
@@ -336,7 +328,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       printer.logger.debug('Adding most common rootkits');
@@ -366,7 +357,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       hiddenPids &&
@@ -385,7 +375,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       hiddenPorts &&
@@ -409,7 +398,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       printer.addContentWithNewLine({
@@ -422,7 +410,6 @@ export async function extendedInformation(
           from,
           to,
           filters,
-          allowedAgentsFilter,
           item,
           pattern,
         );
@@ -460,7 +447,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       printer.addContentWithNewLine({
@@ -473,7 +459,6 @@ export async function extendedInformation(
           from,
           to,
           filters,
-          allowedAgentsFilter,
           item,
           pattern,
         );
@@ -511,7 +496,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       printer.addContentWithNewLine({
@@ -524,7 +508,6 @@ export async function extendedInformation(
           from,
           to,
           filters,
-          allowedAgentsFilter,
           item,
           pattern,
         );
@@ -566,7 +549,6 @@ export async function extendedInformation(
           from,
           to,
           filters,
-          allowedAgentsFilter,
           pattern,
         );
       if (auditAgentsNonSuccess && auditAgentsNonSuccess.length) {
@@ -582,7 +564,6 @@ export async function extendedInformation(
           from,
           to,
           filters,
-          allowedAgentsFilter,
           pattern,
         );
       if (auditAgentsFailedSyscall && auditAgentsFailedSyscall.length) {
@@ -613,7 +594,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
 
@@ -639,7 +619,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
 
@@ -664,7 +643,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       auditFailedSyscall &&
@@ -715,7 +693,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
 
@@ -736,7 +713,6 @@ export async function extendedInformation(
         from,
         to,
         filters,
-        allowedAgentsFilter,
         pattern,
       );
 
@@ -840,7 +816,6 @@ export async function extendedInformation(
                 to,
                 vulnerabilitiesLevel,
                 filters,
-                allowedAgentsFilter,
                 pattern,
               );
             } catch (error) {
@@ -878,7 +853,6 @@ export async function extendedInformation(
         to,
         'Critical',
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       if (topCriticalPackages && topCriticalPackages.length) {
@@ -910,7 +884,6 @@ export async function extendedInformation(
         to,
         'High',
         filters,
-        allowedAgentsFilter,
         pattern,
       );
       if (topHighPackages && topHighPackages.length) {
@@ -945,7 +918,6 @@ export async function extendedInformation(
             from,
             to,
             filters,
-            allowedAgentsFilter,
             summaryTable,
             pattern,
           );
