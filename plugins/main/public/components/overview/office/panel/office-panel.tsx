@@ -36,7 +36,7 @@ export const OfficePanel = withErrorBoundary(() => {
   });
   const [currentSelectedFilter, setCurrentSelectedFilter] = useState();
   const [selectedPanelFilter, setSelectedPanelFilter] = useState([]);
-  const filterDrillDownValue = (value) => {
+  const filterDrillDownValue = value => {
     setDrillDownValue(value);
   };
   const {
@@ -47,7 +47,7 @@ export const OfficePanel = withErrorBoundary(() => {
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
-    filterManager,
+    filterManager
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: Office365DataSource,
     repository: new AlertsDataSourceRepository(),
@@ -59,7 +59,7 @@ export const OfficePanel = withErrorBoundary(() => {
     setFilters,
   });
 
-  const handleChangeView = (selectedFilter) => {
+  const handleChangeView = selectedFilter => {
     if (!selectedFilter) {
       return;
     }
@@ -67,19 +67,14 @@ export const OfficePanel = withErrorBoundary(() => {
     const { field, value } = selectedFilter;
     const controlledByFilter = 'office-panel-row-filter';
     if (value) {
-      const filter = filterManager?.createFilter(
-        FILTER_OPERATOR.IS_ONE_OF,
-        field,
-        [value],
-        controlledByFilter
-      );
+      const filter = filterManager?.createFilter(FILTER_OPERATOR.IS_ONE_OF, field, [value], controlledByFilter);
       // this hide the remove filter button in the filter bar
       setSelectedPanelFilter([filter]);
     } else {
       setSelectedPanelFilter([]);
     }
     setCurrentSelectedFilter(selectedFilter);
-  };
+  }
 
   return (
     <>
@@ -113,3 +108,4 @@ export const OfficePanel = withErrorBoundary(() => {
     </>
   );
 });
+

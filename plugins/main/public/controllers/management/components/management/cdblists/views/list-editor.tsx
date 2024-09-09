@@ -27,11 +27,7 @@ import {
 
 import { connect } from 'react-redux';
 
-import {
-  resourceDictionary,
-  ResourcesHandler,
-  ResourcesConstants,
-} from '../../common/resources-handler';
+import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
 
 import { getToasts } from '../../../../../../kibana-services';
 
@@ -65,9 +61,7 @@ class WzListEditor extends Component {
   }
 
   componentDidMount() {
-    const {
-      listContent: { content },
-    } = this.props;
+    const { listContent: { content } } = this.props;
     const obj = this.contentToObject(content);
     this.items = { ...obj };
     const items = this.contentToArray(obj);
@@ -528,10 +522,7 @@ class WzListEditor extends Component {
   }
 
   render() {
-    const {
-      listContent: { name, path },
-      isLoading,
-    } = this.props;
+    const { listContent: { name, path }, isLoading } = this.props;
 
     const message = isLoading ? false : 'No results...';
 
@@ -572,7 +563,7 @@ class WzListEditor extends Component {
         getErrorOrchestrator().handleError(options);
         this.setState({ generatingCsv: false });
       }
-    };
+    }
 
     return (
       <EuiPage style={{ background: 'transparent' }}>

@@ -5,7 +5,7 @@ const elasticServer = process.env.WAZUH_ELASTIC_IP || 'localhost';
 chai.should();
 
 const headers = {
-  headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
+  headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' }
 };
 
 const date = new Date();
@@ -15,7 +15,7 @@ const index = `wazuh-alerts-2018.${month >= 10 ? month : `0${month}`}.${
   day >= 10 ? day : `0${day}`
 }`;
 
-const commonFields = (sample) => {
+const commonFields = sample => {
   sample.agent.id.should.be.a('string');
   sample.agent.should.be.a('object');
   sample.agent.name.should.be.a('string');
@@ -24,22 +24,25 @@ const commonFields = (sample) => {
   sample.rule.should.be.a('object');
 };
 
-const checkRes = (res) => {
+const checkRes = res => {
   res.statusCode.should.be.eql(200);
   res.body.should.be.a('object');
   res.body.hits.hits.should.be.a('array');
 };
 
-const syscheck = async (agentID) => {
+const syscheck = async agentID => {
   const res = await needle(
     'get',
     `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
-          must: [{ match: { 'agent.id': `${agentID}` } }, { match: { 'rule.groups': 'syscheck' } }],
-        },
-      },
+          must: [
+            { match: { 'agent.id': `${agentID}` } },
+            { match: { 'rule.groups': 'syscheck' } }
+          ]
+        }
+      }
     },
     headers
   );
@@ -63,7 +66,7 @@ const syscheck = async (agentID) => {
   sample.cluster.node.should.be.eql('node01');
 };
 
-const rootcheck = async (agentID) => {
+const rootcheck = async agentID => {
   const res = await needle(
     'get',
     `${elasticServer}:9200/${index}/_search`,
@@ -72,10 +75,10 @@ const rootcheck = async (agentID) => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'rootcheck' } },
-          ],
-        },
-      },
+            { match: { 'rule.groups': 'rootcheck' } }
+          ]
+        }
+      }
     },
     headers
   );
@@ -98,7 +101,7 @@ const rootcheck = async (agentID) => {
   sample.cluster.node.should.be.eql('node01');
 };
 
-const vulnerability = async (agentID) => {
+const vulnerability = async agentID => {
   const res = await needle(
     'get',
     `${elasticServer}:9200/${index}/_search`,
@@ -107,10 +110,10 @@ const vulnerability = async (agentID) => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'vulnerability-detector' } },
-          ],
-        },
-      },
+            { match: { 'rule.groups': 'vulnerability-detector' } }
+          ]
+        }
+      }
     },
     headers
   );
@@ -132,7 +135,9 @@ const vulnerability = async (agentID) => {
   sample.data.vulnerability.severity.should.be.a('string');
   sample.data.vulnerability.state.should.be.a('string');
   sample.data.vulnerability.cve.should.be.a('string');
-  sample.rule.groups.should.be.a('array').that.includes('vulnerability-detector');
+  sample.rule.groups.should.be
+    .a('array')
+    .that.includes('vulnerability-detector');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
   sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
@@ -142,16 +147,19 @@ const vulnerability = async (agentID) => {
   sample.cluster.node.should.be.eql('node01');
 };
 
-const pciDss = async (agentID) => {
+const pciDss = async agentID => {
   const res = await needle(
     'get',
     `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
-          must: [{ match: { 'agent.id': `${agentID}` } }, { exists: { field: 'rule.pci_dss' } }],
-        },
-      },
+          must: [
+            { match: { 'agent.id': `${agentID}` } },
+            { exists: { field: 'rule.pci_dss' } }
+          ]
+        }
+      }
     },
     headers
   );
@@ -173,16 +181,19 @@ const pciDss = async (agentID) => {
   sample.cluster.node.should.be.eql('node01');
 };
 
-const gdpr = async (agentID) => {
+const gdpr = async agentID => {
   const res = await needle(
     'get',
     `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
-          must: [{ match: { 'agent.id': `${agentID}` } }, { exists: { field: 'rule.gdpr' } }],
-        },
-      },
+          must: [
+            { match: { 'agent.id': `${agentID}` } },
+            { exists: { field: 'rule.gdpr' } }
+          ]
+        }
+      }
     },
     headers
   );
@@ -204,16 +215,19 @@ const gdpr = async (agentID) => {
   sample.cluster.node.should.be.eql('node01');
 };
 
-const audit = async (agentID) => {
+const audit = async agentID => {
   const res = await needle(
     'get',
     `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
-          must: [{ match: { 'agent.id': `${agentID}` } }, { match: { 'rule.groups': 'audit' } }],
-        },
-      },
+          must: [
+            { match: { 'agent.id': `${agentID}` } },
+            { match: { 'rule.groups': 'audit' } }
+          ]
+        }
+      }
     },
     headers
   );
@@ -239,19 +253,30 @@ const audit = async (agentID) => {
 
 describe('Elasticsearch', () => {
   it('GET /_cat/indices', async () => {
-    const res = await needle('get', `${elasticServer}:9200/_cat/indices`, {}, headers);
+    const res = await needle(
+      'get',
+      `${elasticServer}:9200/_cat/indices`,
+      {},
+      headers
+    );
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');
   });
 
   it(`GET /_cat/indices/${index}`, async () => {
-    const res = await needle('get', `${elasticServer}:9200/_cat/indices/${index}`, {}, headers);
+    const res = await needle(
+      'get',
+      `${elasticServer}:9200/_cat/indices/${index}`,
+      {},
+      headers
+    );
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');
   });
 
   describe('Manager (agent.id: 000)', () => {
-    it(`GET /${index}/_search - vulnerability-detector`, async () => vulnerability('000'));
+    it(`GET /${index}/_search - vulnerability-detector`, async () =>
+      vulnerability('000'));
     it(`GET /${index}/_search - syscheck`, async () => syscheck('000'));
     it(`GET /${index}/_search - rootcheck`, async () => rootcheck('000'));
     it(`GET /${index}/_search - pci_dss`, async () => pciDss('000'));
@@ -260,7 +285,8 @@ describe('Elasticsearch', () => {
   });
 
   describe('Agent (agent.id: 001)', () => {
-    it(`GET /${index}/_search - vulnerability-detector`, async () => vulnerability('001'));
+    it(`GET /${index}/_search - vulnerability-detector`, async () =>
+      vulnerability('001'));
     it(`GET /${index}/_search - syscheck`, async () => syscheck('001'));
     it(`GET /${index}/_search - rootcheck`, async () => rootcheck('001'));
     it(`GET /${index}/_search - pci_dss`, async () => pciDss('001'));
