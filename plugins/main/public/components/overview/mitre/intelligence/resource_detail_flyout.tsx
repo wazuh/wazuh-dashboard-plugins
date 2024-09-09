@@ -16,10 +16,7 @@ import { MitreAttackResources } from './resources';
 import { ReferencesTable } from './resource_detail_references_table';
 
 import {
-  EuiFlyout,
   EuiFlyoutHeader,
-  EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiTitle,
   EuiText,
   EuiFlexGroup,
@@ -64,7 +61,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
                   <div>
                     <strong>{detailProperty.label}</strong>
                   </div>
-                  <EuiText color='subdued'>
+                  <EuiText>
                     {detailProperty.render
                       ? detailProperty.render(details[detailProperty.id])
                       : details[detailProperty.id]}
@@ -79,7 +76,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
             <div>
               <strong>Description</strong>
             </div>
-            <EuiText color='subdued'>
+            <EuiText>
               {details.description ? (
                 <Markdown markdown={details.description} />
               ) : (
