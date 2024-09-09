@@ -154,17 +154,6 @@ export const updateWithUserLogged = withUserLogged => {
 };
 
 /**
- * Updates allowedAgents in the appState store
- * @param allowedAgents
- */
-export const updateAllowedAgents = allowedAgents => {
-  return {
-    type: 'GET_ALLOWED_AGENTS',
-    allowedAgents,
-  };
-};
-
-/**
  * Updates logtestToken in the appState store
  * @param logtestToken
  */

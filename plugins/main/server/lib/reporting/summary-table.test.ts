@@ -11,7 +11,6 @@ describe('Summary table', () => {
       'now/1h',
       'now',
       [],
-      [],
       summarySetup,
       'pattern',
     );
@@ -105,7 +104,6 @@ describe('Summary table', () => {
         {},
         'now/1h',
         'now',
-        [],
         [],
         summarySetup,
         'pattern',

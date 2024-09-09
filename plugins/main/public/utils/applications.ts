@@ -701,7 +701,7 @@ export const reporting = {
 
 export const settings = {
   category: 'wz-category-server-management',
-  id: 'settings',
+  id: 'dashboards-settings',
   title: i18n.translate('wz-app-settings-title', {
     defaultMessage: 'Settings',
   }),
