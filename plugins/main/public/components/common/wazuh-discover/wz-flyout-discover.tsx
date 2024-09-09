@@ -300,7 +300,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                       ? {
                           ariaLabel: 'Warning',
                           content: `The query results exceeded the limit of ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY
+                            MAX_ENTRIES_PER_QUERY,
                           )} hits. Please refine your search.`,
                           iconType: 'alert',
                           position: 'top',
