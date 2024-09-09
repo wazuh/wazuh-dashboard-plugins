@@ -1,11 +1,5 @@
 #!/bin/bash
 
-wzs_version=(
-  '4.7.0'
-  '4.7.1'
-  '4.7.2'
-)
-
 usage() {
   echo
   echo "./dev.sh [-os os_version] [-osd osd_version] /wazuh_app_src action [saml/server] [server_version]"
@@ -29,6 +23,7 @@ if ! command -v jq &> /dev/null; then
   echo "[ERROR] jq is not installed. Please install jq to continue."
   echo "sudo apt-get install jq in Debian/Ubuntu OS"
   echo "sudo yum install jq in RedHat/CentOS OS"
+  echo "sudo pacman -Sy --noconfirm jq in Arch OS"
   exit 1
 fi
 
@@ -122,11 +117,6 @@ fi
 
 if [[ "$3" =~ "server" ]]; then
   profile="server"
-  if [[ ! " ${wzs_version[*]} " =~ " ${4} " ]]; then
-    echo "[ERROR] Wazuh server version ${4} not found in ${wzs_version[*]}"
-    echo
-    exit -1
-  fi
   export WAZUH_STACK="${4}"
 fi
 
