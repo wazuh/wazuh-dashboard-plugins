@@ -15,6 +15,8 @@
     `sudo apt-get install jq`
   - In RedHat/CentOS:
     `sudo yum install jq`
+  - In Arch:
+    `sudo pacman -Sy --noconfirm jq`
 
 ## Usage
 
@@ -57,40 +59,6 @@ admin:admin
 version of the OpenSearch Stack. We will only create environments for
 the versions of OpenSearch which will be included into a Wazuh
 version.
-
-`OpenSearch` supported versions:
-
-- 1.2.4
-- 2.1.0
-- 2.2.1
-- 2.3.0
-- 2.4.0
-- 2.4.1
-- 2.6.0
-- 2.8.0
-- 2.9.0
-- 2.10.0
-- 2.11.0
-- 2.11.1
-- 2.12.0
-- 2.13.0
-
-`OpenSearch Dashboards` supported versions:
-
-- 1.2.0
-- 2.1.0
-- 2.2.1
-- 2.3.0
-- 2.4.0
-- 2.4.1
-- 2.6.0
-- 2.8.0
-- 2.9.0
-- 2.10.0
-- 2.11.0
-- 2.11.1
-- 2.12.0
-- 2.13.0
 
 We must use official `Wazuh Indexer` and `Wazuh Dashboard` images for
 testing!
