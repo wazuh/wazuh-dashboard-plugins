@@ -38,23 +38,34 @@ export function hasAgentSupportModule(agent, component) {
 export async function getAuthorizedAgents() {
   try {
     const params = { limit: 500 };
-    const output: IApiResponse<{ id: string }> = await WzRequest.apiReq('GET', `/agents`, {});
-    const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
+    const output: IApiResponse<{ id: string }> = await WzRequest.apiReq(
+      'GET',
+      `/agents`,
+      {},
+    );
+    const totalItems = (((output || {}).data || {}).data || {})
+      .total_affected_items;
     let itemsArray = [];
     if (totalItems && output.data && output.data.data && totalItems > 500) {
       params.offset = 0;
       itemsArray.push(...output.data.data.affected_items);
       while (itemsArray.length < totalItems && params.offset < totalItems) {
         params.offset += params.limit;
-        const tmpData: IApiResponse<{ id: string }> = await WzRequest.apiReq('GET', `/agents`, {
-          params: params,
-        });
+        const tmpData: IApiResponse<{ id: string }> = await WzRequest.apiReq(
+          'GET',
+          `/agents`,
+          {
+            params: params,
+          },
+        );
         itemsArray.push(...tmpData.data.data.affected_items);
       }
-      const allowedAgents = itemsArray ? itemsArray.map((agent) => agent.id) : [];
+      const allowedAgents = itemsArray ? itemsArray.map(agent => agent.id) : [];
       return allowedAgents;
     } else {
-      const allowedAgents = output ? output.data.data.affected_items.map((agent) => agent.id) : [];
+      const allowedAgents = output
+        ? output.data.data.affected_items.map(agent => agent.id)
+        : [];
       return allowedAgents;
     }
   } catch (error) {
