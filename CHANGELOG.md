@@ -19,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Upgraded the `axios` dependency to `1.7.4` [#6919](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6919)
 - Improved MITRE ATT&CK intelligence flyout details readability [#6954](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6954)
+- Upgraded Event-tab column selector showing first the picked columns [#6984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6984)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
 
