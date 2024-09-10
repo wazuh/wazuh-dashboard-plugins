@@ -14,6 +14,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error on the command to deploy a new macOS agent that could cause the registration password had a wrong value because a `\n` could be included [#6906](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6906)
 - Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
 - Fixed an error on Dev Tools when using payload properties as arrays [#6908](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6908)
+- Fixed missing link to Vulnerabilities detection and Office 365 in the agent menu of `Endpoints Summary` [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
+- Fixed missing options depending on agent operating system in the agent configuration report [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
 
 ### Changed
 
