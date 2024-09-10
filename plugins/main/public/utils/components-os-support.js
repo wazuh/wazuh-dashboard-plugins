@@ -35,4 +35,4 @@ export const UnsupportedComponents = {
 };
 
 // Office 365 is only compatible with Linux, macOS and Windows
-// https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/office365-module.html#office365
+// https://documentation.wazuh.com/4.9/user-manual/reference/ossec-conf/office365-module.html#office365
