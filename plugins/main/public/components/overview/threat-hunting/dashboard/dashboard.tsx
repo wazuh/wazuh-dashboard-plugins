@@ -20,11 +20,7 @@ import {
   EuiTitle,
   EuiButtonEmpty,
 } from '@elastic/eui';
-import {
-  ErrorFactory,
-  ErrorHandler,
-  HttpError,
-} from '../../../../react-services/error-management';
+import { ErrorFactory, ErrorHandler, HttpError } from '../../../../react-services/error-management';
 import {
   MAX_ENTRIES_PER_QUERY,
   exportSearchToCSV,
@@ -32,8 +28,6 @@ import {
 } from '../../../common/data-grid/data-grid-service';
 import { useDocViewer } from '../../../common/doc-viewer/use-doc-viewer';
 import { useDataGrid } from '../../../common/data-grid/use-data-grid';
-import { HitsCounter } from '../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
-import { formatNumWithCommas } from '../../../../kibana-integrations/discover/application/helpers/format_number_with_commas';
 import DocViewer from '../../../common/doc-viewer/doc-viewer';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import './threat_hunting_dashboard.scss';
@@ -97,18 +91,16 @@ const DashboardTH: React.FC = () => {
       const rowClicked = results.hits.hits[index];
       setInspectedHit(rowClicked);
     },
-    [results],
+    [results]
   );
 
-  const DocViewInspectButton = ({
-    rowIndex,
-  }: EuiDataGridCellValueElementProps) => {
+  const DocViewInspectButton = ({ rowIndex }: EuiDataGridCellValueElementProps) => {
     const inspectHintMsg = 'Inspect document details';
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
           onClick={() => onClickInspectDoc(rowIndex)}
-          iconType='inspect'
+          iconType="inspect"
           aria-label={inspectHintMsg}
         />
       </EuiToolTip>
@@ -120,7 +112,7 @@ const DashboardTH: React.FC = () => {
     defaultColumns: threatHuntingTableDefaultColumns,
     renderColumns: wzDiscoverRenderColumns,
     results,
-    indexPattern: dataSource?.indexPattern,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
     DocViewInspectButton,
   });
 
@@ -128,12 +120,11 @@ const DashboardTH: React.FC = () => {
 
   const docViewerProps = useDocViewer({
     doc: inspectedHit,
-    indexPattern: dataSource?.indexPattern,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
   });
 
   const pinnedAgent =
-    PatternDataSourceFilterManager.getPinnedAgentFilter(dataSource?.id!)
-      .length > 0;
+    PatternDataSourceFilterManager.getPinnedAgentFilter(dataSource?.id!).length > 0;
 
   useEffect(() => {
     const currentColumns = !pinnedAgent
@@ -145,7 +136,7 @@ const DashboardTH: React.FC = () => {
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
     totalResults: results?.hits?.total ?? 0,
-    indexPattern: dataSource?.indexPattern,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
     filters: fetchFilters,
     query: query,
     time: absoluteDateRange,
@@ -161,10 +152,10 @@ const DashboardTH: React.FC = () => {
       sorting,
       dateRange: absoluteDateRange,
     })
-      .then(results => {
+      .then((results) => {
         setResults(results);
       })
-      .catch(error => {
+      .catch((error) => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: 'Error fetching data',
@@ -212,7 +203,7 @@ const DashboardTH: React.FC = () => {
           <LoadingSpinner />
         ) : (
           <WzSearchBar
-            appName='th-searchbar'
+            appName="th-searchbar"
             {...searchBarProps}
             fixedFilters={fixedFilters}
             showDatePicker={true}
@@ -226,13 +217,11 @@ const DashboardTH: React.FC = () => {
         ) : null}
         <div
           className={`th-container ${
-            !isDataSourceLoading && dataSource && results?.hits?.total > 0
-              ? ''
-              : 'wz-no-display'
+            !isDataSourceLoading && dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
           }`}
         >
           <SampleDataWarning />
-          <div className='th-dashboard-responsive'>
+          <div className="th-dashboard-responsive">
             <DashboardByRenderer
               input={{
                 viewMode: ViewMode.VIEW,
@@ -255,10 +244,7 @@ const DashboardTH: React.FC = () => {
             <DashboardByRenderer
               input={{
                 viewMode: ViewMode.VIEW,
-                panels: getDashboardPanels(
-                  AlertsRepository.getStoreIndexPatternId(),
-                  pinnedAgent,
-                ),
+                panels: getDashboardPanels(AlertsRepository.getStoreIndexPatternId(), pinnedAgent),
                 isFullScreenMode: false,
                 filters: fetchFilters ?? [],
                 useMargins: true,
@@ -296,21 +282,18 @@ const DashboardTH: React.FC = () => {
               ) : null}
             </div>
             {inspectedHit && (
-              <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+              <EuiFlyout onClose={() => setInspectedHit(undefined)} size="m">
                 <EuiFlyoutHeader>
-                  <DocDetailsHeader
-                    doc={inspectedHit}
-                    indexPattern={dataSource?.indexPattern}
-                  />
+                  <DocDetailsHeader doc={inspectedHit} indexPattern={dataSource?.indexPattern} />
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
-                  <EuiFlexGroup direction='column'>
+                  <EuiFlexGroup direction="column">
                     <EuiFlexItem>
                       <DocViewer
                         {...docViewerProps}
                         renderFields={getAllCustomRenders(
                           threatHuntingTableDefaultColumns,
-                          wzDiscoverRenderColumns,
+                          wzDiscoverRenderColumns
                         )}
                       />
                     </EuiFlexItem>
