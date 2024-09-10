@@ -24,6 +24,7 @@ if ! command -v jq &> /dev/null; then
   echo "sudo apt-get install jq in Debian/Ubuntu OS"
   echo "sudo yum install jq in RedHat/CentOS OS"
   echo "sudo pacman -Sy --noconfirm jq in Arch OS"
+  echo "brew install jq in MAC OS"
   exit 1
 fi
 
@@ -97,6 +98,7 @@ export IMPOSTER_VERSION=3.44.1
 export SRC=$1
 export OSD_MAJOR_NUMBER=$(echo $OSD_VERSION | cut -d. -f1)
 export COMPOSE_PROJECT_NAME=os-dev-${OSD_VERSION//./}
+export WAZUH_STACK=""
 
 if [[ "$OSD_MAJOR_NUMBER" -ge 2 ]]; then
   export OSD_MAJOR="2.x"

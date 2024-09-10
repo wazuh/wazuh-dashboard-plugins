@@ -17,6 +17,8 @@
     `sudo yum install jq`
   - In Arch:
     `sudo pacman -Sy --noconfirm jq`
+  - In MAC:
+    `brew install jq in MAC OS`
 
 ## Usage
 
