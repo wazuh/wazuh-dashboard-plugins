@@ -149,9 +149,26 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     ];
   }, [results]);
 
+  const filterColumns = () => {
+    const allColumns = parseColumns(indexPattern?.fields || [], defaultColumns);
+    const [columnMatch, columnNonMatch] = allColumns.reduce(
+      ([matches, nonMatches], item) => {
+        if (columnVisibility.includes(item.name)) {
+          matches.push(item);
+        } else {
+          nonMatches.push(item);
+        }
+        return [matches, nonMatches];
+      },
+      [[], []],
+    );
+    columnMatch.sort((a, b) => a.name.localeCompare(b.name));
+    return [...columnMatch, ...columnNonMatch];
+  };
+
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columns: parseColumns(indexPattern?.fields || [], defaultColumns),
+    columns: filterColumns(),
     columnVisibility: {
       visibleColumns: columnVisibility,
       setVisibleColumns: setVisibility,
