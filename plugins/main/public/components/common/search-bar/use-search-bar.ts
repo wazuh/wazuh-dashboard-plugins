@@ -18,17 +18,18 @@ type tUseSearchBarCustomInputs = {
   setTimeFilter?: (timeRange: TimeRange) => void;
   setQuery?: (query: Query) => void;
   onFiltersUpdated?: (filters: Filter[]) => void;
-  onQuerySubmitted?: (
-    payload: { dateRange: TimeRange; query?: Query },
-    isUpdate?: boolean,
-  ) => void;
+  onQuerySubmitted?: (payload: { dateRange: TimeRange; query?: Query }, isUpdate?: boolean) => void;
 };
-export type tUseSearchBarProps = Partial<SearchBarProps> &
-  tUseSearchBarCustomInputs;
+export type tUseSearchBarProps = Partial<SearchBarProps> & tUseSearchBarCustomInputs;
 
 // Output types
 type tUserSearchBarResponse = {
-  searchBarProps: Partial<SearchBarProps>;
+  searchBarProps: Partial<
+    SearchBarProps & {
+      useDefaultBehaviors: boolean;
+      absoluteDateRange: TimeRange;
+    }
+  >;
 };
 
 /**
@@ -36,9 +37,7 @@ type tUserSearchBarResponse = {
  * @param props
  * @returns
  */
-const useSearchBarConfiguration = (
-  props: tUseSearchBarProps,
-): tUserSearchBarResponse => {
+const useSearchBarConfiguration = (props: tUseSearchBarProps): tUserSearchBarResponse => {
   const { indexPattern, filters: defaultFilters, setFilters } = props;
 
   // dependencies
@@ -56,12 +55,11 @@ const useSearchBarConfiguration = (
   // This absoluteDateRange is used to ensure that the date range is the same when we make the
   // pagination request with relative dates like "Last 24 hours"
   const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
-    transformDateRange(globalTimeFilter),
+    transformDateRange(globalTimeFilter)
   );
   // states
   const [isLoading, setIsLoading] = useState(true);
-  const [indexPatternSelected, setIndexPatternSelected] =
-    useState<IndexPattern>(indexPattern);
+  const [indexPatternSelected, setIndexPatternSelected] = useState<IndexPattern>(indexPattern);
 
   useEffect(() => {
     if (indexPattern) {
@@ -93,8 +91,7 @@ const useSearchBarConfiguration = (
    * @returns
    */
   const getDefaultIndexPattern = async (): Promise<IndexPattern> => {
-    const indexPatternService = getDataPlugin()
-      .indexPatterns as IndexPatternsContract;
+    const indexPatternService = getDataPlugin().indexPatterns as IndexPatternsContract;
     return await indexPatternService.getDefault();
   };
 
@@ -116,21 +113,17 @@ const useSearchBarConfiguration = (
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (userFilters: Filter[]) => {
-      setFilters
-        ? setFilters(userFilters)
-        : console.warn('setFilters function is not defined');
+      setFilters ? setFilters(userFilters) : console.warn('setFilters function is not defined');
       props?.onFiltersUpdated && props?.onFiltersUpdated(userFilters);
     },
     onQuerySubmit: (
       payload: { dateRange: TimeRange; query?: Query },
-      _isUpdate?: boolean,
+      _isUpdate?: boolean
     ): void => {
       const { dateRange, query } = payload;
       // its necessary execute setter to apply query filters
       // when the hook receives the dateRange use the setter instead the global setTimeFilter
-      props?.setTimeFilter
-        ? props?.setTimeFilter(dateRange)
-        : setGlobalTimeFilter(dateRange);
+      props?.setTimeFilter ? props?.setTimeFilter(dateRange) : setGlobalTimeFilter(dateRange);
       props?.setQuery ? props?.setQuery(query) : setQuery(query);
       props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
       setTimeFilter(dateRange);
