@@ -12,6 +12,7 @@
 
 import { hasAgentSupportModule } from '../../../../../react-services/wz-agents';
 import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
+import { docker as dockerApp } from '../../../../../utils/applications';
 
 export default [
   {
@@ -158,7 +159,7 @@ export default [
         description:
           'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
         goto: 'docker-listener',
-        when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.DOCKER),
+        when: agent => hasAgentSupportModule(agent, dockerApp.id),
       },
     ],
   },
