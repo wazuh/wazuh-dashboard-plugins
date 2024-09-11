@@ -90,11 +90,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
-    pagination: defaultPagination || {
-      pageIndex: 0,
-      pageSize: 15,
-      pageSizeOptions: [15, 25, 50, 100],
-    },
+    useDefaultPagination: true,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
