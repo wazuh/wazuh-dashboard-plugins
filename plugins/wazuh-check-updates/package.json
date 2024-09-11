@@ -7,6 +7,9 @@
   },
   "description": "Wazuh Check Updates",
   "private": true,
+  "resolutions": {
+    "**/follow-redirects": "^1.15.6"
+  },
   "scripts": {
     "build": "yarn plugin-helpers build --opensearch-dashboards-version=$OPENSEARCH_DASHBOARDS_VERSION",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
