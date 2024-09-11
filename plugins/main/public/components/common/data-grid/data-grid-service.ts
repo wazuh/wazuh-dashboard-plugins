@@ -34,7 +34,7 @@ export const parseData = <T = unknown>(resultsHits: SearchResponse<T>['hits']['h
   return data;
 };
 
-export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) => {
+export const getFieldFormatted = (rowIndex: number, columnId: string, indexPattern: IndexPattern, rowsParsed: ParseData[]) => {
   const field = indexPattern.fields.find((field) => field.name === columnId);
   let fieldValue = null;
   if (columnId.includes('.')) {
