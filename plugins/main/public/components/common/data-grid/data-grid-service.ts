@@ -8,12 +8,20 @@ import { tDataGridColumn } from './use-data-grid';
 import { cellFilterActions } from './cell-filter-actions';
 import { FILTER_OPERATOR, PatternDataSourceFilterManager } from '../data-source';
 
-export const parseData = (resultsHits: SearchResponse['hits']['hits']): any[] => {
+type ParseData<T> = {
+  source: T,
+  _id: string,
+  _index: string,
+  _type: string,
+  _score: number,
+} | {}
+
+export const parseData = <T = unknown>(resultsHits: SearchResponse<T>['hits']['hits']): ParseData<T>[] => {
   const data = resultsHits.map((hit) => {
     if (!hit) {
       return {};
     }
-    const source = hit._source as object;
+    const source = hit._source as T;
     const data = {
       ...source,
       _id: hit._id,
