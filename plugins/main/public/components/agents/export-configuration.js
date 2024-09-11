@@ -20,9 +20,8 @@ import {
 } from '@elastic/eui';
 
 import PropTypes from 'prop-types';
-import { UnsupportedComponents } from '../../utils/components-os-support';
-import { WAZUH_AGENTS_OS_TYPE } from '../../../common/constants';
 import { withErrorBoundary } from '../common/hocs';
+import { hasAgentSupportModule } from '../../react-services';
 
 export const ExportConfiguration = withErrorBoundary(
   class ExportConfiguration extends Component {
@@ -57,11 +56,7 @@ export const ExportConfiguration = withErrorBoundary(
       list.forEach((x, idx) => {
         if (
           typeof x === 'string' ||
-          (x.name &&
-            !(
-              UnsupportedComponents[this.props.agentPlatform] ||
-              UnsupportedComponents[WAZUH_AGENTS_OS_TYPE.OTHERS]
-            ).includes(x.name))
+          (x.name && hasAgentSupportModule(this.props.agent, x.name))
         ) {
           this.options.push({ id: `${idx}`, label: x.desc || x });
         }
