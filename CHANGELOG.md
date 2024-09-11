@@ -18,7 +18,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed missing options depending on agent operating system in the agent configuration report [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
 - Fixed an style that affected the Discover plugin [#6989](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6989)
 
-
 ### Changed
 
 - Change the text of the query limit tooltip [#6981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6981)
