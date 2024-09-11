@@ -1,17 +1,13 @@
 version: '2.2'
-
 # x-logging: &logging
 #   logging:
 #     driver: loki
 #     options:
 #       loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
-
 services:
   exporter:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
-
     # <<: *logging
-
     hostname: exporter-osd-${OS_VERSION}
     profiles:
       - 'server'
@@ -24,10 +20,8 @@ services:
       - '--es.uri=https://admin:${PASSWORD}@os1:9200'
       - '--es.ssl-skip-verify'
       - '--es.all'
-
   imposter:
-    image: outofcoffee/imposter
-
+    image: outofcoffee/imposter:3.44.1
     # <<: *logging
     hostname: imposter-osd-${OS_VERSION}
     networks:
@@ -38,10 +32,8 @@ services:
       - MALLOC_ARENA_MAX=1
     volumes:
       - ../imposter:/opt/imposter/config
-
   generator:
     image: cfssl/cfssl
-
     # <<: *logging
     profiles:
       - 'server'
@@ -63,61 +55,50 @@ services:
       -c '
         export certs=/tmp/certs
         mkdir $$certs
-      	cd $$certs
-
-      	echo "Generating CA"
-      	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
-
-      	echo "Generating servers certificates"
-      	for i in os1 osd imposter; do
-      		echo "Generating cert for $$i"
-      		cat /conf/host.json | \
-      		sed "s/HOST/$$i/g" | \
-      		cfssl gencert \
-      			-ca $$certs/ca.pem \
-      			-ca-key $$certs/ca-key.pem \
-      			-config /conf/cfssl.json \
-      			-profile=server - | \
-      		cfssljson -bare $$i
-      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-      	done
-
-      	echo "Generating clients certificates"
-        	for i in admin filebeat saml; do
-        		echo "Generating cert for $$i"
-      		cat /conf/host.json | \
-      		sed "s/HOST/$$i/g" | \
-      		cfssl gencert \
-      			-ca $$certs/ca.pem \
-      			-ca-key $$certs/ca-key.pem \
-      			-config /conf/cfssl.json \
-      			-profile=client - | \
-      		cfssljson -bare $$i
-      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-      	done
-
+        cd $$certs
+        echo "Generating CA"
+        cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
+        echo "Generating servers certificates"
+        for i in os1 osd imposter; do
+            echo "Generating cert for $$i"
+            cat /conf/host.json | \
+            sed "s/HOST/$$i/g" | \
+            cfssl gencert \
+                -ca $$certs/ca.pem \
+                -ca-key $$certs/ca-key.pem \
+                -config /conf/cfssl.json \
+                -profile=server - | \
+            cfssljson -bare $$i
+            openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+        done
+        echo "Generating clients certificates"
+            for i in admin filebeat saml; do
+                echo "Generating cert for $$i"
+            cat /conf/host.json | \
+            sed "s/HOST/$$i/g" | \
+            cfssl gencert \
+                -ca $$certs/ca.pem \
+                -ca-key $$certs/ca-key.pem \
+                -config /conf/cfssl.json \
+                -profile=client - | \
+            cfssljson -bare $$i
+            openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+        done
           echo "Setting up permissions"
-
           rm /certs/wi/* /certs/wd/* /certs/wm/*
-
           mv $$certs/os1* /certs/wi
           mv $$certs/admin* /certs/wi
           mv /certs/wi/admin.key /certs/wi/admin-key.pem
           cp $$certs/*ca* /certs/wi
-
           mv $$certs/osd* /certs/wd
           cp $$certs/*ca* /certs/wd
-
           mv $$certs/saml* /certs/idp
           mv /certs/idp/saml.key /certs/idp/saml-key.pem
           cp $$certs/*ca* /certs/idp
-
           mv $$certs/*.* /certs/wm
-
           chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
           chown -R 1000:1000 /certs/*
           ls -alR /certs/
-
           chown 1000:1000 /data /logs
           chmod 775 /data /logs
           sleep 300
@@ -127,14 +108,12 @@ services:
       interval: 2s
       timeout: 5s
       retries: 10
-
   os1:
     depends_on:
       idpsetup:
         condition: service_completed_successfully
         required: false
     image: opensearchproject/opensearch:${OS_VERSION}
-
     # <<: *logging
     profiles:
       - 'server'
@@ -162,7 +141,6 @@ services:
       - ${SEC_CONFIG_FILE}:${SEC_CONFIG_PATH}/config.yml
       - ./config/${OSD_MAJOR}/os/roles_mapping.yml:${SEC_CONFIG_PATH}/roles_mapping.yml
       - ./config/${OSD_MAJOR}/os/roles.yml:${SEC_CONFIG_PATH}/roles.yml
-
       - os_logs:/var/log/os1
       - os_data:/var/lib/os1
     ports:
@@ -180,7 +158,74 @@ services:
       interval: 1s
       timeout: 5s
       retries: 120
-
+  data-prepper:
+    image: opensearchproject/data-prepper:2
+    depends_on:
+      os1:
+        condition: service_healthy
+    profiles:
+      - 'saml'
+      - 'standard'
+    hostname: data-prepper
+    networks:
+      - os-dev
+      - mon
+    volumes:
+      - wi_certs:/usr/share/data-prepper-certs/
+      - ./config/${OSD_MAJOR}/data-prepper/trace_analytics_no_ssl_2x.yml:/usr/share/data-prepper/pipelines/pipelines.yaml
+      - ./config/${OSD_MAJOR}/data-prepper/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml
+    ports:
+      - '21890:21890'
+  otel-collector:
+    restart: unless-stopped
+    image: otel/opentelemetry-collector:0.64.1
+    command: ['--config=/etc/otel-collector-config.yml']
+    volumes:
+      - <paht-data-prepper-repo>/data-preper/examples/trace-analytics-sample-app/opentelemetry-collector/otel-collector-config.yml:/etc/otel-collector-config.yml
+      - <paht-data-prepper-repo>/data-preper/examples/demo/demo-data-prepper.crt:/etc/demo-data-prepper.crt
+    ports:
+      - '55680:55680'
+    depends_on:
+      - data-prepper
+    networks:
+      - os-dev
+      - mon
+  mysql:
+    image: mysql:latest
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - os-dev
+      - mon
+  sample-app:
+    build:
+      context: <paht-data-prepper-repo>/data-preper/examples/trace-analytics-sample-app/sample-app
+      dockerfile: Dockerfile
+    ports:
+      - '8082:8082' # inventory
+      - '8083:8083' # database
+      - '8084:8084' # payment
+      - '8085:8085' # auth
+      - '8086:8086' # recommendation
+      - '8087:8087' # analytics-service
+      - '8088:8088' # order
+      - '8089:8089' # client-dashboard
+    environment:
+      - OTEL_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:55680
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=analytics-service
+      - OTLP=otel-collector
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - WAIT_HOSTS=otel-collector:55680, mysql:3306
+    depends_on:
+      - otel-collector
+      - mysql
+    networks:
+      - os-dev
+      - mon
   filebeat:
     depends_on:
       os1:
@@ -194,7 +239,6 @@ services:
     networks:
       - os-dev
       - mon
-
     # <<: *logging
     # restart: always
     entrypoint:
@@ -217,7 +261,6 @@ services:
     volumes:
       - wm_certs:/etc/ssl/elastic
       - ./config/${OSD_MAJOR}/filebeat/filebeat.yml:/tmp/filebeat.yml
-
   osd:
     depends_on:
       os1:
@@ -233,7 +276,6 @@ services:
       - devel
       - mon
     user: '1000:1000'
-
     # <<: *logging
     ports:
       - ${OSD_PORT}:5601
@@ -245,11 +287,9 @@ services:
       - '${SRC}/main:/home/node/kbn/plugins/wazuh'
       - '${SRC}/wazuh-core:/home/node/kbn/plugins/wazuh-core'
       - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
-      - '${SRC}/dashboards-reporting:/home/node/kbn/plugins/dashboards-reporting'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
-
   idpsec:
     image: quay.io/keycloak/keycloak:19.0.1
     depends_on:
@@ -280,7 +320,6 @@ services:
       interval: 2s
       timeout: 5s
       retries: 10
-
   idp:
     image: quay.io/keycloak/keycloak:19.0.1
     depends_on:
@@ -289,7 +328,6 @@ services:
     profiles:
       - 'saml'
     hostname: idp
-
     # <<: *logging
     networks:
       - os-dev
@@ -310,7 +348,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
-
   idpsetup:
     image: badouralix/curl-jq
     depends_on:
@@ -319,7 +356,6 @@ services:
     profiles:
       - 'saml'
     hostname: idpsetup
-
     # <<: *logging
     networks:
       - os-dev
@@ -364,7 +400,6 @@ services:
       - '1515:1515'
       - '1516:1516'
       - '55000:55000'
-
 networks:
   os-dev:
     name: os-dev-${OS_VERSION}
@@ -373,7 +408,6 @@ networks:
     external: true
   devel:
     external: true
-
 volumes:
   osd_cache:
   certs:
