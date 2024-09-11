@@ -20,6 +20,8 @@ describe('useDataGrid hook', () => {
     };
     const { result } = renderHook(() => useDataGrid(dataGridProps));
     expect(result.current?.pagination?.pageSize).toEqual(15);
-    expect(result.current?.pagination?.pageSizeOptions).toEqual([15, 25, 50, 100]);
+    expect(result.current?.pagination?.pageSizeOptions).toEqual([
+      15, 25, 50, 100,
+    ]);
   });
 });

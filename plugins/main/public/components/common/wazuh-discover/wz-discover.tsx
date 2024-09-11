@@ -17,15 +17,25 @@ import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
-import { useDataGrid, tDataGridColumn, exportSearchToCSV, getAllCustomRenders } from '../data-grid';
+import {
+  useDataGrid,
+  tDataGridColumn,
+  exportSearchToCSV,
+  getAllCustomRenders,
+} from '../data-grid';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
-import { ErrorHandler, ErrorFactory, HttpError } from '../../../react-services/error-management';
+import {
+  ErrorHandler,
+  ErrorFactory,
+  HttpError,
+} from '../../../react-services/error-management';
 import useSearchBar from '../search-bar/use-search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 
-const DashboardByRenderer = getPlugins().dashboard.DashboardContainerByValueRenderer;
+const DashboardByRenderer =
+  getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 import { withErrorBoundary } from '../hocs';
 import {
@@ -56,7 +66,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
-  const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(undefined);
+  const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
+    undefined,
+  );
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
@@ -80,16 +92,18 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       const rowClicked = results.hits.hits[index];
       setInspectedHit(rowClicked);
     },
-    [results]
+    [results],
   );
 
-  const DocViewInspectButton = ({ rowIndex }: EuiDataGridCellValueElementProps) => {
+  const DocViewInspectButton = ({
+    rowIndex,
+  }: EuiDataGridCellValueElementProps) => {
     const inspectHintMsg = 'Inspect document details';
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
           onClick={() => onClickInspectDoc(rowIndex)}
-          iconType="inspect"
+          iconType='inspect'
           aria-label={inspectHintMsg}
         />
       </EuiToolTip>
@@ -128,8 +142,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       sorting,
       dateRange: absoluteDateRange,
     })
-      .then((results) => setResults(results))
-      .catch((error) => {
+      .then(results => setResults(results))
+      .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: 'Error fetching data',
@@ -144,7 +158,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     JSON.stringify(absoluteDateRange),
   ]);
 
-  const timeField = indexPattern?.timeFieldName ? indexPattern.timeFieldName : undefined;
+  const timeField = indexPattern?.timeFieldName
+    ? indexPattern.timeFieldName
+    : undefined;
 
   const onClickExportResults = async () => {
     const params = {
@@ -173,20 +189,20 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   };
 
   return (
-    <IntlProvider locale="en">
+    <IntlProvider locale='en'>
       <EuiPageTemplate
-        className="discoverContainer"
-        restrictWidth="100%"
+        className='discoverContainer'
+        restrictWidth='100%'
         fullHeight={true}
         grow
-        paddingSize="none"
+        paddingSize='none'
         pageContentProps={{ color: 'transparent' }}
       >
         {isDataSourceLoading ? (
           <LoadingSpinner />
         ) : (
           <WzSearchBar
-            appName="wazuh-discover-search-bar"
+            appName='wazuh-discover-search-bar'
             {...searchBarProps}
             fixedFilters={fixedFilters}
             showQueryInput={true}
@@ -199,17 +215,24 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         ) : null}
         <div
           className={
-            !isDataSourceLoading && dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            !isDataSourceLoading && dataSource && results?.hits?.total > 0
+              ? ''
+              : 'wz-no-display'
           }
         >
-          <EuiPanel paddingSize="s" hasShadow={false} hasBorder={false} color="transparent">
-            <EuiFlexGroup gutterSize="s" direction="column">
-              <EuiFlexItem grow={false} className="discoverChartContainer">
+          <EuiPanel
+            paddingSize='s'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
+            <EuiFlexGroup gutterSize='s' direction='column'>
+              <EuiFlexItem grow={false} className='discoverChartContainer'>
                 <EuiPanel
                   hasBorder={false}
                   hasShadow={false}
-                  color="transparent"
-                  paddingSize="none"
+                  color='transparent'
+                  paddingSize='none'
                 >
                   <EuiPanel>
                     <DashboardByRenderer
@@ -218,7 +241,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                         fetchFilters,
                         query,
                         absoluteDateRange.from,
-                        absoluteDateRange.to
+                        absoluteDateRange.to,
                       )}
                     />
                   </EuiPanel>
@@ -246,19 +269,22 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             </EuiFlexGroup>
           </EuiPanel>
           {inspectedHit && (
-            <EuiFlyout onClose={() => setInspectedHit(undefined)} size="m">
+            <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
               <EuiFlyoutHeader>
-                <DocDetailsHeader doc={inspectedHit} indexPattern={dataSource?.indexPattern} />
+                <DocDetailsHeader
+                  doc={inspectedHit}
+                  indexPattern={dataSource?.indexPattern}
+                />
               </EuiFlyoutHeader>
               <EuiFlyoutBody>
-                <EuiFlexGroup direction="column">
+                <EuiFlexGroup direction='column'>
                   <EuiFlexItem>
                     <DocumentViewTableAndJson
                       document={inspectedHit}
                       indexPattern={indexPattern}
                       renderFields={getAllCustomRenders(
                         defaultTableColumns,
-                        wzDiscoverRenderColumns
+                        wzDiscoverRenderColumns,
                       )}
                     />
                   </EuiFlexItem>

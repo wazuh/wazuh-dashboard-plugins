@@ -2,14 +2,23 @@ import { SearchResponse } from '../../../../../../src/core/server';
 import * as FileSaver from '../../../services/file-saver';
 import { beautifyDate } from '../../agents/vuls/inventory/lib';
 import { SearchParams, search } from '../search-bar/search-bar-service';
-import { Filter, IFieldType, IndexPattern } from '../../../../../../src/plugins/data/common';
+import {
+  Filter,
+  IFieldType,
+  IndexPattern,
+} from '../../../../../../src/plugins/data/common';
 export const MAX_ENTRIES_PER_QUERY = 10000;
 import { tDataGridColumn } from './use-data-grid';
 import { getCellActions } from './get-cell-actions';
-import { FILTER_OPERATOR, PatternDataSourceFilterManager } from '../data-source';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../data-source';
 
-export const parseData = (resultsHits: SearchResponse['hits']['hits']): any[] => {
-  const data = resultsHits.map((hit) => {
+export const parseData = (
+  resultsHits: SearchResponse['hits']['hits'],
+): any[] => {
+  const data = resultsHits.map(hit => {
     if (!hit) {
       return {};
     }
@@ -26,15 +35,20 @@ export const parseData = (resultsHits: SearchResponse['hits']['hits']): any[] =>
   return data;
 };
 
-export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) => {
-  const field = indexPattern.fields.find((field) => field.name === columnId);
+export const getFieldFormatted = (
+  rowIndex,
+  columnId,
+  indexPattern,
+  rowsParsed,
+) => {
+  const field = indexPattern.fields.find(field => field.name === columnId);
   let fieldValue = null;
   if (columnId.includes('.')) {
     // when the column is a nested field. The column could have 2 to n levels
     // get dinamically the value of the nested field
     const nestedFields = columnId.split('.');
     fieldValue = rowsParsed[rowIndex];
-    nestedFields.forEach((field) => {
+    nestedFields.forEach(field => {
       if (fieldValue) {
         fieldValue = fieldValue[field];
       }
@@ -67,14 +81,25 @@ export const getFieldFormatted = (rowIndex, columnId, indexPattern, rowsParsed) 
 };
 
 // receive search params
-export const exportSearchToCSV = async (params: SearchParams): Promise<void> => {
+export const exportSearchToCSV = async (
+  params: SearchParams,
+): Promise<void> => {
   const DEFAULT_MAX_SIZE_PER_CALL = 1000;
-  const { indexPattern, filters = [], query, sorting, fields, pagination } = params;
+  const {
+    indexPattern,
+    filters = [],
+    query,
+    sorting,
+    fields,
+    pagination,
+  } = params;
   // when the pageSize is greater than the default max size per call (10000)
   // then we need to paginate the search
   const mustPaginateSearch =
     pagination?.pageSize && pagination?.pageSize > DEFAULT_MAX_SIZE_PER_CALL;
-  const pageSize = mustPaginateSearch ? DEFAULT_MAX_SIZE_PER_CALL : pagination?.pageSize;
+  const pageSize = mustPaginateSearch
+    ? DEFAULT_MAX_SIZE_PER_CALL
+    : pagination?.pageSize;
   const totalHits = pagination?.pageSize || DEFAULT_MAX_SIZE_PER_CALL;
   let pageIndex = params.pagination?.pageIndex || 0;
   let hitsCount = 0;
@@ -105,13 +130,13 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
   }
 
   const resultsFields = fields;
-  const data = allHits.map((hit) => {
+  const data = allHits.map(hit => {
     // check if the field type is a date
     const dateFields = indexPattern.fields.getByType('date');
-    const dateFieldsNames = dateFields.map((field) => field.name);
+    const dateFieldsNames = dateFields.map(field => field.name);
     const flattenHit = indexPattern.flattenHit(hit);
     // replace the date fields with the formatted date
-    dateFieldsNames.forEach((field) => {
+    dateFieldsNames.forEach(field => {
       if (flattenHit[field]) {
         flattenHit[field] = beautifyDate(flattenHit[field]);
       }
@@ -126,8 +151,8 @@ export const exportSearchToCSV = async (params: SearchParams): Promise<void> => 
   if (!data || data.length === 0) return;
 
   const parsedData = data
-    .map((row) => {
-      const parsedRow = resultsFields?.map((field) => {
+    .map(row => {
+      const parsedRow = resultsFields?.map(field => {
         const value = row[field];
         if (value === undefined || value === null) {
           return '';
@@ -158,7 +183,7 @@ export const parseColumns = (
   indexPattern: IndexPattern,
   rows: any[],
   filters: Filter[],
-  setFilters: (filters: Filter[]) => void
+  setFilters: (filters: Filter[]) => void,
 ): tDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
   // merge the properties of the field with the default columns
@@ -167,9 +192,11 @@ export const parseColumns = (
   }
 
   const columns = fields
-    .filter((field) => field.name !== '_source')
-    .map((field) => {
-      const defaultColumn = defaultColumns.find((column) => column.id === field.name);
+    .filter(field => field.name !== '_source')
+    .map(field => {
+      const defaultColumn = defaultColumns.find(
+        column => column.id === field.name,
+      );
       return {
         ...field,
         id: field.name,
@@ -186,16 +213,16 @@ export const parseColumns = (
           (
             columndId: string,
             value: any,
-            operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT
+            operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
           ) => {
             const newFilter = PatternDataSourceFilterManager.createFilter(
               operation,
               columndId,
               value,
-              indexPattern.id ?? ''
+              indexPattern.id ?? '',
             );
             setFilters([...filters, newFilter]);
-          }
+          },
         ),
       };
     }) as tDataGridColumn[];
@@ -211,12 +238,12 @@ export const parseColumns = (
  */
 export const getAllCustomRenders = (
   customColumns: tDataGridColumn[],
-  discoverColumns: tDataGridColumn[]
+  discoverColumns: tDataGridColumn[],
 ): tDataGridColumn[] => {
-  const customColumnsWithRender = customColumns.filter((column) => column.render);
-  const allColumns = discoverColumns.map((column) => {
+  const customColumnsWithRender = customColumns.filter(column => column.render);
+  const allColumns = discoverColumns.map(column => {
     const customColumn = customColumnsWithRender.find(
-      (customColumn) => customColumn.id === column.id
+      customColumn => customColumn.id === column.id,
     );
     return customColumn || column;
   });
