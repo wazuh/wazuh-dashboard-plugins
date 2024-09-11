@@ -114,6 +114,8 @@ const DashboardTH: React.FC = () => {
     results,
     indexPattern: dataSource?.indexPattern as IndexPattern,
     DocViewInspectButton,
+    filters,
+    setFilters,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;

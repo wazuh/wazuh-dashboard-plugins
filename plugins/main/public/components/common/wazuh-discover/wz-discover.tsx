@@ -111,6 +111,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
     useDefaultPagination: true,
+    filters,
+    setFilters,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
