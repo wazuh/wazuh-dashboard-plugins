@@ -13,7 +13,7 @@ export const MAX_ENTRIES_PER_QUERY = 10000;
 
 const renderRequirementsSecurityOperations = (value: []) => {
   return (
-    <EuiText gutterSize='s' direction='column'>
+    <EuiText style={{ fontSize: '13px' }} gutterSize='s' direction='column'>
       {value.join(', ')}
     </EuiText>
   );
