@@ -8,7 +8,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
 // ToDo: check how create this methods
 import { parseData, getFieldFormatted, parseColumns } from './data-grid-service';
-import { IndexPattern } from '../../../../../../src/plugins/data/common';
+import { Filter, IndexPattern } from '../../../../../../src/plugins/data/common';
 import { EuiDataGridPaginationProps } from '@opensearch-project/oui';
 
 export interface PaginationOptions
@@ -43,6 +43,8 @@ export type tDataGridProps = {
   ariaLabelledBy: string;
   useDefaultPagination?: boolean;
   pagination?: typeof DEFAULT_PAGINATION_OPTIONS;
+  filters?: Filter[];
+  setFilters?: (filters: Filter[]) => void;
 };
 
 export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
@@ -54,6 +56,8 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     renderColumns,
     useDefaultPagination = false,
     pagination: paginationProps = {},
+    filters,
+    setFilters,
   } = props;
   /** Columns **/
   const [columns /* , setColumns */] = useState<tDataGridColumn[]>(defaultColumns);
@@ -154,7 +158,14 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
 
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columns: parseColumns(indexPattern?.fields || [], defaultColumns),
+    columns: parseColumns(
+      indexPattern?.fields || [],
+      defaultColumns,
+      indexPattern,
+      rows,
+      filters,
+      setFilters
+    ),
     columnVisibility: {
       visibleColumns: columnVisibility,
       setVisibleColumns: setVisibility,
@@ -168,5 +179,5 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       onChangeItemsPerPage: onChangeItemsPerPage,
       onChangePage: onChangePage,
     },
-  };
+  } as EuiDataGridProps;
 };

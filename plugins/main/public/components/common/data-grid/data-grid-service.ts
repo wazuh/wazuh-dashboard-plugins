@@ -2,10 +2,11 @@ import { SearchResponse } from '../../../../../../src/core/server';
 import * as FileSaver from '../../../services/file-saver';
 import { beautifyDate } from '../../agents/vuls/inventory/lib';
 import { SearchParams, search } from '../search-bar/search-bar-service';
-import { IFieldType } from '../../../../../../src/plugins/data/common';
+import { Filter, IFieldType, IndexPattern } from '../../../../../../src/plugins/data/common';
 export const MAX_ENTRIES_PER_QUERY = 10000;
-import { EuiDataGridColumn } from '@elastic/eui';
 import { tDataGridColumn } from './use-data-grid';
+import { getCellActions } from './get-cell-actions';
+import { FILTER_OPERATOR, PatternDataSourceFilterManager } from '../data-source';
 
 export const parseData = (
   resultsHits: SearchResponse['hits']['hits'],
@@ -172,6 +173,10 @@ export const exportSearchToCSV = async (
 export const parseColumns = (
   fields: IFieldType[],
   defaultColumns: tDataGridColumn[] = [],
+  indexPattern: IndexPattern,
+  rows: any[],
+  filters: Filter[],
+  setFilters: (filters: Filter[]) => void
 ): tDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
   // merge the properties of the field with the default columns
@@ -194,6 +199,24 @@ export const parseColumns = (
           showHide: true,
         },
         ...defaultColumn,
+        cellActions: getCellActions(
+          field,
+          indexPattern,
+          rows,
+          (
+            columndId: string,
+            value: any,
+            operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT
+          ) => {
+            const newFilter = PatternDataSourceFilterManager.createFilter(
+              operation,
+              columndId,
+              value,
+              indexPattern.id ?? ''
+            );
+            setFilters([...filters, newFilter]);
+          }
+        ),
       };
     }) as tDataGridColumn[];
   return columns;
