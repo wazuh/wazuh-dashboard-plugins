@@ -177,56 +177,68 @@ export const exportSearchToCSV = async (
   }
 };
 
+const onFilterCellActions = (
+  indexPatternId: string,
+  filters: Filter[],
+  setFilters: (filters: Filter[]) => void
+) => {
+  return (
+    columndId: string,
+    value: any,
+    operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT
+  ) => {
+    const newFilter = PatternDataSourceFilterManager.createFilter(
+      operation,
+      columndId,
+      value,
+      indexPatternId
+    );
+    setFilters([...filters, newFilter]);
+  };
+};
+
+const mapToDataGridColumn = (
+  field: IFieldType,
+  indexPattern: IndexPattern,
+  rows: any[],
+  filters: Filter[],
+  setFilters: (filters: Filter[]) => void,
+  defaultColumns: tDataGridColumn[]
+): tDataGridColumn => {
+  const defaultColumn = defaultColumns.find((column) => column.id === field.name);
+  return {
+    ...field,
+    id: field.name,
+    name: field.name,
+    schema: field.type,
+    actions: { showHide: true },
+    ...defaultColumn,
+    cellActions: cellFilterActions(
+      field,
+      indexPattern,
+      rows,
+      onFilterCellActions(indexPattern.id as string, filters, setFilters)
+    ),
+  } as tDataGridColumn;
+};
+
 export const parseColumns = (
   fields: IFieldType[],
   defaultColumns: tDataGridColumn[] = [],
   indexPattern: IndexPattern,
   rows: any[],
   filters: Filter[],
-  setFilters: (filters: Filter[]) => void,
+  setFilters: (filters: Filter[]) => void
 ): tDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
   // merge the properties of the field with the default columns
-  if (!fields?.length) {
-    return defaultColumns;
-  }
+  if (!fields?.length) return defaultColumns;
 
-  const columns = fields
-    .filter(field => field.name !== '_source')
-    .map(field => {
-      const defaultColumn = defaultColumns.find(
-        column => column.id === field.name,
-      );
-      return {
-        ...field,
-        id: field.name,
-        name: field.name,
-        schema: field.type,
-        actions: {
-          showHide: true,
-        },
-        ...defaultColumn,
-        cellActions: getCellActions(
-          field,
-          indexPattern,
-          rows,
-          (
-            columndId: string,
-            value: any,
-            operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
-          ) => {
-            const newFilter = PatternDataSourceFilterManager.createFilter(
-              operation,
-              columndId,
-              value,
-              indexPattern.id ?? '',
-            );
-            setFilters([...filters, newFilter]);
-          },
-        ),
-      };
-    }) as tDataGridColumn[];
-  return columns;
+  return fields
+    .filter((field) => field.name !== '_source')
+    .map((field) =>
+      mapToDataGridColumn(field, indexPattern, rows, filters, setFilters, defaultColumns)
+    );
 };
 
 /**
