@@ -1,8 +1,14 @@
-import { EuiDataGridColumn, EuiDataGridColumnCellActionProps } from '@elastic/eui';
+import {
+  EuiDataGridColumn,
+  EuiDataGridColumnCellActionProps,
+} from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import React from 'react';
-import { IFieldType, IndexPattern } from '../../../../../../src/plugins/data/common';
-import { FILTER_OPERATOR } from '../data-source';
+import {
+  IFieldType,
+  IndexPattern,
+} from '../../../../../../src/plugins/data/common';
+import { FILTER_OPERATOR } from '../data-source/pattern/pattern-data-source-filter-manager';
 
 export const filterIsAction = (
   indexPattern: IndexPattern,
@@ -10,10 +16,14 @@ export const filterIsAction = (
   onFilter: (
     columndId: string,
     value: any,
-    operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT
-  ) => void
+    operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
+  ) => void,
 ) => {
-  return ({ rowIndex, columnId, Component }: EuiDataGridColumnCellActionProps) => {
+  return ({
+    rowIndex,
+    columnId,
+    Component,
+  }: EuiDataGridColumnCellActionProps) => {
     const filterForValueText = i18n.translate('discover.filterForValue', {
       defaultMessage: 'Filter for value',
     });
@@ -34,9 +44,9 @@ export const filterIsAction = (
     return (
       <Component
         onClick={handleClick}
-        iconType="plusInCircle"
+        iconType='plusInCircle'
         aria-label={filterForValueLabel}
-        data-test-subj="filterForValue"
+        data-test-subj='filterForValue'
       >
         {filterForValueText}
       </Component>
@@ -51,8 +61,8 @@ export const filterIsNotAction =
     onFilter: (
       columndId: string,
       value: any,
-      operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT
-    ) => void
+      operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
+    ) => void,
   ) =>
   ({ rowIndex, columnId, Component }: EuiDataGridColumnCellActionProps) => {
     const filterOutValueText = i18n.translate('discover.filterOutValue', {
@@ -75,9 +85,9 @@ export const filterIsNotAction =
     return (
       <Component
         onClick={handleClick}
-        iconType="minusInCircle"
+        iconType='minusInCircle'
         aria-label={filterOutValueLabel}
-        data-test-subj="filterOutValue"
+        data-test-subj='filterOutValue'
       >
         {filterOutValueText}
       </Component>
@@ -92,8 +102,8 @@ export function cellFilterActions(
   onFilter: (
     columndId: string,
     value: any,
-    operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT
-  ) => void
+    operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
+  ) => void,
 ) {
   if (!field.filterable) return;
 

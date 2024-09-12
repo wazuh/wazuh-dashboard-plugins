@@ -1,5 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { cellFilterActions, filterIsAction, filterIsNotAction } from './cell-filter-actions';
+import {
+  cellFilterActions,
+  filterIsAction,
+  filterIsNotAction,
+} from './cell-filter-actions';
 import { EuiButtonEmpty } from '@elastic/eui';
 
 const indexPattern = {
@@ -37,14 +41,14 @@ describe('cell-filter-actions', () => {
           // @ts-expect-error Argument of type '{ flattenHit: jest.Mock<any, any>; }' is not assignable to parameter of type 'IndexPattern'
           indexPattern,
           rows,
-          onFilter
+          onFilter,
         )({
           rowIndex: 0,
           columnId: TEST_COLUMN_ID,
           Component: EuiButtonEmpty,
           isExpanded: false,
           closePopover: () => {},
-        })
+        }),
       );
 
       let component = screen.getByText('Filter for value');
@@ -74,14 +78,14 @@ describe('cell-filter-actions', () => {
           // @ts-expect-error Argument of type '{ flattenHit: jest.Mock<any, any>; }' is not assignable to parameter of type 'IndexPattern'
           indexPattern,
           rows,
-          onFilter
+          onFilter,
         )({
           rowIndex: 0,
           columnId: TEST_COLUMN_ID,
           Component: EuiButtonEmpty,
           isExpanded: false,
           closePopover: () => {},
-        })
+        }),
       );
 
       let component = screen.getByText('Filter out value');
@@ -92,7 +96,11 @@ describe('cell-filter-actions', () => {
       fireEvent.click(component);
 
       expect(onFilter).toHaveBeenCalledTimes(1);
-      expect(onFilter).toHaveBeenCalledWith(TEST_COLUMN_ID, TEST_VALUE, 'is not');
+      expect(onFilter).toHaveBeenCalledWith(
+        TEST_COLUMN_ID,
+        TEST_VALUE,
+        'is not',
+      );
     });
   });
 });
