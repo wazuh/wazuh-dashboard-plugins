@@ -14,12 +14,18 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error on the command to deploy a new macOS agent that could cause the registration password had a wrong value because a `\n` could be included [#6906](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6906)
 - Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
 - Fixed an error on Dev Tools when using payload properties as arrays [#6908](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6908)
+- Fixed missing link to Vulnerabilities detection and Office 365 in the agent menu of `Endpoints Summary` [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
+- Fixed missing options depending on agent operating system in the agent configuration report [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
+- Fixed an style that affected the Discover plugin [#6989](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6989)
 
 ### Changed
 
+- Change the text of the query limit tooltip [#6981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6981)
 - Upgraded the `axios` dependency to `1.7.4` [#6919](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6919)
 - Improved MITRE ATT&CK intelligence flyout details readability [#6954](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6954)
 - Upgraded Event-tab column selector showing first the picked columns [#6984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6984)
+- Changed vulnerabilities.reference to links in Vulnerability Detection > Inventory columns [#6960](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6960)
+- Upgraded the `follow-redirects` dependency to `1.15.6` [#6982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6982)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
 
