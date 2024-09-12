@@ -8,6 +8,8 @@ entry-pipeline:
         name: 'raw-pipeline'
     - pipeline:
         name: 'service-map-pipeline'
+    - pipeline:
+        name: 'metrics-pipeline'
 raw-pipeline:
   source:
     pipeline:
@@ -35,13 +37,10 @@ service-map-pipeline:
         username: 'admin'
         password: 'admin'
         index_type: trace-analytics-service-map
-
 metrics-pipeline:
-  workers: 1
-  delay: '5000'
   source:
-    otel_metrics_source:
-      ssl: false
+    pipeline:
+      name: 'entry-pipeline'
   processor:
     - otel_metrics_raw_processor:
   sink:
@@ -50,4 +49,4 @@ metrics-pipeline:
         cert: '/usr/share/data-prepper-certs/ca.pem'
         username: 'admin'
         password: 'admin'
-        index: ss4o_metrics-%{yyyy.MM.dd}-test
+        index: metrics-otel-v2-%{yyyy.MM.dd}

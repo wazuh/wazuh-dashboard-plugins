@@ -1,0 +1,25 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:55680
+  otlp/2:
+    protocols:
+      http:
+
+exporters:
+  otlp/2:
+    endpoint: data-prepper:21890
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+  logging:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging, otlp/2]
+    metrics:
+      receivers: [otlp/2]
+      exporters: [otlp/2, logging]

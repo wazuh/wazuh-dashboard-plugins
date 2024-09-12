@@ -181,8 +181,8 @@ services:
     image: otel/opentelemetry-collector:0.64.1
     command: ['--config=/etc/otel-collector-config.yml']
     volumes:
-      - <paht-data-prepper-repo>/data-preper/examples/trace-analytics-sample-app/opentelemetry-collector/otel-collector-config.yml:/etc/otel-collector-config.yml
-      - <paht-data-prepper-repo>/data-preper/examples/demo/demo-data-prepper.crt:/etc/demo-data-prepper.crt
+      - ./config/${OSD_MAJOR}/data-prepper/otel-collector-config.yml:/etc/otel-collector-config.yml
+      - <path-data-prepper-repo>/examples/demo/demo-data-prepper.crt:/etc/demo-data-prepper.crt
     ports:
       - '55680:55680'
     depends_on:
@@ -201,7 +201,7 @@ services:
       - mon
   sample-app:
     build:
-      context: <paht-data-prepper-repo>/data-preper/examples/trace-analytics-sample-app/sample-app
+      context: <path-data-prepper-repo>/examples/trace-analytics-sample-app/sample-app
       dockerfile: Dockerfile
     ports:
       - '8082:8082' # inventory
