@@ -49,4 +49,4 @@ metrics-pipeline:
         cert: '/usr/share/data-prepper-certs/ca.pem'
         username: 'admin'
         password: 'admin'
-        index: metrics-otel-v2-%{yyyy.MM.dd}
+        index: ss4o_metrics-%{yyyy.MM.dd}-test
