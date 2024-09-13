@@ -48,6 +48,7 @@ export class PatternDataSource implements tDataSource {
       throw new Error(`Error selecting index pattern: ${error}`);
     }
     try {
+      // Vulnerability dashboard error loading for read only user
       await this.patternService.updateSavedObject(pattern);
     } catch {}
   }
