@@ -50,8 +50,9 @@ export class PatternDataSource implements tDataSource {
       if (!pattern)
         throw new Error('Error selecting index pattern: pattern not found');
 
-      const fields =
-        await this.patternService.getFieldsForIndexPattern(pattern);
+      const fields = await this.patternService.getFieldsForIndexPattern(
+        pattern,
+      );
       const scripted = pattern.getScriptedFields().map(field => field.spec);
       pattern.fields.replaceAll([...fields, ...scripted]);
     } catch (error) {
