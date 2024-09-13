@@ -22,7 +22,7 @@ describe('PatternDataSource', () => {
       updateSavedObject: jest.fn(),
     };
     // @ts-expect-error
-    patternDataSource.patternService = patternService
+    patternDataSource.patternService = patternService;
   });
 
   it('should throw error when pattern not found', () => {
@@ -30,7 +30,7 @@ describe('PatternDataSource', () => {
     expect(async () => {
       await patternDataSource.select();
     }).rejects.toThrow(
-      'Error selecting index pattern: Error: Error selecting index pattern: pattern not found'
+      'Error selecting index pattern: Error: Error selecting index pattern: pattern not found',
     );
   });
 
