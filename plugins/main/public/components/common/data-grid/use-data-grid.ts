@@ -151,17 +151,17 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
 
   const filterColumns = () => {
     const allColumns = parseColumns(indexPattern?.fields || [], defaultColumns);
-    const [columnMatch, columnNonMatch] = allColumns.reduce(
-      ([matches, nonMatches], item) => {
-        if (columnVisibility.includes(item.name)) {
-          matches.push(item);
-        } else {
-          nonMatches.push(item);
-        }
-        return [matches, nonMatches];
-      },
-      [[], []],
-    );
+    const columnMatch = [];
+    const columnNonMatch = [];
+
+    for (const item of allColumns) {
+      if (columnVisibility.includes(item.name)) {
+        columnMatch.push(item);
+      } else {
+        columnNonMatch.push(item);
+      }
+    }
+
     return [...columnMatch, ...columnNonMatch];
   };
 
