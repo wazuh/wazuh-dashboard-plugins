@@ -1,6 +1,14 @@
-import { tDataSource, tSearchParams, tFilter, tParsedIndexPattern } from '../index';
+import {
+  tDataSource,
+  tSearchParams,
+  tFilter,
+  tParsedIndexPattern,
+} from '../index';
 import { getDataPlugin } from '../../../../kibana-services';
-import { IndexPatternsService, IndexPattern } from '../../../../../../../src/plugins/data/public';
+import {
+  IndexPatternsService,
+  IndexPattern,
+} from '../../../../../../../src/plugins/data/public';
 import { search } from '../../search-bar/search-bar-service';
 import { PatternDataSourceFilterManager } from './pattern-data-source-filter-manager';
 
@@ -39,10 +47,12 @@ export class PatternDataSource implements tDataSource {
     let pattern: IndexPattern;
     try {
       pattern = await this.patternService.get(this.id);
-      if (!pattern) throw new Error('Error selecting index pattern: pattern not found');
+      if (!pattern)
+        throw new Error('Error selecting index pattern: pattern not found');
 
-      const fields = await this.patternService.getFieldsForIndexPattern(pattern);
-      const scripted = pattern.getScriptedFields().map((field) => field.spec);
+      const fields =
+        await this.patternService.getFieldsForIndexPattern(pattern);
+      const scripted = pattern.getScriptedFields().map(field => field.spec);
       pattern.fields.replaceAll([...fields, ...scripted]);
     } catch (error) {
       throw new Error(`Error selecting index pattern: ${error}`);

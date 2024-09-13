@@ -77,8 +77,11 @@ type tUseDataSourceNotLoadedReturns = {
   filterManager: null;
 };
 
-export function useDataSource<T extends tParsedIndexPattern, K extends PatternDataSource>(
-  props: tUseDataSourceProps<T, K>
+export function useDataSource<
+  T extends tParsedIndexPattern,
+  K extends PatternDataSource,
+>(
+  props: tUseDataSourceProps<T, K>,
 ): tUseDataSourceLoadedReturns<K> | tUseDataSourceNotLoadedReturns {
   const navigationService = NavigationService.getInstance();
   const config = getUiSettings();
@@ -87,8 +90,10 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
     useHash: config.get(OSD_URL_STATE_STORAGE_ID),
     history: history,
   });
-  const appDefaultFilters = osdUrlStateStorage.get<{ filters: [] }>('_a')?.filters ?? [];
-  const globalDefaultFilters = osdUrlStateStorage.get<{ filters: [] }>('_g')?.filters ?? [];
+  const appDefaultFilters =
+    osdUrlStateStorage.get<{ filters: [] }>('_a')?.filters ?? [];
+  const globalDefaultFilters =
+    osdUrlStateStorage.get<{ filters: [] }>('_g')?.filters ?? [];
   const defaultFilters = [...appDefaultFilters, ...globalDefaultFilters];
   const {
     filters: initialFilters = [...defaultFilters],
@@ -141,7 +146,10 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
       try {
         const factory = injectedFactory || new PatternDataSourceFactory();
         const patternsData = await repository.getAll();
-        const dataSources = await factory.createAll(DataSourceConstructor, patternsData);
+        const dataSources = await factory.createAll(
+          DataSourceConstructor,
+          patternsData,
+        );
         const selector = new PatternDataSourceSelector(dataSources, repository);
         const dataSource = await selector.getSelectedDataSource();
         if (!dataSource) {
@@ -153,14 +161,16 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
           dataSource,
           initialFilters,
           injectedFilterManager,
-          initialFetchFilters
+          initialFetchFilters,
         );
         // what the filters update
         subscription = dataSourceFilterManager.getUpdates$().subscribe({
           next: () => {
             if (!isComponentMounted()) return;
             // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-            dataSourceFilterManager.setFilters(dataSourceFilterManager.getFilters());
+            dataSourceFilterManager.setFilters(
+              dataSourceFilterManager.getFilters(),
+            );
             setAllFilters(dataSourceFilterManager.getFilters());
             setFetchFilters(dataSourceFilterManager.getFetchFilters());
             setFixedFilters(dataSourceFilterManager.getFixedFilters());
