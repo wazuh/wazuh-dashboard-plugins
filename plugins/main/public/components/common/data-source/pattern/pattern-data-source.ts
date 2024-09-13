@@ -60,7 +60,8 @@ export class PatternDataSource implements tDataSource {
     try {
       // Vulnerability dashboard error loading for read only user
       await this.patternService.updateSavedObject(pattern);
-    } catch {}
+    } catch {
+    }
   }
 
   async fetch(params: tSearchParams) {
