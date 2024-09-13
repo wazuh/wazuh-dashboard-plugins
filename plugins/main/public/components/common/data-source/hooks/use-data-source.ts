@@ -11,7 +11,6 @@ import {
   PatternDataSourceFilterManager,
   tFilterManager,
 } from '../index';
-import { TimeRange } from '../../../../../../../src/plugins/data/public';
 import { createOsdUrlStateStorage } from '../../../../../../../src/plugins/opensearch_dashboards_utils/public';
 import NavigationService from '../../../../react-services/navigation-service';
 import { OSD_URL_STATE_STORAGE_ID } from '../../../../../common/constants';
@@ -56,7 +55,6 @@ type tUseDataSourceLoadedReturns<K> = {
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: PatternDataSourceFilterManager;
-  fetchDateRange: TimeRange;
 };
 
 type tUseDataSourceNotLoadedReturns = {
@@ -89,8 +87,8 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
     useHash: config.get(OSD_URL_STATE_STORAGE_ID),
     history: history,
   });
-  const appDefaultFilters = osdUrlStateStorage.get('_a')?.filters ?? [];
-  const globalDefaultFilters = osdUrlStateStorage.get('_g')?.filters ?? [];
+  const appDefaultFilters = osdUrlStateStorage.get<{ filters: [] }>('_a')?.filters ?? [];
+  const globalDefaultFilters = osdUrlStateStorage.get<{ filters: [] }>('_g')?.filters ?? [];
   const defaultFilters = [...appDefaultFilters, ...globalDefaultFilters];
   const {
     filters: initialFilters = [...defaultFilters],
@@ -115,7 +113,6 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
-  const [fetchDateRange, setFetchDateRange] = useState<TimeRange>();
   const { isComponentMounted, getAbortController } = useIsMounted();
 
   const setFilters = (filters: tFilter[]) => {
@@ -214,7 +211,6 @@ export function useDataSource<T extends tParsedIndexPattern, K extends PatternDa
       fetchData,
       setFilters,
       filterManager: dataSourceFilterManager as PatternDataSourceFilterManager,
-      fetchDateRange,
     };
   }
 }
