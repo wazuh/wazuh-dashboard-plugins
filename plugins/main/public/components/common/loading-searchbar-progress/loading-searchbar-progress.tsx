@@ -9,7 +9,5 @@ interface LoadingSearchbarProgress {
 export function LoadingSearchbarProgress({
   message,
 }: LoadingSearchbarProgress) {
-  return (
-    <EuiProgress size='xs' color='primary' />
-  );
+  return <EuiProgress size='xs' color='primary' />;
 }

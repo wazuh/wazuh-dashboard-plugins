@@ -91,10 +91,10 @@ const DashboardNIST80053Component: React.FC = () => {
   return (
     <>
       <I18nProvider>
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSearchbarProgress />
-          ) : (
-            <>
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSearchbarProgress />
+        ) : (
+          <>
             <WzSearchBar
               appName='nist-searchbar'
               {...searchBarProps}
@@ -103,42 +103,42 @@ const DashboardNIST80053Component: React.FC = () => {
               showQueryInput={true}
               showQueryBar={true}
             />
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
-          <div
-            className={
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }
-          >
-            <SampleDataWarning />
-            <div className='nist-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    AlertsRepository.getStoreIndexPatternId(),
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'nist-dashboard-tab',
-                  timeRange: absoluteDateRange,
-                  title: 'NIST 800-53 dashboard',
-                  description: 'Dashboard of the NIST 800-53',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
+            {dataSource && results?.hits?.total === 0 ? (
+              <DiscoverNoResults />
+            ) : null}
+            <div
+              className={
+                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }
+            >
+              <SampleDataWarning />
+              <div className='nist-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      AlertsRepository.getStoreIndexPatternId(),
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'nist-dashboard-tab',
+                    timeRange: absoluteDateRange,
+                    title: 'NIST 800-53 dashboard',
+                    description: 'Dashboard of the NIST 800-53',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </>
-          )}
+          </>
+        )}
       </I18nProvider>
     </>
   );

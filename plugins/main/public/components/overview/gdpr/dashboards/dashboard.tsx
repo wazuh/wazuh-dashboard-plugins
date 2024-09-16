@@ -91,10 +91,10 @@ const DashboardGDPRComponent: React.FC = () => {
   return (
     <>
       <I18nProvider>
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSearchbarProgress />
-          ) : (
-            <>
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSearchbarProgress />
+        ) : (
+          <>
             <WzSearchBar
               appName='gdpr-searchbar'
               {...searchBarProps}
@@ -103,42 +103,42 @@ const DashboardGDPRComponent: React.FC = () => {
               showQueryInput={true}
               showQueryBar={true}
             />
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
-          <div
-            className={
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }
-          >
-            <SampleDataWarning />
-            <div className='gdpr-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    AlertsRepository.getStoreIndexPatternId(),
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'gdpr-dashboard-tab',
-                  timeRange: absoluteDateRange,
-                  title: 'GDPR dashboard',
-                  description: 'Dashboard of the GDPR',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
+            {dataSource && results?.hits?.total === 0 ? (
+              <DiscoverNoResults />
+            ) : null}
+            <div
+              className={
+                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }
+            >
+              <SampleDataWarning />
+              <div className='gdpr-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      AlertsRepository.getStoreIndexPatternId(),
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'gdpr-dashboard-tab',
+                    timeRange: absoluteDateRange,
+                    title: 'GDPR dashboard',
+                    description: 'Dashboard of the GDPR',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </>
-          )}
+          </>
+        )}
       </I18nProvider>
     </>
   );

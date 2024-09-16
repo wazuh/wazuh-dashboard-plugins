@@ -90,54 +90,54 @@ const DashboardDockerComponent: React.FC = ({}) => {
   return (
     <>
       <I18nProvider>
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSearchbarProgress />
-          ) : (
-            <>
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSearchbarProgress />
+        ) : (
+          <>
             <WzSearchBar
-            appName='docker-searchbar'
-            {...searchBarProps}
-            fixedFilters={fixedFilters}
-            showDatePicker={true}
+              appName='docker-searchbar'
+              {...searchBarProps}
+              fixedFilters={fixedFilters}
+              showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
             />
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
-          <div
-            className={
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }
-          >
-            <SampleDataWarning />
-            <div className='docker-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    AlertsRepository.getStoreIndexPatternId(),
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'docker-dashboard-tab',
-                  timeRange: absoluteDateRange,
-                  title: 'Docker dashboard',
-                  description: 'Dashboard of Docker',
-                  query: query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
+            {dataSource && results?.hits?.total === 0 ? (
+              <DiscoverNoResults />
+            ) : null}
+            <div
+              className={
+                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }
+            >
+              <SampleDataWarning />
+              <div className='docker-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      AlertsRepository.getStoreIndexPatternId(),
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'docker-dashboard-tab',
+                    timeRange: absoluteDateRange,
+                    title: 'Docker dashboard',
+                    description: 'Dashboard of Docker',
+                    query: query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </>
-          )}
+          </>
+        )}
       </I18nProvider>
     </>
   );

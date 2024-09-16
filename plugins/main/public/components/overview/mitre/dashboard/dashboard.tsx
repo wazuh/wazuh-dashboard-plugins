@@ -88,10 +88,10 @@ export const DashboardMITRE: React.FC = () => {
   return (
     <>
       <I18nProvider>
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSearchbarProgress />
-          ) : (
-            <>
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSearchbarProgress />
+        ) : (
+          <>
             <WzSearchBar
               appName='mitre-detector-searchbar'
               {...searchBarProps}
@@ -100,42 +100,42 @@ export const DashboardMITRE: React.FC = () => {
               showQueryBar={true}
               showSaveQuery={true}
             />
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
-          <div
-            className={`mitre-dashboard-responsive ${
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }`}
-          >
-            <SampleDataWarning />
-            <div className='mitre-dashboard-filters-wrapper'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    AlertsRepository.getStoreIndexPatternId(),
-                    Boolean(dataSource?.getPinnedAgentFilter().length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'mitre-dashboard-tab-filters',
-                  timeRange: absoluteDateRange,
-                  title: 'MITRE dashboard filters',
-                  description: 'Dashboard of the MITRE filters',
-                  query: query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
+            {dataSource && results?.hits?.total === 0 ? (
+              <DiscoverNoResults />
+            ) : null}
+            <div
+              className={`mitre-dashboard-responsive ${
+                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }`}
+            >
+              <SampleDataWarning />
+              <div className='mitre-dashboard-filters-wrapper'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      AlertsRepository.getStoreIndexPatternId(),
+                      Boolean(dataSource?.getPinnedAgentFilter().length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'mitre-dashboard-tab-filters',
+                    timeRange: absoluteDateRange,
+                    title: 'MITRE dashboard filters',
+                    description: 'Dashboard of the MITRE filters',
+                    query: query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </>
-          )}
+          </>
+        )}
       </I18nProvider>
     </>
   );

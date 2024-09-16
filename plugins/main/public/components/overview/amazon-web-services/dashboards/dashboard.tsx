@@ -89,53 +89,53 @@ const DashboardAWSComponents: React.FC = ({}) => {
   return (
     <>
       <I18nProvider>
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSearchbarProgress />
-          ) : (
-            <>
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSearchbarProgress />
+        ) : (
+          <>
             <WzSearchBar
               appName='aws-searchbar'
               {...searchBarProps}
               fixedFilters={fixedFilters}
             />
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
-          <div
-            className={
-              !isDataSourceLoading && dataSource && results?.hits?.total > 0
-                ? ''
-                : 'wz-no-display'
-            }
-          >
-            <SampleDataWarning />
-            <div className='aws-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    AlertsRepository.getStoreIndexPatternId(),
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters || [],
-                  useMargins: true,
-                  id: 'aws-dashboard-tab',
-                  timeRange: absoluteDateRange,
-                  title: 'AWS dashboard',
-                  description: 'Dashboard of the AWS',
-                  query: query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
+            {dataSource && results?.hits?.total === 0 ? (
+              <DiscoverNoResults />
+            ) : null}
+            <div
+              className={
+                !isDataSourceLoading && dataSource && results?.hits?.total > 0
+                  ? ''
+                  : 'wz-no-display'
+              }
+            >
+              <SampleDataWarning />
+              <div className='aws-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      AlertsRepository.getStoreIndexPatternId(),
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters || [],
+                    useMargins: true,
+                    id: 'aws-dashboard-tab',
+                    timeRange: absoluteDateRange,
+                    title: 'AWS dashboard',
+                    description: 'Dashboard of the AWS',
+                    query: query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
             </div>
-          </div>
           </>
-          )}
+        )}
       </I18nProvider>
     </>
   );
