@@ -13,6 +13,7 @@ import { FILTER_OPERATOR } from '../data-source/pattern/pattern-data-source-filt
 export const filterIsAction = (
   indexPattern: IndexPattern,
   rows: any[],
+  pageSize: number,
   onFilter: (
     columndId: string,
     value: any,
@@ -33,7 +34,7 @@ export const filterIsAction = (
     });
 
     const handleClick = () => {
-      const row = rows[rowIndex];
+      const row = rows[rowIndex % pageSize];
       const flattened = indexPattern.flattenHit(row);
 
       if (flattened) {
@@ -58,6 +59,7 @@ export const filterIsNotAction =
   (
     indexPattern: IndexPattern,
     rows: any[],
+    pageSize: number,
     onFilter: (
       columndId: string,
       value: any,
@@ -74,7 +76,7 @@ export const filterIsNotAction =
     });
 
     const handleClick = () => {
-      const row = rows[rowIndex];
+      const row = rows[rowIndex % pageSize];
       const flattened = indexPattern.flattenHit(row);
 
       if (flattened) {
@@ -99,6 +101,7 @@ export function cellFilterActions(
   field: IFieldType,
   indexPattern: IndexPattern,
   rows: any[],
+  pageSize: number,
   onFilter: (
     columndId: string,
     value: any,
@@ -108,7 +111,7 @@ export function cellFilterActions(
   if (!field.filterable) return;
 
   return [
-    filterIsAction(indexPattern, rows, onFilter),
-    filterIsNotAction(indexPattern, rows, onFilter),
+    filterIsAction(indexPattern, rows, pageSize, onFilter),
+    filterIsNotAction(indexPattern, rows, pageSize, onFilter),
   ] as EuiDataGridColumn['cellActions'];
 }

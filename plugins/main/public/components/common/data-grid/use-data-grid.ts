@@ -189,6 +189,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       columns,
       indexPattern,
       rows,
+      pagination.pageSize,
       filters,
       setFilters,
     );

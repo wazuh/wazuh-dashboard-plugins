@@ -211,6 +211,7 @@ const mapToDataGridColumn = (
   field: IFieldType,
   indexPattern: IndexPattern,
   rows: any[],
+  pageSize: number,
   filters: Filter[],
   setFilters: (filters: Filter[]) => void,
   defaultColumns: tDataGridColumn[],
@@ -227,6 +228,7 @@ const mapToDataGridColumn = (
       field,
       indexPattern,
       rows,
+      pageSize,
       onFilterCellActions(indexPattern.id as string, filters, setFilters),
     ),
   } as tDataGridColumn;
@@ -237,6 +239,7 @@ export const parseColumns = (
   defaultColumns: tDataGridColumn[] = [],
   indexPattern: IndexPattern,
   rows: any[],
+  pageSize: number,
   filters: Filter[],
   setFilters: (filters: Filter[]) => void,
 ): tDataGridColumn[] => {
@@ -251,6 +254,7 @@ export const parseColumns = (
         field,
         indexPattern,
         rows,
+        pageSize,
         filters,
         setFilters,
         defaultColumns,
