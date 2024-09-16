@@ -17,12 +17,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed of the font size in the table used in the events tab, in the Threat hunting dashboard tab and in the Vulnerabilities inventory tab [#6987](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6987)
 - Fixed missing link to Vulnerabilities detection and Office 365 in the agent menu of `Endpoints Summary` [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
 - Fixed missing options depending on agent operating system in the agent configuration report [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
+- Fixed an style that affected the Discover plugin [#6989](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6989)
 
 ### Changed
 
 - Change the text of the query limit tooltip [#6981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6981)
 - Upgraded the `axios` dependency to `1.7.4` [#6919](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6919)
 - Improved MITRE ATT&CK intelligence flyout details readability [#6954](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6954)
+- Upgraded Event-tab column selector showing first the picked columns [#6984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6984)
 - Changed vulnerabilities.reference to links in Vulnerability Detection > Inventory columns [#6960](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6960)
 - Upgraded the `follow-redirects` dependency to `1.15.6` [#6982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6982)
 
