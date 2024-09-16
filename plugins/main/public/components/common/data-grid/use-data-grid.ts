@@ -64,16 +64,13 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     indexPattern,
     DocViewInspectButton,
     results,
-    defaultColumns,
+    defaultColumns: columns,
     renderColumns,
     useDefaultPagination = false,
     pagination: paginationProps = {},
     filters = [],
     setFilters = () => {},
   } = props;
-  /** Columns **/
-  const [columns /* , setColumns */] =
-    useState<tDataGridColumn[]>(defaultColumns);
   const [columnVisibility, setVisibility] = useState(() =>
     columns.map(({ id }) => id),
   );
@@ -189,7 +186,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   const filterColumns = () => {
     const allColumns = parseColumns(
       indexPattern?.fields || [],
-      defaultColumns,
+      columns,
       indexPattern,
       rows,
       filters,
@@ -224,10 +221,8 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   return {
     'aria-labelledby': props.ariaLabelledBy,
     columns: filterColumns(),
-    columns: filterColumns(),
     columnVisibility: {
-      visibleColumns: defaultColumnsPosition(columnVisibility, defaultColumns),
-      visibleColumns: defaultColumnsPosition(columnVisibility, defaultColumns),
+      visibleColumns: defaultColumnsPosition(columnVisibility, columns),
       setVisibleColumns: setVisibility,
     },
     renderCellValue: renderCellValue,
