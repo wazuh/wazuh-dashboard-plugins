@@ -90,19 +90,18 @@ const DashboardDockerComponent: React.FC = ({}) => {
   return (
     <>
       <I18nProvider>
-        <>
           {isDataSourceLoading && !dataSource ? (
             <LoadingSearchbarProgress />
           ) : (
+            <>
             <WzSearchBar
-              appName='docker-searchbar'
-              {...searchBarProps}
-              fixedFilters={fixedFilters}
-              showDatePicker={true}
+            appName='docker-searchbar'
+            {...searchBarProps}
+            fixedFilters={fixedFilters}
+            showDatePicker={true}
               showQueryInput={true}
               showQueryBar={true}
             />
-          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -138,6 +137,7 @@ const DashboardDockerComponent: React.FC = ({}) => {
             </div>
           </div>
         </>
+          )}
       </I18nProvider>
     </>
   );

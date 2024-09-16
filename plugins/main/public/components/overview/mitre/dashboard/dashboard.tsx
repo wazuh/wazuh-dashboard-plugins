@@ -88,10 +88,10 @@ export const DashboardMITRE: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <>
           {isDataSourceLoading && !dataSource ? (
             <LoadingSearchbarProgress />
           ) : (
+            <>
             <WzSearchBar
               appName='mitre-detector-searchbar'
               {...searchBarProps}
@@ -100,7 +100,6 @@ export const DashboardMITRE: React.FC = () => {
               showQueryBar={true}
               showSaveQuery={true}
             />
-          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -136,6 +135,7 @@ export const DashboardMITRE: React.FC = () => {
             </div>
           </div>
         </>
+          )}
       </I18nProvider>
     </>
   );

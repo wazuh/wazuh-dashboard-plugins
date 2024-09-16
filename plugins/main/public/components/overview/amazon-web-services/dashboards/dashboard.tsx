@@ -89,16 +89,15 @@ const DashboardAWSComponents: React.FC = ({}) => {
   return (
     <>
       <I18nProvider>
-        <>
           {isDataSourceLoading && !dataSource ? (
             <LoadingSearchbarProgress />
           ) : (
+            <>
             <WzSearchBar
               appName='aws-searchbar'
               {...searchBarProps}
               fixedFilters={fixedFilters}
             />
-          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -135,7 +134,8 @@ const DashboardAWSComponents: React.FC = ({}) => {
               />
             </div>
           </div>
-        </>
+          </>
+          )}
       </I18nProvider>
     </>
   );

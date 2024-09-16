@@ -91,10 +91,10 @@ const DashboardNIST80053Component: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <>
           {isDataSourceLoading && !dataSource ? (
             <LoadingSearchbarProgress />
           ) : (
+            <>
             <WzSearchBar
               appName='nist-searchbar'
               {...searchBarProps}
@@ -103,7 +103,6 @@ const DashboardNIST80053Component: React.FC = () => {
               showQueryInput={true}
               showQueryBar={true}
             />
-          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -139,6 +138,7 @@ const DashboardNIST80053Component: React.FC = () => {
             </div>
           </div>
         </>
+          )}
       </I18nProvider>
     </>
   );

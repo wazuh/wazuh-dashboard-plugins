@@ -91,10 +91,10 @@ const DashboardGDPRComponent: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <>
           {isDataSourceLoading && !dataSource ? (
             <LoadingSearchbarProgress />
           ) : (
+            <>
             <WzSearchBar
               appName='gdpr-searchbar'
               {...searchBarProps}
@@ -103,7 +103,6 @@ const DashboardGDPRComponent: React.FC = () => {
               showQueryInput={true}
               showQueryBar={true}
             />
-          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -139,6 +138,7 @@ const DashboardGDPRComponent: React.FC = () => {
             </div>
           </div>
         </>
+          )}
       </I18nProvider>
     </>
   );

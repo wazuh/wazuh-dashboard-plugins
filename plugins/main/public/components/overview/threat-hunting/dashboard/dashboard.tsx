@@ -207,10 +207,10 @@ const DashboardTH: React.FC = () => {
 
   return (
     <I18nProvider>
-      <>
         {isDataSourceLoading && !dataSource ? (
           <LoadingSearchbarProgress />
         ) : (
+      <>
           <WzSearchBar
             appName='th-searchbar'
             {...searchBarProps}
@@ -220,7 +220,6 @@ const DashboardTH: React.FC = () => {
             showQueryBar={true}
             showSaveQuery={true}
           />
-        )}
         {!isDataSourceLoading && dataSource && results?.hits?.total === 0 ? (
           <DiscoverNoResults />
         ) : null}
@@ -321,6 +320,7 @@ const DashboardTH: React.FC = () => {
           </div>
         </div>
       </>
+        )}
     </I18nProvider>
   );
 };

@@ -91,10 +91,10 @@ const DashboardGitHubComponent: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <>
           {isDataSourceLoading && !dataSource ? (
             <LoadingSearchbarProgress />
           ) : (
+            <>
             <WzSearchBar
               appName='github-searchbar'
               {...searchBarProps}
@@ -103,7 +103,6 @@ const DashboardGitHubComponent: React.FC = () => {
               showQueryInput={true}
               showQueryBar={true}
             />
-          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -139,6 +138,7 @@ const DashboardGitHubComponent: React.FC = () => {
             </div>
           ) : null}
         </>
+          )}
       </I18nProvider>
     </>
   );

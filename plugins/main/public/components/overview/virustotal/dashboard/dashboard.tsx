@@ -91,10 +91,10 @@ const DashboardVT: React.FC = () => {
 
   return (
     <I18nProvider>
-      <>
-        {isDataSourceLoading && !dataSource ? (
-          <LoadingSearchbarProgress />
-        ) : (
+      {isDataSourceLoading && !dataSource ? (
+        <LoadingSearchbarProgress />
+      ) : (
+        <>
           <WzSearchBar
             appName='virustotal-searchbar'
             {...searchBarProps}
@@ -104,63 +104,63 @@ const DashboardVT: React.FC = () => {
             showQueryBar={true}
             showSaveQuery={true}
           />
-        )}
-        {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
-          <SampleDataWarning />
-        ) : null}
-        {dataSource && results?.hits?.total === 0 ? (
-          <DiscoverNoResults />
-        ) : null}
-        <div
-          className={`virustotal-dashboard-responsive ${
-            !isDataSourceLoading && dataSource && results?.hits?.total > 0
-              ? ''
-              : 'wz-no-display'
-          }`}
-        >
-          <DashboardByRenderer
-            input={{
-              viewMode: ViewMode.VIEW,
-              panels: getKPIsPanel(AlertsRepository.getStoreIndexPatternId()),
-              isFullScreenMode: false,
-              filters: fetchFilters ?? [],
-              useMargins: true,
-              id: 'kpis-virustotal-dashboard-tab',
-              timeRange: absoluteDateRange,
-              title: 'KPIs Virustotal dashboard',
-              description: 'KPIs Dashboard of the Virustotal',
-              query: query,
-              refreshConfig: {
-                pause: false,
-                value: 15,
-              },
-              hidePanelTitles: true,
-            }}
-          />
-          <DashboardByRenderer
-            input={{
-              viewMode: ViewMode.VIEW,
-              panels: getDashboardPanels(
-                AlertsRepository.getStoreIndexPatternId(),
-                Boolean(dataSource?.getPinnedAgentFilter().length),
-              ),
-              isFullScreenMode: false,
-              filters: fetchFilters ?? [],
-              useMargins: true,
-              id: 'virustotal-dashboard-tab',
-              timeRange: absoluteDateRange,
-              title: 'Virustotal dashboard',
-              description: 'Dashboard of the Virustotal',
-              query: query,
-              refreshConfig: {
-                pause: false,
-                value: 15,
-              },
-              hidePanelTitles: false,
-            }}
-          />
-        </div>
-      </>
+          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
+            <SampleDataWarning />
+          ) : null}
+          {dataSource && results?.hits?.total === 0 ? (
+            <DiscoverNoResults />
+          ) : null}
+          <div
+            className={`virustotal-dashboard-responsive ${
+              !isDataSourceLoading && dataSource && results?.hits?.total > 0
+                ? ''
+                : 'wz-no-display'
+            }`}
+          >
+            <DashboardByRenderer
+              input={{
+                viewMode: ViewMode.VIEW,
+                panels: getKPIsPanel(AlertsRepository.getStoreIndexPatternId()),
+                isFullScreenMode: false,
+                filters: fetchFilters ?? [],
+                useMargins: true,
+                id: 'kpis-virustotal-dashboard-tab',
+                timeRange: absoluteDateRange,
+                title: 'KPIs Virustotal dashboard',
+                description: 'KPIs Dashboard of the Virustotal',
+                query: query,
+                refreshConfig: {
+                  pause: false,
+                  value: 15,
+                },
+                hidePanelTitles: true,
+              }}
+            />
+            <DashboardByRenderer
+              input={{
+                viewMode: ViewMode.VIEW,
+                panels: getDashboardPanels(
+                  AlertsRepository.getStoreIndexPatternId(),
+                  Boolean(dataSource?.getPinnedAgentFilter().length),
+                ),
+                isFullScreenMode: false,
+                filters: fetchFilters ?? [],
+                useMargins: true,
+                id: 'virustotal-dashboard-tab',
+                timeRange: absoluteDateRange,
+                title: 'Virustotal dashboard',
+                description: 'Dashboard of the Virustotal',
+                query: query,
+                refreshConfig: {
+                  pause: false,
+                  value: 15,
+                },
+                hidePanelTitles: false,
+              }}
+            />
+          </div>
+        </>
+      )}
     </I18nProvider>
   );
 };

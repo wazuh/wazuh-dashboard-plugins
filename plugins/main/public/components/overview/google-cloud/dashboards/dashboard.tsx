@@ -89,10 +89,10 @@ const DashboardGoogleCloudComponent: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <>
           {isDataSourceLoading && !dataSource ? (
             <LoadingSearchbarProgress />
           ) : (
+            <>
             <WzSearchBar
               appName='google-cloud-searchbar'
               {...searchBarProps}
@@ -102,7 +102,6 @@ const DashboardGoogleCloudComponent: React.FC = () => {
               showQueryBar={true}
               showSaveQuery={true}
             />
-          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -138,6 +137,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
             </div>
           </div>
         </>
+          )}
       </I18nProvider>
     </>
   );

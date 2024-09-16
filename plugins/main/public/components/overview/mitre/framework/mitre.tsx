@@ -147,6 +147,9 @@ const MitreComponent = props => {
 
   return (
     <I18nProvider>
+                {isDataSourceLoading && !dataSource ? (
+            <LoadingSearchbarProgress />
+          ) : (
       <>
         <EuiPanel
           paddingSize='none'
@@ -154,9 +157,6 @@ const MitreComponent = props => {
           hasBorder={false}
           color='transparent'
         >
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSearchbarProgress />
-          ) : (
             <WzSearchBar
               appName='mitre-attack-searchbar'
               {...searchBarProps}
@@ -165,7 +165,6 @@ const MitreComponent = props => {
               showQueryBar={true}
               showSaveQuery={true}
             />
-          )}
         </EuiPanel>
         <EuiPanel
           paddingSize='s'
@@ -208,6 +207,7 @@ const MitreComponent = props => {
           </EuiPanel>
         </EuiPanel>
       </>
+          )}
     </I18nProvider>
   );
 };

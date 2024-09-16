@@ -192,6 +192,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   return (
     <IntlProvider locale='en'>
+        {isDataSourceLoading ? (
+          <LoadingSearchbarProgress />
+        ) : (
       <EuiPageTemplate
         className='discoverContainer'
         restrictWidth='100%'
@@ -200,9 +203,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         paddingSize='none'
         pageContentProps={{ color: 'transparent' }}
       >
-        {isDataSourceLoading ? (
-          <LoadingSearchbarProgress />
-        ) : (
           <WzSearchBar
             appName='wazuh-discover-search-bar'
             {...searchBarProps}
@@ -211,7 +211,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             showQueryBar={true}
             showSaveQuery={true}
           />
-        )}
         {!isDataSourceLoading && results?.hits?.total === 0 ? (
           <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
         ) : null}
@@ -296,6 +295,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
           )}
         </div>
       </EuiPageTemplate>
+    )}
     </IntlProvider>
   );
 };

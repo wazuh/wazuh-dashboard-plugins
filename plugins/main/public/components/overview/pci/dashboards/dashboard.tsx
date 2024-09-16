@@ -92,10 +92,10 @@ const DashboardPCIDSSComponent: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <>
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSearchbarProgress />
-          ) : (
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSearchbarProgress />
+        ) : (
+          <>
             <WzSearchBar
               appName='pci-dss-searchbar'
               {...searchBarProps}
@@ -104,42 +104,42 @@ const DashboardPCIDSSComponent: React.FC = () => {
               showQueryInput={true}
               showQueryBar={true}
             />
-          )}
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
-          <div
-            className={
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }
-          >
-            <SampleDataWarning />
-            <div className='pci-dss-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    AlertsRepository.getStoreIndexPatternId(),
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'pci-dss-dashboard-tab',
-                  timeRange: absoluteDateRange,
-                  title: 'PCI DSS dashboard',
-                  description: 'Dashboard of the PCI DSS',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
+            {dataSource && results?.hits?.total === 0 ? (
+              <DiscoverNoResults />
+            ) : null}
+            <div
+              className={
+                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }
+            >
+              <SampleDataWarning />
+              <div className='pci-dss-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      AlertsRepository.getStoreIndexPatternId(),
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'pci-dss-dashboard-tab',
+                    timeRange: absoluteDateRange,
+                    title: 'PCI DSS dashboard',
+                    description: 'Dashboard of the PCI DSS',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </>
+          </>
+        )}
       </I18nProvider>
     </>
   );

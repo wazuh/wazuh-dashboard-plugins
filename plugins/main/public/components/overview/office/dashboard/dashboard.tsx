@@ -90,10 +90,10 @@ const DashboardOffice365Component: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <>
           {isDataSourceLoading && !dataSource ? (
             <LoadingSearchbarProgress />
           ) : (
+            <>
             <WzSearchBar
               appName='google-cloud-searchbar'
               {...searchBarProps}
@@ -103,7 +103,6 @@ const DashboardOffice365Component: React.FC = () => {
               showQueryBar={true}
               showSaveQuery={true}
             />
-          )}
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -156,6 +155,7 @@ const DashboardOffice365Component: React.FC = () => {
             />
           </div>
         </>
+          )}
       </I18nProvider>
     </>
   );

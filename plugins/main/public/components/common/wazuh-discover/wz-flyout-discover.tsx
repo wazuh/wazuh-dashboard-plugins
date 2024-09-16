@@ -268,18 +268,17 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   return (
     <IntlProvider locale='en'>
-      <EuiFlexGroup className='flyout-row'>
-        <EuiFlexItem>
-          {isDataSourceLoading ? (
+              {isDataSourceLoading ? (
             <LoadingSearchbarProgress />
           ) : (
+      <EuiFlexGroup className='flyout-row'>
+        <EuiFlexItem>
             <WzSearchBar
               appName='wazuh-discover-search-bar'
               {...searchBarProps}
               useDefaultBehaviors={false}
               hideFixedFilters
             />
-          )}
           {!isDataSourceLoading && results?.hits?.total === 0 && (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           )}
@@ -344,6 +343,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
           )}
         </EuiFlexItem>
       </EuiFlexGroup>
+          )}
     </IntlProvider>
   );
 };
