@@ -35,12 +35,14 @@ describe('cell-filter-actions', () => {
         [TEST_COLUMN_ID]: TEST_VALUE,
       }));
       const rows = [ROW];
+      const pageSize = 15;
 
       render(
         filterIsAction(
           // @ts-expect-error Argument of type '{ flattenHit: jest.Mock<any, any>; }' is not assignable to parameter of type 'IndexPattern'
           indexPattern,
           rows,
+          pageSize,
           onFilter,
         )({
           rowIndex: 0,
@@ -72,12 +74,14 @@ describe('cell-filter-actions', () => {
         [TEST_COLUMN_ID]: TEST_VALUE,
       }));
       const rows = [ROW];
+      const pageSize = 15;
 
       render(
         filterIsNotAction(
           // @ts-expect-error Argument of type '{ flattenHit: jest.Mock<any, any>; }' is not assignable to parameter of type 'IndexPattern'
           indexPattern,
           rows,
+          pageSize,
           onFilter,
         )({
           rowIndex: 0,
