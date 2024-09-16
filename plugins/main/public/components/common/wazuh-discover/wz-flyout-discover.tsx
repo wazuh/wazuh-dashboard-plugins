@@ -17,11 +17,7 @@ import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { tDataGridColumn } from '../data-grid';
-import {
-  ErrorHandler,
-  ErrorFactory,
-  HttpError,
-} from '../../../react-services/error-management';
+import { ErrorHandler, ErrorFactory, HttpError } from '../../../react-services/error-management';
 import useSearchBar, { tUseSearchBarProps } from '../search-bar/use-search-bar';
 import { withErrorBoundary } from '../hocs';
 import { useTimeFilter } from '../hooks';
@@ -72,12 +68,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   }
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
-  const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
-    undefined,
-  );
-  const timeField = indexPattern?.timeFieldName
-    ? indexPattern.timeFieldName
-    : undefined;
+  const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(undefined);
+  const timeField = indexPattern?.timeFieldName ? indexPattern.timeFieldName : undefined;
   // table states
   const [pagination, setPagination] = useState<
     Omit<EuiBasicTableProps<any>['pagination'], 'totalItemCount'>
@@ -88,9 +80,9 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [sorting, setSorting] = useState<EuiBasicTableProps<any>['sorting']>({
     sort: { field: timeField || '@timestamp', direction: 'desc' },
   });
-  const [itemIdToExpandedRowMap, setItemIdToExpandedRowMap] = useState<
-    Record<string, JSX.Element>
-  >({});
+  const [itemIdToExpandedRowMap, setItemIdToExpandedRowMap] = useState<Record<string, JSX.Element>>(
+    {}
+  );
 
   // use the global time filter to get the default date range
   const [query, setQuery] = useState<Query>({ query: '', language: 'kuery' });
@@ -131,9 +123,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       return [];
     }
     return {
-      columns: [
-        { id: sorting?.sort?.field, direction: sorting?.sort?.direction },
-      ],
+      columns: [{ id: sorting?.sort?.field, direction: sorting?.sort?.direction }],
     };
   }, [sorting]);
 
@@ -170,7 +160,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     JSON.stringify(absoluteDateRange),
   ]);
 
-  const toggleDetails = item => {
+  const toggleDetails = (item) => {
     if (!isExpanded) {
       setItemIdToExpandedRowMap({});
       return;
@@ -198,32 +188,28 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     setSorting({ sort: { field, direction: direction as Direction } });
   };
 
-  const onExpandRow = item => {
+  const onExpandRow = (item) => {
     toggleDetails(item);
   };
 
   const expanderColumn = {
     width: '40px',
     isExpander: true,
-    render: item => (
+    render: (item) => (
       <EuiButtonIcon
         onClick={() => onExpandRow(item)}
         aria-label={
-          itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])
-            ? 'Collapse'
-            : 'Expand'
+          itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME]) ? 'Collapse' : 'Expand'
         }
         iconType={
-          itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])
-            ? 'arrowDown'
-            : 'arrowRight'
+          itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME]) ? 'arrowDown' : 'arrowRight'
         }
       />
     ),
   };
 
   const getColumns = (): EuiBasicTableProps<any>['columns'] => {
-    const defaultCols = defaultTableColumns.map(column => {
+    const defaultCols = defaultTableColumns.map((column) => {
       return {
         field: column.id,
         name: column.displayAsText,
@@ -244,7 +230,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const getExpandedRow = (item: any) => {
     const doc = results?.hits?.hits?.find(
-      hit => hit[INDEX_FIELD_NAME] === item[INDEX_FIELD_NAME],
+      (hit) => hit[INDEX_FIELD_NAME] === item[INDEX_FIELD_NAME]
     );
 
     return expandedRowComponent ? (
@@ -260,21 +246,21 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const parsedItems = useMemo(() => {
     return (
-      results?.hits?.hits?.map(item => {
+      results?.hits?.hits?.map((item) => {
         return { [INDEX_FIELD_NAME]: item[INDEX_FIELD_NAME], ...item._source };
       }) || []
     );
   }, [results]);
 
   return (
-    <IntlProvider locale='en'>
+    <IntlProvider locale="en">
       {isDataSourceLoading ? (
         <LoadingSearchbarProgress />
       ) : (
-        <EuiFlexGroup className='flyout-row'>
+        <EuiFlexGroup className="flyout-row">
           <EuiFlexItem>
             <WzSearchBar
-              appName='wazuh-discover-search-bar'
+              appName="wazuh-discover-search-bar"
               {...searchBarProps}
               useDefaultBehaviors={false}
               hideFixedFilters
@@ -284,22 +270,16 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
             )}
             {!isDataSourceLoading && dataSource && results?.hits?.total > 0 && (
               <>
-                <EuiPanel
-                  color='subdued'
-                  borderRadius='none'
-                  hasShadow={false}
-                  paddingSize='s'
-                >
+                <EuiPanel color="subdued" borderRadius="none" hasShadow={false} paddingSize="s">
                   <HitsCounter
                     hits={results?.hits?.total}
                     showResetButton={false}
                     tooltip={
-                      results?.hits?.total &&
-                      results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                      results?.hits?.total && results?.hits?.total > MAX_ENTRIES_PER_QUERY
                         ? {
                             ariaLabel: 'Warning',
                             content: `The query results exceeded the limit of ${formatNumWithCommas(
-                              MAX_ENTRIES_PER_QUERY,
+                              MAX_ENTRIES_PER_QUERY
                             )} hits. Please refine your search.`,
                             iconType: 'alert',
                             position: 'top',
@@ -309,13 +289,13 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                   />
                   {absoluteDateRange ? (
                     <EuiFlexGroup
-                      gutterSize='s'
+                      gutterSize="s"
                       responsive={false}
-                      justifyContent='center'
-                      alignItems='center'
+                      justifyContent="center"
+                      alignItems="center"
                     >
                       <EuiFlexItem grow={false}>
-                        <EuiText size='s'>
+                        <EuiText size="s">
                           {formatUIDate(absoluteDateRange?.from)} -{' '}
                           {formatUIDate(absoluteDateRange?.to)}
                         </EuiText>
@@ -334,7 +314,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                     totalItemCount:
                       (results?.hits?.total ?? 0) > MAX_ENTRIES_PER_QUERY
                         ? MAX_ENTRIES_PER_QUERY
-                        : (results?.hits?.total ?? 0),
+                        : results?.hits?.total ?? 0,
                   }}
                   sorting={sorting}
                   onChange={onTableChange}
@@ -348,6 +328,4 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   );
 };
 
-export const WazuhFlyoutDiscover = withErrorBoundary(
-  WazuhFlyoutDiscoverComponent,
-);
+export const WazuhFlyoutDiscover = withErrorBoundary(WazuhFlyoutDiscoverComponent);
