@@ -17,6 +17,7 @@ import { HTTP_STATUS_CODES } from '../../common/constants';
 
 interface IAPIHost {
   id: string;
+  url: string;
   username: string;
   password: string;
   port: number;

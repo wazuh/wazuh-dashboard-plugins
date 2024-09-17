@@ -18,10 +18,12 @@ import { ManageHosts } from './manage-hosts';
 import { ISecurityFactory } from './security-factory';
 
 interface APIHost {
+  id: string;
   url: string;
-  port: string;
   username: string;
   password: string;
+  port: number;
+  run_as: boolean;
 }
 
 type RequestHTTPMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
@@ -64,6 +66,11 @@ export interface ServerAPIScopedUserClient {
   ) => Promise<AxiosResponse<any, any>>;
 }
 
+export interface ServerAPIAuthenticateOptions {
+  useRunAs: boolean;
+  authContext?: any;
+}
+
 /**
  * This service communicates with the Wazuh server APIs
  */
@@ -86,7 +93,8 @@ export class ServerAPIClient {
 
     // Create internal user client
     this.asInternalUser = {
-      authenticate: async apiHostID => await this._authenticate(apiHostID),
+      authenticate: async apiHostID =>
+        await this._authenticateInternalUser(apiHostID),
       request: async (
         method: RequestHTTPMethod,
         path: RequestPath,
@@ -158,9 +166,9 @@ export class ServerAPIClient {
    */
   private async _authenticate(
     apiHostID: string,
-    authContext?: any,
+    options: ServerAPIAuthenticateOptions,
   ): Promise<string> {
-    const api: APIHost = await this.manageHosts.get(apiHostID);
+    const api = (await this.manageHosts.get(apiHostID)) as APIHost;
     const optionsRequest = {
       method: 'POST',
       headers: {
@@ -171,16 +179,24 @@ export class ServerAPIClient {
         password: api.password,
       },
       url: `${api.url}:${api.port}/security/user/authenticate${
-        !!authContext ? '/run_as' : ''
+        options.useRunAs ? '/run_as' : ''
       }`,
-      ...(!!authContext ? { data: authContext } : {}),
+      ...(!!options?.authContext ? { data: options?.authContext } : {}),
     };
 
     const response: AxiosResponse = await this._axios(optionsRequest);
     const token: string = (((response || {}).data || {}).data || {}).token;
-    if (!authContext) {
-      this._CacheInternalUserAPIHostToken.set(apiHostID, token);
-    }
+    return token;
+  }
+
+  /**
+   * Get the authentication token for the internal user and cache it
+   * @param apiHostID Server API ID
+   * @returns
+   */
+  private async _authenticateInternalUser(apiHostID: string): Promise<string> {
+    const token = await this._authenticate(apiHostID, { useRunAs: false });
+    this._CacheInternalUserAPIHostToken.set(apiHostID, token);
     return token;
   }
 
@@ -192,13 +208,21 @@ export class ServerAPIClient {
    */
   asScoped(context: any, request: any): ServerAPIScopedUserClient {
     return {
-      authenticate: async (apiHostID: string) =>
-        await this._authenticate(
-          apiHostID,
-          (
-            await this.dashboardSecurity.getCurrentUser(request, context)
-          ).authContext,
-        ),
+      authenticate: async (apiHostID: string) => {
+        const useRunAs = this.manageHosts.isEnabledAuthWithRunAs(apiHostID);
+
+        const token = useRunAs
+          ? await this._authenticate(apiHostID, {
+              useRunAs: true,
+              authContext: (
+                await this.dashboardSecurity.getCurrentUser(request, context)
+              ).authContext,
+            })
+          : await this._authenticate(apiHostID, {
+              useRunAs: false,
+            });
+        return token;
+      },
       request: async (
         method: RequestHTTPMethod,
         path: string,
@@ -232,11 +256,13 @@ export class ServerAPIClient {
         this._CacheInternalUserAPIHostToken.has(options.apiHostID) &&
         !options.forceRefresh
           ? this._CacheInternalUserAPIHostToken.get(options.apiHostID)
-          : await this._authenticate(options.apiHostID);
+          : await this._authenticateInternalUser(options.apiHostID);
       return await this._request(method, path, data, { ...options, token });
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        const token: string = await this._authenticate(options.apiHostID);
+        const token: string = await this._authenticateInternalUser(
+          options.apiHostID,
+        );
         return await this._request(method, path, data, { ...options, token });
       }
       throw error;
