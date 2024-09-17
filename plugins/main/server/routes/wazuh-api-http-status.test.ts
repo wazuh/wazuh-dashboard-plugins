@@ -37,6 +37,7 @@ const context = {
       cacheAPIUserAllowRunAs: {
         set: jest.fn(),
         API_USER_STATUS_RUN_AS: {
+          UNABLE_TO_CHECK: -1,
           ALL_DISABLED: 0,
           USER_NOT_ALLOWED: 1,
           HOST_DISABLED: 2,

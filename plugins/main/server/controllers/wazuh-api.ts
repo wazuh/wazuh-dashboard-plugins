@@ -162,94 +162,31 @@ export class WazuhApiCtrl {
       }
 
       // If we have a valid response from the Wazuh API
-      if (
-        responseManagerInfo.status === HTTP_STATUS_CODES.OK &&
-        responseManagerInfo.data
-      ) {
-        // Clear and update cluster information before being sent back to frontend
-        delete api.cluster_info;
-        const responseAgents =
-          await context.wazuh.api.client.asInternalUser.request(
-            'GET',
-            `/agents`,
-            { params: { agents_list: '000' } },
-            { apiHostID: id },
+      try {
+        const { status, manager, node, cluster } =
+          await context.wazuh_core.manageHosts.getRegistryDataByHost(
+            apiHostData,
+            {
+              throwError: true,
+            },
           );
 
-        if (responseAgents.status === HTTP_STATUS_CODES.OK) {
-          const managerName =
-            responseAgents.data.data.affected_items[0].manager;
+        api.cluster_info = { status, manager, node, cluster };
 
-          const responseClusterStatus =
-            await context.wazuh.api.client.asInternalUser.request(
-              'GET',
-              `/cluster/status`,
-              {},
-              { apiHostID: id },
-            );
-          if (responseClusterStatus.status === HTTP_STATUS_CODES.OK) {
-            if (responseClusterStatus.data.data.enabled === 'yes') {
-              const responseClusterLocalInfo =
-                await context.wazuh.api.client.asInternalUser.request(
-                  'GET',
-                  `/cluster/local/info`,
-                  {},
-                  { apiHostID: id },
-                );
-              if (responseClusterLocalInfo.status === HTTP_STATUS_CODES.OK) {
-                const clusterEnabled =
-                  responseClusterStatus.data.data.enabled === 'yes';
-                api.cluster_info = {
-                  status: clusterEnabled ? 'enabled' : 'disabled',
-                  manager: managerName,
-                  node: responseClusterLocalInfo.data.data.affected_items[0]
-                    .node,
-                  cluster: clusterEnabled
-                    ? responseClusterLocalInfo.data.data.affected_items[0]
-                        .cluster
-                    : 'Disabled',
-                };
-              }
-            } else {
-              // Cluster mode is not active
-              api.cluster_info = {
-                status: 'disabled',
-                manager: managerName,
-                cluster: 'Disabled',
-              };
-            }
-          } else {
-            // Cluster mode is not active
-            api.cluster_info = {
-              status: 'disabled',
-              manager: managerName,
-              cluster: 'Disabled',
-            };
-          }
-
-          if (api.cluster_info) {
-            // Update cluster information in the wazuh-registry.json
-            await context.wazuh_core.manageHosts.updateRegistryByHost(
-              id,
-              api.cluster_info,
-            );
-
-            return response.ok({
-              body: {
-                statusCode: HTTP_STATUS_CODES.OK,
-                data: api,
-                idChanged: request.body.idChanged || null,
-              },
-            });
-          }
-        }
+        return response.ok({
+          body: {
+            statusCode: HTTP_STATUS_CODES.OK,
+            data: api,
+            idChanged: request.body.idChanged || null,
+          },
+        });
+      } catch (error) {
+        // If we have an invalid response from the Wazuh API
+        throw new Error(
+          responseManagerInfo.data.detail ||
+            `${api.url}:${api.port} is unreachable`,
+        );
       }
-
-      // If we have an invalid response from the Wazuh API
-      throw new Error(
-        responseManagerInfo.data.detail ||
-          `${api.url}:${api.port} is unreachable`,
-      );
     } catch (error) {
       if (error.code === 'EPROTO') {
         return response.ok({
