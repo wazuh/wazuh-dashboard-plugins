@@ -47,13 +47,12 @@ export const GitHubPanel = withErrorBoundary(() => {
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
-    filterManager
+    filterManager,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: GitHubDataSource,
     repository: new AlertsDataSourceRepository(),
-    fetchFilters: [...selectedPanelFilter]
+    fetchFilters: [...selectedPanelFilter],
   });
-
 
   const { searchBarProps } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
@@ -68,43 +67,48 @@ export const GitHubPanel = withErrorBoundary(() => {
     const { field, value } = selectedFilter;
     const controlledByFilter = 'github-panel-row-filter';
     if (value) {
-      const filter = filterManager?.createFilter(FILTER_OPERATOR.IS_ONE_OF, field, [value], controlledByFilter);
+      const filter = filterManager?.createFilter(
+        FILTER_OPERATOR.IS_ONE_OF,
+        field,
+        [value],
+        controlledByFilter,
+      );
       setSelectedPanelFilter([filter]);
     } else {
       setSelectedPanelFilter([]);
     }
     setCurrentSelectedFilter(selectedFilter);
-  }
+  };
 
   return (
     <>
       {isDataSourceLoading ? (
         <LoadingSearchbarProgress />
       ) : (
-          <>
-            <CustomSearchBar
-              filterInputs={filtersValues}
-              filterDrillDownValue={drillDownValue}
-              fixedFilters={[...fixedFilters, ...selectedPanelFilter]}
-              searchBarProps={{ ...searchBarProps }}
-              setFilters={setFilters}
-              indexPattern={dataSource?.indexPattern}
-            />
-            <MainPanel
-              moduleConfig={ModuleConfig}
-              filterDrillDownValue={filterDrillDownValue}
-              sidePanelChildren={<ModuleConfiguration />}
-              onChangeView={handleChangeView}
-              dataSourceProps={{
-                fetchData: fetchData,
-                fetchFilters: [...fetchFilters, ...selectedPanelFilter],
-                searchBarProps,
-                indexPattern: dataSource?.indexPattern,
-              }}
-              isLoading={isDataSourceLoading}
-            />
-          </>
-        )}
+        <>
+          <CustomSearchBar
+            filterInputs={filtersValues}
+            filterDrillDownValue={drillDownValue}
+            fixedFilters={[...fixedFilters, ...selectedPanelFilter]}
+            searchBarProps={{ ...searchBarProps }}
+            setFilters={setFilters}
+            indexPattern={dataSource?.indexPattern}
+          />
+          <MainPanel
+            moduleConfig={ModuleConfig}
+            filterDrillDownValue={filterDrillDownValue}
+            sidePanelChildren={<ModuleConfiguration />}
+            onChangeView={handleChangeView}
+            dataSourceProps={{
+              fetchData: fetchData,
+              fetchFilters: [...fetchFilters, ...selectedPanelFilter],
+              searchBarProps,
+              indexPattern: dataSource?.indexPattern,
+            }}
+            isLoading={isDataSourceLoading}
+          />
+        </>
+      )}
     </>
   );
 });
