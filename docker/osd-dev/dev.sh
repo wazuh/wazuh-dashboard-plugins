@@ -133,7 +133,7 @@ up)
    docker compose --profile $profile -f dev.yml up -Vd
 
    # Display a command to deploy an agent when using the real server
-   if [[ "$5" =~ "server" ]]; then
+   if [[ "$3" =~ "server" ]]; then
      echo
      echo "**************WARNING**************"
      echo "The agent version must be a published one. This uses only released versions."
