@@ -47,7 +47,7 @@ function buildComplianceObject({ section }) {
     let selectedRequirements = {}; // all enabled by default
     if (section === 'pci') {
       descriptions = pciRequirementsFile;
-      Object.keys(pciRequirementsFile).forEach(item => {
+      Object.keys(pciRequirementsFile).forEach((item) => {
         const currentRequirement = item.split('.')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
@@ -60,7 +60,7 @@ function buildComplianceObject({ section }) {
     }
     if (section === 'gdpr') {
       descriptions = gdprRequirementsFile;
-      Object.keys(gdprRequirementsFile).forEach(item => {
+      Object.keys(gdprRequirementsFile).forEach((item) => {
         const currentRequirement = item.split('_')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
@@ -74,13 +74,9 @@ function buildComplianceObject({ section }) {
 
     if (section === 'hipaa') {
       descriptions = hipaaRequirementsFile;
-      Object.keys(hipaaRequirementsFile).forEach(item => {
+      Object.keys(hipaaRequirementsFile).forEach((item) => {
         const currentRequirement =
-          item.split('.')[0] +
-          '.' +
-          item.split('.')[1] +
-          '.' +
-          item.split('.')[2];
+          item.split('.')[0] + '.' + item.split('.')[1] + '.' + item.split('.')[2];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
@@ -93,7 +89,7 @@ function buildComplianceObject({ section }) {
 
     if (section === 'nist') {
       descriptions = nistRequirementsFile;
-      Object.keys(nistRequirementsFile).forEach(item => {
+      Object.keys(nistRequirementsFile).forEach((item) => {
         const currentRequirement = item.split('.')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
@@ -106,7 +102,7 @@ function buildComplianceObject({ section }) {
     }
     if (section === 'tsc') {
       descriptions = tscRequirementsFile;
-      Object.keys(tscRequirementsFile).forEach(item => {
+      Object.keys(tscRequirementsFile).forEach((item) => {
         const currentRequirement = item.split('.')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
@@ -140,7 +136,7 @@ function buildComplianceObject({ section }) {
   }
 }
 
-export const ComplianceTable = withAgentSupportModule(props => {
+export const ComplianceTable = withAgentSupportModule((props) => {
   const { DataSource, ...rest } = props;
 
   const {
@@ -169,10 +165,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     selectedRequirements: {},
   });
 
-  const getRegulatoryComplianceRequirementFilter = (
-    key: string,
-    value: string,
-  ) => {
+  const getRegulatoryComplianceRequirementFilter = (key: string, value: string) => {
     if (!value) return [];
     return [
       {
@@ -188,8 +181,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
             query: value,
             type: 'phrase',
           },
-          controlledBy:
-            DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
+          controlledBy: DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
         },
         query: {
           match: {
@@ -206,12 +198,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     ];
   };
 
-  const getRequirementsCount = async ({
-    section,
-    query,
-    fetchData,
-    dateRange,
-  }) => {
+  const getRequirementsCount = async ({ section, query, fetchData, dateRange }) => {
     try {
       const mapFieldAgg = {
         pci: 'rule.pci_dss',
@@ -261,8 +248,9 @@ export const ComplianceTable = withAgentSupportModule(props => {
   ]);
 
   useEffect(() => {
-    const { descriptions, complianceObject, selectedRequirements } =
-      buildComplianceObject({ section: props.section });
+    const { descriptions, complianceObject, selectedRequirements } = buildComplianceObject({
+      section: props.section,
+    });
     setComplianceData({ descriptions, complianceObject, selectedRequirements });
   }, []);
 
@@ -284,18 +272,13 @@ export const ComplianceTable = withAgentSupportModule(props => {
 
   return (
     <I18nProvider>
-      <>
-        <EuiPanel
-          paddingSize='none'
-          hasShadow={false}
-          hasBorder={false}
-          color='transparent'
-        >
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSearchbarProgress />
-          ) : (
+      {isDataSourceLoading && !dataSource ? (
+        <LoadingSearchbarProgress />
+      ) : (
+        <>
+          <EuiPanel paddingSize="none" hasShadow={false} hasBorder={false} color="transparent">
             <WzSearchBar
-              appName='compliance-controls'
+              appName="compliance-controls"
               {...searchBarProps}
               fixedFilters={fixedFilters}
               showDatePicker={true}
@@ -303,63 +286,56 @@ export const ComplianceTable = withAgentSupportModule(props => {
               showQueryBar={true}
               showSaveQuery={true}
             />
-          )}
-        </EuiPanel>
-        <EuiPanel
-          paddingSize='s'
-          hasShadow={false}
-          hasBorder={false}
-          color='transparent'
-        >
-          <EuiPanel paddingSize='none'>
-            <EuiFlexGroup paddingSize='none'>
-              <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
-                {!!Object.keys(complianceData.complianceObject).length && (
-                  <EuiFlexGroup>
-                    <EuiFlexItem
-                      grow={false}
-                      style={{
-                        width: '15%',
-                        minWidth: 145,
-                        maxHeight: 'calc(100vh - 320px)',
-                        overflowX: 'hidden',
-                      }}
-                    >
-                      <ComplianceRequirements
-                        section={props.section}
-                        onChangeSelectedRequirements={selectedRequirements =>
-                          setComplianceData(state => ({
-                            ...state,
-                            selectedRequirements,
-                          }))
-                        }
-                        requirementsCount={action.data || []}
-                        loadingAlerts={action.running}
-                        {...complianceData}
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem style={{ width: '15%' }}>
-                      <ComplianceSubrequirements
-                        section={props.section}
-                        onSelectedTabChanged={id =>
-                          props.onSelectedTabChanged(id)
-                        }
-                        requirementsCount={action.data || []}
-                        loadingAlerts={action.running}
-                        fetchFilters={fetchFilters}
-                        getRegulatoryComplianceRequirementFilter={
-                          getRegulatoryComplianceRequirementFilter
-                        }
-                        {...complianceData}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )}
-              </EuiFlexItem>
-            </EuiFlexGroup>
           </EuiPanel>
-        </EuiPanel>
-      </>
+          <EuiPanel paddingSize="s" hasShadow={false} hasBorder={false} color="transparent">
+            <EuiPanel paddingSize="none">
+              <EuiFlexGroup paddingSize="none">
+                <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
+                  {!!Object.keys(complianceData.complianceObject).length && (
+                    <EuiFlexGroup>
+                      <EuiFlexItem
+                        grow={false}
+                        style={{
+                          width: '15%',
+                          minWidth: 145,
+                          maxHeight: 'calc(100vh - 320px)',
+                          overflowX: 'hidden',
+                        }}
+                      >
+                        <ComplianceRequirements
+                          section={props.section}
+                          onChangeSelectedRequirements={(selectedRequirements) =>
+                            setComplianceData((state) => ({
+                              ...state,
+                              selectedRequirements,
+                            }))
+                          }
+                          requirementsCount={action.data || []}
+                          loadingAlerts={action.running}
+                          {...complianceData}
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem style={{ width: '15%' }}>
+                        <ComplianceSubrequirements
+                          section={props.section}
+                          onSelectedTabChanged={(id) => props.onSelectedTabChanged(id)}
+                          requirementsCount={action.data || []}
+                          loadingAlerts={action.running}
+                          fetchFilters={fetchFilters}
+                          getRegulatoryComplianceRequirementFilter={
+                            getRegulatoryComplianceRequirementFilter
+                          }
+                          {...complianceData}
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  )}
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPanel>
+          </EuiPanel>
+        </>
+      )}
     </I18nProvider>
   );
 });
