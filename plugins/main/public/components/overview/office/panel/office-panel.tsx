@@ -16,7 +16,7 @@ import { MainPanel } from '../../../common/modules/panel';
 import { withErrorBoundary } from '../../../common/hocs';
 import { CustomSearchBar } from '../../../common/custom-search-bar';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { ModuleConfiguration } from './views';
 import { ModuleConfig, filtersValues } from './config';
 import {
@@ -79,7 +79,7 @@ export const OfficePanel = withErrorBoundary(() => {
   return (
     <>
       {isDataSourceLoading ? (
-        <LoadingSpinner />
+        <LoadingSearchbarProgress />
       ) : (
         <>
           <CustomSearchBar

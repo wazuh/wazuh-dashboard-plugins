@@ -35,7 +35,7 @@ import {
 } from '../../common/data-source';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import useSearchBar from '../../common/search-bar/use-search-bar';
-import { LoadingSpinner } from '../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
 import { WzSearchBar } from '../../common/search-bar';
@@ -292,7 +292,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
           color='transparent'
         >
           {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
+            <LoadingSearchbarProgress />
           ) : (
             <WzSearchBar
               appName='compliance-controls'
