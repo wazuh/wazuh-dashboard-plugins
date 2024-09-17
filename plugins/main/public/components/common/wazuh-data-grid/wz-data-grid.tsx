@@ -5,7 +5,6 @@ import {
   EuiButtonIcon,
   EuiDataGridCellValueElementProps,
   EuiDataGrid,
-  EuiButtonEmpty,
   EuiFlyout,
   EuiFlyoutHeader,
   EuiTitle,
@@ -17,6 +16,7 @@ import {
   exportSearchToCSV,
   tDataGridColumn,
   getAllCustomRenders,
+  PaginationOptions,
 } from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import {
@@ -44,11 +44,7 @@ export type tWazuhDataGridProps = {
   results: SearchResponse;
   defaultColumns: tDataGridColumn[];
   isLoading: boolean;
-  defaultPagination: {
-    pageIndex: number;
-    pageSize: number;
-    pageSizeOptions: number[];
-  };
+  defaultPagination: PaginationOptions;
   query: any;
   exportFilters: tFilter[];
   dateRange: TimeRange;
@@ -106,11 +102,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
-    pagination: defaultPagination || {
-      pageIndex: 0,
-      pageSize: 15,
-      pageSizeOptions: [15, 25, 50, 100],
-    },
+    useDefaultPagination: true,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;

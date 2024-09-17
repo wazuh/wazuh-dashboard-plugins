@@ -10,7 +10,6 @@ import {
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
-  EuiTitle,
   EuiPanel,
 } from '@elastic/eui';
 import { IntlProvider } from 'react-intl';
@@ -34,6 +33,7 @@ import useSearchBar from '../search-bar/use-search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
 import { getWazuhCorePlugin } from '../../../kibana-services';
+
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
@@ -124,11 +124,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
-    pagination: {
-      pageIndex: 0,
-      pageSize: 15,
-      pageSizeOptions: [15, 25, 50, 100],
-    },
+    useDefaultPagination: true,
+    filters,
+    setFilters,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
