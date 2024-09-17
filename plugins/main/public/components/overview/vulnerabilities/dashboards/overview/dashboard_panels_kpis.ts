@@ -34,7 +34,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 50,
+          fontSize: 40,
         },
       },
     },
@@ -119,7 +119,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 50,
+          fontSize: 40,
         },
       },
     },
@@ -204,7 +204,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 50,
+          fontSize: 40,
         },
       },
     },
@@ -289,7 +289,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 50,
+          fontSize: 40,
         },
       },
     },
@@ -344,7 +344,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
 const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
   return {
     id: 'vulnerabilities_evaluation_count',
-    title: 'Evalution',
+    title: 'Evaluation',
     type: 'metric',
     params: {
       addLegend: false,
@@ -366,7 +366,7 @@ const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
         style: {
           bgColor: false,
           bgFill: '#000',
-          fontSize: 50,
+          fontSize: 40,
           labelColor: false,
           subText: '',
         },
@@ -409,13 +409,6 @@ const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
               {
                 input: {
                   language: 'kuery',
-                  query: 'wazuh.vulnerability.under_evaluation:false',
-                },
-                label: 'Evaluated',
-              },
-              {
-                input: {
-                  language: 'kuery',
                   query: 'wazuh.vulnerability.under_evaluation:true',
                 },
                 label: 'Pending',
@@ -439,7 +432,7 @@ export const getKPIsPanel = (
   return {
     '1': {
       gridData: {
-        w: 8,
+        w: 9,
         h: 6,
         x: 0,
         y: 0,
@@ -453,9 +446,9 @@ export const getKPIsPanel = (
     },
     '2': {
       gridData: {
-        w: 8,
+        w: 9,
         h: 6,
-        x: 8,
+        x: 9,
         y: 0,
         i: '2',
       },
@@ -467,9 +460,9 @@ export const getKPIsPanel = (
     },
     '3': {
       gridData: {
-        w: 8,
+        w: 9,
         h: 6,
-        x: 16,
+        x: 18,
         y: 0,
         i: '3',
       },
@@ -481,9 +474,9 @@ export const getKPIsPanel = (
     },
     '4': {
       gridData: {
-        w: 8,
+        w: 9,
         h: 6,
-        x: 24,
+        x: 27,
         y: 0,
         i: '4',
       },
@@ -495,9 +488,9 @@ export const getKPIsPanel = (
     },
     '5': {
       gridData: {
-        w: 16,
+        w: 12,
         h: 6,
-        x: 32,
+        x: 36,
         y: 0,
         i: '5',
       },
