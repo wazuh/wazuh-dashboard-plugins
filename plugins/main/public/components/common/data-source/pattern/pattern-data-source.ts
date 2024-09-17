@@ -6,7 +6,7 @@ import {
 } from '../index';
 import { getDataPlugin } from '../../../../kibana-services';
 import {
-  IndexPatternsContract,
+  IndexPatternsService,
   IndexPattern,
 } from '../../../../../../../src/plugins/data/public';
 import { search } from '../../search-bar/search-bar-service';
@@ -16,7 +16,7 @@ export class PatternDataSource implements tDataSource {
   id: string;
   title: string;
   fields: any[];
-  patternService: IndexPatternsContract;
+  patternService: IndexPatternsService;
   indexPattern: IndexPattern;
 
   constructor(id: string, title: string) {
@@ -44,21 +44,24 @@ export class PatternDataSource implements tDataSource {
   }
 
   async select() {
+    let pattern: IndexPattern;
     try {
-      const pattern = await this.patternService.get(this.id);
-      if (pattern) {
-        const fields = await this.patternService.getFieldsForIndexPattern(
-          pattern,
-        );
-        const scripted = pattern.getScriptedFields().map(field => field.spec);
-        pattern.fields.replaceAll([...fields, ...scripted]);
-        await this.patternService.updateSavedObject(pattern);
-      } else {
+      pattern = await this.patternService.get(this.id);
+      if (!pattern)
         throw new Error('Error selecting index pattern: pattern not found');
-      }
+
+      const fields = await this.patternService.getFieldsForIndexPattern(
+        pattern,
+      );
+      const scripted = pattern.getScriptedFields().map(field => field.spec);
+      pattern.fields.replaceAll([...fields, ...scripted]);
     } catch (error) {
       throw new Error(`Error selecting index pattern: ${error}`);
     }
+    try {
+      // Vulnerability dashboard error loading for read only user
+      await this.patternService.updateSavedObject(pattern);
+    } catch {}
   }
 
   async fetch(params: tSearchParams) {

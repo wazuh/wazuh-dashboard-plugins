@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed issue causing vulnerability dashboard to fail loading for read-only users [#6933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6993)
 - Fixed the temporal directory variable on the the command to deploy a new Windows agent [#6905](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6905)
 - Fixed an error on the command to deploy a new macOS agent that could cause the registration password had a wrong value because a `\n` could be included [#6906](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6906)
 - Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
@@ -23,6 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Change the text of the query limit tooltip [#6981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6981)
 - Upgraded the `axios` dependency to `1.7.4` [#6919](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6919)
 - Improved MITRE ATT&CK intelligence flyout details readability [#6954](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6954)
+- Upgraded Event-tab column selector showing first the picked columns [#6984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6984)
 - Changed vulnerabilities.reference to links in Vulnerability Detection > Inventory columns [#6960](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6960)
 - Upgraded the `follow-redirects` dependency to `1.15.6` [#6982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6982)
 
