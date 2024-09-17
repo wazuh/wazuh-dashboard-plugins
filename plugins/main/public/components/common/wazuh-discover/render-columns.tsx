@@ -12,11 +12,7 @@ import { i18n } from '@osd/i18n';
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
 const renderRequirementsSecurityOperations = (value: []) => {
-  return (
-    <EuiText gutterSize='s' direction='column'>
-      {value.join(', ')}
-    </EuiText>
-  );
+  return <span>{Array.isArray(value) ? value.join(', ') : value}</span>;
 };
 
 const renderMitreTechnique = technique => (
