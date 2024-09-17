@@ -111,6 +111,8 @@ const InventoryVulsComponent = () => {
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
+    filters,
+    setFilters,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
