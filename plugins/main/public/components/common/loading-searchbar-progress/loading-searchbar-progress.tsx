@@ -1,6 +1,5 @@
 import { EuiProgress } from '@elastic/eui';
 import React from 'react';
-import './loading-searchbar-progress.scss';
 
 interface LoadingSearchbarProgress {
   message?: React.ReactNode;
