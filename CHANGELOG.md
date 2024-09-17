@@ -6,6 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Add feature to filter by field in the events table rows [#6977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6991)
 - Support for Wazuh 4.9.1
 
 ### Fixed

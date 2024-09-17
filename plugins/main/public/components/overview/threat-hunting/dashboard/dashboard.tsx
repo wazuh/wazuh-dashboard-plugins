@@ -32,8 +32,6 @@ import {
 } from '../../../common/data-grid/data-grid-service';
 import { useDocViewer } from '../../../common/doc-viewer/use-doc-viewer';
 import { useDataGrid } from '../../../common/data-grid/use-data-grid';
-import { HitsCounter } from '../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
-import { formatNumWithCommas } from '../../../../kibana-integrations/discover/application/helpers/format_number_with_commas';
 import DocViewer from '../../../common/doc-viewer/doc-viewer';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import './threat_hunting_dashboard.scss';
@@ -120,15 +118,17 @@ const DashboardTH: React.FC = () => {
     defaultColumns: threatHuntingTableDefaultColumns,
     renderColumns: wzDiscoverRenderColumns,
     results,
-    indexPattern: dataSource?.indexPattern,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
     DocViewInspectButton,
+    filters,
+    setFilters,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
 
   const docViewerProps = useDocViewer({
     doc: inspectedHit,
-    indexPattern: dataSource?.indexPattern,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
   });
 
   const pinnedAgent =
@@ -145,7 +145,7 @@ const DashboardTH: React.FC = () => {
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
     totalResults: results?.hits?.total ?? 0,
-    indexPattern: dataSource?.indexPattern,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
     filters: fetchFilters,
     query: query,
     time: absoluteDateRange,
