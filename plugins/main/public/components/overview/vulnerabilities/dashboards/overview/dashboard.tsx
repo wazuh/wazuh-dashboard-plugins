@@ -10,7 +10,7 @@ import './vulnerability_detector_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
-import { LoadingSpinner } from '../../common/components/loading_spinner';
+import { LoadingSearchbarProgress } from '../../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
 import {
   ErrorFactory,
   ErrorHandler,
@@ -89,7 +89,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
         <>
           <ModuleEnabledCheck />
           {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
+            <LoadingSearchbarProgress />
           ) : (
             <WzSearchBar
               appName='vulnerability-detector-searchbar'

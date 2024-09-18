@@ -16,7 +16,7 @@ import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
-import { LoadingSpinner } from '../loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import {
   useDataGrid,
   tDataGridColumn,
@@ -190,17 +190,17 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   return (
     <IntlProvider locale='en'>
-      <EuiPageTemplate
-        className='discoverContainer'
-        restrictWidth='100%'
-        fullHeight={true}
-        grow
-        paddingSize='none'
-        pageContentProps={{ color: 'transparent' }}
-      >
-        {isDataSourceLoading ? (
-          <LoadingSpinner />
-        ) : (
+      {isDataSourceLoading ? (
+        <LoadingSearchbarProgress />
+      ) : (
+        <EuiPageTemplate
+          className='discoverContainer'
+          restrictWidth='100%'
+          fullHeight={true}
+          grow
+          paddingSize='none'
+          pageContentProps={{ color: 'transparent' }}
+        >
           <WzSearchBar
             appName='wazuh-discover-search-bar'
             {...searchBarProps}
@@ -209,91 +209,91 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             showQueryBar={true}
             showSaveQuery={true}
           />
-        )}
-        {!isDataSourceLoading && results?.hits?.total === 0 ? (
-          <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-        ) : null}
-        <div
-          className={
-            !isDataSourceLoading && dataSource && results?.hits?.total > 0
-              ? ''
-              : 'wz-no-display'
-          }
-        >
-          <EuiPanel
-            paddingSize='s'
-            hasShadow={false}
-            hasBorder={false}
-            color='transparent'
+          {!isDataSourceLoading && results?.hits?.total === 0 ? (
+            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+          ) : null}
+          <div
+            className={
+              !isDataSourceLoading && dataSource && results?.hits?.total > 0
+                ? ''
+                : 'wz-no-display'
+            }
           >
-            <EuiFlexGroup gutterSize='s' direction='column'>
-              <EuiFlexItem grow={false} className='discoverChartContainer'>
-                <EuiPanel
-                  hasBorder={false}
-                  hasShadow={false}
-                  color='transparent'
-                  paddingSize='none'
-                >
-                  <EuiPanel>
-                    <DashboardByRenderer
-                      input={histogramChartInput(
-                        AlertsRepository.getStoreIndexPatternId(),
-                        fetchFilters,
-                        query,
-                        absoluteDateRange.from,
-                        absoluteDateRange.to,
-                      )}
-                    />
+            <EuiPanel
+              paddingSize='s'
+              hasShadow={false}
+              hasBorder={false}
+              color='transparent'
+            >
+              <EuiFlexGroup gutterSize='s' direction='column'>
+                <EuiFlexItem grow={false} className='discoverChartContainer'>
+                  <EuiPanel
+                    hasBorder={false}
+                    hasShadow={false}
+                    color='transparent'
+                    paddingSize='none'
+                  >
+                    <EuiPanel>
+                      <DashboardByRenderer
+                        input={histogramChartInput(
+                          AlertsRepository.getStoreIndexPatternId(),
+                          fetchFilters,
+                          query,
+                          absoluteDateRange.from,
+                          absoluteDateRange.to,
+                        )}
+                      />
+                    </EuiPanel>
                   </EuiPanel>
-                </EuiPanel>
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiDataGrid
-                  {...dataGridProps}
-                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                  toolbarVisibility={{
-                    additionalControls: (
-                      <>
-                        <DiscoverDataGridAdditionalControls
-                          totalHits={results?.hits?.total || 0}
-                          isExporting={isExporting}
-                          onClickExportResults={onClickExportResults}
-                          maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                          dateRange={absoluteDateRange}
-                        />
-                      </>
-                    ),
-                  }}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiPanel>
-          {inspectedHit && (
-            <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-              <EuiFlyoutHeader>
-                <DocDetailsHeader
-                  doc={inspectedHit}
-                  indexPattern={dataSource?.indexPattern}
-                />
-              </EuiFlyoutHeader>
-              <EuiFlyoutBody>
-                <EuiFlexGroup direction='column'>
-                  <EuiFlexItem>
-                    <DocumentViewTableAndJson
-                      document={inspectedHit}
-                      indexPattern={indexPattern}
-                      renderFields={getAllCustomRenders(
-                        defaultTableColumns,
-                        wzDiscoverRenderColumns,
-                      )}
-                    />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlyoutBody>
-            </EuiFlyout>
-          )}
-        </div>
-      </EuiPageTemplate>
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiDataGrid
+                    {...dataGridProps}
+                    className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                    toolbarVisibility={{
+                      additionalControls: (
+                        <>
+                          <DiscoverDataGridAdditionalControls
+                            totalHits={results?.hits?.total || 0}
+                            isExporting={isExporting}
+                            onClickExportResults={onClickExportResults}
+                            maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                            dateRange={absoluteDateRange}
+                          />
+                        </>
+                      ),
+                    }}
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPanel>
+            {inspectedHit && (
+              <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+                <EuiFlyoutHeader>
+                  <DocDetailsHeader
+                    doc={inspectedHit}
+                    indexPattern={dataSource?.indexPattern}
+                  />
+                </EuiFlyoutHeader>
+                <EuiFlyoutBody>
+                  <EuiFlexGroup direction='column'>
+                    <EuiFlexItem>
+                      <DocumentViewTableAndJson
+                        document={inspectedHit}
+                        indexPattern={indexPattern}
+                        renderFields={getAllCustomRenders(
+                          defaultTableColumns,
+                          wzDiscoverRenderColumns,
+                        )}
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiFlyoutBody>
+              </EuiFlyout>
+            )}
+          </div>
+        </EuiPageTemplate>
+      )}
     </IntlProvider>
   );
 };

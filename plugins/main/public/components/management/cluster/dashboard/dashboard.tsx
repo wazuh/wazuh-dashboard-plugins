@@ -8,7 +8,7 @@ import {
   ErrorHandler,
   HttpError,
 } from '../../../../react-services/error-management';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import { EuiSpacer, EuiFlexItem } from '@elastic/eui';
 
@@ -154,7 +154,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     <I18nProvider>
       <EuiFlexItem style={{ padding: '0 16px' }}>
         {isDataSourceLoading && !dataSource ? (
-          <LoadingSpinner />
+          <LoadingSearchbarProgress />
         ) : !state.showNodes ? (
           <WzSearchBar
             appName='ct-searchbar'
