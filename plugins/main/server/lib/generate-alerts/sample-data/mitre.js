@@ -11,7 +11,7 @@
  */
 
 // Mitre
-export const arrayMitreRules = [
+module.exports.arrayMitreRules = [
   {
     filename: '0015-ossec_rules.xml',
     relative_dirname: 'ruleset/rules',
@@ -2223,7 +2223,7 @@ export const arrayMitreRules = [
   },
 ];
 
-export const arrayLocation = [
+module.exports.arrayLocation = [
   'EventChannel',
   '/var/log/auth.log',
   '/var/log/secure',
