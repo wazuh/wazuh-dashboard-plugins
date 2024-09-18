@@ -10,15 +10,29 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { Random } from '../helpers/random';
+const { Random } = require('../helpers/random');
 
+module.exports.actorAttributesImage = [
+  'wazuh/wazuh:3.12.0-7.6.1',
+  'docker.elastic.co/elasticsearch/elasticsearch:7.6.2',
+  'docker.elastic.co/kibana/kibana:7.6.2',
+  'nginx:latest',
+];
+module.exports.type = ['container', 'image', 'volume', 'network'];
+module.exports.action = ['start', 'stop', 'pause', 'unpause'];
+module.exports.actorAttributesName = [
+  'wonderful_page',
+  'nostalgic_gates',
+  'jovial_zuckerberg',
+  'inspiring_jobs',
+  'opening_torvalds',
+  'gifted_bezos',
+  'clever_wales',
+  'laughing_tesla',
+  'kind_nobel',
+]; // https://github.com/moby/moby/blob/5aa44cdf132788cc0cd28ce2393b44265dd400e9/pkg/namesgenerator/names-generator.go#L600
 
-export const actorAttributesImage = ["wazuh/wazuh:3.12.0-7.6.1", "docker.elastic.co/elasticsearch/elasticsearch:7.6.2", "docker.elastic.co/kibana/kibana:7.6.2", "nginx:latest"];
-export const type = ["container", "image", "volume", "network"];
-export const action = ["start", "stop", "pause", "unpause"];
-export const actorAttributesName = ["wonderful_page", "nostalgic_gates", "jovial_zuckerberg", "inspiring_jobs", "opening_torvalds", "gifted_bezos", "clever_wales", "laughing_tesla", "kind_nobel"]; // https://github.com/moby/moby/blob/5aa44cdf132788cc0cd28ce2393b44265dd400e9/pkg/namesgenerator/names-generator.go#L600
-
-export const dataDocker = [
+module.exports.dataDocker = [
   {
     rule: {
       level: 3,
