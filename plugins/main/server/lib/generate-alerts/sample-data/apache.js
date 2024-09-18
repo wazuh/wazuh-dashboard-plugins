@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { DECODER } from './common';
+const { DECODER } = require('./common');
 
-export const location = '/var/log/httpd/error_log';
+module.exports.location = '/var/log/httpd/error_log';
 
-export const decoder = DECODER.APACHE_ERRORLOG;
+module.exports.decoder = DECODER.APACHE_ERRORLOG;
 
-export const data = [
+module.exports.data = [
   {
     rule: {
       firedtimes: 5,
