@@ -11,7 +11,7 @@
  */
 
 // General
-import {
+const {
   IPs,
   USERS,
   PORTS,
@@ -20,79 +20,51 @@ import {
   GEO_LOCATION,
   AGENTS,
   DECODER,
-} from './sample-data/common';
-import {
+} = require('./sample-data/common');
+const {
   PCI_DSS,
   GDPR,
   HIPAA,
   GPG13,
   NIST_800_53,
   tsc,
-} from './sample-data/regulatory-compliance';
-import * as Audit from './sample-data/audit';
-import * as Authentication from './sample-data/authentication';
-import * as AWS from './sample-data/aws';
-import * as IntegrityMonitoring from './sample-data/integrity-monitoring';
-import * as CISCAT from './sample-data/ciscat';
-import * as GCP from './sample-data/gcp';
-import * as Docker from './sample-data/docker';
-import * as Mitre from './sample-data/mitre';
-import * as Osquery from './sample-data/osquery';
-import * as OpenSCAP from './sample-data/openscap';
-import * as PolicyMonitoring from './sample-data/policy-monitoring';
-import * as Virustotal from './sample-data/virustotal';
-import * as Vulnerability from './sample-data/vulnerabilities';
-import * as SSH from './sample-data/ssh';
-import * as Apache from './sample-data/apache';
-import * as Web from './sample-data/web';
-import * as GitHub from './sample-data/github';
-import * as Office from './sample-data/office';
-import yara from './sample-data/yara';
-import { Alert, Params, SampleAlert } from './types';
-import { ALERT_ID_MAX, RULE_DESCRIPTION, RULE_MAX_LEVEL } from './constants';
-import { Random } from './helpers/random';
-import { DateFormatter } from './helpers/date-formatter';
-
-/**
- *
- * @param {string} str String with interpolations
- * @param {*} alert Alert object
- * @param {*} extra Extra parameters to interpolate what aren't in alert objet.
- * Only admit one level of depth
- */
-function interpolateAlertProps(
-  str: string,
-  alert: Alert,
-  extra: Record<string, any> = {},
-) {
-  const matches = str.match(/{([\w._]+)}/g);
-  if (!matches) {
-    return str;
-  }
-
-  return matches.reduce((accumulator, current) => {
-    const match = current.match(/{([\w._]+)}/);
-    if (!match) {
-      return '';
-    }
-    const items = match[1].split('.');
-    const value =
-      items.reduce(
-        (accumulator, current) =>
-          (accumulator && accumulator[current]) || extra[current] || undefined,
-        alert,
-      ) || current;
-    // @ts-expect-error Argument of type 'SampleAlert' is not assignable to
-    // parameter of type '(substring: string, ...args: any[]) => string'.
-    return accumulator.replace(current, value);
-  }, str);
-}
+} = require('./sample-data/regulatory-compliance');
+const Audit = require('./sample-data/audit');
+const Authentication = require('./sample-data/authentication');
+const AWS = require('./sample-data/aws');
+const IntegrityMonitoring = require('./sample-data/integrity-monitoring');
+const CISCAT = require('./sample-data/ciscat');
+const GCP = require('./sample-data/gcp');
+const Docker = require('./sample-data/docker');
+const Mitre = require('./sample-data/mitre');
+const Osquery = require('./sample-data/osquery');
+const OpenSCAP = require('./sample-data/openscap');
+const PolicyMonitoring = require('./sample-data/policy-monitoring');
+const Virustotal = require('./sample-data/virustotal');
+const Vulnerability = require('./sample-data/vulnerabilities');
+const SSH = require('./sample-data/ssh');
+const Apache = require('./sample-data/apache');
+const Web = require('./sample-data/web');
+const GitHub = require('./sample-data/github');
+const Office = require('./sample-data/office');
+const Yara = require('./sample-data/yara');
+const {
+  ALERT_ID_MAX,
+  RULE_DESCRIPTION,
+  RULE_MAX_LEVEL,
+} = require('./constants');
+const { Random } = require('./helpers/random');
+const { DateFormatter } = require('./helpers/date-formatter');
+const { interpolateAlertProps } = require('./helpers/interpolate-alert-props');
 
 /**
  * Generate a alert
+ * @param {import('./types').Params} params
+ * @returns {import('./types').SampleAlert}
  **/
-function generateAlert(params: Params): SampleAlert {
-  let alert: Alert = {
+function generateAlert(params) {
+  /** @type {import('./types').Alert} */
+  let alert = {
     timestamp: '2020-01-27T11:08:47.777+0000',
     rule: {
       level: 3,
@@ -104,23 +76,16 @@ function generateAlert(params: Params): SampleAlert {
     agent: {
       id: '000',
       name: 'master',
-      ip: IPs[0],
     },
     manager: {
       name: 'master',
     },
     cluster: {
       name: 'wazuh',
-      node: 'master',
     },
     id: '1580123327.49031',
-    predecoder: {
-      program_name: '',
-      timestamp: '',
-    },
-    decoder: {
-      name: '',
-    },
+    predecoder: {},
+    decoder: {},
     data: {},
     location: '',
   };
@@ -172,7 +137,6 @@ function generateAlert(params: Params): SampleAlert {
         };
         alert.data.aws.resource.instanceDetails.iamInstanceProfile.arn =
           interpolateAlertProps(
-            // @ts-expect-error
             typeAlert.data.aws.resource?.instanceDetails?.iamInstanceProfile
               ?.arn,
             alert,
@@ -698,9 +662,9 @@ function generateAlert(params: Params): SampleAlert {
     alert.data.virustotal.source = {
       sha1: Random.createHash(40),
       file: Random.arrayItem(Virustotal.sourceFile),
-      alert_id: `${Random.createHash(10, '0123456789')}.${Random.createHash(
+      alert_id: `${Random.createHash(10, Random.NUMBERS)}.${Random.createHash(
         7,
-        '0123456789',
+        Random.NUMBERS,
       )}`,
       md5: Random.createHash(32),
     };
@@ -947,35 +911,35 @@ function generateAlert(params: Params): SampleAlert {
         );
         break;
       }
-      // case 'reverseLoockupError': {
-      //   alert.location = Authentication.reverseLoockupError.location;
-      //   alert.rule = { ...Authentication.reverseLoockupError.rule };
-      //   alert.rule.groups = [...Authentication.reverseLoockupError.rule.groups];
-      //   alert.data = {
-      //     srcip: Random.getArrayItem(IPs),
-      //   };
-      //   alert.full_log = interpolateAlertProps(
-      //     Authentication.reverseLoockupError.full_log,
-      //     alert,
-      //   );
-      //   break;
-      // }
-      // case 'insecureConnectionAttempt': {
-      //   alert.location = Authentication.insecureConnectionAttempt.location;
-      //   alert.rule = { ...Authentication.insecureConnectionAttempt.rule };
-      //   alert.rule.groups = [
-      //     ...Authentication.insecureConnectionAttempt.rule.groups,
-      //   ];
-      //   alert.data = {
-      //     srcip: Random.getArrayItem(IPs),
-      //     srcport: Random.getArrayItem(Ports),
-      //   };
-      //   alert.full_log = interpolateAlertProps(
-      //     Authentication.insecureConnectionAttempt.full_log,
-      //     alert,
-      //   );
-      //   break;
-      // }
+      case 'reverseLoockupError': {
+        alert.location = Authentication.reverseLoockupError.location;
+        alert.rule = { ...Authentication.reverseLoockupError.rule };
+        alert.rule.groups = [...Authentication.reverseLoockupError.rule.groups];
+        alert.data = {
+          srcip: Random.arrayItem(IPs),
+        };
+        alert.full_log = interpolateAlertProps(
+          Authentication.reverseLoockupError.full_log,
+          alert,
+        );
+        break;
+      }
+      case 'insecureConnectionAttempt': {
+        alert.location = Authentication.insecureConnectionAttempt.location;
+        alert.rule = { ...Authentication.insecureConnectionAttempt.rule };
+        alert.rule.groups = [
+          ...Authentication.insecureConnectionAttempt.rule.groups,
+        ];
+        alert.data = {
+          srcip: Random.arrayItem(IPs),
+          srcport: Random.arrayItem(PORTS),
+        };
+        alert.full_log = interpolateAlertProps(
+          Authentication.insecureConnectionAttempt.full_log,
+          alert,
+        );
+        break;
+      }
       case 'authenticationSuccess':
         {
           alert.location = Authentication.authenticationSuccess.location;
@@ -1139,7 +1103,8 @@ function generateAlert(params: Params): SampleAlert {
       ),
     });
     if (typeAlert.previous_output) {
-      const previousOutput: string[] = [];
+      /** @type {string[]} */
+      const previousOutput = [];
       const beforeSeconds = 4;
       for (let i = beforeSeconds; i > 0; i--) {
         const beforeDate = new Date(
@@ -1196,7 +1161,7 @@ function generateAlert(params: Params): SampleAlert {
   }
 
   if (params.YARA) {
-    alert = { ...alert, ...yara.createAlert() };
+    alert = { ...alert, ...Yara.createAlert() };
   }
 
   return {
@@ -1212,12 +1177,13 @@ function generateAlert(params: Params): SampleAlert {
  * @param {number} numAlerts - Define number of alerts
  * @return {*} - Random generated alerts defined with params
  */
-function generateAlerts(params, numAlerts: number = 1) {
-  const alerts: Alert[] = [];
+function generateAlerts(params, numAlerts = 1) {
+  /** @type {import('./types').Alert[]} */
+  const alerts = [];
   for (let i = 0; i < numAlerts; i++) {
     alerts.push(generateAlert(params));
   }
   return alerts;
 }
 
-export { generateAlert, generateAlerts };
+module.exports = { generateAlert, generateAlerts };
