@@ -10,11 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { DECODER } from './common';
+const { DECODER } = require('./common');
 
-export const Protocols = ['GET'];
+module.exports.Protocols = ['GET'];
 
-export const urls = [
+module.exports.urls = [
   '/',
   '/index.asp',
   '/remote/login?lang=en',
@@ -34,7 +34,7 @@ export const urls = [
   '/shopdb/index.php?lang=en',
 ];
 
-export const userAgents = [
+module.exports.userAgents = [
   // https://deviceatlas.com/blog/list-of-user-agent-strings
   // Desktop
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0',
@@ -77,7 +77,7 @@ export const userAgents = [
   'Mozilla/5.0 (Nintendo 3DS; U; ; en) Version/1.7412.EU',
 ];
 
-export const data = [
+module.exports.data = [
   {
     rule: {
       firedtimes: 6,
