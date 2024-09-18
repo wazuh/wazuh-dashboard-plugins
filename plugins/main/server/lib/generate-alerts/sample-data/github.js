@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { DECODER } from './common';
+const { DECODER } = require('./common');
 
-export const LOCATION = 'github';
+module.exports.LOCATION = 'github';
 
-export const decoder = DECODER.JSON;
+module.exports.decoder = DECODER.JSON;
 
-export const COUNTRY_CODES = [
+module.exports.COUNTRY_CODES = [
   'AR',
   'CA',
   'DE',
@@ -31,29 +31,29 @@ export const COUNTRY_CODES = [
 
 const baseElements = Array(10).fill(undefined);
 
-export const ORGANIZATION_NAMES = baseElements.map(
+module.exports.ORGANIZATION_NAMES = baseElements.map(
   (_, index) => `Organization${index + 1}`,
 );
 
-export const USER_NAMES = baseElements.map((_, index) => `User${index + 1}`);
+module.exports.USER_NAMES = baseElements.map((_, index) => `User${index + 1}`);
 
-export const REPOSITORY_NAMES = baseElements.map(
+module.exports.REPOSITORY_NAMES = baseElements.map(
   (_, index) => `Repo${index + 1}`,
 );
 
-export const ACTORS = baseElements.map((_, index) => ({
+module.exports.ACTORS = baseElements.map((_, index) => ({
   name: USER_NAMES[index],
   country_code: COUNTRY_CODES[index],
 }));
 
-export const SERVER_ADDRESS_WEBHOOK = [
+module.exports.SERVER_ADDRESS_WEBHOOK = [
   'https://server/webhook',
   'https://cool_server/integrations/webhook',
   'https://another_server/github_notifications',
   'https://my_web/notifications/webhook',
 ];
 
-export const ALERT_TYPES = [
+module.exports.ALERT_TYPES = [
   {
     rule: {
       level: 5,
