@@ -11,17 +11,17 @@
  */
 
 // GCP
-export const arrayAuthAnswer = ['true', 'false'];
-export const arrayProtocol = ['UDP', 'TCP'];
-export const arrayQueryName = [
+module.exports.arrayAuthAnswer = ['true', 'false'];
+module.exports.arrayProtocol = ['UDP', 'TCP'];
+module.exports.arrayQueryName = [
   '185.5.205.124.in-addr.arpa.',
   '98.72.244.104.in-addr.arpa.',
   'mirrors.advancedhosters.com.',
   '41.212.95.203.in-addr.arpa',
   '41.212.95.203.in-addr.arpa.',
 ];
-export const arrayQueryType = ['PTR', 'PTR', 'PTR', 'PTR', 'PTR', 'A'];
-export const arrayResponseCode = [
+module.exports.arrayQueryType = ['PTR', 'PTR', 'PTR', 'PTR', 'PTR', 'A'];
+module.exports.arrayResponseCode = [
   'NXDOMAIN',
   'NOERROR',
   'WARNING',
@@ -35,7 +35,7 @@ export const arrayResponseCode = [
   'BADNAME',
   'NOTAUTH',
 ];
-export const arraySourceIP = [
+module.exports.arraySourceIP = [
   '163.172.0.0',
   '1.33.213.199',
   '83.32.0.0',
@@ -44,7 +44,7 @@ export const arraySourceIP = [
   '171.197.217.149',
   '77.38.119.17',
 ];
-export const arrayLocation = [
+module.exports.arrayLocation = [
   'europe-west1',
   'us-central1',
   'asia-east1',
@@ -58,9 +58,9 @@ export const arrayLocation = [
   'us-east3',
   'southamerica-east1',
 ];
-export const arrayProject = ['wazuh-dev', 'wazuh-prod', 'wazuh-test'];
-export const arraySourceType = ['gce-vm', 'internet'];
-export const arraySeverity = [
+module.exports.arrayProject = ['wazuh-dev', 'wazuh-prod', 'wazuh-test'];
+module.exports.arraySourceType = ['gce-vm', 'internet'];
+module.exports.arraySeverity = [
   'ERROR',
   'INFO',
   'NOTICE',
@@ -68,9 +68,9 @@ export const arraySeverity = [
   'EMERGENCY',
   'ALERT',
 ];
-export const arrayType = ['dns_query', 'app_script_function', 'generic_task'];
+module.exports.arrayType = ['dns_query', 'app_script_function', 'generic_task'];
 
-export const arrayRules = [
+module.exports.arrayRules = [
   {
     level: 12,
     description:
