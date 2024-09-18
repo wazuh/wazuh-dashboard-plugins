@@ -29,7 +29,7 @@ module.exports.COUNTRY_CODES = [
   'US',
 ];
 
-const baseElements = Array(10).fill(undefined);
+const baseElements = Array(10).fill();
 
 module.exports.ORGANIZATION_NAMES = baseElements.map(
   (_, index) => `Organization${index + 1}`,
@@ -42,8 +42,8 @@ module.exports.REPOSITORY_NAMES = baseElements.map(
 );
 
 module.exports.ACTORS = baseElements.map((_, index) => ({
-  name: USER_NAMES[index],
-  country_code: COUNTRY_CODES[index],
+  name: this.USER_NAMES[index],
+  country_code: this.COUNTRY_CODES[index],
 }));
 
 module.exports.SERVER_ADDRESS_WEBHOOK = [
