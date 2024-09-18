@@ -10,8 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 
-// Common data
-export const IPs = [
+import { Agent, Decoder, GeoLocation } from '../types';
+
+/*
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ Common data                                                             │
+  └─────────────────────────────────────────────────────────────────────────┘
+ */
+export const IPs: string[] = [
   '141.98.81.37',
   '54.10.24.5',
   '187.80.4.18',
@@ -21,7 +27,8 @@ export const IPs = [
   '45.75.196.15',
   '16.4.20.20',
 ];
-export const Users = [
+
+export const USERS: string[] = [
   'root',
   'ec2-user',
   'SYSTEM',
@@ -31,7 +38,8 @@ export const Users = [
   'LOCAL Service',
   'NETWORK Service',
 ];
-export const Ports = [
+
+export const PORTS: string[] = [
   '22',
   '55047',
   '26874',
@@ -46,16 +54,21 @@ export const Ports = [
   '5784',
   '7854',
 ];
-export const Win_Hostnames = [
+
+export const WIN_HOSTNAMES: string[] = [
   'Win_Server_01',
   'Win_Server_02',
   'Win_Server_03',
   'Win_Server_04',
 ];
-export const Paths = ['/home/user/sample', '/tmp/sample', '/etc/sample'];
 
-// Agents
-export const Agents = [
+export const PATHS: string[] = [
+  '/home/user/sample',
+  '/tmp/sample',
+  '/etc/sample',
+];
+
+export const AGENTS: Agent[] = [
   // { id: '000', name: 'master', ip: '120.17.47.10' },
   {
     id: '001',
@@ -94,8 +107,7 @@ export const Agents = [
   },
 ];
 
-// Geolocation {country_name, location: {lat, lon }, region_name}
-export const GeoLocation = [
+export const GEO_LOCATION: GeoLocation[] = [
   {
     country_name: 'Spain',
     location: {
@@ -188,26 +200,43 @@ export const GeoLocation = [
   },
 ];
 
-/**
- * Get a random element of an array
- * @param {[]} array - Array to get a randomized element
- * @returns {any} - Element randomized
- */
-function randomStrItem(str) {
-  let array = str.split('');
-  return array[Math.floor(array.length * Math.random())];
-}
-
-export const randomElements = (length, elements) => {
-  let hash = '';
-
-  for (let i = 0; i < length; i++) {
-    hash += randomStrItem(elements);
-  }
-
-  return hash;
-};
-
-export const randomArrayItem = array => {
-  return array[Math.floor(array.length * Math.random())];
-};
+export const DECODER = {
+  JSON: {
+    name: 'json',
+  },
+  SSHD: {
+    parent: 'sshd',
+    name: 'sshd',
+  },
+  WINDOWS_EVENTCHANNEL: {
+    parent: 'sshd',
+    name: 'windows_eventchannel',
+  },
+  PAM: {
+    name: 'pam',
+  },
+  UNIX_CHKPWD: {
+    name: 'unix_chkpwd',
+  },
+  WEB_ACCESSLOG: {
+    name: 'web-accesslog',
+  },
+  OSCAP: {
+    parent: 'oscap',
+    name: 'oscap',
+  },
+  ROOTCHECK: {
+    name: 'rootcheck',
+  },
+  APACHE_ERRORLOG: {
+    parent: 'apache-errorlog',
+    name: 'apache-errorlog',
+  },
+  WINDOWS: {
+    parent: 'windows',
+    name: 'windows',
+  },
+  YARA: {
+    name: 'YARA_decoder',
+  },
+} as const satisfies Record<Uppercase<string>, Decoder>;
