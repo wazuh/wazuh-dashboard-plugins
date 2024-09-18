@@ -10,17 +10,20 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const arrayOfficeGroups = ['office365', 'AzureActiveDirectoryStsLogon'];
+module.exports.arrayOfficeGroups = [
+  'office365',
+  'AzureActiveDirectoryStsLogon',
+];
 
-export const arrayLocationOffice = 'office365';
+module.exports.arrayLocationOffice = 'office365';
 
-export const arrayDecoderOffice = [
+module.exports.arrayDecoderOffice = [
   {
     name: 'json',
   },
 ];
 
-export const arrayUuidOffice = [
+module.exports.arrayUuidOffice = [
   'a8080009-aa85-4d65-a0f0-74fe0331edce',
   '4e93c8e3-52c1-4a4e-ab69-9e61ccf6cd00',
   'd14aa5cb-b070-42f8-8709-0f8afd942fc0',
@@ -43,7 +46,7 @@ export const arrayUuidOffice = [
   '29f96271-5c1b-47ec-9652-a41d5cb17cb4',
 ];
 
-export const arrayDevicePropertiesOffice = [
+module.exports.arrayDevicePropertiesOffice = [
   {
     Name: 'BrowserType',
     Value: 'Chrome',
@@ -58,7 +61,7 @@ export const arrayDevicePropertiesOffice = [
   },
 ];
 
-export const arrayIp = [
+module.exports.arrayIp = [
   '77.231.182.17',
   '172.217.204.94',
   '108.177.13.101',
@@ -68,21 +71,21 @@ export const arrayIp = [
   '13.226.52.89',
   '140.82.113.3',
 ];
-export const arrayUserId = [
+module.exports.arrayUserId = [
   'smith@wazuh.com',
   'williams@wazuh.com',
   'frank@wazuh.com',
   'jones@wazuh.com',
   'brown@wazuh.com',
 ];
-export const arrayTargetOffice = [
+module.exports.arrayTargetOffice = [
   {
     ID: '797f4846-ba00-4fd7-ba43-dac1f8f63013',
     Type: 0,
   },
 ];
 
-export const arrayActorOffice = [
+module.exports.arrayActorOffice = [
   {
     ID: 'a39dd957-d295-4548-b537-2055469bafbb',
     Type: 0,
@@ -93,7 +96,7 @@ export const arrayActorOffice = [
   },
 ];
 
-export const arrayExtendedPropertiesOffice = [
+module.exports.arrayExtendedPropertiesOffice = [
   {
     Name: 'ResultStatusDetail',
     Value: 'Success',
@@ -109,7 +112,7 @@ export const arrayExtendedPropertiesOffice = [
   },
 ];
 
-export const officeRules = {
+module.exports.officeRules = {
   1: {
     data: {
       office365: {
@@ -320,7 +323,7 @@ export const officeRules = {
     },
   },
 };
-export const arrayLogs = [
+module.exports.arrayLogs = [
   {
     Id: '35ab8b89-cfea-4214-5249-08d91a06e537',
     Operation: 'SearchDataInsightsSubscription',
