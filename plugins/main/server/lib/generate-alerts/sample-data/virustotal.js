@@ -11,7 +11,7 @@
  */
 
 // Virustotal
-export const sourceFile = [
+module.exports.sourceFile = [
   '/usr/share/sample/program',
   '/etc/data/file',
   '/etc/sample/script',
@@ -19,7 +19,7 @@ export const sourceFile = [
   '/tmp/virus/notavirus',
   '/var/opt/amazing-file',
 ];
-export const permalink = [
+module.exports.permalink = [
   'https://www.virustotal.com/gui/file/0a049436fa6c103d4e413fc3a5a8f7152245a36750773a19fdd32f5f6e278347/detection',
   'https://www.virustotal.com/gui/file/417871ee18a4c782df7ae9b7a64ca060547f7c88a4a405b2fa2487940eaa3c31/detection',
   'https://www.virustotal.com/gui/file/1bbf37332af75ea682fb4523afc8e61adb22f47f2bf3a8362e310f6d33085a6e/detection',
@@ -31,4 +31,4 @@ export const permalink = [
   'https://www.virustotal.com/file/275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f/analysis/1586879233',
   'https://www.virustotal.com/file/275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f/analysis/1586876465',
 ];
-export const malicious = [0, 1];
+module.exports.malicious = [0, 1];
