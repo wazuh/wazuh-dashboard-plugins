@@ -10,15 +10,19 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { Random } from '../helpers/random';
+const { Random } = require('../helpers/random');
 
 // Audit
 
-export const fileName = ['/etc/samplefile', '/etc/sample/file', '/var/sample'];
+module.exports.fileName = [
+  '/etc/samplefile',
+  '/etc/sample/file',
+  '/var/sample',
+];
 const ruleId = ['80790', '80784', '80781', '80791'];
 const auditType = ['SYSCALL', 'EXECVE', 'CWD', 'NORMAL', 'PATH', 'PROCTITLE'];
 
-export const dataAudit = [
+module.exports.dataAudit = [
   {
     data: {
       audit: {
