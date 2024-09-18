@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const dataOsquery = [
+module.exports.dataOsquery = [
   {
     osquery: {
       calendarTime: new Date(),
