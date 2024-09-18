@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const events = ['modified', 'deleted', 'added'];
-export const attributes = [
+module.exports.events = ['modified', 'deleted', 'added'];
+module.exports.attributes = [
   'mtime',
   'inode',
   'size',
@@ -20,7 +20,7 @@ export const attributes = [
   'sha1',
   'sha256',
 ];
-export const pathsLinux = [
+module.exports.pathsLinux = [
   '/etc/resolv.conf',
   '/var/wazuh/queue/fim/db/fim.db-journal',
   '/var/wazuh/queue/fim/db/fim.db',
@@ -39,7 +39,7 @@ export const pathsLinux = [
   '/var/osquery/osquery.db/CURRENT',
   '/run/utmp',
 ];
-export const pathsWindows = [
+module.exports.pathsWindows = [
   '[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\MpKslDrv',
   '[x32] HKEY_LOCAL_MACHINE\\Security\\SAM\\Domains\\Account\\Users\\000001F4',
   '[x32] HKEY_LOCAL_MACHINE\\Security\\SAM\\Domains\\Account\\Users\\000001F5',
@@ -57,10 +57,10 @@ export const pathsWindows = [
   '[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\WinDefend',
   '[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\bam\\State\\UserSettings\\S-1-5-21-856620481-996501011-1859314257-500',
 ];
-export const uid_after = ['0', 'S-1-5-18', 'S-1-5-32-544', '996', 'S-1-5-19'];
-export const gid_after = ['994', '0', '993', '190', '22'];
-export const tags = ['tmp'];
-export const regulatory = [
+module.exports.uid_after = ['0', 'S-1-5-18', 'S-1-5-32-544', '996', 'S-1-5-19'];
+module.exports.gid_after = ['994', '0', '993', '190', '22'];
+module.exports.tags = ['tmp'];
+module.exports.regulatory = [
   {
     firedtimes: 1,
     mail: false,
