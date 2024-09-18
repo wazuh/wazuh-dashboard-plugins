@@ -11,7 +11,10 @@ class NumberFormatter {
    * padded with zeros to the left based on the `zeros` parameter.
    */
   static pads(number, zeros = 0) {
-    return ('0'.repeat(zeros) + `${number}`).slice(-zeros);
+    if (zeros < 0) {
+      throw new RangeError('Invalid count value');
+    }
+    return number.toString().padStart(zeros, '0');
   }
 }
 
