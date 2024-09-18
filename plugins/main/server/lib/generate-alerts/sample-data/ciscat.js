@@ -12,7 +12,7 @@
 
 // CIS-CAT
 // More info https://documentation.wazuh.com/3.12/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html
-export const ruleTitle = [
+module.exports.ruleTitle = [
   'CIS-CAT 1',
   'CIS-CAT 2',
   'CIS-CAT 3',
@@ -20,10 +20,10 @@ export const ruleTitle = [
   'CIS-CAT 5',
   'CIS-CAT 6',
 ];
-export const group = [
+module.exports.group = [
   'Access, Authentication and Authorization',
   'Logging and Auditing',
 ];
 // TODO: add more benchmarks
-export const benchmark = ['CIS Ubuntu Linux 16.04 LTS Benchmark'];
-export const result = ['fail', 'errors', 'pass', 'unknown', 'notchecked'];
+module.exports.benchmark = ['CIS Ubuntu Linux 16.04 LTS Benchmark'];
+module.exports.result = ['fail', 'errors', 'pass', 'unknown', 'notchecked'];
