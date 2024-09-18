@@ -38,6 +38,7 @@ const Apache = require('./modules/apache');
 const Web = require('./modules/web');
 const GitHub = require('./modules/github');
 const Office = require('./modules/office');
+const Yara = require('./modules/yara');
 
 //Alert
 const alertIDMax = 6000;
@@ -1142,6 +1143,13 @@ function generateAlert(params) {
       (alert.data.github.created_at = alert.timestamp);
     alert.rule = {
       ...alertType.rule,
+    };
+  }
+
+  if (params.yara) {
+    alert = {
+      ...alert,
+      ...Yara.createAlert(),
     };
   }
 

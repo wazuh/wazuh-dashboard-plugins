@@ -1,17 +1,18 @@
-export class Random {
-  public static readonly NUMBERS = '0123456789';
-  public static readonly HEX_CHARACTERS = 'abcdef' + this.NUMBERS;
+class Random {
+  static NUMBERS = '0123456789';
+  static HEX_CHARACTERS = 'abcdef' + this.NUMBERS;
 
   // 7 days in miliseconds
-  public static readonly SEVEN_DAYS = 604800000;
+  static SEVEN_DAYS = 604800000;
 
   /**
+   * @template T
    * The function `arrayItem` returns a random item from an input array.
    * @param {T[]} array - The `array` parameter is an array of elements of type
    * `T`.
-   * @returns A random item from the input array is being returned.
+   * @returns {T} A random item from the input array is being returned.
    */
-  static arrayItem<T = unknown>(array: T[]): T {
+  static arrayItem(array) {
     return array[Math.floor(array.length * Math.random())];
   }
 
@@ -21,9 +22,9 @@ export class Random {
    * @param {string} text - The `text` parameter in the `character` method is
    * a string that represents the input text from which a random character will
    * be selected.
-   * @returns A random character from the input text is being returned.
+   * @returns {string} A random character from the input text is being returned.
    */
-  static character(text: string): string {
+  static character(text) {
     return Random.arrayItem(text.split(''));
   }
 
@@ -38,13 +39,10 @@ export class Random {
    * is a default parameter that is set to `Random.CHARACTERS` if no value is
    * provided when calling the function. This parameter likely represents the
    * set of characters from which the random hash is generated.
-   * @returns The `createHash` function is returning a randomly generated hash
+   * @returns {string} The `createHash` function is returning a randomly generated hash
    * string of the specified length using the characters provided.
    */
-  static createHash(
-    length: number,
-    characters = Random.HEX_CHARACTERS,
-  ): string {
+  static createHash(length, characters = Random.HEX_CHARACTERS) {
     let hash = '';
 
     for (let i = 0; i < length; i++) {
@@ -63,10 +61,10 @@ export class Random {
    * represents the maximum value that can be generated randomly. If the `max`
    * parameter is not provided when calling the function, it defaults to the
    * value of the `min` parameter.
-   * @returns The `number` function returns a random integer between the
+   * @returns {number} The `number` function returns a random integer between the
    * specified `min` and `max` values (inclusive).
    */
-  static number(min: number, max?: number): number {
+  static number(min, max) {
     if (!max) {
       max = min;
       min = 0;
@@ -77,7 +75,7 @@ export class Random {
   /**
    * The function returns a random date within the last 7 days from the current
    * date.
-   * @returns A new Date object representing a date that is 7 days before the
+   * @returns {Date} A new Date object representing a date that is 7 days before the
    * current date and time.
    */
   static date() {
@@ -97,15 +95,16 @@ export class Random {
    * function will return `true` if the randomly generated number is less than
    * or equal to the `probability` parameter. The `maximum` parameter is
    * optional and defaults to 100 if not provided
-   * @returns The `probability` method is returning a boolean value based on
+   * @returns {boolean} The `probability` method is returning a boolean value based on
    * whether a randomly generated number between 0 and `maximum` is less than or
    * equal to the provided `probability` value.
    */
-  static probability(probability: number, maximum = 100) {
+  static probability(probability, maximum = 100) {
     return Random.number(0, maximum) <= probability;
   }
 
   /**
+   * @template T
    * The function `uniqueValues` generates an array of unique values from a
    * given array with a specified length.
    * @param {number} lenght - The `lenght` parameter represents the desired
@@ -113,19 +112,19 @@ export class Random {
    * @param {T[]} values - The `values` parameter in the `uniqueValues` function
    * represents an array of elements of type `T`. These elements are used to
    * generate a new array containing unique values up to a specified length.
-   * @returns The `uniqueValues` function returns an array of unique values from
+   * @returns {T[]} The `uniqueValues` function returns an array of unique values from
    * the `values` array parameter. If the length of the `values` array is less
    * than or equal to the specified `length` parameter, the function simply
    * returns the `values` array as is. Otherwise, it creates a `Set` to store
    * unique values and keeps adding random items from the `values` array until
    * the set
    */
-  static uniqueValues<T = unknown>(lenght: number, values: T[]): T[] {
+  static uniqueValues(lenght, values) {
     if (values.length <= lenght) {
       return values;
     }
 
-    const result = new Set<T>();
+    const result = new Set();
 
     while (result.size <= lenght) {
       result.add(Random.arrayItem(values));
@@ -134,11 +133,26 @@ export class Random {
     return Array.from(result);
   }
 
-  static uniqueValuesFromArray(
-    array: [],
-    sort: (a: unknown, b: unknown) => number,
-    randomMaxRepetitions = 1,
-  ) {
+  /**
+   * @template T
+   * This function generates a set of unique values from an array with an option to
+   * sort them and control the maximum number of repetitions.
+   * @param {T[]} array - The `array` parameter in the `uniqueValuesFromArray` function is
+   * an array from which unique values will be selected.
+   * @param {(a: T, b: T) => number} sort - The `sort` parameter in the `uniqueValuesFromArray` function is a
+   * function that defines the sort order of the unique values in the resulting
+   * array. If a `sort` function is provided, the unique values will be sorted based
+   * on the criteria specified in that function. If no `sort` function
+   * @param [randomMaxRepetitions=1] - The `randomMaxRepetitions` parameter in the
+   * `uniqueValuesFromArray` function determines the maximum number of times a random
+   * element from the input `array` will be added to the `Set`. This parameter allows
+   * you to control the variability in the number of unique values returned by the
+   * function.
+   * @returns {T[]} The method `uniqueValuesFromArray` returns an array containing unique
+   * values from the input `array`, with an optional sorting based on the `sort`
+   * function provided.
+   */
+  static uniqueValuesFromArray(array, sort, randomMaxRepetitions = 1) {
     const repetitions = Random.number(1, randomMaxRepetitions);
     const set = new Set();
     for (let i = 0; i < repetitions; i++) {
@@ -147,3 +161,5 @@ export class Random {
     return sort ? Array.from(set).sort(sort) : Array.from(set);
   }
 }
+
+module.exports.Random = Random;
