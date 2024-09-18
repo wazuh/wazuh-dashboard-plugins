@@ -30,6 +30,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed vulnerabilities.reference to links in Vulnerability Detection > Inventory columns [#6960](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6960)
 - Upgraded the `follow-redirects` dependency to `1.15.6` [#6982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6982)
 
+### Removed
+
+- Removed the XML autoformat function group configuration due to performance [#6999](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6999)
+
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
 
 ### Added
