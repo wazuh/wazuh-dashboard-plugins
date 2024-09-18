@@ -10,20 +10,20 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { DECODER } from './common';
+const { DECODER } = require('./common');
 
 // Policy monitoring
-export const title = ['Trojaned version of file detected.'];
-export const ruleDescription = [
+module.exports.title = ['Trojaned version of file detected.'];
+module.exports.ruleDescription = [
   'Host-based anomaly detection event (rootcheck).',
   'System Audit event.',
 ];
 
-export const location = 'rootcheck';
+module.exports.location = 'rootcheck';
 
-export const decoder = DECODER.ROOTCHECK;
+module.exports.decoder = DECODER.ROOTCHECK;
 
-export const rootkits = {
+module.exports.rootkits = {
   Bash: ['/tmp/mcliZokhb', '/tmp/mclzaKmfa'],
   Adore: ['/dev/.shit/red.tgz', '/usr/lib/libt', '/usr/bin/adore'],
   TRK: ['usr/bin/soucemask', '/usr/bin/sourcemask'],
@@ -58,7 +58,7 @@ export const rootkits = {
   ],
 };
 
-export const rootkitsData = {
+module.exports.rootkitsData = {
   data: {
     title:
       "Rootkit '{_rootkit_category}' detected by the presence of file '{_rootkit_file}'.",
@@ -76,7 +76,7 @@ export const rootkitsData = {
     "Rootkit '{_rootkit_category}' detected by the presence of file '{_rootkit_file}'.",
 };
 
-export const trojans = [
+module.exports.trojans = [
   { file: '/usr/bin/grep', signature: 'bash|givemer' },
   {
     file: '/usr/bin/egrep',
@@ -111,7 +111,7 @@ export const trojans = [
   { file: '/usr/bin/w', signature: 'uname -a|proc.h|bash' },
 ];
 
-export const trojansData = {
+module.exports.trojansData = {
   rule: {
     firedtimes: 2,
     mail: false,
