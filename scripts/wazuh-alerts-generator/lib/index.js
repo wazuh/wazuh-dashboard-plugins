@@ -18,7 +18,7 @@ const {
   GPG13,
   NIST_800_53,
   tsc,
-} = require('./modules/regulatory-compliance');
+} = require('../../../plugins/main/server/lib/generate-alerts/sample-data/regulatory-compliance');
 
 const Audit = require('./modules/audit');
 const Authentication = require('./modules/authentication');

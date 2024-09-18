@@ -1,7 +1,9 @@
 const {
   Random,
 } = require('../../../../plugins/main/server/lib/generate-alerts/helpers/random');
-const { RuleGenerator } = require('../helpers/rule-generator');
+const {
+  RuleGenerator,
+} = require('../../../../plugins/main/server/lib/generate-alerts/helpers/rule-generator');
 
 /*
   ┌─────────────────────────────────────────────────────────────────────────┐
