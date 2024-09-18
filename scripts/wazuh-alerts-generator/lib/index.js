@@ -20,25 +20,25 @@ const {
   tsc,
 } = require('../../../plugins/main/server/lib/generate-alerts/sample-data/regulatory-compliance');
 
-const Audit = require('./modules/audit');
-const Authentication = require('./modules/authentication');
-const AWS = require('./modules/aws');
-const IntegrityMonitoring = require('./modules/integrity-monitoring');
-const CISCAT = require('./modules/ciscat');
-const GCP = require('./modules/gcp');
-const Docker = require('./modules/docker');
-const Mitre = require('./modules/mitre');
-const Osquery = require('./modules/osquery');
-const OpenSCAP = require('./modules/openscap');
-const PolicyMonitoring = require('./modules/policy-monitoring');
-const Virustotal = require('./modules/virustotal');
-const Vulnerability = require('./modules/vulnerabilities');
-const SSH = require('./modules/ssh');
-const Apache = require('./modules/apache');
+const Audit = require('../../../plugins/main/server/lib/generate-alerts/sample-data/audit');
+const Authentication = require('../../../plugins/main/server/lib/generate-alerts/sample-data/authentication');
+const AWS = require('../../../plugins/main/server/lib/generate-alerts/sample-data/aws');
+const IntegrityMonitoring = require('../../../plugins/main/server/lib/generate-alerts/sample-data/integrity-monitoring');
+const CISCAT = require('../../../plugins/main/server/lib/generate-alerts/sample-data/ciscat');
+const GCP = require('../../../plugins/main/server/lib/generate-alerts/sample-data/gcp');
+const Docker = require('../../../plugins/main/server/lib/generate-alerts/sample-data/docker');
+const Mitre = require('../../../plugins/main/server/lib/generate-alerts/sample-data/mitre');
+const Osquery = require('../../../plugins/main/server/lib/generate-alerts/sample-data/osquery');
+const OpenSCAP = require('../../../plugins/main/server/lib/generate-alerts/sample-data/openscap');
+const PolicyMonitoring = require('../../../plugins/main/server/lib/generate-alerts/sample-data/policy-monitoring');
+const Virustotal = require('../../../plugins/main/server/lib/generate-alerts/sample-data/virustotal');
+const Vulnerability = require('../../../plugins/main/server/lib/generate-alerts/sample-data/vulnerabilities');
+const SSH = require('../../../plugins/main/server/lib/generate-alerts/sample-data/ssh');
+const Apache = require('../../../plugins/main/server/lib/generate-alerts/sample-data/apache');
 const Web = require('../../../plugins/main/server/lib/generate-alerts/sample-data/web');
-const GitHub = require('./modules/github');
-const Office = require('./modules/office');
-const Yara = require('./modules/yara');
+const GitHub = require('../../../plugins/main/server/lib/generate-alerts/sample-data/github');
+const Office = require('../../../plugins/main/server/lib/generate-alerts/sample-data/office');
+const Yara = require('../../../plugins/main/server/lib/generate-alerts/sample-data/yara');
 
 //Alert
 const alertIDMax = 6000;
