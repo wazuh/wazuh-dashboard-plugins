@@ -26,21 +26,7 @@ const RULE_AUTHOR = [
 ];
 const LOG_TYPES = ['INFO', 'WARNING', 'ERROR'];
 const API_CUSTOMERS = ['demo', 'test', 'prod'];
-
-const rule_description = `Web Shell - file ${Random.arrayItem(
-  RULE_STATE,
-)}.${Random.arrayItem(FILE_EXTENSIONS)}`;
-
-const rule_name = `${RULE_BASE}_${Random.arrayItem(
-  RULE_STATE,
-)}_Linux_Shell_${Random.number(1, 10)}_RID${Random.number(100, 999)}`;
-
-const scanned_file = `/home/wazuh-user/yara/malware/${Random.arrayItem(
-  SCANNED_FILE,
-)}/${Random.arrayItem(FILE_EXTENSIONS)}`;
-
 const DESCRIPTION = ['File "" is a positive match. Yara rule: '];
-
 const LOCATION = '/var/ossec/logs/active-responses.log';
 
 /*
@@ -48,6 +34,22 @@ const LOCATION = '/var/ossec/logs/active-responses.log';
   │ GENERATORS                                                              │
   └─────────────────────────────────────────────────────────────────────────┘
  */
+
+const generateRuleDescription = () =>
+  `Web Shell - file ${Random.arrayItem(RULE_STATE)}.${Random.arrayItem(
+    FILE_EXTENSIONS,
+  )}`;
+
+const generateRuleName = () =>
+  `${RULE_BASE}_${Random.arrayItem(RULE_STATE)}_Linux_Shell_${Random.number(
+    1,
+    10,
+  )}_RID${Random.number(100, 999)}`;
+
+const generateScannedFile = () =>
+  `/home/wazuh-user/yara/malware/${Random.arrayItem(
+    SCANNED_FILE,
+  )}/${Random.arrayItem(FILE_EXTENSIONS)}`;
 
 const generateRule = () => ({
   level: RuleGenerator.level(),
@@ -63,11 +65,11 @@ const generateData = () => ({
     reference: Random.createHash(32),
     api_customer: Random.arrayItem(API_CUSTOMERS),
     log_type: Random.arrayItem(LOG_TYPES),
-    scanned_file: scanned_file,
+    scanned_file: generateScannedFile(),
     rule_author: Random.arrayItem(RULE_AUTHOR),
-    rule_name: rule_name,
-    rule_description: rule_description,
-    tags: TAGS,
+    rule_name: generateRuleName(),
+    rule_description: generateRuleDescription(),
+    tags: Random.uniqueValues(Random.number(1, TAGS.length), TAGS),
     published_date: Random.date(),
   },
 });

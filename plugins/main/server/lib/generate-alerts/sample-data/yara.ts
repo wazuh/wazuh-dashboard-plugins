@@ -1,8 +1,8 @@
 import { Random } from '../helpers/random';
+import { AlertRandomData } from '../modules/alert-random-data';
+import { RuleGenerator } from '../helpers/rule-generator';
 import { Rule } from '../types';
-import { AlertRandomData } from './alert-random-data';
 import { DECODER } from './common';
-import { RuleGenerator } from './rule-random-date';
 
 class YaraRandomData extends AlertRandomData {
   private readonly LOCATION = ['/var/ossec/logs/active-responses.log'];
@@ -29,7 +29,7 @@ class YaraRandomData extends AlertRandomData {
 
   private readonly API_CUSTOMERS = ['demo', 'test', 'prod'];
 
-  constructor(private ruleGenerator: RuleGenerator) {
+  constructor(private ruleGenerator: typeof RuleGenerator) {
     super();
   }
 
@@ -43,11 +43,11 @@ class YaraRandomData extends AlertRandomData {
 
   override get rule(): Rule {
     return {
-      level: this.ruleGenerator.level,
-      id: this.ruleGenerator.id,
+      level: this.ruleGenerator.level(),
+      id: this.ruleGenerator.id(),
       description: 'File "" is a positive match. Yara rule: ',
-      firedtimes: this.ruleGenerator.firedtimes,
-      mail: this.ruleGenerator.mail,
+      firedtimes: this.ruleGenerator.firedtimes(),
+      mail: this.ruleGenerator.mail(),
       groups: ['yara'],
     };
   }
@@ -87,4 +87,4 @@ class YaraRandomData extends AlertRandomData {
   }
 }
 
-export default new YaraRandomData(new RuleGenerator());
+export default new YaraRandomData(RuleGenerator);

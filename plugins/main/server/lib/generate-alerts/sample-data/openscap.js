@@ -10,18 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { DECODER } from './common';
+const { DECODER } = require('./common');
 
 // OpenSCAP
-export const scanProfileTitle = [
+module.exports.scanProfileTitle = [
   'xccdf_org.ssgproject.content_profile_standard',
   'xccdf_org.ssgproject.content_profile_pci-dss',
   'xccdf_org.ssgproject.content_profile_common',
   'xccdf_org.ssgproject.content_profile_anssi_np_nt28_minimal',
 ];
-export const checkSeverity = ['low', 'medium', 'high'];
-export const checkResult = ['fail'];
-export const scanContent = [
+module.exports.checkSeverity = ['low', 'medium', 'high'];
+module.exports.checkResult = ['fail'];
+module.exports.scanContent = [
   'ssg-centos-7-ds.xml',
   'ssg-centos-6-ds.xml',
   'ssg-rhel6-ds.xml',
@@ -29,7 +29,7 @@ export const scanContent = [
   'ssg-debian-ds.xml',
   'ssg-fedora-ds.xml',
 ];
-export const checkTitle = [
+module.exports.checkTitle = [
   'Record Attempts to Alter the localtime File',
   'Record Attempts to Alter Time Through clock_settime',
   'Ensure auditd Collects Unauthorized Access Attempts to Files (unsuccessful)',
@@ -37,11 +37,11 @@ export const checkTitle = [
   'Ensure auditd Collects File Deletion Events by User',
 ];
 
-export const decoder = DECODER.OSCAP;
+module.exports.decoder = DECODER.OSCAP;
 
-export const location = 'wodle_open-scap';
+module.exports.location = 'wodle_open-scap';
 
-export const data = [
+module.exports.data = [
   {
     // "input": {
     //   "type": "log"

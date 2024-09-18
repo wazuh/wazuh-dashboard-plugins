@@ -27,7 +27,7 @@ import {
   HIPAA,
   GPG13,
   NIST_800_53,
-  TSC,
+  tsc,
 } from './sample-data/regulatory-compliance';
 import * as Audit from './sample-data/audit';
 import * as Authentication from './sample-data/authentication';
@@ -1020,7 +1020,7 @@ function generateAlert(params: Params): SampleAlert {
       }
     }
     alert.rule.firedtimes = Random.number(2, 15);
-    alert.rule.tsc = [Random.arrayItem(TSC)];
+    alert.rule.tsc = [Random.arrayItem(tsc)];
   }
 
   if (params.ssh) {
@@ -1196,7 +1196,7 @@ function generateAlert(params: Params): SampleAlert {
   }
 
   if (params.YARA) {
-    alert = yara.createAlert();
+    alert = { ...alert, ...yara.createAlert() };
   }
 
   return {
