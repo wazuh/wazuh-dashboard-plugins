@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { DECODER } from './common';
+const { DECODER } = require('./common');
 
-export const invalidLoginPassword = {
+module.exports.invalidLoginPassword = {
   decoder: DECODER.SSHD,
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[5330]: Failed password for {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
@@ -36,7 +36,7 @@ export const invalidLoginPassword = {
   },
 };
 
-export const invalidLoginUser = {
+module.exports.invalidLoginUser = {
   decoder: DECODER.SSHD,
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[10022]: Invalid user {data.srcuser} from {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
@@ -59,7 +59,7 @@ export const invalidLoginUser = {
   },
 };
 
-export const multipleAuthenticationFailures = {
+module.exports.multipleAuthenticationFailures = {
   decoder: DECODER.SSHD,
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[5413]: Failed password for invalid user {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
@@ -83,7 +83,7 @@ export const multipleAuthenticationFailures = {
   },
 };
 
-export const windowsInvalidLoginPassword = {
+module.exports.windowsInvalidLoginPassword = {
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[5413]: Failed password for invalid user {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
   data_win: {
@@ -127,7 +127,7 @@ export const windowsInvalidLoginPassword = {
   },
 };
 
-export const userLoginFailed = {
+module.exports.userLoginFailed = {
   rule: {
     id: '5503',
     level: 5,
@@ -151,7 +151,7 @@ export const userLoginFailed = {
     '{predecoder.timestamp} {predecoder.hostname} sshd[11294]: pam_unix(sshd:auth): authentication failure; logname= uid={data.uid} euid={data.euid} tty={data.tty} ruser= rhost={data.srcip}  user={data.dstuser}',
 };
 
-export const passwordCheckFailed = {
+module.exports.passwordCheckFailed = {
   rule: {
     level: 5,
     description: 'unix_chkpwd: Password check failed.',
@@ -176,7 +176,7 @@ export const passwordCheckFailed = {
     '{predecoder.timestamp} {predecoder.hostname} {decoder.name}[29593]: password check failed for user ({data.srcuser})',
 };
 
-export const nonExistentUser = {
+module.exports.nonExistentUser = {
   rule: {
     mail: false,
     level: 5,
@@ -194,7 +194,7 @@ export const nonExistentUser = {
   location: '/var/log/secure',
 };
 
-export const bruteForceTryingAccessSystem = {
+module.exports.bruteForceTryingAccessSystem = {
   rule: {
     mail: false,
     level: 10,
@@ -217,7 +217,7 @@ export const bruteForceTryingAccessSystem = {
   location: '/var/log/secure',
 };
 
-export const authenticationSuccess = {
+module.exports.authenticationSuccess = {
   data: {
     srcip: '84.122.71.89',
     dstuser: 'ec2-user',
@@ -242,7 +242,7 @@ export const authenticationSuccess = {
   },
 };
 
-export const maximumAuthenticationAttemptsExceeded = {
+module.exports.maximumAuthenticationAttemptsExceeded = {
   rule: {
     mail: false,
     level: 8,
