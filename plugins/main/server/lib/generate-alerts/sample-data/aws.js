@@ -10,12 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { Random } from '../helpers/random';
-import { DECODER } from './common';
+const { Random } = require('../helpers/random');
+const { DECODER } = require('./common');
 
 // Amazon AWS services
-export const source = ['guardduty', 'cloudtrail', 'vpcflow', 'config'];
-export const accountId = [
+module.exports.source = ['guardduty', 'cloudtrail', 'vpcflow', 'config'];
+module.exports.accountId = [
   '186157501624',
   '117521235382',
   '150447125201',
@@ -23,7 +23,7 @@ export const accountId = [
   '186154171780',
   '250141701015',
 ];
-export const region = [
+module.exports.region = [
   'eu-west-1',
   'eu-west-2',
   'eu-west-3',
@@ -44,7 +44,7 @@ export const region = [
   'ap-northeast-1',
   'ca-central-1',
 ]; // https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-regions
-export const buckets = [
+module.exports.buckets = [
   'aws-sample-bucket-1',
   'aws-sample-bucket-2',
   'aws-sample-bucket-3',
@@ -56,7 +56,7 @@ export const buckets = [
   'aws-sample-bucket-9',
 ];
 
-export const instanceId = [
+module.exports.instanceId = [
   'i-060bb01699dddc20c',
   'i-060bb020479bedc20w',
   'i-070eb020479bebf20a',
@@ -64,7 +64,7 @@ export const instanceId = [
   'i-057eb060779fdae15b',
 ];
 
-export const remoteIpDetails = [
+module.exports.remoteIpDetails = [
   {
     country: {
       countryName: 'Mexico',
@@ -181,7 +181,7 @@ export const remoteIpDetails = [
   },
 ];
 
-export const instanceDetails = [
+module.exports.instanceDetails = [
   {
     launchTime: '2020-04-22T11:17:08Z',
     instanceId: 'i-0b0b8b34a48c8f1c4',
@@ -233,7 +233,7 @@ export const instanceDetails = [
   },
 ];
 
-export const guarddutyPortProbe = {
+module.exports.guarddutyPortProbe = {
   data: {
     aws: {
       severity: '2',
@@ -310,7 +310,7 @@ export const guarddutyPortProbe = {
   decoder: DECODER.JSON,
 };
 
-export const apiCall = {
+module.exports.apiCall = {
   data: {
     aws: {
       severity: '5',
@@ -398,7 +398,7 @@ export const apiCall = {
   decoder: DECODER.JSON,
 };
 
-export const networkConnection = {
+module.exports.networkConnection = {
   data: {
     integration: 'aws',
     aws: {
@@ -487,7 +487,7 @@ export const networkConnection = {
   decoder: DECODER.JSON,
 };
 
-export const iamPolicyGrantGlobal = {
+module.exports.iamPolicyGrantGlobal = {
   data: {
     aws: {
       severity: 'CRITICAL',
