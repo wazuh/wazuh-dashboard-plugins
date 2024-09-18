@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const reverseLoockupError = {
+module.exports.reverseLoockupError = {
   location: '/var/log/secure',
   rule: {
     mail: false,
@@ -31,7 +31,7 @@ export const reverseLoockupError = {
     '{predecoder.timestamp} {predecoder.hostname} sshd[15409]: reverse mapping checking getaddrinfo for {data.srcip}.static.impsat.com.co [{data.srcip}] failed - POSSIBLE BREAK-IN ATTEMPT!',
 };
 
-export const insecureConnectionAttempt = {
+module.exports.insecureConnectionAttempt = {
   rule: {
     mail: false,
     level: 6,
@@ -48,7 +48,7 @@ export const insecureConnectionAttempt = {
   location: '/var/log/secure',
 };
 
-export const possibleAttackServer = {
+module.exports.possibleAttackServer = {
   rule: {
     mail: false,
     level: 8,
@@ -71,7 +71,7 @@ export const possibleAttackServer = {
     "{predecoder.timestamp} {predecoder.hostname} sshd[15122]: Bad protocol version identification '\\003' from {data.srcip} port {data.srcport}",
 };
 
-export const possibleBreakinAttempt = {
+module.exports.possibleBreakinAttempt = {
   rule: {
     mail: false,
     level: 10,
@@ -95,9 +95,9 @@ export const possibleBreakinAttempt = {
     '{predecoder.timestamp} {predecoder.hostname} sshd[10385]: reverse mapping checking getaddrinfo for . [{data.srcip}] failed - POSSIBLE BREAK-IN ATTEMPT!',
 };
 
-export const data = [
-  reverseLoockupError,
-  insecureConnectionAttempt,
-  possibleAttackServer,
-  possibleBreakinAttempt,
+module.exports.data = [
+  module.exports.reverseLoockupError,
+  module.exports.insecureConnectionAttempt,
+  module.exports.possibleAttackServer,
+  module.exports.possibleBreakinAttempt,
 ];
