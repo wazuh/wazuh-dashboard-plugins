@@ -133,10 +133,10 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/statistics',
+      path: '/elastic/statisticspattern',
       validate: false,
     },
     async (context, request, response) =>
-      ctrl.existStatisticsIndices(context, request, response),
+      ctrl.statisticsIndexPattern(context, request, response),
   );
 }
