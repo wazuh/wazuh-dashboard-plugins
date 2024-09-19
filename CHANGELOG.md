@@ -31,6 +31,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Upgraded the `follow-redirects` dependency to `1.15.6` [#6982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6982)
 - Changed many loading spinners in some views to loading search progress [#6956](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6956)
 
+### Removed
+
+- Removed the XML autoformat function group configuration due to performance [#6999](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6999)
+
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
 
 ### Added
