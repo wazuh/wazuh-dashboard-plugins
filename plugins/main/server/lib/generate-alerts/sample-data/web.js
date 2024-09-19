@@ -113,7 +113,7 @@ module.exports.data = [
       groups: ['web', 'accesslog', 'web_scan', 'recon'],
       id: '31151',
       nist_800_53: ['SA.11', 'SI.4'],
-      frequency: '14',
+      frequency: 14,
       gdpr: ['IV_35.7.d'],
     },
     decoder: DECODER.WEB_ACCESSLOG,
