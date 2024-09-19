@@ -127,7 +127,7 @@ class Random {
 
     const result = new Set();
 
-    while (result.size <= lenght) {
+    while (result.size < lenght) {
       result.add(Random.arrayItem(values));
     }
 
