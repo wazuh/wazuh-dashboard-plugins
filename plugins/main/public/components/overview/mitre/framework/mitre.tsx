@@ -23,7 +23,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import {
   useDataSource,
@@ -147,16 +147,16 @@ const MitreComponent = props => {
 
   return (
     <I18nProvider>
-      <>
-        <EuiPanel
-          paddingSize='none'
-          hasShadow={false}
-          hasBorder={false}
-          color='transparent'
-        >
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
-          ) : (
+      {isDataSourceLoading && !dataSource ? (
+        <LoadingSearchbarProgress />
+      ) : (
+        <>
+          <EuiPanel
+            paddingSize='none'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
             <WzSearchBar
               appName='mitre-attack-searchbar'
               {...searchBarProps}
@@ -165,49 +165,49 @@ const MitreComponent = props => {
               showQueryBar={true}
               showSaveQuery={true}
             />
-          )}
-        </EuiPanel>
-        <EuiPanel
-          paddingSize='s'
-          hasShadow={false}
-          hasBorder={false}
-          color='transparent'
-        >
-          <EuiPanel paddingSize='none'>
-            <EuiFlexGroup>
-              <EuiFlexItem
-                grow={false}
-                style={{
-                  width: '15%',
-                  minWidth: 145,
-                  height: 'calc(100vh - 325px)',
-                  overflowX: 'hidden',
-                }}
-              >
-                <Tactics
-                  onChangeSelectedTactics={onChangeSelectedTactics}
-                  filterParams={filterParams}
-                  tacticsObject={mitreState.tacticsObject}
-                  selectedTactics={mitreState.selectedTactics}
-                  fetchData={fetchData}
-                  isLoading={isLoading}
-                />
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <Techniques
-                  indexPatternId={indexPattern?.id}
-                  filterParams={filterParams}
-                  onSelectedTabChanged={id => onSelectedTabChanged(id)}
-                  tacticsObject={mitreState.tacticsObject}
-                  selectedTactics={mitreState.selectedTactics}
-                  fetchData={fetchData}
-                  isLoading={isLoading}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
           </EuiPanel>
-        </EuiPanel>
-      </>
+          <EuiPanel
+            paddingSize='s'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
+            <EuiPanel paddingSize='none'>
+              <EuiFlexGroup>
+                <EuiFlexItem
+                  grow={false}
+                  style={{
+                    width: '15%',
+                    minWidth: 145,
+                    height: 'calc(100vh - 325px)',
+                    overflowX: 'hidden',
+                  }}
+                >
+                  <Tactics
+                    onChangeSelectedTactics={onChangeSelectedTactics}
+                    filterParams={filterParams}
+                    tacticsObject={mitreState.tacticsObject}
+                    selectedTactics={mitreState.selectedTactics}
+                    fetchData={fetchData}
+                    isLoading={isLoading}
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <Techniques
+                    indexPatternId={indexPattern?.id}
+                    filterParams={filterParams}
+                    onSelectedTabChanged={id => onSelectedTabChanged(id)}
+                    tacticsObject={mitreState.tacticsObject}
+                    selectedTactics={mitreState.selectedTactics}
+                    fetchData={fetchData}
+                    isLoading={isLoading}
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPanel>
+          </EuiPanel>
+        </>
+      )}
     </I18nProvider>
   );
 };

@@ -22,7 +22,7 @@ import {
   StatisticsDataSource,
   StatisticsDataSourceRepository,
 } from '../../../common/data-source/pattern/statistics';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import {
   ErrorFactory,
   ErrorHandler,
@@ -131,7 +131,7 @@ export const DashboardTabsPanels = ({
   return (
     <>
       {isDataSourceLoading && !dataSource ? (
-        <LoadingSpinner />
+        <LoadingSearchbarProgress />
       ) : (
         <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
           {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (

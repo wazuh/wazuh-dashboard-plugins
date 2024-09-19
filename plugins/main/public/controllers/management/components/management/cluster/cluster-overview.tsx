@@ -10,7 +10,7 @@ import { cluster } from '../../../../../utils/applications';
 import { WzRequest } from '../../../../../react-services';
 import { ClusterDisabled } from '../../../../../components/management/cluster/cluster-disabled';
 import { ClusterDashboard } from '../../../../../components/management/cluster/dashboard/dashboard';
-import { LoadingSpinner } from '../../../../../components/common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../../../components/common/loading-searchbar-progress/loading-searchbar-progress';
 import { FormattedMessage } from '@osd/i18n/react';
 
 interface ClusterOverviewState {
@@ -60,7 +60,7 @@ export const ClusterOverview = compose(
       />
     ),
     () => (
-      <LoadingSpinner
+      <LoadingSearchbarProgress
         message={
           <FormattedMessage
             id='module.cluster.checking'
