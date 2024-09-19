@@ -35,7 +35,7 @@ class Random {
    * function represents the desired length of the hash that will be generated.
    * This value determines how many characters will be included in the final
    * hash string.
-   * @param characters - The `characters` parameter in the `createHash` function
+   * @param {string} characters - The `characters` parameter in the `createHash` function
    * is a default parameter that is set to `Random.CHARACTERS` if no value is
    * provided when calling the function. This parameter likely represents the
    * set of characters from which the random hash is generated.
