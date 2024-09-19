@@ -242,7 +242,10 @@ export default compose(
     const fetchData = async () => {
       try {
         setLoading(true);
-        const { data: indexPatternID } = await WzRequest.genericReq('GET', '/elastic/statisticspattern');
+        const { data: indexPatternID } = await WzRequest.genericReq(
+          'GET',
+          '/elastic/statisticspattern',
+        );
         const { exist } = await checkExistenceIndices(indexPatternID);
         setExistStatisticsIndices(exist);
       } catch (error) {
