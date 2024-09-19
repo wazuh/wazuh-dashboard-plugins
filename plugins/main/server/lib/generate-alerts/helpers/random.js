@@ -1,6 +1,7 @@
 class Random {
   static NUMBERS = '0123456789';
   static HEX_CHARACTERS = 'abcdef' + this.NUMBERS;
+  static ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   // 7 days in miliseconds
   static SEVEN_DAYS = 604800000;
