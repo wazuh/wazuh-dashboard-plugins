@@ -43,6 +43,7 @@ import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
 import { connect } from 'react-redux';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { checkExistenceIndices } from '../../../../../react-services';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -241,8 +242,9 @@ export default compose(
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await WzRequest.genericReq('GET', '/elastic/statistics');
-        setExistStatisticsIndices(data.data);
+        const { data: indexPatternID } = await WzRequest.genericReq('GET', '/elastic/statisticspattern');
+        const { exist } = await checkExistenceIndices(indexPatternID);
+        setExistStatisticsIndices(exist);
       } catch (error) {
         setLoading(false);
         const options = {
