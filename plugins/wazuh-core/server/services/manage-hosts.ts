@@ -17,6 +17,7 @@ import { HTTP_STATUS_CODES } from '../../common/constants';
 
 interface IAPIHost {
   id: string;
+  url: string;
   username: string;
   password: string;
   port: number;
@@ -29,6 +30,13 @@ interface IAPIHostRegistry {
   status: string;
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
+}
+
+interface GetRegistryDataByHostOptions {
+  /* this option lets to throw the error when trying to fetch the required data
+  of the API host that is used by the checkStoredAPI of /api/check-stored-api
+  endpoint */
+  throwError: boolean;
 }
 
 /**
@@ -141,6 +149,7 @@ export class ManageHosts {
    */
   private async getRegistryDataByHost(
     host: IAPIHost,
+    options: GetRegistryDataByHostOptions,
   ): Promise<IAPIHostRegistry> {
     const apiHostID = host.id;
     this.logger.debug(`Getting registry data from host [${apiHostID}]`);
@@ -150,7 +159,7 @@ export class ManageHosts {
       node = null,
       status = 'disabled',
       cluster = 'Disabled',
-      allow_run_as = API_USER_STATUS_RUN_AS.ALL_DISABLED;
+      allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK;
 
     try {
       const responseAgents = await this.serverAPIClient.asInternalUser.request(
@@ -165,21 +174,24 @@ export class ManageHosts {
       }
 
       // Get allow_run_as
-      if (!host.run_as) {
-        allow_run_as = API_USER_STATUS_RUN_AS.HOST_DISABLED;
-      } else {
-        const responseAllowRunAs =
-          await this.serverAPIClient.asInternalUser.request(
-            'GET',
-            '/security/users/me',
-            {},
-            { apiHostID },
-          );
-        if (this.isServerAPIClientResponseOk(responseAllowRunAs)) {
-          allow_run_as = responseAllowRunAs.data.data.affected_items[0]
-            .allow_run_as
+      const responseAllowRunAs =
+        await this.serverAPIClient.asInternalUser.request(
+          'GET',
+          '/security/users/me',
+          {},
+          { apiHostID },
+        );
+      if (this.isServerAPIClientResponseOk(responseAllowRunAs)) {
+        const allow_run_as_response =
+          responseAllowRunAs.data.data.affected_items[0].allow_run_as;
+        if (host.run_as) {
+          allow_run_as = allow_run_as_response
             ? API_USER_STATUS_RUN_AS.ENABLED
             : API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED;
+        } else {
+          allow_run_as = allow_run_as_response
+            ? API_USER_STATUS_RUN_AS.HOST_DISABLED
+            : API_USER_STATUS_RUN_AS.ALL_DISABLED;
         }
       }
 
@@ -191,7 +203,10 @@ export class ManageHosts {
           { apiHostID },
         );
 
-      if (this.isServerAPIClientResponseOk(responseClusterStatus) && responseClusterStatus.data?.data?.enabled === 'yes') {
+      if (
+        this.isServerAPIClientResponseOk(responseClusterStatus) &&
+        responseClusterStatus.data?.data?.enabled === 'yes'
+      ) {
         status = 'enabled';
 
         const responseClusterLocal =
@@ -207,7 +222,11 @@ export class ManageHosts {
           cluster = responseClusterLocal.data.data.affected_items[0].cluster;
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      if (options?.throwError) {
+        throw error;
+      }
+    }
 
     const data = {
       manager,
@@ -283,9 +302,31 @@ export class ManageHosts {
         `API host with ID [${apiId}] was not found in the registry. This could be caused by a problem getting and storing the registry data or the API host was removed.`,
       );
     }
+    if (registryHost.allow_run_as === API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK) {
+      throw new Error(
+        `API host with host ID [${apiId}] could not check the ability to use the run as. Ensure the API host is accesible and the internal user has the minimal permissions to check this capability.`,
+      );
+    }
     if (registryHost.allow_run_as === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED) {
       throw new Error(
         `API host with host ID [${apiId}] misconfigured. The configurated API user is not allowed to use [run_as]. Allow it in the API user configuration or set [run_as] host setting with [false] value.`,
+      );
+    }
+
+    /* The allowed values to compare should be:
+      API_USER_STATUS_RUN_AS.ENABLED: use run_as
+      API_USER_STATUS_RUN_AS.HOST_DISABLED: not use run_as
+      API_USER_STATUS_RUN_AS.ALL_DISABLED: not use run_as
+    */
+    if (
+      ![
+        API_USER_STATUS_RUN_AS.ENABLED,
+        API_USER_STATUS_RUN_AS.HOST_DISABLED,
+        API_USER_STATUS_RUN_AS.ALL_DISABLED,
+      ].includes(registryHost.allow_run_as)
+    ) {
+      throw new Error(
+        `API host with host ID [${apiId}] has an unexpected value [${registryHost.allow_run_as}] stored in the registry. This could be caused by a problem getting and storing the registry data.`,
       );
     }
     return registryHost.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED;

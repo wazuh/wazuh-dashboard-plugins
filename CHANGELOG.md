@@ -6,8 +6,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Add feature to filter by field in the events table rows [#6977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6991)
 - Support for Wazuh 4.9.1
+- Add feature to filter by field in the events table rows [#6977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6991)
 
 ### Fixed
 
@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed missing link to Vulnerabilities detection and Office 365 in the agent menu of `Endpoints Summary` [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
 - Fixed missing options depending on agent operating system in the agent configuration report [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
 - Fixed an style that affected the Discover plugin [#6989](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6989)
+- Fixed a problem updating the API host registry in the GET /api/check-stored-api [#6995](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6995)
 
 ### Changed
 
