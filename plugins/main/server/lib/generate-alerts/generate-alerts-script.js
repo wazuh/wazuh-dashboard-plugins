@@ -823,7 +823,7 @@ function generateAlert(params) {
         alert.rule.groups = [
           ...Authentication.multipleAuthenticationFailures.rule.groups,
         ];
-        alert.rule.frequency = Random.number(5, 50).toString();
+        alert.rule.frequency = Random.number(5, 50);
         alert.full_log = interpolateAlertProps(
           Authentication.multipleAuthenticationFailures.full_log,
           alert,
@@ -836,7 +836,7 @@ function generateAlert(params) {
         alert.rule.groups = [
           ...Authentication.windowsInvalidLoginPassword.rule.groups,
         ];
-        alert.rule.frequency = Random.number(5, 50).toString();
+        alert.rule.frequency = Random.number(5, 50);
         alert.data.win = {
           ...Authentication.windowsInvalidLoginPassword.data_win,
         };

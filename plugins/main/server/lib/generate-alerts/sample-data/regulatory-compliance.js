@@ -168,4 +168,4 @@ module.exports.tsc = [
   'P8.1',
 ];
 module.exports.PCI = ['10.6'];
-module.exports.FREQUENCY = ['4', '6', '8', '10', '12', '14', '17'];
+module.exports.FREQUENCY = [4, 6, 8, 10, 12, 14, 17];
