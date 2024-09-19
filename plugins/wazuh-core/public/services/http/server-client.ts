@@ -1,0 +1,532 @@
+/*
+ * Wazuh app - API request service
+ * Copyright (C) 2015-2024 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+import {
+  HTTPClientRequestInterceptor,
+  HTTPClientServer,
+  HTTPVerb,
+  HTTPClientServerUserData,
+} from './types';
+import { Logger } from '../../../common/services/configuration';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from './constants';
+import jwtDecode from 'jwt-decode';
+import { BehaviorSubject } from 'rxjs';
+
+interface WzRequestServices {
+  request: HTTPClientRequestInterceptor['request'];
+  getURL(path: string): string;
+  getTimeout(): Promise<number>;
+  getServerAPI(): string;
+}
+
+interface ServerAPIResponseItems<T> {
+  affected_items: Array<T>;
+  failed_items: Array<any>;
+  total_affected_items: number;
+  total_failed_items: number;
+}
+
+interface ServerAPIResponseItemsData<T> {
+  data: ServerAPIResponseItems<T>;
+  message: string;
+  error: number;
+}
+
+export interface ServerAPIResponseItemsDataHTTPClient<T> {
+  data: ServerAPIResponseItemsData<T>;
+}
+
+export class WzRequest implements HTTPClientServer {
+  onErrorInterceptor?: (
+    error: any,
+    options: {
+      checkCurrentApiIsUp: boolean;
+      shouldRetry: boolean;
+      overwriteHeaders?: any;
+    },
+  ) => Promise<void>;
+  private userData: HTTPClientServerUserData;
+  userData$: BehaviorSubject<HTTPClientServerUserData>;
+  constructor(private logger: Logger, private services: WzRequestServices) {
+    this.userData = {
+      logged: false,
+      token: null,
+      account: null,
+      policies: null,
+    };
+    this.userData$ = new BehaviorSubject(this.userData);
+  }
+
+  /**
+   * Permorn a generic request
+   * @param {String} method
+   * @param {String} path
+   * @param {Object} payload
+   */
+  private async _request(
+    method: HTTPVerb,
+    path: string,
+    payload: any = null,
+    extraOptions: {
+      shouldRetry?: boolean;
+      checkCurrentApiIsUp?: boolean;
+      overwriteHeaders?: any;
+    } = {
+      shouldRetry: true,
+      checkCurrentApiIsUp: true,
+      overwriteHeaders: {},
+    },
+  ): Promise<any> {
+    const shouldRetry =
+      typeof extraOptions.shouldRetry === 'boolean'
+        ? extraOptions.shouldRetry
+        : true;
+    const checkCurrentApiIsUp =
+      typeof extraOptions.checkCurrentApiIsUp === 'boolean'
+        ? extraOptions.checkCurrentApiIsUp
+        : true;
+    const overwriteHeaders =
+      typeof extraOptions.overwriteHeaders === 'object'
+        ? extraOptions.overwriteHeaders
+        : {};
+    try {
+      if (!method || !path) {
+        throw new Error('Missing parameters');
+      }
+
+      const timeout = await this.services.getTimeout();
+
+      const url = this.services.getURL(path);
+      const options = {
+        method: method,
+        headers: {
+          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+          'content-type': 'application/json',
+          ...overwriteHeaders,
+        },
+        url: url,
+        data: payload,
+        timeout: timeout,
+      };
+
+      const data = await this.services.request(options);
+
+      if (data['error']) {
+        throw new Error(data['error']);
+      }
+
+      return Promise.resolve(data);
+    } catch (error) {
+      //if the requests fails, we need to check if the API is down
+      if (checkCurrentApiIsUp) {
+        const currentApi = this.services.getServerAPI();
+        if (currentApi) {
+          try {
+            await this.checkAPIById(currentApi);
+          } catch (error) {
+            // TODO :implement
+            // const wzMisc = new WzMisc();
+            // wzMisc.setApiIsDown(true);
+            // if (
+            //   !NavigationService.getInstance()
+            //     .getPathname()
+            //     .startsWith('/settings')
+            // ) {
+            //   NavigationService.getInstance().navigate('/health-check');
+            // }
+            throw error;
+          }
+        }
+      }
+      // if(this.onErrorInterceptor){
+      //   await this.onErrorInterceptor(error, {checkCurrentApiIsUp, shouldRetry, overwriteHeaders})
+      // }
+      const errorMessage =
+        (error &&
+          error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        (error || {}).message;
+      if (
+        typeof errorMessage === 'string' &&
+        errorMessage.includes('status code 401') &&
+        shouldRetry
+      ) {
+        try {
+          await this.auth(true); //await WzAuthentication.refresh(true);
+          return this._request(method, path, payload, { shouldRetry: false });
+        } catch (error) {
+          return ((error || {}).data || {}).message || false
+            ? Promise.reject(
+                this.returnErrorInstance(error, error.data.message),
+              )
+            : Promise.reject(this.returnErrorInstance(error, error.message));
+        }
+      }
+      return errorMessage
+        ? Promise.reject(this.returnErrorInstance(error, errorMessage))
+        : Promise.reject(
+            this.returnErrorInstance(error, 'Server did not respond'),
+          );
+    }
+  }
+
+  /**
+   * Perform a request to the Wazuh API
+   * @param {String} method Eg. GET, PUT, POST, DELETE
+   * @param {String} path API route
+   * @param {Object} body Request body
+   */
+  async request(
+    method: HTTPVerb,
+    path: string,
+    body: any,
+    options: {
+      checkCurrentApiIsUp?: boolean;
+      returnOriginalResponse?: boolean;
+    } = { checkCurrentApiIsUp: true, returnOriginalResponse: false },
+  ): Promise<ServerAPIResponseItemsDataHTTPClient<any>> {
+    try {
+      if (!method || !path || !body) {
+        throw new Error('Missing parameters');
+      }
+
+      const { returnOriginalResponse, ...optionsToGenericReq } = options;
+
+      const id = this.services.getServerAPI();
+      const requestData = { method, path, body, id };
+      const response = await this._request(
+        'POST',
+        '/api/request',
+        requestData,
+        optionsToGenericReq,
+      );
+
+      if (returnOriginalResponse) {
+        return response;
+      }
+
+      const hasFailed =
+        (((response || {}).data || {}).data || {}).total_failed_items || 0;
+
+      if (hasFailed) {
+        const error =
+          ((((response.data || {}).data || {}).failed_items || [])[0] || {})
+            .error || {};
+        const failed_ids =
+          ((((response.data || {}).data || {}).failed_items || [])[0] || {})
+            .id || {};
+        const message = (response.data || {}).message || 'Unexpected error';
+        const errorMessage = `${message} (${error.code}) - ${error.message} ${
+          failed_ids && failed_ids.length > 1
+            ? ` Affected ids: ${failed_ids} `
+            : ''
+        }`;
+        return Promise.reject(this.returnErrorInstance(null, errorMessage));
+      }
+      return Promise.resolve(response);
+    } catch (error) {
+      return ((error || {}).data || {}).message || false
+        ? Promise.reject(this.returnErrorInstance(error, error.data.message))
+        : Promise.reject(this.returnErrorInstance(error, error.message));
+    }
+  }
+
+  /**
+   * Perform a request to generate a CSV
+   * @param {String} path
+   * @param {Object} filters
+   */
+  async csv(path: string, filters: any) {
+    try {
+      if (!path || !filters) {
+        throw new Error('Missing parameters');
+      }
+      const id = this.services.getServerAPI();
+      const requestData = { path, id, filters };
+      const data = await this._request('POST', '/api/csv', requestData);
+      return Promise.resolve(data);
+    } catch (error) {
+      return ((error || {}).data || {}).message || false
+        ? Promise.reject(this.returnErrorInstance(error, error.data.message))
+        : Promise.reject(this.returnErrorInstance(error, error.message));
+    }
+  }
+
+  /**
+   * Customize message and return an error object
+   * @param error
+   * @param message
+   * @returns error
+   */
+  private returnErrorInstance(error: any, message: string | undefined) {
+    if (!error || typeof error === 'string') {
+      return new Error(message || error);
+    }
+    error.message = message;
+    return error;
+  }
+
+  setOnErrorInterceptor(onErrorInterceptor: (error: any) => Promise<void>) {
+    this.onErrorInterceptor = onErrorInterceptor;
+  }
+
+  /**
+   * Requests and returns an user token to the API.
+   *
+   * @param {boolean} force
+   * @returns {string} token as string or Promise.reject error
+   */
+  private async login(force = false) {
+    try {
+      let idHost = this.services.getServerAPI();
+      while (!idHost) {
+        await new Promise(r => setTimeout(r, 500));
+        idHost = this.services.getServerAPI();
+      }
+
+      const response = await this._request('POST', '/api/login', {
+        idHost,
+        force,
+      });
+
+      const token = ((response || {}).data || {}).token;
+      return token as string;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Refresh the user's token
+   *
+   * @param {boolean} force
+   * @returns {void} nothing or Promise.reject error
+   */
+  async auth(force = false) {
+    try {
+      // Get user token
+      const token: string = await this.login(force);
+      if (!token) {
+        // Remove old existent token
+        // await this.unauth();
+        return;
+      }
+
+      // Decode token and get expiration time
+      const jwtPayload = jwtDecode(token);
+
+      // Get user Policies
+      const userPolicies = await this.getUserPolicies();
+
+      // Dispatch actions to set permissions and administrator consideration
+      // TODO: implement
+      // store.dispatch(updateUserPermissions(userPolicies));
+
+      // store.dispatch(
+      //   updateUserAccount(
+      //     getWazuhCorePlugin().dashboardSecurity.getAccountFromJWTAPIDecodedToken(
+      //       jwtPayload,
+      //     ),
+      //   ),
+      // );
+      // store.dispatch(updateWithUserLogged(true));
+      const data = {
+        token,
+        policies: userPolicies,
+        account: null, // TODO: implement
+        logged: true,
+      };
+
+      this.updateUserData(data);
+      return data;
+    } catch (error) {
+      // TODO: implement
+      // const options: UIErrorLog = {
+      //   context: `${WzAuthentication.name}.refresh`,
+      //   level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+      //   severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+      //   error: {
+      //     error: error,
+      //     message: error.message || error,
+      //     title: `${error.name}: Error getting the authorization token`,
+      //   },
+      // };
+      // getErrorOrchestrator().handleError(options);
+      // store.dispatch(
+      //   updateUserAccount(
+      //     getWazuhCorePlugin().dashboardSecurity.getAccountFromJWTAPIDecodedToken(
+      //       {}, // This value should cause the user is not considered as an administrator
+      //     ),
+      //   ),
+      // );
+      // store.dispatch(updateWithUserLogged(true));
+      this.updateUserData({
+        token: null,
+        policies: null,
+        account: null, // TODO: implement
+        logged: true,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get current user's policies
+   *
+   * @returns {Object} user's policies or Promise.reject error
+   */
+  private async getUserPolicies() {
+    try {
+      let idHost = this.services.getServerAPI();
+      while (!idHost) {
+        await new Promise(r => setTimeout(r, 500));
+        idHost = this.services.getServerAPI();
+      }
+      const response = await this.request(
+        'GET',
+        '/security/users/me/policies',
+        { idHost },
+      );
+      return response?.data?.data || {};
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  getUserData() {
+    return this.userData;
+  }
+
+  /**
+   * Sends a request to the Wazuh's API to delete the user's token.
+   *
+   * @returns {Object}
+   */
+  async unauth() {
+    try {
+      const response = await this.request(
+        'DELETE',
+        '/security/user/authenticate',
+        { delay: 5000 },
+      );
+
+      return response?.data?.data || {};
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Update the internal user data and emit the value to the subscribers of userData$
+   * @param data
+   */
+  private updateUserData(data: HTTPClientServerUserData) {
+    this.userData = data;
+    this.userData$.next(this.getUserData());
+  }
+
+  async checkAPIById(serverHostId: string, idChanged = false) {
+    try {
+      const timeout = await this.services.getTimeout();
+      const payload = { id: serverHostId };
+      if (idChanged) {
+        payload.idChanged = serverHostId;
+      }
+
+      const url = this.services.getURL('/api/check-stored-api');
+      const options = {
+        method: 'POST',
+        headers: {
+          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+          'content-type': 'application/json',
+        },
+        url: url,
+        data: payload,
+        timeout: timeout,
+      };
+
+      // TODO: implement
+      // if (Object.keys(configuration).length) {
+      //   AppState.setPatternSelector(configuration['ip.selector']);
+      // }
+
+      const response = await this.services.request(options);
+
+      if (response.error) {
+        return Promise.reject(this.returnErrorInstance(response));
+      }
+
+      return response;
+    } catch (error) {
+      if (error.response) {
+        // TODO: implement
+        // const wzMisc = new WzMisc();
+        // wzMisc.setApiIsDown(true);
+        const response = (error.response.data || {}).message || error.message;
+        return Promise.reject(this.returnErrorInstance(response));
+      } else {
+        return (error || {}).message || false
+          ? Promise.reject(this.returnErrorInstance(error, error.message))
+          : Promise.reject(
+              this.returnErrorInstance(
+                error,
+                error || 'Server did not respond',
+              ),
+            );
+      }
+    }
+  }
+
+  /**
+   * Check the status of an API entry
+   * @param {String} apiObject
+   */
+  async checkAPI(apiEntry: any, forceRefresh = false) {
+    try {
+      const timeout = await this.services.getTimeout();
+      const url = this.services.getURL('/api/check-api');
+
+      const options = {
+        method: 'POST',
+        headers: {
+          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+          'content-type': 'application/json',
+        },
+        url: url,
+        data: { ...apiEntry, forceRefresh },
+        timeout: timeout,
+      };
+
+      const response = await this.services.request(options);
+
+      if (response.error) {
+        return Promise.reject(this.returnErrorInstance(response));
+      }
+
+      return response;
+    } catch (error) {
+      if (error.response) {
+        const response = (error.response.data || {}).message || error.message;
+        return Promise.reject(this.returnErrorInstance(response));
+      } else {
+        return (error || {}).message || false
+          ? Promise.reject(this.returnErrorInstance(error, error.message))
+          : Promise.reject(
+              this.returnErrorInstance(
+                error,
+                error || 'Server did not respond',
+              ),
+            );
+      }
+    }
+  }
+}

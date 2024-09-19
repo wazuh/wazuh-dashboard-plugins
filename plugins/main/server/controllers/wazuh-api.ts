@@ -76,16 +76,9 @@ export class WazuhApiCtrl {
           }
         }
       }
-      let token;
-      if (context.wazuh_core.manageHosts.isEnabledAuthWithRunAs(idHost)) {
-        token = await context.wazuh.api.client.asCurrentUser.authenticate(
-          idHost,
-        );
-      } else {
-        token = await context.wazuh.api.client.asInternalUser.authenticate(
-          idHost,
-        );
-      }
+      const token = await context.wazuh.api.client.asCurrentUser.authenticate(
+        idHost,
+      );
 
       let textSecure = '';
       if (context.wazuh.server.info.protocol === 'https') {

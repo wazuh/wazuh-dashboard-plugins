@@ -1,6 +1,6 @@
 import {
   IConfigurationStore,
-  ILogger,
+  Logger,
   IConfiguration,
 } from '../../common/services/configuration';
 
@@ -8,7 +8,7 @@ export class ConfigurationStore implements IConfigurationStore {
   private _stored: any;
   file: string = '';
   configuration: IConfiguration | null = null;
-  constructor(private logger: ILogger, private http: any) {
+  constructor(private logger: Logger, private http: any) {
     this._stored = {};
   }
   setConfiguration(configuration: IConfiguration) {
