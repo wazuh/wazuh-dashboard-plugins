@@ -3,7 +3,10 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withGuardAsync } from '../../../../common/hocs';
 import { getSavedObjects } from '../../../../../kibana-services';
-import { SavedObject } from '../../../../../react-services';
+import {
+  SavedObject,
+  checkExistenceIndices,
+} from '../../../../../react-services';
 import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/constants';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
@@ -15,15 +18,6 @@ const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
 async function checkExistenceIndexPattern(indexPatternID: string) {
   return await getSavedObjects().client.get('index-pattern', indexPatternID);
-}
-
-async function checkExistenceIndices(indexPatternId: string) {
-  try {
-    const fields = await SavedObject.getIndicesFields(indexPatternId);
-    return { exist: true, fields };
-  } catch (error) {
-    return { exist: false };
-  }
 }
 
 async function createIndexPattern(indexPattern, fields: any) {
