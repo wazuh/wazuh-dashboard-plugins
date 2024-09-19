@@ -77,7 +77,7 @@ describe('Random', () => {
     });
   });
   describe('uniqueValues', () => {
-    it('', () => {
+    it('should_verify_unique_values_returns_array_within_specified_length', () => {
       for (let i = 0; i < 100; i++) {
         const actualLenght = 2;
         const actualValue = Random.uniqueValues(actualLenght, [1, 2, 3]);
