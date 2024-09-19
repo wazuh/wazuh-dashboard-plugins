@@ -29,7 +29,7 @@ import {
   ErrorFactory,
   HttpError,
 } from '../../../react-services/error-management';
-import { LoadingSpinner } from '../loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { DocumentViewTableAndJson } from '../wazuh-discover/components/document-view-table-and-json';
 import DiscoverDataGridAdditionalControls from '../wazuh-discover/components/data-grid-additional-controls';
@@ -152,7 +152,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
 
   return (
     <>
-      {isLoading ? <LoadingSpinner /> : null}
+      {isLoading ? <LoadingSearchbarProgress /> : null}
       {!isLoading && !results?.hits?.total === 0 ? (
         <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
       ) : null}

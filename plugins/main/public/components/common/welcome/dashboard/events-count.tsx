@@ -14,7 +14,7 @@ import {
   EuiText,
 } from '@elastic/eui';
 import { useTimeFilter } from '../../hooks';
-import { LoadingSpinner } from '../../loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -67,7 +67,7 @@ export const EventsCount = () => {
             }}
           />
         ) : (
-          <LoadingSpinner />
+          <LoadingSearchbarProgress />
         )}
       </EuiFlexItem>
     </EuiPanel>

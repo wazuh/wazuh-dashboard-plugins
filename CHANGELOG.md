@@ -29,6 +29,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Upgraded Event-tab column selector showing first the picked columns [#6984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6984)
 - Changed vulnerabilities.reference to links in Vulnerability Detection > Inventory columns [#6960](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6960)
 - Upgraded the `follow-redirects` dependency to `1.15.6` [#6982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6982)
+- Changed many loading spinners in some views to loading search progress [#6956](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6956)
 
 ### Removed
 
@@ -648,7 +649,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   [#3367](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3367)
   [#3373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3373)
   [#3374](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3374)
-  [#3390](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3390)  
+  [#3390](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3390)
   [#3410](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3410)
   [#3408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3408)
   [#3429](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3429)
