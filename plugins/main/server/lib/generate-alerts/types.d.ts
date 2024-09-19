@@ -212,7 +212,7 @@ export type Params = {
   /* if true, set windows fields */
   github: boolean;
   /* if true, set YARA fields */
-  YARA: boolean;
+  yara: boolean;
   /* if true, set windows fields */
   windows: {
     service_control_manager: boolean;

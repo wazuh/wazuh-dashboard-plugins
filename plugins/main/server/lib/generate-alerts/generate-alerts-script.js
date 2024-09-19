@@ -1160,7 +1160,7 @@ function generateAlert(params) {
     };
   }
 
-  if (params.YARA) {
+  if (params.yara) {
     alert = { ...alert, ...Yara.createAlert() };
   }
 
