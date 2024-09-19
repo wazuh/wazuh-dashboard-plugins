@@ -55,21 +55,27 @@ class DateFormatter {
     D: (/** @type {Date} */ date) => NumberFormatter.pads(date.getDate(), 2), // 01-31
     // 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
     // 'Saturday'
-    A: (/** @type {Date} */ date) => DateFormatter.LONG_DAY_NAMES[date.getDay()],
+    A: (/** @type {Date} */ date) =>
+      DateFormatter.LONG_DAY_NAMES[date.getDay()],
     // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
-    E: (/** @type {Date} */ date) => DateFormatter.SHORT_DAY_NAMES[date.getDay()],
-    M: (/** @type {Date} */ date) => NumberFormatter.pads(date.getMonth() + 1, 2), // 01-12
+    E: (/** @type {Date} */ date) =>
+      DateFormatter.SHORT_DAY_NAMES[date.getDay()],
+    M: (/** @type {Date} */ date) =>
+      NumberFormatter.pads(date.getMonth() + 1, 2), // 01-12
     // 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
     // 'September', 'October', 'November', 'December'
-    J: (/** @type {Date} */ date) => DateFormatter.LONG_MONTH_NAMES[date.getMonth()],
+    J: (/** @type {Date} */ date) =>
+      DateFormatter.LONG_MONTH_NAMES[date.getMonth()],
     // 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct',
     // 'Nov', 'Dec'
-    N: (/** @type {Date} */ date) => DateFormatter.SHORT_MONTH_NAMES[date.getMonth()],
+    N: (/** @type {Date} */ date) =>
+      DateFormatter.SHORT_MONTH_NAMES[date.getMonth()],
     Y: (/** @type {Date} */ date) => date.getFullYear(), // 2020
     h: (/** @type {Date} */ date) => NumberFormatter.pads(date.getHours(), 2), // 00-23
     m: (/** @type {Date} */ date) => NumberFormatter.pads(date.getMinutes(), 2), // 00-59
     s: (/** @type {Date} */ date) => NumberFormatter.pads(date.getSeconds(), 2), // 00-59
-    l: (/** @type {Date} */ date) => NumberFormatter.pads(date.getMilliseconds(), 3), // 000-999
+    l: (/** @type {Date} */ date) =>
+      NumberFormatter.pads(date.getMilliseconds(), 3), // 000-999
   };
 
   /**

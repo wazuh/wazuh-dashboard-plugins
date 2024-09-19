@@ -200,27 +200,39 @@ describe('DateFormatter', () => {
     });
     it('should_format_date_with_custom_format_string', () => {
       const actualDate = new Date('2024-09-19T00:40:18.573Z');
-      expect(DateFormatter.format(actualDate, 'Y-M-DTh:m:s.lZ')).toBe('2024-09-19T00:40:18.573Z');
+      expect(DateFormatter.format(actualDate, 'Y-M-DTh:m:s.lZ')).toBe(
+        '2024-09-19T00:40:18.573Z',
+      );
     });
     it('should_format_date_with_custom_format_without_timezone', () => {
       const actualDate = new Date('2024-09-19T00:40:18.573Z');
-      expect(DateFormatter.format(actualDate, 'Y-M-D-h-m-s-l')).toBe('2024-09-19-00-40-18-573');
+      expect(DateFormatter.format(actualDate, 'Y-M-D-h-m-s-l')).toBe(
+        '2024-09-19-00-40-18-573',
+      );
     });
     it('should_format_date_with_day_name_and_custom_format', () => {
       const actualDate = new Date('2024-09-19T00:40:18.573Z');
-      expect(DateFormatter.format(actualDate, 'E N D h:m:s.l Y')).toBe('Thu Sep 19 00:40:18.573 2024');
+      expect(DateFormatter.format(actualDate, 'E N D h:m:s.l Y')).toBe(
+        'Thu Sep 19 00:40:18.573 2024',
+      );
     });
     it('should_format_date_with_abbreviated_month_and_custom_time', () => {
       const actualDate = new Date('2024-09-19T00:40:18.573Z');
-      expect(DateFormatter.format(actualDate, 'N D h:m:s')).toBe('Sep 19 00:40:18');
+      expect(DateFormatter.format(actualDate, 'N D h:m:s')).toBe(
+        'Sep 19 00:40:18',
+      );
     });
     it('should_format_date_in_log_format_with_abbreviated_month', () => {
       const actualDate = new Date('2024-09-19T00:40:18.573Z');
-      expect(DateFormatter.format(actualDate, 'D/N/Y:h:m:s +0000')).toBe('19/Sep/2024:00:40:18 +0000');
+      expect(DateFormatter.format(actualDate, 'D/N/Y:h:m:s +0000')).toBe(
+        '19/Sep/2024:00:40:18 +0000',
+      );
     });
     it('should_format_date_with_iso_format_and_timezone', () => {
       const actualDate = new Date('2024-09-19T00:40:18.573Z');
-      expect(DateFormatter.format(actualDate, 'Y-M-DTh:m:s.l+0000')).toBe('2024-09-19T00:40:18.573+0000');
+      expect(DateFormatter.format(actualDate, 'Y-M-DTh:m:s.l+0000')).toBe(
+        '2024-09-19T00:40:18.573+0000',
+      );
     });
     it('should_format_date_with_custom_separator_and_time', () => {
       const actualDate = new Date('2024-09-19T00:40:18.573Z');
@@ -228,7 +240,9 @@ describe('DateFormatter', () => {
     });
     it('should_format_date_with_custom_format_and_hyphen_separator', () => {
       const actualDate = new Date('2024-09-19T00:40:18.573Z');
-      expect(DateFormatter.format(actualDate, 'Y-M-D-h-m-s')).toBe('2024-09-19-00-40-18');
+      expect(DateFormatter.format(actualDate, 'Y-M-D-h-m-s')).toBe(
+        '2024-09-19-00-40-18',
+      );
     });
   });
 });

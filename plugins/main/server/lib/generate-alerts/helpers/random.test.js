@@ -26,13 +26,13 @@ describe('Random', () => {
     });
     it('should_verify_all_characters_in_random_hash_are_in_string', () => {
       const actualHash = Random.createHash(16);
-      actualHash.split('').forEach((char) => {
+      actualHash.split('').forEach(char => {
         expect('abcdef0123456789'.includes(char)).toBe(true);
       });
     });
     it('should_verify_all_characters_in_random_hash_with_default_charset_are_in_string', () => {
       const actualHash = Random.createHash(16, undefined);
-      actualHash.split('').forEach((char) => {
+      actualHash.split('').forEach(char => {
         expect('abcdef0123456789'.includes(char)).toBe(true);
       });
     });
@@ -72,7 +72,9 @@ describe('Random', () => {
       for (let i = 0; i < 100; i++) {
         const expectedDate = new Date();
         expectedDate.setDate(-7);
-        expect(Random.date().getTime()).toBeGreaterThanOrEqual(expectedDate.getTime());
+        expect(Random.date().getTime()).toBeGreaterThanOrEqual(
+          expectedDate.getTime(),
+        );
       }
     });
   });

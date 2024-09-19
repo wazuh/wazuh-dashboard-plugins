@@ -14,6 +14,8 @@ describe('NumberFormatter', () => {
     expect(NumberFormatter.pads(1, 5)).toEqual('00001');
   });
   it('should_throw_range_error_for_invalid_count_value', () => {
-    expect(() => { NumberFormatter.pads(1, -1) }).toThrow('Invalid count value');
+    expect(() => {
+      NumberFormatter.pads(1, -1);
+    }).toThrow('Invalid count value');
   });
 });
