@@ -67,4 +67,13 @@ describe('Random', () => {
       expect(actualNumber).toBeLessThanOrEqual(5);
     });
   });
+  describe('date', () => {
+    it('should_return_date_after_seven_days_ago', () => {
+      for (let i = 0; i < 100; i++) {
+        const expectedDate = new Date();
+        expectedDate.setDate(-7);
+        expect(Random.date().getTime()).toBeGreaterThanOrEqual(expectedDate.getTime());
+      }
+    });
+  });
 });
