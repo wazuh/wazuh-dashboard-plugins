@@ -226,7 +226,7 @@ module.exports.instanceDetails = [
       productCodeType: 'marketplace',
     },
     iamInstanceProfile: {
-      id: Random.createHash(21),
+      id: Random.createHash(21, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
       arn: 'arn:aws:iam::{data.aws.accountId}:instance-profile/opsworks-web-production',
     },
     availabilityZone: 'us-east-1e',
