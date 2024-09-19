@@ -681,6 +681,23 @@ export class WazuhElasticCtrl {
     }
   }
 
+  async statisticsIndexPattern(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const config = await context.wazuh_core.configuration.get();
+      const statisticsPattern = `${config['cron.prefix']}-${config['cron.statistics.index.name']}*`;
+      return response.ok({
+        body: statisticsPattern,
+      });
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(error.message || error, 1000, 500, response);
+    }
+  }
+
   // Check if there are indices for Statistics
   async existStatisticsIndices(
     context: RequestHandlerContext,
