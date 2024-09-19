@@ -16,7 +16,7 @@ module.exports.LOCATION = 'github';
 
 module.exports.decoder = DECODER.JSON;
 
-module.exports.COUNTRY_CODES = [
+const COUNTRY_CODES = [
   'AR',
   'CA',
   'DE',
@@ -28,6 +28,7 @@ module.exports.COUNTRY_CODES = [
   'SE',
   'US',
 ];
+module.exports.COUNTRY_CODES = COUNTRY_CODES;
 
 const baseElements = Array(10).fill();
 
@@ -35,15 +36,16 @@ module.exports.ORGANIZATION_NAMES = baseElements.map(
   (_, index) => `Organization${index + 1}`,
 );
 
-module.exports.USER_NAMES = baseElements.map((_, index) => `User${index + 1}`);
+const USER_NAMES = baseElements.map((_, index) => `User${index + 1}`);
+module.exports.USER_NAMES = USER_NAMES;
 
 module.exports.REPOSITORY_NAMES = baseElements.map(
   (_, index) => `Repo${index + 1}`,
 );
 
 module.exports.ACTORS = baseElements.map((_, index) => ({
-  name: this.USER_NAMES[index],
-  country_code: this.COUNTRY_CODES[index],
+  name: USER_NAMES[index],
+  country_code: COUNTRY_CODES[index],
 }));
 
 module.exports.SERVER_ADDRESS_WEBHOOK = [
