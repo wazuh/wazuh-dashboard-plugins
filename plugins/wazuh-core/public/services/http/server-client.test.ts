@@ -39,9 +39,6 @@ function createClient() {
         };
       }
     }
-    // if(path === '/security/users/me/policies'){
-
-    // }
   });
   const client = new WzRequest(logger, {
     getServerAPI: () => 'test',
