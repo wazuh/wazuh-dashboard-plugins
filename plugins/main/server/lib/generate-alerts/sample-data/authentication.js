@@ -68,7 +68,7 @@ module.exports.multipleAuthenticationFailures = {
     description: 'sshd: Multiple authentication failures.',
     id: '5720',
     level: 10,
-    frequency: '8',
+    frequency: 8,
     groups: ['syslog', 'sshd', 'authentication_failures'],
     pci_dss: ['10.2.4', '10.2.5', '11.4'],
     gpg13: ['7.1'],
@@ -209,7 +209,7 @@ module.exports.bruteForceTryingAccessSystem = {
     },
     id: '5712',
     nist_800_53: ['SI.4', 'AU.14', 'AC.7'],
-    frequency: '8',
+    frequency: 8,
     gdpr: ['IV_35.7.d', 'IV_32.2'],
   },
   full_log:
