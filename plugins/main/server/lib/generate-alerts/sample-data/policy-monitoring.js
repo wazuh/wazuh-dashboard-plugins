@@ -80,35 +80,35 @@ module.exports.trojans = [
   { file: '/usr/bin/grep', signature: 'bash|givemer' },
   {
     file: '/usr/bin/egrep',
-    signature: 'bash|^/bin/sh|file.h|proc.h|/dev/|^/bin/.*sh',
+    signature: 'bash|^/bin/sh|file\.h|proc\.h|/dev/|^/bin/.*sh',
   },
   {
     file: '/usr/bin/find',
-    signature: 'bash|/dev/[^tnlcs]|/prof|/home/virus|file.h',
+    signature: 'bash|/dev/[^tnlcs]|/prof|/home/virus|file\.h',
   },
   {
     file: '/usr/bin/lsof',
-    signature: '/prof|/dev/[^apcmnfk]|proc.h|bash|^/bin/sh|/dev/ttyo|/dev/ttyp',
+    signature: '/prof|/dev/[^apcmnfk]|proc\.h|bash|^/bin/sh|/dev/ttyo|/dev/ttyp',
   },
   {
     file: '/usr/bin/netstat',
-    signature: 'bash|^/bin/sh|/dev/[^aik]|/prof|grep|addr.h',
+    signature: 'bash|^/bin/sh|/dev/[^aik]|/prof|grep|addr\.h',
   },
-  { file: '/usr/bin/top', signature: '/dev/[^npi3st%]|proc.h|/prof/' },
-  { file: '/usr/bin/ps', signature: '/dev/ttyo|.1proc|proc.h|bash|^/bin/sh' },
+  { file: '/usr/bin/top', signature: '/dev/[^npi3st%]|proc\.h|/prof/' },
+  { file: '/usr/bin/ps', signature: '/dev/ttyo|\.1proc|proc\.h|bash|^/bin/sh' },
   {
     file: '/usr/bin/tcpdump',
-    signature: 'bash|^/bin/sh|file.h|proc.h|/dev/[^bu]|^/bin/.*sh',
+    signature: 'bash|^/bin/sh|file\.h|proc\.h|/dev/[^bu]|^/bin/.*sh',
   },
   {
     file: '/usr/bin/pidof',
-    signature: 'bash|^/bin/sh|file.h|proc.h|/dev/[^f]|^/bin/.*sh',
+    signature: 'bash|^/bin/sh|file\.h|proc\.h|/dev/[^f]|^/bin/.*sh',
   },
   {
     file: '/usr/bin/fuser',
-    signature: 'bash|^/bin/sh|file.h|proc.h|/dev/[a-dtz]|^/bin/.*sh',
+    signature: 'bash|^/bin/sh|file\.h|proc\.h|/dev/[a-dtz]|^/bin/.*sh',
   },
-  { file: '/usr/bin/w', signature: 'uname -a|proc.h|bash' },
+  { file: '/usr/bin/w', signature: 'uname -a|proc\.h|bash' },
 ];
 
 module.exports.trojansData = {
