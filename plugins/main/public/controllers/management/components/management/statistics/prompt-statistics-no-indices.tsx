@@ -13,11 +13,8 @@
 import React from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
 
-export const PromptStatisticsNoIndices = ({
-  indexPatternID,
-  existIndexPattern,
-}) => {
-  return existIndexPattern ? (
+export const PromptStatisticsNoIndices = ({ indexPatternID, existIndex }) => {
+  return !existIndex ? (
     <EuiEmptyPrompt
       iconType='securitySignalDetected'
       title={<h2>{indexPatternID} indices were not found.</h2>}

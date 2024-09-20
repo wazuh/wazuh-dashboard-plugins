@@ -254,31 +254,24 @@ export default compose(
       try {
         // Check the existence of related index pattern
         const existIndexPattern = await existsIndexPattern(indexPatternID);
+        const { exist, fields } = await existsIndices(indexPatternID);
         setLoading(true);
 
-        // If the index pattern does not exist, then check the existence of index
-        if (
-          existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND
-        ) {
-          // Check the existence of indices
-          const { exist, fields } = await existsIndices(indexPatternID);
-          if (!exist) {
-            setLoading(false);
-            return;
-          }
+        if (exist) {
           setExistStatisticsIndices(true);
-          // If the some index match the index pattern, then create the index pattern
-          const resultCreateIndexPattern = await createIndexPattern(
-            indexPatternID,
-            fields,
-          );
-          if (resultCreateIndexPattern?.error) {
-            setLoading(false);
-            return;
+          if (!existIndexPattern) {
+            // If some index match the index pattern, then create the index pattern
+            const resultCreateIndexPattern = await createIndexPattern(
+              indexPatternID,
+              fields,
+            );
+            if (resultCreateIndexPattern?.error) {
+              setLoading(false);
+              return;
+            }
           }
+          setExistStatisticsIndexPattern(true);
         }
-        setExistStatisticsIndexPattern(true);
-        setExistStatisticsIndices(true);
       } catch (error) {
         setLoading(false);
         const options = {
@@ -306,7 +299,7 @@ export default compose(
   ) : (
     <PromptStatisticsNoIndices
       indexPatternID={indexPatternID}
-      existIndexPattern={existStatisticsIndexPattern}
+      existIndex={existStatisticsIndices}
     />
   );
 });
