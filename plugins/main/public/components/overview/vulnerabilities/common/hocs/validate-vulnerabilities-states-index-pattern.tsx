@@ -3,8 +3,8 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withGuardAsync } from '../../../../common/hocs';
 import {
-  checkExistenceIndices,
-  checkExistenceIndexPattern,
+  verifyExistenceIndices,
+  verifyExistenceIndexPattern,
   createIndexPattern,
 } from '../../../../../react-services';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
@@ -20,13 +20,13 @@ export async function validateVulnerabilitiesStateDataSources({
 }) {
   try {
     // Check the existence of related index pattern
-    const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
+    const existIndexPattern = await verifyExistenceIndexPattern(indexPatternID);
     const indexPattern = existIndexPattern;
 
     // If the idnex pattern does not exist, then check the existence of index
     if (existIndexPattern?.error?.statusCode === 404) {
       // Check the existence of indices
-      const { exist, fields } = await checkExistenceIndices(indexPatternID);
+      const { exist, fields } = await verifyExistenceIndices(indexPatternID);
 
       if (!exist) {
         return {

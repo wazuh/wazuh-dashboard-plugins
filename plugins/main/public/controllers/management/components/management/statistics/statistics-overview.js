@@ -43,8 +43,8 @@ import { DashboardTabsPanels } from '../../../../../components/overview/server-m
 import { connect } from 'react-redux';
 import NavigationService from '../../../../../react-services/navigation-service';
 import {
-  checkExistenceIndices,
-  checkExistenceIndexPattern,
+  verifyExistenceIndices,
+  verifyExistenceIndexPattern,
   createIndexPattern,
 } from '../../../../../react-services';
 import { StatisticsDataSource } from '../../../../../components/common/data-source/pattern/statistics';
@@ -251,13 +251,13 @@ export default compose(
     const fetchData = async () => {
       try {
         // Check the existence of related index pattern
-        const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
+        const existIndexPattern = await verifyExistenceIndexPattern(indexPatternID);
         setLoading(true);
 
         // If the index pattern does not exist, then check the existence of index
         if (existIndexPattern?.error?.statusCode === 404) {
           // Check the existence of indices
-          const { exist, fields } = await checkExistenceIndices(indexPatternID);
+          const { exist, fields } = await verifyExistenceIndices(indexPatternID);
           if (!exist) {
             setLoading(false);
             return;

@@ -2,7 +2,7 @@ import { SavedObject } from '.';
 import { getSavedObjects } from '../kibana-services';
 import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../common/constants';
 
-export async function checkExistenceIndices(indexPatternId: string) {
+export async function verifyExistenceIndices(indexPatternId: string) {
   try {
     const fields = await SavedObject.getIndicesFields(indexPatternId);
     return { exist: true, fields };
@@ -11,7 +11,7 @@ export async function checkExistenceIndices(indexPatternId: string) {
   }
 }
 
-export async function checkExistenceIndexPattern(indexPatternID: string) {
+export async function verifyExistenceIndexPattern(indexPatternID: string) {
   return await getSavedObjects().client.get('index-pattern', indexPatternID);
 }
 
