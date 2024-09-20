@@ -192,6 +192,78 @@ describe('DateFormatter', () => {
         expect(DateFormatter.tokens.J(actualDate)).toBe('December');
       });
     });
+    describe('tokens.N', () => {
+      it('should_format_month_name_for_january', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(0);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Jan');
+      });
+      it('should_format_month_name_for_february', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(1);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Feb');
+      });
+      it('should_format_month_name_for_march', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(2);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Mar');
+      });
+      it('should_format_month_name_for_april', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(3);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Apr');
+      });
+      it('should_format_month_name_for_may', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(4);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('May');
+      });
+      it('should_format_month_name_for_june', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(5);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Jun');
+      });
+      it('should_format_month_name_for_july', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(6);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Jul');
+      });
+      it('should_format_month_name_for_august', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(7);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Aug');
+      });
+      it('should_format_month_name_for_september', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(8);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Sep');
+      });
+      it('should_format_month_name_for_october', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(9);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Oct');
+      });
+      it('should_format_month_name_for_november', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(10);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Nov');
+      });
+      it('should_format_month_name_for_december', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(11);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Dec');
+      });
+      it('should_format_month_name_for_thirteenth_month', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(12);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Jan');
+      });
+      it('should_format_month_name_for_previous_year_december', () => {
+        const actualDate = new Date('2024-09-19T00:40:18.573Z');
+        actualDate.setMonth(-1);
+        expect(DateFormatter.tokens.N(actualDate)).toBe('Dec');
+      });
+    });
   });
   describe('format', () => {
     it('should_format_date_to_iso_string', () => {
