@@ -241,7 +241,7 @@ export default compose(
     return !props.statisticsEnabled;
   }, PromptStatisticsDisabled),
 )(props => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [existStatisticsIndices, setExistStatisticsIndices] = useState(false);
   const [existStatisticsIndexPattern, setExistStatisticsIndexPattern] =
     useState(false);
