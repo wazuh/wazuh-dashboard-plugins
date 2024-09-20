@@ -33,7 +33,6 @@ import {
 } from '../../../../../components/common/hocs';
 import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
-import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
@@ -43,7 +42,12 @@ import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
 import { connect } from 'react-redux';
 import NavigationService from '../../../../../react-services/navigation-service';
-import { checkExistenceIndices } from '../../../../../react-services';
+import {
+  checkExistenceIndices,
+  checkExistenceIndexPattern,
+  createIndexPattern,
+} from '../../../../../react-services';
+import { StatisticsDataSource } from '../../../../../components/common/data-source/pattern/statistics';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -223,6 +227,8 @@ const mapStateToProps = state => ({
   statisticsEnabled: state.appConfig.data?.['cron.statistics.status'],
   configurationUIEditable:
     state.appConfig.data?.['configuration.ui_api_editable'],
+  statisticsIndexPatternID:
+    `${state.appConfig.data['cron.prefix']}-${state.appConfig.data['cron.statistics.index.name']}*`,
 });
 
 export default compose(
@@ -238,16 +244,37 @@ export default compose(
 )(props => {
   const [loading, setLoading] = useState(false);
   const [existStatisticsIndices, setExistStatisticsIndices] = useState(false);
+  const [existStatisticsIndexPattern, setExistStatisticsIndexPattern] = useState(false);
+  const indexPatternID =
+    StatisticsDataSource.getIdentifierDataSourcePattern();
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Check the existence of related index pattern
+        const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
         setLoading(true);
-        const { data: indexPatternID } = await WzRequest.genericReq(
-          'GET',
-          '/elastic/statisticspattern',
-        );
-        const { exist } = await checkExistenceIndices(indexPatternID);
-        setExistStatisticsIndices(exist);
+
+        // If the index pattern does not exist, then check the existence of index
+        if (existIndexPattern?.error?.statusCode === 404) {
+          // Check the existence of indices
+          const { exist, fields } = await checkExistenceIndices(indexPatternID);
+          if (!exist) {
+            setLoading(false);
+            return;
+          }
+          setExistStatisticsIndices(true);
+          // If the some index match the index pattern, then create the index pattern
+          const resultCreateIndexPattern = await createIndexPattern(
+            indexPatternID,
+            fields,
+          );
+          if (resultCreateIndexPattern?.error) {
+            setLoading(false);
+            return;
+          }
+        }
+        setExistStatisticsIndexPattern(true);
+        setExistStatisticsIndices(true);
       } catch (error) {
         setLoading(false);
         const options = {
@@ -261,7 +288,7 @@ export default compose(
           },
         };
         getErrorOrchestrator().handleError(options);
-      }
+      };
       setLoading(false);
     };
 
@@ -270,9 +297,9 @@ export default compose(
   if (loading) {
     return <EuiProgress size='xs' color='primary' />;
   }
-  return existStatisticsIndices ? (
+  return (existStatisticsIndices && existStatisticsIndexPattern) ? (
     <WzStatisticsOverview {...props} />
   ) : (
-    <PromptStatisticsNoIndices {...props} />
+    <PromptStatisticsNoIndices indexPatternID={indexPatternID} existIndexPattern={existStatisticsIndexPattern} />
   );
 });
