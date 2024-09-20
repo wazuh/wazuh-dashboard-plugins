@@ -88,14 +88,18 @@ module.exports.trojans = [
   },
   {
     file: '/usr/bin/lsof',
-    signature: '/prof|/dev/[^apcmnfk]|proc\\.h|bash|^/bin/sh|/dev/ttyo|/dev/ttyp',
+    signature:
+      '/prof|/dev/[^apcmnfk]|proc\\.h|bash|^/bin/sh|/dev/ttyo|/dev/ttyp',
   },
   {
     file: '/usr/bin/netstat',
     signature: 'bash|^/bin/sh|/dev/[^aik]|/prof|grep|addr\\.h',
   },
   { file: '/usr/bin/top', signature: '/dev/[^npi3st%]|proc\\.h|/prof/' },
-  { file: '/usr/bin/ps', signature: '/dev/ttyo|\\.1proc|proc\\.h|bash|^/bin/sh' },
+  {
+    file: '/usr/bin/ps',
+    signature: '/dev/ttyo|\\.1proc|proc\\.h|bash|^/bin/sh',
+  },
   {
     file: '/usr/bin/tcpdump',
     signature: 'bash|^/bin/sh|file\\.h|proc\\.h|/dev/[^bu]|^/bin/.*sh',
