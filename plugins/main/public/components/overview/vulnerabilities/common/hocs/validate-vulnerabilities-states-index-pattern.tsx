@@ -2,12 +2,11 @@ import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withGuardAsync } from '../../../../common/hocs';
-import { getSavedObjects } from '../../../../../kibana-services';
 import {
-  SavedObject,
   checkExistenceIndices,
+  checkExistenceIndexPattern,
+  createIndexPattern,
 } from '../../../../../react-services';
-import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/constants';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
@@ -16,36 +15,13 @@ import NavigationService from '../../../../../react-services/navigation-service'
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
-async function checkExistenceIndexPattern(indexPatternID: string) {
-  return await getSavedObjects().client.get('index-pattern', indexPatternID);
-}
-
-async function createIndexPattern(indexPattern, fields: any) {
-  try {
-    await SavedObject.createSavedObject(
-      'index-pattern',
-      indexPattern,
-      {
-        attributes: {
-          title: indexPattern,
-          timeFieldName: NOT_TIME_FIELD_NAME_INDEX_PATTERN,
-        },
-      },
-      fields,
-    );
-    await SavedObject.validateIndexPatternSavedObjectCanBeFound([indexPattern]);
-  } catch (error) {
-    return { error: error.message };
-  }
-}
-
 export async function validateVulnerabilitiesStateDataSources({
   vulnerabilitiesStatesindexPatternID: indexPatternID,
 }) {
   try {
     // Check the existence of related index pattern
     const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
-    let indexPattern = existIndexPattern;
+    const indexPattern = existIndexPattern;
 
     // If the idnex pattern does not exist, then check the existence of index
     if (existIndexPattern?.error?.statusCode === 404) {
