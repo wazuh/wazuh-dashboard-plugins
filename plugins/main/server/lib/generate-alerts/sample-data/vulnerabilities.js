@@ -1,6 +1,6 @@
 // Vulnerability
 
-export const data = [
+module.exports.data = [
   {
     rule: {
       level: 7,

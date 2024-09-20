@@ -90,6 +90,7 @@
     osquery: { osquery: true },
     docker: { docker: true },
     mitre: { mitre: true },
+    yara: { yara: true },
   };
 
   // Define the alert module categories
