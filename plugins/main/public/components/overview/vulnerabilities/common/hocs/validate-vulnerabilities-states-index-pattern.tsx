@@ -3,8 +3,8 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withGuardAsync } from '../../../../common/hocs';
 import {
-  verifyExistenceIndices,
-  verifyExistenceIndexPattern,
+  existsIndices,
+  existsIndexPattern,
   createIndexPattern,
 } from '../../../../../react-services';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
@@ -12,6 +12,7 @@ import { webDocumentationLink } from '../../../../../../common/services/web_docu
 import { vulnerabilityDetection } from '../../../../../utils/applications';
 import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { HTTP_STATUS_CODES } from '../../../../../../common/constants';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
@@ -20,13 +21,13 @@ export async function validateVulnerabilitiesStateDataSources({
 }) {
   try {
     // Check the existence of related index pattern
-    const existIndexPattern = await verifyExistenceIndexPattern(indexPatternID);
+    const existIndexPattern = await existsIndexPattern(indexPatternID);
     const indexPattern = existIndexPattern;
 
     // If the idnex pattern does not exist, then check the existence of index
-    if (existIndexPattern?.error?.statusCode === 404) {
+    if (existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND) {
       // Check the existence of indices
-      const { exist, fields } = await verifyExistenceIndices(indexPatternID);
+      const { exist, fields } = await existsIndices(indexPatternID);
 
       if (!exist) {
         return {

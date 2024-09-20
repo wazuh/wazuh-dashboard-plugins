@@ -34,7 +34,10 @@ import {
 import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import {
+  HTTP_STATUS_CODES,
+  UI_LOGGER_LEVELS,
+} from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { getCore } from '../../../../../kibana-services';
 import { appSettings, statistics } from '../../../../../utils/applications';
@@ -43,8 +46,8 @@ import { DashboardTabsPanels } from '../../../../../components/overview/server-m
 import { connect } from 'react-redux';
 import NavigationService from '../../../../../react-services/navigation-service';
 import {
-  verifyExistenceIndices,
-  verifyExistenceIndexPattern,
+  existsIndices,
+  existsIndexPattern,
   createIndexPattern,
 } from '../../../../../react-services';
 import { StatisticsDataSource } from '../../../../../components/common/data-source/pattern/statistics';
@@ -250,17 +253,15 @@ export default compose(
     const fetchData = async () => {
       try {
         // Check the existence of related index pattern
-        const existIndexPattern = await verifyExistenceIndexPattern(
-          indexPatternID,
-        );
+        const existIndexPattern = await existsIndexPattern(indexPatternID);
         setLoading(true);
 
         // If the index pattern does not exist, then check the existence of index
-        if (existIndexPattern?.error?.statusCode === 404) {
+        if (
+          existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND
+        ) {
           // Check the existence of indices
-          const { exist, fields } = await verifyExistenceIndices(
-            indexPatternID,
-          );
+          const { exist, fields } = await existsIndices(indexPatternID);
           if (!exist) {
             setLoading(false);
             return;
