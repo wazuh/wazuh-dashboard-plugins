@@ -11,6 +11,7 @@ import {
 } from '../../../../../../../src/plugins/data/public';
 import { search } from '../../search-bar/search-bar-service';
 import { PatternDataSourceFilterManager } from './pattern-data-source-filter-manager';
+import { useSelector } from 'react-redux';
 
 export class PatternDataSource implements tDataSource {
   id: string;
@@ -52,7 +53,9 @@ export class PatternDataSource implements tDataSource {
         );
         const scripted = pattern.getScriptedFields().map(field => field.spec);
         pattern.fields.replaceAll([...fields, ...scripted]);
-        await this.patternService.updateSavedObject(pattern);
+        try {
+          await this.patternService.updateSavedObject(pattern);
+        } catch {}
       } else {
         throw new Error('Error selecting index pattern: pattern not found');
       }
