@@ -320,14 +320,4 @@ describe.skip('Wazuh Elastic', () => {
   //     });
   //   });
   // });
-
-  describe('Wazuh API - /elastic/statisticspattern', () => {
-    test('[200] Check if there is a statistics index pattern', () => {
-      const options = buildAxiosOptions('get', '/elastic/statisticspattern');
-      return axios(options).then(response => {
-        expect(response.status).toBe(200);
-        expect(typeof response.data).toBe('text');
-      });
-    });
-  });
 });

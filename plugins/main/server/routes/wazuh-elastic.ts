@@ -130,13 +130,4 @@ export function WazuhElasticRoutes(router: IRouter) {
     async (context, request, response) =>
       ctrl.alerts(context, request, response),
   );
-
-  router.get(
-    {
-      path: '/elastic/statisticspattern',
-      validate: false,
-    },
-    async (context, request, response) =>
-      ctrl.statisticsIndexPattern(context, request, response),
-  );
 }
