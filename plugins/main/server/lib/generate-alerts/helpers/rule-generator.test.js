@@ -37,7 +37,9 @@ describe('rule-generator', () => {
       for (let i = 0; i < 100; i++) {
         const actualValue = RuleGenerator.gdpr();
         expect(Array.isArray(actualValue)).toBe(true);
-        expect(actualValue.every((value) => typeof value === 'string')).toBe(true);
+        expect(actualValue.every(value => typeof value === 'string')).toBe(
+          true,
+        );
         expect(actualValue.length).toBeGreaterThanOrEqual(1);
         expect(actualValue.length).toBeLessThanOrEqual(2);
       }
@@ -48,7 +50,9 @@ describe('rule-generator', () => {
       for (let i = 0; i < 100; i++) {
         const actualValue = RuleGenerator.pci_dss();
         expect(Array.isArray(actualValue)).toBe(true);
-        expect(actualValue.every((value) => typeof value === 'string')).toBe(true);
+        expect(actualValue.every(value => typeof value === 'string')).toBe(
+          true,
+        );
         expect(actualValue.length).toBeGreaterThanOrEqual(1);
         expect(actualValue.length).toBeLessThanOrEqual(3);
       }
@@ -59,7 +63,9 @@ describe('rule-generator', () => {
       for (let i = 0; i < 100; i++) {
         const actualValue = RuleGenerator.tsc();
         expect(Array.isArray(actualValue)).toBe(true);
-        expect(actualValue.every((value) => typeof value === 'string')).toBe(true);
+        expect(actualValue.every(value => typeof value === 'string')).toBe(
+          true,
+        );
         expect(actualValue.length).toBeGreaterThanOrEqual(1);
         expect(actualValue.length).toBeLessThanOrEqual(6);
       }
@@ -70,7 +76,9 @@ describe('rule-generator', () => {
       for (let i = 0; i < 100; i++) {
         const actualValue = RuleGenerator.hipaa();
         expect(Array.isArray(actualValue)).toBe(true);
-        expect(actualValue.every((value) => typeof value === 'string')).toBe(true);
+        expect(actualValue.every(value => typeof value === 'string')).toBe(
+          true,
+        );
         expect(actualValue.length).toBeGreaterThanOrEqual(1);
         expect(actualValue.length).toBeLessThanOrEqual(3);
       }
@@ -81,7 +89,9 @@ describe('rule-generator', () => {
       for (let i = 0; i < 100; i++) {
         const actualValue = RuleGenerator.nist_800_53();
         expect(Array.isArray(actualValue)).toBe(true);
-        expect(actualValue.every((value) => typeof value === 'string')).toBe(true);
+        expect(actualValue.every(value => typeof value === 'string')).toBe(
+          true,
+        );
         expect(actualValue.length).toBeGreaterThanOrEqual(1);
         expect(actualValue.length).toBeLessThanOrEqual(4);
       }
@@ -92,7 +102,9 @@ describe('rule-generator', () => {
       for (let i = 0; i < 100; i++) {
         const actualValue = RuleGenerator.gpg13();
         expect(Array.isArray(actualValue)).toBe(true);
-        expect(actualValue.every((value) => typeof value === 'string')).toBe(true);
+        expect(actualValue.every(value => typeof value === 'string')).toBe(
+          true,
+        );
         expect(actualValue.length).toBeGreaterThanOrEqual(1);
         expect(actualValue.length).toBeLessThanOrEqual(3);
       }
@@ -103,7 +115,9 @@ describe('rule-generator', () => {
       for (let i = 0; i < 100; i++) {
         const actualValue = RuleGenerator.pci();
         expect(Array.isArray(actualValue)).toBe(true);
-        expect(actualValue.every((value) => typeof value === 'string')).toBe(true);
+        expect(actualValue.every(value => typeof value === 'string')).toBe(
+          true,
+        );
         expect(actualValue.length).toEqual(1);
       }
     });
