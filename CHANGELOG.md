@@ -7,11 +7,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.10.0
+- Addded sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 
 ### Changed
 
 - Update malware detection group values in data sources [#6963](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6963)
 - Changed the registration id of the Settings application for compatibility with Opensearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
+- Changed Malware detection dashboard visualizations [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 
 ### Removed
 
