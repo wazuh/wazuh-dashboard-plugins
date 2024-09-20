@@ -227,8 +227,7 @@ const mapStateToProps = state => ({
   statisticsEnabled: state.appConfig.data?.['cron.statistics.status'],
   configurationUIEditable:
     state.appConfig.data?.['configuration.ui_api_editable'],
-  statisticsIndexPatternID:
-    `${state.appConfig.data['cron.prefix']}-${state.appConfig.data['cron.statistics.index.name']}*`,
+  statisticsIndexPatternID: `${state.appConfig.data['cron.prefix']}-${state.appConfig.data['cron.statistics.index.name']}*`,
 });
 
 export default compose(
@@ -244,20 +243,24 @@ export default compose(
 )(props => {
   const [loading, setLoading] = useState(false);
   const [existStatisticsIndices, setExistStatisticsIndices] = useState(false);
-  const [existStatisticsIndexPattern, setExistStatisticsIndexPattern] = useState(false);
-  const indexPatternID =
-    StatisticsDataSource.getIdentifierDataSourcePattern();
+  const [existStatisticsIndexPattern, setExistStatisticsIndexPattern] =
+    useState(false);
+  const indexPatternID = StatisticsDataSource.getIdentifierDataSourcePattern();
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Check the existence of related index pattern
-        const existIndexPattern = await verifyExistenceIndexPattern(indexPatternID);
+        const existIndexPattern = await verifyExistenceIndexPattern(
+          indexPatternID,
+        );
         setLoading(true);
 
         // If the index pattern does not exist, then check the existence of index
         if (existIndexPattern?.error?.statusCode === 404) {
           // Check the existence of indices
-          const { exist, fields } = await verifyExistenceIndices(indexPatternID);
+          const { exist, fields } = await verifyExistenceIndices(
+            indexPatternID,
+          );
           if (!exist) {
             setLoading(false);
             return;
@@ -288,7 +291,7 @@ export default compose(
           },
         };
         getErrorOrchestrator().handleError(options);
-      };
+      }
       setLoading(false);
     };
 
@@ -297,9 +300,12 @@ export default compose(
   if (loading) {
     return <EuiProgress size='xs' color='primary' />;
   }
-  return (existStatisticsIndices && existStatisticsIndexPattern) ? (
+  return existStatisticsIndices && existStatisticsIndexPattern ? (
     <WzStatisticsOverview {...props} />
   ) : (
-    <PromptStatisticsNoIndices indexPatternID={indexPatternID} existIndexPattern={existStatisticsIndexPattern} />
+    <PromptStatisticsNoIndices
+      indexPatternID={indexPatternID}
+      existIndexPattern={existStatisticsIndexPattern}
+    />
   );
 });
