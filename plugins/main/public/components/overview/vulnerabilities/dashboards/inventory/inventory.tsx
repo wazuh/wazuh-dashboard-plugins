@@ -30,7 +30,7 @@ import {
   getAllCustomRenders,
 } from '../../../../common/data-grid/data-grid-service';
 import { DiscoverNoResults } from '../../common/components/no_results';
-import { LoadingSpinner } from '../../common/components/loading_spinner';
+import { LoadingSearchbarProgress } from '../../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
 // common components/hooks
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { useDataGrid } from '../../../../common/data-grid/use-data-grid';
@@ -111,6 +111,8 @@ const InventoryVulsComponent = () => {
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
+    filters,
+    setFilters,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
@@ -183,7 +185,7 @@ const InventoryVulsComponent = () => {
         >
           <>
             {isDataSourceLoading ? (
-              <LoadingSpinner />
+              <LoadingSearchbarProgress />
             ) : (
               <WzSearchBar
                 appName='inventory-vuls'
@@ -220,11 +222,9 @@ const InventoryVulsComponent = () => {
                               results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
                                     ariaLabel: 'Warning',
-                                    content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                                    content: `The query results exceeded the limit of ${formatNumWithCommas(
                                       MAX_ENTRIES_PER_QUERY,
-                                    )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                      MAX_ENTRIES_PER_QUERY,
-                                    )} hits.`,
+                                    )} hits. Please refine your search.`,
                                     iconType: 'alert',
                                     position: 'top',
                                   }

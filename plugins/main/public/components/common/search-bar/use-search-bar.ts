@@ -28,7 +28,12 @@ export type tUseSearchBarProps = Partial<SearchBarProps> &
 
 // Output types
 type tUserSearchBarResponse = {
-  searchBarProps: Partial<SearchBarProps>;
+  searchBarProps: Partial<
+    SearchBarProps & {
+      useDefaultBehaviors: boolean;
+      absoluteDateRange: TimeRange;
+    }
+  >;
 };
 
 /**
