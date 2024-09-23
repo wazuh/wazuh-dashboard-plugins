@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiText } from '@elastic/eui';
+import { EuiText, EuiLink, EuiToolTip } from '@elastic/eui';
 import { tDataGridRenderColumn } from '../data-grid';
 import {
   endpointSummary,
@@ -12,11 +12,7 @@ import { i18n } from '@osd/i18n';
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
 const renderRequirementsSecurityOperations = (value: []) => {
-  return (
-    <EuiText gutterSize='s' direction='column'>
-      {value.join(', ')}
-    </EuiText>
-  );
+  return <span>{Array.isArray(value) ? value.join(', ') : value}</span>;
 };
 
 const renderMitreTechnique = technique => (
@@ -77,6 +73,36 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
           {value}
         </WzLink>
       );
+    },
+  },
+  {
+    id: 'vulnerability.reference',
+    render: value => {
+      const links = (
+        <>
+          {/* We separated the reference value since it is a string separated by
+            commas, causing an issue when returning 2 links. */}
+          {value?.split(', ').map((link, index) => (
+            <span key={index}>
+              {!!index && ', '}
+              <EuiToolTip
+                position='top'
+                content='Navigate to the vulnerability reference'
+              >
+                <EuiLink
+                  href={link}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  external
+                >
+                  {link}
+                </EuiLink>
+              </EuiToolTip>
+            </span>
+          ))}
+        </>
+      );
+      return links;
     },
   },
   {

@@ -42,11 +42,9 @@ const DiscoverDataGridAdditionalControls = (
           totalHits && totalHits > maxEntriesPerQuery
             ? {
                 ariaLabel: 'Warning',
-                content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                content: `The query results exceeded the limit of ${formatNumWithCommas(
                   maxEntriesPerQuery,
-                )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                  maxEntriesPerQuery,
-                )} hits.`,
+                )} hits. Please refine your search.`,
                 iconType: 'alert',
                 position: 'top',
               }

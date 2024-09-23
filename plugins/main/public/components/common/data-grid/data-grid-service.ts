@@ -2,19 +2,37 @@ import { SearchResponse } from '../../../../../../src/core/server';
 import * as FileSaver from '../../../services/file-saver';
 import { beautifyDate } from '../../agents/vuls/inventory/lib';
 import { SearchParams, search } from '../search-bar/search-bar-service';
-import { IFieldType } from '../../../../../../src/plugins/data/common';
+import {
+  Filter,
+  IFieldType,
+  IndexPattern,
+} from '../../../../../../src/plugins/data/common';
 export const MAX_ENTRIES_PER_QUERY = 10000;
-import { EuiDataGridColumn } from '@elastic/eui';
 import { tDataGridColumn } from './use-data-grid';
+import { cellFilterActions } from './cell-filter-actions';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../data-source/pattern/pattern-data-source-filter-manager';
 
-export const parseData = (
-  resultsHits: SearchResponse['hits']['hits'],
-): any[] => {
+type ParseData<T> =
+  | {
+      source: T;
+      _id: string;
+      _index: string;
+      _type: string;
+      _score: number;
+    }
+  | {};
+
+export const parseData = <T = unknown>(
+  resultsHits: SearchResponse<T>['hits']['hits'],
+): ParseData<T>[] => {
   const data = resultsHits.map(hit => {
     if (!hit) {
       return {};
     }
-    const source = hit._source as object;
+    const source = hit._source as T;
     const data = {
       ...source,
       _id: hit._id,
@@ -28,10 +46,10 @@ export const parseData = (
 };
 
 export const getFieldFormatted = (
-  rowIndex,
-  columnId,
-  indexPattern,
-  rowsParsed,
+  rowIndex: number,
+  columnId: string,
+  indexPattern: IndexPattern,
+  rowsParsed: ParseData[],
 ) => {
   const field = indexPattern.fields.find(field => field.name === columnId);
   let fieldValue = null;
@@ -169,34 +187,79 @@ export const exportSearchToCSV = async (
   }
 };
 
+const onFilterCellActions = (
+  indexPatternId: string,
+  filters: Filter[],
+  setFilters: (filters: Filter[]) => void,
+) => {
+  return (
+    columndId: string,
+    value: any,
+    operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
+  ) => {
+    const newFilter = PatternDataSourceFilterManager.createFilter(
+      operation,
+      columndId,
+      value,
+      indexPatternId,
+    );
+    setFilters([...filters, newFilter]);
+  };
+};
+
+const mapToDataGridColumn = (
+  field: IFieldType,
+  indexPattern: IndexPattern,
+  rows: any[],
+  pageSize: number,
+  filters: Filter[],
+  setFilters: (filters: Filter[]) => void,
+  defaultColumns: tDataGridColumn[],
+): tDataGridColumn => {
+  const defaultColumn = defaultColumns.find(column => column.id === field.name);
+  return {
+    ...field,
+    id: field.name,
+    name: field.name,
+    schema: field.type,
+    actions: { showHide: true },
+    ...defaultColumn,
+    cellActions: cellFilterActions(
+      field,
+      indexPattern,
+      rows,
+      pageSize,
+      onFilterCellActions(indexPattern.id as string, filters, setFilters),
+    ),
+  } as tDataGridColumn;
+};
+
 export const parseColumns = (
   fields: IFieldType[],
   defaultColumns: tDataGridColumn[] = [],
+  indexPattern: IndexPattern,
+  rows: any[],
+  pageSize: number,
+  filters: Filter[],
+  setFilters: (filters: Filter[]) => void,
 ): tDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
   // merge the properties of the field with the default columns
-  if (!fields?.length) {
-    return defaultColumns;
-  }
+  if (!fields?.length) return defaultColumns;
 
-  const columns = fields
+  return fields
     .filter(field => field.name !== '_source')
-    .map(field => {
-      const defaultColumn = defaultColumns.find(
-        column => column.id === field.name,
-      );
-      return {
-        ...field,
-        id: field.name,
-        name: field.name,
-        schema: field.type,
-        actions: {
-          showHide: true,
-        },
-        ...defaultColumn,
-      };
-    }) as tDataGridColumn[];
-  return columns;
+    .map(field =>
+      mapToDataGridColumn(
+        field,
+        indexPattern,
+        rows,
+        pageSize,
+        filters,
+        setFilters,
+        defaultColumns,
+      ),
+    );
 };
 
 /**

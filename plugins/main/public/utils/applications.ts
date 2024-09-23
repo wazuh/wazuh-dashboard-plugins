@@ -198,7 +198,7 @@ export const vulnerabilityDetection = {
   euiIconType: 'heartbeatApp',
   order: 301,
   showInOverviewApp: true,
-  showInAgentMenu: false,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=vuls&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -475,7 +475,7 @@ export const office365 = {
   euiIconType: LogoOffice365,
   order: 503,
   showInOverviewApp: true,
-  showInAgentMenu: false,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=office&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id

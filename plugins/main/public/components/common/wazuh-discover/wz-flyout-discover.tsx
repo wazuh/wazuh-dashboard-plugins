@@ -15,7 +15,7 @@ import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/public';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
-import { LoadingSpinner } from '../loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { tDataGridColumn } from '../data-grid';
 import {
   ErrorHandler,
@@ -268,84 +268,82 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   return (
     <IntlProvider locale='en'>
-      <EuiFlexGroup className='flyout-row'>
-        <EuiFlexItem>
-          {isDataSourceLoading ? (
-            <LoadingSpinner />
-          ) : (
+      {isDataSourceLoading ? (
+        <LoadingSearchbarProgress />
+      ) : (
+        <EuiFlexGroup className='flyout-row'>
+          <EuiFlexItem>
             <WzSearchBar
               appName='wazuh-discover-search-bar'
               {...searchBarProps}
               useDefaultBehaviors={false}
               hideFixedFilters
             />
-          )}
-          {!isDataSourceLoading && results?.hits?.total === 0 && (
-            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-          )}
-          {!isDataSourceLoading && dataSource && results?.hits?.total > 0 && (
-            <>
-              <EuiPanel
-                color='subdued'
-                borderRadius='none'
-                hasShadow={false}
-                paddingSize='s'
-              >
-                <HitsCounter
-                  hits={results?.hits?.total}
-                  showResetButton={false}
-                  tooltip={
-                    results?.hits?.total &&
-                    results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                      ? {
-                          ariaLabel: 'Warning',
-                          content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits.`,
-                          iconType: 'alert',
-                          position: 'top',
-                        }
-                      : undefined
-                  }
+            {!isDataSourceLoading && results?.hits?.total === 0 && (
+              <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+            )}
+            {!isDataSourceLoading && dataSource && results?.hits?.total > 0 && (
+              <>
+                <EuiPanel
+                  color='subdued'
+                  borderRadius='none'
+                  hasShadow={false}
+                  paddingSize='s'
+                >
+                  <HitsCounter
+                    hits={results?.hits?.total}
+                    showResetButton={false}
+                    tooltip={
+                      results?.hits?.total &&
+                      results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                        ? {
+                            ariaLabel: 'Warning',
+                            content: `The query results exceeded the limit of ${formatNumWithCommas(
+                              MAX_ENTRIES_PER_QUERY,
+                            )} hits. Please refine your search.`,
+                            iconType: 'alert',
+                            position: 'top',
+                          }
+                        : undefined
+                    }
+                  />
+                  {absoluteDateRange ? (
+                    <EuiFlexGroup
+                      gutterSize='s'
+                      responsive={false}
+                      justifyContent='center'
+                      alignItems='center'
+                    >
+                      <EuiFlexItem grow={false}>
+                        <EuiText size='s'>
+                          {formatUIDate(absoluteDateRange?.from)} -{' '}
+                          {formatUIDate(absoluteDateRange?.to)}
+                        </EuiText>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  ) : null}
+                </EuiPanel>
+                <EuiBasicTable
+                  items={parsedItems}
+                  itemId={INDEX_FIELD_NAME}
+                  itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+                  isExpandable={isExpanded}
+                  columns={getColumns()}
+                  pagination={{
+                    ...pagination,
+                    totalItemCount:
+                      (results?.hits?.total ?? 0) > MAX_ENTRIES_PER_QUERY
+                        ? MAX_ENTRIES_PER_QUERY
+                        : results?.hits?.total ?? 0,
+                  }}
+                  sorting={sorting}
+                  onChange={onTableChange}
                 />
-                {absoluteDateRange ? (
-                  <EuiFlexGroup
-                    gutterSize='s'
-                    responsive={false}
-                    justifyContent='center'
-                    alignItems='center'
-                  >
-                    <EuiFlexItem grow={false}>
-                      <EuiText size='s'>
-                        {formatUIDate(absoluteDateRange?.from)} -{' '}
-                        {formatUIDate(absoluteDateRange?.to)}
-                      </EuiText>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                ) : null}
-              </EuiPanel>
-              <EuiBasicTable
-                items={parsedItems}
-                itemId={INDEX_FIELD_NAME}
-                itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-                isExpandable={isExpanded}
-                columns={getColumns()}
-                pagination={{
-                  ...pagination,
-                  totalItemCount:
-                    (results?.hits?.total ?? 0) > MAX_ENTRIES_PER_QUERY
-                      ? MAX_ENTRIES_PER_QUERY
-                      : results?.hits?.total ?? 0,
-                }}
-                sorting={sorting}
-                onChange={onTableChange}
-              />
-            </>
-          )}
-        </EuiFlexItem>
-      </EuiFlexGroup>
+              </>
+            )}
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      )}
     </IntlProvider>
   );
 };

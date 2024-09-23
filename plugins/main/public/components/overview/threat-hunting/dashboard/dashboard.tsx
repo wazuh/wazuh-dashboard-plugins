@@ -32,8 +32,6 @@ import {
 } from '../../../common/data-grid/data-grid-service';
 import { useDocViewer } from '../../../common/doc-viewer/use-doc-viewer';
 import { useDataGrid } from '../../../common/data-grid/use-data-grid';
-import { HitsCounter } from '../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
-import { formatNumWithCommas } from '../../../../kibana-integrations/discover/application/helpers/format_number_with_commas';
 import DocViewer from '../../../common/doc-viewer/doc-viewer';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import './threat_hunting_dashboard.scss';
@@ -51,7 +49,7 @@ import {
   useDataSource,
 } from '../../../common/data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { wzDiscoverRenderColumns } from '../../../common/wazuh-discover/render-columns';
 import { WzSearchBar } from '../../../common/search-bar';
@@ -120,15 +118,17 @@ const DashboardTH: React.FC = () => {
     defaultColumns: threatHuntingTableDefaultColumns,
     renderColumns: wzDiscoverRenderColumns,
     results,
-    indexPattern: dataSource?.indexPattern,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
     DocViewInspectButton,
+    filters,
+    setFilters,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
 
   const docViewerProps = useDocViewer({
     doc: inspectedHit,
-    indexPattern: dataSource?.indexPattern,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
   });
 
   const pinnedAgent =
@@ -145,7 +145,7 @@ const DashboardTH: React.FC = () => {
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
     totalResults: results?.hits?.total ?? 0,
-    indexPattern: dataSource?.indexPattern,
+    indexPattern: dataSource?.indexPattern as IndexPattern,
     filters: fetchFilters,
     query: query,
     time: absoluteDateRange,
@@ -207,10 +207,10 @@ const DashboardTH: React.FC = () => {
 
   return (
     <I18nProvider>
-      <>
-        {isDataSourceLoading && !dataSource ? (
-          <LoadingSpinner />
-        ) : (
+      {isDataSourceLoading && !dataSource ? (
+        <LoadingSearchbarProgress />
+      ) : (
+        <>
           <WzSearchBar
             appName='th-searchbar'
             {...searchBarProps}
@@ -220,107 +220,109 @@ const DashboardTH: React.FC = () => {
             showQueryBar={true}
             showSaveQuery={true}
           />
-        )}
-        {!isDataSourceLoading && dataSource && results?.hits?.total === 0 ? (
-          <DiscoverNoResults />
-        ) : null}
-        <div
-          className={`th-container ${
-            !isDataSourceLoading && dataSource && results?.hits?.total > 0
-              ? ''
-              : 'wz-no-display'
-          }`}
-        >
-          <SampleDataWarning />
-          <div className='th-dashboard-responsive'>
-            <DashboardByRenderer
-              input={{
-                viewMode: ViewMode.VIEW,
-                panels: getKPIsPanel(AlertsRepository.getStoreIndexPatternId()),
-                isFullScreenMode: false,
-                filters: fetchFilters ?? [],
-                useMargins: true,
-                id: 'kpis-th-dashboard-tab',
-                timeRange: absoluteDateRange,
-                title: 'KPIs Threat Hunting dashboard',
-                description: 'KPIs Dashboard of the Threat Hunting',
-                query: query,
-                refreshConfig: {
-                  pause: false,
-                  value: 15,
-                },
-                hidePanelTitles: true,
-              }}
-            />
-            <DashboardByRenderer
-              input={{
-                viewMode: ViewMode.VIEW,
-                panels: getDashboardPanels(
-                  AlertsRepository.getStoreIndexPatternId(),
-                  pinnedAgent,
-                ),
-                isFullScreenMode: false,
-                filters: fetchFilters ?? [],
-                useMargins: true,
-                id: 'th-dashboard-tab',
-                timeRange: absoluteDateRange,
-                title: 'Threat Hunting dashboard',
-                description: 'Dashboard of the Threat Hunting',
-                query: query,
-                refreshConfig: {
-                  pause: false,
-                  value: 15,
-                },
-                hidePanelTitles: false,
-              }}
-            />
-            <div style={{ margin: '8px' }}>
-              {!isDataSourceLoading ? (
-                <EuiDataGrid
-                  {...dataGridProps}
-                  className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                  toolbarVisibility={{
-                    additionalControls: (
-                      <>
-                        <DiscoverDataGridAdditionalControls
-                          totalHits={results?.hits?.total || 0}
-                          isExporting={isExporting}
-                          onClickExportResults={onClickExportResults}
-                          maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                          dateRange={absoluteDateRange}
-                        />
-                      </>
-                    ),
-                  }}
-                />
-              ) : null}
-            </div>
-            {inspectedHit && (
-              <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-                <EuiFlyoutHeader>
-                  <DocDetailsHeader
-                    doc={inspectedHit}
-                    indexPattern={dataSource?.indexPattern}
+          {!isDataSourceLoading && dataSource && results?.hits?.total === 0 ? (
+            <DiscoverNoResults />
+          ) : null}
+          <div
+            className={`th-container ${
+              !isDataSourceLoading && dataSource && results?.hits?.total > 0
+                ? ''
+                : 'wz-no-display'
+            }`}
+          >
+            <SampleDataWarning />
+            <div className='th-dashboard-responsive'>
+              <DashboardByRenderer
+                input={{
+                  viewMode: ViewMode.VIEW,
+                  panels: getKPIsPanel(
+                    AlertsRepository.getStoreIndexPatternId(),
+                  ),
+                  isFullScreenMode: false,
+                  filters: fetchFilters ?? [],
+                  useMargins: true,
+                  id: 'kpis-th-dashboard-tab',
+                  timeRange: absoluteDateRange,
+                  title: 'KPIs Threat Hunting dashboard',
+                  description: 'KPIs Dashboard of the Threat Hunting',
+                  query: query,
+                  refreshConfig: {
+                    pause: false,
+                    value: 15,
+                  },
+                  hidePanelTitles: true,
+                }}
+              />
+              <DashboardByRenderer
+                input={{
+                  viewMode: ViewMode.VIEW,
+                  panels: getDashboardPanels(
+                    AlertsRepository.getStoreIndexPatternId(),
+                    pinnedAgent,
+                  ),
+                  isFullScreenMode: false,
+                  filters: fetchFilters ?? [],
+                  useMargins: true,
+                  id: 'th-dashboard-tab',
+                  timeRange: absoluteDateRange,
+                  title: 'Threat Hunting dashboard',
+                  description: 'Dashboard of the Threat Hunting',
+                  query: query,
+                  refreshConfig: {
+                    pause: false,
+                    value: 15,
+                  },
+                  hidePanelTitles: false,
+                }}
+              />
+              <div style={{ margin: '8px' }}>
+                {!isDataSourceLoading ? (
+                  <EuiDataGrid
+                    {...dataGridProps}
+                    className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                    toolbarVisibility={{
+                      additionalControls: (
+                        <>
+                          <DiscoverDataGridAdditionalControls
+                            totalHits={results?.hits?.total || 0}
+                            isExporting={isExporting}
+                            onClickExportResults={onClickExportResults}
+                            maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                            dateRange={absoluteDateRange}
+                          />
+                        </>
+                      ),
+                    }}
                   />
-                </EuiFlyoutHeader>
-                <EuiFlyoutBody>
-                  <EuiFlexGroup direction='column'>
-                    <EuiFlexItem>
-                      <DocViewer
-                        {...docViewerProps}
-                        renderFields={getAllCustomRenders(
-                          threatHuntingTableDefaultColumns,
-                          wzDiscoverRenderColumns,
-                        )}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiFlyoutBody>
-              </EuiFlyout>
-            )}
+                ) : null}
+              </div>
+              {inspectedHit && (
+                <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+                  <EuiFlyoutHeader>
+                    <DocDetailsHeader
+                      doc={inspectedHit}
+                      indexPattern={dataSource?.indexPattern}
+                    />
+                  </EuiFlyoutHeader>
+                  <EuiFlyoutBody>
+                    <EuiFlexGroup direction='column'>
+                      <EuiFlexItem>
+                        <DocViewer
+                          {...docViewerProps}
+                          renderFields={getAllCustomRenders(
+                            threatHuntingTableDefaultColumns,
+                            wzDiscoverRenderColumns,
+                          )}
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlyoutBody>
+                </EuiFlyout>
+              )}
+            </div>
           </div>
-        </div>
-      </>
+        </>
+      )}
     </I18nProvider>
   );
 };

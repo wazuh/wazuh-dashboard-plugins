@@ -8,7 +8,7 @@ import useSearchBar from '../../../common/search-bar/use-search-bar';
 import './styles.scss';
 import { withErrorBoundary } from '../../../common/hocs';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
 import {
   ErrorFactory,
@@ -91,10 +91,10 @@ const DashboardTSCComponent: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <>
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
-          ) : (
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSearchbarProgress />
+        ) : (
+          <>
             <WzSearchBar
               appName='tsc-searchbar'
               {...searchBarProps}
@@ -103,42 +103,42 @@ const DashboardTSCComponent: React.FC = () => {
               showQueryInput={true}
               showQueryBar={true}
             />
-          )}
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
-          <div
-            className={
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }
-          >
-            <SampleDataWarning />
-            <div className='tsc-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    AlertsRepository.getStoreIndexPatternId(),
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'tsc-dashboard-tab',
-                  timeRange: absoluteDateRange,
-                  title: 'TSC dashboard',
-                  description: 'Dashboard of the TSC',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
+            {dataSource && results?.hits?.total === 0 ? (
+              <DiscoverNoResults />
+            ) : null}
+            <div
+              className={
+                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }
+            >
+              <SampleDataWarning />
+              <div className='tsc-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      AlertsRepository.getStoreIndexPatternId(),
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'tsc-dashboard-tab',
+                    timeRange: absoluteDateRange,
+                    title: 'TSC dashboard',
+                    description: 'Dashboard of the TSC',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </>
+          </>
+        )}
       </I18nProvider>
     </>
   );

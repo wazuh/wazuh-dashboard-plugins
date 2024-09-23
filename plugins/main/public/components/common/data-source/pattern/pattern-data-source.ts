@@ -6,7 +6,7 @@ import {
 } from '../index';
 import { getDataPlugin } from '../../../../kibana-services';
 import {
-  IndexPatternsContract,
+  IndexPatternsService,
   IndexPattern,
 } from '../../../../../../../src/plugins/data/public';
 import { search } from '../../search-bar/search-bar-service';
@@ -17,7 +17,7 @@ export class PatternDataSource implements tDataSource {
   id: string;
   title: string;
   fields: any[];
-  patternService: IndexPatternsContract;
+  patternService: IndexPatternsService;
   indexPattern: IndexPattern;
 
   constructor(id: string, title: string) {

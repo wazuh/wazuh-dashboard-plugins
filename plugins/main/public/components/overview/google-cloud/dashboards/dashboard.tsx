@@ -22,7 +22,7 @@ import {
 } from '../../../common/data-source';
 import { GoogleCloudDataSource } from '../../../common/data-source/pattern/alerts/google-cloud/google-cloud-data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../../../common/search-bar';
 
@@ -89,10 +89,10 @@ const DashboardGoogleCloudComponent: React.FC = () => {
   return (
     <>
       <I18nProvider>
-        <>
-          {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
-          ) : (
+        {isDataSourceLoading && !dataSource ? (
+          <LoadingSearchbarProgress />
+        ) : (
+          <>
             <WzSearchBar
               appName='google-cloud-searchbar'
               {...searchBarProps}
@@ -102,42 +102,42 @@ const DashboardGoogleCloudComponent: React.FC = () => {
               showQueryBar={true}
               showSaveQuery={true}
             />
-          )}
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
-          <div
-            className={
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }
-          >
-            <SampleDataWarning />
-            <div className='google-cloud-dashboard-responsive'>
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    AlertsRepository.getStoreIndexPatternId(),
-                    Boolean(dataSource?.getPinnedAgentFilter()?.length),
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'google-cloud-detector-dashboard-tab',
-                  timeRange: absoluteDateRange,
-                  title: 'Google Cloud detector dashboard',
-                  description: 'Dashboard of the Google Cloud',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                }}
-              />
+            {dataSource && results?.hits?.total === 0 ? (
+              <DiscoverNoResults />
+            ) : null}
+            <div
+              className={
+                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }
+            >
+              <SampleDataWarning />
+              <div className='google-cloud-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      AlertsRepository.getStoreIndexPatternId(),
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'google-cloud-detector-dashboard-tab',
+                    timeRange: absoluteDateRange,
+                    title: 'Google Cloud detector dashboard',
+                    description: 'Dashboard of the Google Cloud',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </>
+          </>
+        )}
       </I18nProvider>
     </>
   );
