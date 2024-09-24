@@ -15,9 +15,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the registration id of the Settings application for compatibility with Opensearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
 - Changed Malware detection dashboard visualizations [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 
+### Fixed
+
+- Fixed read-only users could not access to Statistics application [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
+
 ### Removed
 
 - Removed agent RBAC filters from dashboard queries [#6945](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6945)
+- Removed GET /elastic/statistics API endpoint [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
 
 ## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 01
 
