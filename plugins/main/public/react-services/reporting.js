@@ -94,12 +94,24 @@ export class ReportingService {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
-              onClick={() =>
-                window.open(
-                  getHttp().basePath.prepend(`/reports/${filename}`),
-                  '_blank',
-                )
-              }
+              onClick={() => {
+                // Open the new tab immediately
+                const windowReference = window.open('', '_blank');
+
+                // Verify if the new tab was locked
+                if (windowReference) {
+                  // Get the URL (in this case, it is obtained directly, but it can be asynchronous)
+                  const url = getHttp().basePath.prepend(
+                    `/reports/${filename}`,
+                  );
+
+                  // Then assign the URL to the new tab
+                  windowReference.location = url;
+                } else {
+                  // If the tab is locked, it displays an alert to the user.
+                  alert('The tab was blocked. Please enable pop-up windows.');
+                }
+              }}
               size='s'
             >
               Open report
