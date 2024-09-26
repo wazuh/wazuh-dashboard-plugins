@@ -12,11 +12,13 @@ export interface WzSearchBarProps extends SearchBarProps {
   userFilters?: Filter[];
   preQueryBar?: React.ReactElement;
   postFilters?: React.ReactElement;
+  postFixedFilters?: () => React.ReactElement<any>[];
   hideFixedFilters?: boolean;
 }
 
 export const WzSearchBar = ({
   fixedFilters = [],
+  postFixedFilters,
   preQueryBar,
   hideFixedFilters,
   postFilters,
@@ -65,14 +67,18 @@ export const WzSearchBar = ({
                 {fixedFilters?.map((filter, idx) => (
                   <EuiFlexItem grow={false} key={idx}>
                     <EuiBadge className='globalFilterItem' color='hollow'>
-                      {`${filter.meta.key}: ${
-                        typeof filter.meta.value === 'function'
-                          ? filter.meta.value()
-                          : filter.meta.value
-                      }`}
+                      {`${filter.meta.key}: ${typeof filter.meta.value === 'function'
+                        ? filter.meta.value()
+                        : filter.meta.value
+                        }`}
                     </EuiBadge>
                   </EuiFlexItem>
                 ))}
+                {postFixedFilters ? postFixedFilters.map((Filter, idx) => (
+                  <EuiFlexItem grow={false} key={idx}>
+                    <Filter />
+                  </EuiFlexItem>
+                )) : null}
               </EuiFlexGroup>
             </EuiFlexItem>
           )}
