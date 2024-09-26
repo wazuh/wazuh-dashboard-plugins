@@ -22,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an style that affected the Discover plugin [#6989](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6989)
 - Fixed a problem updating the API host registry in the GET /api/check-stored-api [#6995](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6995)
 - Fixed the `Open report` button of the toast and the `Download report` icon of the reporting table in Safari [#7019](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7019)
+- Fixed style when unnpinned an agent in endpoint summary section [#7015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7015)
 
 ### Changed
 
