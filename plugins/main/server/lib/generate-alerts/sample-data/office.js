@@ -10,17 +10,20 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const arrayOfficeGroups = ['office365', 'AzureActiveDirectoryStsLogon'];
+module.exports.arrayOfficeGroups = [
+  'office365',
+  'AzureActiveDirectoryStsLogon',
+];
 
-export const arrayLocationOffice = 'office365';
+module.exports.arrayLocationOffice = 'office365';
 
-export const arrayDecoderOffice = [
+module.exports.arrayDecoderOffice = [
   {
     name: 'json',
   },
 ];
 
-export const arrayUuidOffice = [
+module.exports.arrayUuidOffice = [
   'a8080009-aa85-4d65-a0f0-74fe0331edce',
   '4e93c8e3-52c1-4a4e-ab69-9e61ccf6cd00',
   'd14aa5cb-b070-42f8-8709-0f8afd942fc0',
@@ -43,7 +46,7 @@ export const arrayUuidOffice = [
   '29f96271-5c1b-47ec-9652-a41d5cb17cb4',
 ];
 
-export const arrayDevicePropertiesOffice = [
+module.exports.arrayDevicePropertiesOffice = [
   {
     Name: 'BrowserType',
     Value: 'Chrome',
@@ -58,7 +61,7 @@ export const arrayDevicePropertiesOffice = [
   },
 ];
 
-export const arrayIp = [
+module.exports.arrayIp = [
   '77.231.182.17',
   '172.217.204.94',
   '108.177.13.101',
@@ -68,21 +71,21 @@ export const arrayIp = [
   '13.226.52.89',
   '140.82.113.3',
 ];
-export const arrayUserId = [
+module.exports.arrayUserId = [
   'smith@wazuh.com',
   'williams@wazuh.com',
   'frank@wazuh.com',
   'jones@wazuh.com',
   'brown@wazuh.com',
 ];
-export const arrayTargetOffice = [
+module.exports.arrayTargetOffice = [
   {
     ID: '797f4846-ba00-4fd7-ba43-dac1f8f63013',
     Type: 0,
   },
 ];
 
-export const arrayActorOffice = [
+module.exports.arrayActorOffice = [
   {
     ID: 'a39dd957-d295-4548-b537-2055469bafbb',
     Type: 0,
@@ -93,7 +96,7 @@ export const arrayActorOffice = [
   },
 ];
 
-export const arrayExtendedPropertiesOffice = [
+module.exports.arrayExtendedPropertiesOffice = [
   {
     Name: 'ResultStatusDetail',
     Value: 'Success',
@@ -109,7 +112,7 @@ export const arrayExtendedPropertiesOffice = [
   },
 ];
 
-export const officeRules = {
+module.exports.officeRules = {
   1: {
     data: {
       office365: {
@@ -123,7 +126,13 @@ export const officeRules = {
       id: '91533',
       mail: false,
       firedtimes: 3,
-      groups: ['office365', 'ExchangeAdmin', 'hipaa_164.312.b', 'pci_dss_10.2.2', 'pci_dss_10.6.1'],
+      groups: [
+        'office365',
+        'ExchangeAdmin',
+        'hipaa_164.312.b',
+        'pci_dss_10.2.2',
+        'pci_dss_10.6.1',
+      ],
     },
   },
   2: {
@@ -140,7 +149,12 @@ export const officeRules = {
       id: '91534',
       mail: false,
       firedtimes: 3,
-      groups: ['office365', 'ExchangeItem', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: [
+        'office365',
+        'ExchangeItem',
+        'hipaa_164.312.b',
+        'pci_dss_10.6.2',
+      ],
     },
   },
   4: {
@@ -195,7 +209,12 @@ export const officeRules = {
       id: '91539',
       mail: false,
       firedtimes: 3,
-      groups: ['office365', 'AzureActiveDirectory', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: [
+        'office365',
+        'AzureActiveDirectory',
+        'hipaa_164.312.b',
+        'pci_dss_10.6.2',
+      ],
     },
   },
   14: {
@@ -223,7 +242,8 @@ export const officeRules = {
     },
     rule: {
       level: 3,
-      description: 'Office 365: Secure Token Service (STS) logon events in Azure Active Directory.',
+      description:
+        'Office 365: Secure Token Service (STS) logon events in Azure Active Directory.',
       id: '91545',
       mail: false,
       firedtimes: 3,
@@ -246,7 +266,8 @@ export const officeRules = {
     },
     rule: {
       level: 5,
-      description: 'Office 365: Admin actions from the Security and Compliance Center.',
+      description:
+        'Office 365: Admin actions from the Security and Compliance Center.',
       id: '91548',
       mail: false,
       firedtimes: 3,
@@ -272,7 +293,12 @@ export const officeRules = {
       id: '91564',
       mail: false,
       firedtimes: 3,
-      groups: ['office365', 'SharePointListOperation', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: [
+        'office365',
+        'SharePointListOperation',
+        'hipaa_164.312.b',
+        'pci_dss_10.6.2',
+      ],
     },
   },
   52: {
@@ -288,11 +314,16 @@ export const officeRules = {
       id: '91580',
       mail: false,
       firedtimes: 4,
-      groups: ['office365', 'DataInsightsRestApiAudit', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: [
+        'office365',
+        'DataInsightsRestApiAudit',
+        'hipaa_164.312.b',
+        'pci_dss_10.6.2',
+      ],
     },
   },
 };
-export const arrayLogs = [
+module.exports.arrayLogs = [
   {
     Id: '35ab8b89-cfea-4214-5249-08d91a06e537',
     Operation: 'SearchDataInsightsSubscription',
@@ -689,7 +720,8 @@ export const arrayLogs = [
       },
       {
         Name: 'Included Updated Properties',
-        NewValue: 'AccountEnabled, AppPrincipalId, DisplayName, ServicePrincipalName, Credential',
+        NewValue:
+          'AccountEnabled, AppPrincipalId, DisplayName, ServicePrincipalName, Credential',
         OldValue: '',
       },
       {
@@ -1182,7 +1214,8 @@ export const arrayLogs = [
     Version: 1,
     Workload: 'SharePoint',
     ClientIP: '190.16.9.176',
-    ObjectId: 'https://wazuh.sharepoint.com/sites/TestSharePoint/SitePages/Home.aspx',
+    ObjectId:
+      'https://wazuh.sharepoint.com/sites/TestSharePoint/SitePages/Home.aspx',
     UserId: 'fake@email.not',
     CorrelationId: '48d1c99f-f03c-2000-df13-38983a6608f8',
     EventSource: 'SharePoint',
@@ -1245,7 +1278,8 @@ export const arrayLogs = [
     Version: 1,
     Workload: 'SharePoint',
     ClientIP: '190.16.9.176',
-    ObjectId: 'https://wazuh.sharepoint.com/sites/TestSharePoint/SitePages/Home.aspx',
+    ObjectId:
+      'https://wazuh.sharepoint.com/sites/TestSharePoint/SitePages/Home.aspx',
     UserId: 'fake@email.not',
     CorrelationId: '53d1c99f-b0aa-2000-df13-3efea9e41071',
     CustomUniqueId: false,
@@ -1269,7 +1303,8 @@ export const arrayLogs = [
     Version: 1,
     Workload: 'SharePoint',
     ClientIP: '190.16.9.176',
-    ObjectId: 'https://wazuh.sharepoint.com/sites/TestSharePoint/SitePages/Home.aspx',
+    ObjectId:
+      'https://wazuh.sharepoint.com/sites/TestSharePoint/SitePages/Home.aspx',
     UserId: 'fake@email.not',
     CorrelationId: '62d1c99f-d09c-2000-df13-37ddf480e717',
     DoNotDistributeEvent: true,
@@ -1480,8 +1515,7 @@ export const arrayLogs = [
     Item: {
       Attachments:
         'warming_email_03_2017_calendar.png (646b); warming_email_03_2017_conversation.png (661b); warming_email_03_2017_links.png (1450b); google_play_store_badge.png (4871b); apple_store_badge.png (4493b); windows_store_badge.png (3728b); warming_email_03_2017_files.png (856b); warming_email_03_2017_sharePoint.png (1479b)',
-      Id:
-        'RgAAAAA6tVhba3JWSaGmky7/7OvfBwDRwKc47c1sT4Waab6O4zbPAAAAAAEMAADRwKc47c1sT4Waab6O4zbPAAAAAAk9AAAJ',
+      Id: 'RgAAAAA6tVhba3JWSaGmky7/7OvfBwDRwKc47c1sT4Waab6O4zbPAAAAAAEMAADRwKc47c1sT4Waab6O4zbPAAAAAAk9AAAJ',
       InternetMessageId:
         '<AS8PR04MB846542106D3939F2D1952D05D32A9@AS8PR04MB8465.eurprd04.prod.outlook.com>',
       IsRecord: false,
@@ -1547,7 +1581,8 @@ export const arrayLogs = [
       },
       {
         Name: 'EmailAddresses',
-        Value: 'smtp:TestSharePoint@wazuh.testytest.com;SMTP:TestSharePoint@wazuh.com',
+        Value:
+          'smtp:TestSharePoint@wazuh.testytest.com;SMTP:TestSharePoint@wazuh.com',
       },
       {
         Name: 'IncludeSoftDeletedObjects',
@@ -1578,7 +1613,8 @@ export const arrayLogs = [
     Parameters: [
       {
         Name: 'Identity',
-        Value: '0fea4e03-8146-453b-b889-54b4bd11565b\\bdbb8236-0f48-4fc6-9f77-914cdcc02b3c',
+        Value:
+          '0fea4e03-8146-453b-b889-54b4bd11565b\\bdbb8236-0f48-4fc6-9f77-914cdcc02b3c',
       },
       {
         Name: 'SyncMailboxLocationGuids',

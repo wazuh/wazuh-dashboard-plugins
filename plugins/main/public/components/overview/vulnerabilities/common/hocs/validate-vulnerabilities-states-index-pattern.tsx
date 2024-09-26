@@ -2,61 +2,32 @@ import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withGuardAsync } from '../../../../common/hocs';
-import { getSavedObjects } from '../../../../../kibana-services';
-import { SavedObject } from '../../../../../react-services';
-import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/constants';
+import {
+  existsIndices,
+  existsIndexPattern,
+  createIndexPattern,
+} from '../../../../../react-services';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
 import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { HTTP_STATUS_CODES } from '../../../../../../common/constants';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
-
-async function checkExistenceIndexPattern(indexPatternID: string) {
-  return await getSavedObjects().client.get('index-pattern', indexPatternID);
-}
-
-async function checkExistenceIndices(indexPatternId: string) {
-  try {
-    const fields = await SavedObject.getIndicesFields(indexPatternId);
-    return { exist: true, fields };
-  } catch (error) {
-    return { exist: false };
-  }
-}
-
-async function createIndexPattern(indexPattern, fields: any) {
-  try {
-    await SavedObject.createSavedObject(
-      'index-pattern',
-      indexPattern,
-      {
-        attributes: {
-          title: indexPattern,
-          timeFieldName: NOT_TIME_FIELD_NAME_INDEX_PATTERN,
-        },
-      },
-      fields,
-    );
-    await SavedObject.validateIndexPatternSavedObjectCanBeFound([indexPattern]);
-  } catch (error) {
-    return { error: error.message };
-  }
-}
 
 export async function validateVulnerabilitiesStateDataSources({
   vulnerabilitiesStatesindexPatternID: indexPatternID,
 }) {
   try {
     // Check the existence of related index pattern
-    const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
-    let indexPattern = existIndexPattern;
+    const existIndexPattern = await existsIndexPattern(indexPatternID);
+    const indexPattern = existIndexPattern;
 
     // If the idnex pattern does not exist, then check the existence of index
-    if (existIndexPattern?.error?.statusCode === 404) {
+    if (existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND) {
       // Check the existence of indices
-      const { exist, fields } = await checkExistenceIndices(indexPatternID);
+      const { exist, fields } = await existsIndices(indexPatternID);
 
       if (!exist) {
         return {

@@ -1,7 +1,7 @@
 {
   "name": "wazuh",
   "version": "4.10.0",
-  "revision": "00",
+  "revision": "01",
   "pluginPlatform": {
     "version": "2.16.0"
   },
@@ -16,7 +16,7 @@
   "license": "GPL-2.0",
   "resolutions": {
     "**/es5-ext": "^0.10.63",
-    "**/follow-redirects": "^1.15.4"
+    "**/follow-redirects": "^1.15.6"
   },
   "repository": {
     "type": "git",

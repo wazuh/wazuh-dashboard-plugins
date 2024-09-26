@@ -5,7 +5,6 @@ import {
   EuiButtonIcon,
   EuiDataGridCellValueElementProps,
   EuiDataGrid,
-  EuiButtonEmpty,
   EuiFlyout,
   EuiFlyoutHeader,
   EuiTitle,
@@ -17,6 +16,7 @@ import {
   exportSearchToCSV,
   tDataGridColumn,
   getAllCustomRenders,
+  PaginationOptions,
 } from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import {
@@ -29,7 +29,7 @@ import {
   ErrorFactory,
   HttpError,
 } from '../../../react-services/error-management';
-import { LoadingSpinner } from '../loading-spinner/loading-spinner';
+import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { DocumentViewTableAndJson } from '../wazuh-discover/components/document-view-table-and-json';
 import DiscoverDataGridAdditionalControls from '../wazuh-discover/components/data-grid-additional-controls';
@@ -44,11 +44,7 @@ export type tWazuhDataGridProps = {
   results: SearchResponse;
   defaultColumns: tDataGridColumn[];
   isLoading: boolean;
-  defaultPagination: {
-    pageIndex: number;
-    pageSize: number;
-    pageSizeOptions: number[];
-  };
+  defaultPagination: PaginationOptions;
   query: any;
   exportFilters: tFilter[];
   dateRange: TimeRange;
@@ -106,11 +102,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     results,
     indexPattern: indexPattern as IndexPattern,
     DocViewInspectButton,
-    pagination: defaultPagination || {
-      pageIndex: 0,
-      pageSize: 15,
-      pageSizeOptions: [15, 25, 50, 100],
-    },
+    useDefaultPagination: true,
   });
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
@@ -160,7 +152,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
 
   return (
     <>
-      {isLoading ? <LoadingSpinner /> : null}
+      {isLoading ? <LoadingSearchbarProgress /> : null}
       {!isLoading && !results?.hits?.total === 0 ? (
         <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
       ) : null}

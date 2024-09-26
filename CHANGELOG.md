@@ -2,43 +2,61 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 00
+## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 01
 
 ### Added
 
 - Support for Wazuh 4.10.0
-- Added a visulization to Vulnerabilities Detection dashboard related to evalution status count [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6968)
-
-### Fixed
-
-- Fixed some fields were not correctly rendering or not using the field format in some tables [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6968)
+- Added sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 
 ### Changed
 
 - Update malware detection group values in data sources [#6963](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6963)
 - Changed the registration id of the Settings application for compatibility with Opensearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
+- Changed Malware detection dashboard visualizations [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
+
+### Fixed
+
+- Fixed read-only users could not access to Statistics application [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
 
 ### Removed
 
 - Removed agent RBAC filters from dashboard queries [#6945](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6945)
+- Removed GET /elastic/statistics API endpoint [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
 
-## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 00
+## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 01
 
 ### Added
 
 - Support for Wazuh 4.9.1
+- Add feature to filter by field in the events table rows [#6977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6991)
 
 ### Fixed
 
+- Fixed issue causing vulnerability dashboard to fail loading for read-only users [#6933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6993)
 - Fixed the temporal directory variable on the the command to deploy a new Windows agent [#6905](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6905)
 - Fixed an error on the command to deploy a new macOS agent that could cause the registration password had a wrong value because a `\n` could be included [#6906](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6906)
 - Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
 - Fixed an error on Dev Tools when using payload properties as arrays [#6908](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6908)
+- Fixed of the font size in the table used in the events tab, in the Threat hunting dashboard tab and in the Vulnerabilities inventory tab [#6987](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6987)
+- Fixed missing link to Vulnerabilities detection and Office 365 in the agent menu of `Endpoints Summary` [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
+- Fixed missing options depending on agent operating system in the agent configuration report [#6983](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6983)
+- Fixed an style that affected the Discover plugin [#6989](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6989)
+- Fixed a problem updating the API host registry in the GET /api/check-stored-api [#6995](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6995)
 
 ### Changed
 
+- Change the text of the query limit tooltip [#6981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6981)
 - Upgraded the `axios` dependency to `1.7.4` [#6919](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6919)
 - Improved MITRE ATT&CK intelligence flyout details readability [#6954](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6954)
+- Upgraded Event-tab column selector showing first the picked columns [#6984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6984)
+- Changed vulnerabilities.reference to links in Vulnerability Detection > Inventory columns [#6960](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6960)
+- Upgraded the `follow-redirects` dependency to `1.15.6` [#6982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6982)
+- Changed many loading spinners in some views to loading search progress [#6956](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6956)
+
+### Removed
+
+- Removed the XML autoformat function group configuration due to performance [#6999](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6999)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
 

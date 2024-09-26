@@ -4,7 +4,7 @@ import {
   EuiDataGridProps,
   EuiDataGridSorting,
 } from '@elastic/eui';
-import React, { useEffect, useMemo, useState, Fragment } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
 // ToDo: check how create this methods
 import {
@@ -12,18 +12,37 @@ import {
   getFieldFormatted,
   parseColumns,
 } from './data-grid-service';
-import { IndexPattern } from '../../../../../../src/plugins/data/common';
-import dompurify from 'dompurify';
+import {
+  Filter,
+  IndexPattern,
+} from '../../../../../../src/plugins/data/common';
+import { EuiDataGridPaginationProps } from '@opensearch-project/oui';
+
+export interface PaginationOptions
+  extends Pick<
+    EuiDataGridPaginationProps,
+    'pageIndex' | 'pageSize' | 'pageSizeOptions'
+  > { }
+
+type SortingColumns = EuiDataGridSorting['columns'];
 
 const MAX_ENTRIES_PER_QUERY = 10000;
-const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
+const DEFAULT_PAGE_INDEX = 0;
+const DEFAULT_PAGE_SIZE = 15;
+const DEFAULT_PAGE_SIZE_OPTIONS = [DEFAULT_PAGE_SIZE, 25, 50, 100];
+const DEFAULT_PAGINATION_OPTIONS: PaginationOptions = {
+  pageIndex: DEFAULT_PAGE_INDEX,
+  pageSize: DEFAULT_PAGE_SIZE,
+  pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS,
+};
 
-export type tDataGridColumn = {
-  render?: (value: any, rowItem: object) => string | React.ReactNode;
-} & EuiDataGridColumn;
+export interface RenderColumn {
+  render: (value: any, rowItem: object) => string | React.ReactNode;
+}
 
-export type tDataGridRenderColumn = Required<Pick<tDataGridColumn, 'render'>> &
-  Omit<tDataGridColumn, 'render'>;
+export type tDataGridColumn = Partial<RenderColumn> & EuiDataGridColumn;
+
+export type tDataGridRenderColumn = RenderColumn & EuiDataGridColumn;
 
 export type tDataGridProps = {
   indexPattern: IndexPattern;
@@ -34,7 +53,10 @@ export type tDataGridProps = {
     rowIndex,
   }: EuiDataGridCellValueElementProps) => React.JSX.Element;
   ariaLabelledBy: string;
-  pagination?: Partial<EuiDataGridProps['pagination']>;
+  useDefaultPagination?: boolean;
+  pagination?: typeof DEFAULT_PAGINATION_OPTIONS;
+  filters?: Filter[];
+  setFilters?: (filters: Filter[]) => void;
 };
 
 export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
@@ -42,12 +64,13 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     indexPattern,
     DocViewInspectButton,
     results,
-    defaultColumns,
+    defaultColumns: columns,
     renderColumns,
-    pagination: defaultPagination,
+    useDefaultPagination = false,
+    pagination: paginationProps = {},
+    filters = [],
+    setFilters = () => { },
   } = props;
-  /** Columns **/
-  const [columns, setColumns] = useState<tDataGridColumn[]>(defaultColumns);
   const [columnVisibility, setVisibility] = useState(() =>
     columns.map(({ id }) => id),
   );
@@ -62,28 +85,32 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     );
     return defaultSort
       ? [
-          {
-            id: defaultSort.id,
-            direction: defaultSort.defaultSortDirection || 'desc',
-          },
-        ]
+        {
+          id: defaultSort.id,
+          direction: defaultSort.defaultSortDirection || 'desc',
+        },
+      ]
       : [];
   };
-  const defaultSorting: EuiDataGridSorting['columns'] = getDefaultSorting();
+  const defaultSorting: SortingColumns = getDefaultSorting();
   const [sortingColumns, setSortingColumns] = useState(defaultSorting);
-  const onSort = sortingColumns => {
+  const onSort = (sortingColumns: SortingColumns) => {
     setSortingColumns(sortingColumns);
   };
   /** Pagination **/
-  const [pagination, setPagination] = useState<EuiDataGridProps['pagination']>(
-    defaultPagination || {
-      pageIndex: 0,
-      pageSize: 20,
-      pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS,
-    },
+  const [pagination, setPagination] = useState<
+    typeof DEFAULT_PAGINATION_OPTIONS
+  >(
+    useDefaultPagination
+      ? DEFAULT_PAGINATION_OPTIONS
+      : {
+        ...DEFAULT_PAGINATION_OPTIONS,
+        ...paginationProps,
+      },
   );
+
   const onChangeItemsPerPage = useMemo(
-    () => pageSize =>
+    () => (pageSize: number) =>
       setPagination(pagination => ({
         ...pagination,
         pageSize,
@@ -91,7 +118,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       })),
     [rows, rowCount],
   );
-  const onChangePage = pageIndex =>
+  const onChangePage = (pageIndex: number) =>
     setPagination(pagination => ({ ...pagination, pageIndex }));
 
   useEffect(() => {
@@ -102,7 +129,13 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     setPagination(pagination => ({ ...pagination, pageIndex: 0 }));
   }, [rowCount]);
 
-  const renderCellValue = ({ rowIndex, columnId, setCellProps }) => {
+  const renderCellValue = ({
+    rowIndex,
+    columnId,
+  }: {
+    rowIndex: number;
+    columnId: string;
+  }) => {
     const rowsParsed = parseData(rows);
     // On the context data always is stored the current page data (pagination)
     // then the rowIndex is relative to the current page
@@ -151,7 +184,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       {
         id: 'inspectCollapseColumn',
         headerCellRender: () => null,
-        rowCellRender: props =>
+        rowCellRender: (props: EuiDataGridCellValueElementProps) =>
           DocViewInspectButton({
             ...props,
             rowIndex: props.rowIndex % pagination.pageSize,
@@ -161,11 +194,47 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     ];
   }, [results]);
 
+  const filterColumns = () => {
+    const allColumns = parseColumns(
+      indexPattern?.fields || [],
+      columns,
+      indexPattern,
+      rows,
+      pagination.pageSize,
+      filters,
+      setFilters,
+    );
+    const columnMatch = [];
+    const columnNonMatch = [];
+
+    for (const item of allColumns) {
+      if (columnVisibility.includes(item.name)) {
+        columnMatch.push(item);
+      } else {
+        columnNonMatch.push(item);
+      }
+    }
+
+    return [...columnMatch, ...columnNonMatch];
+  };
+
+  const defaultColumnsPosition = (columnsVisibility, defaultColumns) => {
+    const defaults = defaultColumns
+      .map(item => item.id)
+      .filter(id => columnsVisibility.includes(id));
+
+    const nonDefaults = columnsVisibility.filter(
+      item => !defaultColumns.map(item => item.id).includes(item),
+    );
+
+    return [...defaults, ...nonDefaults];
+  };
+
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columns: parseColumns(indexPattern?.fields || [], defaultColumns),
+    columns: filterColumns(),
     columnVisibility: {
-      visibleColumns: columnVisibility,
+      visibleColumns: defaultColumnsPosition(columnVisibility, columns),
       setVisibleColumns: setVisibility,
     },
     renderCellValue: renderCellValue,
@@ -178,5 +247,5 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       onChangeItemsPerPage: onChangeItemsPerPage,
       onChangePage: onChangePage,
     },
-  };
+  } as EuiDataGridProps;
 };
