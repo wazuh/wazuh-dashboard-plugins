@@ -22,7 +22,7 @@ import store from '../redux/store';
 import domtoimage from '../utils/dom-to-image-more';
 import dateMath from '@elastic/datemath';
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiButton, EuiLink } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
 import { reporting } from '../utils/applications';
 import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
 import {
@@ -93,29 +93,12 @@ export class ReportingService {
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButton
-              onClick={() => {
-                // Open the new tab immediately
-                const windowReference = window.open('', '_blank');
-
-                // Verify if the new tab was locked
-                if (windowReference) {
-                  // Get the URL (in this case, it is obtained directly, but it can be asynchronous)
-                  const url = getHttp().basePath.prepend(
-                    `/reports/${filename}`,
-                  );
-
-                  // Then assign the URL to the new tab
-                  windowReference.location = url;
-                } else {
-                  // If the tab is locked, it displays an alert to the user.
-                  alert('The tab was blocked. Please enable pop-up windows.');
-                }
-              }}
-              size='s'
+            <EuiLink
+              href={getHttp().basePath.prepend(`/reports/${filename}`)}
+              target='_blank'
             >
               Open report
-            </EuiButton>
+            </EuiLink>
           </EuiFlexItem>
         </EuiFlexGroup>
       </>,
