@@ -53,7 +53,7 @@ export const WzSearchBar = ({
         </EuiFlexGroup>
       ) : null}
       {showFilters ? (
-        <EuiFlexGroup gutterSize='s'>
+        <EuiFlexGroup gutterSize='s' direction="column">
           {hideFixedFilters ? null : (
             <EuiFlexItem grow={false}>
               <EuiFlexGroup
@@ -77,23 +77,16 @@ export const WzSearchBar = ({
             </EuiFlexItem>
           )}
           <EuiFlexItem>
-            <EuiFlexGroup
-              gutterSize='s'
-              alignItems='center'
-              responsive={false}
-              wrap={true}
-            >
-              <EuiFlexItem>
-                <SearchBar
-                  {...restProps}
-                  showQueryBar={false}
-                  useDefaultBehaviors={false}
-                />
-              </EuiFlexItem>
+            <div>
+              <SearchBar
+                {...restProps}
+                showQueryBar={false}
+                useDefaultBehaviors={false}
+              />
               {postFilters ? (
                 <EuiFlexItem grow={false}>{postFilters}</EuiFlexItem>
               ) : null}
-            </EuiFlexGroup>
+            </div>
           </EuiFlexItem>
         </EuiFlexGroup>
       ) : null}
