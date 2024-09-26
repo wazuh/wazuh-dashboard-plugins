@@ -53,7 +53,7 @@ export const WzSearchBar = ({
         </EuiFlexGroup>
       ) : null}
       {showFilters ? (
-        <EuiFlexGroup gutterSize='s' direction="column">
+        <EuiFlexGroup gutterSize='s' direction='column'>
           {hideFixedFilters ? null : (
             <EuiFlexItem grow={false}>
               <EuiFlexGroup
