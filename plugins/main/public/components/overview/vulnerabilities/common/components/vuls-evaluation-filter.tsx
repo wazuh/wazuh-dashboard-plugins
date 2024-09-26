@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { EuiButtonGroup } from "@elastic/eui"
 import { FILTER_OPERATOR, PatternDataSourceFilterManager } from "../../../../common/data-source";
 import { Filter } from "../../../../../../../../src/plugins/data/common";
+import "./vuls-evaluation-filter.scss";
 
 type VulsEvaluatedFilterProps = {
     setValue: (underEvaluation: boolean | null) => void;
@@ -80,6 +81,7 @@ const VulsEvaluationFilter = ({ setValue, value }: VulsEvaluatedFilterProps) => 
 
     return (
         <EuiButtonGroup
+            className="button-group-filter"
             type="multi"
             idToSelectedMap={toggleIdToSelectedMap}
             options={toggleButtons}
