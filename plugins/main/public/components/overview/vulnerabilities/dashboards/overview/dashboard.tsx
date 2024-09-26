@@ -26,12 +26,16 @@ import {
   PatternDataSource,
   tParsedIndexPattern,
   PatternDataSourceFilterManager,
-  FILTER_OPERATOR
+  FILTER_OPERATOR,
 } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { WzSearchBar } from '../../../../common/search-bar';
-import VulsEvaluationFilter, { createUnderEvaluationFilter, excludeUnderEvaluationFilter, getUnderEvaluationFilterValue } from '../../common/components/vuls-evaluation-filter';
+import VulsEvaluationFilter, {
+  createUnderEvaluationFilter,
+  excludeUnderEvaluationFilter,
+  getUnderEvaluationFilterValue,
+} from '../../common/components/vuls-evaluation-filter';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -91,8 +95,8 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
    * When the user changes the filter value, this function is called to update the filters
    * If the value is null, the filter is removed
    * If the filter already exists, it is remove and the new filter is added
-   * @param underEvaluation 
-   * @returns 
+   * @param underEvaluation
+   * @returns
    */
   const handleFilterChange = (underEvaluation: boolean | null) => {
     const newFilters = excludeUnderEvaluationFilter(filters || []);
@@ -100,19 +104,23 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
       setFilters(newFilters);
       return;
     }
-    newFilters.push(createUnderEvaluationFilter(underEvaluation, dataSource?.id || indexPattern?.id));
+    newFilters.push(
+      createUnderEvaluationFilter(
+        underEvaluation,
+        dataSource?.id || indexPattern?.id,
+      ),
+    );
     setFilters(newFilters);
-  }
-
+  };
 
   const getUnderEvaluation = useCallback(getUnderEvaluationFilterValue, [
     JSON.stringify(filters),
-    isDataSourceLoading
+    isDataSourceLoading,
   ]);
 
-
-  const [underEvaluation, setUnderEvaluation] = useState<boolean | null>(getUnderEvaluation(filters || []));
-
+  const [underEvaluation, setUnderEvaluation] = useState<boolean | null>(
+    getUnderEvaluation(filters || []),
+  );
 
   return (
     <>
@@ -127,7 +135,14 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
               {...searchBarProps}
               filters={excludeUnderEvaluationFilter(filters)}
               fixedFilters={fixedFilters}
-              postFixedFilters={[() => <VulsEvaluationFilter value={underEvaluation} setValue={handleFilterChange} />]}
+              postFixedFilters={[
+                () => (
+                  <VulsEvaluationFilter
+                    value={underEvaluation}
+                    setValue={handleFilterChange}
+                  />
+                ),
+              ]}
               showDatePicker={false}
               showQueryInput={true}
               showQueryBar={true}
@@ -138,8 +153,9 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
             <DiscoverNoResults />
           ) : null}
           <div
-            className={`vulnerability-dashboard-responsive vulnerability-dashboard-metrics ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-              }`}
+            className={`vulnerability-dashboard-responsive vulnerability-dashboard-metrics ${
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }`}
           >
             <DashboardByRenderer
               input={{

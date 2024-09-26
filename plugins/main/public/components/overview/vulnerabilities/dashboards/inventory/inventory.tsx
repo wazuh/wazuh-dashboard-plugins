@@ -50,7 +50,11 @@ import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
 import { DocumentViewTableAndJson } from '../../../../common/wazuh-discover/components/document-view-table-and-json';
 import { WzSearchBar } from '../../../../common/search-bar';
-import VulsEvaluationFilter, { createUnderEvaluationFilter, excludeUnderEvaluationFilter, getUnderEvaluationFilterValue } from '../../common/components/vuls-evaluation-filter';
+import VulsEvaluationFilter, {
+  createUnderEvaluationFilter,
+  excludeUnderEvaluationFilter,
+  getUnderEvaluationFilterValue,
+} from '../../common/components/vuls-evaluation-filter';
 
 const InventoryVulsComponent = () => {
   const {
@@ -106,7 +110,7 @@ const InventoryVulsComponent = () => {
 
   const getUnderEvaluation = useCallback(getUnderEvaluationFilterValue, [
     JSON.stringify(filters),
-    isDataSourceLoading
+    isDataSourceLoading,
   ]);
 
   const dataGridProps = useDataGrid({
@@ -172,13 +176,12 @@ const InventoryVulsComponent = () => {
     JSON.stringify(sorting),
   ]);
 
-
   /**
    * When the user changes the filter value, this function is called to update the filters
    * If the value is null, the filter is removed
    * If the filter already exists, it is remove and the new filter is added
-   * @param underEvaluation 
-   * @returns 
+   * @param underEvaluation
+   * @returns
    */
   const handleFilterChange = (underEvaluation: boolean | null) => {
     const newFilters = excludeUnderEvaluationFilter(filters || []);
@@ -186,13 +189,18 @@ const InventoryVulsComponent = () => {
       setFilters(newFilters);
       return;
     }
-    newFilters.push(createUnderEvaluationFilter(underEvaluation, dataSource?.id || indexPattern?.id));
+    newFilters.push(
+      createUnderEvaluationFilter(
+        underEvaluation,
+        dataSource?.id || indexPattern?.id,
+      ),
+    );
     setFilters(newFilters);
   };
 
-
-  const [underEvaluation, setUnderEvaluation] = useState<boolean | null>(getUnderEvaluation(filters || []));
-
+  const [underEvaluation, setUnderEvaluation] = useState<boolean | null>(
+    getUnderEvaluation(filters || []),
+  );
 
   return (
     <IntlProvider locale='en'>
@@ -215,7 +223,14 @@ const InventoryVulsComponent = () => {
                 {...searchBarProps}
                 filters={excludeUnderEvaluationFilter(filters)}
                 fixedFilters={fixedFilters}
-                postFixedFilters={[() => <VulsEvaluationFilter value={underEvaluation} setValue={handleFilterChange} />]}
+                postFixedFilters={[
+                  () => (
+                    <VulsEvaluationFilter
+                      value={underEvaluation}
+                      setValue={handleFilterChange}
+                    />
+                  ),
+                ]}
                 showDatePicker={false}
                 showQueryInput={true}
                 showQueryBar={true}
@@ -244,17 +259,17 @@ const InventoryVulsComponent = () => {
                             showResetButton={false}
                             tooltip={
                               results?.hits?.total &&
-                                results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                              results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
-                                  ariaLabel: 'Warning',
-                                  content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                                    MAX_ENTRIES_PER_QUERY,
-                                  )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                    MAX_ENTRIES_PER_QUERY,
-                                  )} hits.`,
-                                  iconType: 'alert',
-                                  position: 'top',
-                                }
+                                    ariaLabel: 'Warning',
+                                    content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                                      MAX_ENTRIES_PER_QUERY,
+                                    )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                                      MAX_ENTRIES_PER_QUERY,
+                                    )} hits.`,
+                                    iconType: 'alert',
+                                    position: 'top',
+                                  }
                                 : undefined
                             }
                           />

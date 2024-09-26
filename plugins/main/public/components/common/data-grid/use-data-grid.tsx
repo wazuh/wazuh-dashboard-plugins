@@ -23,7 +23,7 @@ export interface PaginationOptions
   extends Pick<
     EuiDataGridPaginationProps,
     'pageIndex' | 'pageSize' | 'pageSizeOptions'
-  > { }
+  > {}
 
 type SortingColumns = EuiDataGridSorting['columns'];
 
@@ -70,7 +70,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     useDefaultPagination = false,
     pagination: paginationProps = {},
     filters = [],
-    setFilters = () => { },
+    setFilters = () => {},
   } = props;
   const [columnVisibility, setVisibility] = useState(() =>
     columns.map(({ id }) => id),
@@ -86,11 +86,11 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     );
     return defaultSort
       ? [
-        {
-          id: defaultSort.id,
-          direction: defaultSort.defaultSortDirection || 'desc',
-        },
-      ]
+          {
+            id: defaultSort.id,
+            direction: defaultSort.defaultSortDirection || 'desc',
+          },
+        ]
       : [];
   };
   const defaultSorting: SortingColumns = getDefaultSorting();
@@ -105,9 +105,9 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     useDefaultPagination
       ? DEFAULT_PAGINATION_OPTIONS
       : {
-        ...DEFAULT_PAGINATION_OPTIONS,
-        ...paginationProps,
-      },
+          ...DEFAULT_PAGINATION_OPTIONS,
+          ...paginationProps,
+        },
   );
 
   const onChangeItemsPerPage = useMemo(
