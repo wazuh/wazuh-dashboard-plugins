@@ -5,7 +5,6 @@ import {
   PatternDataSourceFilterManager,
 } from '../../../../common/data-source';
 import { Filter } from '../../../../../../../../src/plugins/data/common';
-import './vuls-evaluation-filter.scss';
 
 type VulsEvaluatedFilterProps = {
   setValue: (underEvaluation: boolean | null) => void;
