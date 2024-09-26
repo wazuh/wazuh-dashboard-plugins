@@ -67,8 +67,9 @@ const VulsEvaluationFilter = ({
     }
   };
 
-  const [toggleIdToSelectedMap, setToggleIdToSelectedMap] =
-    useState(getDefaultValue());
+  const [toggleIdToSelectedMap, setToggleIdToSelectedMap] = useState(
+    getDefaultValue(),
+  );
 
   useEffect(() => {
     setToggleIdToSelectedMap(getDefaultValue());
