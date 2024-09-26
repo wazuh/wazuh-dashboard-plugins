@@ -17,6 +17,7 @@ import {
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
 import { EuiDataGridPaginationProps } from '@opensearch-project/oui';
+import dompurify from 'dompurify';
 
 export interface PaginationOptions
   extends Pick<
