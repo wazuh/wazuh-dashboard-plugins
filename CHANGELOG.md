@@ -36,7 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
-- Removed the PDF report footer year [#7022](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7022)
+- Removed the PDF report footer year [#7023](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7023)
 - Removed the XML autoformat function group configuration due to performance [#6999](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6999)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
