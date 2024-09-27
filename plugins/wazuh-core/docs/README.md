@@ -15,6 +15,8 @@ This plugin provides some core services:
 
 ## Frontend
 
-- Configuration: manage the plugins configuration
-- Utils
 - Constants
+- Utils
+- Configuration: manage the plugins configuration
+- Dashboard Security: manage the security related to Wazuh dashboard
+- Server Security: manage the security related to Wazuh server
