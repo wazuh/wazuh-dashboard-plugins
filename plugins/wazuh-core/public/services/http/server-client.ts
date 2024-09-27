@@ -149,12 +149,7 @@ export class WzRequest implements HTTPClientServer {
       // if(this.onErrorInterceptor){
       //   await this.onErrorInterceptor(error, {checkCurrentApiIsUp, shouldRetry, overwriteHeaders})
       // }
-      const errorMessage =
-        (error &&
-          error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        (error || {}).message;
+      const errorMessage = error?.response?.data?.message || error?.message;
       if (
         typeof errorMessage === 'string' &&
         errorMessage.includes('status code 401') &&
@@ -164,18 +159,16 @@ export class WzRequest implements HTTPClientServer {
           await this.auth(true); //await WzAuthentication.refresh(true);
           return this._request(method, path, payload, { shouldRetry: false });
         } catch (error) {
-          return ((error || {}).data || {}).message || false
-            ? Promise.reject(
-                this.returnErrorInstance(error, error.data.message),
-              )
-            : Promise.reject(this.returnErrorInstance(error, error.message));
+          throw this.returnErrorInstance(
+            error,
+            error?.data?.message || error.message,
+          );
         }
       }
-      return errorMessage
-        ? Promise.reject(this.returnErrorInstance(error, errorMessage))
-        : Promise.reject(
-            this.returnErrorInstance(error, 'Server did not respond'),
-          );
+      throw this.returnErrorInstance(
+        error,
+        errorMessage || 'Server did not respond',
+      );
     }
   }
 
@@ -214,29 +207,25 @@ export class WzRequest implements HTTPClientServer {
         return response;
       }
 
-      const hasFailed =
-        (((response || {}).data || {}).data || {}).total_failed_items || 0;
+      const hasFailed = response?.data?.data?.total_failed_items || 0;
 
       if (hasFailed) {
-        const error =
-          ((((response.data || {}).data || {}).failed_items || [])[0] || {})
-            .error || {};
-        const failed_ids =
-          ((((response.data || {}).data || {}).failed_items || [])[0] || {})
-            .id || {};
+        const error = response?.data?.data?.failed_items?.[0]?.error || {};
+        const failedIds = response?.data?.data?.failed_items?.[0]?.id || {};
         const message = (response.data || {}).message || 'Unexpected error';
         const errorMessage = `${message} (${error.code}) - ${error.message} ${
-          failed_ids && failed_ids.length > 1
-            ? ` Affected ids: ${failed_ids} `
+          failedIds && failedIds.length > 1
+            ? ` Affected ids: ${failedIds} `
             : ''
         }`;
-        return Promise.reject(this.returnErrorInstance(null, errorMessage));
+        throw this.returnErrorInstance(null, errorMessage);
       }
-      return Promise.resolve(response);
+      return response;
     } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? Promise.reject(this.returnErrorInstance(error, error.data.message))
-        : Promise.reject(this.returnErrorInstance(error, error.message));
+      throw this.returnErrorInstance(
+        error,
+        error?.data?.message || error.message,
+      );
     }
   }
 
@@ -255,9 +244,10 @@ export class WzRequest implements HTTPClientServer {
       const data = await this._request('POST', '/api/csv', requestData);
       return Promise.resolve(data);
     } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? Promise.reject(this.returnErrorInstance(error, error.data.message))
-        : Promise.reject(this.returnErrorInstance(error, error.message));
+      throw this.returnErrorInstance(
+        error,
+        error?.data?.message || error?.message,
+      );
     }
   }
 
@@ -462,7 +452,7 @@ export class WzRequest implements HTTPClientServer {
       const response = await this.services.request(options);
 
       if (response.error) {
-        return Promise.reject(this.returnErrorInstance(response));
+        throw this.returnErrorInstance(response);
       }
 
       return response;
@@ -472,16 +462,12 @@ export class WzRequest implements HTTPClientServer {
         // const wzMisc = new WzMisc();
         // wzMisc.setApiIsDown(true);
         const response = (error.response.data || {}).message || error.message;
-        return Promise.reject(this.returnErrorInstance(response));
+        throw this.returnErrorInstance(response);
       } else {
-        return (error || {}).message || false
-          ? Promise.reject(this.returnErrorInstance(error, error.message))
-          : Promise.reject(
-              this.returnErrorInstance(
-                error,
-                error || 'Server did not respond',
-              ),
-            );
+        throw this.returnErrorInstance(
+          error,
+          error?.message || error || 'Server did not respond',
+        );
       }
     }
   }
@@ -509,23 +495,19 @@ export class WzRequest implements HTTPClientServer {
       const response = await this.services.request(options);
 
       if (response.error) {
-        return Promise.reject(this.returnErrorInstance(response));
+        throw this.returnErrorInstance(response);
       }
 
       return response;
     } catch (error) {
       if (error.response) {
         const response = (error.response.data || {}).message || error.message;
-        return Promise.reject(this.returnErrorInstance(response));
+        throw this.returnErrorInstance(response);
       } else {
-        return (error || {}).message || false
-          ? Promise.reject(this.returnErrorInstance(error, error.message))
-          : Promise.reject(
-              this.returnErrorInstance(
-                error,
-                error || 'Server did not respond',
-              ),
-            );
+        throw this.returnErrorInstance(
+          error,
+          error?.message || error || 'Server did not respond',
+        );
       }
     }
   }
