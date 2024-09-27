@@ -76,14 +76,14 @@ export const WzSearchBar = ({
               </EuiFlexGroup>
             </EuiFlexItem>
           )}
-          <EuiFlexItem>
+          <EuiFlexItem className='overflow-hidden'>
             <EuiFlexGroup
               gutterSize='s'
               alignItems='center'
               responsive={false}
               wrap={true}
             >
-              <EuiFlexItem>
+              <EuiFlexItem className='overflow-hidden'>
                 <SearchBar
                   {...restProps}
                   showQueryBar={false}
