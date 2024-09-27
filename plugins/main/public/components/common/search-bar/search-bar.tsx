@@ -89,10 +89,10 @@ export const WzSearchBar = ({
                   showQueryBar={false}
                   useDefaultBehaviors={false}
                 />
-                {postFilters ? (
-                  <EuiFlexItem grow={false}>{postFilters}</EuiFlexItem>
-                ) : null}
               </EuiFlexItem>
+              {postFilters ? (
+                <EuiFlexItem grow={false}>{postFilters}</EuiFlexItem>
+              ) : null}
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
