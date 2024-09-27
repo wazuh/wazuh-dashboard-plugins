@@ -33,11 +33,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Upgraded Event-tab column selector showing first the picked columns [#6984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6984)
 - Changed vulnerabilities.reference to links in Vulnerability Detection > Inventory columns [#6960](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6960)
 - Upgraded the `follow-redirects` dependency to `1.15.6` [#6982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6982)
-- Changed PDF report footer year [#7022](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7022)
 - Changed many loading spinners in some views to loading search progress [#6956](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6956)
 
 ### Removed
 
+- Removed the PDF report footer year [#7023](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7023)
 - Removed the XML autoformat function group configuration due to performance [#6999](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6999)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
