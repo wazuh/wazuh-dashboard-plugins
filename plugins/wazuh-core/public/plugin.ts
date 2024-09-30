@@ -11,12 +11,24 @@ import {
 } from '../common/constants';
 import { DashboardSecurity } from './utils/dashboard-security';
 import * as hooks from './hooks';
+import { CoreState, State } from './services/state';
+import { ServerHostClusterInfoStateContainer } from './services/state/containers/server-host-cluster-info';
+import { Cookies } from 'react-cookie';
+import { ServerHostStateContainer } from './services/state/containers/server-host';
+import { DataSourceAlertsStateContainer } from './services/state/containers/data-source-alerts';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
+  runtime: { [key: string]: any } = {
+    state: {},
+  };
   _internal: { [key: string]: any } = {};
-  services: { [key: string]: any } = {};
+  services: {
+    [key: string]: any;
+    dashboardSecurity?: DashboardSecurity;
+    state?: State;
+  } = {};
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     const noop = () => {};
     const logger = {
@@ -46,12 +58,37 @@ export class WazuhCorePlugin
 
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
+    this.services.state = new CoreState(logger);
+
+    this.runtime.state.setup = this.services.state.setup();
+    const cookiesStore = new Cookies();
+    this.services.state.register(
+      'server_host_cluster_info',
+      new ServerHostClusterInfoStateContainer(logger, { store: cookiesStore }),
+    );
+    this.services.state.register(
+      'server_host',
+      new ServerHostStateContainer(logger, { store: cookiesStore }),
+    );
+    this.services.state.subscribe('server_host', value => {
+      // TODO: refresh the auth when the server_host data changed
+    });
+    this.services.state.register(
+      'data_source_alerts',
+      new DataSourceAlertsStateContainer(logger, { store: cookiesStore }),
+    );
+
+    console.log(this.services.state.get('server_host'));
+
     await this.services.dashboardSecurity.setup();
 
     return {
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
+      hooks: {
+        ...this.runtime.state.setup.hooks,
+      },
     };
   }
 
@@ -66,7 +103,11 @@ export class WazuhCorePlugin
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
-      hooks,
+      // hooks,
+      hooks: {
+        ...hooks,
+        ...this.runtime.state.setup.hooks,
+      },
     };
   }
 
