@@ -47,6 +47,15 @@ mockedGetDataPlugin.mockImplementation(
               unsubscribe: jest.fn(),
             })),
           },
+          timefilter: {
+            ...mockDataPlugin.query.queryString.timefilter,
+            timefilter: {
+              getRefreshInterval: jest.fn().mockImplementation(() => ({
+                value: 0,
+                pause: false,
+              })),
+            },
+          },
         },
       },
     } as Start),
