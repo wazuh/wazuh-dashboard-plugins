@@ -68,9 +68,7 @@ jest.mock('../components/check-result', () => ({
 }));
 
 jest.mock('../../../react-services', () => ({
-  AppState: {
-    setPatternSelector: () => {},
-  },
+  AppState: {},
   ErrorHandler: {
     handle: error => error,
   },

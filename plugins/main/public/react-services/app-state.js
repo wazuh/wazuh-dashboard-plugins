@@ -80,59 +80,6 @@ export class AppState {
   }
 
   /**
-   * Set a new value to the 'createdAt' cookie
-   * @param {*} date
-   */
-  static setCreatedAt(date) {
-    try {
-      const createdAt = encodeURI(date);
-      const exp = new Date();
-      exp.setDate(exp.getDate() + 365);
-      getCookies().set('createdAt', createdAt, {
-        expires: exp,
-      });
-    } catch (error) {
-      const options = {
-        context: `${AppState.name}.setCreatedAt`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `${error.name}: Error set createdAt date`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      throw error;
-    }
-  }
-
-  /**
-   * Get 'createdAt' value
-   */
-  static getCreatedAt() {
-    try {
-      const createdAt = getCookies().get('createdAt')
-        ? decodeURI(getCookies().get('createdAt'))
-        : false;
-      return createdAt ? createdAt : false;
-    } catch (error) {
-      const options = {
-        context: `${AppState.name}.getCreatedAt`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `${error.name}: Error get createdAt date`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      throw error;
-    }
-  }
-
-  /**
    * Get 'API' value
    */
   static getCurrentAPI() {
@@ -188,33 +135,6 @@ export class AppState {
       getErrorOrchestrator().handleError(options);
       throw error;
     }
-  }
-
-  /**
-   * Get 'APISelector' value
-   */
-  static getAPISelector() {
-    return getCookies().get('APISelector')
-      ? decodeURI(getCookies().get('APISelector')) == 'true'
-      : false;
-  }
-
-  /**
-   * Get 'patternSelector' value
-   */
-  static getPatternSelector() {
-    return getCookies().get('patternSelector')
-      ? decodeURI(getCookies().get('patternSelector')) == 'true'
-      : false;
-  }
-
-  /**
-   * Set a new value to the 'patternSelector' cookie
-   * @param {*} value
-   */
-  static setPatternSelector(value) {
-    const encodedPattern = encodeURI(value);
-    getCookies().set('patternSelector', encodedPattern, {});
   }
 
   /**
