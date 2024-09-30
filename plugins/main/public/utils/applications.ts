@@ -218,7 +218,7 @@ export const mitreAttack = {
   }),
   description: i18n.translate('wz-app-mitre-attack-description', {
     defaultMessage:
-      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations.',
+      'Explore security alerts mapped to adversary tactics and techniques for better threat understanding.',
   }),
   euiIconType: 'grokApp',
   order: 302,

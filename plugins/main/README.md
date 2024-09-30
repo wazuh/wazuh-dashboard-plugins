@@ -25,7 +25,7 @@ the Wazuh Indexer. The plugin provides the following capabilities:
     - CIS-CAT: Configuration assessment using Center of Internet Security scanner and SCAP checks.
   - Threat Detection and Response
     - Vulnerabilities: Discover what applications in your environment are affected by well-known vulnerabilities.
-    - MITRE ATT&CK: Security events from the knowledge base of adversary tactics and techniques based on real-world observations.
+    - MITRE ATT&CK: Explore security alerts mapped to adversary tactics and techniques for better threat understanding.
     - VirusTotal: Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.
     - Osquery: Osquery can be used to expose an operating system as a high-performance relational database.
     - Docker listener: Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.
