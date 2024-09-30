@@ -112,7 +112,7 @@ export const malwareDetection = {
   }),
   description: i18n.translate('wz-app-malware-detection-description', {
     defaultMessage:
-      'Verify that your systems are configured according to your security policies baseline.',
+      'Check indicators of compromise triggered by malware infections or cyberattacks.',
   }),
   euiIconType: 'indexRollupApp',
   order: 201,
