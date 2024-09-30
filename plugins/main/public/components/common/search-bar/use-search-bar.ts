@@ -6,9 +6,11 @@ import {
   Filter,
   IndexPattern,
   IndexPatternsContract,
+  SavedQuery,
 } from '../../../../../../src/plugins/data/public';
 import { getDataPlugin } from '../../../kibana-services';
 import { useQueryManager, useTimeFilter } from '../hooks';
+import { useSavedQuery } from '../hooks/saved_query/use_saved_query';
 import { transformDateRange } from './search-bar-service';
 
 // Input - types
@@ -16,7 +18,7 @@ type tUseSearchBarCustomInputs = {
   indexPattern: IndexPattern;
   setFilters: (filters: Filter[]) => void;
   setTimeFilter?: (timeRange: TimeRange) => void;
-  setQuery?: (query: Query) => void;
+  setQuery?: (query?: Query) => void;
   onFiltersUpdated?: (filters: Filter[]) => void;
   onQuerySubmitted?: (
     payload: { dateRange: TimeRange; query?: Query },
@@ -44,7 +46,7 @@ type tUserSearchBarResponse = {
 const useSearchBarConfiguration = (
   props: tUseSearchBarProps,
 ): tUserSearchBarResponse => {
-  const { indexPattern, filters: defaultFilters, setFilters } = props;
+  const { indexPattern, filters = [], setFilters } = props;
 
   // dependencies
   const {
@@ -52,7 +54,6 @@ const useSearchBarConfiguration = (
     timeHistory,
     setTimeFilter: setGlobalTimeFilter,
   } = useTimeFilter();
-  const filters = defaultFilters ?? [];
   const [timeFilter, setTimeFilter] = useState(globalTimeFilter);
   const [query, setQuery] = props?.setQuery
     ? useState(props?.query || { query: '', language: 'kuery' })
@@ -63,6 +64,14 @@ const useSearchBarConfiguration = (
   const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
     transformDateRange(globalTimeFilter),
   );
+  const [refreshInterval, setRefreshInterval] = useState(
+    props?.refreshInterval,
+  );
+  const [isPaused, setIsPaused] = useState(props?.isRefreshPaused);
+  const { query: queryService } = getDataPlugin();
+  const { savedQuery, setSavedQuery, clearSavedQuery } = useSavedQuery({
+    queryService,
+  });
   // states
   const [isLoading, setIsLoading] = useState(true);
   const [indexPatternSelected, setIndexPatternSelected] =
@@ -106,6 +115,7 @@ const useSearchBarConfiguration = (
   /**
    * Search bar properties necessary to render and initialize the osd search bar component
    */
+
   const searchBarProps: Partial<
     SearchBarProps & {
       useDefaultBehaviors: boolean;
@@ -126,6 +136,15 @@ const useSearchBarConfiguration = (
         : console.warn('setFilters function is not defined');
       props?.onFiltersUpdated && props?.onFiltersUpdated(userFilters);
     },
+    refreshInterval,
+    isRefreshPaused: isPaused,
+    onRefreshChange: ({ refreshInterval, isPaused }) => {
+      setRefreshInterval(refreshInterval);
+      setIsPaused(isPaused);
+    },
+    onRefresh: ({ dateRange }) => {
+      setAbsoluteDateRange(transformDateRange(dateRange));
+    },
     onQuerySubmit: (
       payload: { dateRange: TimeRange; query?: Query },
       _isUpdate?: boolean,
@@ -143,7 +162,21 @@ const useSearchBarConfiguration = (
       setQuery(query);
     },
     // its necessary to use saved queries. if not, the load saved query not work
-    useDefaultBehaviors: true,
+    onClearSavedQuery: () => {
+      setFilters([]);
+      clearSavedQuery();
+    },
+    onSaved: (savedQuery: SavedQuery) => {
+      const savedQueryFilters = savedQuery.attributes.filters || [];
+      setFilters([...savedQueryFilters]);
+      setSavedQuery(savedQuery);
+    },
+    onSavedQueryUpdated: (savedQuery: SavedQuery) => {
+      const savedQueryFilters = savedQuery.attributes.filters || [];
+      setFilters([...savedQueryFilters]);
+      setSavedQuery(savedQuery);
+    },
+    savedQuery,
   };
 
   return {
