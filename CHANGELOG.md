@@ -16,7 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the registration id of the Settings application for compatibility with OpenSearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
 - Changed Malware detection dashboard visualizations [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 - Changed malware feature description [#7036](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7036)
-- Changed the font size of the kpi subtitles and the features descriptions [#7027](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7027)
+- Changed the font size of the kpi subtitles and the features descriptions [#7033](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7033)
 
 ### Fixed
 
