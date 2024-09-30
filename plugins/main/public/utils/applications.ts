@@ -841,7 +841,6 @@ export const Applications = [
   threatHunting,
   vulnerabilityDetection,
   mitreAttack,
-  virustotal,
   pciDss,
   hipaa,
   gdpr,
