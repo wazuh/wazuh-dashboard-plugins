@@ -64,10 +64,6 @@ const useSearchBarConfiguration = (
   const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
     transformDateRange(globalTimeFilter),
   );
-  const [refreshInterval, setRefreshInterval] = useState(
-    props?.refreshInterval,
-  );
-  const [isPaused, setIsPaused] = useState(props?.isRefreshPaused);
   const { query: queryService } = getDataPlugin();
   const { savedQuery, setSavedQuery, clearSavedQuery } = useSavedQuery({
     queryService,
@@ -136,11 +132,10 @@ const useSearchBarConfiguration = (
         : console.warn('setFilters function is not defined');
       props?.onFiltersUpdated && props?.onFiltersUpdated(userFilters);
     },
-    refreshInterval,
-    isRefreshPaused: isPaused,
-    onRefreshChange: ({ refreshInterval, isPaused }) => {
-      setRefreshInterval(refreshInterval);
-      setIsPaused(isPaused);
+    refreshInterval: queryService.timefilter.timefilter.getRefreshInterval().value,
+    isRefreshPaused: queryService.timefilter.timefilter.getRefreshInterval().pause,
+    onRefreshChange: (opts) => {
+      queryService.timefilter.timefilter.setRefreshInterval(opts);
     },
     onRefresh: ({ dateRange }) => {
       setAbsoluteDateRange(transformDateRange(dateRange));
