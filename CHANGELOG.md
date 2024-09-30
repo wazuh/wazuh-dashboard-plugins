@@ -8,16 +8,18 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.0
 - Added sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
+- Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968)
 
 ### Changed
 
 - Update malware detection group values in data sources [#6963](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6963)
-- Changed the registration id of the Settings application for compatibility with Opensearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
+- Changed the registration id of the Settings application for compatibility with OpenSearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
 - Changed Malware detection dashboard visualizations [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 
 ### Fixed
 
 - Fixed read-only users could not access to Statistics application [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
+- Fixed no-agent-alert spawn with selected agent in agent-welcome view[#7029](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7029)
 
 ### Removed
 
