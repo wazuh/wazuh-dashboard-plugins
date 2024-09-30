@@ -1,26 +1,28 @@
-import React, { useState, useEffect } from 'react';
 import {
-  EuiStat,
   EuiFlexItem,
   EuiLink,
-  EuiToolTip,
+  EuiStat,
   EuiText,
+  EuiToolTip,
 } from '@elastic/eui';
-import { getLast24HoursAlerts } from './last-alerts-service';
-import { UI_COLOR_STATUS } from '../../../../../common/constants';
-import { getCore } from '../../../../kibana-services';
+import { useEffect, useState } from 'react';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import {
-  ErrorHandler,
-  ErrorFactory,
-  HttpError,
-} from '../../../../react-services/error-management';
+import { UI_COLOR_STATUS } from '../../../../../common/constants';
 import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
 } from '../../../../components/common/data-source/pattern/pattern-data-source-filter-manager';
+import { getCore } from '../../../../kibana-services';
+import {
+  ErrorFactory,
+  ErrorHandler,
+  HttpError,
+} from '../../../../react-services/error-management';
+import { getLast24HoursAlerts } from './last-alerts-service';
 
-export function LastAlertsStat({ severity }: { severity: string }) {
+type SeverityLevelKey = 'low' | 'medium' | 'high' | 'critical';
+
+export function LastAlertsStat({ severity }: { severity: SeverityLevelKey }) {
   const [countLastAlerts, setCountLastAlerts] = useState<number | null>(null);
   const [discoverLocation, setDiscoverLocation] = useState<string>('');
   const severityLabel = {
@@ -53,15 +55,20 @@ export function LastAlertsStat({ severity }: { severity: string }) {
       color: UI_COLOR_STATUS.danger,
       ruleLevelRange: {
         minRuleLevel: 15,
+        maxRuleLevel: undefined,
       },
     },
-  };
+  } as const;
+
+  const ruleLevelRange = severityLabel[severity].ruleLevelRange;
+  const maxRuleLevel = ruleLevelRange.maxRuleLevel;
+  const minRuleLevel = ruleLevelRange.minRuleLevel;
 
   useEffect(() => {
     const getCountLastAlerts = async () => {
       try {
         const { indexPatternId, cluster, count } = await getLast24HoursAlerts(
-          severityLabel[severity].ruleLevelRange,
+          ruleLevelRange,
         );
         setCountLastAlerts(count);
         const core = getCore();
@@ -82,10 +89,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           PatternDataSourceFilterManager.createFilter(
             FILTER_OPERATOR.IS_BETWEEN,
             'rule.level',
-            [
-              severityLabel[severity].ruleLevelRange.minRuleLevel,
-              severityLabel[severity].ruleLevelRange.maxRuleLevel,
-            ],
+            [minRuleLevel, maxRuleLevel],
             indexPatternId,
           );
         const predefinedFilters =
@@ -117,13 +121,9 @@ export function LastAlertsStat({ severity }: { severity: string }) {
             <EuiToolTip
               position='top'
               content={`Click to see rule.level ${
-                severityLabel[severity].ruleLevelRange.maxRuleLevel
-                  ? 'between ' +
-                    severityLabel[severity].ruleLevelRange.minRuleLevel +
-                    ' to ' +
-                    severityLabel[severity].ruleLevelRange.maxRuleLevel
-                  : severityLabel[severity].ruleLevelRange.minRuleLevel +
-                    ' or higher'
+                maxRuleLevel
+                  ? 'between ' + minRuleLevel + ' to ' + maxRuleLevel
+                  : minRuleLevel + ' or higher'
               }`}
             >
               <EuiLink
@@ -143,12 +143,15 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           titleColor={severityLabel[severity].color}
           textAlign='center'
         />
-        <EuiText size='xs' css='margin-top: 0.7vh'>
+        <EuiText
+          size='s'
+          style={{
+            marginTop: '0.7vh',
+          }}
+        >
           {'Rule level ' +
-            severityLabel[severity].ruleLevelRange.minRuleLevel +
-            (severityLabel[severity].ruleLevelRange.maxRuleLevel
-              ? ' to ' + severityLabel[severity].ruleLevelRange.maxRuleLevel
-              : ' or higher')}
+            minRuleLevel +
+            (maxRuleLevel ? ' to ' + maxRuleLevel : ' or higher')}
         </EuiText>
       </RedirectAppLinks>
     </EuiFlexItem>
