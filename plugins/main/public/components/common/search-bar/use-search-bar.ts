@@ -132,9 +132,11 @@ const useSearchBarConfiguration = (
         : console.warn('setFilters function is not defined');
       props?.onFiltersUpdated && props?.onFiltersUpdated(userFilters);
     },
-    refreshInterval: queryService.timefilter.timefilter.getRefreshInterval().value,
-    isRefreshPaused: queryService.timefilter.timefilter.getRefreshInterval().pause,
-    onRefreshChange: (opts) => {
+    refreshInterval:
+      queryService.timefilter.timefilter.getRefreshInterval().value,
+    isRefreshPaused:
+      queryService.timefilter.timefilter.getRefreshInterval().pause,
+    onRefreshChange: opts => {
       queryService.timefilter.timefilter.setRefreshInterval(opts);
     },
     onRefresh: ({ dateRange }) => {
