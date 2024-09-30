@@ -3,7 +3,7 @@
 exports[`Stats component renders correctly to match the snapshot 1`] = `
 <div>
   <div
-    class="euiPage euiPage--paddingMedium euiPage--grow"
+    class="euiPage euiPage--paddingMedium euiPage--grow wz-welcome-stats"
   >
     <div
       class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"

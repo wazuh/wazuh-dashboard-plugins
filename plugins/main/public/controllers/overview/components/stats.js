@@ -10,25 +10,25 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   EuiCard,
-  EuiFlexGroup,
   EuiFlexItem,
+  EuiFlexGroup,
   EuiPage,
   EuiToolTip,
 } from '@elastic/eui';
-import PropTypes from 'prop-types';
-import { Component } from 'react';
+import { withErrorBoundary } from '../../../components/common/hocs';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import {
-  agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
+  agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
-import { VisualizationBasic } from '../../../components/common/charts/visualizations/basic';
-import { withErrorBoundary } from '../../../components/common/hocs';
-import NavigationService from '../../../react-services/navigation-service';
 import { endpointSummary } from '../../../utils/applications';
 import { LastAlertsStat } from './last-alerts-stat';
+import { VisualizationBasic } from '../../../components/common/charts/visualizations/basic';
+import NavigationService from '../../../react-services/navigation-service';
 import './stats.scss';
 export const Stats = withErrorBoundary(
   class Stats extends Component {
