@@ -21,7 +21,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed read-only users could not access to Statistics application [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
-- Fixed no-agent-alert spawn with selected agent in agent-welcome view[#7029](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7029)
+- Fixed no-agent-alert spawn with selected agent in agent-welcome view [#7029](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7029)
+- Fixed security policy exception when it contained deprecated actions [#7042](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7042)
 
 ### Removed
 
