@@ -103,6 +103,14 @@ def generateRandomTags():
         tags.append('tag{}'.format(random.randint(0, 99)))
     return(tags)
 
+#Sometimes vulnerability.reference contains 2 links; this function mocks it.
+def generateRandomReference(vulnerability_id):
+    reference = 'https://mycve.test.org/cgi-bin/cvename.cgi?name={}'.format(vulnerability_id)
+    if random.choice([True, False]):
+        return '{0}, {0}'.format(reference)
+    else:
+        return reference
+
 def generateRandomVulnerability():
     vulnerability = {}
     vulnerability['category'] = random.choice(['security','config','os','package','custom'])
@@ -110,7 +118,7 @@ def generateRandomVulnerability():
     vulnerability['description'] = 'description{}'.format(random.randint(0, 9999))
     vulnerability['enumeration'] = 'CVE'
     vulnerability['id'] = 'CVE-{}'.format(random.randint(0, 9999))
-    vulnerability['reference'] = 'https://mycve.test.org/cgi-bin/cvename.cgi?name={}'.format(vulnerability['id'])
+    vulnerability['reference'] = generateRandomReference(vulnerability['id'])
     vulnerability['report_id'] = 'report-{}'.format(random.randint(0, 9999))
     vulnerability['scanner'] = {'vendor':'vendor-{}'.format(random.randint(0, 9))}
     vulnerability['score'] = {'base':round(random.uniform(0, 10),1), 'environmental':round(random.uniform(0, 10),1), 'temporal':round(random.uniform(0, 10),1),'version':'{}'.format(round(random.uniform(0, 10),1))}
@@ -122,6 +130,7 @@ def generateRandomVulnerability():
 def generateRandomWazuh():
     wazuh = {}
     wazuh['cluster'] = {'name':random.choice(['wazuh.manager', 'wazuh']), 'node':random.choice(['master','worker-01','worker-02','worker-03'])}
+    wazuh['vulnerability'] = {'under_evaluation': random.choice([True, False])}
     return(wazuh)
 
 def generateRandomData(number):

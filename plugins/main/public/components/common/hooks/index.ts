@@ -18,7 +18,6 @@ export * from './use-time-filter';
 export * from './useWindowSize';
 export * from './useUserPermissions';
 export * from './use-user-is-admin';
-export * from './useAllowedAgents';
 export * from './useApiRequest';
 export * from './use-app-config';
 export * from './use_async_action';

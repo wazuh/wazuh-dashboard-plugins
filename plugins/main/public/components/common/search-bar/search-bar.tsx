@@ -13,11 +13,13 @@ export interface WzSearchBarProps extends SearchBarProps {
   userFilters?: Filter[];
   preQueryBar?: React.ReactElement;
   postFilters?: React.ReactElement;
+  postFixedFilters?: () => React.ReactElement<any>[];
   hideFixedFilters?: boolean;
 }
 
 export const WzSearchBar = ({
   fixedFilters = [],
+  postFixedFilters,
   preQueryBar,
   hideFixedFilters,
   postFilters,
@@ -74,6 +76,13 @@ export const WzSearchBar = ({
                     </EuiBadge>
                   </EuiFlexItem>
                 ))}
+                {postFixedFilters
+                  ? postFixedFilters.map((Filter, idx) => (
+                      <EuiFlexItem grow={false} key={idx}>
+                        <Filter />
+                      </EuiFlexItem>
+                    ))
+                  : null}
               </EuiFlexGroup>
             </EuiFlexItem>
           )}

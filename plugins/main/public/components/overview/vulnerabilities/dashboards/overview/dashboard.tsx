@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
@@ -10,7 +10,7 @@ import './vulnerability_detector_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
-import { LoadingSpinner } from '../../common/components/loading_spinner';
+import { LoadingSearchbarProgress } from '../../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
 import {
   ErrorFactory,
   ErrorHandler,
@@ -25,10 +25,17 @@ import {
   VulnerabilitiesDataSource,
   PatternDataSource,
   tParsedIndexPattern,
+  PatternDataSourceFilterManager,
+  FILTER_OPERATOR,
 } from '../../../../common/data-source';
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { WzSearchBar } from '../../../../common/search-bar';
+import VulsEvaluationFilter, {
+  createUnderEvaluationFilter,
+  excludeUnderEvaluationFilter,
+  getUnderEvaluationFilterValue,
+} from '../../common/components/vuls-evaluation-filter';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -70,6 +77,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
     if (isDataSourceLoading) {
       return;
     }
+    setUnderEvaluation(getUnderEvaluation(filters || []));
     fetchData({ query })
       .then(results => {
         setResults(results);
@@ -83,18 +91,58 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
       });
   }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
 
+  /**
+   * When the user changes the filter value, this function is called to update the filters
+   * If the value is null, the filter is removed
+   * If the filter already exists, it is remove and the new filter is added
+   * @param underEvaluation
+   * @returns
+   */
+  const handleFilterChange = (underEvaluation: boolean | null) => {
+    const newFilters = excludeUnderEvaluationFilter(filters || []);
+    if (underEvaluation === null) {
+      setFilters(newFilters);
+      return;
+    }
+    newFilters.push(
+      createUnderEvaluationFilter(
+        underEvaluation,
+        dataSource?.id || indexPattern?.id,
+      ),
+    );
+    setFilters(newFilters);
+  };
+
+  const getUnderEvaluation = useCallback(getUnderEvaluationFilterValue, [
+    JSON.stringify(filters),
+    isDataSourceLoading,
+  ]);
+
+  const [underEvaluation, setUnderEvaluation] = useState<boolean | null>(
+    getUnderEvaluation(filters || []),
+  );
+
   return (
     <>
       <I18nProvider>
         <>
           <ModuleEnabledCheck />
           {isDataSourceLoading && !dataSource ? (
-            <LoadingSpinner />
+            <LoadingSearchbarProgress />
           ) : (
             <WzSearchBar
               appName='vulnerability-detector-searchbar'
               {...searchBarProps}
+              filters={excludeUnderEvaluationFilter(filters)}
               fixedFilters={fixedFilters}
+              postFixedFilters={[
+                () => (
+                  <VulsEvaluationFilter
+                    value={underEvaluation}
+                    setValue={handleFilterChange}
+                  />
+                ),
+              ]}
               showDatePicker={false}
               showQueryInput={true}
               showQueryBar={true}

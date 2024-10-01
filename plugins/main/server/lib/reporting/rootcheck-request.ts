@@ -24,14 +24,13 @@ export const top5RootkitsDetected = async (
   gte,
   lte,
   filters,
-  allowedAgentsFilter,
   pattern,
   size = 5,
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {
@@ -82,13 +81,12 @@ export const agentsWithHiddenPids = async (
   gte,
   lte,
   filters,
-  allowedAgentsFilter,
   pattern,
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '1': {
@@ -134,13 +132,12 @@ export const agentsWithHiddenPorts = async (
   gte,
   lte,
   filters,
-  allowedAgentsFilter,
   pattern,
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '1': {

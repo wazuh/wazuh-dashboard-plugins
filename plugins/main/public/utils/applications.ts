@@ -112,7 +112,7 @@ export const malwareDetection = {
   }),
   description: i18n.translate('wz-app-malware-detection-description', {
     defaultMessage:
-      'Verify that your systems are configured according to your security policies baseline.',
+      'Check indicators of compromise triggered by malware infections or cyberattacks.',
   }),
   euiIconType: 'indexRollupApp',
   order: 201,
@@ -198,7 +198,7 @@ export const vulnerabilityDetection = {
   euiIconType: 'heartbeatApp',
   order: 301,
   showInOverviewApp: true,
-  showInAgentMenu: false,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=vuls&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -475,7 +475,7 @@ export const office365 = {
   euiIconType: LogoOffice365,
   order: 503,
   showInOverviewApp: true,
-  showInAgentMenu: false,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=office&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -682,7 +682,7 @@ export const reporting = {
 
 export const settings = {
   category: 'wz-category-server-management',
-  id: 'settings',
+  id: 'dashboards-settings',
   title: i18n.translate('wz-app-settings-title', {
     defaultMessage: 'Settings',
   }),

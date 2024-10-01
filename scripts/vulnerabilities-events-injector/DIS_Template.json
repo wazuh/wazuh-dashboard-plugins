@@ -257,6 +257,13 @@
                 "type": "keyword"
               }
             }
+          },
+          "vulnerability": {
+            "properties": {
+              "under_evaluation": {
+                "type": "boolean"
+              }
+            }
           }
         }
       }

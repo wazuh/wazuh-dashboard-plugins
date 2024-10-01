@@ -139,7 +139,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       </p>
                     </div>
                     <div
-                      class="euiText euiText--extraSmall"
+                      class="euiText euiText--small"
                       css="margin-top: 0.7vh"
                     >
                       Rule level 15 or higher
@@ -184,7 +184,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       </p>
                     </div>
                     <div
-                      class="euiText euiText--extraSmall"
+                      class="euiText euiText--small"
                       css="margin-top: 0.7vh"
                     >
                       Rule level 12 to 14
@@ -229,7 +229,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       </p>
                     </div>
                     <div
-                      class="euiText euiText--extraSmall"
+                      class="euiText euiText--small"
                       css="margin-top: 0.7vh"
                     >
                       Rule level 7 to 11
@@ -274,7 +274,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       </p>
                     </div>
                     <div
-                      class="euiText euiText--extraSmall"
+                      class="euiText euiText--small"
                       css="margin-top: 0.7vh"
                     >
                       Rule level 0 to 6
