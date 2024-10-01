@@ -2,8 +2,10 @@ import { ILogger } from '../../../common/services/configuration';
 import { createHOCs } from './hocs/creator';
 import { createHooks } from './hooks/creator';
 import { State, StateContainer } from './types';
+import { Subscription } from 'rxjs';
 
 export class CoreState implements State {
+  private _subscriptions: Subscription = new Subscription();
   private stateContainers: Map<string, StateContainer>;
   constructor(private logger: ILogger) {
     this.stateContainers = new Map();
@@ -22,6 +24,9 @@ export class CoreState implements State {
   }
   stop() {
     this.logger.debug('Stop');
+    this.logger.debug('Unsubscribing');
+    this._subscriptions.unsubscribe();
+    this.logger.debug('Unsubscribed');
   }
   getStateContainer(name: string) {
     if (!this.stateContainers.has(name)) {
@@ -48,7 +53,13 @@ export class CoreState implements State {
   subscribe(name: string, callback: (value) => void) {
     const stateContainerSubscription =
       this.getStateContainer(name)!.subscribe(callback);
-    // TODO: unsubscribe when the app is stopped
-    return stateContainerSubscription;
+
+    // Create a wrapper of the original subscription to remove all in the stop plugin lifecycle
+    const stateContainerSub = () => {
+      stateContainerSubscription();
+      this._subscriptions.remove(stateContainerSubscription);
+    };
+    this._subscriptions.add(stateContainerSubscription);
+    return stateContainerSub;
   }
 }

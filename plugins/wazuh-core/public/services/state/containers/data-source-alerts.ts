@@ -81,6 +81,7 @@ export class DataSourceAlertsStateContainer implements StateContainer {
     try {
       this.logger.debug('Removing');
       const result = this.store.remove(this.storeKey);
+      this.updater$.next(undefined);
       this.logger.debug('Removed');
       return result;
     } catch (error) {

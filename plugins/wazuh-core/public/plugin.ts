@@ -71,14 +71,12 @@ export class WazuhCorePlugin
       new ServerHostStateContainer(logger, { store: cookiesStore }),
     );
     this.services.state.subscribe('server_host', value => {
-      // TODO: refresh the auth when the server_host data changed
+      // TODO: refresh the auth when the server_host data changed and there is value
     });
     this.services.state.register(
       'data_source_alerts',
       new DataSourceAlertsStateContainer(logger, { store: cookiesStore }),
     );
-
-    console.log(this.services.state.get('server_host'));
 
     await this.services.dashboardSecurity.setup();
 
@@ -98,6 +96,7 @@ export class WazuhCorePlugin
     setUiSettings(core.uiSettings);
 
     await this.services.configuration.start({ http: core.http });
+    this.services.state.start();
 
     return {
       ...this.services,
@@ -111,5 +110,7 @@ export class WazuhCorePlugin
     };
   }
 
-  public stop() {}
+  public stop() {
+    this.services.state.stop();
+  }
 }

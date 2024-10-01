@@ -55,6 +55,7 @@ export class ServerHostStateContainer implements StateContainer {
   remove() {
     this.logger.debug('Removing');
     const result = this.store.remove(this.storeKey);
+    this.updater$.next(undefined);
     this.logger.debug('Removed');
     return result;
   }
