@@ -150,7 +150,7 @@ export function LastAlertsStat({
           titleColor={severity.color}
           textAlign='center'
         />
-        <EuiText size='xs' css='margin-top: 0.7vh'>
+        <EuiText size='s' css='margin-top: 0.7vh'>
           {'Rule level ' +
             ruleLevelRange.minRuleLevel +
             (ruleLevelRange.maxRuleLevel
