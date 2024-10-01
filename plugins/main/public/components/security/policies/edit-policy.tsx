@@ -137,7 +137,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const loadResources = () => {
     let allResources = [];
     addedActions
-      .filter(x => !!availableActions[x.action]) // Remove configured actions no longer available on the API
+      .filter(x => !!availableActions?.[x.action]) // Remove configured actions no longer available on the API
       .forEach(x => {
         const res = availableActions[x.action]?.['resources'];
         allResources = allResources.concat(res);
