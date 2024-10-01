@@ -4,6 +4,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 00
 
+## Fixed
+
+- Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
+
 ### Added
 
 - Support for Wazuh 4.10.0
@@ -20,7 +24,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error on the command to deploy a new macOS agent that could cause the registration password had a wrong value because a `\n` could be included [#6906](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6906)
 - Fixed rendering an active response as disabled when is active [#6901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6901)
 - Fixed an error on Dev Tools when using payload properties as arrays [#6908](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6908)
-- Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 05
 
