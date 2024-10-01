@@ -130,16 +130,18 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           ),
         };
       })
-      .sort((a, b) => a.value.localeCompare(b.value));
+      .sort((a, b) => a.value?.localeCompare(b.value));
     setActions(actions);
   }
 
   const loadResources = () => {
     let allResources = [];
-    addedActions.forEach(x => {
-      const res = (availableActions[x.action] || {})['resources'];
-      allResources = allResources.concat(res);
-    });
+    addedActions
+      .filter(x => !!availableActions?.[x.action]) // Remove configured actions no longer available on the API
+      .forEach(x => {
+        const res = availableActions[x.action]?.['resources'];
+        allResources = allResources.concat(res);
+      });
     const allResourcesSet = new Set(allResources);
     const resources = Array.from(allResourcesSet)
       .map((x, idx) => {
@@ -159,7 +161,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           ),
         };
       })
-      .sort((a, b) => a.value.localeCompare(b.value));
+      .sort((a, b) => a.value?.localeCompare(b.value));
     setResources(resources);
   };
 
