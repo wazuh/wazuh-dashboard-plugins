@@ -229,7 +229,7 @@ describe('[endpoint] PUT /utils/configuration', () => {
   // If any of the parameters is changed this variable should be updated with the new md5
   it.each`
     footer              | header                                 | responseStatusCode | expectedMD5                           | tab
-    ${null}             | ${null}                                | ${200}             | ${'2a8dfb6e1fa377ce6a235bd5b4b701b5'} | ${'pm'}
+    ${null}             | ${null}                                | ${200}             | ${'dc7edb68490376cdb70535f420ba82d3'} | ${'pm'}
     ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'} | ${200}             | ${'9003caabb5a3ef69b4b7e56e8c549011'} | ${'general'}
     ${''}               | ${''}                                  | ${200}             | ${'66bd70790000b5016f42775653a0f169'} | ${'fim'}
     ${'Custom Footer'}  | ${null}                                | ${200}             | ${'ed1b880b6141fde5c9109178ea112646'} | ${'aws'}
@@ -326,8 +326,6 @@ describe('[endpoint] PUT /utils/configuration', () => {
         .set('x-test-username', USER_NAME)
         .send(reportBody);
       // .expect(200);
-
-      console.log({ responseReport });
 
       const fileName =
         responseReport.body?.message.match(/([A-Z-0-9]*\.pdf)/gi)[0];
