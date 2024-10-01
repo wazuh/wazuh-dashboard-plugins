@@ -10,7 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiCard,
@@ -109,10 +109,8 @@ export const Stats = withErrorBoundary(
                   />
                 ) : (
                   !hasResults &&
-                  !this.props === undefined && (
+                  this.props !== undefined && (
                     <EuiEmptyPrompt
-                      iconType='watchesApp'
-                      title={<h2>No agents were added to the manager</h2>}
                       body={<p>Add agents to fleet to start monitoring</p>}
                       actions={
                         <WzButtonPermissions
