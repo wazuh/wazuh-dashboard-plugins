@@ -12,13 +12,7 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  EuiCard,
-  EuiFlexItem,
-  EuiFlexGroup,
-  EuiPage,
-  EuiToolTip,
-} from '@elastic/eui';
+import { EuiCard, EuiFlexItem, EuiFlexGroup, EuiToolTip } from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import {
@@ -82,46 +76,42 @@ export const Stats = withErrorBoundary(
         ({ status }) => this.props[status],
       );
       return (
-        <EuiPage className='wz-welcome-stats'>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <EuiCard betaBadgeLabel='Agents summary' title=''>
-                <VisualizationBasic
-                  isLoading={this.state.loadingSummary}
-                  type='donut'
-                  size={{ width: '100%', height: '150px' }}
-                  showLegend
-                  data={
-                    hasResults &&
-                    this.agentStatus.map(
-                      ({ status, label, color, onClick }) => ({
-                        onClick,
-                        label,
-                        value:
-                          typeof this.props[status] !== 'undefined'
-                            ? this.props[status]
-                            : 0,
-                        color,
-                      }),
-                    )
-                  }
-                  noDataTitle='No results'
-                  noDataMessage='No results were found.'
-                />
-              </EuiCard>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
-                <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
-                  <LastAlertsStat severity='critical' />
-                  <LastAlertsStat severity='high' />
-                  <LastAlertsStat severity='medium' />
-                  <LastAlertsStat severity='low' />
-                </EuiFlexGroup>
-              </EuiCard>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPage>
+        <EuiFlexGroup gutterSize='l'>
+          <EuiFlexItem grow={false}>
+            <EuiCard betaBadgeLabel='Agents summary' title=''>
+              <VisualizationBasic
+                isLoading={this.state.loadingSummary}
+                type='donut'
+                size={{ width: '100%', height: '150px' }}
+                showLegend
+                data={
+                  hasResults &&
+                  this.agentStatus.map(({ status, label, color, onClick }) => ({
+                    onClick,
+                    label,
+                    value:
+                      typeof this.props[status] !== 'undefined'
+                        ? this.props[status]
+                        : 0,
+                    color,
+                  }))
+                }
+                noDataTitle='No results'
+                noDataMessage='No results were found.'
+              />
+            </EuiCard>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
+              <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
+                <LastAlertsStat severity='critical' />
+                <LastAlertsStat severity='high' />
+                <LastAlertsStat severity='medium' />
+                <LastAlertsStat severity='low' />
+              </EuiFlexGroup>
+            </EuiCard>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       );
     }
   },

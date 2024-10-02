@@ -21,7 +21,6 @@ import {
   EuiSpacer,
   EuiFlexGrid,
   EuiCallOut,
-  EuiPage,
 } from '@elastic/eui';
 import './welcome.scss';
 import { withErrorBoundary, withGlobalBreadcrumb } from '../hocs';
@@ -111,63 +110,56 @@ export const OverviewWelcome = compose(
 
     render() {
       return (
-        <Fragment>
-          <EuiPage className='wz-welcome-page'>
-            <EuiFlexGroup gutterSize='l'>
-              <EuiFlexItem>
-                {this.props.agentsCountTotal === 0 && this.addAgent()}
-                <EuiFlexGroup gutterSize='none'>
-                  <EuiFlexGrid columns={2}>
-                    {appCategories.map(({ label, apps }) => (
-                      <EuiFlexItem key={label}>
-                        <EuiCard
-                          title
-                          description
-                          betaBadgeLabel={
-                            Categories.find(category => category.id === label)
-                              ?.label
-                          }
-                        >
-                          <EuiSpacer size='s' />
-                          <EuiFlexGrid columns={2}>
-                            {apps.map(app => (
-                              <EuiFlexItem key={app.id}>
-                                <RedirectAppLinks
-                                  className='flex-redirect-app-links'
-                                  application={getCore().application}
-                                >
-                                  <EuiCard
-                                    size='xs'
-                                    layout='horizontal'
-                                    icon={
-                                      <EuiIcon
-                                        size='xl'
-                                        type={app.euiIconType}
-                                      />
-                                    }
-                                    className='homSynopsis__card'
-                                    title={app.title}
-                                    href={NavigationService.getInstance().getUrlForApp(
-                                      app.id,
-                                    )}
-                                    data-test-subj={`overviewWelcome${this.strtools.capitalize(
-                                      app.id,
-                                    )}`}
-                                    description={app.description}
-                                  />
-                                </RedirectAppLinks>
-                              </EuiFlexItem>
-                            ))}
-                          </EuiFlexGrid>
-                        </EuiCard>
-                      </EuiFlexItem>
-                    ))}
-                  </EuiFlexGrid>
-                </EuiFlexGroup>
-              </EuiFlexItem>
+        <EuiFlexGroup gutterSize='l'>
+          <EuiFlexItem>
+            {this.props.agentsCountTotal === 0 && this.addAgent()}
+            <EuiFlexGroup gutterSize='none'>
+              <EuiFlexGrid columns={2}>
+                {appCategories.map(({ label, apps }) => (
+                  <EuiFlexItem key={label}>
+                    <EuiCard
+                      title
+                      description
+                      betaBadgeLabel={
+                        Categories.find(category => category.id === label)
+                          ?.label
+                      }
+                    >
+                      <EuiSpacer size='s' />
+                      <EuiFlexGrid columns={2}>
+                        {apps.map(app => (
+                          <EuiFlexItem key={app.id}>
+                            <RedirectAppLinks
+                              className='flex-redirect-app-links'
+                              application={getCore().application}
+                            >
+                              <EuiCard
+                                size='xs'
+                                layout='horizontal'
+                                icon={
+                                  <EuiIcon size='xl' type={app.euiIconType} />
+                                }
+                                className='homSynopsis__card'
+                                title={app.title}
+                                href={NavigationService.getInstance().getUrlForApp(
+                                  app.id,
+                                )}
+                                data-test-subj={`overviewWelcome${this.strtools.capitalize(
+                                  app.id,
+                                )}`}
+                                description={app.description}
+                              />
+                            </RedirectAppLinks>
+                          </EuiFlexItem>
+                        ))}
+                      </EuiFlexGrid>
+                    </EuiCard>
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGrid>
             </EuiFlexGroup>
-          </EuiPage>
-        </Fragment>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       );
     }
   },
