@@ -128,9 +128,9 @@ export const OverviewWelcome = compose(
                       <EuiSpacer size='s' />
                       <EuiFlexGrid columns={2}>
                         {apps.map(app => (
-                          <EuiFlexItem key={app.id}>
+                          <EuiFlexItem key={app.id} grow>
                             <RedirectAppLinks
-                              className='flex-redirect-app-links'
+                              className='h-100'
                               application={getCore().application}
                             >
                               <EuiCard
@@ -139,8 +139,9 @@ export const OverviewWelcome = compose(
                                 icon={
                                   <EuiIcon size='xl' type={app.euiIconType} />
                                 }
-                                className='homSynopsis__card'
+                                className='wz-module-card-title h-100'
                                 title={app.title}
+                                titleSize='xs'
                                 href={NavigationService.getInstance().getUrlForApp(
                                   app.id,
                                 )}

@@ -1,14 +1,3 @@
-.wz-welcome-page .euiCard .euiTitle,
-.wz-module-body .euiCard .euiTitle {
-  font-size: 16px;
-  font-weight: 400;
-}
-
-.wz-welcome-page .euiCard .euiText,
-.wz-module-body .euiCard .euiText {
-  font-family: sans-serif;
-}
-
 .wz-module-header-agent:not(.wz-module-header-agent-main) {
   background: white;
   border-bottom: 1px solid #d3dae6;
@@ -44,11 +33,6 @@ span.statWithLink:hover {
   text-decoration: underline;
 }
 
-.wz-welcome-page .flex-redirect-app-links {
-  display: flex;
-  flex-grow: 1;
-}
-
-.wz-welcome-page {
-  padding-bottom: 24px;
+.wz-module-card-title .euiCard__content .euiTitle {
+  font-weight: 400;
 }
