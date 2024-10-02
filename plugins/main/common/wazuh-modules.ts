@@ -109,7 +109,7 @@ export const WAZUH_MODULES = {
     title: 'MITRE ATT&CK',
     appId: 'mitre-attack',
     description:
-      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations',
+      'Explore security alerts mapped to adversary tactics and techniques for better threat understanding.',
   },
   syscollector: {
     title: 'Inventory data',
