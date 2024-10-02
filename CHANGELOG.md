@@ -8,7 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.0
 - Added sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
-- Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968)
+- Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968) [#7044](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7044) [#7046](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7046)
 
 ### Changed
 
