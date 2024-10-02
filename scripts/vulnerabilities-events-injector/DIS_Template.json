@@ -229,6 +229,9 @@
           "severity": {
             "ignore_above": 1024,
             "type": "keyword"
+          },
+          "under_evaluation": {
+            "type": "boolean"
           }
         }
       },
@@ -255,13 +258,6 @@
               "name": {
                 "ignore_above": 1024,
                 "type": "keyword"
-              }
-            }
-          },
-          "vulnerability": {
-            "properties": {
-              "under_evaluation": {
-                "type": "boolean"
               }
             }
           }
