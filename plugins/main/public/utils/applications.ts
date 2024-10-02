@@ -232,6 +232,7 @@ export const mitreAttack = {
     }`,
 };
 
+// The Virustotal feature and dashboards are no longer in use, as they have been replaced by the Malware Dashboard.
 export const virustotal = {
   category: 'wz-category-threat-intelligence',
   id: 'virustotal',
