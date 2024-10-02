@@ -24,6 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the `Open report` button of the toast and the `Download report` icon of the reporting table in Safari [#7019](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7019)
 - Fixed style when unnpinned an agent in endpoint summary section [#7015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7015)
 - Fixed overflow style on a long value filter [#7021](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7021)
+- Fixed buttons enabled for a readonly user in `Endpoint groups` section [#7056](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7056)
 
 ### Changed
 
