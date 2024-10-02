@@ -1,9 +1,9 @@
 import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../common/constants';
-import { ILogger } from '../../common/services/configuration';
+import { Logger } from '../../common/services/configuration';
 
 export class DashboardSecurity {
   private securityPlatform: string = '';
-  constructor(private logger: ILogger, private http) {}
+  constructor(private logger: Logger, private http) {}
   private async fetchCurrentPlatform() {
     try {
       this.logger.debug('Fetching the security platform');

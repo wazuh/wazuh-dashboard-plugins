@@ -51,3 +51,5 @@ export const useDockedSideNav = () => {
 
   return isDockedSideNavVisible;
 };
+
+export type UseDockedSideNav = () => boolean;
