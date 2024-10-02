@@ -4,6 +4,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 01
 
+## Fixed
+
+- Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
+
 ### Added
 
 - Support for Wazuh 4.10.0
