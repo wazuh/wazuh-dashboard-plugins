@@ -170,7 +170,12 @@ export const exportSearchToCSV = async (
         if (typeof value === 'object') {
           return JSON.stringify(value);
         }
-        return `"${value}"`;
+        // Escape double quotes and handle line breaks to prevent column misalignment
+        return `"${value
+          .toString()
+          .replaceAll(/"/g, '""')
+          .replaceAll(/\r\n/g, '\\r\\n')
+          .replaceAll(/\n/g, '\\n')}"`;
       });
       return parsedRow?.join(',');
     })

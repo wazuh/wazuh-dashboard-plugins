@@ -11,7 +11,7 @@ type VulsEvaluatedFilterProps = {
   value: boolean | null;
 };
 
-const UNDER_EVALUATION_FIELD = 'wazuh.vulnerability.under_evaluation';
+const UNDER_EVALUATION_FIELD = 'vulnerability.under_evaluation';
 
 export const getUnderEvaluationFilterValue = (
   filters: Filter[],

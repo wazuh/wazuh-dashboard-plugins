@@ -12,7 +12,13 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiCard, EuiFlexItem, EuiFlexGroup, EuiToolTip } from '@elastic/eui';
+import {
+  EuiCard,
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiToolTip,
+  EuiEmptyPrompt,
+} from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import {
@@ -24,6 +30,8 @@ import { LastAlertsStat } from './last-alerts-stat';
 import { VisualizationBasic } from '../../../components/common/charts/visualizations/basic';
 import NavigationService from '../../../react-services/navigation-service';
 import './stats.scss';
+import { WzButtonPermissions } from '../../../components/common/permissions/button';
+
 export const Stats = withErrorBoundary(
   class Stats extends Component {
     constructor(props) {
@@ -75,30 +83,61 @@ export const Stats = withErrorBoundary(
       const hasResults = this.agentStatus.some(
         ({ status }) => this.props[status],
       );
+
       return (
         <EuiFlexGroup gutterSize='l'>
           <EuiFlexItem grow={false}>
             <EuiCard betaBadgeLabel='Agents summary' title=''>
-              <VisualizationBasic
-                isLoading={this.state.loadingSummary}
-                type='donut'
-                size={{ width: '100%', height: '150px' }}
-                showLegend
-                data={
-                  hasResults &&
-                  this.agentStatus.map(({ status, label, color, onClick }) => ({
-                    onClick,
-                    label,
-                    value:
-                      typeof this.props[status] !== 'undefined'
-                        ? this.props[status]
-                        : 0,
-                    color,
-                  }))
-                }
-                noDataTitle='No results'
-                noDataMessage='No results were found.'
-              />
+              {hasResults ? (
+                <VisualizationBasic
+                  isLoading={this.state.loadingSummary}
+                  type='donut'
+                  size={{ width: '100%', height: '150px' }}
+                  showLegend
+                  data={this.agentStatus.map(
+                    ({ status, label, color, onClick }) => ({
+                      onClick,
+                      label,
+                      value:
+                        typeof this.props[status] !== 'undefined'
+                          ? this.props[status]
+                          : 0,
+                      color,
+                    }),
+                  )}
+                />
+              ) : (
+                !hasResults &&
+                this.props !== undefined && (
+                  <EuiEmptyPrompt
+                    body={
+                      <p>
+                        This instance has no agents registered.
+                        <br />
+                        Please deploy agents to begin monitoring your endpoints.
+                      </p>
+                    }
+                    actions={
+                      <WzButtonPermissions
+                        color='primary'
+                        fill
+                        permissions={[
+                          { action: 'agent:create', resource: '*:*:*' },
+                        ]}
+                        iconType='plusInCircle'
+                        href={NavigationService.getInstance().getUrlForApp(
+                          endpointSummary.id,
+                          {
+                            path: `#${endpointSummary.redirectTo()}deploy`,
+                          },
+                        )}
+                      >
+                        Deploy new agent
+                      </WzButtonPermissions>
+                    }
+                  />
+                )
+              )}
             </EuiCard>
           </EuiFlexItem>
           <EuiFlexItem>
