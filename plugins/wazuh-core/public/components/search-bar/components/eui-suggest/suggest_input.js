@@ -7,7 +7,7 @@ import {
   EuiFieldText,
   EuiToolTip,
   EuiIcon,
-  EuiPopover
+  EuiPopover,
 } from '@elastic/eui';
 import { EuiInputPopover } from '@elastic/eui';
 
@@ -15,29 +15,29 @@ const statusMap = {
   unsaved: {
     icon: 'dot',
     color: 'accent',
-    tooltip: 'Changes have not been saved.'
+    tooltip: 'Changes have not been saved.',
   },
   saved: {
     icon: 'checkInCircleFilled',
     color: 'secondary',
-    tooltip: 'Saved.'
+    tooltip: 'Saved.',
   },
   unchanged: {
     icon: '',
-    color: 'secondary'
-  }
+    color: 'secondary',
+  },
 };
 
 export class EuiSuggestInput extends Component {
   state = {
     value: '',
-    isPopoverOpen: false
+    isPopoverOpen: false,
   };
 
   onFieldChange = e => {
     this.setState({
       value: e.target.value,
-      isPopoverOpen: e.target.value !== '' ? true : false
+      isPopoverOpen: e.target.value !== '' ? true : false,
     });
     this.props.sendValue(e.target.value);
   };
@@ -71,11 +71,11 @@ export class EuiSuggestInput extends Component {
 
     const statusElement = (status === 'saved' || status === 'unsaved') && (
       <EuiToolTip
-        position="left"
+        position='left'
         content={tooltipContent || statusMap[status].tooltip}
       >
         <EuiIcon
-          className="euiSuggestInput__statusIcon"
+          className='euiSuggestInput__statusIcon'
           color={color}
           type={icon}
         />
@@ -103,10 +103,10 @@ export class EuiSuggestInput extends Component {
     return (
       <div className={classes}>
         <EuiInputPopover
-          id="popover"
+          id='popover'
           input={customInput}
           isOpen={isPopoverOpen}
-          panelPaddingSize="none"
+          panelPaddingSize='none'
           fullWidth
           closePopover={onClosePopover}
           disableFocusTrap={disableFocusTrap}
@@ -135,9 +135,9 @@ EuiSuggestInput.propTypes = {
   suggestions: PropTypes.array,
   isOpen: PropTypes.bool,
   onClosePopover: PropTypes.func,
-  onPopoverFocus: PropTypes.func
+  onPopoverFocus: PropTypes.func,
 };
 
 EuiSuggestInput.defaultProps = {
-  status: 'unchanged'
+  status: 'unchanged',
 };

@@ -7,15 +7,21 @@ type SearchBarQueryLanguage = {
   id: string;
   label: string;
   getConfiguration?: () => any;
-  run: (input: string | undefined, params: any) => Promise<{
-    searchBarProps: any,
+  run: (
+    input: string | undefined,
+    params: any,
+  ) => Promise<{
+    searchBarProps: any;
     output: {
-      language: string,
-      unifiedQuery: string,
-      query: string
-    }
+      language: string;
+      unifiedQuery: string;
+      query: string;
+    };
   }>;
-  transformInput: (unifiedQuery: string, options: {configuration: any, parameters: any}) => string;
+  transformInput: (
+    unifiedQuery: string,
+    options: { configuration: any; parameters: any },
+  ) => string;
 };
 
 // Register the query languages

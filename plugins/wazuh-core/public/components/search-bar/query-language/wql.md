@@ -5,7 +5,7 @@ endpoints.
 
 Documentation: https://wazuh.com/<major_version>.<minor_version>/user-manual/api/queries.html
 
-The implementation is adapted to work with the search bar component defined 
+The implementation is adapted to work with the search bar component defined
 `public/components/search-bar/index.tsx`.
 
 # Language syntax
@@ -64,6 +64,7 @@ field.custom
 - Value with spaces should be wrapped by `"`. The `"` can be escaped using `\"`.
 
 Examples:
+
 ```
 value_without_whitespace
 "value with whitespaces"
@@ -84,6 +85,7 @@ id = 001
 ```
 
 - Complex query (logical operator)
+
 ```
 status=active and os.platform~linux
 status = active and os.platform ~ linux
@@ -95,6 +97,7 @@ status != never_connected and ip ~ 240 or os.platform ~ linux
 ```
 
 - Complex query (logical operators and group operator)
+
 ```
 (status!=never_connected and ip~240) or id=001
 ( status != never_connected and ip ~ 240 ) or id = 001
@@ -123,6 +126,7 @@ id~linux,ip~linux
 ## Developer notes
 
 ## Features
+
 - Support suggestions for each token entity. `fields` and `values` are customizable.
 - Support implicit query.
 - Support for search term mode. It enables to search a term in multiple fields.
@@ -139,6 +143,7 @@ This mode enables to search in multiple fields using a search term. The fields t
 Use an union expression of each field with the like as operation `~`.
 
 The user input is transformed to something as:
+
 ```
 field1~user_input,field2~user_input,field3~user_input
 ```
@@ -148,13 +153,10 @@ field1~user_input,field2~user_input,field3~user_input
 - `options`: options
 
   - `implicitQuery`: add an implicit query that is added to the user input. Optional.
-  This can't be changed by the user. If this is defined, will be displayed as a prepend of the search bar.
-    - `query`: query string in UQL (Unified Query Language)
-Use UQL (Unified Query Language).
-    - `conjunction`: query string of the conjunction in UQL (Unified Query Language)
+    This can't be changed by the user. If this is defined, will be displayed as a prepend of the search bar. - `query`: query string in UQL (Unified Query Language)
+    Use UQL (Unified Query Language). - `conjunction`: query string of the conjunction in UQL (Unified Query Language)
   - `searchTermFields`: define the fields used to build the query for the search term mode
   - `filterButtons`: define a list of buttons to filter in the search bar
- 
 
 ```ts
 // language options
@@ -175,7 +177,7 @@ options: {
 - `suggestions`: define the suggestion handlers. This is required.
 
   - `field`: method that returns the suggestions for the fields
-  
+
   ```ts
   // language options
   field(currentValue) {
@@ -188,30 +190,31 @@ options: {
   ```
 
   - `value`: method that returns the suggestion for the values
+
   ```ts
   // language options
   value: async (currentValue, { field }) => {
     // static or async fetching is allowed
     // async fetching data
     // const response = await fetchData();
-    return [
-      { label: 'value1' },
-      { label: 'value2' }
-    ]
-  }
+    return [{ label: 'value1' }, { label: 'value2' }];
+  };
   ```
 
 - `validate`: define validation methods for the field types. Optional
+
   - `value`: method to validate the value token
 
   ```ts
   validate: {
-    value: (token, {field, operator_compare}) => {
-      if(field === 'field1'){
-        const value = token.formattedValue || token.value
-        return /\d+/ ? undefined : `Invalid value for field ${field}, only digits are supported: "${value}"`
+    value: (token, { field, operator_compare }) => {
+      if (field === 'field1') {
+        const value = token.formattedValue || token.value;
+        return /\d+/
+          ? undefined
+          : `Invalid value for field ${field}, only digits are supported: "${value}"`;
       }
-    }
+    };
   }
   ```
 
@@ -248,7 +251,7 @@ graph TD;
     searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_error[Error]
     searchBarProps_isInvalid[isInvalid]-->searchBarProps_validate_input[validate input]
   end
-  
+
   subgraph output[output];
     output_input_options_implicitFilter[options.implicitFilter]-->output_input_options_result["{apiQuery: { q }, error, language: 'wql', query}"]
     output_input_user_input_QL[User input in QL]-->output_input_user_input_UQL[User input in UQL]-->output_input_options_result["{apiQuery: { q }, error, language: 'wql', query}"]
@@ -263,7 +266,7 @@ graph TD;
 ## Notes
 
 - The value that contains the following characters: `!`, `~` are not supported by the AQL and this
-could cause problems when do the request to the API.
+  could cause problems when do the request to the API.
 - The value with spaces are wrapped with `"`. If the value contains the `\"` sequence this is
-replaced by `"`. This could cause a problem with values that are intended to have the mentioned
-sequence.
+  replaced by `"`. This could cause a problem with values that are intended to have the mentioned
+  sequence.

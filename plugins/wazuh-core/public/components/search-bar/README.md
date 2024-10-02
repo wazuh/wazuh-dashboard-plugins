@@ -34,9 +34,9 @@ Basic usage:
         // Use the UQL (Unified Query Language) syntax.
         implicitQuery: {
           query: 'id!=000',
-          conjunction: ';'
+          conjunction: ';',
         },
-        searchTermFields: ['id', 'ip']
+        searchTermFields: ['id', 'ip'],
       },
       suggestions: {
         field(currentValue) {
@@ -46,7 +46,10 @@ Basic usage:
             { label: 'id', description: 'ID' },
             { label: 'ip', description: 'IP address' },
             { label: 'group', description: 'Group' },
-            { label: 'group_config_status', description: 'Synced configuration status' },
+            {
+              label: 'group_config_status',
+              description: 'Synced configuration status',
+            },
             { label: 'lastKeepAline', description: 'Date add' },
             { label: 'manager', description: 'Manager' },
             { label: 'mergedSum', description: 'Merged sum' },
@@ -60,30 +63,22 @@ Basic usage:
         value: async (currentValue, { field }) => {
           switch (field) {
             case 'configSum':
-              return [
-                { label: 'configSum1' },
-                { label: 'configSum2' },
-              ];
+              return [{ label: 'configSum1' }, { label: 'configSum2' }];
               break;
             case 'dateAdd':
-              return [
-                { label: 'dateAdd1' },
-                { label: 'dateAdd2' },
-              ];
+              return [{ label: 'dateAdd1' }, { label: 'dateAdd2' }];
               break;
             case 'status':
-              return UI_ORDER_AGENT_STATUS.map(
-                (status) => ({
-                  label: status,
-                }),
-              );
+              return UI_ORDER_AGENT_STATUS.map(status => ({
+                label: status,
+              }));
               break;
             default:
               return [];
               break;
           }
         },
-      }
+      },
     },
   ]}
   // Handler fired when the input handler changes. Optional.
@@ -118,15 +113,21 @@ type SearchBarQueryLanguage = {
   id: string;
   label: string;
   getConfiguration?: () => any;
-  run: (input: string | undefined, params: any) => Promise<{
-    searchBarProps: any,
+  run: (
+    input: string | undefined,
+    params: any,
+  ) => Promise<{
+    searchBarProps: any;
     output: {
-      language: string,
-      apiQuery: string,
-      query: string
-    }
+      language: string;
+      apiQuery: string;
+      query: string;
+    };
   }>;
-  transformInput: (unifiedQuery: string, options: {configuration: any, parameters: any}) => string;
+  transformInput: (
+    unifiedQuery: string,
+    options: { configuration: any; parameters: any },
+  ) => string;
 };
 ```
 
@@ -140,7 +141,7 @@ where:
 - `getConfiguration`: method that returns the configuration of the language. This allows custom behavior.
 - `run`: method that returns:
   - `searchBarProps`: properties to be passed to the search bar component. This allows the
-  customization the properties that will used by the base search bar component and the output used when searching
+    customization the properties that will used by the base search bar component and the output used when searching
   - `output`:
     - `language`: query language ID
     - `apiQuery`: API query.
@@ -189,10 +190,11 @@ with the different query language implementations.
 The input and output parameters of the search bar component must use this syntax.
 
 This is used in:
+
 - input:
   - `input` component property
 - output:
-  - `onChange` component handler 
+  - `onChange` component handler
   - `onSearch` component handler
 
 Its syntax is equal to Wazuh API Query Language
