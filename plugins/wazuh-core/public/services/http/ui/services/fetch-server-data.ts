@@ -9,7 +9,6 @@ const getFilters = filters => {
 export const fetchServerTableDataCreator =
   fetchData =>
   async ({ pagination, sorting, fetchContext }) => {
-    console.log(fetchContext);
     const { pageIndex, pageSize } = pagination;
     const { field, direction } = sorting.sort;
     const params = {
