@@ -7,7 +7,10 @@ import {
   ErrorHandler,
 } from '../../../../../react-services/error-management';
 import WazuhDataGrid from '../../../../common/wazuh-data-grid/wz-data-grid';
-import { tDataGridColumn } from '../../../../common/data-grid';
+import {
+  DEFAULT_PAGINATION_OPTIONS,
+  tDataGridColumn,
+} from '../../../../common/data-grid';
 
 type tDrillDownDataGridProps = {
   defaultTableColumns: tDataGridColumn[];
@@ -15,11 +18,7 @@ type tDrillDownDataGridProps = {
 
 export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
   const [results, setResults] = useState<any>([]);
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 15,
-    pageSizeOptions: [15, 25, 50, 100],
-  });
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION_OPTIONS);
   const [sorting, setSorting] = useState<any[]>([]);
 
   const {
