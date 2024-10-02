@@ -59,7 +59,7 @@ export function TableData<T>({
   const isMounted = useRef(false);
   const tableRef = useRef();
 
-  const [selectedFields, setSelectedFields] = useStateStorage(
+  const [selectedFields, setSelectedFields] = useStateStorage<string[]>(
     rest.tableColumns.some(({ show }) => show)
       ? rest.tableColumns.filter(({ show }) => show).map(({ field }) => field)
       : rest.tableColumns.map(({ field }) => field),
