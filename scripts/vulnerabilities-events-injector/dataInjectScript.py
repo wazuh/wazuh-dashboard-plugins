@@ -125,12 +125,12 @@ def generateRandomVulnerability():
     vulnerability['severity'] = random.choice(['Low','Medium','High','Critical'])
     vulnerability['published_at'] = generateRandomDate(2000)
     vulnerability['detected_at'] = generateRandomDate(180)
+    vulnerability['under_evaluation'] = random.choice([True, False])
     return(vulnerability)
 
 def generateRandomWazuh():
     wazuh = {}
     wazuh['cluster'] = {'name':random.choice(['wazuh.manager', 'wazuh']), 'node':random.choice(['master','worker-01','worker-02','worker-03'])}
-    wazuh['vulnerability'] = {'under_evaluation': random.choice([True, False])}
     return(wazuh)
 
 def generateRandomData(number):
