@@ -4,18 +4,23 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 01
 
+## Fixed
+
+- Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
+
 ### Added
 
 - Support for Wazuh 4.10.0
 - Added sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
-- Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968)
+- Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968) [#7044](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7044) [#7046](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7046)
 
 ### Changed
 
 - Update malware detection group values in data sources [#6963](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6963)
 - Changed the registration id of the Settings application for compatibility with OpenSearch Dashboard 2.16.0 [#6938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6938)
 - Changed Malware detection dashboard visualizations [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
-- Changed MITRE ATT&CK overview description [#7032] (https://github.com/wazuh/wazuh-dashboard-plugins/pull/7032)
+- Changed MITRE ATT&CK overview description [#7032](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7032)
+- Changed the agents summary in overview with no results to an agent deployment help message. [#7041](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7041)
 - Changed malware feature description [#7036](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7036)
 - Changed the font size of the kpi subtitles and the features descriptions [#7033](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7033)
 
