@@ -4,6 +4,7 @@ import { GenericRequest } from './generic-client';
 import { RequestInterceptorClient } from './request-interceptor';
 import { WzRequest } from './server-client';
 import { HTTPClient, HTTPClientRequestInterceptor } from './types';
+import { createUI } from './ui/create';
 
 interface HTTPClientServices {
   http: any;
@@ -48,8 +49,11 @@ export class CoreHTTPClient implements HTTPClient {
     });
     this.logger.debug('Created client');
   }
-  async setup() {
+  async setup(deps) {
     this.logger.debug('Setup');
+    return {
+      ui: createUI({ ...deps, http: this }),
+    };
   }
   async start() {}
   async stop() {}

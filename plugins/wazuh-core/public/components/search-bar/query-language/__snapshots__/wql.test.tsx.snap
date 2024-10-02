@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SearchBar component Renders correctly to match the snapshot of query language 1`] = `
+<div>
+  <div>
+    <div
+      class="euiSuggestInput"
+    >
+      <div
+        class="euiPopover euiPopover--anchorDownLeft euiPopover--displayBlock euiInputPopover euiInputPopover--fullWidth"
+        id="popover"
+      >
+        <div
+          class="euiPopover__anchor"
+        >
+          <div>
+            <div
+              class="euiFormControlLayout euiFormControlLayout--fullWidth euiFormControlLayout--group"
+            >
+              <div
+                class="euiFormControlLayout__childrenWrapper"
+              >
+                <input
+                  class="euiFieldText euiFieldText--fullWidth euiFieldText--inGroup"
+                  placeholder="Search"
+                  type="text"
+                  value=""
+                />
+              </div>
+              <div
+                class="euiPopover euiPopover--anchorDownCenter euiFormControlLayout__append"
+              >
+                <div
+                  class="euiPopover__anchor"
+                >
+                  <button
+                    class="euiButtonEmpty euiButtonEmpty--primary"
+                    type="button"
+                  >
+                    <span
+                      class="euiButtonContent euiButtonEmpty__content"
+                    >
+                      <span
+                        class="euiButtonEmpty__text"
+                      >
+                        WQL
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
