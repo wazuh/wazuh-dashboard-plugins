@@ -166,7 +166,10 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
 
       // Format the value using the field formatter
       // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.16.0/src/plugins/discover/public/application/components/data_grid/data_grid_table_cell_value.tsx#L80-L89
-      const formattedValue = indexPattern.formatField(rows[rowIndex], columnId);
+      const formattedValue = indexPattern.formatField(
+        rows[relativeRowIndex],
+        columnId,
+      );
       if (typeof formattedValue === 'undefined') {
         return <span>-</span>;
       } else {

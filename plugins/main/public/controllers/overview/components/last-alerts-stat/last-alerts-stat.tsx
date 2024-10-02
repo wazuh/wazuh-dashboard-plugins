@@ -20,48 +20,59 @@ import {
   PatternDataSourceFilterManager,
 } from '../../../../components/common/data-source/pattern/pattern-data-source-filter-manager';
 
-export function LastAlertsStat({ severity }: { severity: string }) {
+type SeverityKey = 'low' | 'medium' | 'high' | 'critical';
+
+const severities = {
+  low: {
+    label: 'Low',
+    color: UI_COLOR_STATUS.success,
+    ruleLevelRange: {
+      minRuleLevel: 0,
+      maxRuleLevel: 6,
+    },
+  },
+  medium: {
+    label: 'Medium',
+    color: UI_COLOR_STATUS.info,
+    ruleLevelRange: {
+      minRuleLevel: 7,
+      maxRuleLevel: 11,
+    },
+  },
+  high: {
+    label: 'High',
+    color: UI_COLOR_STATUS.warning,
+    ruleLevelRange: {
+      minRuleLevel: 12,
+      maxRuleLevel: 14,
+    },
+  },
+  critical: {
+    label: 'Critical',
+    color: UI_COLOR_STATUS.danger,
+    ruleLevelRange: {
+      minRuleLevel: 15,
+      maxRuleLevel: undefined,
+    },
+  },
+} as const;
+
+export function LastAlertsStat({
+  severity: severityKey,
+}: {
+  severity: SeverityKey;
+}) {
   const [countLastAlerts, setCountLastAlerts] = useState<number | null>(null);
   const [discoverLocation, setDiscoverLocation] = useState<string>('');
-  const severityLabel = {
-    low: {
-      label: 'Low',
-      color: UI_COLOR_STATUS.success,
-      ruleLevelRange: {
-        minRuleLevel: 0,
-        maxRuleLevel: 6,
-      },
-    },
-    medium: {
-      label: 'Medium',
-      color: UI_COLOR_STATUS.info,
-      ruleLevelRange: {
-        minRuleLevel: 7,
-        maxRuleLevel: 11,
-      },
-    },
-    high: {
-      label: 'High',
-      color: UI_COLOR_STATUS.warning,
-      ruleLevelRange: {
-        minRuleLevel: 12,
-        maxRuleLevel: 14,
-      },
-    },
-    critical: {
-      label: 'Critical',
-      color: UI_COLOR_STATUS.danger,
-      ruleLevelRange: {
-        minRuleLevel: 15,
-      },
-    },
-  };
+
+  const severity = severities[severityKey];
+  const ruleLevelRange = severity.ruleLevelRange;
 
   useEffect(() => {
     const getCountLastAlerts = async () => {
       try {
         const { indexPatternId, cluster, count } = await getLast24HoursAlerts(
-          severityLabel[severity].ruleLevelRange,
+          ruleLevelRange,
         );
         setCountLastAlerts(count);
         const core = getCore();
@@ -82,10 +93,7 @@ export function LastAlertsStat({ severity }: { severity: string }) {
           PatternDataSourceFilterManager.createFilter(
             FILTER_OPERATOR.IS_BETWEEN,
             'rule.level',
-            [
-              severityLabel[severity].ruleLevelRange.minRuleLevel,
-              severityLabel[severity].ruleLevelRange.maxRuleLevel,
-            ],
+            [ruleLevelRange.minRuleLevel, ruleLevelRange.maxRuleLevel],
             indexPatternId,
           );
         const predefinedFilters =
@@ -117,20 +125,19 @@ export function LastAlertsStat({ severity }: { severity: string }) {
             <EuiToolTip
               position='top'
               content={`Click to see rule.level ${
-                severityLabel[severity].ruleLevelRange.maxRuleLevel
+                ruleLevelRange.maxRuleLevel
                   ? 'between ' +
-                    severityLabel[severity].ruleLevelRange.minRuleLevel +
+                    ruleLevelRange.minRuleLevel +
                     ' to ' +
-                    severityLabel[severity].ruleLevelRange.maxRuleLevel
-                  : severityLabel[severity].ruleLevelRange.minRuleLevel +
-                    ' or higher'
+                    ruleLevelRange.maxRuleLevel
+                  : ruleLevelRange.minRuleLevel + ' or higher'
               }`}
             >
               <EuiLink
                 className='statWithLink'
                 style={{
                   fontWeight: 'normal',
-                  color: severityLabel[severity].color,
+                  color: severity.color,
                 }}
                 href={discoverLocation}
               >
@@ -138,16 +145,16 @@ export function LastAlertsStat({ severity }: { severity: string }) {
               </EuiLink>
             </EuiToolTip>
           }
-          description={`${severityLabel[severity].label} severity`}
+          description={`${severity.label} severity`}
           descriptionElement='h3'
-          titleColor={severityLabel[severity].color}
+          titleColor={severity.color}
           textAlign='center'
         />
-        <EuiText size='xs' css='margin-top: 0.7vh'>
+        <EuiText size='s' css='margin-top: 0.7vh'>
           {'Rule level ' +
-            severityLabel[severity].ruleLevelRange.minRuleLevel +
-            (severityLabel[severity].ruleLevelRange.maxRuleLevel
-              ? ' to ' + severityLabel[severity].ruleLevelRange.maxRuleLevel
+            ruleLevelRange.minRuleLevel +
+            (ruleLevelRange.maxRuleLevel
+              ? ' to ' + ruleLevelRange.maxRuleLevel
               : ' or higher')}
         </EuiText>
       </RedirectAppLinks>

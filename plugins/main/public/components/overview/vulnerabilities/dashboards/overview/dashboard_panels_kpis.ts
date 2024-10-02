@@ -409,7 +409,7 @@ const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
               {
                 input: {
                   language: 'kuery',
-                  query: 'wazuh.vulnerability.under_evaluation:true',
+                  query: 'vulnerability.under_evaluation:true',
                 },
                 label: 'Pending',
               },

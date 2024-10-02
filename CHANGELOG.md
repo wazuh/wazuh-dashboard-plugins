@@ -8,7 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.0
 - Added sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
-- Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968)
+- Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968) [#7044](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7044) [#7046](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7046)
 
 ### Changed
 
@@ -17,11 +17,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed Malware detection dashboard visualizations [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 - Changed the agents summary in overview with no results to an agent deployment help message. [#7041](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7041)
 - Changed malware feature description [#7036](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7036)
+- Changed the font size of the kpi subtitles and the features descriptions [#7033](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7033)
 
 ### Fixed
 
 - Fixed read-only users could not access to Statistics application [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
-- Fixed no-agent-alert spawn with selected agent in agent-welcome view[#7029](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7029)
+- Fixed no-agent-alert spawn with selected agent in agent-welcome view [#7029](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7029)
+- Fixed security policy exception when it contained deprecated actions [#7042](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7042)
 
 ### Removed
 
