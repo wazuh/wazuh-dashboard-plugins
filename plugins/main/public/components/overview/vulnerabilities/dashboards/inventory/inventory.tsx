@@ -100,15 +100,11 @@ const InventoryVulsComponent = () => {
     const inspectHintMsg = 'Inspect vulnerability details';
     return (
       <EuiToolTip content={inspectHintMsg}>
-        {
-          (
-            <EuiButtonIcon
-              onClick={() => onClickInspectDoc(rowIndex)}
-              iconType='inspect'
-              aria-label={inspectHintMsg}
-            />
-          ) as EuiToolTipProps['children']
-        }
+        <EuiButtonIcon
+          onClick={() => onClickInspectDoc(rowIndex)}
+          iconType='inspect'
+          aria-label={inspectHintMsg}
+        />
       </EuiToolTip>
     );
   };
