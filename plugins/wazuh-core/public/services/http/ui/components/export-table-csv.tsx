@@ -14,7 +14,7 @@ import React from 'react';
 import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 
 export function ExportTableCsv({
-  fetchContext: { endpoint, filters },
+  fetchContext,
   totalItems,
   title,
   showToast,
@@ -22,7 +22,8 @@ export function ExportTableCsv({
 }) {
   const downloadCSV = async () => {
     try {
-      const formatedFilters = Object.entries(filters || []).map(
+      const { endpoint, filters } = fetchContext;
+      const formattedFilters = Object.entries(filters || []).map(
         ([name, value]) => ({
           name,
           value,
@@ -34,7 +35,7 @@ export function ExportTableCsv({
         toastLifeTimeMs: 3000,
       });
 
-      await exportCSV(endpoint, [...formatedFilters], `${title.toLowerCase()}`);
+      await exportCSV(endpoint, formattedFilters, title.toLowerCase());
     } catch (error) {
       // TODO: implement
       // const options = {

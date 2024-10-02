@@ -15,24 +15,30 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { ExportTableCsv } from './export-table-csv';
-
-jest.mock('../../../../kibana-services', () => ({
-  getHttp: () => ({
-    basePath: {
-      prepend: str => str,
-    },
-  }),
-}));
-
-jest.mock('../../../../react-services/common-services', () => ({
-  getErrorOrchestrator: () => ({
-    handleError: options => {},
-  }),
-}));
-
+const noop = () => {};
 describe('Export Table Csv component', () => {
-  it('renders correctly to match the snapshot', () => {
-    const wrapper = mount(<ExportTableCsv />);
+  it('renders correctly to match the snapshot when the button is disabled', () => {
+    const wrapper = mount(
+      <ExportTableCsv
+        totalItems={0}
+        showToast={noop}
+        exportCSV={noop}
+        fetchContext={{ endpoint: '', filters: {} }}
+        title='example'
+      />,
+    );
+    expect(wrapper).toMatchSnapshot();
+  });
+  it('renders correctly to match the snapshot when the button is enabled', () => {
+    const wrapper = mount(
+      <ExportTableCsv
+        totalItems={1}
+        showToast={noop}
+        exportCSV={noop}
+        fetchContext={{ endpoint: '', filters: {} }}
+        title='example'
+      />,
+    );
     expect(wrapper).toMatchSnapshot();
   });
 });
