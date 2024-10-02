@@ -85,13 +85,6 @@ export const Stats = withErrorBoundary(
         ({ status }) => this.props[status],
       );
 
-      const addAgentUrl = NavigationService.getInstance().getUrlForApp(
-        endpointSummary.id,
-        {
-          path: `#${endpointSummary.redirectTo()}deploy`,
-        },
-      );
-
       return (
         <EuiPage>
           <EuiFlexGroup>
@@ -135,7 +128,12 @@ export const Stats = withErrorBoundary(
                             { action: 'agent:create', resource: '*:*:*' },
                           ]}
                           iconType='plusInCircle'
-                          href={addAgentUrl}
+                          href={NavigationService.getInstance().getUrlForApp(
+                            endpointSummary.id,
+                            {
+                              path: `#${endpointSummary.redirectTo()}deploy`,
+                            },
+                          )}
                         >
                           Deploy new agent
                         </WzButtonPermissions>

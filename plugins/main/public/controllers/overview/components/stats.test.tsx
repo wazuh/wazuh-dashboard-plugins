@@ -16,6 +16,37 @@ import React from 'react';
 import { render, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Stats } from './stats';
+import jsonBeautifier from '../../../utils/json-beautifier';
+
+jest.mock('../../../react-services/navigation-service', () => {
+  return {
+    getInstance() {
+      return {
+        getUrlForApp() {
+          return '';
+        },
+      };
+    },
+  };
+});
+
+jest.mock('../../../components/common/hooks/use-user-is-admin', () => {
+  return {
+    useUserPermissionsIsAdminRequirements() {
+      console.log('UserPermisionsIsAdmin');
+      return ['', []];
+    },
+  };
+});
+
+jest.mock('../../../components/common/hooks/useUserPermissions', () => {
+  return {
+    useUserPermissionsRequirements() {
+      console.log('UserPermisions');
+      return [false, []];
+    },
+  };
+});
 
 jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
