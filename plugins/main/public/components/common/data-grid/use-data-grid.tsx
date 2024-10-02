@@ -41,7 +41,8 @@ export interface RenderColumn {
   render: (value: any, rowItem: object) => string | React.ReactNode;
 }
 
-export type tDataGridColumn = Partial<RenderColumn> & EuiDataGridColumn;
+export type tDataGridColumn = Partial<RenderColumn> &
+  EuiDataGridColumn & { name: string };
 
 export type tDataGridRenderColumn = RenderColumn & EuiDataGridColumn;
 
@@ -60,7 +61,10 @@ export type tDataGridProps = {
   setFilters?: (filters: Filter[]) => void;
 };
 
-export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
+type DataGridProps = EuiDataGridProps &
+  Required<Pick<EuiDataGridProps, 'sorting' | 'pagination'>>;
+
+export const useDataGrid = (props: tDataGridProps): DataGridProps => {
   const {
     indexPattern,
     DocViewInspectButton,
@@ -222,7 +226,10 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     return [...columnMatch, ...columnNonMatch];
   };
 
-  const defaultColumnsPosition = (columnsVisibility, defaultColumns) => {
+  const defaultColumnsPosition = (
+    columnsVisibility: string[],
+    defaultColumns: tDataGridColumn[],
+  ) => {
     const defaults = defaultColumns
       .map(item => item.id)
       .filter(id => columnsVisibility.includes(id));
@@ -251,5 +258,5 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       onChangeItemsPerPage: onChangeItemsPerPage,
       onChangePage: onChangePage,
     },
-  } as EuiDataGridProps;
+  } as DataGridProps;
 };
