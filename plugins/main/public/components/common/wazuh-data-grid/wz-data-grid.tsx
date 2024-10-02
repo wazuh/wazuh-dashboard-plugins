@@ -36,6 +36,7 @@ import './wazuh-data-grid.scss';
 import { wzDiscoverRenderColumns } from '../wazuh-discover/render-columns';
 import DocDetailsHeader from '../wazuh-discover/components/doc-details-header';
 import { tFilter } from '../data-source';
+import { SearchResponse } from '@opensearch-project/opensearch/api/types';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -45,8 +46,8 @@ export type tWazuhDataGridProps = {
   defaultColumns: tDataGridColumn[];
   isLoading: boolean;
   defaultPagination: PaginationOptions;
-  query: any;
-  exportFilters: tFilter[];
+  query?: any;
+  exportFilters?: tFilter[];
   dateRange: TimeRange;
   onChangePagination: (pagination: {
     pageIndex: number;
@@ -122,7 +123,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
       fields: columnVisibility.visibleColumns,
       pagination: {
         pageIndex: 0,
-        pageSize: results.hits.total,
+        pageSize: results.hits.total as number,
       },
       sorting,
     };
@@ -145,7 +146,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
   if (hasResults) {
     additionalControls = (
       <DiscoverDataGridAdditionalControls
-        totalHits={results.hits.total}
+        totalHits={results.hits.total as number}
         isExporting={isExporting}
         onClickExportResults={onClickExportResults}
         maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
@@ -168,7 +169,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
             <EuiFlexItem>
               <DocumentViewTableAndJson
                 document={inspectedHit}
-                indexPattern={indexPattern as IndexPattern}
+                indexPattern={indexPattern}
                 renderFields={getAllCustomRenders(
                   defaultColumns,
                   wzDiscoverRenderColumns,

@@ -12,7 +12,7 @@ export interface WzSearchBarProps extends SearchBarProps {
   userFilters?: Filter[];
   preQueryBar?: React.ReactElement;
   postFilters?: React.ReactElement;
-  postFixedFilters?: () => React.ReactElement<any>[];
+  postFixedFilters?: (() => React.JSX.Element)[];
   hideFixedFilters?: boolean;
 }
 

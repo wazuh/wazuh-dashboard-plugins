@@ -13,6 +13,7 @@ import {
   EuiTitle,
   EuiButtonEmpty,
   EuiPanel,
+  EuiToolTipProps,
 } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
@@ -99,11 +100,15 @@ const InventoryVulsComponent = () => {
     const inspectHintMsg = 'Inspect vulnerability details';
     return (
       <EuiToolTip content={inspectHintMsg}>
-        <EuiButtonIcon
-          onClick={() => onClickInspectDoc(rowIndex)}
-          iconType='inspect'
-          aria-label={inspectHintMsg}
-        />
+        {
+          (
+            <EuiButtonIcon
+              onClick={() => onClickInspectDoc(rowIndex)}
+              iconType='inspect'
+              aria-label={inspectHintMsg}
+            />
+          ) as EuiToolTipProps['children']
+        }
       </EuiToolTip>
     );
   };
@@ -192,7 +197,7 @@ const InventoryVulsComponent = () => {
     newFilters.push(
       createUnderEvaluationFilter(
         underEvaluation,
-        dataSource?.id || indexPattern?.id,
+        dataSource?.id || indexPattern?.id || '',
       ),
     );
     setFilters(newFilters);
