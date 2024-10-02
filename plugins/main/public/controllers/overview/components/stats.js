@@ -119,7 +119,14 @@ export const Stats = withErrorBoundary(
                   !hasResults &&
                   this.props !== undefined && (
                     <EuiEmptyPrompt
-                      body={<p>Add agents to fleet to start monitoring</p>}
+                      body={
+                        <p>
+                          This instance has no agents registered.
+                          <br />
+                          Please deploy agents to begin monitoring your
+                          endpoints.
+                        </p>
+                      }
                       actions={
                         <WzButtonPermissions
                           color='primary'
