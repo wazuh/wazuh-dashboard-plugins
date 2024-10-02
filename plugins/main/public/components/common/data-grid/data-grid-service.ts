@@ -174,8 +174,8 @@ export const exportSearchToCSV = async (
         return `"${value
           .toString()
           .replaceAll(/"/g, '""')
-          .replaceAll(/\n/g, '\\n')
-          .replaceAll(/\r/g, '\\r')}"`;
+          .replaceAll(/\r\n/g, '\\r\\n')
+          .replaceAll(/\n/g, '\\n')}"`;
       });
       return parsedRow?.join(',');
     })
