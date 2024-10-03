@@ -1,9 +1,5 @@
-import {
-  MODULES_PAGE
-} from '../../../pageobjects/odfe/settings/modules.page';
-import {
-  MODULES_DIRECTORY_PAGE
-} from '../../../pageobjects/odfe/modules-directory.page';
+import { MODULES_PAGE } from '../../../pageobjects/odfe/settings/modules.page';
+import { MODULES_DIRECTORY_PAGE } from '../../../pageobjects/odfe/modules-directory.page';
 
 export const MODULES_CARDS = {
   'Amazon AWS': MODULES_PAGE['amazonAWSToggleButton'],
