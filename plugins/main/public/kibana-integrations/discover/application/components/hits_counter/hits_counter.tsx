@@ -17,7 +17,14 @@
  * under the License.
  */
 import React from 'react';
-import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiText, EuiToolTip, EuiIcon } from '@elastic/eui';
+import {
+  EuiButtonEmpty,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiText,
+  EuiToolTip,
+  EuiIcon,
+} from '@elastic/eui';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { i18n } from '@osd/i18n';
 import { formatNumWithCommas } from '../../helpers';
@@ -43,45 +50,61 @@ export interface HitsCounterProps {
   };
 }
 
-export function HitsCounter({ hits, showResetButton, onResetQuery, tooltip }: HitsCounterProps) {
+export function HitsCounter({
+  hits,
+  showResetButton,
+  onResetQuery,
+  tooltip,
+}: HitsCounterProps) {
   return (
     <I18nProvider>
       <EuiFlexGroup
-        gutterSize="s"
-        className="dscResultCount"
+        gutterSize='s'
+        className='dscResultCount'
         responsive={false}
-        justifyContent="center"
-        alignItems="center"
+        justifyContent='center'
+        alignItems='center'
       >
         <EuiFlexItem grow={false}>
           <EuiText>
-            <strong data-test-subj="discoverQueryHits">{formatNumWithCommas(hits)}</strong>{' '}
+            <strong data-test-subj='discoverQueryHits'>
+              {formatNumWithCommas(hits)}
+            </strong>{' '}
             <FormattedMessage
-              id="discover.hitsPluralTitle"
-              defaultMessage="{hits, plural, one {hit} other {hits}}"
+              id='discover.hitsPluralTitle'
+              defaultMessage='{hits, plural, one {hit} other {hits}}'
               values={{
                 hits,
               }}
             />{' '}
-            {tooltip && tooltip.content && (<EuiToolTip position={tooltip.position || 'top'} content={tooltip.content}>
-              <EuiIcon tabIndex={0} type={tooltip.iconType || 'info'} aria-label={tooltip.ariaLabel || 'Info'} />
-            </EuiToolTip>)}
+            {tooltip && tooltip.content && (
+              <EuiToolTip
+                position={tooltip.position || 'top'}
+                content={tooltip.content}
+              >
+                <EuiIcon
+                  tabIndex={0}
+                  type={tooltip.iconType || 'questionInCircle'}
+                  aria-label={tooltip.ariaLabel || 'QuestionInCircle'}
+                />
+              </EuiToolTip>
+            )}
           </EuiText>
         </EuiFlexItem>
         {showResetButton && (
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
-              iconType="refresh"
-              data-test-subj="resetSavedSearch"
+              iconType='refresh'
+              data-test-subj='resetSavedSearch'
               onClick={onResetQuery}
-              size="s"
+              size='s'
               aria-label={i18n.translate('discover.reloadSavedSearchButton', {
                 defaultMessage: 'Reset search',
               })}
             >
               <FormattedMessage
-                id="discover.reloadSavedSearchButton"
-                defaultMessage="Reset search"
+                id='discover.reloadSavedSearchButton'
+                defaultMessage='Reset search'
               />
             </EuiButtonEmpty>
           </EuiFlexItem>

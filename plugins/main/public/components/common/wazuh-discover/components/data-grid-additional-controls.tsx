@@ -45,7 +45,7 @@ const DiscoverDataGridAdditionalControls = (
                 content: `The query results exceeded the limit of ${formatNumWithCommas(
                   maxEntriesPerQuery,
                 )} hits. Please refine your search.`,
-                iconType: 'alert',
+                iconType: 'questionInCircle',
                 position: 'top',
               }
             : undefined
