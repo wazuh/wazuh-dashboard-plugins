@@ -3,6 +3,7 @@ export const MODULES_DIRECTORY_PAGE = {
   gCPCard: '[data-test-subj="overviewWelcomeGcp"]',
   openSCAPCard: '[data-test-subj="overviewWelcomeOscap"]',
   cisCatCard: '[data-test-subj="overviewWelcomeCiscat"]',
+  virusTotalCard: '[data-test-subj="overviewWelcomeVirustotal"]',
   osqueryCard: '[data-test-subj="overviewWelcomeOsquery"]',
   dockerListenerCard: '[data-test-subj="overviewWelcomeDocker"]',
   gDPRCard: '[data-test-subj="overviewWelcomeGdpr"]',
