@@ -6,13 +6,15 @@ const generalAlertsSummary = {
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ],
-};
+  ]
+}
 
 const generalGroupsSummary = {
   title: 'Groups summary',
-  aggs: [AggregationFields['rule.groups']],
-};
+  aggs: [
+    AggregationFields['rule.groups'],
+  ]
+}
 
 const awsAlertsSummary = {
   title: 'Alerts summary',
@@ -20,24 +22,33 @@ const awsAlertsSummary = {
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ],
-};
+  ]
+}
 
 const fimAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
     AggregationFields['syscheck.path'],
     AggregationFields['rule.description'],
-  ],
-};
+  ]
+}
 const gcpAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ],
-};
+  ]
+}
+
+const virustotalAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.id'],
+    AggregationFields['rule.description'],
+    AggregationFields['rule.level'],
+  ]
+}
 
 const osqueryAlertsSummary = {
   title: 'Alerts summary',
@@ -47,8 +58,8 @@ const osqueryAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['data.osquery.pack'],
     AggregationFields['data.osquery.calendarTime'],
-  ],
-};
+  ]
+}
 
 const mitreAlertsSummary = {
   title: 'Alerts summary',
@@ -56,8 +67,8 @@ const mitreAlertsSummary = {
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ],
-};
+  ]
+}
 
 const ciscatAlertsSummary = {
   title: 'Alerts summary',
@@ -65,16 +76,16 @@ const ciscatAlertsSummary = {
     AggregationFields['data.cis.rule_title'],
     AggregationFields['data.cis.group'],
     AggregationFields['data.cis.result'],
-  ],
-};
+  ]
+}
 
 const pmAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
     AggregationFields['rule.description'],
     AggregationFields['data.title'],
-  ],
-};
+  ]
+}
 
 const tscAlertsSummary = {
   title: 'Alerts summary',
@@ -82,8 +93,8 @@ const tscAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['rule.tsc'],
     AggregationFields['rule.description'],
-  ],
-};
+  ]
+}
 
 const githubAlertsSummary = {
   title: 'Alerts summary',
@@ -91,14 +102,18 @@ const githubAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['data.github.org'],
     AggregationFields['rule.description'],
-  ],
-};
+  ]
+}
 
 // 'Wazuh-App-Agents-GDPR-Last-alerts'
 const gdprLastAlerts = {
   title: 'Last alerts',
-  aggs: [AggregationFields['rule.gdpr'], AggregationFields['rule.description']],
-};
+  aggs: [
+    AggregationFields['rule.gdpr'],
+    AggregationFields['rule.description'],
+  ]
+
+}
 
 // 'Wazuh-App-Agents-PCI-Last-alerts'
 const pciLastAlerts = {
@@ -106,8 +121,8 @@ const pciLastAlerts = {
   aggs: [
     AggregationFields['rule.pci_dss'],
     AggregationFields['rule.description'],
-  ],
-};
+  ]
+}
 
 // 'Wazuh-App-Agents-NIST-Last-alerts'
 const nistLastAlerts = {
@@ -116,8 +131,8 @@ const nistLastAlerts = {
     AggregationFields['rule.nist_800_53'],
     AggregationFields['rule.level'],
     AggregationFields['rule.description'],
-  ],
-};
+  ]
+}
 
 // 'Wazuh-App-Agents-HIPAA-Last-alerts'
 const hipaaLastAlerts = {
@@ -126,8 +141,8 @@ const hipaaLastAlerts = {
     AggregationFields['rule.hipaa'],
     AggregationFields['rule.level'],
     AggregationFields['rule.description'],
-  ],
-};
+  ]
+}
 
 // 'Wazuh-App-Agents-OSCAP-Last-alerts'
 const oscapLastAlerts = {
@@ -135,8 +150,8 @@ const oscapLastAlerts = {
   aggs: [
     AggregationFields['data.oscap.check.title'],
     AggregationFields['data.oscap.scan.profile.title'],
-  ],
-};
+  ]
+}
 
 // 'Wazuh-App-Agents-Audit-Last-alerts'
 const auditLastAlerts = {
@@ -145,8 +160,8 @@ const auditLastAlerts = {
     AggregationFields['rule.description'],
     AggregationFields['data.audit.exe'],
     AggregationFields['data.audit.type'],
-  ],
-};
+  ]
+}
 
 const dockerAlertsSummary = {
   title: 'Events summary',
@@ -154,8 +169,8 @@ const dockerAlertsSummary = {
     AggregationFields['data.docker.Actor.Attributes.name'],
     AggregationFields['data.docker.Action'],
     AggregationFields['timestamp'],
-  ],
-};
+  ]
+}
 
 export default {
   general: [generalAlertsSummary, generalGroupsSummary],
@@ -166,6 +181,7 @@ export default {
   nist: [nistLastAlerts],
   gcp: [gcpAlertsSummary],
   tsc: [tscAlertsSummary],
+  virustotal: [virustotalAlertsSummary],
   osquery: [osqueryAlertsSummary],
   mitre: [mitreAlertsSummary],
   ciscat: [ciscatAlertsSummary],
@@ -175,4 +191,4 @@ export default {
   gdpr: [gdprLastAlerts],
   pci: [pciLastAlerts],
   docker: [dockerAlertsSummary],
-};
+}
