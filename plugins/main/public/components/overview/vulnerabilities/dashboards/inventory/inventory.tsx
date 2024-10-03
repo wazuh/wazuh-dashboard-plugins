@@ -267,7 +267,7 @@ const InventoryVulsComponent = () => {
                                     )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
                                       MAX_ENTRIES_PER_QUERY,
                                     )} hits.`,
-                                    iconType: 'questionInCircle',
+                                    iconType: 'iInCircle',
                                     position: 'top',
                                   }
                                 : undefined

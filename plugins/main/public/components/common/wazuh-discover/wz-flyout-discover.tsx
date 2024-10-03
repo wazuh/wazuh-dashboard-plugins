@@ -301,7 +301,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                             content: `The query results exceeded the limit of ${formatNumWithCommas(
                               MAX_ENTRIES_PER_QUERY,
                             )} hits. Please refine your search.`,
-                            iconType: 'questionInCircle',
+                            iconType: 'iInCircle',
                             position: 'top',
                           }
                         : undefined
