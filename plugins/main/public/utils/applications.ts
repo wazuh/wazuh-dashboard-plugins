@@ -232,6 +232,31 @@ export const mitreAttack = {
     }`,
 };
 
+export const virustotal = {
+  category: 'wz-category-threat-intelligence',
+  id: 'virustotal',
+  title: i18n.translate('wz-app-virustotal-title', {
+    defaultMessage: 'VirusTotal',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-virustotal-breadcrumbLabel', {
+    defaultMessage: 'VirusTotal',
+  }),
+  description: i18n.translate('wz-app-virustotal-description', {
+    defaultMessage:
+      'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.',
+  }),
+  euiIconType: 'monitoringApp',
+  order: 303,
+  showInOverviewApp: true,
+  showInAgentMenu: true,
+  redirectTo: () =>
+    `/overview/?tab=virustotal&tabView=dashboard${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
 const pciDss = {
   category: 'wz-category-security-operations',
   id: 'pci-dss',
@@ -816,6 +841,7 @@ export const Applications = [
   threatHunting,
   vulnerabilityDetection,
   mitreAttack,
+  virustotal,
   pciDss,
   hipaa,
   gdpr,
