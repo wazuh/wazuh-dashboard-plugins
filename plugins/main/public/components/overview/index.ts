@@ -12,4 +12,5 @@ export { DashboardPCIDSS } from './pci/dashboards';
 export { DashboardOffice365 } from './office/dashboard';
 export { DashboardThreatHunting } from './threat-hunting/dashboard';
 export { DashboardTSC } from './tsc/dashboards';
+export { DashboardVirustotal } from './virustotal/dashboard';
 export { DashboardVuls, InventoryVuls } from './vulnerabilities';
