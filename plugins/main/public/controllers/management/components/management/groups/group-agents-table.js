@@ -90,9 +90,10 @@ class WzGroupAgentsTable extends Component {
         align: 'left',
         searchable: true,
         sortable: true,
-        render: status => (
+        render: (status, agent) => (
           <AgentStatus
             status={status}
+            agent={agent}
             labelProps={{ className: 'hide-agent-status' }}
           />
         ),
@@ -224,7 +225,7 @@ class WzGroupAgentsTable extends Component {
       return (
         <TableWzAPI
           title='Agents'
-          description='From here you can list and manage your agents'
+          description=' your agents'
           tableColumns={this.columns}
           tableInitialSortingField='id'
           endpoint={`/groups/${groupName}/agents`}
