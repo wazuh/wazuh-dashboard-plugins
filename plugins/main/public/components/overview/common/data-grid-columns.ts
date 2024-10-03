@@ -1,4 +1,4 @@
-import { commonInitialWidth } from "./initial-width";
+import { commonInitialWidth } from './initial-width';
 
 export const commonColumns = {
   timestamp: {
@@ -9,21 +9,21 @@ export const commonColumns = {
   },
   'agent.id': {
     id: 'agent.id',
-    initialWidth: commonInitialWidth["agent.id"],
+    initialWidth: commonInitialWidth['agent.id'],
   },
   'agent.name': {
     id: 'agent.name',
-    initialWidth: commonInitialWidth["agent.name"],
+    initialWidth: commonInitialWidth['agent.name'],
   },
   'rule.description': {
     id: 'rule.description',
   },
   'rule.level': {
     id: 'rule.level',
-    initialWidth: commonInitialWidth["rule.level"],
+    initialWidth: commonInitialWidth['rule.level'],
   },
   'rule.id': {
     id: 'rule.id',
-    initialWidth: commonInitialWidth["rule.id"],
+    initialWidth: commonInitialWidth['rule.id'],
   },
 } as const;
