@@ -155,8 +155,9 @@ class WzGroupAgentsTable extends Component {
                   }}
                   color='danger'
                   isDisabled={item.name === 'default'}
-                  modalTitle={`Remove ${item.file || item.name
-                    } agent from this group?`}
+                  modalTitle={`Remove ${
+                    item.file || item.name
+                  } agent from this group?`}
                   modalProps={{
                     buttonColor: 'danger',
                   }}
