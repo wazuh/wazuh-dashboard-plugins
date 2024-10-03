@@ -38,6 +38,7 @@ import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
+import { virustotalColumns } from '../../overview/virustotal/events/virustotal-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
 import {
@@ -54,6 +55,7 @@ import {
   DashboardAWS,
   DashboardOffice365,
   DashboardThreatHunting,
+  DashboardVirustotal,
   DashboardGoogleCloud,
   DashboardVuls,
   InventoryVuls,
@@ -62,6 +64,7 @@ import {
   DockerDataSource,
   AlertsVulnerabilitiesDataSource,
   AWSDataSource,
+  VirusTotalDataSource,
   FIMDataSource,
   GitHubDataSource,
   MalwareDetectionDataSource,
@@ -304,6 +307,21 @@ export const ModulesDefaults = {
       renderDiscoverTab({
         DataSource: MitreAttackDataSource,
         tableColumns: mitreAttackColumns,
+      }),
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  virustotal: {
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardVirustotal,
+      },
+      renderDiscoverTab({
+        tableColumns: virustotalColumns,
+        DataSource: VirusTotalDataSource,
       }),
     ],
     availableFor: ['manager', 'agent'],

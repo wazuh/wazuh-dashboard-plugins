@@ -1,10 +1,22 @@
-import { commonColumns } from "../../../overview/common/data-grid-columns";
+import React from 'react';
 import { tDataGridColumn } from '../../data-grid';
 
 export const threatHuntingColumns: tDataGridColumn[] = [
-  commonColumns.timestamp,
-  commonColumns["agent.name"],
-  commonColumns["rule.description"],
-  commonColumns["rule.level"],
-  commonColumns["rule.id"],
+  {
+    id: 'timestamp',
+    isSortable: true,
+    defaultSortDirection: 'desc',
+  },
+  {
+    id: 'agent.name',
+  },
+  {
+    id: 'rule.description',
+  },
+  {
+    id: 'rule.level',
+  },
+  {
+    id: 'rule.id',
+  },
 ];
