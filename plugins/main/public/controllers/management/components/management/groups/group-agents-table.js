@@ -155,9 +155,8 @@ class WzGroupAgentsTable extends Component {
                   }}
                   color='danger'
                   isDisabled={item.name === 'default'}
-                  modalTitle={`Remove ${
-                    item.file || item.name
-                  } agent from this group?`}
+                  modalTitle={`Remove ${item.file || item.name
+                    } agent from this group?`}
                   modalProps={{
                     buttonColor: 'danger',
                   }}
@@ -225,7 +224,7 @@ class WzGroupAgentsTable extends Component {
       return (
         <TableWzAPI
           title='Agents'
-          description=' your agents'
+          description='From here you can list and manage your agents'
           tableColumns={this.columns}
           tableInitialSortingField='id'
           endpoint={`/groups/${groupName}/agents`}
