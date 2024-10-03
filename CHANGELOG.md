@@ -23,6 +23,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the agents summary in overview with no results to an agent deployment help message. [#7041](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7041)
 - Changed malware feature description [#7036](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7036)
 - Changed the font size of the kpi subtitles and the features descriptions [#7033](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7033)
+- Changed the initial width to the default columns on each selected field [#7059](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7059)
 
 ### Fixed
 
