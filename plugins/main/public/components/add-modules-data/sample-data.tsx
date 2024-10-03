@@ -37,7 +37,6 @@ import {
   malwareDetection,
   mitreAttack,
   office365,
-  virustotal,
   vulnerabilityDetection,
 } from '../../utils/applications';
 
@@ -51,7 +50,6 @@ const sampleSecurityInformationApplication = [
 
 const sampleThreatDetectionApplication = [
   vulnerabilityDetection.title,
-  virustotal.title,
   docker.title,
   mitreAttack.title,
 ];

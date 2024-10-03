@@ -28,7 +28,6 @@ export const WAZUH_MENU_PAGE = {
   cisCatLink: '[data-test-subj=menuModulesCiscatLink]',
   securityConfigurationAssessmentLink: '[data-test-subj=menuModulesScaLink]',
   vulnerabilitiesLink: '[data-test-subj=menuModulesVulsLink]',
-  virusTotalLink: '[data-test-subj=menuModulesVirustotalLink]',
   osqueryLink: '[data-test-subj=menuModulesOsqueryLink]',
   dockerListenerLink: '[data-test-subj=menuModulesDockerLink]',
   mitreAttackLink: '[data-test-subj=menuModulesMitreLink]',

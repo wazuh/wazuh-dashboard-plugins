@@ -41,15 +41,6 @@ const gcpAlertsSummary = {
   ]
 }
 
-const virustotalAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['rule.id'],
-    AggregationFields['rule.description'],
-    AggregationFields['rule.level'],
-  ]
-}
-
 const osqueryAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -181,7 +172,6 @@ export default {
   nist: [nistLastAlerts],
   gcp: [gcpAlertsSummary],
   tsc: [tscAlertsSummary],
-  virustotal: [virustotalAlertsSummary],
   osquery: [osqueryAlertsSummary],
   mitre: [mitreAlertsSummary],
   ciscat: [ciscatAlertsSummary],
@@ -191,4 +181,4 @@ export default {
   gdpr: [gdprLastAlerts],
   pci: [pciLastAlerts],
   docker: [dockerAlertsSummary],
-}
+};

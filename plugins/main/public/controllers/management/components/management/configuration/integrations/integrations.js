@@ -23,12 +23,6 @@ const helpLinks = [
     href: webDocumentationLink('user-manual/manager/manual-integration.html'),
   },
   {
-    text: 'VirusTotal integration',
-    href: webDocumentationLink(
-      'user-manual/capabilities/malware-detection/virus-total-integration.html',
-    ),
-  },
-  {
     text: 'Integration reference',
     href: webDocumentationLink(
       'user-manual/reference/ossec-conf/integration.html',
@@ -38,10 +32,6 @@ const helpLinks = [
 
 const defaultIntegrations = [
   { title: 'Slack', description: 'Get alerts directly on Slack' },
-  {
-    title: 'VirusTotal',
-    description: 'Get notified when malicious software is found',
-  },
   {
     title: 'PagerDuty',
     description: 'Get alerts on this streamlined incident resolution software',

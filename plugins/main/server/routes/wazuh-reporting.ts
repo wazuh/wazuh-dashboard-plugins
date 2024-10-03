@@ -43,7 +43,6 @@ export function WazuhReportingRoutes(router: IRouter) {
     schema.literal('ciscat'),
     schema.literal('vuls'),
     schema.literal('mitre'),
-    schema.literal('virustotal'),
     schema.literal('docker'),
     schema.literal('osquery'),
     schema.literal('oscap'),
