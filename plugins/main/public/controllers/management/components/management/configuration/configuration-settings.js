@@ -80,6 +80,13 @@ export default [
         goto: 'alerts',
         when: 'manager',
       },
+      {
+        name: 'Integrations',
+        description:
+          'Slack, VirusTotal and PagerDuty integrations with external APIs',
+        goto: 'integrations',
+        when: 'manager',
+      },
     ],
   },
   {
