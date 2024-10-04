@@ -87,8 +87,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     DataSource,
   });
 
-  console.log('datasource ++++', dataSource);
-
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
       const rowClicked = results.hits.hits[index];
