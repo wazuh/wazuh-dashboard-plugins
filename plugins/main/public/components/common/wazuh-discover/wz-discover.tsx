@@ -87,6 +87,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     DataSource,
   });
 
+  console.log('datasource ++++', dataSource);
+
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
       const rowClicked = results.hits.hits[index];
@@ -250,6 +252,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   <EuiDataGrid
                     {...dataGridProps}
                     className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                    gridStyle={{
+                      fontSize: 's',
+                      cellPadding: 's',
+                    }}
                     toolbarVisibility={{
                       additionalControls: (
                         <>
