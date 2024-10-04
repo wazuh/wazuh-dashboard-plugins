@@ -110,8 +110,33 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         },
   );
 
-  const filterColumns = () => {
-    const allColumns = parseColumns(
+  const reOrderFirstMatchedColumns = (
+    columns: tDataGridColumn[],
+    visibleColumnsOrdered: string[],
+  ) => {
+    const firstMatchedColumns = [];
+    const nonMatchedColumns = [];
+
+    for (let i = 0; i < columns.length; i++) {
+      const column = columns[i];
+      if (visibleColumnsOrdered.includes(column.id)) {
+        firstMatchedColumns.push(column);
+      } else {
+        nonMatchedColumns.push(column);
+      }
+    }
+
+    firstMatchedColumns.sort(
+      (a, b) =>
+        visibleColumnsOrdered.indexOf(a.id) -
+        visibleColumnsOrdered.indexOf(b.id),
+    );
+
+    return [...firstMatchedColumns, ...nonMatchedColumns];
+  };
+
+  const getColumns = () => {
+    return parseColumns(
       indexPattern?.fields || [],
       defaultColumns,
       indexPattern,
@@ -120,18 +145,18 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       filters,
       setFilters,
     );
-    const columnNonMatch = allColumns.filter(
-      item => !visibleColumns.includes(item.name),
-    );
-
-    return [...defaultColumns, ...columnNonMatch];
   };
 
   const [columns, setColumns] = useState<tDataGridColumn[]>([]);
 
   useEffect(() => {
     if (indexPattern !== undefined) {
-      setColumns(filterColumns());
+      setColumns(
+        reOrderFirstMatchedColumns(
+          getColumns(),
+          defaultColumns.map(col => col.id),
+        ),
+      );
     }
   }, [indexPattern]);
 
@@ -228,7 +253,10 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     columns,
     columnVisibility: {
       visibleColumns,
-      setVisibleColumns,
+      setVisibleColumns: colsId => {
+        setVisibleColumns(colsId);
+        setColumns(reOrderFirstMatchedColumns(columns, colsId));
+      },
     },
     renderCellValue: renderCellValue,
     leadingControlColumns: leadingControlColumns,
