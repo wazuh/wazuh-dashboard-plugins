@@ -110,32 +110,42 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         },
   );
 
-  const reOrderFirstMatchedColumns = (
+  const sortFirstMatchedColumns = (
+    firstMatchedColumns: tDataGridColumn[],
+    visibleColumnsOrdered: string[],
+  ) => {
+    firstMatchedColumns.sort(
+      (a, b) =>
+        visibleColumnsOrdered.indexOf(a.id) -
+        visibleColumnsOrdered.indexOf(b.id),
+    );
+    return firstMatchedColumns;
+  };
+
+  const orderFirstMatchedColumns = (
     columns: tDataGridColumn[],
     visibleColumnsOrdered: string[],
   ) => {
-    const firstMatchedColumns = [];
-    const nonMatchedColumns = [];
+    const firstMatchedColumns: tDataGridColumn[] = [];
+    const nonMatchedColumns: tDataGridColumn[] = [];
+    const visibleColumnsSet = new Set(visibleColumnsOrdered);
 
     for (let i = 0; i < columns.length; i++) {
       const column = columns[i];
-      if (visibleColumnsOrdered.includes(column.id)) {
+      if (visibleColumnsSet.has(column.id)) {
         firstMatchedColumns.push(column);
       } else {
         nonMatchedColumns.push(column);
       }
     }
 
-    firstMatchedColumns.sort(
-      (a, b) =>
-        visibleColumnsOrdered.indexOf(a.id) -
-        visibleColumnsOrdered.indexOf(b.id),
-    );
-
-    return [...firstMatchedColumns, ...nonMatchedColumns];
+    return [
+      ...sortFirstMatchedColumns(firstMatchedColumns, visibleColumnsOrdered),
+      ...nonMatchedColumns,
+    ];
   };
 
-  const getColumns = () => {
+  const getColumns = useMemo(() => {
     return parseColumns(
       indexPattern?.fields || [],
       defaultColumns,
@@ -145,15 +155,15 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       filters,
       setFilters,
     );
-  };
+  }, [indexPattern, rows, pagination.pageSize, filters, setFilters]);
 
   const [columns, setColumns] = useState<tDataGridColumn[]>([]);
 
   useEffect(() => {
     if (indexPattern !== undefined) {
       setColumns(
-        reOrderFirstMatchedColumns(
-          getColumns(),
+        orderFirstMatchedColumns(
+          getColumns,
           defaultColumns.map(col => col.id),
         ),
       );
@@ -248,15 +258,16 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     ];
   }, [results]);
 
+  useEffect(() => {
+    setColumns(orderFirstMatchedColumns(columns, visibleColumns));
+  }, [visibleColumns]);
+
   return {
     'aria-labelledby': props.ariaLabelledBy,
     columns,
     columnVisibility: {
       visibleColumns,
-      setVisibleColumns: colsId => {
-        setVisibleColumns(colsId);
-        setColumns(reOrderFirstMatchedColumns(columns, colsId));
-      },
+      setVisibleColumns,
     },
     renderCellValue: renderCellValue,
     leadingControlColumns: leadingControlColumns,
