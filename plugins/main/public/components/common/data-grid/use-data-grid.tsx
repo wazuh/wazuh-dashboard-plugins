@@ -65,15 +65,15 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     indexPattern,
     DocViewInspectButton,
     results,
-    defaultColumns: columns,
+    defaultColumns,
     renderColumns,
     useDefaultPagination = false,
     pagination: paginationProps = {},
     filters = [],
     setFilters = () => {},
   } = props;
-  const [columnVisibility, setVisibility] = useState(() =>
-    columns.map(({ id }) => id),
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
+    defaultColumns.map(({ id }) => id),
   );
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
@@ -81,7 +81,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   /** Sorting **/
   // get default sorting from default columns
   const getDefaultSorting = () => {
-    const defaultSort = columns.find(
+    const defaultSort = defaultColumns.find(
       column => column.isSortable || column.defaultSortDirection,
     );
     return defaultSort
@@ -109,6 +109,31 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
           ...paginationProps,
         },
   );
+
+  const filterColumns = () => {
+    const allColumns = parseColumns(
+      indexPattern?.fields || [],
+      defaultColumns,
+      indexPattern,
+      rows,
+      pagination.pageSize,
+      filters,
+      setFilters,
+    );
+    const columnNonMatch = allColumns.filter(
+      item => !visibleColumns.includes(item.name),
+    );
+
+    return [...defaultColumns, ...columnNonMatch];
+  };
+
+  const [columns, setColumns] = useState<tDataGridColumn[]>([]);
+
+  useEffect(() => {
+    if (indexPattern !== undefined) {
+      setColumns(filterColumns());
+    }
+  }, [indexPattern]);
 
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) =>
@@ -149,7 +174,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         rowsParsed,
       );
       // check if column have render method initialized
-      const column = columns.find(column => column.id === columnId);
+      const column = defaultColumns.find(column => column.id === columnId);
       if (column && column.render) {
         return column.render(fieldFormatted, rowsParsed[relativeRowIndex]);
       }
@@ -198,53 +223,16 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     ];
   }, [results]);
 
-  const filterColumns = () => {
-    const allColumns = parseColumns(
-      indexPattern?.fields || [],
-      columns,
-      indexPattern,
-      rows,
-      pagination.pageSize,
-      filters,
-      setFilters,
-    );
-    const columnMatch = [];
-    const columnNonMatch = [];
-
-    for (const item of allColumns) {
-      if (columnVisibility.includes(item.name)) {
-        columnMatch.push(item);
-      } else {
-        columnNonMatch.push(item);
-      }
-    }
-
-    return [...columnMatch, ...columnNonMatch];
-  };
-
-  const defaultColumnsPosition = (columnsVisibility, defaultColumns) => {
-    const defaults = defaultColumns
-      .map(item => item.id)
-      .filter(id => columnsVisibility.includes(id));
-
-    const nonDefaults = columnsVisibility.filter(
-      item => !defaultColumns.map(item => item.id).includes(item),
-    );
-
-    return [...defaults, ...nonDefaults];
-  };
-
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columns: filterColumns(),
+    columns,
     columnVisibility: {
-      visibleColumns: defaultColumnsPosition(columnVisibility, columns),
-      setVisibleColumns: setVisibility,
+      visibleColumns,
+      setVisibleColumns,
     },
     renderCellValue: renderCellValue,
     leadingControlColumns: leadingControlColumns,
-    rowCount:
-      rowCount < MAX_ENTRIES_PER_QUERY ? rowCount : MAX_ENTRIES_PER_QUERY,
+    rowCount: Math.min(rowCount, MAX_ENTRIES_PER_QUERY),
     sorting: { columns: sortingColumns, onSort },
     pagination: {
       ...pagination,
