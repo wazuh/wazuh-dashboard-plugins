@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Fixed
 
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
+- Fixed events table don't work when add more row per page [#7065](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7065)
 
 ### Added
 
