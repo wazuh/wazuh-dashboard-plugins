@@ -3,6 +3,14 @@
     height: max-content !important;
   }
 
+  .euiDataGridRowCell:focus {
+    border: 1px solid rgba(0, 107, 180, 0.4);
+    border-radius: 1px;
+    z-index: 2;
+    outline: none;
+    margin-top: -1px;
+  }
+
   .euiDataGrid--fullScreen {
     height: calc(100vh - 49px);
     bottom: 0;
