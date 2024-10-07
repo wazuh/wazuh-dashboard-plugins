@@ -10,6 +10,7 @@ import { FILTER_OPERATOR } from '../data-source';
 import { DocViewTableRowBtnFilterAdd } from './table_row_btn_filter_add';
 import { DocViewTableRowBtnFilterRemove } from './table_row_btn_filter_remove';
 import { DocViewTableRowBtnFilterExists } from './table_row_btn_filter_exists';
+import './doc-viewer.scss';
 
 const COLLAPSE_LINE_LENGTH = 350;
 const DOT_PREFIX_RE = /(.).+?\./g;
