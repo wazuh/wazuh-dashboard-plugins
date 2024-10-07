@@ -4,8 +4,6 @@ import { escapeRegExp } from 'lodash';
 import { i18n } from '@osd/i18n';
 import { FieldIcon } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { onFilterCellActions } from '../data-grid';
-import { Filter } from '../../../../../../src/plugins/data/common';
 import { FILTER_OPERATOR } from '../data-source';
 import { DocViewTableRowBtnFilterAdd } from './table_row_btn_filter_add';
 import { DocViewTableRowBtnFilterRemove } from './table_row_btn_filter_remove';
@@ -22,8 +20,7 @@ export type tDocViewerProps = {
   mapping: any;
   indexPattern: any;
   docJSON: any;
-  filters: Filter[];
-  setFilters: (filters: Filter[]) => void;
+  onFilter: (columndId: string, operation: FILTER_OPERATOR, value?: any) => void;
 };
 
 /**
@@ -98,8 +95,7 @@ const DocViewer = (props: tDocViewerProps) => {
     indexPattern,
     renderFields,
     docJSON,
-    filters,
-    setFilters,
+    onFilter,
   } = props;
 
   return (
@@ -138,19 +134,13 @@ const DocViewer = (props: tDocViewerProps) => {
                 const fieldIconProps = { fill: 'none', color: 'gray' };
                 const scripted = Boolean(fieldMapping?.scripted);
 
-                const onFilter = onFilterCellActions(
-                  indexPattern.id,
-                  filters,
-                  setFilters,
-                );
-
                 return (
                   <tr key={index} data-test-subj={`tableDocViewRow-${field}`}>
                     <td className='osdDocViewer__buttons'>
                       <DocViewTableRowBtnFilterAdd
                         disabled={!fieldMapping || !fieldMapping.filterable}
                         onClick={() =>
-                          onFilter(field, flattened[field], FILTER_OPERATOR.IS)
+                          onFilter(field, FILTER_OPERATOR.IS, flattened[field])
                         }
                       />
                       <DocViewTableRowBtnFilterRemove
@@ -158,15 +148,15 @@ const DocViewer = (props: tDocViewerProps) => {
                         onClick={() =>
                           onFilter(
                             field,
-                            flattened[field],
                             FILTER_OPERATOR.IS_NOT,
+                            flattened[field],
                           )
                         }
                       />
                       <DocViewTableRowBtnFilterExists
                         disabled={!fieldMapping || !fieldMapping.filterable}
                         onClick={() =>
-                          onFilter(field, null, FILTER_OPERATOR.EXISTS)
+                          onFilter(field, FILTER_OPERATOR.EXISTS)
                         }
                         scripted={fieldMapping && fieldMapping.scripted}
                       />
