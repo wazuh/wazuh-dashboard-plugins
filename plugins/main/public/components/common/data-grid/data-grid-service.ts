@@ -192,16 +192,12 @@ export const exportSearchToCSV = async (
   }
 };
 
-const onFilterCellActions = (
+export const onFilterCellActions = (
   indexPatternId: string,
   filters: Filter[],
   setFilters: (filters: Filter[]) => void,
 ) => {
-  return (
-    columndId: string,
-    value: any,
-    operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
-  ) => {
+  return (columndId: string, value: any, operation: FILTER_OPERATOR) => {
     const newFilter = PatternDataSourceFilterManager.createFilter(
       operation,
       columndId,

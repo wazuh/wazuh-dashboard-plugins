@@ -4,6 +4,12 @@ import { escapeRegExp } from 'lodash';
 import { i18n } from '@osd/i18n';
 import { FieldIcon } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { onFilterCellActions } from '../data-grid';
+import { Filter } from '../../../../../../src/plugins/data/common';
+import { FILTER_OPERATOR } from '../data-source';
+import { DocViewTableRowBtnFilterAdd } from './table_row_btn_filter_add';
+import { DocViewTableRowBtnFilterRemove } from './table_row_btn_filter_remove';
+import { DocViewTableRowBtnFilterExists } from './table_row_btn_filter_exists';
 
 const COLLAPSE_LINE_LENGTH = 350;
 const DOT_PREFIX_RE = /(.).+?\./g;
@@ -15,6 +21,8 @@ export type tDocViewerProps = {
   mapping: any;
   indexPattern: any;
   docJSON: any;
+  filters: Filter[];
+  setFilters: (filters: Filter[]) => void;
 };
 
 /**
@@ -82,8 +90,16 @@ const DocViewer = (props: tDocViewerProps) => {
   const [fieldRowOpen, setFieldRowOpen] = useState(
     {} as Record<string, boolean>,
   );
-  const { flattened, formatted, mapping, indexPattern, renderFields, docJSON } =
-    props;
+  const {
+    flattened,
+    formatted,
+    mapping,
+    indexPattern,
+    renderFields,
+    docJSON,
+    filters,
+    setFilters,
+  } = props;
 
   return (
     <>
@@ -121,8 +137,39 @@ const DocViewer = (props: tDocViewerProps) => {
                 const fieldIconProps = { fill: 'none', color: 'gray' };
                 const scripted = Boolean(fieldMapping?.scripted);
 
+                const onFilter = onFilterCellActions(
+                  indexPattern.id,
+                  filters,
+                  setFilters,
+                );
+
                 return (
                   <tr key={index} data-test-subj={`tableDocViewRow-${field}`}>
+                    <td className='osdDocViewer__buttons'>
+                      <DocViewTableRowBtnFilterAdd
+                        disabled={!fieldMapping || !fieldMapping.filterable}
+                        onClick={() =>
+                          onFilter(field, flattened[field], FILTER_OPERATOR.IS)
+                        }
+                      />
+                      <DocViewTableRowBtnFilterRemove
+                        disabled={!fieldMapping || !fieldMapping.filterable}
+                        onClick={() =>
+                          onFilter(
+                            field,
+                            flattened[field],
+                            FILTER_OPERATOR.IS_NOT,
+                          )
+                        }
+                      />
+                      <DocViewTableRowBtnFilterExists
+                        disabled={!fieldMapping || !fieldMapping.filterable}
+                        onClick={() =>
+                          onFilter(field, null, FILTER_OPERATOR.EXISTS)
+                        }
+                        scripted={fieldMapping && fieldMapping.scripted}
+                      />
+                    </td>
                     <td className='osdDocViewer__field'>
                       <EuiFlexGroup
                         alignItems='center'
