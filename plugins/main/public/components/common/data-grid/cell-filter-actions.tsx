@@ -15,14 +15,14 @@ export const filterIsAction = (
   rows: any[],
   pageSize: number,
   onFilter: (
-    columndId: string,
-    value: any,
+    field: string,
     operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
+    value?: any,
   ) => void,
 ) => {
   return ({
     rowIndex,
-    columnId,
+    columnId: field,
     Component,
   }: EuiDataGridColumnCellActionProps) => {
     const filterForValueText = i18n.translate('discover.filterForValue', {
@@ -30,7 +30,7 @@ export const filterIsAction = (
     });
     const filterForValueLabel = i18n.translate('discover.filterForValueLabel', {
       defaultMessage: 'Filter for value: {value}',
-      values: { value: columnId },
+      values: { value: field },
     });
 
     const handleClick = () => {
@@ -38,7 +38,7 @@ export const filterIsAction = (
       const flattened = indexPattern.flattenHit(row);
 
       if (flattened) {
-        onFilter(columnId, flattened[columnId], FILTER_OPERATOR.IS);
+        onFilter(field, FILTER_OPERATOR.IS, flattened[field]);
       }
     };
 
@@ -61,18 +61,18 @@ export const filterIsNotAction =
     rows: any[],
     pageSize: number,
     onFilter: (
-      columndId: string,
-      value: any,
+      field: string,
       operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
+      value?: any,
     ) => void,
   ) =>
-  ({ rowIndex, columnId, Component }: EuiDataGridColumnCellActionProps) => {
+  ({ rowIndex, columnId: field, Component }: EuiDataGridColumnCellActionProps) => {
     const filterOutValueText = i18n.translate('discover.filterOutValue', {
       defaultMessage: 'Filter out value',
     });
     const filterOutValueLabel = i18n.translate('discover.filterOutValueLabel', {
       defaultMessage: 'Filter out value: {value}',
-      values: { value: columnId },
+      values: { value: field },
     });
 
     const handleClick = () => {
@@ -80,7 +80,7 @@ export const filterIsNotAction =
       const flattened = indexPattern.flattenHit(row);
 
       if (flattened) {
-        onFilter(columnId, flattened[columnId], FILTER_OPERATOR.IS_NOT);
+        onFilter(field, FILTER_OPERATOR.IS_NOT, flattened[field]);
       }
     };
 
@@ -103,9 +103,9 @@ export function cellFilterActions(
   rows: any[],
   pageSize: number,
   onFilter: (
-    columndId: string,
-    value: any,
+    field: string,
     operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
+    value: any,
   ) => void,
 ) {
   if (!field.filterable) return;
