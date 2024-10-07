@@ -157,19 +157,6 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     );
   }, [indexPattern, rows, pagination.pageSize, filters, setFilters]);
 
-  const [columns, setColumns] = useState<tDataGridColumn[]>([]);
-
-  useEffect(() => {
-    if (indexPattern !== undefined) {
-      setColumns(
-        orderFirstMatchedColumns(
-          getColumns,
-          defaultColumns.map(col => col.id),
-        ),
-      );
-    }
-  }, [indexPattern]);
-
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) =>
       setPagination(pagination => ({
@@ -258,13 +245,9 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     ];
   }, [results]);
 
-  useEffect(() => {
-    setColumns(orderFirstMatchedColumns(columns, visibleColumns));
-  }, [visibleColumns]);
-
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columns,
+    columns: orderFirstMatchedColumns(getColumns, visibleColumns),
     columnVisibility: {
       visibleColumns,
       setVisibleColumns,
