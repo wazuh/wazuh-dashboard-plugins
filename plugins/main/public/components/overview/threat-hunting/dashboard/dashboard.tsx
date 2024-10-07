@@ -17,18 +17,13 @@ import {
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
-  EuiTitle,
-  EuiButtonEmpty,
 } from '@elastic/eui';
-import {
-  ErrorFactory,
-  ErrorHandler,
-  HttpError,
-} from '../../../../react-services/error-management';
+import { ErrorFactory, ErrorHandler, HttpError } from '../../../../react-services/error-management';
 import {
   MAX_ENTRIES_PER_QUERY,
   exportSearchToCSV,
   getAllCustomRenders,
+  onFilterCellActions,
 } from '../../../common/data-grid/data-grid-service';
 import { useDocViewer } from '../../../common/doc-viewer/use-doc-viewer';
 import { useDataGrid } from '../../../common/data-grid/use-data-grid';
@@ -47,6 +42,7 @@ import {
   PatternDataSourceFilterManager,
   tParsedIndexPattern,
   useDataSource,
+  FILTER_OPERATOR,
 } from '../../../common/data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
@@ -95,18 +91,16 @@ const DashboardTH: React.FC = () => {
       const rowClicked = results.hits.hits[index];
       setInspectedHit(rowClicked);
     },
-    [results],
+    [results]
   );
 
-  const DocViewInspectButton = ({
-    rowIndex,
-  }: EuiDataGridCellValueElementProps) => {
+  const DocViewInspectButton = ({ rowIndex }: EuiDataGridCellValueElementProps) => {
     const inspectHintMsg = 'Inspect document details';
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
           onClick={() => onClickInspectDoc(rowIndex)}
-          iconType='inspect'
+          iconType="inspect"
           aria-label={inspectHintMsg}
         />
       </EuiToolTip>
@@ -132,8 +126,7 @@ const DashboardTH: React.FC = () => {
   });
 
   const pinnedAgent =
-    PatternDataSourceFilterManager.getPinnedAgentFilter(dataSource?.id!)
-      .length > 0;
+    PatternDataSourceFilterManager.getPinnedAgentFilter(dataSource?.id!).length > 0;
 
   useEffect(() => {
     const currentColumns = !pinnedAgent
@@ -161,10 +154,10 @@ const DashboardTH: React.FC = () => {
       sorting,
       dateRange: absoluteDateRange,
     })
-      .then(results => {
+      .then((results) => {
         setResults(results);
       })
-      .catch(error => {
+      .catch((error) => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: 'Error fetching data',
@@ -205,6 +198,11 @@ const DashboardTH: React.FC = () => {
     }
   };
 
+  const onFilterHandler = (field: string, operation: FILTER_OPERATOR, value?: any) => {
+    const onFilter = onFilterCellActions(dataSource?.indexPattern?.id, filters, setFilters);
+    onFilter(field, operation, value);
+  };
+
   return (
     <I18nProvider>
       {isDataSourceLoading && !dataSource ? (
@@ -212,7 +210,7 @@ const DashboardTH: React.FC = () => {
       ) : (
         <>
           <WzSearchBar
-            appName='th-searchbar'
+            appName="th-searchbar"
             {...searchBarProps}
             fixedFilters={fixedFilters}
             showDatePicker={true}
@@ -225,19 +223,15 @@ const DashboardTH: React.FC = () => {
           ) : null}
           <div
             className={`th-container ${
-              !isDataSourceLoading && dataSource && results?.hits?.total > 0
-                ? ''
-                : 'wz-no-display'
+              !isDataSourceLoading && dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
             }`}
           >
             <SampleDataWarning />
-            <div className='th-dashboard-responsive'>
+            <div className="th-dashboard-responsive">
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
-                  panels: getKPIsPanel(
-                    AlertsRepository.getStoreIndexPatternId(),
-                  ),
+                  panels: getKPIsPanel(AlertsRepository.getStoreIndexPatternId()),
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
                   useMargins: true,
@@ -258,7 +252,7 @@ const DashboardTH: React.FC = () => {
                   viewMode: ViewMode.VIEW,
                   panels: getDashboardPanels(
                     AlertsRepository.getStoreIndexPatternId(),
-                    pinnedAgent,
+                    pinnedAgent
                   ),
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
@@ -297,22 +291,20 @@ const DashboardTH: React.FC = () => {
                 ) : null}
               </div>
               {inspectedHit && (
-                <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+                <EuiFlyout onClose={() => setInspectedHit(undefined)} size="m">
                   <EuiFlyoutHeader>
-                    <DocDetailsHeader
-                      doc={inspectedHit}
-                      indexPattern={dataSource?.indexPattern}
-                    />
+                    <DocDetailsHeader doc={inspectedHit} indexPattern={dataSource?.indexPattern} />
                   </EuiFlyoutHeader>
                   <EuiFlyoutBody>
-                    <EuiFlexGroup direction='column'>
+                    <EuiFlexGroup direction="column">
                       <EuiFlexItem>
                         <DocViewer
                           {...docViewerProps}
                           renderFields={getAllCustomRenders(
                             threatHuntingTableDefaultColumns,
-                            wzDiscoverRenderColumns,
+                            wzDiscoverRenderColumns
                           )}
+                          onFilter={onFilterHandler}
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
