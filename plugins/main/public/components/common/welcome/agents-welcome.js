@@ -58,6 +58,7 @@ import { EventsCount } from './dashboard/events-count';
 import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import NavigationService from '../../../react-services/navigation-service';
+import VulsPanel from './components/vuls_panel/vuls_welcome_panel';
 
 export const AgentsWelcome = compose(
   withErrorBoundary,
@@ -388,7 +389,7 @@ export const AgentsWelcome = compose(
     renderMitrePanel() {
       return (
         <Fragment>
-          <EuiPanel paddingSize='m' height={{ height: 300 }}>
+          <EuiPanel paddingSize='m'>
             <EuiFlexGroup gutterSize='s'>
               <EuiFlexItem>
                 <h2 className='embPanel__title wz-headline-title'>
@@ -491,19 +492,6 @@ export const AgentsWelcome = compose(
                   </EuiFlexGroup>
                   {(this.state.widthWindow < 1150 && (
                     <Fragment>
-                      <EuiFlexGroup wrap>
-                        <EuiFlexItem
-                          key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                        >
-                          {this.renderMitrePanel()}
-                        </EuiFlexItem>
-                        {this.renderCompliancePanel()}
-                      </EuiFlexGroup>
-                      <EuiSpacer size='m' />
-                      <EuiFlexGroup>
-                        <FimEventsTable agent={this.props.agent} />
-                      </EuiFlexGroup>
-                      <EuiSpacer size='m' />
                       <EuiFlexGroup>
                         <EuiFlexItem
                           key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
@@ -511,6 +499,27 @@ export const AgentsWelcome = compose(
                           {' '}
                           {/* Events count evolution */}
                           {this.renderEventCountVisualization()}
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                      <EuiSpacer size='m' />
+                      <EuiFlexGroup wrap>
+                        <EuiFlexItem
+                          key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
+                        >
+                          {this.renderMitrePanel()}
+                        </EuiFlexItem>
+                        <EuiFlexItem>
+                          {this.renderCompliancePanel()}
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                      <EuiSpacer size='m' />
+                      <EuiFlexGroup>
+                        <FimEventsTable agent={this.props.agent} />
+                      </EuiFlexGroup>
+                      <EuiSpacer size='m' />
+                      <EuiFlexGroup>
+                        <EuiFlexItem>
+                          <VulsPanel agent={this.props.agent} />
                         </EuiFlexItem>
                       </EuiFlexGroup>
                       <EuiSpacer size='m' />
@@ -524,25 +533,40 @@ export const AgentsWelcome = compose(
                         <EuiFlexItem>
                           <EuiFlexGroup>
                             <EuiFlexItem
-                              key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
+                              key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                              grow={3}
                             >
-                              {this.renderMitrePanel()}
+                              {' '}
+                              {/* Events count evolution */}
+                              {this.renderEventCountVisualization()}
                             </EuiFlexItem>
-                            {this.renderCompliancePanel()}
+                            <EuiFlexItem grow={3}>
+                              <EuiFlexGroup>
+                                <EuiFlexItem
+                                  key={
+                                    'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'
+                                  }
+                                >
+                                  {this.renderMitrePanel()}
+                                </EuiFlexItem>
+                                <EuiFlexItem>
+                                  {this.renderCompliancePanel()}
+                                </EuiFlexItem>
+                              </EuiFlexGroup>
+                            </EuiFlexItem>
                           </EuiFlexGroup>
                         </EuiFlexItem>
-                        <FimEventsTable agent={this.props.agent} />
                       </EuiFlexGroup>
                       <EuiSpacer size='l' />
                       <EuiFlexGroup>
-                        <EuiFlexItem
-                          key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                        >
-                          {' '}
-                          {/* Events count evolution */}
-                          {this.renderEventCountVisualization()}
+                        <EuiFlexItem>
+                          <VulsPanel agent={this.props.agent} />
                         </EuiFlexItem>
                         <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
+                      </EuiFlexGroup>
+                      <EuiSpacer size='l' />
+                      <EuiFlexGroup>
+                        <FimEventsTable agent={this.props.agent} />
                       </EuiFlexGroup>
                     </Fragment>
                   )}
