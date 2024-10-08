@@ -108,7 +108,13 @@
       'windows',
     ],
     'auditing-policy-monitoring': ['audit', 'ciscat', 'openscap', 'rootcheck'],
-    'thread-detection': ['docker', 'mitre', 'osquery', 'vulnerabilities'],
+    'thread-detection': [
+      'docker',
+      'mitre',
+      'osquery',
+      'virustotal',
+      'vulnerabilities',
+    ],
   };
 
   function displayHelp() {
