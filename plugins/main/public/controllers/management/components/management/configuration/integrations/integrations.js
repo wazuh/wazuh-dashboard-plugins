@@ -23,6 +23,12 @@ const helpLinks = [
     href: webDocumentationLink('user-manual/manager/manual-integration.html'),
   },
   {
+    text: 'VirusTotal integration',
+    href: webDocumentationLink(
+      'user-manual/capabilities/malware-detection/virus-total-integration.html',
+    ),
+  },
+  {
     text: 'Integration reference',
     href: webDocumentationLink(
       'user-manual/reference/ossec-conf/integration.html',
@@ -32,6 +38,10 @@ const helpLinks = [
 
 const defaultIntegrations = [
   { title: 'Slack', description: 'Get alerts directly on Slack' },
+  {
+    title: 'VirusTotal',
+    description: 'Get notified when malicious software is found',
+  },
   {
     title: 'PagerDuty',
     description: 'Get alerts on this streamlined incident resolution software',
@@ -84,26 +94,28 @@ class WzConfigurationIntegrations extends Component {
             />
           )}
         {currentConfig['integrator-integration'] &&
-        !isString(currentConfig['integrator-integration'])
-          ? integrations &&
-            integrations.map((integrationInfo, key) => {
-              const integration = Object.assign(
-                this.buildIntegration(integrationInfo.name),
-                integrationInfo,
-              );
-              return (
-                <Fragment key={`integration-${integration.title}`}>
-                  <WzConfigurationSettingsGroup
-                    title={integration.title}
-                    description={integration.description}
-                    items={integrationsSettings}
-                    config={integration}
-                    help={key === 0 ? helpLinks : undefined}
-                  />
-                </Fragment>
-              );
-            })
-          : null}
+          !isString(currentConfig['integrator-integration']) ? (
+            integrations &&
+              integrations.map((integrationInfo, key) => {
+                const integration = Object.assign(
+                  this.buildIntegration(integrationInfo.name),
+                  integrationInfo
+                );
+                return (
+                  <Fragment key={`integration-${integration.title}`}>
+                    <WzConfigurationSettingsGroup
+                      title={integration.title}
+                      description={integration.description}
+                      items={integrationsSettings}
+                      config={integration}
+                      help={key === 0 ? helpLinks : undefined}
+                    />
+                  </Fragment>
+                );
+              })
+          )
+          : null
+        }
       </Fragment>
     );
   }
