@@ -35,6 +35,7 @@ import TechniqueRowDetails from '../../../mitre/framework/components/techniques/
 import { buildPhraseFilter, Filter } from '../../../../../../../../src/plugins/data/common';
 import { connect } from 'react-redux';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
+import { setFilters } from "../../../../common/search-bar/set-filters";
 
 const mapStateToProps = (state) => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -159,22 +160,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
             this.filterManager.addFilters(newFilter);
           }}
           filters={[]}
-          setFilters={(filters: Filter[]) => {
-            const prevFilters = this.filterManager
-              .getFilters()
-              .filter(
-                (prevFilter) =>
-                  !filters.find(
-                    (filter) =>
-                      filter.meta.key === prevFilter.meta.key &&
-                      filter.meta.type === prevFilter.meta.type &&
-                      filter.meta.params === prevFilter.meta.params.query &&
-                      filter.meta.negate !== prevFilter.meta.negate
-                  )
-              );
-            const newFilters = [...filters, ...prevFilters];
-            this.filterManager.setFilters(newFilters, undefined);
-          }}
+          setFilters={setFilters(this.filterManager)}
         />
       );
     }
