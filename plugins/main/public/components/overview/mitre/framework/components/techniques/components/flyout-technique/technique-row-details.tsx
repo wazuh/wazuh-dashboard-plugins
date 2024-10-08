@@ -8,8 +8,6 @@ import {
   Filter,
 } from '../../../../../../../../../../../src/plugins/data/common';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
-import { onFilterCellActions } from '../../../../../../../common/data-grid';
-import { FILTER_OPERATOR } from '../../../../../../../common/data-source';
 
 type Props = {
   doc: any;
@@ -53,15 +51,6 @@ const TechniqueRowDetails = ({
     getRuleData();
   }, []);
 
-  const onFilterHandler = (
-    field: string,
-    operation: FILTER_OPERATOR,
-    value?: any,
-  ) => {
-    const onFilter = onFilterCellActions(indexPattern.id, filters, setFilters);
-    onFilter(field, operation, value);
-  };
-
   return (
     <EuiFlexGroup style={{ margin: '-8px' }}>
       <EuiTabbedContent
@@ -72,7 +61,11 @@ const TechniqueRowDetails = ({
             name: 'Table',
             content: (
               <>
-                <DocViewer {...docViewerProps} onFilter={onFilterHandler} />
+                <DocViewer
+                  {...docViewerProps}
+                  filters={filters}
+                  setFilters={setFilters}
+                />
               </>
             ),
           },

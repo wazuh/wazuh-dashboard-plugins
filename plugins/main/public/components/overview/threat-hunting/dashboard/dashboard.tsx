@@ -27,7 +27,6 @@ import {
   MAX_ENTRIES_PER_QUERY,
   exportSearchToCSV,
   getAllCustomRenders,
-  onFilterCellActions,
 } from '../../../common/data-grid/data-grid-service';
 import { useDocViewer } from '../../../common/doc-viewer/use-doc-viewer';
 import { useDataGrid } from '../../../common/data-grid/use-data-grid';
@@ -46,7 +45,6 @@ import {
   PatternDataSourceFilterManager,
   tParsedIndexPattern,
   useDataSource,
-  FILTER_OPERATOR,
 } from '../../../common/data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
@@ -205,19 +203,6 @@ const DashboardTH: React.FC = () => {
     }
   };
 
-  const onFilterHandler = (
-    field: string,
-    operation: FILTER_OPERATOR,
-    value?: any,
-  ) => {
-    const onFilter = onFilterCellActions(
-      dataSource?.indexPattern?.id,
-      filters,
-      setFilters,
-    );
-    onFilter(field, operation, value);
-  };
-
   return (
     <I18nProvider>
       {isDataSourceLoading && !dataSource ? (
@@ -326,7 +311,8 @@ const DashboardTH: React.FC = () => {
                             threatHuntingTableDefaultColumns,
                             wzDiscoverRenderColumns,
                           )}
-                          onFilter={onFilterHandler}
+                          filters={filters}
+                          setFilters={setFilters}
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>

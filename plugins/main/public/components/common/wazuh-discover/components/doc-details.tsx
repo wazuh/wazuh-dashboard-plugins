@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDocViewer } from '../../doc-viewer';
 import DocViewer from '../../doc-viewer/doc-viewer';
 import {
@@ -6,8 +6,6 @@ import {
   IndexPattern,
 } from '../../../../../../../src/plugins/data/common';
 import { EuiCodeBlock, EuiFlexGroup, EuiTabbedContent } from '@elastic/eui';
-import { onFilterCellActions } from '../../data-grid';
-import { FILTER_OPERATOR } from '../../data-source';
 
 interface DocDetailsProps {
   doc: any;
@@ -29,19 +27,6 @@ const DocDetails = ({
     indexPattern: indexPattern as IndexPattern,
   });
 
-  const onFilterHandler = (
-    field: string,
-    operation: FILTER_OPERATOR,
-    value?: any,
-  ) => {
-    const onFilter = onFilterCellActions(
-      indexPattern.id as string,
-      filters,
-      setFilters,
-    );
-    onFilter(field, operation, value);
-  };
-
   return (
     <EuiFlexGroup direction='column' style={{ width: '100%' }}>
       <EuiTabbedContent
@@ -51,7 +36,11 @@ const DocDetails = ({
             name: 'Table',
             content: (
               <>
-                <DocViewer {...docViewerProps} onFilter={onFilterHandler} />
+                <DocViewer
+                  {...docViewerProps}
+                  filters={filters}
+                  setFilters={setFilters}
+                />
               </>
             ),
           },
