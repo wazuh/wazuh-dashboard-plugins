@@ -1,5 +1,9 @@
-import { MODULES_PAGE } from '../../../pageobjects/basic/settings/modules.page';
-import { MODULES_DIRECTORY_PAGE } from '../../../pageobjects/basic/modules-directory.page';
+import {
+  MODULES_PAGE
+} from '../../../pageobjects/basic/settings/modules.page';
+import {
+  MODULES_DIRECTORY_PAGE
+} from '../../../pageobjects/basic/modules-directory.page';
 
 export const MODULES_CARDS = {
   'Amazon AWS': MODULES_PAGE['amazonAWSToggleButton'],
@@ -7,6 +11,7 @@ export const MODULES_CARDS = {
   GitHub: MODULES_PAGE['gitHubCardToggleButton'],
   OpenSCAP: MODULES_PAGE['openSCAPToggleButton'],
   'CIS-CAT': MODULES_PAGE['cisCatToggleButton'],
+  VirusTotal: MODULES_PAGE['virusTotalToggleButton'],
   Osquery: MODULES_PAGE['osqueryToggleButton'],
   'Docker listener': MODULES_PAGE['dockerListenerToggleButton'],
   GDPR: MODULES_PAGE['gDPRToggleButton'],
@@ -20,6 +25,7 @@ export const MODULES_SETTINGS = {
   GitHub: MODULES_DIRECTORY_PAGE['gitHubCard'],
   OpenSCAP: MODULES_DIRECTORY_PAGE['openSCAPCard'],
   'CIS-CAT': MODULES_DIRECTORY_PAGE['cisCatCard'],
+  VirusTotal: MODULES_DIRECTORY_PAGE['virusTotalCard'],
   Osquery: MODULES_DIRECTORY_PAGE['osqueryCard'],
   'Docker listener': MODULES_DIRECTORY_PAGE['dockerListenerCard'],
   GDPR: MODULES_DIRECTORY_PAGE['gDPRCard'],
