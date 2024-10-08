@@ -52,7 +52,7 @@ import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_da
 import TechniqueRowDetails from '../../../overview/mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../../../../../common/constants';
 import NavigationService from '../../../../react-services/navigation-service';
-import { setFilters } from "../../../common/search-bar/set-filters";
+import { setFilters } from '../../../common/search-bar/set-filters';
 
 export class FileDetails extends Component {
   props!: {

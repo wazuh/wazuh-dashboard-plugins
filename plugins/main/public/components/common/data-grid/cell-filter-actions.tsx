@@ -66,7 +66,11 @@ export const filterIsNotAction =
       value?: any,
     ) => void,
   ) =>
-  ({ rowIndex, columnId: field, Component }: EuiDataGridColumnCellActionProps) => {
+  ({
+    rowIndex,
+    columnId: field,
+    Component,
+  }: EuiDataGridColumnCellActionProps) => {
     const filterOutValueText = i18n.translate('discover.filterOutValue', {
       defaultMessage: 'Filter out value',
     });

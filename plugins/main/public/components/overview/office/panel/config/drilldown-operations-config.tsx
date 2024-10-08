@@ -83,7 +83,14 @@ const getDashboardPanels = (
 };
 
 export const drilldownOperationsConfig = props => {
-  const { fetchData, fetchFilters, searchBarProps, indexPattern, filters, setFilters } = props;
+  const {
+    fetchData,
+    fetchFilters,
+    searchBarProps,
+    indexPattern,
+    filters,
+    setFilters,
+  } = props;
 
   return {
     rows: [

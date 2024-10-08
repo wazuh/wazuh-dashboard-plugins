@@ -99,7 +99,14 @@ const getDashboardPanels = (
 };
 
 export const drilldownIPConfig = props => {
-  const { fetchData, fetchFilters, searchBarProps, indexPattern, filters, setFilters } = props;
+  const {
+    fetchData,
+    fetchFilters,
+    searchBarProps,
+    indexPattern,
+    filters,
+    setFilters,
+  } = props;
 
   return {
     rows: [

@@ -8,7 +8,7 @@ import {
 } from '../../../../../react-services/error-management';
 import WazuhDataGrid from '../../../../common/wazuh-data-grid/wz-data-grid';
 import { tDataGridColumn } from '../../../../common/data-grid';
-import { Filter } from "../../../../../../../../src/plugins/data/common";
+import { Filter } from '../../../../../../../../src/plugins/data/common';
 
 type tDrillDownDataGridProps = {
   defaultTableColumns: tDataGridColumn[];

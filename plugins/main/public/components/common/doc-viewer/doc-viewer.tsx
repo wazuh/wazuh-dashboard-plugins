@@ -20,7 +20,11 @@ export type tDocViewerProps = {
   mapping: any;
   indexPattern: any;
   docJSON: any;
-  onFilter: (columndId: string, operation: FILTER_OPERATOR, value?: any) => void;
+  onFilter: (
+    columndId: string,
+    operation: FILTER_OPERATOR,
+    value?: any,
+  ) => void;
 };
 
 /**
@@ -164,7 +168,11 @@ const DocViewer = (props: tDocViewerProps) => {
                         <DocViewTableRowBtnFilterAdd
                           disabled={!fieldMapping || !fieldMapping.filterable}
                           onClick={() =>
-                            onFilter(field, FILTER_OPERATOR.IS, flattened[field])
+                            onFilter(
+                              field,
+                              FILTER_OPERATOR.IS,
+                              flattened[field],
+                            )
                           }
                         />
                         <DocViewTableRowBtnFilterRemove

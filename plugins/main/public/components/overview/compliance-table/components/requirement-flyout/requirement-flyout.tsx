@@ -26,18 +26,24 @@ import {
 import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
 import { getUiSettings } from '../../../../../kibana-services';
-import { FilterManager, IndexPattern } from '../../../../../../../../src/plugins/data/public/';
+import {
+  FilterManager,
+  IndexPattern,
+} from '../../../../../../../../src/plugins/data/public/';
 import { WzFlyout } from '../../../../../components/common/flyouts';
 import { WazuhFlyoutDiscover } from '../../../../common/wazuh-discover/wz-flyout-discover';
 import { PatternDataSource } from '../../../../common/data-source';
 import { formatUIDate } from '../../../../../react-services';
 import TechniqueRowDetails from '../../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
-import { buildPhraseFilter, Filter } from '../../../../../../../../src/plugins/data/common';
+import {
+  buildPhraseFilter,
+  Filter,
+} from '../../../../../../../../src/plugins/data/common';
 import { connect } from 'react-redux';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
-import { setFilters } from "../../../../common/search-bar/set-filters";
+import { setFilters } from '../../../../common/search-bar/set-filters';
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
 });
 
@@ -61,9 +67,9 @@ export const RequirementFlyout = connect(mapStateToProps)(
     }
 
     addRenderColumn(columns) {
-      return columns.map((column) => {
+      return columns.map(column => {
         const renderColumn = wzDiscoverRenderColumns.find(
-          (columnRender) => columnRender.id === column.id
+          columnRender => columnRender.id === column.id,
         );
         if (renderColumn) {
           return { ...column, render: renderColumn.render };
@@ -79,7 +85,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
           isSortable: true,
           defaultSortDirection: 'desc',
           displayAsText: 'Time',
-          render: (value) => formatUIDate(value),
+          render: value => formatUIDate(value),
         },
         {
           id: this.props.getRequirementKey(),
@@ -99,7 +105,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
           isSortable: true,
           defaultSortDirection: 'desc',
           displayAsText: 'Time',
-          render: (value) => formatUIDate(value),
+          render: value => formatUIDate(value),
         },
         {
           id: 'agent.id',
@@ -135,15 +141,19 @@ export const RequirementFlyout = connect(mapStateToProps)(
               <EuiLoadingContent lines={1} />
             </div>
           )) || (
-            <EuiTitle size="m">
-              <h2 id="flyoutSmallTitle">Requirement {currentRequirement}</h2>
+            <EuiTitle size='m'>
+              <h2 id='flyoutSmallTitle'>Requirement {currentRequirement}</h2>
             </EuiTitle>
           )}
         </EuiFlyoutHeader>
       );
     }
 
-    renderDiscoverExpandedRow(props: { doc: any; item: any; indexPattern: any }) {
+    renderDiscoverExpandedRow(props: {
+      doc: any;
+      item: any;
+      indexPattern: any;
+    }) {
       return (
         <TechniqueRowDetails
           {...props}
@@ -152,9 +162,17 @@ export const RequirementFlyout = connect(mapStateToProps)(
             // generate the filter
             const key = Object.keys(value)[0];
             const filterValue = value[key];
-            const valuesArray = Array.isArray(filterValue) ? [...filterValue] : [filterValue];
+            const valuesArray = Array.isArray(filterValue)
+              ? [...filterValue]
+              : [filterValue];
             const newFilter = valuesArray
-              .map((item) => buildPhraseFilter({ name: key, type: 'string' }, item, indexPattern))
+              .map(item =>
+                buildPhraseFilter(
+                  { name: key, type: 'string' },
+                  item,
+                  indexPattern,
+                ),
+              )
               .filter(Boolean);
 
             this.filterManager.addFilters(newFilter);
@@ -173,33 +191,39 @@ export const RequirementFlyout = connect(mapStateToProps)(
         ? { 'cluster.name': AppState.getClusterInfo().cluster }
         : { 'manager.name': AppState.getClusterInfo().manager };
       this.clusterFilter = clusterFilter;
-      requirementImplicitFilter[this.props.getRequirementKey()] = currentRequirement;
+      requirementImplicitFilter[this.props.getRequirementKey()] =
+        currentRequirement;
 
       const implicitFilters = [requirementImplicitFilter, this.clusterFilter];
       if (this.props.implicitFilters) {
-        this.props.implicitFilters.forEach((item) => implicitFilters.push(item));
+        this.props.implicitFilters.forEach(item => implicitFilters.push(item));
       }
       //Goal for PCI
       const currentReq = this.props.currentRequirement.split('.')[0];
 
       return (
-        <EuiFlyoutBody className="flyout-body">
+        <EuiFlyoutBody className='flyout-body'>
           <EuiAccordion
             id={'details'}
             buttonContent={
-              <EuiTitle size="s">
+              <EuiTitle size='s'>
                 <h3>Details</h3>
               </EuiTitle>
             }
-            paddingSize="xs"
+            paddingSize='xs'
             initialIsOpen={true}
           >
-            <div className="flyout-row details-row">
-              <EuiSpacer size="xs" />
+            <div className='flyout-row details-row'>
+              <EuiSpacer size='xs' />
               {requirementGoal[currentReq] && (
                 <EuiFlexGroup style={{ marginBottom: 10 }}>
                   <EuiFlexItem grow={false}>
-                    <EuiIcon size="l" type={'bullseye'} color="primary" style={{ marginTop: 8 }} />
+                    <EuiIcon
+                      size='l'
+                      type={'bullseye'}
+                      color='primary'
+                      style={{ marginTop: 8 }}
+                    />
                   </EuiFlexItem>
                   <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                     <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
@@ -213,57 +237,68 @@ export const RequirementFlyout = connect(mapStateToProps)(
 
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
-                  <EuiIcon size="l" type={'filebeatApp'} color="primary" style={{ marginTop: 8 }} />
+                  <EuiIcon
+                    size='l'
+                    type={'filebeatApp'}
+                    color='primary'
+                    style={{ marginTop: 8 }}
+                  />
                 </EuiFlexItem>
                 <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                   <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                    <p style={{ fontWeight: 500, marginBottom: 2 }}>Requirement description</p>
+                    <p style={{ fontWeight: 500, marginBottom: 2 }}>
+                      Requirement description
+                    </p>
 
                     <p>{this.props.description}</p>
                   </EuiText>
                 </EuiFlexItem>
               </EuiFlexGroup>
-              <EuiSpacer size="xs" />
+              <EuiSpacer size='xs' />
             </div>
           </EuiAccordion>
 
-          <EuiSpacer size="s" />
+          <EuiSpacer size='s' />
           <EuiAccordion
             style={{ textDecoration: 'none' }}
             id={'recent_events'}
-            className="events-accordion"
+            className='events-accordion'
             buttonContent={
-              <EuiTitle size="s">
+              <EuiTitle size='s'>
                 <h3>
                   Recent events
                   {this.props.view !== 'events' && (
                     <span style={{ marginLeft: 16 }}>
                       <span>
                         <EuiToolTip
-                          position="top"
-                          content={'Show ' + currentRequirement + ' in Dashboard'}
+                          position='top'
+                          content={
+                            'Show ' + currentRequirement + ' in Dashboard'
+                          }
                         >
                           <EuiIcon
-                            onMouseDown={(e) => {
+                            onMouseDown={e => {
                               this.props.openDashboard(e, currentRequirement);
                               e.stopPropagation();
                             }}
-                            color="primary"
-                            type="visualizeApp"
+                            color='primary'
+                            type='visualizeApp'
                             style={{ marginRight: '10px' }}
                           ></EuiIcon>
                         </EuiToolTip>
                         <EuiToolTip
-                          position="top"
-                          content={'Inspect ' + currentRequirement + ' in Events'}
+                          position='top'
+                          content={
+                            'Inspect ' + currentRequirement + ' in Events'
+                          }
                         >
                           <EuiIcon
-                            onMouseDown={(e) => {
+                            onMouseDown={e => {
                               this.props.openDiscover(e, currentRequirement);
                               e.stopPropagation();
                             }}
-                            color="primary"
-                            type="discoverApp"
+                            color='primary'
+                            type='discoverApp'
                           ></EuiIcon>
                         </EuiToolTip>
                       </span>
@@ -272,7 +307,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
                 </h3>
               </EuiTitle>
             }
-            paddingSize="none"
+            paddingSize='none'
             initialIsOpen={true}
           >
             <WazuhFlyoutDiscover
@@ -280,7 +315,9 @@ export const RequirementFlyout = connect(mapStateToProps)(
               tableColumns={this.getDiscoverColumns()}
               filterManager={this.filterManager}
               initialFetchFilters={this.props.fetchFilters}
-              expandedRowComponent={(...args) => this.renderDiscoverExpandedRow(...args)}
+              expandedRowComponent={(...args) =>
+                this.renderDiscoverExpandedRow(...args)
+              }
             />
           </EuiAccordion>
         </EuiFlyoutBody>
@@ -315,5 +352,5 @@ export const RequirementFlyout = connect(mapStateToProps)(
         </WzFlyout>
       );
     }
-  }
+  },
 );
