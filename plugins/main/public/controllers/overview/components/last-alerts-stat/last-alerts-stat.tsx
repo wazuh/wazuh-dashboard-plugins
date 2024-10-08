@@ -62,12 +62,12 @@ export function LastAlertsStat({
   severity: severityKey,
   hideBottomText,
   direction = 'row',
-  textAlign = 'center'
+  textAlign = 'center',
 }: {
   severity: SeverityKey;
   hideBottomText?: boolean;
   direction: 'row' | 'column';
-  textAlign?: EuiStatProps['textAlign']
+  textAlign?: EuiStatProps['textAlign'];
 }) {
   const [countLastAlerts, setCountLastAlerts] = useState<number | null>(null);
   const [discoverLocation, setDiscoverLocation] = useState<string>('');
@@ -124,8 +124,12 @@ export function LastAlertsStat({
     getCountLastAlerts();
   }, []);
 
-  const statDescription = direction === 'row' ? `${severity.label} severity` : ''
-  const statValue = direction === 'row' ? `${countLastAlerts ?? '-'}` : ` ${countLastAlerts ?? '-'} ${severity.label}`;
+  const statDescription =
+    direction === 'row' ? `${severity.label} severity` : '';
+  const statValue =
+    direction === 'row'
+      ? `${countLastAlerts ?? '-'}`
+      : ` ${countLastAlerts ?? '-'} ${severity.label}`;
 
   return (
     <EuiFlexItem>
@@ -134,13 +138,14 @@ export function LastAlertsStat({
           title={
             <EuiToolTip
               position='top'
-              content={`Click to see rule.level ${ruleLevelRange.maxRuleLevel
-                ? 'between ' +
-                ruleLevelRange.minRuleLevel +
-                ' to ' +
+              content={`Click to see rule.level ${
                 ruleLevelRange.maxRuleLevel
-                : ruleLevelRange.minRuleLevel + ' or higher'
-                }`}
+                  ? 'between ' +
+                    ruleLevelRange.minRuleLevel +
+                    ' to ' +
+                    ruleLevelRange.maxRuleLevel
+                  : ruleLevelRange.minRuleLevel + ' or higher'
+              }`}
             >
               <EuiLink
                 className='statWithLink'
@@ -159,7 +164,7 @@ export function LastAlertsStat({
           titleColor={severity.color}
           textAlign={textAlign}
         />
-        {hideBottomText ? null :
+        {hideBottomText ? null : (
           <EuiText size='s' css='margin-top: 0.7vh'>
             {'Rule level ' +
               ruleLevelRange.minRuleLevel +
@@ -167,7 +172,7 @@ export function LastAlertsStat({
                 ? ' to ' + ruleLevelRange.maxRuleLevel
                 : ' or higher')}
           </EuiText>
-        }
+        )}
       </RedirectAppLinks>
     </EuiFlexItem>
   );

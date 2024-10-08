@@ -22,7 +22,7 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiToolTip,
-  EuiLink
+  EuiLink,
 } from '@elastic/eui';
 // @ts-ignore
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
@@ -37,7 +37,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
   VulnerabilitiesDataSourceRepository,
-  VulnerabilitiesDataSource
+  VulnerabilitiesDataSource,
 } from '../../../data-source';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 
@@ -54,7 +54,6 @@ export function useTimeFilter() {
   }, []);
   return timeFilter;
 }
-
 
 export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
   const [sort, setSort] = useState({
@@ -75,21 +74,22 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
           href={NavigationService.getInstance().getUrlForApp(
             vulnerabilityDetection.id,
             {
-              path: `tab=vuls&tabView=dashboard&agentId=${agentId
-                }&_g=${PatternDataSourceFilterManager.filtersToURLFormat([
+              path: `tab=vuls&tabView=dashboard&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
+                [
                   PatternDataSourceFilterManager.createFilter(
                     FILTER_OPERATOR.IS,
                     `package.name`,
                     field,
                     indexPatternId,
                   ),
-                ])}`
+                ],
+              )}`,
             },
           )}
         >
           {field}
         </EuiLink>
-      )
+      ),
     },
     {
       field: 'doc_count',
@@ -97,7 +97,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
       sortable: true,
       truncateText: true,
       width: '100px',
-    }
+    },
   ];
 
   return (
@@ -122,5 +122,3 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
     </EuiPanel>
   );
 }
-
-

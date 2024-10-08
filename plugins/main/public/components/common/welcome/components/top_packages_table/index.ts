@@ -12,4 +12,4 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { VulsTopPackageTable, useTimeFilter, } from './top_packages_table';
+export { VulsTopPackageTable, useTimeFilter } from './top_packages_table';
