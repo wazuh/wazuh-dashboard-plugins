@@ -168,12 +168,12 @@ export default function VulsPanel({ agent }) {
                 </EuiFlexGroup>
             </EuiText>
             <EuiFlexGroup paddingSize="none">
-                <EuiFlexItem style={{ maxWidth: "200px" }}>
+                <EuiFlexItem grow={2}>
                     <EuiFlexGroup wrap direction='column' gutterSize='s'>
                         {Object.keys(severities).reverse().map(renderSeverityStats)}
                     </EuiFlexGroup>
                 </EuiFlexItem>
-                <EuiFlexItem>
+                <EuiFlexItem grow={3}>
                     <VulsTopPackageTable agentId={agent.id} items={topPackagesData} indexPatternId={dataSource?.indexPattern.id} />
                 </EuiFlexItem>
             </EuiFlexGroup>
