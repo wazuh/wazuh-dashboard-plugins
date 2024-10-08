@@ -193,7 +193,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
                   document={inspectedHit}
                   indexPattern={indexPattern as IndexPattern}
                   renderFields={getAllCustomRenders(
-                    defaultColumns,
+                    defaultTableColumns,
                     wzDiscoverRenderColumns,
                   )}
                   filters={filters}
