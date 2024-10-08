@@ -23,7 +23,6 @@ import {
   IndexPattern,
   SearchResponse,
 } from '../../../../../../src/plugins/data/public';
-import { useDocViewer } from '../doc-viewer';
 import {
   ErrorHandler,
   ErrorFactory,
@@ -114,11 +113,6 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
   useEffect(() => {
     onChangeSorting && onChangeSorting(sorting || []);
   }, [JSON.stringify(sorting)]);
-
-  const docViewerProps = useDocViewer({
-    doc: inspectedHit,
-    indexPattern: indexPattern as IndexPattern,
-  });
 
   const timeField = indexPattern?.timeFieldName
     ? indexPattern.timeFieldName
