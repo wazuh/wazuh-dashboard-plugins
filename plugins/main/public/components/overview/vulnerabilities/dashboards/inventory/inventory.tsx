@@ -310,6 +310,8 @@ const InventoryVulsComponent = () => {
                         inventoryTableDefaultColumns,
                         wzDiscoverRenderColumns,
                       )}
+                      filters={filters}
+                      setFilters={setFilters}
                     />
                   </EuiFlexGroup>
                 </EuiFlyoutBody>
