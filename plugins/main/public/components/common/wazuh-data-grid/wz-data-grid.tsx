@@ -20,6 +20,7 @@ import {
 } from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import {
+  Filter,
   IndexPattern,
   SearchResponse,
 } from '../../../../../../src/plugins/data/public';
@@ -52,6 +53,8 @@ export type tWazuhDataGridProps = {
     pageSize: number;
   }) => void;
   onChangeSorting: (sorting: { columns: any[]; onSort: any }) => void;
+  filters: Filter[];
+  setFilters: (filters: Filter[]) => void;
 };
 
 const WazuhDataGrid = (props: tWazuhDataGridProps) => {
@@ -66,6 +69,8 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     onChangeSorting,
     query,
     dateRange,
+    filters,
+    setFilters
   } = props;
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -188,9 +193,11 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
                   document={inspectedHit}
                   indexPattern={indexPattern as IndexPattern}
                   renderFields={getAllCustomRenders(
-                    defaultTableColumns,
+                    defaultColumns,
                     wzDiscoverRenderColumns,
                   )}
+                  filters={filters}
+                  setFilters={setFilters}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>

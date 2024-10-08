@@ -8,9 +8,12 @@ import {
 } from '../../../../../react-services/error-management';
 import WazuhDataGrid from '../../../../common/wazuh-data-grid/wz-data-grid';
 import { tDataGridColumn } from '../../../../common/data-grid';
+import { Filter } from "../../../../../../../../src/plugins/data/common";
 
 type tDrillDownDataGridProps = {
   defaultTableColumns: tDataGridColumn[];
+  filters: Filter[];
+  setFilters: (filters: Filter[]) => void;
 } & ModuleConfigProps;
 
 export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
@@ -28,6 +31,8 @@ export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
     indexPattern,
     fetchFilters,
     defaultTableColumns,
+    filters,
+    setFilters,
   } = props;
 
   useEffect(() => {
@@ -73,6 +78,8 @@ export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
           setSorting(sorting);
         }}
         dateRange={searchBarProps?.absoluteDateRange}
+        filters={filters}
+        setFilters={setFilters}
       />
     </EuiFlexItem>
   );

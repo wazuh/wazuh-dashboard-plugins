@@ -99,7 +99,7 @@ const getDashboardPanels = (
 };
 
 export const drilldownUserConfig = props => {
-  const { fetchData, fetchFilters, searchBarProps, indexPattern } = props;
+  const { fetchData, fetchFilters, searchBarProps, indexPattern, filters, setFilters } = props;
 
   return {
     rows: [
@@ -171,6 +171,8 @@ export const drilldownUserConfig = props => {
                       fetchFilters={fetchFilters}
                       searchBarProps={searchBarProps}
                       indexPattern={indexPattern}
+                      filters={filters}
+                      setFilters={setFilters}
                     />
                   </EuiFlexItem>
                 </div>
