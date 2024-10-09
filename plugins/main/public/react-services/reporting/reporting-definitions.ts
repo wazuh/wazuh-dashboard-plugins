@@ -87,7 +87,6 @@ export class reportingDefinitions {
             report?._source?.report_definition?.report_params?.report_name !==
             dashboard.titleReport
         );
-        console.log(reportDefinitionNoExist);
         if (!reportDefinitionNoExist) {
           return;
         }
