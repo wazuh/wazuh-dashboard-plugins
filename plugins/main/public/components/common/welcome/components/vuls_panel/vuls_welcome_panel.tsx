@@ -22,11 +22,11 @@ import {
   VulnerabilitiesDataSource,
 } from '../../../data-source';
 import { severities } from '../../../../../controllers/overview/components/last-alerts-stat/last-alerts-stat';
-import { getCore, getDataPlugin } from '../../../../../kibana-services';
+import { getCore } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
-import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { WzLink } from '../../../../../components/wz-link/wz-link';
 
 export default function VulsPanel({ agent }) {
   const {
@@ -95,52 +95,24 @@ export default function VulsPanel({ agent }) {
     return value ? `${value} ${severity}` : '-';
   };
 
-  const goToVulnerabilityDashboardWithSeverityFilterURL = async (
-    severity,
-    indexPatternId,
-  ) => {
-    const filters = [
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        `vulnerability.severity`,
-        severity,
-        indexPatternId,
-      ),
-    ];
-    const url = NavigationService.getInstance().getUrlForApp(
-      vulnerabilityDetection.id,
-      {
-        path: `tab=vuls&tabView=dashboard&agentId=${
-          agent.id
-        }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`,
-      },
-    );
-
-    return url;
-  };
-
   const renderSeverityStats = (severity, index) => {
     const severityLabel = severities[severity].label;
     const severityColor = severities[severity].color;
     return (
       <EuiFlexItem key={index}>
         <EuiPanel paddingSize='s'>
-          <EuiLink
-            href={NavigationService.getInstance().getUrlForApp(
-              vulnerabilityDetection.id,
-              {
-                path: `tab=vuls&tabView=dashboard&agentId=${
-                  agent.id
-                }&_g=${PatternDataSourceFilterManager.filtersToURLFormat([
-                  PatternDataSourceFilterManager.createFilter(
-                    FILTER_OPERATOR.IS,
-                    `vulnerability.severity`,
-                    severityLabel,
-                    dataSource?.indexPattern?.id,
-                  ),
-                ])}`,
-              },
-            )}
+          <WzLink
+            appId={vulnerabilityDetection.id}
+            path={`/overview?tab=vuls&tabView=dashboard&agentId=${agent.id}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
+              [
+                PatternDataSourceFilterManager.createFilter(
+                  FILTER_OPERATOR.IS,
+                  `vulnerability.severity`,
+                  severityLabel,
+                  dataSource?.indexPattern?.id,
+                ),
+              ],
+            )}`}
             style={{ color: severityColor }}
           >
             <VulsSeverityStat
@@ -148,7 +120,7 @@ export default function VulsPanel({ agent }) {
               color={severityColor}
               isLoading={isLoading || isDataSourceLoading}
             />
-          </EuiLink>
+          </WzLink>
         </EuiPanel>
       </EuiFlexItem>
     );
@@ -158,13 +130,11 @@ export default function VulsPanel({ agent }) {
     <Fragment>
       <EuiPanel paddingSize='m'>
         <EuiText size='xs'>
-          <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
+          <EuiFlexGroup className='wz-section-sca-euiFlexGroup' responsive={false}>
             <EuiFlexItem grow={false}>
-              <RedirectAppLinks application={getCore().application}>
-                <EuiTitle size='xs'>
-                  <h2>Vulnerability Detection</h2>
-                </EuiTitle>
-              </RedirectAppLinks>
+              <EuiTitle size='xs'>
+                <h2>Vulnerability Detection</h2>
+              </EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>
@@ -186,9 +156,10 @@ export default function VulsPanel({ agent }) {
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiText>
+        <EuiSpacer size='s' />
         <EuiFlexGroup paddingSize='none'>
           <EuiFlexItem grow={2}>
-            <EuiFlexGroup wrap direction='column' gutterSize='s'>
+            <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
               {Object.keys(severities).reverse().map(renderSeverityStats)}
             </EuiFlexGroup>
           </EuiFlexItem>

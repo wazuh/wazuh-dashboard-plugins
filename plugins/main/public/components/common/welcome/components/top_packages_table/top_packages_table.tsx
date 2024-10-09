@@ -25,21 +25,13 @@ import {
   EuiLink,
 } from '@elastic/eui';
 // @ts-ignore
-import { getCore, getDataPlugin } from '../../../../../kibana-services';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { getDataPlugin } from '../../../../../kibana-services';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
-import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
-import NavigationService from '../../../../../react-services/navigation-service';
 import {
   PatternDataSourceFilterManager,
   FILTER_OPERATOR,
-  PatternDataSource,
-  tParsedIndexPattern,
-  useDataSource,
-  VulnerabilitiesDataSourceRepository,
-  VulnerabilitiesDataSource,
 } from '../../../data-source';
-import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
+import { WzLink } from '../../../../../components/wz-link/wz-link';
 
 export function useTimeFilter() {
   const { timefilter } = getDataPlugin().query.timefilter;
@@ -69,26 +61,21 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
       name: 'Package',
       sortable: true,
       render: field => (
-        <EuiLink
-          className='euiTableCellContent__text euiTableCellContent--truncateText'
-          href={NavigationService.getInstance().getUrlForApp(
-            vulnerabilityDetection.id,
-            {
-              path: `tab=vuls&tabView=dashboard&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
-                [
-                  PatternDataSourceFilterManager.createFilter(
-                    FILTER_OPERATOR.IS,
-                    `package.name`,
-                    field,
-                    indexPatternId,
-                  ),
-                ],
-              )}`,
-            },
-          )}
+        <WzLink
+          appId={vulnerabilityDetection.id}
+          path={`/overview?tab=vuls&tabView=dashboard&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
+            [
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.IS,
+                `package.name`,
+                field,
+                indexPatternId,
+              ),
+            ],
+          )}`}
         >
           {field}
-        </EuiLink>
+        </WzLink >
       ),
     },
     {
