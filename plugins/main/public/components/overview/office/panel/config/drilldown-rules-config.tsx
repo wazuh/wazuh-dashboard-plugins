@@ -12,9 +12,8 @@
  */
 
 import React from 'react';
-import { EuiFlexItem, EuiLink } from '@elastic/eui';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getPlugins, getCore } from '../../../../../kibana-services';
+import { getPlugins } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import {
@@ -23,9 +22,6 @@ import {
   getVisStateOfficeCountryTagCloud,
   getVisStateOfficeAlertsEvolutionByUserID,
 } from './visualizations';
-import DrillDownDataGrid from '../../../github/panel/config/drilldown-data-grid';
-import { rules } from '../../../../../utils/applications';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -98,7 +94,7 @@ const getDashboardPanels = (
 };
 
 export const drilldownRulesConfig = props => {
-  const { fetchData, fetchFilters, searchBarProps, indexPattern } = props;
+  const { fetchFilters, searchBarProps, indexPattern } = props;
 
   return {
     rows: [
@@ -107,37 +103,6 @@ export const drilldownRulesConfig = props => {
           {
             width: 100,
             component: props => {
-              const defaultTableColumns = [
-                {
-                  id: 'timestamp',
-                  isSortable: true,
-                  defaultSortDirection: 'desc',
-                },
-                { id: 'rule.description', displayAsText: 'Description' },
-                { id: 'data.office365.UserId', displayAsText: 'User ID' },
-                {
-                  id: 'data.office365.ClientIP',
-                  displayAsText: 'Client IP address',
-                },
-                {
-                  id: 'data.office365.Operation',
-                  displayAsText: 'Operation',
-                },
-                { id: 'rule.level', displayAsText: 'Level' },
-                {
-                  id: 'rule.id',
-                  render: value => (
-                    <RedirectAppLinks application={getCore().application}>
-                      <EuiLink
-                        href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-                      >
-                        {value}
-                      </EuiLink>
-                    </RedirectAppLinks>
-                  ),
-                },
-              ];
-
               return (
                 <div style={{ width: '100%' }}>
                   <DashboardByRenderer
@@ -164,15 +129,6 @@ export const drilldownRulesConfig = props => {
                     }}
                     onInputUpdated={() => {}}
                   />
-                  <EuiFlexItem>
-                    <DrillDownDataGrid
-                      defaultTableColumns={defaultTableColumns}
-                      fetchData={fetchData}
-                      fetchFilters={fetchFilters}
-                      searchBarProps={searchBarProps}
-                      indexPattern={indexPattern}
-                    />
-                  </EuiFlexItem>
                 </div>
               );
             },

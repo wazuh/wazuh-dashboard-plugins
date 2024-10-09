@@ -11,9 +11,8 @@
  */
 
 import React from 'react';
-import { EuiLink } from '@elastic/eui';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getPlugins, getCore } from '../../../../../kibana-services';
+import { getPlugins } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import {
@@ -24,13 +23,6 @@ import {
   getVisStateTopOrganizations,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import {
-  ErrorFactory,
-  HttpError,
-  ErrorHandler,
-} from '../../../../../react-services/error-management';
-import DrillDownDataGrid from './drilldown-data-grid';
-import { rules } from '../../../../../utils/applications';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -152,47 +144,6 @@ export const DrilldownConfigRepository = (
                     onInputUpdated={() => {}}
                   />
                 </div>
-              );
-            },
-          },
-        ],
-      },
-      {
-        columns: [
-          {
-            width: 100,
-            component: () => {
-              const defaultTableColumns = [
-                {
-                  id: 'timestamp',
-                  isSortable: true,
-                  defaultSortDirection: 'desc',
-                },
-                { id: 'rule.description' },
-                { id: 'data.github.org', displayAsText: 'Organization' },
-                { id: 'data.github.actor', displayAsText: 'Actor' },
-                { id: 'data.github.action', displayAsText: 'Action' },
-                { id: 'rule.level' },
-                {
-                  id: 'rule.id',
-                  render: value => (
-                    <EuiLink
-                      href={`${rules.id}#/manager/?tab=rules&redirectRule=${value}`}
-                    >
-                      {value}
-                    </EuiLink>
-                  ),
-                },
-              ];
-
-              return (
-                <DrillDownDataGrid
-                  defaultTableColumns={defaultTableColumns}
-                  fetchData={fetchData}
-                  fetchFilters={fetchFilters}
-                  searchBarProps={searchBarProps}
-                  indexPattern={indexPattern}
-                />
               );
             },
           },
