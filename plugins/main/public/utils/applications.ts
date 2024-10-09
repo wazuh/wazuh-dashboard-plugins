@@ -232,6 +232,12 @@ export const mitreAttack = {
     }`,
 };
 
+export const virustotal = {
+  title: i18n.translate('wz-app-virustotal-title', {
+    defaultMessage: 'VirusTotal',
+  }),
+};
+
 const pciDss = {
   category: 'wz-category-security-operations',
   id: 'pci-dss',
@@ -816,6 +822,7 @@ export const Applications = [
   threatHunting,
   vulnerabilityDetection,
   mitreAttack,
+  virustotal,
   pciDss,
   hipaa,
   gdpr,
