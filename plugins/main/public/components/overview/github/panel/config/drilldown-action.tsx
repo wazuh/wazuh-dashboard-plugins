@@ -12,7 +12,7 @@
 
 import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getPlugins, getCore } from '../../../../../kibana-services';
+import { getPlugins } from '../../../../../kibana-services';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import {
@@ -23,7 +23,6 @@ import {
   getVisStateTopRepositories,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
-import DrillDownDataGrid from './drilldown-data-grid';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -143,38 +142,6 @@ export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
                     onInputUpdated={() => {}}
                   />
                 </div>
-              );
-            },
-          },
-        ],
-      },
-      {
-        columns: [
-          {
-            width: 100,
-            component: () => {
-              const defaultTableColumns = [
-                {
-                  id: 'timestamp',
-                  isSortable: true,
-                  defaultSortDirection: 'desc',
-                },
-                { id: 'rule.description' },
-                { id: 'data.github.org', displayAsText: 'Organization' },
-                { id: 'data.github.repo', displayAsText: 'Repository' },
-                { id: 'data.github.actor', displayAsText: 'Actor' },
-                { id: 'rule.level' },
-                { id: 'rule.id' },
-              ];
-
-              return (
-                <DrillDownDataGrid
-                  defaultTableColumns={defaultTableColumns}
-                  fetchData={fetchData}
-                  fetchFilters={fetchFilters}
-                  searchBarProps={searchBarProps}
-                  indexPattern={indexPattern}
-                />
               );
             },
           },
