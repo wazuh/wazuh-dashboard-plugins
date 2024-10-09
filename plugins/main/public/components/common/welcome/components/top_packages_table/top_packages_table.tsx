@@ -75,7 +75,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
           )}`}
         >
           {field}
-        </WzLink >
+        </WzLink>
       ),
     },
     {

@@ -103,16 +103,16 @@ export default function VulsPanel({ agent }) {
         <EuiPanel paddingSize='s'>
           <WzLink
             appId={vulnerabilityDetection.id}
-            path={`/overview?tab=vuls&tabView=dashboard&agentId=${agent.id}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
-              [
-                PatternDataSourceFilterManager.createFilter(
-                  FILTER_OPERATOR.IS,
-                  `vulnerability.severity`,
-                  severityLabel,
-                  dataSource?.indexPattern?.id,
-                ),
-              ],
-            )}`}
+            path={`/overview?tab=vuls&tabView=dashboard&agentId=${
+              agent.id
+            }&_g=${PatternDataSourceFilterManager.filtersToURLFormat([
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.IS,
+                `vulnerability.severity`,
+                severityLabel,
+                dataSource?.indexPattern?.id,
+              ),
+            ])}`}
             style={{ color: severityColor }}
           >
             <VulsSeverityStat
@@ -130,7 +130,10 @@ export default function VulsPanel({ agent }) {
     <Fragment>
       <EuiPanel paddingSize='m'>
         <EuiText size='xs'>
-          <EuiFlexGroup className='wz-section-sca-euiFlexGroup' responsive={false}>
+          <EuiFlexGroup
+            className='wz-section-sca-euiFlexGroup'
+            responsive={false}
+          >
             <EuiFlexItem grow={false}>
               <EuiTitle size='xs'>
                 <h2>Vulnerability Detection</h2>
