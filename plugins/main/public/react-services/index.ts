@@ -21,3 +21,4 @@ export * from './wz-security-opensearch-dashboards-security';
 export * from './wz-user-permissions';
 export * from './query-config';
 export * from './elastic_helpers';
+export * from './state-storage';

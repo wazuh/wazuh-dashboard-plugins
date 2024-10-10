@@ -135,6 +135,7 @@ export const histogramChartInput = (
   query,
   dateRangeFrom,
   dateRangeTo,
+  lastReloadRequestTime,
 ) => ({
   viewMode: ViewMode.VIEW,
   panels: getDiscoverPanels(indexPatternId),
@@ -154,4 +155,5 @@ export const histogramChartInput = (
     value: 15,
   },
   hidePanelTitles: true,
+  lastReloadRequestTime,
 });

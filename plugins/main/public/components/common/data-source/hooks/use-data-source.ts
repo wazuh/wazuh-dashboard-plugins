@@ -98,7 +98,6 @@ export function useDataSource<
   const {
     filters: initialFilters = [...defaultFilters],
     fetchFilters: initialFetchFilters = [],
-    fixedFilters: initialFixedFilters = [],
     DataSource: DataSourceConstructor,
     repository,
     factory: injectedFactory,

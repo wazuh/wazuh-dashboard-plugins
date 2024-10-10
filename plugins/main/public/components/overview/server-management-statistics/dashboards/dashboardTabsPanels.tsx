@@ -72,13 +72,13 @@ export const DashboardTabsPanels = ({
       "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
   };
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
   });
 
-  const { query, absoluteDateRange } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -86,7 +86,10 @@ export const DashboardTabsPanels = ({
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
     })
       .then(results => {
         setResults(results);
@@ -101,7 +104,8 @@ export const DashboardTabsPanels = ({
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
   ]);
 
   const selectedNodeFilter: tFilter = {
@@ -168,6 +172,7 @@ export const DashboardTabsPanels = ({
               <DashboardListenerEngineStatistics
                 indexPatternId={dataSource?.id}
                 searchBarProps={searchBarProps}
+                lastReloadRequestTime={fingerprint}
                 filters={
                   clusterNodeSelected !== 'all'
                     ? [...fetchFilters, selectedNodeFilter]
@@ -181,6 +186,7 @@ export const DashboardTabsPanels = ({
               isClusterMode={isClusterMode}
               indexPatternId={dataSource?.id}
               searchBarProps={searchBarProps}
+              lastReloadRequestTime={fingerprint}
               filters={
                 clusterNodeSelected !== 'all'
                   ? [...fetchFilters, selectedNodeFilter]

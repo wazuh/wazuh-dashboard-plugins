@@ -25,6 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed style when unnpinned an agent in endpoint summary section [#7015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7015)
 - Fixed overflow style on a long value filter [#7021](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7021)
 - Fixed buttons enabled for a readonly user in `Endpoint groups` section [#7056](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7056)
+- Fixed the automatic page refresh in dashboards and prevent duplicate requests [#7090](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7090)
 
 ### Changed
 

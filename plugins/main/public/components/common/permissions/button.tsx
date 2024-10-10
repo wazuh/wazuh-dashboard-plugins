@@ -18,18 +18,19 @@ import {
   EuiButtonEmpty,
   EuiButtonIcon,
   EuiLink,
+  EuiButtonProps,
 } from '@elastic/eui';
 
 import { IWzElementPermissionsProps, WzElementPermissions } from './element';
 
-interface IWzButtonPermissionsProps
-  extends Omit<
-    IWzElementPermissionsProps,
-    'children' | 'additionalPropsFunction'
-  > {
-  buttonType?: 'default' | 'empty' | 'icon' | 'link' | 'switch';
-  rest: any;
-}
+type IWzButtonPermissionsProps = Omit<
+  IWzElementPermissionsProps,
+  'children' | 'additionalPropsFunction'
+> &
+  React.ButtonHTMLAttributes<HTMLButtonElement> &
+  EuiButtonProps & {
+    buttonType?: 'default' | 'empty' | 'icon' | 'link' | 'switch';
+  };
 
 export const WzButtonPermissions = ({
   buttonType = 'default',

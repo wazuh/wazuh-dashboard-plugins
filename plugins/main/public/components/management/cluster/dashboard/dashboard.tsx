@@ -72,7 +72,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     filters,
     setFilters,
   });
-  const { query, absoluteDateRange } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
@@ -80,7 +80,10 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange,
+      dateRange: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
     })
       .then(results => {
         setResults(results);
@@ -95,7 +98,8 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
   ]);
 
   const setBooleans = (component: string | null) => {
