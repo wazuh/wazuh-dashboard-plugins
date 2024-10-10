@@ -48,6 +48,7 @@ export const AgentView = compose(
               You need to select an agent or return to
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink
+                  className='eui-textCenter'
                   aria-label='go to Endpoint summary'
                   href={`${endpointSummary.id}#/agents-preview`}
                   onClick={() =>
