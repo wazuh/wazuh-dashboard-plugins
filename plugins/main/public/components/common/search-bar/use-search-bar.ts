@@ -52,6 +52,7 @@ const useSearchBarConfiguration = (
     timeFilter: globalTimeFilter,
     timeHistory,
     setTimeFilter: setGlobalTimeFilter,
+    setRefreshInterval,
   } = useTimeFilter();
   const [timeFilter, setTimeFilter] = useState(globalTimeFilter);
   const [query, setQuery] = props?.setQuery
@@ -67,6 +68,7 @@ const useSearchBarConfiguration = (
   const { savedQuery, setSavedQuery, clearSavedQuery } = useSavedQuery({
     queryService,
     setTimeFilter,
+    setRefreshInterval,
   });
   // states
   const [isLoading, setIsLoading] = useState(true);
