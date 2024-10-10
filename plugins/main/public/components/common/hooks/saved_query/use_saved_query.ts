@@ -66,30 +66,52 @@ export const useSavedQuery = (
     history: history,
   });
 
-  const saveSavedQuery = async (newSavedQuery?: SavedQuery) => {
-    const { filterManager, queryString, timefilter } = props.queryService;
-    const filters = !savedQuery
+  const getAppFilters = (newSavedQuery?: SavedQuery) => {
+    const { filterManager } = props.queryService;
+    // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
+    return !savedQuery
       ? filterManager.getAppFilters()
       : newSavedQuery?.attributes.filters;
-    const query = !savedQuery
+  };
+
+  const getQuery = (newSavedQuery?: SavedQuery) => {
+    const { queryString } = props.queryService;
+    // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
+    return !savedQuery
       ? queryString.getQuery()
       : newSavedQuery?.attributes.query;
+  };
+
+  const getTimeFilter = (newSavedQuery?: SavedQuery) => {
+    const { timefilter } = props.queryService;
+    // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
+    return !savedQuery
+      ? timefilter.timefilter.getTime()
+      : newSavedQuery.attributes.timefilter;
+  };
+
+  const getRefreshInterval = (newSavedQuery?: SavedQuery) => {
+    const { timefilter } = props.queryService;
+    // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
+    return !savedQuery
+      ? timefilter.timefilter.getRefreshInterval()
+      : newSavedQuery.attributes.timefilter.refreshInterval;
+  };
+
+  const setTimeFilter = (timeFilter: TimeRange) => {
+    props.setTimeFilter(timeFilter);
+    props.queryService.timefilter.timefilter.setTime(timeFilter);
+  };
+
+  const saveSavedQuery = async (newSavedQuery?: SavedQuery) => {
     await OsdUrlStateStorage(data, osdUrlStateStorage).replaceUrlAppState({
       savedQuery: newSavedQuery?.id,
-      filters,
-      query,
+      filters: getAppFilters(newSavedQuery),
+      query: getQuery(newSavedQuery),
     });
     if (newSavedQuery?.attributes.timefilter) {
-      // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
-      const { from, to } = !savedQuery
-        ? timefilter.timefilter.getTime()
-        : newSavedQuery.attributes.timefilter;
-      props.setTimeFilter({ from, to });
-      timefilter.timefilter.setTime({ from, to });
-      const refreshInterval = !savedQuery
-        ? timefilter.timefilter.getRefreshInterval()
-        : newSavedQuery.attributes.timefilter.refreshInterval;
-      props.setRefreshInterval(refreshInterval);
+      setTimeFilter(getTimeFilter(newSavedQuery));
+      props.setRefreshInterval(getRefreshInterval(newSavedQuery));
     }
   };
 
