@@ -2,7 +2,6 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 01
 
 ## Fixed
@@ -38,7 +37,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed GET /elastic/statistics API endpoint [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
 
 ## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 03
-
 
 ### Added
 
