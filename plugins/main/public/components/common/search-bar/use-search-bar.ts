@@ -57,6 +57,10 @@ const useSearchBarConfiguration = (
   const [query, setQuery] = props?.setQuery
     ? useState(props?.query || { query: '', language: 'kuery' })
     : useQueryManager();
+
+  /* The state of the fingerprint is meant to pass this value to "lastReloadRequestTime" in
+   * the Dashboards embeddables so they refresh when the user clicks on the Update button in the search bar.
+   */
   const [fingerprint, setFingerprint] = useState(Date.now());
 
   const { query: queryService } = getDataPlugin();
