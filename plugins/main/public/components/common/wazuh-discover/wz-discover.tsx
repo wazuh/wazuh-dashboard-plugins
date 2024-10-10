@@ -110,12 +110,12 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     );
   };
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
   });
-  const { query, absoluteDateRange } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
@@ -140,7 +140,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       query,
       pagination,
       sorting,
-      dateRange: absoluteDateRange,
+      dateRange: { from: dateRangeFrom, to: dateRangeTo },
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -155,7 +155,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     JSON.stringify(query),
     JSON.stringify(sorting),
     JSON.stringify(pagination),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
+    fingerprint,
   ]);
 
   const timeField = indexPattern?.timeFieldName
@@ -239,8 +241,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           AlertsRepository.getStoreIndexPatternId(),
                           fetchFilters,
                           query,
-                          absoluteDateRange.from,
-                          absoluteDateRange.to,
+                          dateRangeFrom,
+                          dateRangeTo,
+                          fingerprint,
                         )}
                       />
                     </EuiPanel>
@@ -258,7 +261,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                             isExporting={isExporting}
                             onClickExportResults={onClickExportResults}
                             maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                            dateRange={absoluteDateRange}
+                            dateRange={{ from: dateRangeFrom, to: dateRangeTo }}
                           />
                         </>
                       ),

@@ -47,13 +47,13 @@ const DashboardGoogleCloudComponent: React.FC = () => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
   });
 
-  const { query, absoluteDateRange } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -61,7 +61,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange,
+    time: { from: dateRangeFrom, to: dateRangeTo },
   });
 
   useEffect(() => {
@@ -70,7 +70,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange,
+      dateRange: { from: dateRangeFrom, to: dateRangeTo },
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -83,7 +83,8 @@ const DashboardGoogleCloudComponent: React.FC = () => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
   ]);
 
   return (
@@ -123,7 +124,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
                     filters: fetchFilters ?? [],
                     useMargins: true,
                     id: 'google-cloud-detector-dashboard-tab',
-                    timeRange: absoluteDateRange,
+                    timeRange: { from: dateRangeFrom, to: dateRangeTo },
                     title: 'Google Cloud detector dashboard',
                     description: 'Dashboard of the Google Cloud',
                     query: searchBarProps.query,
@@ -132,6 +133,7 @@ const DashboardGoogleCloudComponent: React.FC = () => {
                       value: 15,
                     },
                     hidePanelTitles: false,
+                    lastReloadRequestTime: fingerprint,
                   }}
                 />
               </div>

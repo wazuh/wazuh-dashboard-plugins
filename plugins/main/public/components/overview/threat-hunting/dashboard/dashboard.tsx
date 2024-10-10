@@ -78,12 +78,12 @@ const DashboardTH: React.FC = () => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
   });
-  const { query, absoluteDateRange } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -148,7 +148,7 @@ const DashboardTH: React.FC = () => {
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange,
+    time: { from: dateRangeFrom, to: dateRangeTo },
   });
 
   useEffect(() => {
@@ -159,7 +159,7 @@ const DashboardTH: React.FC = () => {
       query,
       pagination,
       sorting,
-      dateRange: absoluteDateRange,
+      dateRange: { from: dateRangeFrom, to: dateRangeTo },
     })
       .then(results => {
         setResults(results);
@@ -176,7 +176,8 @@ const DashboardTH: React.FC = () => {
     JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
   ]);
 
   const onClickExportResults = async () => {
@@ -242,7 +243,7 @@ const DashboardTH: React.FC = () => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'kpis-th-dashboard-tab',
-                  timeRange: absoluteDateRange,
+                  timeRange: { from: dateRangeFrom, to: dateRangeTo },
                   title: 'KPIs Threat Hunting dashboard',
                   description: 'KPIs Dashboard of the Threat Hunting',
                   query: query,
@@ -251,6 +252,7 @@ const DashboardTH: React.FC = () => {
                     value: 15,
                   },
                   hidePanelTitles: true,
+                  lastReloadRequestTime: fingerprint,
                 }}
               />
               <DashboardByRenderer
@@ -264,7 +266,7 @@ const DashboardTH: React.FC = () => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'th-dashboard-tab',
-                  timeRange: absoluteDateRange,
+                  timeRange: { from: dateRangeFrom, to: dateRangeTo },
                   title: 'Threat Hunting dashboard',
                   description: 'Dashboard of the Threat Hunting',
                   query: query,
@@ -273,6 +275,7 @@ const DashboardTH: React.FC = () => {
                     value: 15,
                   },
                   hidePanelTitles: false,
+                  lastReloadRequestTime: fingerprint,
                 }}
               />
               <div style={{ margin: '8px' }}>
@@ -288,7 +291,7 @@ const DashboardTH: React.FC = () => {
                             isExporting={isExporting}
                             onClickExportResults={onClickExportResults}
                             maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                            dateRange={absoluteDateRange}
+                            dateRange={{ from: dateRangeFrom, to: dateRangeTo }}
                           />
                         </>
                       ),

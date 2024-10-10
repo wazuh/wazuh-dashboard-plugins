@@ -11,7 +11,6 @@ import {
 import { getDataPlugin } from '../../../kibana-services';
 import { useQueryManager, useTimeFilter } from '../hooks';
 import { useSavedQuery } from '../hooks/saved_query/use_saved_query';
-import { transformDateRange } from './search-bar-service';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
@@ -33,9 +32,9 @@ type tUserSearchBarResponse = {
   searchBarProps: Partial<
     SearchBarProps & {
       useDefaultBehaviors: boolean;
-      absoluteDateRange: TimeRange;
     }
   >;
+  fingerprint: number;
 };
 
 /**
@@ -58,12 +57,8 @@ const useSearchBarConfiguration = (
   const [query, setQuery] = props?.setQuery
     ? useState(props?.query || { query: '', language: 'kuery' })
     : useQueryManager();
+  const [fingerprint, setFingerprint] = useState(Date.now());
 
-  // This absoluteDateRange is used to ensure that the date range is the same when we make the
-  // pagination request with relative dates like "Last 24 hours"
-  const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
-    transformDateRange(globalTimeFilter),
-  );
   const { query: queryService } = getDataPlugin();
   const { savedQuery, setSavedQuery, clearSavedQuery } = useSavedQuery({
     queryService,
@@ -116,7 +111,6 @@ const useSearchBarConfiguration = (
   const searchBarProps: Partial<
     SearchBarProps & {
       useDefaultBehaviors: boolean;
-      absoluteDateRange: TimeRange;
     }
   > = {
     isLoading,
@@ -124,7 +118,6 @@ const useSearchBarConfiguration = (
     filters,
     query,
     timeHistory,
-    absoluteDateRange,
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
     onFiltersUpdated: (userFilters: Filter[]) => {
@@ -147,9 +140,6 @@ const useSearchBarConfiguration = (
         pause: options.isPaused,
       });
     },
-    onRefresh: ({ dateRange }) => {
-      setAbsoluteDateRange(transformDateRange(dateRange));
-    },
     onQuerySubmit: (
       payload: { dateRange: TimeRange; query?: Query },
       _isUpdate?: boolean,
@@ -163,8 +153,8 @@ const useSearchBarConfiguration = (
       props?.setQuery ? props?.setQuery(query) : setQuery(query);
       props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
       setTimeFilter(dateRange);
-      setAbsoluteDateRange(transformDateRange(dateRange));
       setQuery(query);
+      setFingerprint(Date.now());
     },
     // its necessary to use saved queries. if not, the load saved query not work
     onClearSavedQuery: () => {
@@ -186,6 +176,7 @@ const useSearchBarConfiguration = (
 
   return {
     searchBarProps,
+    fingerprint,
   };
 };
 

@@ -211,7 +211,10 @@ export const OverviewCards = ({
               filters: filters,
               useMargins: true,
               id: 'ct-dashboard-tab',
-              timeRange: searchBarProps?.absoluteDateRange,
+              timeRange: {
+                from: searchBarProps?.dateRangeFrom,
+                to: searchBarProps?.dateRangeTo,
+              },
               title: 'Cluster Timelions dashboard',
               description: 'Dashboard of the Cluster Timelions',
               query: searchBarProps.query,

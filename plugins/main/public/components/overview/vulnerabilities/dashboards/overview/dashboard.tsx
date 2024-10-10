@@ -59,7 +59,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -163,6 +163,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
                     value: 15,
                   },
                   hidePanelTitles: true,
+                  lastReloadRequestTime: fingerprint,
                 }}
               />
             </div>
@@ -190,6 +191,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
                   value: 15,
                 },
                 hidePanelTitles: false,
+                lastReloadRequestTime: fingerprint,
               }}
             />
           </div>

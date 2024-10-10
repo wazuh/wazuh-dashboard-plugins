@@ -39,7 +39,10 @@ export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
       filters: fetchFilters,
       pagination,
       sorting,
-      dateRange: searchBarProps.absoluteDateRange,
+      dateRange: {
+        from: searchBarProps.dateRangeFrom,
+        to: searchBarProps.dateRangeTo,
+      },
     })
       .then(results => {
         setResults(results);
@@ -56,7 +59,8 @@ export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
     JSON.stringify(searchBarProps.query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
-    JSON.stringify(searchBarProps.absoluteDateRange),
+    searchBarProps.dateRangeFrom,
+    searchBarProps.dateRangeTo,
   ]);
 
   return (
@@ -72,7 +76,10 @@ export default function DrillDownDataGrid(props: tDrillDownDataGridProps) {
         onChangeSorting={sorting => {
           setSorting(sorting);
         }}
-        dateRange={searchBarProps?.absoluteDateRange}
+        dateRange={{
+          from: searchBarProps.dateRangeFrom,
+          to: searchBarProps.dateRangeTo,
+        }}
       />
     </EuiFlexItem>
   );

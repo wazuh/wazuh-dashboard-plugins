@@ -162,7 +162,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     setFilters,
   });
 
-  const { absoluteDateRange } = searchBarProps;
+  const { dateRangeFrom, dateRangeTo } = searchBarProps;
   const [complianceData, setComplianceData] = useState({
     descriptions: {},
     complianceObject: {},
@@ -232,7 +232,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
       const data = await fetchData({
         aggs,
         query,
-        dateRange: absoluteDateRange,
+        dateRange: dateRange,
       });
 
       return data?.aggregations?.tactics?.buckets || [];
@@ -257,7 +257,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     props.section,
     dataSource,
     searchBarProps.query,
-    absoluteDateRange,
+    { from: dateRangeFrom, to: dateRangeTo },
   ]);
 
   useEffect(() => {
@@ -274,14 +274,15 @@ export const ComplianceTable = withAgentSupportModule(props => {
         section: props.section,
         fetchData,
         query: searchBarProps.query,
-        dateRange: absoluteDateRange,
+        dateRange: { from: dateRangeFrom, to: dateRangeTo },
       });
     }
   }, [
     dataSource,
     JSON.stringify(searchBarProps.query),
     JSON.stringify(fetchFilters),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
   ]);
 
   return (

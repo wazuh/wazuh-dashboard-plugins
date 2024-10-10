@@ -124,8 +124,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     setTimeFilter: setDateRange,
   } as tUseSearchBarProps);
 
-  const { absoluteDateRange } = searchBarProps;
-
   const parseSorting = useMemo(() => {
     if (!sorting) {
       return [];
@@ -144,7 +142,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     setIndexPattern(dataSource?.indexPattern);
     fetchData({
       query,
-      dateRange: absoluteDateRange,
+      dateRange: { from: dateRange.from || '', to: dateRange.to || '' },
       pagination,
       sorting: parseSorting,
     })
@@ -167,7 +165,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     JSON.stringify(query),
     JSON.stringify(sorting),
     JSON.stringify(pagination),
-    JSON.stringify(absoluteDateRange),
+    dateRange.from,
+    dateRange.to,
   ]);
 
   const toggleDetails = item => {
@@ -307,21 +306,20 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                         : undefined
                     }
                   />
-                  {absoluteDateRange ? (
-                    <EuiFlexGroup
-                      gutterSize='s'
-                      responsive={false}
-                      justifyContent='center'
-                      alignItems='center'
-                    >
-                      <EuiFlexItem grow={false}>
-                        <EuiText size='s'>
-                          {formatUIDate(absoluteDateRange?.from)} -{' '}
-                          {formatUIDate(absoluteDateRange?.to)}
-                        </EuiText>
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  ) : null}
+
+                  <EuiFlexGroup
+                    gutterSize='s'
+                    responsive={false}
+                    justifyContent='center'
+                    alignItems='center'
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiText size='s'>
+                        {formatUIDate(dateRange?.from)} -{' '}
+                        {formatUIDate(dateRange?.to)}
+                      </EuiText>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                 </EuiPanel>
                 <EuiBasicTable
                   items={parsedItems}
