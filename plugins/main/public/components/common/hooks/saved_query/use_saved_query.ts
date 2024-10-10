@@ -32,6 +32,7 @@ import { useState, useEffect } from 'react';
 import {
   DataPublicPluginStart,
   SavedQuery,
+  TimeRange,
 } from '../../../../../../../src/plugins/data/public';
 import { clearStateFromSavedQuery } from './clear_saved_query';
 import { populateStateFromSavedQuery } from './populate_state_from_saved_query';
@@ -43,6 +44,7 @@ import OsdUrlStateStorage from '../../../../react-services/state-storage';
 
 interface UseSavedQueriesProps {
   queryService: DataPublicPluginStart['query'];
+  setTimeFilter: (timeFilter: TimeRange) => void;
 }
 
 interface UseSavedQueriesReturn {
@@ -64,16 +66,20 @@ export const useSavedQuery = (
     history: history,
   });
 
-  const saveSavedQuery = async (savedQueryId?: string) => {
+  const saveSavedQuery = async (savedQuery?: SavedQuery) => {
     await OsdUrlStateStorage(data, osdUrlStateStorage).replaceUrlAppState({
-      savedQuery: savedQueryId,
-      filters: props.queryService.filterManager.getAppFilters(),
+      savedQuery: savedQuery?.id,
+      filters: savedQuery?.attributes.filters,
+      query: savedQuery?.attributes.query,
     });
+    if (savedQuery?.attributes.timefilter) {
+      props.setTimeFilter(savedQuery?.attributes.timefilter);
+    }
   };
 
   const updateSavedQuery = async (savedQuery: SavedQuery) => {
     setSavedQuery(savedQuery);
-    saveSavedQuery(savedQuery.id);
+    saveSavedQuery(savedQuery);
     populateStateFromSavedQuery(props.queryService, savedQuery);
   };
 

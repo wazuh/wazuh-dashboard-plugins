@@ -67,6 +67,7 @@ const useSearchBarConfiguration = (
   const { query: queryService } = getDataPlugin();
   const { savedQuery, setSavedQuery, clearSavedQuery } = useSavedQuery({
     queryService,
+    setTimeFilter,
   });
   // states
   const [isLoading, setIsLoading] = useState(true);
@@ -136,8 +137,15 @@ const useSearchBarConfiguration = (
       queryService.timefilter.timefilter.getRefreshInterval().value,
     isRefreshPaused:
       queryService.timefilter.timefilter.getRefreshInterval().pause,
-    onRefreshChange: opts => {
-      queryService.timefilter.timefilter.setRefreshInterval(opts);
+    onRefreshChange: (options: {
+      isPaused: boolean;
+      refreshInterval: number;
+    }) => {
+      const { timefilter } = queryService.timefilter;
+      timefilter.setRefreshInterval({
+        value: options.refreshInterval,
+        pause: options.isPaused,
+      });
     },
     onRefresh: ({ dateRange }) => {
       setAbsoluteDateRange(transformDateRange(dateRange));
