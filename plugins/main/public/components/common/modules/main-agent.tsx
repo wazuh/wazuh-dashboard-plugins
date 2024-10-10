@@ -16,6 +16,9 @@ import {
   EuiFlexItem,
   EuiTitle,
   EuiButtonEmpty,
+  EuiTabs,
+  EuiTab,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 import '../../common/modules/module.scss';
@@ -38,10 +41,12 @@ import {
 } from '../data-source';
 import { useAsyncAction } from '../hooks';
 import NavigationService from '../../../react-services/navigation-service';
+import { toTitleCase } from '../util/change-case';
 
 export class MainModuleAgent extends Component {
   props!: {
     [key: string]: any;
+    section: string;
   };
   state: {
     selectView: Boolean;
@@ -70,24 +75,14 @@ export class MainModuleAgent extends Component {
         <EuiFlexItem className='wz-module-header-agent-title'>
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <span style={{ display: 'inline-flex' }}>
-                <EuiTitle size='s' className='wz-module-header-agent-title-btn'>
-                  <h1>
-                    <span
-                      style={{ color: euiThemeVars.euiColorPrimaryText }}
-                      onClick={() => {
-                        NavigationService.getInstance().navigate(
-                          `/agents?tab=welcome&agent=${this.props.agent.id}`,
-                        );
-                      }}
-                    >
-                      <span>
-                        &nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;
-                      </span>
-                    </span>
-                  </h1>
-                </EuiTitle>
-              </span>
+              <EuiTabs>
+                <EuiTab isSelected={true}>
+                  {toTitleCase(this.props.section)}&nbsp;
+                  {this.state.loadingReport === true && (
+                    <EuiLoadingSpinner size='s' />
+                  )}
+                </EuiTab>
+              </EuiTabs>
             </EuiFlexItem>
             <EuiFlexItem />
             {this.props.section === 'syscollector' && (
