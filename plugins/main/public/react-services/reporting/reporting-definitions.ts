@@ -2,8 +2,9 @@ import { SavedObject } from '../saved-objects';
 import { WzRequest } from '../wz-request';
 import {
   DashboardGenerateReport,
-  DASHBOARDS_GENERATE_REPORTS
+  DASHBOARDS_GENERATE_REPORTS,
 } from './dashboards-generate-reports';
+import { htmlTemplate } from './html-template';
 
 export class reportingDefinitions {
   /**
@@ -21,14 +22,14 @@ export class reportingDefinitions {
             core_params: {
               base_url: `/app/dashboards#/view/${dashboard.idDashboardByReference}`,
               report_format: 'pdf',
-              time_duration: 'PT30M'
-            }
+              time_duration: 'PT30M',
+            },
           },
           delivery: {
             configIds: [],
-            title: '',
-            textDescription: '',
-            htmlDescription: ''
+            title: dashboard.titleReport,
+            textDescription: htmlTemplate,
+            htmlDescription: htmlTemplate,
           },
           trigger: {
             trigger_type: 'Schedule',
@@ -38,14 +39,14 @@ export class reportingDefinitions {
                 interval: {
                   period: 1,
                   unit: 'DAYS',
-                  start_time: 1728473700000
-                }
+                  start_time: 1728473700000,
+                },
               },
               schedule_type: 'Recurring',
-              enabled: false
-            }
-          }
-        }
+              enabled: false,
+            },
+          },
+        },
       );
       return postReport;
     } catch (error) {
@@ -61,7 +62,7 @@ export class reportingDefinitions {
     try {
       const getReport = await WzRequest.genericReq(
         'GET',
-        '/api/reporting/reportDefinitions'
+        '/api/reporting/reportDefinitions',
       );
       return getReport;
     } catch (error) {
@@ -85,7 +86,7 @@ export class reportingDefinitions {
         const reportDefinitionNoExist = reportsDefinitionsList?.every(
           report =>
             report?._source?.report_definition?.report_params?.report_name !==
-            dashboard.titleReport
+            dashboard.titleReport,
         );
         if (!reportDefinitionNoExist) {
           return;
@@ -93,7 +94,7 @@ export class reportingDefinitions {
 
         const dashboardByRenferenceNoExist = dashboardsByReferenceList.every(
           dashboardByReference =>
-            dashboardByReference.id !== dashboard.idDashboardByReference
+            dashboardByReference.id !== dashboard.idDashboardByReference,
         );
 
         if (dashboardByRenferenceNoExist) {
