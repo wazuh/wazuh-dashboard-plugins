@@ -8,6 +8,8 @@ export const DocumentViewTableAndJson = ({
   document,
   indexPattern,
   renderFields,
+  filters,
+  setFilters,
 }) => {
   const docViewerProps = useDocViewer({
     doc: document,
@@ -22,7 +24,12 @@ export const DocumentViewTableAndJson = ({
             id: 'table',
             name: 'Table',
             content: (
-              <DocViewer {...docViewerProps} renderFields={renderFields} />
+              <DocViewer
+                {...docViewerProps}
+                renderFields={renderFields}
+                filters={filters}
+                setFilters={setFilters}
+              />
             ),
           },
           {

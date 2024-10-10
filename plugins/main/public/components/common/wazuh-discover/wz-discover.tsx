@@ -285,6 +285,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           defaultTableColumns,
                           wzDiscoverRenderColumns,
                         )}
+                        filters={filters}
+                        setFilters={setFilters}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>

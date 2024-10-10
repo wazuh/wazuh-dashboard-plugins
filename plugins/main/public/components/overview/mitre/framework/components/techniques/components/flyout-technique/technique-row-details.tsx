@@ -3,7 +3,10 @@ import { EuiCodeBlock, EuiFlexGroup, EuiTabbedContent } from '@elastic/eui';
 import { useDocViewer } from '../../../../../../../common/doc-viewer/use-doc-viewer';
 import DocViewer from '../../../../../../../common/doc-viewer/doc-viewer';
 import RuleDetails from '../rule-details';
-import { IndexPattern } from '../../../../../../../../../../../src/plugins/data/common';
+import {
+  IndexPattern,
+  Filter,
+} from '../../../../../../../../../../../src/plugins/data/common';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
 
 type Props = {
@@ -11,9 +14,18 @@ type Props = {
   item: any;
   indexPattern: IndexPattern;
   onRuleItemClick?: (value: any, indexPattern: IndexPattern) => void;
+  filters: Filter[];
+  setFilters: (filters: Filter[]) => void;
 };
 
-const TechniqueRowDetails = ({ doc, item, indexPattern, onRuleItemClick }) => {
+const TechniqueRowDetails = ({
+  doc,
+  item,
+  indexPattern,
+  onRuleItemClick,
+  filters,
+  setFilters,
+}) => {
   const docViewerProps = useDocViewer({
     doc,
     indexPattern: indexPattern as IndexPattern,
@@ -23,8 +35,11 @@ const TechniqueRowDetails = ({ doc, item, indexPattern, onRuleItemClick }) => {
 
   const getRuleData = async () => {
     const params = { q: `id=${item.rule.id}` };
-    const rulesDataResponse = await WzRequest.apiReq('GET', `/rules`, { params });
-    const ruleData = ((rulesDataResponse.data || {}).data || {}).affected_items[0] || {};
+    const rulesDataResponse = await WzRequest.apiReq('GET', `/rules`, {
+      params,
+    });
+    const ruleData =
+      ((rulesDataResponse.data || {}).data || {}).affected_items[0] || {};
     setRuleData(ruleData);
   };
 
@@ -46,7 +61,11 @@ const TechniqueRowDetails = ({ doc, item, indexPattern, onRuleItemClick }) => {
             name: 'Table',
             content: (
               <>
-                <DocViewer {...docViewerProps} />
+                <DocViewer
+                  {...docViewerProps}
+                  filters={filters}
+                  setFilters={setFilters}
+                />
               </>
             ),
           },
@@ -56,9 +75,9 @@ const TechniqueRowDetails = ({ doc, item, indexPattern, onRuleItemClick }) => {
             content: (
               <EuiCodeBlock
                 aria-label={'Document details'}
-                language="json"
+                language='json'
                 isCopyable
-                paddingSize="s"
+                paddingSize='s'
               >
                 {JSON.stringify(item, null, 2)}
               </EuiCodeBlock>

@@ -17,8 +17,6 @@ import {
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
-  EuiTitle,
-  EuiButtonEmpty,
 } from '@elastic/eui';
 import {
   ErrorFactory,
@@ -313,6 +311,8 @@ const DashboardTH: React.FC = () => {
                             threatHuntingTableDefaultColumns,
                             wzDiscoverRenderColumns,
                           )}
+                          filters={filters}
+                          setFilters={setFilters}
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
