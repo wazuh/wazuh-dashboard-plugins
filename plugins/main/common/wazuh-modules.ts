@@ -99,12 +99,6 @@ export const WAZUH_MODULES = {
     description:
       'Security events related to your Google Cloud Platform services, collected directly via GCP API.', // TODO GCP
   },
-  virustotal: {
-    title: 'VirusTotal',
-    appId: 'virustotal',
-    description:
-      'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.',
-  },
   mitre: {
     title: 'MITRE ATT&CK',
     appId: 'mitre-attack',
