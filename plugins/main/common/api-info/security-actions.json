@@ -551,6 +551,16 @@
       "DELETE /decoders/files/{filename}"
     ]
   },
+  "event:ingest": {
+    "description": "Ingest events",
+    "resources": ["*:*"],
+    "example": {
+      "actions": ["event:ingest"],
+      "resources": ["*:*:*"],
+      "effect": "allow"
+    },
+    "related_endpoints": ["POST /events"]
+  },
   "syscollector:read": {
     "description": "Access agents syscollector information",
     "resources": ["agent:id", "agent:group"],
@@ -694,15 +704,5 @@
       "effect": "deny"
     },
     "related_endpoints": ["GET /tasks/status"]
-  },
-  "event:ingest": {
-    "description": "Ingest events",
-    "resources": ["*:*"],
-    "example": {
-      "actions": ["event:ingest"],
-      "resources": ["*:*:*"],
-      "effect": "allow"
-    },
-    "related_endpoints": ["POST /events"]
   }
 }
