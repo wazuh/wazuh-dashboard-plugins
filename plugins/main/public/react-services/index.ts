@@ -22,3 +22,4 @@ export * from './wz-user-permissions';
 export * from './query-config';
 export * from './elastic_helpers';
 export * from './check-index';
+export * from './state-storage';
