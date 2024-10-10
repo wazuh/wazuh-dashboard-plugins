@@ -19,18 +19,11 @@ import { Base } from './base-query';
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>}
  */
-export const top3agents = async (
-  context,
-  gte,
-  lte,
-  filters,
-  allowedAgentsFilter,
-  pattern,
-) => {
+export const top3agents = async (context, gte, lte, filters, pattern) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {
@@ -72,18 +65,11 @@ export const top3agents = async (
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>}
  */
-export const top3Rules = async (
-  context,
-  gte,
-  lte,
-  filters,
-  allowedAgentsFilter,
-  pattern,
-) => {
+export const top3Rules = async (context, gte, lte, filters, pattern) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {
@@ -140,13 +126,12 @@ export const lastTenDeletedFiles = async (
   gte,
   lte,
   filters,
-  allowedAgentsFilter,
   pattern,
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {
@@ -194,13 +179,12 @@ export const lastTenModifiedFiles = async (
   gte,
   lte,
   filters,
-  allowedAgentsFilter,
   pattern,
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
+    Object.assign(base, Base(pattern, filters, gte, lte));
 
     Object.assign(base.aggs, {
       '2': {

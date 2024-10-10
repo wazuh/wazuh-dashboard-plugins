@@ -112,7 +112,7 @@ export const malwareDetection = {
   }),
   description: i18n.translate('wz-app-malware-detection-description', {
     defaultMessage:
-      'Verify that your systems are configured according to your security policies baseline.',
+      'Check indicators of compromise triggered by malware infections or cyberattacks.',
   }),
   euiIconType: 'indexRollupApp',
   order: 201,
@@ -218,7 +218,7 @@ export const mitreAttack = {
   }),
   description: i18n.translate('wz-app-mitre-attack-description', {
     defaultMessage:
-      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations.',
+      'Explore security alerts mapped to adversary tactics and techniques for better threat understanding.',
   }),
   euiIconType: 'grokApp',
   order: 302,
@@ -682,7 +682,7 @@ export const reporting = {
 
 export const settings = {
   category: 'wz-category-server-management',
-  id: 'settings',
+  id: 'dashboards-settings',
   title: i18n.translate('wz-app-settings-title', {
     defaultMessage: 'Settings',
   }),

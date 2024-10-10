@@ -6,17 +6,20 @@ import {
   SearchBarProps,
   Filter,
 } from '../../../../../../src/plugins/data/public';
+import '../../../../public/styles/media-queries.scss';
 
 export interface WzSearchBarProps extends SearchBarProps {
   fixedFilters?: Filter[];
   userFilters?: Filter[];
   preQueryBar?: React.ReactElement;
   postFilters?: React.ReactElement;
+  postFixedFilters?: () => React.ReactElement<any>[];
   hideFixedFilters?: boolean;
 }
 
 export const WzSearchBar = ({
   fixedFilters = [],
+  postFixedFilters,
   preQueryBar,
   hideFixedFilters,
   postFilters,
@@ -73,6 +76,13 @@ export const WzSearchBar = ({
                     </EuiBadge>
                   </EuiFlexItem>
                 ))}
+                {postFixedFilters
+                  ? postFixedFilters.map((Filter, idx) => (
+                      <EuiFlexItem grow={false} key={idx}>
+                        <Filter />
+                      </EuiFlexItem>
+                    ))
+                  : null}
               </EuiFlexGroup>
             </EuiFlexItem>
           )}

@@ -27,6 +27,7 @@ import { PromptNoSelectedAgent } from '../../agents/prompts';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../kibana-services';
 import { endpointSummary } from '../../../utils/applications';
+import { withAgentSync } from '../../common/hocs/withAgentSync';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers?.currentAgentData,
@@ -36,6 +37,7 @@ export const AgentView = compose(
   withErrorBoundary,
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   connect(mapStateToProps),
+  withAgentSync,
   withGuard(
     props => !(props.agent && props.agent.id),
     () => (

@@ -81,6 +81,7 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
     { audit: true },
     { openscap: true },
     { ciscat: true },
+    { yara: true },
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [
     { vulnerabilities: true },

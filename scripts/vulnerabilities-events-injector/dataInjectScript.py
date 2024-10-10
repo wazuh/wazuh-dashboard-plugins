@@ -125,6 +125,7 @@ def generateRandomVulnerability():
     vulnerability['severity'] = random.choice(['Low','Medium','High','Critical'])
     vulnerability['published_at'] = generateRandomDate(2000)
     vulnerability['detected_at'] = generateRandomDate(180)
+    vulnerability['under_evaluation'] = random.choice([True, False])
     return(vulnerability)
 
 def generateRandomWazuh():

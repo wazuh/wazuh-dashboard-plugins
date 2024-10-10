@@ -10,23 +10,19 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
-import { StatisticsDataSource } from '../../../../../components/common/data-source/pattern/statistics';
 
-export const PromptStatisticsNoIndices = () => {
-  const [indexName, setIndexName] = useState('');
-
-  useEffect(() => {
-    const STATISTICS_PATTERN_IDENTIFIER =
-      StatisticsDataSource.getIdentifierDataSourcePattern();
-    setIndexName(STATISTICS_PATTERN_IDENTIFIER);
-  }, []);
-
-  return (
+export const PromptStatisticsNoIndices = ({ indexPatternID, existIndex }) => {
+  return !existIndex ? (
     <EuiEmptyPrompt
       iconType='securitySignalDetected'
-      title={<h2>{indexName} indices were not found.</h2>}
+      title={<h2>{indexPatternID} indices were not found.</h2>}
+    />
+  ) : (
+    <EuiEmptyPrompt
+      iconType='securitySignalDetected'
+      title={<h2>There was a problem creating the index pattern.</h2>}
     />
   );
 };

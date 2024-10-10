@@ -40,47 +40,6 @@ export function getFilterExcludeManager(indexPatternId: string) {
   };
 }
 
-/**
- * Get the filter that restrict the search to the allowed agents
- * @param agentsIds
- * @param indexPatternId
- * @returns
- */
-export function getFilterAllowedAgents(
-  agentsIds: string[],
-  indexPatternId: string,
-) {
-  const field = AGENT_ID_KEY;
-  return {
-    meta: {
-      index: indexPatternId,
-      type: 'phrases',
-      key: field,
-      value: agentsIds.toString(),
-      params: agentsIds,
-      alias: null,
-      negate: false,
-      disabled: false,
-      controlledBy: AUTHORIZED_AGENTS,
-    },
-    query: {
-      bool: {
-        should: agentsIds.map(id => {
-          return {
-            match_phrase: {
-              [field]: id,
-            },
-          };
-        }),
-        minimum_should_match: 1,
-      },
-    },
-    $state: {
-      store: 'appState',
-    },
-  };
-}
-
 export enum FILTER_OPERATOR {
   IS = 'is',
   IS_NOT = 'is not',
@@ -359,23 +318,6 @@ export class PatternDataSourceFilterManager
     return [];
   }
 
-  /**
-     * Return the allowed agents related to the user permissions to read data from agents in the
-      API server
-     */
-  static getAllowAgentsFilter(indexPatternId: string): tFilter[] {
-    const allowedAgents =
-      store.getState().appStateReducers?.allowedAgents || [];
-    if (allowedAgents.length > 0) {
-      const allowAgentsFilter = getFilterAllowedAgents(
-        allowedAgents,
-        indexPatternId,
-      ) as tFilter;
-      return [allowAgentsFilter];
-    }
-    return [];
-  }
-
   /******************************************************************/
   /********************** FILTERS FACTORY ***************************/
   /******************************************************************/
@@ -383,7 +325,7 @@ export class PatternDataSourceFilterManager
   static createFilter(
     type: FILTER_OPERATOR,
     key: string,
-    value: string | [],
+    value: string | string[] | any,
     indexPatternId: string,
     controlledBy?: string,
   ) {

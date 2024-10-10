@@ -10,11 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const invalidLoginPassword = {
-  decoder: {
-    parent: 'sshd',
-    name: 'sshd',
-  },
+const { DECODER } = require('./common');
+
+module.exports.invalidLoginPassword = {
+  decoder: DECODER.SSHD,
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[5330]: Failed password for {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
   location: '/var/log/auth.log',
@@ -26,7 +25,7 @@ export const invalidLoginPassword = {
   rule: {
     description: 'sshd: authentication failed.',
     groups: ['syslog', 'sshd', 'invalid_login', 'authentication_failed'],
-    id: 5716,
+    id: '5716',
     level: 5,
     mail: false,
     pci_dss: ['10.2.4', '10.2.5'],
@@ -37,11 +36,8 @@ export const invalidLoginPassword = {
   },
 };
 
-export const invalidLoginUser = {
-  decoder: {
-    parent: 'sshd',
-    name: 'sshd',
-  },
+module.exports.invalidLoginUser = {
+  decoder: DECODER.SSHD,
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[10022]: Invalid user {data.srcuser} from {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
   location: '/var/log/secure',
@@ -53,7 +49,7 @@ export const invalidLoginUser = {
   rule: {
     description: 'sshd: Attempt to login using a non-existent user',
     groups: ['syslog', 'sshd', 'invalid_login', 'authentication_failed'],
-    id: 5710,
+    id: '5710',
     level: 5,
     pci_dss: ['10.2.4', '10.2.5', '10.6.1'],
     gpg13: ['7.1'],
@@ -63,16 +59,14 @@ export const invalidLoginUser = {
   },
 };
 
-export const multipleAuthenticationFailures = {
-  decoder: {
-    parent: 'sshd',
-    name: 'sshd',
-  },
-  full_log: `{predecoder.timestamp} {predecoder.hostname} sshd[5413]: Failed password for invalid user {data.srcuser} from {data.srcip} port {data.srcport} ssh2`,
+module.exports.multipleAuthenticationFailures = {
+  decoder: DECODER.SSHD,
+  full_log:
+    '{predecoder.timestamp} {predecoder.hostname} sshd[5413]: Failed password for invalid user {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
   location: '/var/log/secure',
   rule: {
     description: 'sshd: Multiple authentication failures.',
-    id: 5720,
+    id: '5720',
     level: 10,
     frequency: 8,
     groups: ['syslog', 'sshd', 'authentication_failures'],
@@ -89,8 +83,9 @@ export const multipleAuthenticationFailures = {
   },
 };
 
-export const windowsInvalidLoginPassword = {
-  full_log: `{predecoder.timestamp} {predecoder.hostname} sshd[5413]: Failed password for invalid user {data.srcuser} from {data.srcip} port {data.srcport} ssh2`,
+module.exports.windowsInvalidLoginPassword = {
+  full_log:
+    '{predecoder.timestamp} {predecoder.hostname} sshd[5413]: Failed password for invalid user {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
   data_win: {
     eventdata: {
       authenticationPackageName: 'NTLM',
@@ -117,15 +112,12 @@ export const windowsInvalidLoginPassword = {
       version: '0',
     },
   },
-  decoder: {
-    parent: 'sshd',
-    name: 'windows_eventchannel',
-  },
+  decoder: DECODER.WINDOWS_EVENTCHANNEL,
   location: 'EventChannel',
   rule: {
     description: 'Logon Failure - Unknown user or bad password',
     groups: ['windows', 'windows_security', 'win_authentication_failed'],
-    id: 60122,
+    id: '60122',
     level: 5,
     pci_dss: ['10.2.4', '10.2.5'],
     gpg13: ['7.1'],
@@ -135,9 +127,9 @@ export const windowsInvalidLoginPassword = {
   },
 };
 
-export const userLoginFailed = {
+module.exports.userLoginFailed = {
   rule: {
-    id: 5503,
+    id: '5503',
     level: 5,
     description: 'PAM: User login failed.',
     mail: false,
@@ -153,15 +145,13 @@ export const userLoginFailed = {
     timestamp: 'Apr 17 00:04:40',
     hostname: 'ip-10-0-1-178',
   },
-  decoder: {
-    name: 'pam',
-  },
+  decoder: DECODER.PAM,
   location: '/var/log/secure',
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[11294]: pam_unix(sshd:auth): authentication failure; logname= uid={data.uid} euid={data.euid} tty={data.tty} ruser= rhost={data.srcip}  user={data.dstuser}',
 };
 
-export const passwordCheckFailed = {
+module.exports.passwordCheckFailed = {
   rule: {
     level: 5,
     description: 'unix_chkpwd: Password check failed.',
@@ -179,16 +169,14 @@ export const passwordCheckFailed = {
     timestamp: 'Apr 17 00:07:04',
     hostname: 'ip-10-0-1-132',
   },
-  decoder: {
-    name: 'unix_chkpwd',
-  },
+  decoder: DECODER.UNIX_CHKPWD,
   data: { srcuser: 'root' },
   location: '/var/log/secure',
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} {decoder.name}[29593]: password check failed for user ({data.srcuser})',
 };
 
-export const nonExistentUser = {
+module.exports.nonExistentUser = {
   rule: {
     mail: false,
     level: 5,
@@ -206,7 +194,7 @@ export const nonExistentUser = {
   location: '/var/log/secure',
 };
 
-export const bruteForceTryingAccessSystem = {
+module.exports.bruteForceTryingAccessSystem = {
   rule: {
     mail: false,
     level: 10,
@@ -229,7 +217,7 @@ export const bruteForceTryingAccessSystem = {
   location: '/var/log/secure',
 };
 
-export const authenticationSuccess = {
+module.exports.authenticationSuccess = {
   data: {
     srcip: '84.122.71.89',
     dstuser: 'ec2-user',
@@ -254,7 +242,7 @@ export const authenticationSuccess = {
   },
 };
 
-export const maximumAuthenticationAttemptsExceeded = {
+module.exports.maximumAuthenticationAttemptsExceeded = {
   rule: {
     mail: false,
     level: 8,

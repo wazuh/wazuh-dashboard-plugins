@@ -34,7 +34,7 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 50,
+          fontSize: 40,
         },
       },
     },
@@ -119,7 +119,7 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 50,
+          fontSize: 40,
         },
       },
     },
@@ -204,7 +204,7 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 50,
+          fontSize: 40,
         },
       },
     },
@@ -289,7 +289,7 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
           bgColor: false,
           labelColor: false,
           subText: '',
-          fontSize: 50,
+          fontSize: 40,
         },
       },
     },
@@ -341,6 +341,87 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
   };
 };
 
+const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
+  return {
+    id: 'vulnerabilities_evaluation_count',
+    title: 'Evaluation',
+    type: 'metric',
+    params: {
+      addLegend: false,
+      addTooltip: true,
+      metric: {
+        colorSchema: 'Green to Red',
+        colorsRange: [
+          {
+            from: 0,
+            to: 10000,
+          },
+        ],
+        invertColors: false,
+        labels: {
+          show: true,
+        },
+        metricColorMode: 'None',
+        percentageMode: false,
+        style: {
+          bgColor: false,
+          bgFill: '#000',
+          fontSize: 40,
+          labelColor: false,
+          subText: '',
+        },
+        useRanges: false,
+      },
+      type: 'metric',
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'Evaluation',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  language: 'kuery',
+                  query: 'vulnerability.under_evaluation:true',
+                },
+                label: 'Pending',
+              },
+            ],
+          },
+          schema: 'group',
+        },
+      ],
+    },
+  };
+};
+
 export const getKPIsPanel = (
   indexPatternId: string,
 ): {
@@ -351,7 +432,7 @@ export const getKPIsPanel = (
   return {
     '1': {
       gridData: {
-        w: 12,
+        w: 9,
         h: 6,
         x: 0,
         y: 0,
@@ -365,9 +446,9 @@ export const getKPIsPanel = (
     },
     '2': {
       gridData: {
-        w: 12,
+        w: 9,
         h: 6,
-        x: 12,
+        x: 9,
         y: 0,
         i: '2',
       },
@@ -379,9 +460,9 @@ export const getKPIsPanel = (
     },
     '3': {
       gridData: {
-        w: 12,
+        w: 9,
         h: 6,
-        x: 24,
+        x: 18,
         y: 0,
         i: '3',
       },
@@ -393,9 +474,9 @@ export const getKPIsPanel = (
     },
     '4': {
       gridData: {
-        w: 12,
+        w: 9,
         h: 6,
-        x: 36,
+        x: 27,
         y: 0,
         i: '4',
       },
@@ -403,6 +484,20 @@ export const getKPIsPanel = (
       explicitInput: {
         id: '4',
         savedVis: getVisStateSeverityLow(indexPatternId),
+      },
+    },
+    '5': {
+      gridData: {
+        w: 12,
+        h: 6,
+        x: 36,
+        y: 0,
+        i: '5',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: '5',
+        savedVis: getVisStateEvaluatedEvaluationPending(indexPatternId),
       },
     },
   };

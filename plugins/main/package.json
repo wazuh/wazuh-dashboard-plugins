@@ -1,9 +1,9 @@
 {
   "name": "wazuh",
-  "version": "4.9.1",
-  "revision": "03",
+  "version": "4.10.0",
+  "revision": "01",
   "pluginPlatform": {
-    "version": "2.13.0"
+    "version": "2.16.0"
   },
   "description": "Wazuh dashboard",
   "keywords": [
