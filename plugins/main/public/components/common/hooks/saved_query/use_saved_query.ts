@@ -31,11 +31,10 @@
 import { useState, useEffect } from 'react';
 import {
   DataPublicPluginStart,
+  RefreshInterval,
   SavedQuery,
   TimeRange,
 } from '../../../../../../../src/plugins/data/public';
-import { clearStateFromSavedQuery } from './clear_saved_query';
-import { populateStateFromSavedQuery } from './populate_state_from_saved_query';
 import NavigationService from '../../../../react-services/navigation-service';
 import { OSD_URL_STATE_STORAGE_ID } from '../../../../../common/constants';
 import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
@@ -45,6 +44,7 @@ import OsdUrlStateStorage from '../../../../react-services/state-storage';
 interface UseSavedQueriesProps {
   queryService: DataPublicPluginStart['query'];
   setTimeFilter: (timeFilter: TimeRange) => void;
+  setRefreshInterval: (refreshInterval: RefreshInterval) => void;
 }
 
 interface UseSavedQueriesReturn {
@@ -66,28 +66,42 @@ export const useSavedQuery = (
     history: history,
   });
 
-  const saveSavedQuery = async (savedQuery?: SavedQuery) => {
+  const saveSavedQuery = async (newSavedQuery?: SavedQuery) => {
+    const { filterManager, queryString, timefilter } = props.queryService;
+    const filters = !savedQuery
+      ? filterManager.getAppFilters()
+      : newSavedQuery?.attributes.filters;
+    const query = !savedQuery
+      ? queryString.getQuery()
+      : newSavedQuery?.attributes.query;
     await OsdUrlStateStorage(data, osdUrlStateStorage).replaceUrlAppState({
-      savedQuery: savedQuery?.id,
-      filters: savedQuery?.attributes.filters,
-      query: savedQuery?.attributes.query,
+      savedQuery: newSavedQuery?.id,
+      filters,
+      query,
     });
-    if (savedQuery?.attributes.timefilter) {
-      props.setTimeFilter(savedQuery?.attributes.timefilter);
+    if (newSavedQuery?.attributes.timefilter) {
+      // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
+      const { from, to } = !savedQuery
+        ? timefilter.timefilter.getTime()
+        : newSavedQuery.attributes.timefilter;
+      props.setTimeFilter({ from, to });
+      timefilter.timefilter.setTime({ from, to });
+      const refreshInterval = !savedQuery
+        ? timefilter.timefilter.getRefreshInterval()
+        : newSavedQuery.attributes.timefilter.refreshInterval;
+      props.setRefreshInterval(refreshInterval);
     }
   };
 
   const updateSavedQuery = async (savedQuery: SavedQuery) => {
     setSavedQuery(savedQuery);
     saveSavedQuery(savedQuery);
-    populateStateFromSavedQuery(props.queryService, savedQuery);
   };
 
   const clearSavedQuery = () => {
     setSavedQuery(undefined);
     // remove saved query from url
     saveSavedQuery(undefined);
-    clearStateFromSavedQuery(props.queryService);
   };
 
   // Effect is used to convert a saved query id into an object
