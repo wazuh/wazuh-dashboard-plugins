@@ -41,6 +41,10 @@ import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { createOsdUrlStateStorage } from '../../../../../../../src/plugins/opensearch_dashboards_utils/public';
 import OsdUrlStateStorage from '../../../../react-services/state-storage';
 
+interface Options {
+  firstTime?: boolean;
+}
+
 interface UseSavedQueriesProps {
   queryService: DataPublicPluginStart['query'];
   setTimeFilter: (timeFilter: TimeRange) => void;
@@ -66,34 +70,44 @@ export const useSavedQuery = (
     history: history,
   });
 
-  const getAppFilters = (newSavedQuery?: SavedQuery) => {
+  const getAppFilters = (
+    newSavedQuery?: SavedQuery,
+    { firstTime }: Options = { firstTime: false },
+  ) => {
     const { filterManager } = props.queryService;
     // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
-    return !savedQuery
+    return firstTime
       ? filterManager.getAppFilters()
       : newSavedQuery?.attributes.filters;
   };
 
-  const getQuery = (newSavedQuery?: SavedQuery) => {
+  const getQuery = (
+    newSavedQuery?: SavedQuery,
+    { firstTime }: Options = { firstTime: false },
+  ) => {
     const { queryString } = props.queryService;
     // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
-    return !savedQuery
-      ? queryString.getQuery()
-      : newSavedQuery?.attributes.query;
+    return firstTime ? queryString.getQuery() : newSavedQuery?.attributes.query;
   };
 
-  const getTimeFilter = (newSavedQuery?: SavedQuery) => {
+  const getTimeFilter = (
+    newSavedQuery?: SavedQuery,
+    { firstTime }: Options = { firstTime: false },
+  ) => {
     const { timefilter } = props.queryService;
     // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
-    return !savedQuery
+    return firstTime
       ? timefilter.timefilter.getTime()
       : newSavedQuery.attributes.timefilter;
   };
 
-  const getRefreshInterval = (newSavedQuery?: SavedQuery) => {
+  const getRefreshInterval = (
+    newSavedQuery?: SavedQuery,
+    { firstTime }: Options = { firstTime: false },
+  ) => {
     const { timefilter } = props.queryService;
     // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
-    return !savedQuery
+    return firstTime
       ? timefilter.timefilter.getRefreshInterval()
       : newSavedQuery.attributes.timefilter.refreshInterval;
   };
@@ -103,21 +117,29 @@ export const useSavedQuery = (
     props.queryService.timefilter.timefilter.setTime(timeFilter);
   };
 
-  const saveSavedQuery = async (newSavedQuery?: SavedQuery) => {
+  const saveSavedQuery = async (
+    newSavedQuery?: SavedQuery,
+    { firstTime }: Options = { firstTime: false },
+  ) => {
     await OsdUrlStateStorage(data, osdUrlStateStorage).replaceUrlAppState({
       savedQuery: newSavedQuery?.id,
-      filters: getAppFilters(newSavedQuery),
-      query: getQuery(newSavedQuery),
+      filters: getAppFilters(newSavedQuery, { firstTime }),
+      query: getQuery(newSavedQuery, { firstTime }),
     });
     if (newSavedQuery?.attributes.timefilter) {
-      setTimeFilter(getTimeFilter(newSavedQuery));
-      props.setRefreshInterval(getRefreshInterval(newSavedQuery));
+      setTimeFilter(getTimeFilter(newSavedQuery, { firstTime }));
+      props.setRefreshInterval(
+        getRefreshInterval(newSavedQuery, { firstTime }),
+      );
     }
   };
 
-  const updateSavedQuery = async (savedQuery: SavedQuery) => {
+  const updateSavedQuery = async (
+    savedQuery: SavedQuery,
+    { firstTime }: { firstTime?: boolean } = { firstTime: false },
+  ) => {
     setSavedQuery(savedQuery);
-    saveSavedQuery(savedQuery);
+    saveSavedQuery(savedQuery, { firstTime });
   };
 
   const clearSavedQuery = () => {
@@ -139,7 +161,7 @@ export const useSavedQuery = (
         const savedQuery = await props.queryService.savedQueries.getSavedQuery(
           savedQueryId,
         );
-        updateSavedQuery(savedQuery);
+        updateSavedQuery(savedQuery, { firstTime: true });
       } catch (error) {
         clearSavedQuery();
       }
