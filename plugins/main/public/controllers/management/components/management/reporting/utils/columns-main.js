@@ -1,8 +1,7 @@
 import React from 'react';
-import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
+import { EuiToolTip, EuiButtonEmpty } from '@elastic/eui';
 import ReportingHandler from './reporting-handler';
 import moment from 'moment-timezone';
-import { WzButton } from '../../../../../../components/common/buttons';
 import { getHttp, getUiSettings } from '../../../../../../kibana-services';
 import { formatUIDate } from '../../../../../../react-services/time-service';
 export default class ReportingColums {
@@ -41,15 +40,17 @@ export default class ReportingColums {
           return (
             <div>
               <EuiToolTip position='top' content={`Download report`}>
-                <EuiButtonIcon
+                <EuiButtonEmpty
                   aria-label='Dowload report'
                   iconType='importAction'
-                  onClick={() => this.goReport(item.name)}
+                  href={getHttp().basePath.prepend(`/reports/${item.name}`)}
+                  target='_blank'
                   color='primary'
+                  contentProps={{ className: 'wz-no-padding' }}
                 />
               </EuiToolTip>
 
-              <WzButton
+              <EuiButtonEmpty
                 buttonType='icon'
                 aria-label='Delete report'
                 iconType='trash'
@@ -60,6 +61,7 @@ export default class ReportingColums {
                 }}
                 color='danger'
                 isDisabled={item.name === 'default'}
+                contentProps={{ className: 'wz-no-padding' }}
               />
             </div>
           );
@@ -68,14 +70,6 @@ export default class ReportingColums {
     };
 
     this.buildColumns();
-  }
-
-  /**
-   * Downloads the report
-   * @param {*} name The name of the report
-   */
-  goReport(name) {
-    window.open(getHttp().basePath.prepend(`/reports/${name}`), '_blank');
   }
 
   /**
