@@ -1,13 +1,71 @@
-.wz-search-bar-no-padding .globalQueryBar:not(:empty) {
-  padding: 0px !important;
-}
-
 .wz-search-bar {
+  &.no-padding .globalQueryBar:not(:empty) {
+    padding: 0px !important;
+  }
+
   > .euiFlexGroup {
     &:first-child {
       #GlobalFilterGroup {
         display: none;
       }
+    }
+  }
+
+  &-query {
+    .osdQueryBar--withDatePicker {
+      align-items: flex-end;
+
+      > :first-child {
+        margin-top: 8px;
+        margin-bottom: 4px !important;
+
+        @media only screen and (max-width: 574px) {
+          margin-top: -8px;
+        }
+      }
+    }
+  }
+
+  @media only screen and (min-width: 575px) and (max-width: 767px) {
+    .globalFilterGroup__filterBar {
+      margin-top: 4px;
+    }
+
+    .globalFilterGroup__wrapper-isVisible {
+      margin-top: 0;
+    }
+
+    .euiFlexGroup--responsive > .euiFlexItem {
+      margin-bottom: 0 !important;
+    }
+  }
+
+  @media only screen and (max-width: 767px) {
+    .euiFlexGroup--responsive {
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+      margin-left: 0;
+      margin-right: 0;
+      margin-bottom: 1px;
+    }
+  }
+
+  @media only screen and (max-width: 574px) {
+    .globalFilterGroup__wrapper-isVisible {
+      margin-top: -6px;
+    }
+
+    .euiFlexGroup--responsive {
+      margin-bottom: -3px;
+    }
+
+    > .euiFlexGroup.euiFlexGroup--gutterSmall.euiFlexGroup--directionRow.euiFlexGroup--responsive
+      > .euiFlexItem.euiFlexItem--flexGrowZero {
+      margin-bottom: 6px !important;
+    }
+
+    .osdQueryBar--withDatePicker > :first-child {
+      margin-top: -8px;
     }
   }
 }
