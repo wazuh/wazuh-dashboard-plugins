@@ -22,7 +22,7 @@ import store from '../redux/store';
 import domtoimage from '../utils/dom-to-image-more';
 import dateMath from '@elastic/datemath';
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiButton, EuiLink } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
 import { reporting } from '../utils/applications';
 import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
 import {
@@ -93,17 +93,12 @@ export class ReportingService {
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButton
-              onClick={() =>
-                window.open(
-                  getHttp().basePath.prepend(`/reports/${filename}`),
-                  '_blank',
-                )
-              }
-              size='s'
+            <EuiLink
+              href={getHttp().basePath.prepend(`/reports/${filename}`)}
+              target='_blank'
             >
               Open report
-            </EuiButton>
+            </EuiLink>
           </EuiFlexItem>
         </EuiFlexGroup>
       </>,

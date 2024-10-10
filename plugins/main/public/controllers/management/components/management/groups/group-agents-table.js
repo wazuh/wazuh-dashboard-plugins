@@ -90,9 +90,10 @@ class WzGroupAgentsTable extends Component {
         align: 'left',
         searchable: true,
         sortable: true,
-        render: status => (
+        render: (status, agent) => (
           <AgentStatus
             status={status}
+            agent={agent}
             labelProps={{ className: 'hide-agent-status' }}
           />
         ),
