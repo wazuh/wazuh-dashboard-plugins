@@ -1,27 +1,23 @@
 import { tDataGridColumn } from '../../../common/data-grid';
+import { commonColumns } from '../../common/data-grid-columns';
 
 export const office365Columns: tDataGridColumn[] = [
-  {
-    id: 'timestamp',
-    isSortable: true,
-    defaultSortDirection: 'desc',
-  },
+  commonColumns.timestamp,
   {
     id: 'data.office365.Subscription',
+    initialWidth: 224.775,
   },
   {
     id: 'data.office365.Operation',
   },
   {
     id: 'data.office365.UserId',
+    initialWidth: 225.775,
   },
   {
     id: 'data.office365.ClientIP',
+    initialWidth: 190.775,
   },
-  {
-    id: 'rule.level',
-  },
-  {
-    id: 'rule.id',
-  },
+  commonColumns['rule.level'],
+  commonColumns['rule.id'],
 ];
