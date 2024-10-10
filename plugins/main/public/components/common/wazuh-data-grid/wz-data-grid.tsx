@@ -21,9 +21,8 @@ import {
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import {
   IndexPattern,
-  SearchResponse,
+  TimeRange,
 } from '../../../../../../src/plugins/data/public';
-import { useDocViewer } from '../doc-viewer';
 import {
   ErrorHandler,
   ErrorFactory,
@@ -36,6 +35,8 @@ import DiscoverDataGridAdditionalControls from '../wazuh-discover/components/dat
 import './wazuh-data-grid.scss';
 import { wzDiscoverRenderColumns } from '../wazuh-discover/render-columns';
 import DocDetailsHeader from '../wazuh-discover/components/doc-details-header';
+import { tFilter } from '../data-source';
+import { SearchResponse } from '@opensearch-project/opensearch/api/types';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -45,8 +46,8 @@ export type tWazuhDataGridProps = {
   defaultColumns: tDataGridColumn[];
   isLoading: boolean;
   defaultPagination: PaginationOptions;
-  query: any;
-  exportFilters: tFilter[];
+  query?: any;
+  exportFilters?: tFilter[];
   dateRange: TimeRange;
   onChangePagination: (pagination: {
     pageIndex: number;
@@ -61,7 +62,6 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     defaultColumns,
     indexPattern,
     isLoading,
-    defaultPagination,
     onChangePagination,
     exportFilters = [],
     onChangeSorting,
@@ -100,7 +100,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     defaultColumns,
     renderColumns: wzDiscoverRenderColumns,
     results,
-    indexPattern: indexPattern as IndexPattern,
+    indexPattern,
     DocViewInspectButton,
     useDefaultPagination: true,
   });
@@ -112,27 +112,18 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
   }, [JSON.stringify(pagination)]);
 
   useEffect(() => {
-    onChangeSorting && onChangeSorting(sorting || []);
+    onChangeSorting && onChangeSorting(sorting);
   }, [JSON.stringify(sorting)]);
-
-  const docViewerProps = useDocViewer({
-    doc: inspectedHit,
-    indexPattern: indexPattern as IndexPattern,
-  });
-
-  const timeField = indexPattern?.timeFieldName
-    ? indexPattern.timeFieldName
-    : undefined;
 
   const onClickExportResults = async () => {
     const params = {
-      indexPattern: indexPattern as IndexPattern,
+      indexPattern,
       filters: exportFilters,
       query,
       fields: columnVisibility.visibleColumns,
       pagination: {
         pageIndex: 0,
-        pageSize: results.hits.total,
+        pageSize: results.hits.total as number,
       },
       sorting,
     };
@@ -141,7 +132,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
       await exportSearchToCSV(params);
     } catch (error) {
       const searchError = ErrorFactory.create(HttpError, {
-        error,
+        error: error as Error,
         message: 'Error downloading csv report',
       });
       ErrorHandler.handleError(searchError);
@@ -150,59 +141,65 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     }
   };
 
+  const hasResults = results?.hits?.total > 0;
+  let additionalControls;
+  if (hasResults) {
+    additionalControls = (
+      <DiscoverDataGridAdditionalControls
+        totalHits={results.hits.total as number}
+        isExporting={isExporting}
+        onClickExportResults={onClickExportResults}
+        maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+        dateRange={dateRange}
+      />
+    );
+  }
+
+  let docViewDetails;
+  if (inspectedHit) {
+    docViewDetails = (
+      <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+        <EuiFlyoutHeader>
+          <EuiTitle>
+            <DocDetailsHeader doc={inspectedHit} indexPattern={indexPattern} />
+          </EuiTitle>
+        </EuiFlyoutHeader>
+        <EuiFlyoutBody>
+          <EuiFlexGroup direction='column'>
+            <EuiFlexItem>
+              <DocumentViewTableAndJson
+                document={inspectedHit}
+                indexPattern={indexPattern}
+                renderFields={getAllCustomRenders(
+                  defaultColumns,
+                  wzDiscoverRenderColumns,
+                )}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlyoutBody>
+      </EuiFlyout>
+    );
+  }
+
+  if (isLoading) {
+    return <LoadingSearchbarProgress />;
+  }
+
   return (
     <>
-      {isLoading ? <LoadingSearchbarProgress /> : null}
-      {!isLoading && !results?.hits?.total === 0 ? (
-        <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-      ) : null}
-      {!isLoading && results?.hits?.total > 0 ? (
+      {!hasResults ? (
+        <DiscoverNoResults />
+      ) : (
         <div className='wazuhDataGridContainer'>
           <EuiDataGrid
             {...dataGridProps}
             className={sideNavDocked ? 'dataGridDockedNav' : ''}
-            toolbarVisibility={{
-              additionalControls: (
-                <>
-                  <DiscoverDataGridAdditionalControls
-                    totalHits={results.hits.total}
-                    isExporting={isExporting}
-                    onClickExportResults={onClickExportResults}
-                    maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                    dateRange={dateRange}
-                  />
-                </>
-              ),
-            }}
+            toolbarVisibility={{ additionalControls }}
           />
         </div>
-      ) : null}
-      {inspectedHit && (
-        <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-          <EuiFlyoutHeader>
-            <EuiTitle>
-              <DocDetailsHeader
-                doc={inspectedHit}
-                indexPattern={indexPattern}
-              />
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiFlexGroup direction='column'>
-              <EuiFlexItem>
-                <DocumentViewTableAndJson
-                  document={inspectedHit}
-                  indexPattern={indexPattern as IndexPattern}
-                  renderFields={getAllCustomRenders(
-                    defaultTableColumns,
-                    wzDiscoverRenderColumns,
-                  )}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlyoutBody>
-        </EuiFlyout>
       )}
+      {inspectedHit && docViewDetails}
     </>
   );
 };
