@@ -16,7 +16,6 @@ import {
   EuiCard,
   EuiFlexItem,
   EuiFlexGroup,
-  EuiPage,
   EuiToolTip,
   EuiEmptyPrompt,
 } from '@elastic/eui';
@@ -86,75 +85,72 @@ export const Stats = withErrorBoundary(
       );
 
       return (
-        <EuiPage>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <EuiCard betaBadgeLabel='Agents summary' title=''>
-                {hasResults ? (
-                  <VisualizationBasic
-                    isLoading={this.state.loadingSummary}
-                    type='donut'
-                    size={{ width: '100%', height: '150px' }}
-                    showLegend
-                    data={this.agentStatus.map(
-                      ({ status, label, color, onClick }) => ({
-                        onClick,
-                        label,
-                        value:
-                          typeof this.props[status] !== 'undefined'
-                            ? this.props[status]
-                            : 0,
-                        color,
-                      }),
-                    )}
+        <EuiFlexGroup gutterSize='l'>
+          <EuiFlexItem grow={false}>
+            <EuiCard betaBadgeLabel='Agents summary' title=''>
+              {hasResults ? (
+                <VisualizationBasic
+                  isLoading={this.state.loadingSummary}
+                  type='donut'
+                  size={{ width: '100%', height: '150px' }}
+                  showLegend
+                  data={this.agentStatus.map(
+                    ({ status, label, color, onClick }) => ({
+                      onClick,
+                      label,
+                      value:
+                        typeof this.props[status] !== 'undefined'
+                          ? this.props[status]
+                          : 0,
+                      color,
+                    }),
+                  )}
+                />
+              ) : (
+                !hasResults &&
+                this.props !== undefined && (
+                  <EuiEmptyPrompt
+                    body={
+                      <p>
+                        This instance has no agents registered.
+                        <br />
+                        Please deploy agents to begin monitoring your endpoints.
+                      </p>
+                    }
+                    actions={
+                      <WzButtonPermissions
+                        color='primary'
+                        fill
+                        permissions={[
+                          { action: 'agent:create', resource: '*:*:*' },
+                        ]}
+                        iconType='plusInCircle'
+                        href={NavigationService.getInstance().getUrlForApp(
+                          endpointSummary.id,
+                          {
+                            path: `#${endpointSummary.redirectTo()}deploy`,
+                          },
+                        )}
+                      >
+                        Deploy new agent
+                      </WzButtonPermissions>
+                    }
                   />
-                ) : (
-                  !hasResults &&
-                  this.props !== undefined && (
-                    <EuiEmptyPrompt
-                      body={
-                        <p>
-                          This instance has no agents registered.
-                          <br />
-                          Please deploy agents to begin monitoring your
-                          endpoints.
-                        </p>
-                      }
-                      actions={
-                        <WzButtonPermissions
-                          color='primary'
-                          fill
-                          permissions={[
-                            { action: 'agent:create', resource: '*:*:*' },
-                          ]}
-                          iconType='plusInCircle'
-                          href={NavigationService.getInstance().getUrlForApp(
-                            endpointSummary.id,
-                            {
-                              path: `#${endpointSummary.redirectTo()}deploy`,
-                            },
-                          )}
-                        >
-                          Deploy new agent
-                        </WzButtonPermissions>
-                      }
-                    />
-                  )
-                )}
-              </EuiCard>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
-                <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
-                  <LastAlertsStat severity='critical' />
-                  <LastAlertsStat severity='high' />
-                  <LastAlertsStat severity='medium' />
-                  <LastAlertsStat severity='low' />
-                </EuiFlexGroup>
-              </EuiCard>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPage>
+                )
+              )}
+            </EuiCard>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
+              <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
+                <LastAlertsStat severity='critical' />
+                <LastAlertsStat severity='high' />
+                <LastAlertsStat severity='medium' />
+                <LastAlertsStat severity='low' />
+              </EuiFlexGroup>
+            </EuiCard>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       );
     }
   },

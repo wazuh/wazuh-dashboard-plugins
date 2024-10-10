@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { EuiPage, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { getDataPlugin, getUiSettings } from '../../kibana-services';
 import { Stats } from '../../controllers/overview/components/stats';
 import { AppState, WzRequest } from '../../react-services';
@@ -158,10 +159,16 @@ export const Overview: React.FC = withRouteResolvers({
         </>
       )}
       {tab === 'welcome' && (
-        <>
-          <Stats {...agentsCounts} />
-          <OverviewWelcome {...agentsCounts} />
-        </>
+        <EuiPage paddingSize='l'>
+          <EuiFlexGroup direction='column'>
+            <EuiFlexItem>
+              <Stats {...agentsCounts} />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <OverviewWelcome {...agentsCounts} />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPage>
       )}
     </>
   );
