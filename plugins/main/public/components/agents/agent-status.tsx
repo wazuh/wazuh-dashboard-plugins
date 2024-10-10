@@ -26,7 +26,7 @@ export const AgentStatus = ({ status, children = null, style = {}, agent }) => {
         anchorClassName='wz-margin-left-10'
         aria-label='Description'
         size='m'
-        type='questionInCircle'
+        type='iInCircle'
         color='primary'
         content={statusCodeAgent?.STATUS_DESCRIPTION ?? 'Without information'}
       />
