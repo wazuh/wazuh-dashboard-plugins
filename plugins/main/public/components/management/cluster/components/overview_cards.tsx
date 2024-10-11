@@ -31,6 +31,7 @@ interface OverviewCardsProps {
   indexPattern: tParsedIndexPattern;
   clusterName?: string;
   filters: tFilter[];
+  lastReloadRequestTime: number;
 }
 
 const plugins = getPlugins();
@@ -52,6 +53,7 @@ export const OverviewCards = ({
   indexPattern,
   clusterName,
   filters,
+  lastReloadRequestTime,
 }: OverviewCardsProps) => {
   return (
     <>
@@ -223,6 +225,7 @@ export const OverviewCards = ({
                 value: 15,
               },
               hidePanelTitles: false,
+              lastReloadRequestTime,
             }}
           />
         </div>

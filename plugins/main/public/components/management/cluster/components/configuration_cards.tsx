@@ -23,6 +23,7 @@ interface ConfigurationCardsProps {
   results: any;
   indexPatternId?: string;
   filters: tFilter[];
+  lastReloadRequestTime: number;
 }
 
 const plugins = getPlugins();
@@ -36,6 +37,7 @@ export const ConfigurationCards = ({
   results,
   indexPatternId,
   filters,
+  lastReloadRequestTime,
 }: ConfigurationCardsProps) => {
   const configurationItemsList = [
     {
@@ -126,6 +128,7 @@ export const ConfigurationCards = ({
                     value: 15,
                   },
                   hidePanelTitles: false,
+                  lastReloadRequestTime,
                 }}
               />
             ) : (

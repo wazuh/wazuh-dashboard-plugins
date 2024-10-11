@@ -67,7 +67,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -100,6 +100,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     JSON.stringify(query),
     dateRangeFrom,
     dateRangeTo,
+    fingerprint,
   ]);
 
   const setBooleans = (component: string | null) => {
@@ -186,6 +187,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
             results={results}
             indexPattern={dataSource?.indexPattern}
             filters={fetchFilters ?? []}
+            lastReloadRequestTime={fingerprint}
           />
         ) : null}
         {state.showConfig ? (
@@ -196,6 +198,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
             results={results}
             indexPatternId={dataSource?.id}
             filters={fetchFilters ?? []}
+            lastReloadRequestTime={fingerprint}
           />
         ) : null}
         {state.showNodes ? <NodeList goBack={goBack} /> : null}

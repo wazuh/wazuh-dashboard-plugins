@@ -63,7 +63,6 @@ const useSearchBarConfiguration = (
    * the Dashboards embeddables so they refresh when the user clicks on the Update button in the search bar.
    */
   const [fingerprint, setFingerprint] = useState(Date.now());
-
   const { query: queryService } = getDataPlugin();
   const { savedQuery, setSavedQuery, clearSavedQuery } = useSavedQuery({
     queryService,
@@ -80,6 +79,8 @@ const useSearchBarConfiguration = (
       setIndexPatternSelected(indexPattern);
     }
   }, [indexPattern]);
+
+  useEffect(() => setTimeFilter(globalTimeFilter), [globalTimeFilter]);
 
   useEffect(() => {
     initSearchBar();

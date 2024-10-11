@@ -9,6 +9,7 @@ import {
   EuiPanel,
   EuiText,
 } from '@elastic/eui';
+import { TimeRange } from '../../../../../../src/plugins/data/public';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
 import { IntlProvider } from 'react-intl';
@@ -36,6 +37,7 @@ import {
 } from '../data-source';
 import DocDetails from './components/doc-details';
 import { WzSearchBar } from '../search-bar/search-bar';
+import { transformDateRange } from '../search-bar/search-bar-service';
 import { MAX_ENTRIES_PER_QUERY } from '../data-grid/data-grid-service';
 export const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 export const DEFAULT_PAGE_SIZE = 20;
@@ -116,13 +118,17 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     to: timeFilter.to,
   });
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
     setQuery,
     setTimeFilter: setDateRange,
   } as tUseSearchBarProps);
+
+  const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
+    transformDateRange({ from: dateRange.from, to: dateRange.to }),
+  );
 
   const parseSorting = useMemo(() => {
     if (!sorting) {
@@ -140,11 +146,12 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       return;
     }
     setIndexPattern(dataSource?.indexPattern);
+
     fetchData({
       query,
-      dateRange: { from: dateRange.from || '', to: dateRange.to || '' },
       pagination,
       sorting: parseSorting,
+      dateRange: absoluteDateRange,
     })
       .then((response: SearchResponse) => {
         setPagination({
@@ -152,21 +159,34 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
         });
         setResults(response);
       })
-      .catch((error: HttpError) => {
+      .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
+  }, [absoluteDateRange, JSON.stringify(sorting), JSON.stringify(pagination)]);
+
+  useEffect(() => {
+    if (isDataSourceLoading) {
+      return;
+    }
+
+    setPagination(pagination => ({
+      ...pagination,
+      pageIndex: 0,
+    }));
+    setAbsoluteDateRange(
+      transformDateRange({ from: dateRange.from, to: dateRange.to }),
+    );
   }, [
     isDataSourceLoading,
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(sorting),
-    JSON.stringify(pagination),
     dateRange.from,
     dateRange.to,
+    fingerprint,
   ]);
 
   const toggleDetails = item => {
@@ -315,8 +335,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                   >
                     <EuiFlexItem grow={false}>
                       <EuiText size='s'>
-                        {formatUIDate(dateRange?.from)} -{' '}
-                        {formatUIDate(dateRange?.to)}
+                        {formatUIDate(absoluteDateRange?.from)} -{' '}
+                        {formatUIDate(absoluteDateRange?.to)}
                       </EuiText>
                     </EuiFlexItem>
                   </EuiFlexGroup>

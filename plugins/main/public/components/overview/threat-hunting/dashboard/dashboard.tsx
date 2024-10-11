@@ -88,8 +88,6 @@ const DashboardTH: React.FC = () => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(pagination),
-    JSON.stringify(sorting),
     dateRangeFrom,
     dateRangeTo,
   ]);

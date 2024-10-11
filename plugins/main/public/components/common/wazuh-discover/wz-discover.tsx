@@ -12,6 +12,7 @@ import {
   EuiFlyoutHeader,
   EuiPanel,
 } from '@elastic/eui';
+import { TimeRange } from '../../../../../../src/plugins/data/public';
 import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
@@ -48,6 +49,7 @@ import {
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
 import { WzSearchBar } from '../search-bar';
+import { transformDateRange } from '../search-bar/search-bar-service';
 import DocDetailsHeader from './components/doc-details-header';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
@@ -116,7 +118,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
   });
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
-
+  const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
+    transformDateRange({ from: dateRangeFrom, to: dateRangeTo }),
+  );
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
     defaultColumns: defaultTableColumns,
@@ -129,18 +133,20 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
   });
 
-  const { pagination, sorting, columnVisibility } = dataGridProps;
+  const { pagination, setPagination, sorting, columnVisibility } =
+    dataGridProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
       return;
     }
     setIndexPattern(dataSource?.indexPattern);
+
     fetchData({
       query,
       pagination,
       sorting,
-      dateRange: { from: dateRangeFrom, to: dateRangeTo },
+      dateRange: absoluteDateRange,
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -150,11 +156,23 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         });
         ErrorHandler.handleError(searchError);
       });
+  }, [absoluteDateRange, JSON.stringify(sorting), JSON.stringify(pagination)]);
+
+  useEffect(() => {
+    if (isDataSourceLoading) {
+      return;
+    }
+    setIndexPattern(dataSource?.indexPattern);
+    setPagination(pagination => ({
+      ...pagination,
+      pageIndex: 0,
+    }));
+    setAbsoluteDateRange(
+      transformDateRange({ from: dateRangeFrom, to: dateRangeTo }),
+    );
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(sorting),
-    JSON.stringify(pagination),
     dateRangeFrom,
     dateRangeTo,
     fingerprint,
@@ -261,7 +279,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                             isExporting={isExporting}
                             onClickExportResults={onClickExportResults}
                             maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                            dateRange={{ from: dateRangeFrom, to: dateRangeTo }}
+                            dateRange={absoluteDateRange}
                           />
                         </>
                       ),
