@@ -41,6 +41,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed the PDF report footer year [#7023](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7023)
 - Removed the XML autoformat function group configuration due to performance [#6999](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6999)
+- Removed data grid tables from Threat hunting dashboard, GitHub panel and Office365 panel [#7086](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7086)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
 
