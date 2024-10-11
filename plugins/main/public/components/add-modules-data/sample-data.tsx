@@ -57,9 +57,7 @@ const sampleThreatDetectionApplication = [
   mitreAttack.title,
 ].join(', ');
 
-const sampleThreatMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(
-  ', ',
-);
+const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 
 export default class WzSampleData extends Component {
   categories: {
@@ -88,7 +86,7 @@ export default class WzSampleData extends Component {
       },
       {
         title: `Sample ${malwareDetection.title}`,
-        description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${sampleThreatMalwareDetection}).`,
+        description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
         image: '',
         categorySampleAlertsIndex: 'auditing-policy-monitoring',
       },
