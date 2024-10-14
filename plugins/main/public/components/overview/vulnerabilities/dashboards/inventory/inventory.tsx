@@ -65,7 +65,7 @@ const InventoryVulsComponent = () => {
     DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository(),
   });
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -169,6 +169,7 @@ const InventoryVulsComponent = () => {
     JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
+    fingerprint,
   ]);
 
   return (
