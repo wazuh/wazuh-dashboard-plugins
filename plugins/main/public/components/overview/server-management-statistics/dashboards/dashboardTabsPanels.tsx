@@ -72,7 +72,7 @@ export const DashboardTabsPanels = ({
       "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
   };
 
-  const { searchBarProps, fingerprint } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -106,6 +106,8 @@ export const DashboardTabsPanels = ({
     JSON.stringify(query),
     dateRangeFrom,
     dateRangeTo,
+    fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   const selectedNodeFilter: tFilter = {

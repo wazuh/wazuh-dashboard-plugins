@@ -68,7 +68,7 @@ const MitreComponent = props => {
     repository: new AlertsDataSourceRepository(),
   });
 
-  const { searchBarProps, fingerprint } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters: setFilters,
@@ -117,6 +117,7 @@ const MitreComponent = props => {
     dateRangeFrom,
     dateRangeTo,
     fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   const buildTacticsObject = async () => {

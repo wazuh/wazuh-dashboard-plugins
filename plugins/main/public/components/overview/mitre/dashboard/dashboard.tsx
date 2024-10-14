@@ -45,7 +45,7 @@ export const DashboardMITRE: React.FC = () => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps, fingerprint } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -84,6 +84,8 @@ export const DashboardMITRE: React.FC = () => {
     JSON.stringify(query),
     dateRangeFrom,
     dateRangeTo,
+    fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   return (

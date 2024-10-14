@@ -67,7 +67,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps, fingerprint } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -101,6 +101,7 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     dateRangeFrom,
     dateRangeTo,
     fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   const setBooleans = (component: string | null) => {

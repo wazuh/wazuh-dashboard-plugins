@@ -156,7 +156,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     repository: new AlertsDataSourceRepository(),
   });
 
-  const { searchBarProps, fingerprint } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -284,6 +284,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     dateRangeFrom,
     dateRangeTo,
     fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   return (

@@ -48,7 +48,7 @@ const DashboardVT: React.FC = () => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps, fingerprint } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -88,6 +88,8 @@ const DashboardVT: React.FC = () => {
     JSON.stringify(query),
     dateRangeFrom,
     dateRangeTo,
+    fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   return (
