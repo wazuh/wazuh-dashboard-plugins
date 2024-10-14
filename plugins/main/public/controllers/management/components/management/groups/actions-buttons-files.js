@@ -59,9 +59,10 @@ class WzGroupsActionButtonsFiles extends Component {
         buttonType='empty'
         permissions={[
           {
-            action: 'group:read',
+            action: 'group:update_config',
             resource: `group:id:${this.props.state.itemDetail.name}`,
           },
+          { action: 'cluster:status', resource: '*:*:*' },
         ]}
         iconSide='left'
         iconType='documentEdit'
