@@ -109,7 +109,9 @@ describe('[hook] useSearchBarConfiguration', () => {
       .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
       .mockReturnValue([]);
     // @ts-ignore
-    const { result, waitForNextUpdate } = renderHook(() => useSearchBar({}));
+    const { result, waitForNextUpdate } = renderHook(() => useSearchBar({
+      setFilters: jest.fn()
+    }));
     await waitForNextUpdate();
     expect(mockDataPlugin.indexPatterns.getDefault).toBeCalled();
     expect(result.current.searchBarProps.indexPatterns).toMatchObject([
