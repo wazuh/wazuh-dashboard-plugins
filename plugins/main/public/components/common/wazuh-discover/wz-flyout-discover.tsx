@@ -118,7 +118,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     to: timeFilter.to,
   });
 
-  const { searchBarProps, fingerprint } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -187,6 +187,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     dateRange.from,
     dateRange.to,
     fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   const toggleDetails = item => {

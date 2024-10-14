@@ -112,7 +112,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     );
   };
 
-  const { searchBarProps, fingerprint } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -176,6 +176,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     dateRangeFrom,
     dateRangeTo,
     fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   const timeField = indexPattern?.timeFieldName

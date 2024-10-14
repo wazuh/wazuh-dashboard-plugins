@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { isEqual } from 'lodash';
 import {
   SearchBarProps,
   TimeRange,
@@ -34,6 +35,7 @@ type tUserSearchBarResponse = {
     }
   >;
   fingerprint: number;
+  autoRefreshFingerprint: number;
 };
 
 /**
@@ -62,6 +64,14 @@ const useSearchBarConfiguration = (
    * the Dashboards embeddables so they refresh when the user clicks on the Update button in the search bar.
    */
   const [fingerprint, setFingerprint] = useState(Date.now());
+
+  /*
+    This fingerprint is used for auto refresh of time filter
+  */
+  const [autoRefreshFingerprint, setAutoRefreshFingerprint] = useState(
+    Date.now(),
+  );
+
   const { query: queryService } = getDataPlugin();
   const { savedQuery, setSavedQuery, clearSavedQuery } = useSavedQuery({
     queryService,
@@ -85,6 +95,14 @@ const useSearchBarConfiguration = (
 
   useEffect(() => {
     initSearchBar();
+  }, []);
+
+  // Subscribe to changes in the search bar auto refresh feature (every 5 seconds, etc.)
+  useEffect(() => {
+    const subscription = queryService.timefilter.timefilter
+      .getAutoRefreshFetch$()
+      .subscribe(() => setAutoRefreshFingerprint(Date.now()));
+    return () => subscription.unsubscribe();
   }, []);
 
   /**
@@ -152,17 +170,21 @@ const useSearchBarConfiguration = (
       payload: { dateRange: TimeRange; query?: Query },
       _isUpdate?: boolean,
     ): void => {
-      const { dateRange, query } = payload;
+      const { dateRange: newDateRange, query: newQuery } = payload;
       // its necessary execute setter to apply query filters
       // when the hook receives the dateRange use the setter instead the global setTimeFilter
       props?.setTimeFilter
-        ? props?.setTimeFilter(dateRange)
-        : setGlobalTimeFilter(dateRange);
-      props?.setQuery ? props?.setQuery(query) : setQuery(query);
+        ? props?.setTimeFilter(newDateRange)
+        : setGlobalTimeFilter(newDateRange);
+      props?.setQuery ? props?.setQuery(newQuery) : setQuery(newQuery);
       props?.onQuerySubmitted && props?.onQuerySubmitted(payload);
-      setTimeFilter(dateRange);
-      setQuery(query);
-      setFingerprint(Date.now());
+      // Change the fingerprint only when the search parameter are all the same. This should happen only when the user clicks on Update button
+      if (isEqual(newDateRange, timeFilter) && isEqual(query, newQuery)) {
+        setFingerprint(Date.now());
+      }
+
+      setTimeFilter(newDateRange);
+      setQuery(newQuery);
     },
     // its necessary to use saved queries. if not, the load saved query not work
     onClearSavedQuery: clearSavedQuery,
@@ -174,6 +196,7 @@ const useSearchBarConfiguration = (
   return {
     searchBarProps,
     fingerprint,
+    autoRefreshFingerprint,
   };
 };
 
