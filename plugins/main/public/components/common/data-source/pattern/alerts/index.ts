@@ -8,7 +8,6 @@ export * from './docker';
 export * from './malware-detection';
 export * from './vulnerabilities';
 export * from './hipaa';
-export * from './virustotal';
 export * from './nist-800-53';
 export * from './mitre-attack';
 export * from './pci-dss';
