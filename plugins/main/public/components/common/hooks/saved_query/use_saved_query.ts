@@ -34,6 +34,8 @@ import {
   RefreshInterval,
   SavedQuery,
   TimeRange,
+  Query,
+  Filter,
 } from '../../../../../../../src/plugins/data/public';
 import NavigationService from '../../../../react-services/navigation-service';
 import { OSD_URL_STATE_STORAGE_ID } from '../../../../../common/constants';
@@ -49,6 +51,8 @@ interface UseSavedQueriesProps {
   queryService: DataPublicPluginStart['query'];
   setTimeFilter: (timeFilter: TimeRange) => void;
   setRefreshInterval: (refreshInterval: RefreshInterval) => void;
+  setQuery: (query?: Query) => void;
+  setFilters: (filters: Filter[]) => void;
 }
 
 interface UseSavedQueriesReturn {
@@ -57,9 +61,7 @@ interface UseSavedQueriesReturn {
   clearSavedQuery: () => void;
 }
 
-export const useSavedQuery = (
-  props: UseSavedQueriesProps,
-): UseSavedQueriesReturn => {
+export const useSavedQuery = (props: UseSavedQueriesProps): UseSavedQueriesReturn => {
   // Handle saved queries
   const [savedQuery, setSavedQuery] = useState<SavedQuery | undefined>();
   const data = getDataPlugin();
@@ -72,44 +74,39 @@ export const useSavedQuery = (
 
   const getAppFilters = (
     newSavedQuery?: SavedQuery,
-    { firstTime }: Options = { firstTime: false },
+    { firstTime }: Options = { firstTime: false }
   ) => {
     const { filterManager } = props.queryService;
     // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
-    return firstTime
-      ? filterManager.getAppFilters()
-      : newSavedQuery?.attributes.filters;
+    return firstTime ? filterManager.getAppFilters() : newSavedQuery?.attributes.filters ?? [];
   };
 
-  const getQuery = (
-    newSavedQuery?: SavedQuery,
-    { firstTime }: Options = { firstTime: false },
-  ) => {
+  const getQuery = (newSavedQuery?: SavedQuery, { firstTime }: Options = { firstTime: false }) => {
     const { queryString } = props.queryService;
     // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
-    return firstTime ? queryString.getQuery() : newSavedQuery?.attributes.query;
+    return firstTime
+      ? queryString.getQuery()
+      : newSavedQuery?.attributes.query ?? { query: '', language: 'kuery' };
   };
 
   const getTimeFilter = (
     newSavedQuery?: SavedQuery,
-    { firstTime }: Options = { firstTime: false },
+    { firstTime }: Options = { firstTime: false }
   ) => {
     const { timefilter } = props.queryService;
     // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
-    return firstTime
-      ? timefilter.timefilter.getTime()
-      : newSavedQuery.attributes.timefilter;
+    return firstTime ? timefilter.timefilter.getTime() : newSavedQuery?.attributes.timefilter;
   };
 
   const getRefreshInterval = (
     newSavedQuery?: SavedQuery,
-    { firstTime }: Options = { firstTime: false },
+    { firstTime }: Options = { firstTime: false }
   ) => {
     const { timefilter } = props.queryService;
     // When the page reloads, savedQuery starts as undefined, so retrieve the time and refreshInterval from the URL.
     return firstTime
       ? timefilter.timefilter.getRefreshInterval()
-      : newSavedQuery.attributes.timefilter.refreshInterval;
+      : newSavedQuery?.attributes.timefilter?.refreshInterval;
   };
 
   const setTimeFilter = (timeFilter: TimeRange) => {
@@ -119,31 +116,30 @@ export const useSavedQuery = (
 
   const saveSavedQuery = async (
     newSavedQuery?: SavedQuery,
-    { firstTime }: Options = { firstTime: false },
+    { firstTime }: Options = { firstTime: false }
   ) => {
+    setSavedQuery(newSavedQuery);
+    const filters = getAppFilters(newSavedQuery, { firstTime });
+    const query = getQuery(newSavedQuery, { firstTime });
     await OsdUrlStateStorage(data, osdUrlStateStorage).replaceUrlAppState({
       savedQuery: newSavedQuery?.id,
-      filters: getAppFilters(newSavedQuery, { firstTime }),
-      query: getQuery(newSavedQuery, { firstTime }),
     });
+    props.setFilters(filters);
+    props.setQuery(query);
     if (newSavedQuery?.attributes.timefilter) {
       setTimeFilter(getTimeFilter(newSavedQuery, { firstTime }));
-      props.setRefreshInterval(
-        getRefreshInterval(newSavedQuery, { firstTime }),
-      );
+      props.setRefreshInterval(getRefreshInterval(newSavedQuery, { firstTime }));
     }
   };
 
   const updateSavedQuery = async (
     savedQuery: SavedQuery,
-    { firstTime }: { firstTime?: boolean } = { firstTime: false },
+    { firstTime }: { firstTime?: boolean } = { firstTime: false }
   ) => {
-    setSavedQuery(savedQuery);
     saveSavedQuery(savedQuery, { firstTime });
   };
 
   const clearSavedQuery = () => {
-    setSavedQuery(undefined);
     // remove saved query from url
     saveSavedQuery(undefined);
   };
@@ -152,15 +148,11 @@ export const useSavedQuery = (
   useEffect(() => {
     const fetchSavedQuery = async () => {
       try {
-        const savedQueryId = OsdUrlStateStorage(
-          data,
-          osdUrlStateStorage,
-        ).getAppStateFromUrl().savedQuery as string;
+        const savedQueryId = OsdUrlStateStorage(data, osdUrlStateStorage).getAppStateFromUrl()
+          .savedQuery as string;
         if (!savedQueryId) return;
         // fetch saved query
-        const savedQuery = await props.queryService.savedQueries.getSavedQuery(
-          savedQueryId,
-        );
+        const savedQuery = await props.queryService.savedQueries.getSavedQuery(savedQueryId);
         updateSavedQuery(savedQuery, { firstTime: true });
       } catch (error) {
         clearSavedQuery();

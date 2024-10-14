@@ -6,7 +6,6 @@ import {
   Filter,
   IndexPattern,
   IndexPatternsContract,
-  SavedQuery,
 } from '../../../../../../src/plugins/data/public';
 import { getDataPlugin } from '../../../kibana-services';
 import { useQueryManager, useTimeFilter } from '../hooks';
@@ -68,6 +67,8 @@ const useSearchBarConfiguration = (
     queryService,
     setTimeFilter,
     setRefreshInterval,
+    setFilters,
+    setQuery,
   });
   // states
   const [isLoading, setIsLoading] = useState(true);
@@ -164,20 +165,9 @@ const useSearchBarConfiguration = (
       setFingerprint(Date.now());
     },
     // its necessary to use saved queries. if not, the load saved query not work
-    onClearSavedQuery: () => {
-      setFilters([]);
-      clearSavedQuery();
-    },
-    onSaved: (savedQuery: SavedQuery) => {
-      const savedQueryFilters = savedQuery.attributes.filters || [];
-      setFilters([...savedQueryFilters]);
-      setSavedQuery(savedQuery);
-    },
-    onSavedQueryUpdated: (savedQuery: SavedQuery) => {
-      const savedQueryFilters = savedQuery.attributes.filters || [];
-      setFilters([...savedQueryFilters]);
-      setSavedQuery(savedQuery);
-    },
+    onClearSavedQuery: clearSavedQuery,
+    onSaved: setSavedQuery,
+    onSavedQueryUpdated: setSavedQuery,
     savedQuery,
   };
 
