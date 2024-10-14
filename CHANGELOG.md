@@ -23,6 +23,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the agents summary in overview with no results to an agent deployment help message. [#7041](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7041)
 - Changed malware feature description [#7036](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7036)
 - Changed the font size of the kpi subtitles and the features descriptions [#7033](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7033)
+- Changed feature container margins to ensure consistent separation and uniform design. [#7034](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7034)
 - Changed the initial width to the default columns on each selected field [#7059](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7059)
 
 ### Fixed
@@ -30,7 +31,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed read-only users could not access to Statistics application [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
 - Fixed no-agent-alert spawn with selected agent in agent-welcome view [#7029](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7029)
 - Fixed security policy exception when it contained deprecated actions [#7042](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7042)
-- Fix export formatted csv data with special characters from tables [#7048](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7048)
+- Fixed export formatted csv data with special characters from tables [#7048](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7048)
+- Fixed column reordering feature [#7072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7072)
 
 ### Removed
 
