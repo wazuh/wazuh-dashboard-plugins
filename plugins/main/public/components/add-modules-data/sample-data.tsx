@@ -37,7 +37,6 @@ import {
   malwareDetection,
   mitreAttack,
   office365,
-  virustotal,
   vulnerabilityDetection,
 } from '../../utils/applications';
 
@@ -47,14 +46,18 @@ const sampleSecurityInformationApplication = [
   office365.title,
   googleCloud.title,
   github.title,
-];
+  'authorization',
+  'ssh',
+  'web',
+].join(', ');
 
 const sampleThreatDetectionApplication = [
   vulnerabilityDetection.title,
-  virustotal.title,
   docker.title,
   mitreAttack.title,
-];
+].join(', ');
+
+const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 
 export default class WzSampleData extends Component {
   categories: {
@@ -77,23 +80,19 @@ export default class WzSampleData extends Component {
     this.categories = [
       {
         title: 'Sample security information',
-        description: `Sample data, visualizations and dashboards for security information (${sampleSecurityInformationApplication.join(
-          ', ',
-        )}, authorization, ssh, web).`,
+        description: `Sample data, visualizations and dashboards for security information (${sampleSecurityInformationApplication}).`,
         image: '',
         categorySampleAlertsIndex: 'security',
       },
       {
         title: `Sample ${malwareDetection.title}`,
-        description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${malwareDetection.title}).`,
+        description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
         image: '',
         categorySampleAlertsIndex: 'auditing-policy-monitoring',
       },
       {
         title: 'Sample threat detection and response',
-        description: `Sample data, visualizations and dashboards for threat events of detection and response (${sampleThreatDetectionApplication.join(
-          ', ',
-        )}).`,
+        description: `Sample data, visualizations and dashboards for threat events of detection and response (${sampleThreatDetectionApplication}).`,
         image: '',
         categorySampleAlertsIndex: 'threat-detection',
       },
