@@ -13,10 +13,12 @@ export interface WzSearchBarProps extends SearchBarProps {
   preQueryBar?: React.ReactElement;
   postFilters?: React.ReactElement;
   hideFixedFilters?: boolean;
+  showSaveQueryButton?: boolean;
 }
 
 export const WzSearchBar = ({
   fixedFilters = [],
+  showSaveQueryButton = true,
   preQueryBar,
   hideFixedFilters,
   postFilters,
@@ -48,7 +50,7 @@ export const WzSearchBar = ({
         >
           {preQueryBar ? <EuiFlexItem>{preQueryBar}</EuiFlexItem> : null}
           <EuiFlexItem grow={!preQueryBar}>
-            <SearchBar {...restProps} />
+            <SearchBar {...restProps} showFilterBar={showSaveQueryButton} />
           </EuiFlexItem>
         </EuiFlexGroup>
       ) : null}

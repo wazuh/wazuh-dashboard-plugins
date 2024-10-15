@@ -298,6 +298,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
               {...searchBarProps}
               useDefaultBehaviors={false}
               hideFixedFilters
+              showSaveQueryButton={false}
             />
             {!isDataSourceLoading && results?.hits?.total === 0 && (
               <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
