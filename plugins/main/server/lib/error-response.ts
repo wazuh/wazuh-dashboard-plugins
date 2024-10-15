@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { ERROR_CODES } from '../../common/constants';
+
 /**
  * Error codes:
  * wazuh-api-elastic 20XX
@@ -27,7 +29,7 @@
  */
 export function ErrorResponse(
   message: string | null = '',
-  code: number | null = null,
+  code: string | number | null = null,
   statusCode: number | null = null,
   response: object,
 ) {
@@ -48,7 +50,11 @@ export function ErrorResponse(
       code === 3005
     ) {
       filteredMessage = 'API is not reachable. Please check your url and port.';
-    } else if (isString && message?.includes('ECONNREFUSED') && code === 3005) {
+    } else if (
+      isString &&
+      message?.includes(ERROR_CODES.ECONNREFUSED) &&
+      code === 3005
+    ) {
       filteredMessage = 'API is not reachable. Please check your url and port.';
     } else if (
       isString &&
