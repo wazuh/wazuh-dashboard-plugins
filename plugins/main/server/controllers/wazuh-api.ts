@@ -107,6 +107,20 @@ export class WazuhApiCtrl {
     }
   }
 
+  private async requestManagerInfo(
+    context: RequestHandlerContext,
+    id: string,
+    { forceRefresh }: { forceRefresh?: boolean } = {},
+  ) {
+    // Fetch needed information about the cluster and the manager itself
+    return await context.wazuh.api.client.asInternalUser.request(
+      'GET',
+      `/manager/info`,
+      {},
+      { apiHostID: id, forceRefresh },
+    );
+  }
+
   /**
    * Returns if the wazuh-api configuration is working
    * @param {Object} context
@@ -133,37 +147,38 @@ export class WazuhApiCtrl {
 
       context.wazuh.logger.debug(`${id} exists`);
 
-      // Fetch needed information about the cluster and the manager itself
-      const responseManagerInfo =
-        await context.wazuh.api.client.asInternalUser.request(
-          'get',
-          `/manager/info`,
-          {},
-          { apiHostID: id, forceRefresh: true },
-        );
+      const promises = [
+        this.requestManagerInfo(context, id, {
+          forceRefresh: true,
+        }),
+        context.wazuh_core.manageHosts.getRegistryDataByHost(apiHostData, {
+          throwError: true,
+        }),
+      ];
 
-      // Look for socket-related errors
-      if (this.checkResponseIsDown(context, responseManagerInfo)) {
-        return ErrorResponse(
-          `ERROR3099 - ${
-            responseManagerInfo.data.detail || 'Server not ready yet'
-          }`,
-          3099,
-          HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
-          response,
-        );
+      const settledResult = await Promise.allSettled(promises);
+      let responseManagerInfo;
+
+      if (settledResult[0].status === 'fulfilled') {
+        responseManagerInfo = settledResult[0].value;
+        // Look for socket-related errors
+        if (this.checkResponseIsDown(context, responseManagerInfo)) {
+          return ErrorResponse(
+            `ERROR3099 - ${
+              responseManagerInfo.data.detail || 'Server not ready yet'
+            }`,
+            3099,
+            HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
+            response,
+          );
+        }
+      } else {
+        throw new Error(settledResult[0].reason);
       }
 
       // If we have a valid response from the Wazuh API
-      try {
-        const { status, manager, node, cluster } =
-          await context.wazuh_core.manageHosts.getRegistryDataByHost(
-            apiHostData,
-            {
-              throwError: true,
-            },
-          );
-
+      if (settledResult[1].status === 'fulfilled') {
+        const { status, manager, node, cluster } = settledResult[1].value;
         api.cluster_info = { status, manager, node, cluster };
 
         return response.ok({
@@ -173,7 +188,7 @@ export class WazuhApiCtrl {
             idChanged: request.body.idChanged || null,
           },
         });
-      } catch (error) {
+      } else {
         // If we have an invalid response from the Wazuh API
         throw new Error(
           responseManagerInfo.data.detail ||
@@ -202,13 +217,10 @@ export class WazuhApiCtrl {
             try {
               const { id } = api;
 
-              const responseManagerInfo =
-                await context.wazuh.api.client.asInternalUser.request(
-                  'GET',
-                  `/manager/info`,
-                  {},
-                  { apiHostID: id },
-                );
+              const responseManagerInfo = await this.requestManagerInfo(
+                context,
+                id,
+              );
 
               if (this.checkResponseIsDown(context, responseManagerInfo)) {
                 return ErrorResponse(
