@@ -79,7 +79,9 @@ export class WazuhApiCtrl {
             }
           } catch (error) {
             context.wazuh.logger.error(
-              `Error decoding the API host entry token: ${error.message}`,
+              `Error decoding the API host entry token: ${
+                (error as Error).message
+              }`,
             );
           }
         }
@@ -105,7 +107,7 @@ export class WazuhApiCtrl {
       });
     } catch (error) {
       const errorMessage = `Error getting the authorization token: ${
-        ((error.response || {}).data || {}).detail || error.message || error
+        error.response?.data?.detail || (error as Error).message || error
       }`;
       context.wazuh.logger.error(errorMessage);
       return ErrorResponse(
@@ -250,17 +252,17 @@ export class WazuhApiCtrl {
             } catch (error) {} // eslint-disable-line
           }
         } catch (error) {
-          context.wazuh.logger.error(error.message || error);
+          context.wazuh.logger.error((error as Error).message || error);
           return ErrorResponse(
-            error.message || error,
+            (error as Error).message || error,
             3020,
             error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
             response,
           );
         }
-        context.wazuh.logger.error(error.message || error);
+        context.wazuh.logger.error((error as Error).message || error);
         return ErrorResponse(
-          error.message || error,
+          (error as Error).message || error,
           3002,
           error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response,
@@ -365,7 +367,7 @@ export class WazuhApiCtrl {
         });
       }
     } catch (error) {
-      context.wazuh.logger.warn(error.message || error);
+      context.wazuh.logger.warn((error as Error).message || error);
 
       if (
         error &&
@@ -401,7 +403,7 @@ export class WazuhApiCtrl {
         );
       }
       return ErrorResponse(
-        error.message || error,
+        (error as Error).message || error,
         3005,
         error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
@@ -413,7 +415,7 @@ export class WazuhApiCtrl {
     if (response.status !== HTTP_STATUS_CODES.OK) {
       // Avoid "Error communicating with socket" like errors
       const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
-      const status = (response.data || {}).status || 1;
+      const status = response.data?.status || 1;
       const isDown = socketErrorCodes.includes(status);
 
       isDown &&
@@ -439,12 +441,10 @@ export class WazuhApiCtrl {
         { apiHostID: api.id },
       );
 
-      const daemons =
-        ((((response || {}).data || {}).data || {}).affected_items || [])[0] ||
-        {};
+      const daemons = response?.data?.data?.affected_items?.[0] || {};
 
       const isCluster =
-        ((api || {}).cluster_info || {}).status === 'enabled' &&
+        api?.cluster_info?.status === 'enabled' &&
         typeof daemons['wazuh-clusterd'] !== 'undefined';
       const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
@@ -467,7 +467,7 @@ export class WazuhApiCtrl {
         throw new Error(this.SERVER_NOT_READY_YET);
       }
     } catch (error) {
-      context.wazuh.logger.error(error.message || error);
+      context.wazuh.logger.error((error as Error).message || error);
       return Promise.reject(error);
     }
   }
@@ -488,8 +488,7 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(context, method, path, data, id, response) {
-    const devTools = !!(data || {}).devTools;
+    const devTools = !!data?.devTools;
     try {
       let api;
       try {
@@ -524,30 +523,21 @@ export class WazuhApiCtrl {
       };
 
       // Set content type application/xml if needed
-      if (
-        typeof (data || {}).body === 'string' &&
-        (data || {}).origin === 'xmleditor'
-      ) {
+      if (typeof data?.body === 'string' && data?.origin === 'xmleditor') {
         data.headers['content-type'] = 'application/xml';
         delete data.origin;
       }
 
-      if (
-        typeof (data || {}).body === 'string' &&
-        (data || {}).origin === 'json'
-      ) {
+      if (typeof data?.body === 'string' && data?.origin === 'json') {
         data.headers['content-type'] = 'application/json';
         delete data.origin;
       }
 
-      if (
-        typeof (data || {}).body === 'string' &&
-        (data || {}).origin === 'raw'
-      ) {
+      if (typeof data?.body === 'string' && data?.origin === 'raw') {
         data.headers['content-type'] = 'application/octet-stream';
         delete data.origin;
       }
-      const delay = (data || {}).delay || 0;
+      const delay = data?.delay || 0;
       if (delay) {
         // Remove the delay parameter that is used to add the sever API request to the queue job.
         // This assumes the delay parameter is not used as part of the server API request. If it
@@ -567,7 +557,7 @@ export class WazuhApiCtrl {
             } catch (error) {
               contextJob.wazuh.logger.error(
                 `An error ocurred in the delayed request: "${method} ${path}": ${
-                  error.message || error
+                  (error as Error).message || error
                 }`,
               );
             }
@@ -618,7 +608,7 @@ export class WazuhApiCtrl {
           response,
         );
       }
-      let responseBody = (responseToken || {}).data || {};
+      let responseBody = responseToken?.data || {};
       if (!responseBody) {
         responseBody =
           typeof responseBody === 'string' &&
@@ -652,21 +642,21 @@ export class WazuhApiCtrl {
         error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED
       ) {
         return ErrorResponse(
-          error.message || error,
+          (error as Error).message || error,
           error.code ? `API error: ${error.code}` : 3013,
           HTTP_STATUS_CODES.UNAUTHORIZED,
           response,
         );
       }
-      const errorMsg = (error.response || {}).data || error.message;
+      const errorMsg = error.response?.data || (error as Error).message;
       context.wazuh.logger.error(errorMsg || error);
       if (devTools) {
         return response.ok({
           body: { error: '3013', message: errorMsg || error },
         });
       } else {
-        if ((error || {}).code && ApiErrorEquivalence[error.code]) {
-          error.message = ApiErrorEquivalence[error.code];
+        if (error?.code && ApiErrorEquivalence[error.code]) {
+          (error as Error).message = ApiErrorEquivalence[error.code];
         }
         return ErrorResponse(
           errorMsg.detail || error,
@@ -761,7 +751,7 @@ export class WazuhApiCtrl {
         throw new Error('Field path is required');
       if (!request.body.id) throw new Error('Field id is required');
 
-      const filters = Array.isArray(((request || {}).body || {}).filters)
+      const filters = Array.isArray(request?.body?.filters)
         ? request.body.filters
         : [];
 
@@ -799,8 +789,7 @@ export class WazuhApiCtrl {
         request.body.filters.length &&
         request.body.filters.find(filter => filter._isCDBList);
 
-      const totalItems = (((output || {}).data || {}).data || {})
-        .total_affected_items;
+      const totalItems = output?.data?.data?.total_affected_items;
 
       if (totalItems && !isList) {
         params.offset = 0;
@@ -906,9 +895,9 @@ export class WazuhApiCtrl {
         );
       }
     } catch (error) {
-      context.wazuh.logger.error(error.message || error);
+      context.wazuh.logger.error((error as Error).message || error);
       return ErrorResponse(
-        error.message || error,
+        (error as Error).message || error,
         3034,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
@@ -952,10 +941,10 @@ export class WazuhApiCtrl {
         },
       });
     } catch (error) {
-      context.wazuh.logger.error(error.message || error);
+      context.wazuh.logger.error((error as Error).message || error);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${
-          error.message || error
+          (error as Error).message || error
         }`,
         4005,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
@@ -999,7 +988,7 @@ export class WazuhApiCtrl {
         ),
       ]);
 
-      const result = data.map(item => (item.data || {}).data || []);
+      const result = data.map(item => item.data?.data || []);
       const [hardwareResponse, osResponse] = result;
 
       // Fill syscollector object
@@ -1019,9 +1008,9 @@ export class WazuhApiCtrl {
         body: syscollector,
       });
     } catch (error) {
-      context.wazuh.logger.error(error.message || error);
+      context.wazuh.logger.error((error as Error).message || error);
       return ErrorResponse(
-        error.message || error,
+        (error as Error).message || error,
         3035,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
@@ -1059,9 +1048,9 @@ export class WazuhApiCtrl {
         body: { logos },
       });
     } catch (error) {
-      context.wazuh.logger.error(error.message || error);
+      context.wazuh.logger.error((error as Error).message || error);
       return ErrorResponse(
-        error.message || error,
+        (error as Error).message || error,
         3035,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
