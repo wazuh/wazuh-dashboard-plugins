@@ -35,6 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed agent RBAC filters from dashboard queries [#6945](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6945)
 - Removed GET /elastic/statistics API endpoint [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
+- Removed density selector in wz discover and applying compact density styles to the table [#7074](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7074)
 
 ## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 01
 
