@@ -59,7 +59,7 @@ export class WazuhApiCtrl {
         request.headers.cookie &&
         username ===
           decodeURIComponent(
-            getCookieValueByName(request.headers.cookie, 'wz-user'),
+            getCookieValueByName(request.headers.cookie, 'wz-user') ?? '',
           ) &&
         idHost === getCookieValueByName(request.headers.cookie, 'wz-api')
       ) {
@@ -275,7 +275,13 @@ export class WazuhApiCtrl {
    * This perfoms a validation of API params
    * @param {Object} body API params
    */
-  validateCheckApiParams(body) {
+  validateCheckApiParams(body: {
+    username?: string;
+    password?: string;
+    url?: string;
+    port?: number;
+    id?: string;
+  }) {
     if (!('username' in body)) {
       return this.MISSING_PARAM_API + ' USERNAME';
     }
@@ -292,7 +298,7 @@ export class WazuhApiCtrl {
       return this.MISSING_PARAM_API + ' PORT';
     }
 
-    if (!body.url.includes('https://') && !body.url.includes('http://')) {
+    if (!body.url?.includes('https://') && !body.url?.includes('http://')) {
       return 'protocol_error';
     }
 
@@ -332,7 +338,9 @@ export class WazuhApiCtrl {
           response,
         );
       }
-      const options = { apiHostID: request.body.id };
+      const options: { apiHostID: string; forceRefresh?: boolean } = {
+        apiHostID: request.body.id,
+      };
       if (request.body.forceRefresh) {
         options['forceRefresh'] = request.body.forceRefresh;
       }
@@ -411,7 +419,10 @@ export class WazuhApiCtrl {
     }
   }
 
-  checkResponseIsDown(context, response) {
+  checkResponseIsDown(
+    context: RequestHandlerContext,
+    response: { status: number; data?: { status: number } },
+  ) {
     if (response.status !== HTTP_STATUS_CODES.OK) {
       // Avoid "Error communicating with socket" like errors
       const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
@@ -428,11 +439,11 @@ export class WazuhApiCtrl {
 
   /**
    * Check main Wazuh daemons status
-   * @param {*} context Endpoint context
+   * @param {RequestHandlerContext} context Endpoint context
    * @param {*} api API entry stored in .wazuh
-   * @param {*} path Optional. Wazuh API target path.
+   * @param {string} path Optional. Wazuh API target path.
    */
-  async checkDaemons(context, api, path) {
+  async checkDaemons(context: RequestHandlerContext, api, path: string) {
     try {
       const response = await context.wazuh.api.client.asInternalUser.request(
         'GET',
@@ -472,7 +483,7 @@ export class WazuhApiCtrl {
     }
   }
 
-  sleep(timeMs) {
+  sleep(timeMs: number) {
     // eslint-disable-next-line
     return new Promise((resolve, reject) => {
       setTimeout(resolve, timeMs);
@@ -488,6 +499,20 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} API response or ErrorResponse
    */
+  async makeRequest(
+    context: RequestHandlerContext,
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    path: string,
+    data: {
+      devTools?: boolean;
+      delay?: number;
+      headers?: Record<string, string>;
+      origin?: string;
+      body?: any;
+    },
+    id: string,
+    response: object,
+  ) {
     const devTools = !!data?.devTools;
     try {
       let api;
