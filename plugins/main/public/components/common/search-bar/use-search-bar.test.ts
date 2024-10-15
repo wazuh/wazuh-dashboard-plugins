@@ -30,6 +30,7 @@ jest.mock('../../../kibana-services', () => {
     })),
   };
 });
+
 /* using osd mock utils */
 const mockDataPlugin = dataPluginMock.createStartContract();
 const mockedGetDataPlugin = getDataPlugin as jest.Mock<Start>;
@@ -54,12 +55,16 @@ mockedGetDataPlugin.mockImplementation(
                 value: 0,
                 pause: false,
               })),
+              getAutoRefreshFetch$: jest.fn().mockImplementation(() => ({
+                subscribe: jest.fn().mockImplementation(() => ({ unsubscribe:  jest.fn() })),
+              })),
             },
           },
         },
       },
     } as Start),
 );
+
 ///////////////////////////////////////////////////////////
 
 const mockedDefaultIndexPatternData: Partial<IndexPattern> = {
