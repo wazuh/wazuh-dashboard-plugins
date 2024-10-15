@@ -35,6 +35,12 @@ import {
 } from '../../package.json';
 
 export class WazuhApiCtrl {
+  private readonly SERVER_API_PENDING_INITIALIZATION =
+    'Server API is online but the server is not ready yet';
+  private readonly SERVER_NOT_READY_YET = 'Server not ready yet';
+
+  private readonly MISSING_PARAM_API = 'Missing param: API';
+
   constructor() {}
 
   async getToken(
@@ -169,7 +175,7 @@ export class WazuhApiCtrl {
         if (this.checkResponseIsDown(context, responseManagerInfo)) {
           return ErrorResponse(
             `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
-              responseManagerInfo.data.detail || 'Server not ready yet'
+              responseManagerInfo.data.detail || this.SERVER_NOT_READY_YET
             }`,
             3099,
             HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -228,8 +234,8 @@ export class WazuhApiCtrl {
 
               if (this.checkResponseIsDown(context, responseManagerInfo)) {
                 return ErrorResponse(
-                  `ERROR3099 - ${
-                    response.data.detail || 'Server not ready yet'
+                  `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
+                    response.data.detail || this.SERVER_NOT_READY_YET
                   }`,
                   3099,
                   HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -269,19 +275,19 @@ export class WazuhApiCtrl {
    */
   validateCheckApiParams(body) {
     if (!('username' in body)) {
-      return 'Missing param: API USERNAME';
+      return this.MISSING_PARAM_API + ' USERNAME';
     }
 
     if (!('password' in body) && !('id' in body)) {
-      return 'Missing param: API PASSWORD';
+      return this.MISSING_PARAM_API + ' PASSWORD';
     }
 
     if (!('url' in body)) {
-      return 'Missing param: API URL';
+      return this.MISSING_PARAM_API + ' URL';
     }
 
     if (!('port' in body)) {
-      return 'Missing param: API PORT';
+      return this.MISSING_PARAM_API + ' PORT';
     }
 
     if (!body.url.includes('https://') && !body.url.includes('http://')) {
@@ -339,8 +345,8 @@ export class WazuhApiCtrl {
           );
       } catch (error) {
         return ErrorResponse(
-          `ERROR3099 - ${
-            error.response?.data?.detail || 'Server not ready yet'
+          `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
+            error.response?.data?.detail || this.SERVER_NOT_READY_YET
           }`,
           3099,
           error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -411,9 +417,7 @@ export class WazuhApiCtrl {
       const isDown = socketErrorCodes.includes(status);
 
       isDown &&
-        context.wazuh.logger.error(
-          'Server API is online but the server is not ready yet',
-        );
+        context.wazuh.logger.error(this.SERVER_API_PENDING_INITIALIZATION);
 
       return isDown;
     }
@@ -460,7 +464,7 @@ export class WazuhApiCtrl {
       }
 
       if (!isValid) {
-        throw new Error('Server not ready yet');
+        throw new Error(this.SERVER_NOT_READY_YET);
       }
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
@@ -581,11 +585,11 @@ export class WazuhApiCtrl {
         } catch (error) {
           const isDown = error?.code === ERROR_CODES.ECONNREFUSED;
           if (!isDown) {
-            context.wazuh.logger.error(
-              'Server API is online but the server is not ready yet',
-            );
+            context.wazuh.logger.error(this.SERVER_API_PENDING_INITIALIZATION);
             return ErrorResponse(
-              `ERROR3099 - ${error.message || 'Server not ready yet'}`,
+              `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
+                (error as Error).message || this.SERVER_NOT_READY_YET
+              }`,
               3099,
               HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
               response,
@@ -606,7 +610,9 @@ export class WazuhApiCtrl {
       const responseIsDown = this.checkResponseIsDown(context, responseToken);
       if (responseIsDown) {
         return ErrorResponse(
-          `ERROR3099 - ${response.body.message || 'Server not ready yet'}`,
+          `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
+            response.body.message || this.SERVER_NOT_READY_YET
+          }`,
           3099,
           HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response,
