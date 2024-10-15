@@ -30,15 +30,30 @@ export function useTimeFilter() {
   const [timeFilter, setTimeFilter] = useState(
     globalStateFromUrl?.time ?? timefilter.getTime(),
   );
+  const [refreshInterval, setRefreshInterval] = useState(
+    globalStateFromUrl?.refreshInterval ?? timefilter.getRefreshInterval(),
+  );
   const [timeHistory, setTimeHistory] = useState(timefilter._history);
   useEffect(() => {
     const subscription = timefilter.getTimeUpdate$().subscribe(() => {
       setTimeFilter(timefilter.getTime());
       setTimeHistory(timefilter._history);
     });
+    const subscriptionRefreshInterval = timefilter
+      .getRefreshIntervalUpdate$()
+      .subscribe(() => {
+        setRefreshInterval(timefilter.getRefreshInterval());
+      });
     return () => {
       subscription.unsubscribe();
+      subscriptionRefreshInterval.unsubscribe();
     };
   }, []);
-  return { timeFilter, setTimeFilter: timefilter.setTime, timeHistory };
+  return {
+    timeFilter,
+    setTimeFilter: timefilter.setTime,
+    refreshInterval,
+    setRefreshInterval: timefilter.setRefreshInterval,
+    timeHistory,
+  };
 }

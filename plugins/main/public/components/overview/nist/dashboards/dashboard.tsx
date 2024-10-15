@@ -47,13 +47,13 @@ const DashboardNIST80053Component: React.FC = () => {
   });
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
   });
 
-  const { query, absoluteDateRange } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -61,7 +61,7 @@ const DashboardNIST80053Component: React.FC = () => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange,
+    time: { from: dateRangeFrom, to: dateRangeTo },
   });
 
   useEffect(() => {
@@ -70,7 +70,7 @@ const DashboardNIST80053Component: React.FC = () => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange,
+      dateRange: { from: dateRangeFrom, to: dateRangeTo },
     })
       .then(results => {
         setResults(results);
@@ -85,7 +85,10 @@ const DashboardNIST80053Component: React.FC = () => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
+    fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   return (
@@ -124,7 +127,7 @@ const DashboardNIST80053Component: React.FC = () => {
                     filters: fetchFilters ?? [],
                     useMargins: true,
                     id: 'nist-dashboard-tab',
-                    timeRange: absoluteDateRange,
+                    timeRange: { from: dateRangeFrom, to: dateRangeTo },
                     title: 'NIST 800-53 dashboard',
                     description: 'Dashboard of the NIST 800-53',
                     query: searchBarProps.query,
@@ -133,6 +136,7 @@ const DashboardNIST80053Component: React.FC = () => {
                       value: 15,
                     },
                     hidePanelTitles: false,
+                    lastReloadRequestTime: fingerprint,
                   }}
                 />
               </div>
