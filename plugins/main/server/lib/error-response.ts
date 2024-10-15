@@ -20,13 +20,18 @@
  */
 /**
  * Returns a suitable error message
- * @param {String} message Error message
- * @param {Number} code Error code
- * @param {Number} statusCode Error status code
+ * @param {string} message Error message
+ * @param {number} code Error code
+ * @param {number} statusCode Error status code
  * @returns {Object} Error response object
  */
-export function ErrorResponse(message = null, code = null, statusCode = null, response) {
-  message.includes('password: ')
+export function ErrorResponse(
+  message: string | null = '',
+  code: number | null = null,
+  statusCode: number | null = null,
+  response: object,
+) {
+  message?.includes('password: ')
     ? (message = message.split('password: ')[0] + ' password: ***')
     : false;
   let filteredMessage = '';
@@ -36,23 +41,30 @@ export function ErrorResponse(message = null, code = null, statusCode = null, re
       filteredMessage = 'Wrong protocol being used to connect to the API';
     } else if (
       isString &&
-      (message.includes('ENOTFOUND') ||
-        message.includes('EHOSTUNREACH') ||
-        message.includes('EINVAL') ||
-        message.includes('EAI_AGAIN')) &&
+      (message?.includes('ENOTFOUND') ||
+        message?.includes('EHOSTUNREACH') ||
+        message?.includes('EINVAL') ||
+        message?.includes('EAI_AGAIN')) &&
       code === 3005
     ) {
       filteredMessage = 'API is not reachable. Please check your url and port.';
-    } else if (isString && message.includes('ECONNREFUSED') && code === 3005) {
+    } else if (isString && message?.includes('ECONNREFUSED') && code === 3005) {
       filteredMessage = 'API is not reachable. Please check your url and port.';
-    } else if (isString && message.toLowerCase().includes('not found') && code === 3002) {
-      filteredMessage = 'It seems the selected API was deleted.';
     } else if (
       isString &&
-      message.includes('ENOENT') &&
-      message.toLowerCase().includes('no such file or directory') &&
-      message.toLowerCase().includes('data') &&
-      code === 5029 || code === 5030 || code === 5031 || code === 5032
+      message?.toLowerCase().includes('not found') &&
+      code === 3002
+    ) {
+      filteredMessage = 'It seems the selected API was deleted.';
+    } else if (
+      (isString &&
+        message?.includes('ENOENT') &&
+        message?.toLowerCase().includes('no such file or directory') &&
+        message?.toLowerCase().includes('data') &&
+        code === 5029) ||
+      code === 5030 ||
+      code === 5031 ||
+      code === 5032
     ) {
       filteredMessage = 'Reporting was aborted - no such file or directory';
     } else if (isString && code === 5029) {
