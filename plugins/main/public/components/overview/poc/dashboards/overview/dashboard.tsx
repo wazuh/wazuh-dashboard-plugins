@@ -9,6 +9,8 @@ import {
 } from '../../../../common/hocs/validate-states-index-pattern-and-dashboards';
 import { SavedObject } from '../../../../../react-services';
 import { EuiButton } from '@elastic/eui';
+import { reportingDefinitions } from '../../../../../react-services/reporting/reporting-definitions';
+import { vulnerabilityDetectionDashboardReport } from '../../../../../react-services/reporting/dashboards-generate-reports';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -139,11 +141,23 @@ const DashboardComponent = () => {
     }
   };
 
+  const handleRestartReportDefinition = async () => {
+    await reportingDefinitions.overrideReportDefinition(
+      vulnerabilityDetectionDashboardReport.idDashboardByReference,
+    );
+  };
+
   return (
     <>
       {idDashboard ? (
         <>
           <EuiButton onClick={handleRestart}>Restart</EuiButton>
+          <EuiButton
+            className='wz-margin-left-10'
+            onClick={handleRestartReportDefinition}
+          >
+            Restart report definition
+          </EuiButton>
           <DashboardSavedObject key={idDashboard} savedObjectId={idDashboard} />
         </>
       ) : isLoading ? (
