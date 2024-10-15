@@ -255,6 +255,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                       cellPadding: 's',
                     }}
                     toolbarVisibility={{
+                      showStyleSelector: false,
                       additionalControls: (
                         <>
                           <DiscoverDataGridAdditionalControls
