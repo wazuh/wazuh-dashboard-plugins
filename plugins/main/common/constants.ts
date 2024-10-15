@@ -527,3 +527,8 @@ export const SEARCH_BAR_DEBOUNCE_UPDATE_TIME = 400;
 
 // ID used to refer the createOsdUrlStateStorage state
 export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
+
+export enum ERROR_CODES {
+  EPROTO = 'EPROTO',
+  ECONNREFUSED = 'ECONNREFUSED',
+};

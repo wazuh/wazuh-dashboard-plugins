@@ -17,6 +17,7 @@ import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
 import {
+  ERROR_CODES,
   HTTP_STATUS_CODES,
   WAZUH_ERROR_DAEMONS_NOT_READY,
 } from '../../common/constants';
@@ -199,14 +200,14 @@ export class WazuhApiCtrl {
         );
       }
     } catch (error) {
-      if (error.code === 'EPROTO') {
+      if (error.code === ERROR_CODES.EPROTO) {
         return response.ok({
           body: {
             statusCode: HTTP_STATUS_CODES.OK,
             data: { apiIsDown: true },
           },
         });
-      } else if (error.code === 'ECONNREFUSED') {
+      } else if (error.code === ERROR_CODES.ECONNREFUSED) {
         return response.ok({
           body: {
             statusCode: HTTP_STATUS_CODES.OK,
@@ -385,7 +386,7 @@ export class WazuhApiCtrl {
           response,
         );
       }
-      if (error.code === 'EPROTO') {
+      if (error.code === ERROR_CODES.EPROTO) {
         return ErrorResponse(
           'Wrong protocol being used to connect to the API',
           3005,
@@ -578,7 +579,7 @@ export class WazuhApiCtrl {
           const check = await this.checkDaemons(context, api, path);
           return check;
         } catch (error) {
-          const isDown = (error || {}).code === 'ECONNREFUSED';
+          const isDown = error?.code === ERROR_CODES.ECONNREFUSED;
           if (!isDown) {
             context.wazuh.logger.error(
               'Server API is online but the server is not ready yet',
