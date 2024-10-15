@@ -12,13 +12,13 @@
 import cron from 'node-cron';
 import { WAZUH_QUEUE_CRON_FREQ } from '../../../common/constants';
 
-export let queue = [];
+export let queue: IQueueJob[] = [];
 
 export interface IQueueJob {
   /** Date object to start the job */
   startAt: Date;
   /** Function to execute */
-  run: () => void;
+  run: (contextJob: any) => Promise<void>;
 }
 
 /**
@@ -62,7 +62,7 @@ export function jobQueueRun(context) {
     try {
       await executePendingJobs(context);
     } catch (error) {
-      context.wazuh.logger.error(error.message || error);
+      context.wazuh.logger.error((error as Error).message || error);
     }
   });
 }
