@@ -16,7 +16,10 @@ import { Parser } from 'json2csv';
 import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
-import { HTTP_STATUS_CODES } from '../../common/constants';
+import {
+  HTTP_STATUS_CODES,
+  WAZUH_ERROR_DAEMONS_NOT_READY,
+} from '../../common/constants';
 import { addJobToQueue } from '../start/queue';
 import jwtDecode from 'jwt-decode';
 import {
@@ -164,7 +167,7 @@ export class WazuhApiCtrl {
         // Look for socket-related errors
         if (this.checkResponseIsDown(context, responseManagerInfo)) {
           return ErrorResponse(
-            `ERROR3099 - ${
+            `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
               responseManagerInfo.data.detail || 'Server not ready yet'
             }`,
             3099,

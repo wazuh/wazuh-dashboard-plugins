@@ -14,7 +14,7 @@ import { WzRequest } from '../../../../../../react-services/wz-request';
 import { replaceIllegalXML } from './xml';
 import { getToasts } from '../../../../../../kibana-services';
 import { delayAsPromise } from '../../../../../../../common/utils';
-import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
+import { AGENT_SYNCED_STATUS, WAZUH_ERROR_DAEMONS_NOT_READY } from '../../../../../../../common/constants';
 
 /**
  * Get configuration for an agent/manager of request sections
@@ -144,7 +144,7 @@ export const handleError = async (
   const message = extractMessage(error);
   const messageIsString = typeof message === 'string';
   try {
-    if (messageIsString && message.includes('ERROR3099')) {
+    if (messageIsString && message.includes(WAZUH_ERROR_DAEMONS_NOT_READY)) {
       updateWazuhNotReadyYet('Server not ready yet.');
       await makePing(updateWazuhNotReadyYet, isCluster);
       return;

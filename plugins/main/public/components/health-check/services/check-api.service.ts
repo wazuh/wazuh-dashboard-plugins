@@ -18,6 +18,7 @@ import { CheckLogger } from '../types/check_logger';
 import {
   PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
   PLUGIN_APP_NAME,
+  WAZUH_ERROR_DAEMONS_NOT_READY,
 } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
@@ -52,7 +53,11 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
       }
       if (errors.length) {
         for (var j = 0; j < errors.length; j++) {
-          if (errors[j].includes('ERROR3099 - 405: Method Not Allowed')) {
+          if (
+            errors[j].includes(
+              `${WAZUH_ERROR_DAEMONS_NOT_READY} - 405: Method Not Allowed`,
+            )
+          ) {
             return Promise.reject(
               `No API available to connect. This may be related to a version mismatch between server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${webDocumentationLink(
                 PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
