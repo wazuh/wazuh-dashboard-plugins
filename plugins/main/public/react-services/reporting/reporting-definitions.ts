@@ -75,34 +75,26 @@ export class reportingDefinitions {
   /**
    * Validate if the report exists
    * If the report does not exist, it is created */
-  static async validateIfReportDefinitionExist() {
+  static async validateIfReportDefinitionExist(dashboardId: string) {
     try {
-      const reportsDefinitionsRes = await this.getReportDefinitions();
-      const reportsDefinitionsList = reportsDefinitionsRes?.data?.data;
-      const dashboardsByReferenceRes = await SavedObject.getAllDashboards();
-      const dashboardsByReferenceList =
-        dashboardsByReferenceRes?.data?.saved_objects;
-      DASHBOARDS_GENERATE_REPORTS.forEach(async dashboard => {
-        const reportDefinitionNoExist = reportsDefinitionsList?.every(
-          report =>
-            report?._source?.report_definition?.report_params?.report_name !==
-            dashboard.titleReport,
-        );
-        if (!reportDefinitionNoExist) {
-          return;
-        }
+      const {
+        data: { data: reportsDefinitionsList },
+      } = await this.getReportDefinitions();
 
-        const dashboardByRenferenceNoExist = dashboardsByReferenceList.every(
-          dashboardByReference =>
-            dashboardByReference.id !== dashboard.idDashboardByReference,
-        );
+      const reportDefinitionNoExist = reportsDefinitionsList?.every(
+        report =>
+          report?.report_definition?.report_params?.report_name !== dashboardId,
+      );
 
-        if (dashboardByRenferenceNoExist) {
-          return;
-        }
+      if (!reportDefinitionNoExist) {
+        return;
+      }
 
-        await this.createReportDefinition(dashboard);
-      });
+      const dashboard = DASHBOARDS_GENERATE_REPORTS.filter(
+        ({ idDashboardByReference }) => idDashboardByReference === dashboardId,
+      )[0];
+
+      await this.createReportDefinition(dashboard);
     } catch (error) {
       throw error?.data?.message || false
         ? new Error(error.data.message)

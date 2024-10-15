@@ -215,10 +215,6 @@ export class WazuhPlugin
     setWazuhCorePlugin(plugins.wazuhCore);
     setWazuhEnginePlugin(plugins.wazuhEngine);
     setWazuhFleetPlugin(plugins.wazuhFleet);
-
-    // Create the reporting definitions
-    reportingDefinitions.validateIfReportDefinitionExist();
-
     return {};
   }
 }
