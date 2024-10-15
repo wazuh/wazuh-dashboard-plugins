@@ -56,7 +56,9 @@ mockedGetDataPlugin.mockImplementation(
                 pause: false,
               })),
               getAutoRefreshFetch$: jest.fn().mockImplementation(() => ({
-                subscribe: jest.fn().mockImplementation(() => ({ unsubscribe:  jest.fn() })),
+                subscribe: jest
+                  .fn()
+                  .mockImplementation(() => ({ unsubscribe: jest.fn() })),
               })),
             },
           },
