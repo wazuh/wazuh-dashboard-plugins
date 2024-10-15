@@ -337,8 +337,9 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                   >
                     <EuiFlexItem grow={false}>
                       <EuiText size='s'>
-                        {formatUIDate(absoluteDateRange?.from)} -{' '}
-                        {formatUIDate(absoluteDateRange?.to)}
+                        {`${formatUIDate(
+                          absoluteDateRange?.from,
+                        )} - ${formatUIDate(absoluteDateRange?.to)}`}
                       </EuiText>
                     </EuiFlexItem>
                   </EuiFlexGroup>
