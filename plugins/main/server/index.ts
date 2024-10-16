@@ -1,4 +1,4 @@
-import { PluginInitializerContext } from 'opensearch_dashboards/server';
+import { PluginInitializerContext } from '../../../src/core/server';
 
 import { WazuhPlugin } from './plugin';
 
