@@ -785,7 +785,7 @@ export class WazuhApiCtrl {
 
       context.wazuh.logger.debug(`Report ${tmpPath}`);
       // Real limit, regardless the user query
-      const params = { limit: 500 };
+      const params: Record<string, number> = { limit: 500 };
 
       if (filters.length) {
         for (const filter of filters) {
