@@ -15,7 +15,7 @@ import { ErrorResponse } from '../lib/error-response';
 import { Parser } from 'json2csv';
 import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
-import apiRequestList from '../../common/api-info/endpoints';
+import apiRequestList from '../../common/api-info/endpoints.json';
 import {
   ERROR_CODES,
   HTTP_STATUS_CODES,
@@ -27,12 +27,13 @@ import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
   OpenSearchDashboardsResponseFactory,
-} from 'src/core/server';
+} from '../../../../src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
 import {
   version as pluginVersion,
   revision as pluginRevision,
 } from '../../package.json';
+import { WzToken } from './types';
 
 export class WazuhApiCtrl {
   private readonly SERVER_API_PENDING_INITIALIZATION =
@@ -45,7 +46,11 @@ export class WazuhApiCtrl {
 
   async getToken(
     context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
+    request: OpenSearchDashboardsRequest<
+      unknown,
+      unknown,
+      { force: boolean; idHost: string }
+    >,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
@@ -59,18 +64,20 @@ export class WazuhApiCtrl {
         request.headers.cookie &&
         username ===
           decodeURIComponent(
-            getCookieValueByName(request.headers.cookie, 'wz-user') ?? '',
+            getCookieValueByName(request.headers.cookie as string, 'wz-user') ??
+              '',
           ) &&
-        idHost === getCookieValueByName(request.headers.cookie, 'wz-api')
+        idHost ===
+          getCookieValueByName(request.headers.cookie as string, 'wz-api')
       ) {
         const wzToken = getCookieValueByName(
-          request.headers.cookie,
+          request.headers.cookie as string,
           'wz-token',
         );
         if (wzToken) {
           try {
             // if the current token is not a valid jwt token we ask for a new one
-            const decodedToken = jwtDecode(wzToken);
+            const decodedToken = jwtDecode<WzToken>(wzToken);
             const expirationTime = decodedToken.exp - Date.now() / 1000;
             if (wzToken && expirationTime > 0) {
               return response.ok({
