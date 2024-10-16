@@ -16,7 +16,8 @@ export function WazuhApiRoutes(router: IRouter) {
         }),
       },
     },
-    ctrl.checkStoredAPI,
+    async (context, request, response) =>
+      ctrl.checkStoredAPI(context, request, response),
   );
 
   // Check if credentials on POST connect to Wazuh API. Not storing them!
@@ -43,7 +44,8 @@ export function WazuhApiRoutes(router: IRouter) {
         }),
       },
     },
-    ctrl.checkAPI,
+    async (context, request, response) =>
+      ctrl.checkAPI(context, request, response),
   );
 
   router.post(
@@ -56,7 +58,8 @@ export function WazuhApiRoutes(router: IRouter) {
         }),
       },
     },
-    ctrl.getToken,
+    async (context, request, response) =>
+      ctrl.getToken(context, request, response),
   );
 
   // Returns the request result (With error control)
@@ -72,7 +75,8 @@ export function WazuhApiRoutes(router: IRouter) {
         }),
       },
     },
-    ctrl.requestApi,
+    async (context, request, response) =>
+      ctrl.requestApi(context, request, response),
   );
 
   // Returns data from the Wazuh API on CSV readable format
@@ -87,7 +91,7 @@ export function WazuhApiRoutes(router: IRouter) {
         }),
       },
     },
-    ctrl.csv,
+    async (context, request, response) => ctrl.csv(context, request, response),
   );
 
   // Returns a route list used by the Dev Tools
@@ -96,7 +100,8 @@ export function WazuhApiRoutes(router: IRouter) {
       path: '/api/routes',
       validate: false,
     },
-    ctrl.getRequestList,
+    async (context, request, response) =>
+      ctrl.getRequestList(context, request, response),
   );
 
   // Return Wazuh Appsetup info
@@ -105,7 +110,8 @@ export function WazuhApiRoutes(router: IRouter) {
       path: '/api/setup',
       validate: false,
     },
-    ctrl.getSetupInfo,
+    async (context, request, response) =>
+      ctrl.getSetupInfo(context, request, response),
   );
 
   // Return basic information of syscollector for given agent
@@ -118,7 +124,8 @@ export function WazuhApiRoutes(router: IRouter) {
         }),
       },
     },
-    ctrl.getSyscollector,
+    async (context, request, response) =>
+      ctrl.getSyscollector(context, request, response),
   );
 
   // Return app logos configuration
@@ -128,6 +135,7 @@ export function WazuhApiRoutes(router: IRouter) {
       validate: false,
       options: { authRequired: false },
     },
-    ctrl.getAppLogos,
+    async (context, request, response) =>
+      ctrl.getAppLogos(context, request, response),
   );
 }
