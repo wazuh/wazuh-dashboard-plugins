@@ -142,7 +142,7 @@ export class WazuhApiCtrl {
    */
   async checkStoredAPI(
     context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
+    request: OpenSearchDashboardsRequest<unknown, unknown, any>,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
@@ -314,7 +314,7 @@ export class WazuhApiCtrl {
    */
   async checkAPI(
     context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
+    request: OpenSearchDashboardsRequest<unknown, unknown, any>,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
@@ -506,7 +506,7 @@ export class WazuhApiCtrl {
       body?: any;
     },
     id: string,
-    response: object,
+    response: OpenSearchDashboardsResponseFactory,
   ) {
     const devTools = !!data?.devTools;
     try {
