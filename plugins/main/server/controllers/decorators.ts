@@ -1,8 +1,23 @@
+import {
+  OpenSearchDashboardsRequest,
+  OpenSearchDashboardsResponseFactory,
+  RequestHandlerContext,
+} from 'opensearch-dashboards/server';
 import { ErrorResponse } from '../lib/error-response';
 
 export function routeDecoratorProtectedAdministrator(errorCode: number) {
-  return handler => {
-    return async (context, request, response) => {
+  return (
+    handler: (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => Promise<unknown>,
+  ) => {
+    return async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
       try {
         const { administrator, administrator_requirements } =
           await context.wazuh_core.dashboardSecurity.isAdministratorUser(
@@ -20,9 +35,19 @@ export function routeDecoratorProtectedAdministrator(errorCode: number) {
   };
 }
 
-export function routeDecoratorConfigurationAPIEditable(errorCode) {
-  return handler => {
-    return async (context, request, response) => {
+export function routeDecoratorConfigurationAPIEditable(errorCode: number) {
+  return (
+    handler: (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => Promise<unknown>,
+  ) => {
+    return async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
       try {
         const canEditConfiguration = await context.wazuh_core.configuration.get(
           'configuration.ui_api_editable',
