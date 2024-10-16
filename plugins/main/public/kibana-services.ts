@@ -15,6 +15,7 @@ import { VisualizationsStart } from '../../../src/plugins/visualizations/public'
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AppPluginStartDependencies } from './types';
 import { WazuhCheckUpdatesPluginStart } from '../../wazuh-check-updates/public';
+import { WazuhCorePluginStart } from 'plugins/wazuh-core/public';
 
 let angularModule: any = null;
 let discoverModule: any = null;
@@ -46,7 +47,7 @@ export const [getWzCurrentAppID, setWzCurrentAppID] =
 export const [getWazuhCheckUpdatesPlugin, setWazuhCheckUpdatesPlugin] =
   createGetterSetter<WazuhCheckUpdatesPluginStart>('WazuhCheckUpdatesPlugin');
 export const [getWazuhCorePlugin, setWazuhCorePlugin] =
-  createGetterSetter<WazuhCheckUpdatesPluginStart>('WazuhCorePlugin');
+  createGetterSetter<WazuhCorePluginStart>('WazuhCorePlugin');
 export const [getHeaderActionMenuMounter, setHeaderActionMenuMounter] =
   createGetterSetter<AppMountParameters['setHeaderActionMenu']>(
     'headerActionMenuMounter',
