@@ -319,42 +319,57 @@ export class WazuhApiCtrl {
   ) {
     try {
       context.wazuh.logger.debug(`${request.body.id} is valid`);
-      // Check if a Wazuh API id is given (already stored API)
-      const data = await context.wazuh_core.manageHosts.get(request.body.id, {
-        excludePassword: true,
-      });
-      if (!data) {
-        const errorMessage = `The server API host entry with ID ${request.body.id} was not found`;
-        context.wazuh.logger.debug(errorMessage);
-        return ErrorResponse(
-          errorMessage,
-          3029,
-          HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-          response,
-        );
-      }
       const options: { apiHostID: string; forceRefresh?: boolean } = {
         apiHostID: request.body.id,
       };
       if (request.body.forceRefresh) {
         options['forceRefresh'] = request.body.forceRefresh;
       }
-      let responseManagerInfo;
-      try {
-        responseManagerInfo =
-          await context.wazuh.api.client.asInternalUser.request(
-            'GET',
-            `/manager/info`,
-            {},
-            options,
+      const promises = [
+        context.wazuh_core.manageHosts.get(request.body.id, {
+          excludePassword: true,
+        }),
+        context.wazuh.api.client.asInternalUser.request(
+          'GET',
+          `/manager/info`,
+          {},
+          options,
+        ),
+      ];
+
+      let data;
+      const settledResults = await Promise.allSettled(promises);
+
+      if (settledResults[0].status === 'fulfilled') {
+        // Check if a Wazuh API id is given (already stored API)
+        data = settledResults[0].value;
+
+        if (!data) {
+          const errorMessage = `The server API host entry with ID ${request.body.id} was not found`;
+          context.wazuh.logger.debug(errorMessage);
+          return ErrorResponse(
+            errorMessage,
+            3029,
+            HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+            response,
           );
-      } catch (error) {
+        }
+      } else {
+        throw new Error(settledResults[0].reason);
+      }
+
+      let responseManagerInfo;
+      if (settledResults[1].status === 'fulfilled') {
+        responseManagerInfo = settledResults[1].value;
+      } else {
         return ErrorResponse(
           `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
-            error.response?.data?.detail || this.SERVER_NOT_READY_YET
+            settledResults[1].reason.response?.data?.detail ||
+            this.SERVER_NOT_READY_YET
           }`,
           3099,
-          error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
+          settledResults[1].reason?.response?.status ||
+            HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
           response,
         );
       }
