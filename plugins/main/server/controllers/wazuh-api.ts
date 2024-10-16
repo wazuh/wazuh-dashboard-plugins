@@ -318,17 +318,12 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      let apiAvailable = null;
-      // const notValid = this.validateCheckApiParams(request.body);
-      // if (notValid) return ErrorResponse(notValid, 3003, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, response);
       context.wazuh.logger.debug(`${request.body.id} is valid`);
       // Check if a Wazuh API id is given (already stored API)
       const data = await context.wazuh_core.manageHosts.get(request.body.id, {
         excludePassword: true,
       });
-      if (data) {
-        apiAvailable = data;
-      } else {
+      if (!data) {
         const errorMessage = `The server API host entry with ID ${request.body.id} was not found`;
         context.wazuh.logger.debug(errorMessage);
         return ErrorResponse(
