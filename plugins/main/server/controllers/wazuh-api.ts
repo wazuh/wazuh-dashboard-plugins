@@ -362,14 +362,13 @@ export class WazuhApiCtrl {
       if (settledResults[1].status === 'fulfilled') {
         responseManagerInfo = settledResults[1].value;
       } else {
+        const error = settledResults[1].reason;
         return ErrorResponse(
           `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
-            settledResults[1].reason.response?.data?.detail ||
-            this.SERVER_NOT_READY_YET
+            error.response?.data?.detail || this.SERVER_NOT_READY_YET
           }`,
           3099,
-          settledResults[1].reason?.response?.status ||
-            HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
+          error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
           response,
         );
       }
