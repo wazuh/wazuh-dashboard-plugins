@@ -6,7 +6,7 @@ export const gdprColumns: tDataGridColumn[] = [
   commonColumns['agent.name'],
   {
     id: 'rule.gdpr',
-    initialWidth: 137.525,
+    initialWidth: 138,
   },
   commonColumns['rule.description'],
   commonColumns['rule.level'],

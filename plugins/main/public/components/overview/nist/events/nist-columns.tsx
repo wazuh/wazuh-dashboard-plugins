@@ -6,7 +6,7 @@ export const nistColumns: tDataGridColumn[] = [
   commonColumns['agent.name'],
   {
     id: 'rule.nist_800_53',
-    initialWidth: 170.525,
+    initialWidth: 171,
   },
   commonColumns['rule.description'],
   commonColumns['rule.level'],

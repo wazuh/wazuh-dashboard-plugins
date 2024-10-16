@@ -6,11 +6,11 @@ export const fileIntegrityMonitoringColumns: tDataGridColumn[] = [
   commonColumns['agent.name'],
   {
     id: 'syscheck.path',
-    initialWidth: 392.017,
+    initialWidth: 392,
   },
   {
     id: 'syscheck.event',
-    initialWidth: 140.017,
+    initialWidth: 140,
   },
   commonColumns['rule.description'],
   commonColumns['rule.level'],

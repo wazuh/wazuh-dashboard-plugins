@@ -9,18 +9,18 @@ export const googleCloudColumns: tDataGridColumn[] = [
   },
   {
     id: 'data.gcp.resource.labels.location',
-    initialWidth: 260.23,
+    initialWidth: 261,
   },
   {
     id: 'data.gcp.resource.labels.project_id',
-    initialWidth: 280.23,
+    initialWidth: 281,
   },
   {
     id: 'data.gcp.resource.type',
-    initialWidth: 191.23,
+    initialWidth: 192,
   },
   {
     id: 'data.gcp.severity',
-    initialWidth: 151.23,
+    initialWidth: 152,
   },
 ];

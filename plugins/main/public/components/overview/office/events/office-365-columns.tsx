@@ -5,18 +5,18 @@ export const office365Columns: tDataGridColumn[] = [
   commonColumns.timestamp,
   {
     id: 'data.office365.Subscription',
-    initialWidth: 224.775,
+    initialWidth: 225,
   },
   {
     id: 'data.office365.Operation',
   },
   {
     id: 'data.office365.UserId',
-    initialWidth: 225.775,
+    initialWidth: 226,
   },
   {
     id: 'data.office365.ClientIP',
-    initialWidth: 190.775,
+    initialWidth: 191,
   },
   commonColumns['rule.level'],
   commonColumns['rule.id'],

@@ -5,7 +5,7 @@ export const amazonWebServicesColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   {
     id: 'data.aws.source',
-    initialWidth: 143.55,
+    initialWidth: 144,
   },
   commonColumns['rule.description'],
   commonColumns['rule.level'],

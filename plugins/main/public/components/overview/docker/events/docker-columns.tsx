@@ -6,15 +6,15 @@ export const dockerColumns: tDataGridColumn[] = [
   commonColumns['agent.name'],
   {
     id: 'data.docker.from',
-    initialWidth: 150.525,
+    initialWidth: 151,
   },
   {
     id: 'data.docker.Type',
-    initialWidth: 148.525,
+    initialWidth: 149,
   },
   {
     id: 'data.docker.Action',
-    initialWidth: 160.525,
+    initialWidth: 161,
   },
   commonColumns['rule.description'],
   commonColumns['rule.level'],

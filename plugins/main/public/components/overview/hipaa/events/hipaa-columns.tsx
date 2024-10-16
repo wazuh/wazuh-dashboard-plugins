@@ -6,7 +6,7 @@ export const hipaaColumns: tDataGridColumn[] = [
   commonColumns['agent.name'],
   {
     id: 'rule.hipaa',
-    initialWidth: 182.525,
+    initialWidth: 183,
   },
   commonColumns['rule.description'],
   commonColumns['rule.level'],

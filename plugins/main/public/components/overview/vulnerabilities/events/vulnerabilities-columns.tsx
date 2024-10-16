@@ -6,21 +6,21 @@ export const vulnerabilitiesColumns: tDataGridColumn[] = [
   commonColumns['agent.name'],
   {
     id: 'data.vulnerability.cve',
-    initialWidth: 185.23,
+    initialWidth: 186,
   },
   {
     id: 'data.vulnerability.severity',
-    initialWidth: 216.23,
+    initialWidth: 217,
   },
   {
     id: 'data.vulnerability.package.name',
-    initialWidth: 256.23,
+    initialWidth: 257,
   },
   {
     id: 'data.vulnerability.package.version',
   },
   {
     id: 'data.vulnerability.status',
-    initialWidth: 198.23,
+    initialWidth: 199,
   },
 ];
