@@ -406,7 +406,7 @@ export class WazuhApiCtrl {
         );
       }
       return ErrorResponse(
-        (error as Error).message || error,
+        ((error as Error).message || error) as string,
         3005,
         error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
@@ -577,7 +577,7 @@ export class WazuhApiCtrl {
             } catch (error) {
               contextJob.wazuh.logger.error(
                 `An error ocurred in the delayed request: "${method} ${path}": ${
-                  (error as Error).message || error
+                  ((error as Error).message || error) as string
                 }`,
               );
             }
@@ -915,9 +915,9 @@ export class WazuhApiCtrl {
         );
       }
     } catch (error) {
-      context.wazuh.logger.error((error as Error).message || error);
+      context.wazuh.logger.error(((error as Error).message || error) as string);
       return ErrorResponse(
-        (error as Error).message || error,
+        ((error as Error).message || error) as string,
         3034,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
@@ -961,10 +961,10 @@ export class WazuhApiCtrl {
         },
       });
     } catch (error) {
-      context.wazuh.logger.error((error as Error).message || error);
+      context.wazuh.logger.error(((error as Error).message || error) as string);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${
-          (error as Error).message || error
+          ((error as Error).message || error) as string
         }`,
         4005,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
@@ -1028,9 +1028,9 @@ export class WazuhApiCtrl {
         body: syscollector,
       });
     } catch (error) {
-      context.wazuh.logger.error((error as Error).message || error);
+      context.wazuh.logger.error(((error as Error).message || error) as string);
       return ErrorResponse(
-        (error as Error).message || error,
+        ((error as Error).message || error) as string,
         3035,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
@@ -1068,9 +1068,9 @@ export class WazuhApiCtrl {
         body: { logos },
       });
     } catch (error) {
-      context.wazuh.logger.error((error as Error).message || error);
+      context.wazuh.logger.error(((error as Error).message || error) as string);
       return ErrorResponse(
-        (error as Error).message || error,
+        ((error as Error).message || error) as string,
         3035,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
