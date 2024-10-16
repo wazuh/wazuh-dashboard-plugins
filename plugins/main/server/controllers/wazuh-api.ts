@@ -882,12 +882,15 @@ export class WazuhApiCtrl {
           fields = ['key', 'value'];
           itemsArray = output.data.data.affected_items[0].items;
         }
-        fields = fields.map(item => ({ value: item, default: '-' }));
+        const fieldsMapped = fields.map(item => ({
+          value: item,
+          default: '-',
+        }));
 
-        const json2csvParser = new Parser({ fields });
+        const json2csvParser = new Parser({ fields: fieldsMapped });
 
         let csv = json2csvParser.parse(itemsArray);
-        for (const field of fields) {
+        for (const field of fieldsMapped) {
           const { value } = field;
           if (csv.includes(value)) {
             csv = csv.replace(value, KeyEquivalence[value] || value);
