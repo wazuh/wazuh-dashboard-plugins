@@ -531,4 +531,4 @@ export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
 export enum ERROR_CODES {
   EPROTO = 'EPROTO',
   ECONNREFUSED = 'ECONNREFUSED',
-};
+}
