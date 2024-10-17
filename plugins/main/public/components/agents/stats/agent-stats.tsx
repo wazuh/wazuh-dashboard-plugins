@@ -13,7 +13,6 @@ import React, { useState, useEffect } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiLoadingSpinner,
   EuiPanel,
   EuiPage,
   EuiPageBody,
@@ -47,6 +46,7 @@ import {
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
+import { AgentInfo } from '../../common/welcome/agents-info';
 
 const tableColumns = [
   {
@@ -142,7 +142,8 @@ export const MainAgentStats = compose(
   ),
 )(AgentStats);
 
-function AgentStats({ agent }) {
+function AgentStats(props) {
+  const { agent } = props;
   const [loading, setLoading] = useState();
   const [dataStatLogcollector, setDataStatLogcollector] = useState({});
   const [dataStatAgent, setDataStatAgent] = useState();
@@ -186,32 +187,14 @@ function AgentStats({ agent }) {
   return (
     <EuiPage>
       <EuiPageBody>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiPanel paddingSize='m'>
-              <EuiFlexGroup>
-                {statsAgents.map(stat => (
-                  <EuiFlexItem key={`agent-stat-${stat.field}`} grow={false}>
-                    <EuiText>
-                      {stat.title}:{' '}
-                      {loading ? (
-                        <EuiLoadingSpinner size='s' />
-                      ) : (
-                        <strong>
-                          {dataStatAgent !== undefined
-                            ? stat.render
-                              ? stat.render(dataStatAgent[stat.field])
-                              : dataStatAgent?.[stat.field]
-                            : '-'}
-                        </strong>
-                      )}
-                    </EuiText>
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGroup>
-            </EuiPanel>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        <EuiPanel grow paddingSize='s'>
+          <AgentInfo
+            agent={props.agent}
+            isCondensed={false}
+            hideActions={true}
+            {...props}
+          ></AgentInfo>
+        </EuiPanel>
         <EuiSpacer />
         <EuiFlexGroup>
           <EuiFlexItem>
