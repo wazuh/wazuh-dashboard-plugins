@@ -7,8 +7,11 @@ import {
   withVulnerabilitiesStateDataSource,
   createDashboard,
 } from '../../../../common/hocs/validate-states-index-pattern-and-dashboards';
-import { SavedObject } from '../../../../../react-services';
+import { SavedObject, ToastNotifications } from '../../../../../react-services';
 import { EuiButton } from '@elastic/eui';
+import { reportingDefinitions } from '../../../../../react-services/reporting/reporting-definitions';
+import { vulnerabilityDetectionDashboardReport } from '../../../../../react-services/reporting/dashboards-generate-reports';
+import { WzButtonPermissionsModalConfirm } from '../../../../common/buttons';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -139,11 +142,59 @@ const DashboardComponent = () => {
     }
   };
 
+  const handleRestartReportDefinition = async () => {
+    try {
+      ToastNotifications.add({
+        title: 'Restarting report definition...',
+        color: 'primary',
+      });
+      await reportingDefinitions.overrideReportDefinition(
+        vulnerabilityDetectionDashboardReport.idDashboardByReference,
+      );
+      ToastNotifications.success({
+        title: 'Report definition restarted successfully.',
+      });
+    } catch (error) {
+      ToastNotifications.error(
+        'plugins/main/public/components/overview/poc/dashboards/overview/dashboard.tsx',
+        error,
+      );
+    }
+    ToastNotifications;
+  };
+
   return (
     <>
       {idDashboard ? (
         <>
           <EuiButton onClick={handleRestart}>Restart</EuiButton>
+          <WzButtonPermissionsModalConfirm
+            permissions={[
+              {
+                action: 'cluster:admin/opendistro/reports/definition/create',
+                resource: '*:*:*',
+              },
+              {
+                action: 'cluster:admin/opendistro/reports/definition/update',
+                resource: '*:*:*',
+              },
+            ]}
+            className='wz-margin-10'
+            onConfirm={handleRestartReportDefinition}
+            modalTitle='Do you want to restart the report definition?'
+            tooltip={{
+              content:
+                'This will restart the definition of the report to the default',
+              position: 'top',
+            }}
+            modalProps={{
+              confirmButtonDisabled: false,
+              cancelButtonDisabled: false,
+              defaultFocusedButton: 'confirm',
+            }}
+          >
+            Restart report definition
+          </WzButtonPermissionsModalConfirm>
           <DashboardSavedObject key={idDashboard} savedObjectId={idDashboard} />
         </>
       ) : isLoading ? (
